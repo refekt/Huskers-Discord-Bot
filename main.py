@@ -1,19 +1,9 @@
 import discord
 from discord.ext import commands
-import requests
-import urllib.request
-import time
-from bs4 import BeautifulSoup
-import discord
-from discord.ext import commands
-from discord.ext.commands import Bot
-import asyncio
 from discord.utils import get
-import random
+import requests
 import re
-import importlib
-import sys
-import uuid
+from bs4 import BeautifulSoup
 
 prefix = "$"
 bot = commands.Bot(command_prefix=prefix)
@@ -21,7 +11,7 @@ bot = commands.Bot(command_prefix=prefix)
 # add a command for stocks to stonks
 # add iowasux command, reactions
 
-def loadFongBombs():
+"""def loadFongBombs():
     # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates from Wiltfong.
     print("Loading Fong Bomgs!")
 
@@ -39,11 +29,10 @@ def loadFongBombs():
 
         print(link)'''
 
-    print("Fong Bombs loaded!")
+    print("Fong Bombs loaded!")"""
 
 def main():
-    # loadFongBombs()
-    print('nada')
+    print("*")
 
 if __name__ == "__main__":
     main()
@@ -54,19 +43,37 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    # Change "stocks" to "stonks" because Isms
-    '''if not message.author.bot and "stock" in message.content.lower():
-        llamaString = message.content.replace('Stock', 'Stonk')
-        newString = re.compile("stock", re.IGNORECASE)
-    await message.channel.send(message.channel, newString.sub('stonk', llamaString))'''
+    """ Commands processed as messages are entered """
+
+    # Good bot, bad bot
+    if not message.author.bot and "good bot" in message.content.lower():
+        await message.channel.send("OwO thanks")
+    elif not message.author.bot and "bad bot" in message.content.lower():
+        embed = discord.Embed(title="I'm a bad, bad bot")
+        embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
+        await message.channel.send(embed=embed)
 
     await bot.process_commands(message)
 
 @bot.command(pass_context=True)
 async def iowasux(ctx):
-    #WORK IN PROGRESS
-    # I cannot figure out how to add reactions. add_reaction does not seem to populate.
-    await ctx.send("You're god damn right they do!", emoji = bot.get_emoji(":iowasux:"))
+    """ Iowa Sucks """
 
+    # Need to add reactions
+    await ctx.send("You're god damn right they do!")
+
+@bot.command(pass_context=True)
+async def stonk(ctx):
+    """ Isms hates stocks """
+    await ctx.send("Stonk!")
+
+@bot.command(pass_context=True)
+async def potatoes(ctx):
+    """ Potatoes are love; potatoes are life """
+    embed = discord.Embed(title="Po-Tay-Toes")
+    embed.set_image(url='https://i.imgur.com/Fzw6Gbh.gif')
+    await ctx.send(embed=embed)
+
+# Retrieve the Discord Bot Token
 f = open("../token.txt","r")
 bot.run(f.readline())
