@@ -1,8 +1,20 @@
+import discord
 from discord.ext import commands
 import requests
 import urllib.request
 import time
 from bs4 import BeautifulSoup
+import discord
+from discord.ext import commands
+from discord.ext.commands import Bot
+import asyncio
+from discord.utils import get
+import random
+import re
+import importlib
+import sys
+import uuid
+
 prefix = "$"
 bot = commands.Bot(command_prefix=prefix)
 
@@ -42,11 +54,18 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    # Change "stocks" to "stonks" because Isms
+    '''if not message.author.bot and "stock" in message.content.lower():
+        llamaString = message.content.replace('Stock', 'Stonk')
+        newString = re.compile("stock", re.IGNORECASE)
+    await message.channel.send(message.channel, newString.sub('stonk', llamaString))'''
+
     await bot.process_commands(message)
 
-@bot.command()
+@bot.command(pass_context=True)
 async def iowasux(ctx):
     #WORK IN PROGRESS
+    # I cannot figure out how to add reactions. add_reaction does not seem to populate.
     await ctx.send("You're god damn right they do!", emoji = bot.get_emoji(":iowasux:"))
 
 f = open("../token.txt","r")
