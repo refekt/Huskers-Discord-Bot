@@ -30,7 +30,8 @@ def loadFongBombs():
     print("Fong Bombs loaded!")
 
 def main():
-    loadFongBombs()
+    # loadFongBombs()
+    print('nada')
 
 if __name__ == "__main__":
     main()
@@ -44,16 +45,9 @@ async def on_message(message):
     await bot.process_commands(message)
 
 @bot.command()
-async def ping(ctx):
-    # Get the latency of the bot
-    latency = bot.latency  # Included in the Discord.py library
-    # Send it to the user
-    await ctx.send(latency)
-    print(latency)
-
-'''@bot.command()
-async def echo(ctx, *, content:str):
-    await ctx.send(content)'''
+async def iowasux(ctx):
+    #WORK IN PROGRESS
+    await ctx.send("You're god damn right they do!", emoji = bot.get_emoji(":iowasux:"))
 
 f = open("../token.txt","r")
 bot.run(f.readline())
