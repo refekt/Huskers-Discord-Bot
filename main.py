@@ -1,20 +1,22 @@
 import discord
 from discord.ext import commands
-from discord.utils import get
+# from discord.utils import get
 import requests
 from bs4 import BeautifulSoup
 
 prefix = "$"
 bot = commands.Bot(command_prefix=prefix)
 
+
 @bot.event
 async def on_ready():
     print("Logged in. Discord.py version is:",discord.__version__)
 
-@bot.event
+
+'''@bot.event
 async def on_reaction_add(reaction, user):
-    #await bot.send_message('{} has added {} to the message: {}'.format(user.name, reaction.emoji, reaction.message.content))
-    await reaction.message.channel.send('{} has added {} to the messge: {}'.format(user.name, reaction.emoji, reaction.message.content))
+    await reaction.message.channel.send('{} has added {} to the messge: {}'.format(user.name, reaction.emoji, reaction.message.content))'''
+
 
 @bot.event
 async def on_message(message):
@@ -32,8 +34,18 @@ async def on_message(message):
         if "isms" in message.content.lower():
             await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make shut up for fake internet points. I’m glad he’s gone.")
 
-
     await bot.process_commands(message)
+
+
+'''@bot.command(pass_context=True)
+async def clearBotChat(ctx, amount=100):
+    channel = ctx.message.channel
+    messages = []
+    async for message in bot.logs_from(channel, int(limit=amount)):
+        messages.append(message)
+    await bot.delete_messages(messages)
+    await bot.say('Messages deleted')'''
+
 
 @bot.command(pass_context=True)
 async def iowasux(ctx):
@@ -41,10 +53,12 @@ async def iowasux(ctx):
     # Need to add reactions
     await ctx.send("You're god damn right they do!")
 
+
 @bot.command(pass_context=True)
 async def stonk(ctx):
     """ Isms hates stocks """
     await ctx.send("Stonk!")
+
 
 @bot.command(pass_context=True)
 async def potatoes(ctx):
@@ -52,6 +66,7 @@ async def potatoes(ctx):
     embed = discord.Embed(title="Po-Tay-Toes")
     embed.set_image(url='https://i.imgur.com/Fzw6Gbh.gif')
     await ctx.send(embed=embed)
+
 
 @bot.command(pass_context=True)
 async def loadFong(ctx):
