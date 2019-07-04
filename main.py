@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.utils import get
 import requests
-import re
 from bs4 import BeautifulSoup
 
 prefix = "$"
@@ -13,26 +11,13 @@ bot = commands.Bot(command_prefix=prefix)
 
 """def loadFongBombs():
     # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates from Wiltfong.
-    print("Loading Fong Bomgs!")
-
-    url='https://247sports.com/User/Steve%20Wiltfong/Predictions/?PlayerInstitution.PrimaryPlayerSport.Sport=Football&PlayerInstitution.PrimaryPlayerSport.Recruitment.Year=2020'
-
-    response = requests.get(url)
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    print("\n",soup.find_all("li"),"\n")
-
-    '''for i in range(0,len(soup.find_all("li","target"))+1):
-        one_li_tag = soup.find_all("li","target")[0]
-        link = one_li_tag['class']
-
-        print(link)'''
-
-    print("Fong Bombs loaded!")"""
+    url='https://247sports.com/User/Steve%20Wiltfong/Predictions/'
+    r = requests.get(url)
+    print(r.content)"""
 
 def main():
-    print("*")
+    #loadFongBombs()
+    print("")
 
 if __name__ == "__main__":
     main()
@@ -73,6 +58,15 @@ async def potatoes(ctx):
     embed = discord.Embed(title="Po-Tay-Toes")
     embed.set_image(url='https://i.imgur.com/Fzw6Gbh.gif')
     await ctx.send(embed=embed)
+
+"""@bot.command(pass_context=True)
+async def loadFong(ctx):
+    # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates from Wiltfong.
+    # Currently receiving a 500 Internal Server Error each pull
+    url = 'https://247sports.com/User/Steve%20Wiltfong/Predictions/?PlayerInstitution.PrimaryPlayerSport.Sport=Football&PlayerInstitution.PrimaryPlayerSport.Recruitment.Year=2020'
+    page_response = requests.get(url, timeout=5)
+    page_content = BeautifulSoup(page_response.content, "html.parser")
+    print(page_content.contents)"""
 
 # Retrieve the Discord Bot Token
 f = open("../token.txt","r")
