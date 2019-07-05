@@ -10,12 +10,13 @@ bot = commands.Bot(command_prefix=prefix)
 
 @bot.event
 async def on_ready():
-    print("Logged in. Discord.py version is:",discord.__version__)
+    print("Logged in. Discord.py version is:", discord.__version__)
 
 
 '''@bot.event
 async def on_reaction_add(reaction, user):
-    await reaction.message.channel.send('{} has added {} to the messge: {}'.format(user.name, reaction.emoji, reaction.message.content))'''
+    await reaction.message.channel.send('{} has added {} to the messge: {}'.format(user.name, reaction.emoji, 
+    reaction.message.content))'''
 
 
 @bot.event
@@ -32,19 +33,20 @@ async def on_message(message):
             await message.channel.send(embed=embed)
         # Husker Bot hates Isms
         if "isms" in message.content.lower():
-            await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make shut up for fake internet points. I’m glad he’s gone.")
+            await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
+                                       "make shut up for fake internet points. I’m glad he’s gone.")
 
     await bot.process_commands(message)
 
 
-'''@bot.command(pass_context=True)
+@bot.command(pass_context=True)
 async def clearBotChat(ctx, amount=100):
     channel = ctx.message.channel
     messages = []
     async for message in bot.logs_from(channel, int(limit=amount)):
         messages.append(message)
     await bot.delete_messages(messages)
-    await bot.say('Messages deleted')'''
+    await bot.say('Messages deleted')
 
 
 @bot.command(pass_context=True)
@@ -70,10 +72,12 @@ async def potatoes(ctx):
 
 @bot.command(pass_context=True)
 async def loadFong(ctx):
-    # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates from Wiltfong.
+    # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates
+    # from Wiltfong.
     # Currently receiving a 500 Internal Server Error each pull
     url = 'https://247sports.com/User/Steve%20Wiltfong/Predictions/'
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+                             'Chrome/39.0.2171.95 Safari/537.36'}
     page_response = requests.get(url, timeout=5,headers=headers)
     page_content = BeautifulSoup(page_response.content, "html.parser")
 
