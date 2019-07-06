@@ -1,25 +1,32 @@
+#!/usr/bin/env python3.6
 import discord
 from discord.ext import commands
-# from discord.utils import get
+from discord.utils import get
 import requests
+import sys
 from bs4 import BeautifulSoup
 
-prefix = "$"
-bot = commands.Bot(command_prefix=prefix)
+client = commands.Bot(command_prefix='$')
 
 
-@bot.event
+@client.event
 async def on_ready():
-    print("Logged in. Discord.py version is:", discord.__version__)
+    print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
+    # print("The client has the following emojis:\n", client.emojis)
 
 
-'''@bot.event
+'''@client.event
 async def on_reaction_add(reaction, user):
     await reaction.message.channel.send('{} has added {} to the messge: {}'.format(user.name, reaction.emoji, 
     reaction.message.content))'''
 
 
-@bot.event
+''''@client.event
+async def on_typing(channel, user, when):
+    print("{0} is typing in {1}!".format(user, channel))'''
+
+
+@client.event
 async def on_message(message):
     """ Commands processed as messages are entered """
 
@@ -36,33 +43,33 @@ async def on_message(message):
             await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
                                        "make shut up for fake internet points. I’m glad he’s gone.")
 
-    await bot.process_commands(message)
+    await client.process_commands(message)
 
 
-@bot.command(pass_context=True)
-async def clearBotChat(ctx, amount=100):
-    channel = ctx.message.channel
-    messages = []
-    async for message in bot.logs_from(channel, int(limit=amount)):
-        messages.append(message)
-    await bot.delete_messages(messages)
-    await bot.say('Messages deleted')
+@client.command()
+async def clear(ctx):
+    msgs = []
+    async for msg in client.logs_from(ctx.message.channel):
+        if msg.author.id == ctx.author.bot:
+            msgs.append(msg)
+        await client.delete_messages(msgs)
 
 
-@bot.command(pass_context=True)
+@client.command()
 async def iowasux(ctx):
-    """ Iowa Sucks """
-    # Need to add reactions
-    await ctx.send("You're god damn right they do!")
+    await ctx.message.channel.send("You're god damn right they do, {0}!".format(ctx.message.author))
+    emoji = client.get_emoji(441038975323471874)
+    await ctx.message.add_reaction(emoji)
+    await ctx.message.channel.send(emoji)
 
 
-@bot.command(pass_context=True)
+@client.command()
 async def stonk(ctx):
     """ Isms hates stocks """
     await ctx.send("Stonk!")
 
 
-@bot.command(pass_context=True)
+@client.command()
 async def potatoes(ctx):
     """ Potatoes are love; potatoes are life """
     embed = discord.Embed(title="Po-Tay-Toes")
@@ -70,7 +77,7 @@ async def potatoes(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.command(pass_context=True)
+@client.command()
 async def loadFong(ctx):
     # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates
     # from Wiltfong.
@@ -92,4 +99,4 @@ async def loadFong(ctx):
 
 # Retrieve the Discord Bot Token
 f = open("../token.txt","r")
-bot.run(f.readline())
+client.run(f.readline())
