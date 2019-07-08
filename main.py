@@ -40,8 +40,8 @@ async def on_message(message):
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
-            emojiUpvote = client.get_emoji("\N{UPWARDS BLACK ARROW}")
-            emojiDownvote = client.get_emoji("\N{DOWNWARDS BLACK ARROW}")
+            emojiUpvote = "\N{UPWARDS BLACK ARROW}"
+            emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
             print("Upvote: {0} and Downvote: {1}".format(emojiUpvote, emojiDownvote))
             try:
                 await message.add_reaction(emojiUpvote)
