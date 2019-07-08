@@ -6,7 +6,8 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 
-client = commands.Bot(command_prefix='$')
+botPrefix = '$'
+client = commands.Bot(command_prefix=botPrefix)
 
 
 @client.event
@@ -41,7 +42,18 @@ async def on_message(message):
         # Husker Bot hates Isms
         if "isms" in message.content.lower():
             await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
-                                       "make shut up for fake internet points. I’m glad he’s gone.")
+                                       "make **shit** up for fake internet points. I’m glad he’s gone.")
+        # Add Up Votes and Down Votes
+        # Work In Progress
+        if (".addvotes") in message.content.lower():
+            emojiUpvote = client.get_emoji("\N{UPWARDS BLACK ARROW}")
+            emojiDownvote = client.get_emoji("\N{DOWNWARDS BLACK ARROW}")
+            print("Upvote: {0} and Downvote: {1}".format(emojiUpvote, emojiDownvote))
+            try:
+                await message.add_reaction(emojiUpvote)
+                await message.add_reaction(emojiDownvote)
+            except:
+                pass
 
     await client.process_commands(message)
 
@@ -78,6 +90,13 @@ async def potatoes(ctx):
 
 
 @client.command()
+async def flex(ctx):
+    embed = discord.Embed(title="Flexxx")
+    embed.set_image(url='https://i.imgur.com/A7RQqKN.mp4')
+    await ctx.send(embed=embed)
+
+
+'''@client.command()
 async def loadFong(ctx):
     # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates
     # from Wiltfong.
@@ -95,7 +114,7 @@ async def loadFong(ctx):
     #span class="prediction-date"
     #li class="correct"
 
-    print(page_content.find_all(id="main-photo"),'\n')
+    print(page_content.find_all(id="main-photo"),'\n')'''
 
 # Retrieve the Discord Bot Token
 f = open("../token.txt","r")
