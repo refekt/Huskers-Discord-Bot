@@ -46,6 +46,8 @@ async def on_message(message):
         # Add Up Votes and Down Votes
         # Work In Progress
         if (".addvotes") in message.content.lower():
+            # Upvote = u"\u2B07" or "\N{UPWARDS BLACK ARROW}"
+            # Downvote = u"\u2B08" or "\N{DOWNWARDS BLACK ARROW}"
             emojiUpvote = client.get_emoji("\N{UPWARDS BLACK ARROW}")
             emojiDownvote = client.get_emoji("\N{DOWNWARDS BLACK ARROW}")
             print("Upvote: {0} and Downvote: {1}".format(emojiUpvote, emojiDownvote))
