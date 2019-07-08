@@ -106,28 +106,7 @@ async def bigsexy(ctx):
     await ctx.send(embed=embed)
 
 
-'''@client.command()
-async def loadFong(ctx):
-    # The intent for this function is to web scrape data from 247Sports and eventually display Crystal Ball updates
-    # from Wiltfong.
-    # Currently receiving a 500 Internal Server Error each pull
-    url = 'https://247sports.com/User/Steve%20Wiltfong/Predictions/'
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
-                             'Chrome/39.0.2171.95 Safari/537.36'}
-    page_response = requests.get(url, timeout=5,headers=headers)
-    page_content = BeautifulSoup(page_response.content, "html.parser")
-
-    #li class="name"
-    #span regex => xxx / #-# / ###
-    #b regex => #.####
-    #li class="prediction"
-    #span class="prediction-date"
-    #li class="correct"
-
-    print(page_content.find_all(id="main-photo"),'\n')'''
-
 # Retrieve the Discord Bot Token
-
 f = open("config.txt", "r")
 client.run(f.readline())
 f.close()
