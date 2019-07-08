@@ -91,10 +91,16 @@ async def potatoes(ctx):
 
 @client.command()
 async def flex(ctx):
-    embed = discord.Embed(title="Flexxx")
-    embed.set_image(url='https://i.imgur.com/A7RQqKN.mp4')
+    embed = discord.Embed(title="FLEXXX 😩")
+    embed.set_image(url='https://i.imgur.com/92b9uFU.gif')
     await ctx.send(embed=embed)
 
+
+@client.command()
+async def shrug(ctx):
+    embed = discord.Embed(title="🤷‍♂️")
+    embed.set_image(url='https://media.giphy.com/media/SFe8UbVS4b6Jq/giphy.gif')
+    await ctx.send(embed=embed)
 
 '''@client.command()
 async def loadFong(ctx):
