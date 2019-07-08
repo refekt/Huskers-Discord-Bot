@@ -77,17 +77,34 @@ async def potatoes(ctx):
 
 @client.command()
 async def flex(ctx):
-    """ Who knows 😉 """
+    """ S T R O N K """
     embed = discord.Embed(title="FLEXXX 😩")
     embed.set_image(url='https://i.imgur.com/92b9uFU.gif')
     await ctx.send(embed=embed)
 
-
 @client.command()
 async def shrug(ctx):
-    embed = discord.Embed(title="🤷‍♂️")
-    embed.set_image(url='https://media.giphy.com/media/SFe8UbVS4b6Jq/giphy.gif')
+    """ Who knows 😉 """
+    embed = discord.Embed(title="🤷‍♀️")
+    embed.set_image(url='https://i.imgur.com/Yt63gGE.gif')
     await ctx.send(embed=embed)
+
+
+@client.command()
+async def ohno(ctx):
+    """ This is not ideal """
+    embed = discord.Embed(title="Big oof")
+    embed.set_image(url='https://i.imgur.com/f4P6jBO.png')
+    await ctx.send(embed=embed)
+
+
+@client.command()
+async def bigsexy(ctx):
+    """ Give it to me Kool Aid man """
+    embed = discord.Embed(title="OOOHHH YEAAHHH 😩")
+    embed.set_image(url='https://i.imgur.com/UpKIx5I.png')
+    await ctx.send(embed=embed)
+
 
 '''@client.command()
 async def loadFong(ctx):
@@ -110,5 +127,7 @@ async def loadFong(ctx):
     print(page_content.find_all(id="main-photo"),'\n')'''
 
 # Retrieve the Discord Bot Token
-f = open("../token.txt", "r")
+
+f = open("config.txt", "r")
 client.run(f.readline())
+f.close()
