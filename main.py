@@ -6,6 +6,7 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 
+
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
 
@@ -14,17 +15,6 @@ client = commands.Bot(command_prefix=botPrefix)
 async def on_ready():
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
     # print("The client has the following emojis:\n", client.emojis)
-
-
-'''@client.event
-async def on_reaction_add(reaction, user):
-    await reaction.message.channel.send('{} has added {} to the messge: {}'.format(user.name, reaction.emoji, 
-    reaction.message.content))'''
-
-
-''''@client.event
-async def on_typing(channel, user, when):
-    print("{0} is typing in {1}!".format(user, channel))'''
 
 
 @client.event
@@ -45,6 +35,8 @@ async def on_message(message):
                                        "make **shit** up for fake internet points. I’m glad he’s gone.")
         # Add Up Votes and Down Votes
         # Work In Progress
+        # https://discordpy.readthedocs.io/en/latest/faq.html#how-can-i-add-a-reaction-to-a-message
+
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
@@ -61,16 +53,8 @@ async def on_message(message):
 
 
 @client.command()
-async def clear(ctx):
-    msgs = []
-    async for msg in client.logs_from(ctx.message.channel):
-        if msg.author.id == ctx.author.bot:
-            msgs.append(msg)
-        await client.delete_messages(msgs)
-
-
-@client.command()
 async def iowasux(ctx):
+    """ Iowa has the worst corn """
     await ctx.message.channel.send("You're god damn right they do, {0}!".format(ctx.message.author))
     emoji = client.get_emoji(441038975323471874)
     await ctx.message.add_reaction(emoji)
@@ -93,6 +77,7 @@ async def potatoes(ctx):
 
 @client.command()
 async def flex(ctx):
+    """ Who knows 😉 """
     embed = discord.Embed(title="FLEXXX 😩")
     embed.set_image(url='https://i.imgur.com/92b9uFU.gif')
     await ctx.send(embed=embed)
@@ -125,5 +110,5 @@ async def loadFong(ctx):
     print(page_content.find_all(id="main-photo"),'\n')'''
 
 # Retrieve the Discord Bot Token
-f = open("../token.txt","r")
+f = open("../token.txt", "r")
 client.run(f.readline())
