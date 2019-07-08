@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord.utils import get
 import requests
 import sys
+import random
 from bs4 import BeautifulSoup
 
 
@@ -50,6 +51,18 @@ async def on_message(message):
                 pass
 
     await client.process_commands(message)
+
+
+@client.command()
+async def billyfacts(ctx):
+    facts = []
+    with open("facts.txt") as f:
+        for line in f:
+            facts.append(line)
+    f.close()
+
+    random.shuffle(facts)
+    await ctx.message.channel.send(random.choice(facts))
 
 
 @client.command()
