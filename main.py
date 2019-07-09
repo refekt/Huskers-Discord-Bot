@@ -55,6 +55,7 @@ async def on_message(message):
 
 @client.command()
 async def billyfacts(ctx):
+    """ Real facts about Bill Callahan """
     facts = []
     with open("facts.txt") as f:
         for line in f:
@@ -67,6 +68,7 @@ async def billyfacts(ctx):
 
 @client.command()
 async def randomflag(ctx):
+    """ A random ass, badly made Nebraska flag """
     flags = []
     with open("flags.txt") as f:
         for line in f:
