@@ -201,9 +201,6 @@ async def huskerbotquit(ctx):
 
 
 # Retrieve the Discord Bot Token
-# f = open("config.txt", "r")
-# client.run(f.readline())
-# f.close()
-
-TOKEN = 'NTk1NzA1NjYzOTk3NDc2ODg3.XRu4Uw.Urzm-7CPB5y4nSV4I7OR2bKO0Tc'    
-client.run(TOKEN)
+f = open("config.txt", "r")
+client.run(f.readline())
+f.close()
