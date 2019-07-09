@@ -58,7 +58,15 @@ async def crootbot(ctx):
     #pulls a json file from the 247 advanced player search API and parses it to give
     #info on the croot.
     #First, pull the message content, split the individual pieces, and make the api call
-    croot_info = ctx.message.content.strip().split() 
+    croot_info = ctx.message.content.strip().split()
+    # Added error handling to prevent bad inputs, not perfect doesn't check each value
+    # [0] should be $crootbot
+    # [1] should be a 4 digit int
+    # [2] should be a string
+    # [3] should be a string
+    if len(croot_info) != 3:
+        await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
+        return
     year = int(croot_info[1])
     first_name = croot_info[2]
     last_name = croot_info[3]
