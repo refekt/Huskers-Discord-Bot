@@ -52,6 +52,7 @@ async def on_message(message):
                 pass
     await client.process_commands(message)
 
+
 @client.command()
 async def crootbot(ctx):
     #pulls a json file from the 247 advanced player search API and parses it to give
@@ -91,7 +92,7 @@ async def crootbot(ctx):
         stars = ''
         for i in range(int(composite_star_rating)):
             stars += '\N{WHITE MEDIUM STAR}'
-        
+
         title = '**{} {}** - {}'.format(first_name, last_name, stars)
         body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n247 Link - {}'.format(position, year, height, int(weight), city, state, high_school, composite_rating, player_url)
         await ctx.send(title)
