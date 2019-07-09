@@ -12,6 +12,30 @@ from bs4 import BeautifulSoup
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
 
+long_positions = {'PRO' : 'Pro-Style Quarterback',
+                  'DUAL': 'Dual-Threat Quarterback',
+                  'APB' : 'All-Purpose Back',
+                  'RB' : 'Running Back',
+                  'FB' : 'Fullback',
+                  'WR' : 'Wide Receiver',
+                  'TE' : 'Tight End',
+                  'OT' : 'Offensive Tackle',
+                  'OG' : 'Offensive Guard',
+                  'OC' : 'Center',
+                  'SDE' : 'Strong-Side Defensive End',
+                  'WDE' : 'Weak-Side Defensive End', 
+                  'DT' : 'Defensive Tackle',
+                  'ILB' : 'Inside Linebacker', 
+                  'OLB' : 'Outside Linebacker',
+                  'CB' : 'Cornerback',
+                  'S' : 'Safety',
+                  'ATH' : 'Athlete',
+                  'K' : 'Kicker',
+                  'P' : 'Punter', 
+                  'LS' : 'Long Snapper',
+                  'RET' : 'Returner'
+                  }
+
 
 @client.event
 async def on_ready():
@@ -85,6 +109,8 @@ async def crootbot(ctx):
         first_name = player['FirstName']
         last_name = player['LastName']
         position = player['PrimaryPlayerPosition']['Abbreviation']
+        if position in long_positions:
+            position = long_positions[position]
         hometown = player['Hometown']
         state = hometown['State']
         city = hometown['City']
@@ -120,10 +146,10 @@ async def crootbot(ctx):
         else:
             body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
             rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
-        crootstring = title + body + rankings
+        crootstring = body + rankings
         
         message_embed = discord.Embed(name = 'CrootBot')
-        message_embed.add_field(name = 'Croot Info', value = crootstring, inline = False)
+        message_embed.add_field(name = title, value = crootstring, inline = False)
         #Don't want to try to set a thumbnail for a croot who has no image on 247
         if image_url != '/.':
             message_embed.set_thumbnail(url = image_url)
