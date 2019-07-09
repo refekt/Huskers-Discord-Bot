@@ -5,6 +5,7 @@ from discord.utils import get
 import requests
 import sys
 import random
+import json
 from bs4 import BeautifulSoup
 
 
@@ -49,9 +50,54 @@ async def on_message(message):
                 await message.add_reaction(emojiDownvote)
             except:
                 pass
-
     await client.process_commands(message)
 
+@client.command()
+async def crootbot(ctx):
+    #pulls a json file from the 247 advanced player search API and parses it to give
+    #info on the croot.
+    #First, pull the message content, split the individual pieces, and make the api call
+    croot_info = ctx.message.content.strip().split() 
+    year = int(croot_info[1])
+    first_name = croot_info[2]
+    last_name = croot_info[3]
+    url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, first_name, last_name)
+    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+    search = requests.get(url=url, headers=headers)
+    search = json.loads(search.text)
+    if not search:
+        await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
+    else:
+        search = search[0] #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
+        player = search['Player']
+        first_name = player['FirstName']
+        last_name = player['LastName']
+        position = player['PrimaryPlayerPosition']['Abbreviation']
+        hometown = player['Hometown']
+        state = hometown['State']
+        city = hometown['City']
+        height = player['Height'].replace('-', "'") + '"'
+        weight = player['Weight']
+        high_school = player['PlayerHighSchool']['Name']
+        image_url = player['DefaultAssetUrl']
+        embed = discord.Embed(title = 'CrootPic')
+        embed.set_image(url=image_url)
+        composite_rating = player['CompositeRating']/100
+        composite_star_rating = player['CompositeStarRating']
+        national_rank = player['NationalRank']
+        position_rank = player['PositionRank']
+        state_rank = player['StateRank']
+        player_url = player['Url']
+        stars = ''
+        for i in range(int(composite_star_rating)):
+            stars += '\N{WHITE MEDIUM STAR}'
+        
+        title = '**{} {}** - {}'.format(first_name, last_name, stars)
+        body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n247 Link - {}'.format(position, year, height, int(weight), city, state, high_school, composite_rating, player_url)
+        await ctx.send(title)
+        await ctx.send(embed=embed)
+        await ctx.send(body)
+    
 
 @client.command()
 async def billyfacts(ctx):
@@ -133,6 +179,10 @@ async def bigsexy(ctx):
     embed = discord.Embed(title="OOOHHH YEAAHHH 😩")
     embed.set_image(url='https://i.imgur.com/UpKIx5I.png')
     await ctx.send(embed=embed)
+
+@client.command()    
+async def huskerbotquit(ctx):
+    await client.logout()
 
 
 # Retrieve the Discord Bot Token
