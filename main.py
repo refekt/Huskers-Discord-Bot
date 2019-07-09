@@ -106,7 +106,7 @@ async def crootbot(ctx):
     else:
         # print(search)
         print("Length of search[]:", len(search))
-        i = 0
+        '''i = 0
         while i <= len(search)-1:
             dictSearch = search[i]
             dictPlayer = dictSearch['Player']
@@ -114,59 +114,64 @@ async def crootbot(ctx):
             dictLastName = dictPlayer['LastName']
             dictRating = dictPlayer['CompositeRating']
             print(dictRating, dictLastName, dictFirstName)
+            i += 1'''
+        # Only one search result returned
+        if len(search) == 1:
+            search = search[0] #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
+            player = search['Player']
+            first_name = player['FirstName']
+            last_name = player['LastName']
+            position = player['PrimaryPlayerPosition']['Abbreviation']
+            if position in long_positions:
+                position = long_positions[position]
+            hometown = player['Hometown']
+            state = hometown['State']
+            city = hometown['City']
+            height = player['Height'].replace('-', "'") + '"'
+            weight = player['Weight']
+            high_school = player['PlayerHighSchool']['Name']
+            image_url = player['DefaultAssetUrl']
+            composite_rating = player['CompositeRating']
+            if composite_rating is None:
+                composite_rating = 'N/A'
+            else:
+                composite_rating = player['CompositeRating']/100
+            composite_star_rating = player['CompositeStarRating']
+            national_rank = player['NationalRank']
+            if national_rank is None:
+                national_rank = 'N/A'
+            position_rank = player['PositionRank']
+            if position_rank is None:
+                position_rank = 'N/A'
+            state_rank = player['StateRank']
+            if state_rank is None:
+                state_rank = 'N/A'
+            player_url = player['Url']
+            stars = ''
+            for i in range(int(composite_star_rating)):
+                stars += '\N{WHITE MEDIUM STAR}'
 
-            i += 1
+            title = '**{} {}** - {}\n'.format(first_name, last_name, stars)
+            # Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
+            if type(composite_rating) is str:
+                body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+                rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
+            else:
+                body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+                rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
+            crootstring = body + rankings
 
-        search = search[0] #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
-        player = search['Player']
-        first_name = player['FirstName']
-        last_name = player['LastName']
-        position = player['PrimaryPlayerPosition']['Abbreviation']
-        if position in long_positions:
-            position = long_positions[position]
-        hometown = player['Hometown']
-        state = hometown['State']
-        city = hometown['City']
-        height = player['Height'].replace('-', "'") + '"'
-        weight = player['Weight']
-        high_school = player['PlayerHighSchool']['Name']
-        image_url = player['DefaultAssetUrl']
-        composite_rating = player['CompositeRating']
-        if composite_rating is None:
-            composite_rating = 'N/A'
-        else:
-            composite_rating = player['CompositeRating']/100
-        composite_star_rating = player['CompositeStarRating']
-        national_rank = player['NationalRank']
-        if national_rank is None:
-            national_rank = 'N/A'
-        position_rank = player['PositionRank']
-        if position_rank is None:
-            position_rank = 'N/A'
-        state_rank = player['StateRank']
-        if state_rank is None:
-            state_rank = 'N/A'
-        player_url = player['Url']
-        stars = ''
-        for i in range(int(composite_star_rating)):
-            stars += '\N{WHITE MEDIUM STAR}'
-            
-        title = '**{} {}** - {}\n'.format(first_name, last_name, stars)
-        #Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
-        if type(composite_rating) is str:
-            body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
-        else:
-            body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
-        crootstring = body + rankings
-        
-        message_embed = discord.Embed(name = "CrootBot", color = 0xd00000)
-        message_embed.add_field(name = title, value = crootstring, inline = False)
-        #Don't want to try to set a thumbnail for a croot who has no image on 247
-        if image_url != '/.':
-            message_embed.set_thumbnail(url = image_url)
-        await ctx.send(embed=message_embed)
+            message_embed = discord.Embed(name="CrootBot", color=0xd00000)
+            message_embed.add_field(name=title, value=crootstring, inline=False)
+            # Don't want to try to set a thumbnail for a croot who has no image on 247
+            if image_url != '/.':
+                message_embed.set_thumbnail(url=image_url)
+            await ctx.send(embed=message_embed)
+        # Multiple search results returned
+        # Display search message
+        elif len(search) > 1:
+            print("Not implemented yet.")
+            pass
     
 
 @client.command()
