@@ -33,8 +33,10 @@ async def on_message(message):
             await message.channel.send(embed=embed)
         # Husker Bot hates Isms
         if "isms" in message.content.lower():
-            await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
-                                       "make **shit** up for fake internet points. I’m glad he’s gone.")
+            dice_roll = random.randint(1,101)
+            if dice_roll >= 90:
+                await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
+                                           "make **shit** up for fake internet points. I’m glad he’s gone.")
         # Add Up Votes and Down Votes
         # Work In Progress
         # https://discordpy.readthedocs.io/en/latest/faq.html#how-can-i-add-a-reaction-to-a-message
@@ -90,28 +92,42 @@ async def crootbot(ctx):
         weight = player['Weight']
         high_school = player['PlayerHighSchool']['Name']
         image_url = player['DefaultAssetUrl']
-        embed = discord.Embed(title = 'CrootPic')
-        embed.set_image(url=image_url)
-        composite_rating = player['CompositeRating']/100
+        composite_rating = player['CompositeRating']
+        if composite_rating is None:
+            composite_rating = 'N/A'
+        else:
+            composite_rating = player['CompositeRating']/100
         composite_star_rating = player['CompositeStarRating']
         national_rank = player['NationalRank']
+        if national_rank is None:
+            national_rank = 'N/A'
         position_rank = player['PositionRank']
+        if position_rank is None:
+            position_rank = 'N/A'
         state_rank = player['StateRank']
+        if state_rank is None:
+            state_rank = 'N/A'
         player_url = player['Url']
         stars = ''
         for i in range(int(composite_star_rating)):
             stars += '\N{WHITE MEDIUM STAR}'
-
+            
         title = '**{} {}** - {}\n'.format(first_name, last_name, stars)
-        body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-        rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
+        #Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
+        if type(composite_rating) is str:
+            body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
+        else:
+            body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+            rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
         crootstring = title + body + rankings
+        
         message_embed = discord.Embed(name = 'CrootBot')
         message_embed.add_field(name = 'Croot Info', value = crootstring, inline = False)
-        message_embed.set_thumbnail(url = image_url)
-        #await ctx.send(title)
+        #Don't want to try to set a thumbnail for a croot who has no image on 247
+        if image_url != '/.':
+            message_embed.set_thumbnail(url = image_url)
         await ctx.send(embed=message_embed)
-        #await ctx.send(body)
     
 
 @client.command()
