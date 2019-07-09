@@ -148,7 +148,7 @@ async def crootbot(ctx):
             rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
         crootstring = body + rankings
         
-        message_embed = discord.Embed(name = 'CrootBot')
+        message_embed = discord.Embed(name = "CrootBot", color = 0xd00000)
         message_embed.add_field(name = title, value = crootstring, inline = False)
         #Don't want to try to set a thumbnail for a croot who has no image on 247
         if image_url != '/.':
