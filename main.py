@@ -83,7 +83,7 @@ async def on_message(message):
 @client.event
 async def on_reaction_add(reaction, user):
     print(reaction.emoji)
-    if reaction.message.author == client.user and 'Search Results:' in reaction.message.content:
+    if reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
                       '2⃣' : 1,
@@ -195,6 +195,8 @@ async def parse_search(search, channel):
         if image_url != '/.':
             message_embed.set_thumbnail(url = image_url)
         await channel.send(embed=message_embed)
+        global player_search_list
+        player_search_list = []
 
 @client.command()
 async def billyfacts(ctx):
