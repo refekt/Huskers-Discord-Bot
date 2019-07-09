@@ -66,6 +66,20 @@ async def billyfacts(ctx):
 
 
 @client.command()
+async def randomflag(ctx):
+    flags = []
+    with open("flags.txt") as f:
+        for line in f:
+            flags.append(line)
+    f.close()
+
+    random.shuffle(flags)
+    embed = discord.Embed(title="Random Ass Nebraska Flag")
+    embed.set_image(url=random.choice(flags))
+    await ctx.send(embed=embed)
+
+
+@client.command()
 async def iowasux(ctx):
     """ Iowa has the worst corn """
     await ctx.message.channel.send("You're god damn right they do, {0}!".format(ctx.message.author))
