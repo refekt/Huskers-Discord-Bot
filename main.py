@@ -64,7 +64,8 @@ async def crootbot(ctx):
     # [1] should be a 4 digit int
     # [2] should be a string
     # [3] should be a string
-    if len(croot_info) != 3:
+    print(croot_info, len(croot_info))
+    if len(croot_info) != 4:
         await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
         return
     year = int(croot_info[1])
