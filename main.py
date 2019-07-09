@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
+player_search_list = [] #initialize a global list for crootbot to put search results in
+
 
 long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'DUAL': 'Dual-Threat Quarterback',
@@ -78,7 +80,25 @@ async def on_message(message):
                 pass
     await client.process_commands(message)
 
-
+@client.event
+async def on_reaction_add(reaction, user):
+    print(reaction.emoji)
+    if reaction.message.author == client.user and 'Search Results:' in reaction.message.content:
+        channel = reaction.message.channel
+        emoji_dict = {'1⃣' : 0,
+                      '2⃣' : 1,
+                      '3⃣' : 2,
+                      '4⃣' : 3,
+                      '5⃣' : 4,
+                      '6⃣' : 5,
+                      '7⃣' : 6, 
+                      '8⃣' : 7, 
+                      '9⃣' : 8, 
+                      '🔟' : 9
+                      }
+        if reaction.emoji in emoji_dict:
+            await parse_search(search = player_search_list[emoji_dict[reaction.emoji]], channel = channel)
+    
 @client.command()
 async def crootbot(ctx):
     #pulls a json file from the 247 advanced player search API and parses it to give
@@ -103,8 +123,29 @@ async def crootbot(ctx):
     search = json.loads(search.text)
     if not search:
         await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
+    elif len(search) > 1:
+        global player_search_list
+        players_string = ('''There were multiple matches for {} {} in the {} class. Please react with the corresponding emoji to the player you\'d 
+like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
+        players_list = []
+        player_search_list = search
+        emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']                     
+        for i in range(min(10, len(search))):
+            player = search[i]['Player']
+            first_name = player['FirstName']
+            last_name = player['LastName']
+            position = player['PrimaryPlayerPosition']['Abbreviation']
+            if position in long_positions:
+                position = long_positions[position]
+            players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
+            players_list.append(['FirstName', 'LastName'])
+        await ctx.send(players_string)         
     else:
-        search = search[0] #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
+        channel = ctx.channel
+        await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
+
+async def parse_search(search, channel):
+        year = search['Year']
         player = search['Player']
         first_name = player['FirstName']
         last_name = player['LastName']
@@ -153,8 +194,7 @@ async def crootbot(ctx):
         #Don't want to try to set a thumbnail for a croot who has no image on 247
         if image_url != '/.':
             message_embed.set_thumbnail(url = image_url)
-        await ctx.send(embed=message_embed)
-    
+        await channel.send(embed=message_embed)
 
 @client.command()
 async def billyfacts(ctx):
