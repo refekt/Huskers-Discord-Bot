@@ -90,7 +90,7 @@ async def crootbot(ctx):
     # [1] should be a 4 digit int
     # [2] should be a string
     # [3] should be a string
-    print(croot_info, len(croot_info))
+    # print(croot_info, len(croot_info))
     if len(croot_info) != 4:
         await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
         return
@@ -104,6 +104,19 @@ async def crootbot(ctx):
     if not search:
         await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
     else:
+        # print(search)
+        print("Length of search[]:", len(search))
+        i = 0
+        while i <= len(search)-1:
+            dictSearch = search[i]
+            dictPlayer = dictSearch['Player']
+            dictFirstName = dictPlayer['FirstName']
+            dictLastName = dictPlayer['LastName']
+            dictRating = dictPlayer['CompositeRating']
+            print(dictRating, dictLastName, dictFirstName)
+
+            i += 1
+
         search = search[0] #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
         player = search['Player']
         first_name = player['FirstName']
@@ -227,6 +240,14 @@ async def ohno(ctx):
     """ This is not ideal """
     embed = discord.Embed(title="Big oof")
     embed.set_image(url='https://i.imgur.com/f4P6jBO.png')
+    await ctx.send(embed=embed)
+
+
+@client.command()
+async def whoami(ctx):
+    """ OH YEAH! """
+    embed = discord.Embed(title="OHHH YEAAAHHH!!")
+    embed.set_image(url='https://i.imgur.com/jgvr8pd.gif')
     await ctx.send(embed=embed)
 
 
