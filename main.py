@@ -102,11 +102,16 @@ async def crootbot(ctx):
         for i in range(int(composite_star_rating)):
             stars += '\N{WHITE MEDIUM STAR}'
 
-        title = '**{} {}** - {}'.format(first_name, last_name, stars)
-        body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n247 Link - {}'.format(position, year, height, int(weight), city, state, high_school, composite_rating, player_url)
-        await ctx.send(title)
-        await ctx.send(embed=embed)
-        await ctx.send(body)
+        title = '**{} {}** - {}\n'.format(first_name, last_name, stars)
+        body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+        rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
+        crootstring = title + body + rankings
+        message_embed = discord.Embed(name = 'CrootBot')
+        message_embed.add_field(name = 'Croot Info', value = crootstring, inline = False)
+        message_embed.set_thumbnail(url = image_url)
+        #await ctx.send(title)
+        await ctx.send(embed=message_embed)
+        #await ctx.send(body)
     
 
 @client.command()
@@ -196,6 +201,9 @@ async def huskerbotquit(ctx):
 
 
 # Retrieve the Discord Bot Token
-f = open("config.txt", "r")
-client.run(f.readline())
-f.close()
+# f = open("config.txt", "r")
+# client.run(f.readline())
+# f.close()
+
+TOKEN = 'NTk1NzA1NjYzOTk3NDc2ODg3.XRu4Uw.Urzm-7CPB5y4nSV4I7OR2bKO0Tc'    
+client.run(TOKEN)
