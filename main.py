@@ -12,6 +12,8 @@ from bs4 import BeautifulSoup
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
 player_search_list = [] #initialize a global list for crootbot to put search results in
+player_search_list_len = 0 # length storage
+emoji_list = []
 
 
 long_positions = {'PRO' : 'Pro-Style Quarterback',
@@ -64,25 +66,31 @@ async def on_message(message):
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
                                            "make **shit** up for fake internet points. I’m glad he’s gone.")
         # Add Up Votes and Down Votes
-        # Work In Progress
-        # https://discordpy.readthedocs.io/en/latest/faq.html#how-can-i-add-a-reaction-to-a-message
-
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
             emojiUpvote = "\N{UPWARDS BLACK ARROW}"
             emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
-            print("Upvote: {0} and Downvote: {1}".format(emojiUpvote, emojiDownvote))
-            try:
-                await message.add_reaction(emojiUpvote)
-                await message.add_reaction(emojiDownvote)
-            except:
-                pass
+            await message.add_reaction(emojiUpvote)
+            await message.add_reaction(emojiDownvote)
+
+        # Working with crootbot
+        if "Search Results:" in message.content:
+            print("Ping search results")
+            # Add reactions
+            # player_search_list_len
+            i = 0
+            # Pre-add reactions for users
+            while i < player_search_list_len:
+                await message.add_reaction(emoji_list[i])
+                i += 1
+
     await client.process_commands(message)
+
 
 @client.event
 async def on_reaction_add(reaction, user):
-    print(reaction.emoji)
+    # print(reaction.emoji)
     if reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
@@ -110,7 +118,7 @@ async def crootbot(ctx):
     # [1] should be a 4 digit int
     # [2] should be a string
     # [3] should be a string
-    print(croot_info, len(croot_info))
+    # print(croot_info, len(croot_info))
     if len(croot_info) != 4:
         await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
         return
@@ -129,7 +137,8 @@ async def crootbot(ctx):
 like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
         players_list = []
         player_search_list = search
-        emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']                     
+        emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
+        player_search_list_len = range(min(10,len(search)))
         for i in range(min(10, len(search))):
             player = search[i]['Player']
             first_name = player['FirstName']
@@ -139,7 +148,14 @@ like to see CrootBot results for.\n Search Results:\n''').format(first_name, las
                 position = long_positions[position]
             players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
             players_list.append(['FirstName', 'LastName'])
-        await ctx.send(players_string)         
+        await ctx.send(players_string)
+        # new_message = client.
+        # i = 0
+        # Pre-add reactions for users
+        # while i < range(min(10, len(search))):
+            # await ctx.message.add_reaction(emoji_list[i])
+            # i += 1
+
     else:
         channel = ctx.channel
         await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
