@@ -263,8 +263,9 @@ async def bigsexy(ctx):
     embed.set_image(url='https://i.imgur.com/UpKIx5I.png')
     await ctx.send(embed=embed)
 
-@client.command()    
+@client.command()
 async def huskerbotquit(ctx):
+    """ Turn off bot in case of emergency """
     await client.logout()
 
 
