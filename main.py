@@ -294,6 +294,15 @@ async def bigsexy(ctx):
     embed.set_image(url='https://i.imgur.com/UpKIx5I.png')
     await ctx.send(embed=embed)
 
+
+@client.command()
+async def whoami(ctx):
+    """ OH YEAH! """
+    embed = discord.Embed(title="OHHH YEAAAHHH!!")
+    embed.set_image(url='https://i.imgur.com/jgvr8pd.gif')
+    await ctx.send(embed=embed)
+    
+
 @client.command()    
 async def huskerbotquit(ctx):
     await client.logout()
