@@ -301,7 +301,7 @@ async def whoami(ctx):
     embed = discord.Embed(title="OHHH YEAAAHHH!!")
     embed.set_image(url='https://i.imgur.com/jgvr8pd.gif')
     await ctx.send(embed=embed)
-    
+
 
 @client.command()    
 async def huskerbotquit(ctx):
