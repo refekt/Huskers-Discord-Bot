@@ -113,8 +113,7 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_command_error(ctx, error):
-    output_msg = "Whoa there {}! Something went wrong. {}.".format(ctx.message.author, error)
-    # print(ctx.message,'\n', error)
+    output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
     await ctx.send(output_msg)
 
 
