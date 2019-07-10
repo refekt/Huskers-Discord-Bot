@@ -10,25 +10,18 @@ headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit
 now = datetime.datetime.now()
 
 
-def scrape_crystal_balls(year = now.year):
-    crystal_balls = []
-
-    url = 'https://247sports.com/college/nebraska/Season/{}-Football/TargetPredictions/'.format(year)
+def scrape_crystal_balls(year=now.year+1):
+    url = 'https://247sports.com/User/Steve%20Wiltfong/Predictions/?PlayerInstitution.PrimaryPlayerSport.Sport=Football&PlayerInstitution.PrimaryPlayerSport.Recruitment.Year={}'.format(year)
     page = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
 
-    cb_urls = set()
+    crystal_balls = soup.find_all(class_='target')
 
-    for link in soup.find_all('a'):
-        grab_url = link.get('href')
-        if "https://247sports.com/player/" in grab_url.lower():
-            # print("Found player", grab_url.lower())
-            cb_urls.add(grab_url)
+    for x in range(len(crystal_balls)):
+        print(crystal_balls[x])
 
-    print(cb_urls)
-
-    """with open('team_ids.json', 'w') as fp:
-        json.dump(team_dict, fp, sort_keys = True, indent = 4)"""
+    # with open('crystal_balls.json', 'w') as fp:
+        # json.dump(crystal_balls, fp, sort_keys=True, indent=4)
 
 
 scrape_crystal_balls()
