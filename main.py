@@ -10,17 +10,19 @@ import config
 from bs4 import BeautifulSoup
 
 
-botPrefix = '$'
+botPrefix = '$' # The prefix used for all commands
 client = commands.Bot(command_prefix=botPrefix)
-player_search_list = [] #initialize a global list for crootbot to put search results in
+player_search_list = [] # initialize a global list for crootbot to put search results in
 player_search_list_len = 0 # length storage
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 
 
+# Load the Team_IDs JSON
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
 
+# Load the long names and abbreviations for recruit positions
 long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'DUAL': 'Dual-Threat Quarterback',
                   'APB' : 'All-Purpose Back',
@@ -49,13 +51,11 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
 @client.event
 async def on_ready():
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
-    # print("The client has the following emojis:\n", client.emojis)
 
 
 @client.event
 async def on_message(message):
-    """ Commands processed as messages are entered """
-
+    # We do not want to react to the bot itself
     if not message.author.bot:
         # Good bot, bad bot
         if "good bot" in message.content.lower():
@@ -70,7 +70,7 @@ async def on_message(message):
             if dice_roll >= 90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
                                            "make **shit** up for fake internet points. I’m glad he’s gone.")
-        # Add Up Votes and Down Votes
+        # Add Upvote and Downvote to the message with this command in it
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
@@ -81,21 +81,20 @@ async def on_message(message):
 
     # Working with crootbot
     if message.author == client.user and 'Search Results:' in message.content and player_search_list:
-        print("Ping search results")
-        # Add reactions
-        # player_search_list_len
-        i = 0
         # Pre-add reactions for users
+        i = 0
         while i < len(player_search_list):
             await message.add_reaction(emoji_list[i])
             i += 1
 
+    # Always need this
     await client.process_commands(message)
 
 
+# Monitor reactions added to messages
 @client.event
 async def on_reaction_add(reaction, user):
-    # print(reaction.emoji)
+    # Interfacing with crootbot's search results
     if user != client.user and reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
@@ -113,6 +112,7 @@ async def on_reaction_add(reaction, user):
             await parse_search(search = player_search_list[emoji_dict[reaction.emoji]], channel = channel)
 
 
+# Catch invalid commands/errors
 @client.event
 async def on_command_error(ctx, error):
     output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
@@ -123,33 +123,37 @@ async def on_command_error(ctx, error):
 async def crootbot(ctx):
     #pulls a json file from the 247 advanced player search API and parses it to give
     #info on the croot.
-    #First, pull the message content, split the individual pieces, and make the api call
+    #First pull the message content, split the individual pieces, and make the api call
     croot_info = ctx.message.content.strip().split()
     # Added error handling to prevent bad inputs, not perfect doesn't check each value
-    # [0] should be $crootbot
-    # [1] should be a 4 digit int
-    # [2] should be a string
-    # [3] should be a string
-    # print(croot_info, len(croot_info))
     if len(croot_info) != 4:
         await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
         return
-    year = int(croot_info[1])
-    first_name = croot_info[2]
-    last_name = croot_info[3]
+    
+    # Search info
+    year = int(croot_info[1]) # [1] should be a 4 digit int
+    first_name = croot_info[2] # [2] should be a string
+    last_name = croot_info[3] # [3] should be a string
+    
+    # Putting URL and headers together
     url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, first_name, last_name)
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+    
+    # Perform search
     search = requests.get(url=url, headers=headers)
     search = json.loads(search.text)
+    
     if not search:
         await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
-    elif len(search) > 1:
+    elif len(search) > 1: # More than one result returned
         global player_search_list
         players_string = ('''There were multiple matches for {} {} in the {} class. Please react with the corresponding emoji to the player you\'d 
 like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
+        
         players_list = []
         player_search_list = search       
-        player_search_list_len = range(min(10,len(search)))
+        player_search_list_len = range(min(10,len(search))) # Might be able to delete this 
+        
         for i in range(min(10, len(search))):
             player = search[i]['Player']
             first_name = player['FirstName']
@@ -160,17 +164,11 @@ like to see CrootBot results for.\n Search Results:\n''').format(first_name, las
             players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
             players_list.append(['FirstName', 'LastName'])
         await ctx.send(players_string)
-        # new_message = client.
-        # i = 0
-        # Pre-add reactions for users
-        # while i < range(min(10, len(search))):
-            # await ctx.message.add_reaction(emoji_list[i])
-            # i += 1
-
-    else:
+    else: # Only one result was returned
         channel = ctx.channel
         await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
 
+# Output an embeded Discord message to channel
 async def parse_search(search, channel):
         year = search['Year']
         player = search['Player']
@@ -233,6 +231,7 @@ async def parse_search(search, channel):
                 school = 'Unknown'
             else:
                 school = team_ids[school_id]
+            # Go Big Red!
             if school == 'Nebraska':
                 school += ' 💯:corn::punch:'
             recruitment_status += ' to {}'.format(school)
