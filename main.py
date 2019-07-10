@@ -6,7 +6,7 @@ import requests
 import sys
 import random
 import json
-# import config
+import config
 from bs4 import BeautifulSoup
 
 
@@ -343,6 +343,6 @@ async def huskerbotquit(ctx):
 
 
 # Retrieve the Discord Bot Token
-f = open("config.py", "r")
-client.run(f.readline())
-f.close()
+# f = open("config.py", "r")
+client.run(config.DISCORD_TOKEN) # (f.readline())
+# f.close()
