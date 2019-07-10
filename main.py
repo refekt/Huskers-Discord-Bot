@@ -109,7 +109,15 @@ async def on_reaction_add(reaction, user):
                       }
         if reaction.emoji in emoji_dict:
             await parse_search(search = player_search_list[emoji_dict[reaction.emoji]], channel = channel)
-    
+
+
+@client.event
+async def on_command_error(ctx, error):
+    output_msg = "Whoa there {}! Something went wrong. {}.".format(ctx.message.author, error)
+    # print(ctx.message,'\n', error)
+    await ctx.send(output_msg)
+
+
 @client.command()
 async def crootbot(ctx):
     #pulls a json file from the 247 advanced player search API and parses it to give
