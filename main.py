@@ -15,6 +15,8 @@ client = commands.Bot(command_prefix=botPrefix)
 player_search_list = [] #initialize a global list for crootbot to put search results in
 player_search_list_len = 0 # length storage
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
+
+
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
@@ -339,10 +341,10 @@ async def whoami(ctx):
 
 @client.command()    
 async def huskerbotquit(ctx):
+    """ Did HuskerBot act up? Use this only in emergencies. """
+    print("HuskerBot was terminated by {}.".format(ctx.message.author))
     await client.logout()
 
 
-# Retrieve the Discord Bot Token
-# f = open("config.py", "r")
-client.run(config.DISCORD_TOKEN) # (f.readline())
-# f.close()
+# Run the Discord bot
+client.run(config.DISCORD_TOKEN)
