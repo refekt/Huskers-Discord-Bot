@@ -14,6 +14,8 @@ client = commands.Bot(command_prefix=botPrefix)
 player_search_list = [] #initialize a global list for crootbot to put search results in
 player_search_list_len = 0 # length storage
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
+with open('team_ids.json', 'r') as fp:
+    team_ids = json.load(fp)
 
 
 long_positions = {'PRO' : 'Pro-Style Quarterback',
@@ -194,22 +196,46 @@ async def parse_search(search, channel):
         for i in range(int(composite_star_rating)):
             stars += '\N{WHITE MEDIUM STAR}'
             
-        title = '**{} {}** - {}\n'.format(first_name, last_name, stars)
+        #Check if they are committed. It's a little different with signed players.
+        commit_status = search['HighestRecruitInterestEventType']
+        if commit_status == 'HardCommit' or commit_status == 'SoftCommit':
+            commit_status = 'Committed'
+        else:
+            commit_status = 'Uncommitted'
+        if type(search['SignedInstitution']) is int:
+            commit_status = 'Signed'  
+        title = '**{} {}** - {}\n'.format(first_name, last_name, stars) 
+        
         #Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
         if type(composite_rating) is str:
             body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
+            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n247 Link - {}\n'.format(national_rank, state_rank, position_rank, player_url)
         else:
             body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}'.format(national_rank, state_rank, position_rank, player_url)
-        crootstring = body + rankings
+            rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}\n'.format(national_rank, state_rank, position_rank, player_url)
         
+        #Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.
+        #I've found that if a team does not have an image on 247, they use a generic image with 0 as the id. Also if the image id is not in the dictionary, we want to say Unknown.
+        recruitment_status = 'Currently {}'.format(commit_status)
+        if commit_status == 'Committed' or commit_status == 'Signed':
+            school_id = str(search['CommitedInstitutionTeamImage'].split('/')[-1].split('.')[0])
+            if school_id == '0' or school_id not in team_ids:
+                school = 'Unknown'
+            else:
+                school = team_ids[school_id]
+            if school == 'Nebraska':
+                school += ' 💯:corn::punch:'
+            recruitment_status += ' to {}'.format(school)
+        recruitment_status = '**' + recruitment_status + '**'
+            
+        crootstring = body + rankings + recruitment_status        
         message_embed = discord.Embed(name = "CrootBot", color = 0xd00000)
         message_embed.add_field(name = title, value = crootstring, inline = False)
         #Don't want to try to set a thumbnail for a croot who has no image on 247
         if image_url != '/.':
             message_embed.set_thumbnail(url = image_url)
         await channel.send(embed=message_embed)
+        
         global player_search_list
         player_search_list = []
 
