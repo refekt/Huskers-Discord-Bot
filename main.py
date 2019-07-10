@@ -13,7 +13,7 @@ botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
 player_search_list = [] #initialize a global list for crootbot to put search results in
 player_search_list_len = 0 # length storage
-emoji_list = []
+emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 
 
 long_positions = {'PRO' : 'Pro-Style Quarterback',
@@ -74,16 +74,16 @@ async def on_message(message):
             await message.add_reaction(emojiUpvote)
             await message.add_reaction(emojiDownvote)
 
-        # Working with crootbot
-        if "Search Results:" in message.content:
-            print("Ping search results")
-            # Add reactions
-            # player_search_list_len
-            i = 0
-            # Pre-add reactions for users
-            while i < player_search_list_len:
-                await message.add_reaction(emoji_list[i])
-                i += 1
+    # Working with crootbot
+    if message.author == client.user and 'Search Results:' in message.content and player_search_list:
+        print("Ping search results")
+        # Add reactions
+        # player_search_list_len
+        i = 0
+        # Pre-add reactions for users
+        while i < len(player_search_list):
+            await message.add_reaction(emoji_list[i])
+            i += 1
 
     await client.process_commands(message)
 
@@ -91,7 +91,7 @@ async def on_message(message):
 @client.event
 async def on_reaction_add(reaction, user):
     # print(reaction.emoji)
-    if reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
+    if user != client.user and reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
                       '2⃣' : 1,
@@ -136,8 +136,7 @@ async def crootbot(ctx):
         players_string = ('''There were multiple matches for {} {} in the {} class. Please react with the corresponding emoji to the player you\'d 
 like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
         players_list = []
-        player_search_list = search
-        emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
+        player_search_list = search       
         player_search_list_len = range(min(10,len(search)))
         for i in range(min(10, len(search))):
             player = search[i]['Player']
