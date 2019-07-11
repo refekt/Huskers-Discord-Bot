@@ -1,13 +1,13 @@
 #!/usr/bin/env python3.6
 import discord
 from discord.ext import commands
-from discord.utils import get
 import requests
 import sys
-#import config
 import random
 import json
 from bs4 import BeautifulSoup
+import config
+
 
 
 botPrefix = '$' # The prefix used for all commands
@@ -371,6 +371,4 @@ async def huskerbotquit(ctx):
 
 
 # Run the Discord bot
-TOKEN = 'NTk1NzA1NjYzOTk3NDc2ODg3.XRu4Uw.Urzm-7CPB5y4nSV4I7OR2bKO0Tc'    
-client.run(TOKEN)
-#client.run(config.DISCORD_TOKEN)
+client.run(config.DISCORD_TOKEN)
