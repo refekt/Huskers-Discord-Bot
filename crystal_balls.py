@@ -15,13 +15,23 @@ def scrape_crystal_balls(year=now.year+1):
     page = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
 
-    crystal_balls = soup.find_all(class_='target')
+    main_photo = soup.find_all('li', class_='main-photo')
+    name = soup.find_all('li', class_='name')
+    predicted_by = soup.find_all('li', class_='predicted-by')
+    prediction = soup.find_all('li', class_='prediction')
+    correct = soup.find_all('li', class_='correct')
 
+    print(prediction)
+
+    # Should I dump all the contents of crystal_balls into a new string to make a new soup?
+    # To search for sub items?
+
+    """crystal_balls = soup.find_all(class_='target')
     for x in range(len(crystal_balls)):
-        print(crystal_balls[x])
+        print(crystal_balls[x])"""
 
-    # with open('crystal_balls.json', 'w') as fp:
-        # json.dump(crystal_balls, fp, sort_keys=True, indent=4)
+    """with open('crystal_balls.json', 'w') as fp:
+        json.dump(crystal_balls, fp, sort_keys=True, indent=4)"""
 
 
 scrape_crystal_balls()
