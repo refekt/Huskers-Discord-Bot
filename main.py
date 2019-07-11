@@ -6,6 +6,7 @@ import sys
 import random
 import json
 import config
+import crystal_balls
 from selenium import webdriver
 
 
@@ -344,6 +345,13 @@ async def huskerbotquit(ctx):
     print("HuskerBot was terminated by {}.".format(ctx.message.author))
     await client.logout()
 
+
+@client.command()
+async def secretCommand(ctx):
+    i = 0
+    for cbs in crystal_balls.cb_list:
+        await ctx.send(cbs[i]['Profile'])
+        i += 1
 
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)

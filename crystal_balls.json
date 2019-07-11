@@ -1,14 +1,26 @@
 [
     {
+        "Koy Moore": {
+            "Photo": "https://s3media.247sports.com/Uploads/Assets/691/124/9124691.jpg",
+            "Prediction": "Locked",
+            "Profile": "https://247sports.com/PlayerInstitution/Koy-Moore-at-Archbishop-Rummel-200133/CurrentExpertPredictions/",
+            "Result": "Unknown",
+            "Teams": {
+                "LSU": "80%",
+                "USC": "20%"
+            }
+        }
+    },
+    {
         "Makari Paige": {
             "Photo": "https://s3media.247sports.com/Uploads/Assets/709/80/9080709.jpg",
             "Prediction": "Locked",
             "Profile": "https://247sports.com/PlayerInstitution/Makari-Paige-at-West-Bloomfield-205196/CurrentExpertPredictions/",
             "Result": "Unknown",
             "Teams": {
-                "Michigan": "71%",
-                "Ohio State": "14%",
-                "Unknown": "14%"
+                "Michigan": "78%",
+                "Ohio State": "11%",
+                "Unknown": "11%"
             }
         }
     },
@@ -88,9 +100,9 @@
             "Profile": "https://247sports.com/PlayerInstitution/Jaheim-Thomas-at-Princeton-211157/CurrentExpertPredictions/",
             "Result": "Unknown",
             "Teams": {
-                "Cincinnati": "27%",
-                "Ohio State": "45%",
-                "Unknown": "27%"
+                "Cincinnati": "55%",
+                "Ohio State": "36%",
+                "Unknown": "9%"
             }
         }
     },
@@ -277,17 +289,6 @@
                 "Texas": "73%",
                 "Texas A&M": "9%",
                 "Unknown": "18%"
-            }
-        }
-    },
-    {
-        "Blaise Gunnerson": {
-            "Photo": "https://s3media.247sports.com/Uploads/Assets/753/437/8437753.jpg",
-            "Prediction": "NEB",
-            "Profile": "https://247sports.com/PlayerInstitution/Blaise-Gunnerson-at-Kuemper-Catholic-School-System-219274/CurrentExpertPredictions/",
-            "Result": "Correct",
-            "Teams": {
-                "Nebraska": "Committed"
             }
         }
     }

@@ -5,14 +5,14 @@ import time
 import json
 import datetime
 
+cb_list = []
 
 def scrape_crystal_balls(year):
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page=1&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(year)
     page = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
-    cb_list = []
-    
+
     #pull every 'target' block
     targets = soup.find_all('li', class_='target')
     
