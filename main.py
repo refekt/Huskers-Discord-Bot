@@ -1,13 +1,11 @@
 #!/usr/bin/env python3.6
 import discord
 from discord.ext import commands
-from discord.utils import get
 import requests
 import sys
 import random
 import json
 import config
-from bs4 import BeautifulSoup
 
 
 botPrefix = '$' # The prefix used for all commands
