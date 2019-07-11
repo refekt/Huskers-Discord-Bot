@@ -17,7 +17,6 @@ def scrape_crystal_balls(year):
     targets = soup.find_all('li', class_='target')
     
     #This is a tough cookie. I'm going to loop over every target block we pulled and grab the info you want, then store in a nested dictionary, then add it to a list.
-    # i = 0
     for t in targets:
         #for the current target block, grab the main photo url. I also split around ? and picked the first item from the result to get a url without the 
         #image width and height args
@@ -46,50 +45,31 @@ def scrape_crystal_balls(year):
                 teams[p_team] = p_percent
 
         #since we are looking at a free page, the prediction can differ if its a locked pick or free pick. I'm going to first check if it's locked or not and handle it from there
-        unlock =  t.find(class_='prediction').find('div').find('div')
+        unlock = t.find(class_='prediction').find('div').find('div')
         #I noticed locked picks are two nested divs while free picks are one div containing a team image
         pick = 'Locked'
         if not unlock:
             pick = t.find(class_='prediction').find('div').find('img').get('alt')
         #Correct is tough
         result_exist = t.find(class_='correct').find('svg')
-        correct = 'Unknown'
+        correct = 'TBD'
         if result_exist:
             correct = 'Correct'
             correct_incorrect = result_exist.find('g').find('circle')
             if correct_incorrect:
                 correct = 'Incorrect'
-        
+
+        # TBD: pull prediction date/time as well
+
         #Now build the dictionary
-        
-        # *** Suggestion : Add 'Name' to the sub_dict and create keys for t_dic
-        """
-        sub_dict = {'Name' : name
+        sub_dict = {'Name' : name,
                     'Photo' : main_photo,
                     'Profile' : profile,
                     'Teams' : teams,
                     'Prediction' : pick,
                     'Result' : correct
                     }
-        i += 1
-        t_dict = {i : sub_dict}
-        """
-        # *** End suggestion
-        sub_dict = {'Photo' : main_photo,
-                    'Profile' : profile,
-                    'Teams' : teams,
-                    'Prediction' : pick,
-                    'Result' : correct
-                    }
-        t_dict = {name : sub_dict}
-        cb_list.append(t_dict)
-
-    # Should I dump all the contents of crystal_balls into a new string to make a new soup?
-    # To search for sub items?
-
-    """crystal_balls = soup.find_all(class_='target')
-    for x in range(len(crystal_balls)):
-        print(crystal_balls[x])"""
+        cb_list.append(sub_dict)
 
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
