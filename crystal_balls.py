@@ -12,11 +12,6 @@ def scrape_crystal_balls(year):
     page = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
     cb_list = []
-    # main_photo = soup.find_all('li', class_='main-photo')
-    # name = soup.find_all('li', class_='name')
-    # predicted_by = soup.find_all('li', class_='predicted-by')
-    # prediction = soup.find_all('li', class_='prediction')
-    # correct = soup.find_all('li', class_='correct')
     
     #pull every 'target' block
     targets = soup.find_all('li', class_='target')
@@ -29,9 +24,11 @@ def scrape_crystal_balls(year):
         #Grab the recruit's name. I'll also pull the profile url
         name = t.find(class_='name').find('a').get_text()
         profile = t.find(class_='name').find('a').get('href')
+
         #I assume we want the percentages for each team from the predicted-by section. I'm going to do yet another dictionary lol
         teams = {}
         predicted_by = t.find(class_='predicted-by')
+
         if predicted_by.find('a'):
             committed_team = predicted_by.find('a').find('img').get('alt')
             teams[committed_team] = "Committed"
@@ -71,8 +68,6 @@ def scrape_crystal_balls(year):
                     }
         t_dict = {name : sub_dict}
         cb_list.append(t_dict)
-
-    #print(prediction)
 
     # Should I dump all the contents of crystal_balls into a new string to make a new soup?
     # To search for sub items?
