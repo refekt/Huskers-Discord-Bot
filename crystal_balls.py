@@ -17,6 +17,7 @@ def scrape_crystal_balls(year):
     targets = soup.find_all('li', class_='target')
     
     #This is a tough cookie. I'm going to loop over every target block we pulled and grab the info you want, then store in a nested dictionary, then add it to a list.
+    # i = 0
     for t in targets:
         #for the current target block, grab the main photo url. I also split around ? and picked the first item from the result to get a url without the 
         #image width and height args
@@ -60,6 +61,20 @@ def scrape_crystal_balls(year):
                 correct = 'Incorrect'
         
         #Now build the dictionary
+        
+        # *** Suggestion : Add 'Name' to the sub_dict and create keys for t_dic
+        """
+        sub_dict = {'Name' : name
+                    'Photo' : main_photo,
+                    'Profile' : profile,
+                    'Teams' : teams,
+                    'Prediction' : pick,
+                    'Result' : correct
+                    }
+        i += 1
+        t_dict = {i : sub_dict}
+        """
+        # *** End suggestion
         sub_dict = {'Photo' : main_photo,
                     'Profile' : profile,
                     'Teams' : teams,
