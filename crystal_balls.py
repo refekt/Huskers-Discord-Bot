@@ -6,8 +6,6 @@ import json
 import datetime
 
 
-
-
 def scrape_crystal_balls(year):
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page=1&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(year)
@@ -85,6 +83,7 @@ def scrape_crystal_balls(year):
 
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
+
 
 now = datetime.datetime.now()
 scrape_crystal_balls(now.year + 1)

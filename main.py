@@ -6,6 +6,7 @@ import sys
 import random
 import json
 import config
+from selenium import webdriver
 
 
 botPrefix = '$'
