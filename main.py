@@ -6,9 +6,8 @@ import sys
 import random
 import json
 import config
-# import crystal_balls
+import crystal_balls
 import time
-import threading
 
 
 botPrefix = '$'
