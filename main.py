@@ -81,11 +81,8 @@ async def on_message(message):
 
     # Working with crootbot
     if message.author == client.user and 'Search Results:' in message.content and player_search_list:
-        print("Ping search results")
-        # Add reactions
-        # player_search_list_len
-        i = 0
         # Pre-add reactions for users
+        i = 0
         while i < len(player_search_list):
             await message.add_reaction(emoji_list[i])
             i += 1
@@ -348,7 +345,7 @@ async def huskerbotquit(ctx):
 
 @client.command()
 async def secretCommand(ctx, number=0):
-    # print("The secret command was run by {} in {} channel".format(ctx.message.author,ctx.message.channel))
+    print("The secret command (number = {}) was run by {} in {} channel".format(number, ctx.message.author,ctx.message.channel))
     # Error handling
     if number > len(crystal_balls.cb_list):
         await ctx.send("The number of retrieved Crystal Balls must be less than {}.".format(len(crystal_balls.cb_list)))
@@ -356,7 +353,7 @@ async def secretCommand(ctx, number=0):
 
     limitSpam = 0
     for cbs in crystal_balls.cb_list:
-        if limitSpam > number-1:
+        if limitSpam > number:
             return
         limitSpam += 1
         varPhoto = cbs['Photo']
