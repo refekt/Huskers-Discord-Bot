@@ -101,7 +101,9 @@ def compile_all_predictions():
     now = datetime.datetime.now()
     i = 1
     while i <= 14:
+        print("Starting to pull page {} of data.".format(i))
         scrape_crystal_balls(now.year + 1, i)
+        print("Completed page {}.".format(i))
     # Dumps cb_list into a JSON file
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
