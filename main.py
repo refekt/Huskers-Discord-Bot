@@ -6,7 +6,7 @@ import sys
 import random
 import json
 import config
-import crystal_balls
+# import crystal_balls
 import time
 
 
@@ -351,7 +351,7 @@ async def huskerbotquit(ctx):
 
 @client.command()
 async def secretCommand(ctx, number=0):
-    # return # used to stop people from using the command
+    return # used to stop people from using the command
     print("The secret command (number = {}) was run by {} in {} channel".format(number, ctx.message.author,ctx.message.channel))
     # Error handling
     if number > len(crystal_balls.cb_list):
