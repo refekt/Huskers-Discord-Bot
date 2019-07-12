@@ -5,8 +5,9 @@ import requests
 import time
 import datetime
 import cb_settings
+import threading
 
-CB_REFRESH_INTERVAL = 120
+CB_REFRESH_INTERVAL = 240
 cb_list = []
 
 
@@ -106,7 +107,13 @@ def pull_crystal_balls_from_pages(year, page=1):
 
 
 def load_cb_to_list():
-    return
+    print("cb to list")
+    # This function will load the JSON into cb_list
+    f = open('crystal_balls.json', 'r')
+    temp_json = f.read()
+    global cb_list
+    cb_list = json.loads(temp_json)
+    
 
 def move_cb_to_list_and_json(pages=14, json_dump=False):
     # Loops through pull_crystal_balls_from_pages() 'pages' times.
@@ -145,5 +152,11 @@ def check_last_run():
         print("Last time JSON was pulled does not exceed threshold")
         load_cb_to_list()
 
+    # Start a timer
+    check_timer = threading.Timer(CB_REFRESH_INTERVAL*60)
+    check_timer.start()
+    print("Starting a timer to check back in {} minutes".format(CB_REFRESH_INTERVAL))
 
-check_last_run()
+
+# check_last_run()
+load_cb_to_list()
