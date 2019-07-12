@@ -95,11 +95,14 @@ def scrape_crystal_balls(page=1, year):
         # the JSON file for identical matches. If a non-match is found, it'll have to be added to the 
         # JSON and sorted by prediction_time if possible. If not, reverse the JSON and append the list, dict, 
         # or JSON and add all together for historical data.
-        
+
+
+def compile_all_predictions():
+    now = datetime.datetime.now()
+    i = 1
+    while i <= 14
+        scrape_crystal_balls(i, now.year + 1)
     # Dumps cb_list into a JSON file
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
 
-
-now = datetime.datetime.now()
-scrape_crystal_balls(year=now.year + 1)
