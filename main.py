@@ -24,7 +24,7 @@ emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
-
+    
 # Load the long names and abbreviations for recruit positions
 long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'DUAL': 'Dual-Threat Quarterback',
