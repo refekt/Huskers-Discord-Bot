@@ -3,6 +3,7 @@ import datetime
 from bs4 import BeautifulSoup
 import requests
 import time
+import datetime
 
 cb_list = []
 
@@ -12,7 +13,7 @@ def scrape_crystal_balls(year, page=1):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
     url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page={}&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(page, year)
-    print("Opening {}".format(url))
+    # print("Opening {}".format(url))
     # Pull all data from the aforementioned URL
     page = requests.get(url=url, headers=headers)
     # Convert into a BeautifulSoup4 object
@@ -111,6 +112,7 @@ def compile_all_predictions(jsonDump=False):
         time.sleep(1)
         print("** Completed page {}.".format(i))
         i += 1
+    print("*** All finished")
     # Dumps cb_list into a JSON file
     if jsonDump:
         with open('crystal_balls.json', 'w') as fp:
