@@ -345,7 +345,7 @@ async def huskerbotquit(ctx):
 
 @client.command()
 async def secretCommand(ctx, number=0):
-    return
+    # return
     print("The secret command (number = {}) was run by {} in {} channel".format(number, ctx.message.author,ctx.message.channel))
     # Error handling
     if number > len(crystal_balls.cb_list):

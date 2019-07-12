@@ -12,7 +12,7 @@ def scrape_crystal_balls(year, page=1):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
     url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page={}&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(page, year)
-    
+    print("Opening {}".format(url))
     # Pull all data from the aforementioned URL
     page = requests.get(url=url, headers=headers)
     # Convert into a BeautifulSoup4 object
@@ -63,11 +63,12 @@ def scrape_crystal_balls(year, page=1):
         # Since we are looking at a free page, the prediction can differ if its a locked pick or free pick.
         # I'm going to first check if it's locked or not and handle it from there
         unlock = t.find(class_='prediction').find('div').find('div')
-        print("{}: {}".format(name, unlock))
         # I noticed locked picks are two nested divs while free picks are one div containing a team image
         pick = 'VIP'
-        if t.find(class_='question-icon'):
+        if t.find(class_='prediction').find('div').find(class_='question-icon'):
             pick = 'Cloudy'
+        elif t.find(class_='prediction').find('div').find(class_='icon-zero'):
+            pick = 'Zero'
         elif not unlock:
             pick = t.find(class_='prediction').find('div').find('img').get('alt')
         # Correct is tough
@@ -101,7 +102,7 @@ def scrape_crystal_balls(year, page=1):
         # or JSON and add all together for historical data.
 
 
-def compile_all_predictions():
+def compile_all_predictions(jsonDump=False):
     now = datetime.datetime.now()
     i = 1
     while i <= 14:
@@ -111,8 +112,9 @@ def compile_all_predictions():
         print("** Completed page {}.".format(i))
         i += 1
     # Dumps cb_list into a JSON file
-    with open('crystal_balls.json', 'w') as fp:
-        json.dump(cb_list, fp, sort_keys=True, indent=4)
+    if jsonDump:
+        with open('crystal_balls.json', 'w') as fp:
+            json.dump(cb_list, fp, sort_keys=True, indent=4)
 
 
 compile_all_predictions()
