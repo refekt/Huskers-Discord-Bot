@@ -6,7 +6,7 @@ import requests
 cb_list = []
 
 
-def scrape_crystal_balls(page=1, year):
+def scrape_crystal_balls(year, page=1):
     # Headers are requires to avoid the Interal Server Error (500) when using request.get()
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
@@ -101,7 +101,7 @@ def compile_all_predictions():
     now = datetime.datetime.now()
     i = 1
     while i <= 14
-        scrape_crystal_balls(i, now.year + 1)
+        scrape_crystal_balls(now.year + 1, i)
     # Dumps cb_list into a JSON file
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
