@@ -100,9 +100,12 @@ def scrape_crystal_balls(page=1, year):
 def compile_all_predictions():
     now = datetime.datetime.now()
     i = 1
-    while i <= 14
+    while i <= 14:
         scrape_crystal_balls(i, now.year + 1)
     # Dumps cb_list into a JSON file
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
 
+
+
+compile_all_predictions2()
