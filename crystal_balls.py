@@ -63,10 +63,12 @@ def scrape_crystal_balls(year, page=1):
         # Since we are looking at a free page, the prediction can differ if its a locked pick or free pick.
         # I'm going to first check if it's locked or not and handle it from there
         unlock = t.find(class_='prediction').find('div').find('div')
-        print("Test: {}".format(unlock))
+        print("{}: {}".format(name, unlock))
         # I noticed locked picks are two nested divs while free picks are one div containing a team image
         pick = 'VIP'
-        if not unlock:
+        if t.find(class_='question-icon'):
+            pick = 'Cloudy'
+        elif not unlock:
             pick = t.find(class_='prediction').find('div').find('img').get('alt')
         # Correct is tough
         result_exist = t.find(class_='correct').find('svg')
@@ -103,11 +105,11 @@ def compile_all_predictions():
     now = datetime.datetime.now()
     i = 1
     while i <= 14:
-        print("Starting to pull page {} of data.".format(i))
+        print("*** Starting to pull page {} of data.".format(i))
         scrape_crystal_balls(now.year + 1, i)
         time.sleep(1)
+        print("** Completed page {}.".format(i))
         i += 1
-        print("Completed page {}.".format(i))
     # Dumps cb_list into a JSON file
     with open('crystal_balls.json', 'w') as fp:
         json.dump(cb_list, fp, sort_keys=True, indent=4)
