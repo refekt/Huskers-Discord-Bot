@@ -4,11 +4,12 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import datetime
+import cb_settings
 
 cb_list = []
 
 
-def scrape_crystal_balls(year, page=1):
+def crystal_balls_to_list(year, page=1):
     # Headers are requires to avoid the Interal Server Error (500) when using request.get()
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
@@ -103,12 +104,12 @@ def scrape_crystal_balls(year, page=1):
         # or JSON and add all together for historical data.
 
 
-def compile_all_predictions(jsonDump=False):
+def crystal_balls_to_json(pages=14, jsonDump=False):
     now = datetime.datetime.now()
     i = 1
-    while i <= 14:
+    while i <= pages:
         print("*** Starting to pull page {} of data.".format(i))
-        scrape_crystal_balls(now.year + 1, i)
+        crystal_balls_to_list(now.year + 1, i)
         time.sleep(1)
         print("** Completed page {}.".format(i))
         i += 1
@@ -119,4 +120,16 @@ def compile_all_predictions(jsonDump=False):
             json.dump(cb_list, fp, sort_keys=True, indent=4)
 
 
-compile_all_predictions()
+def dummy():
+    currentDT = datetime.datetime.now()
+    checkDT = currentDT + datetime.timedelta(minutes=120)
+    cb_settings.last_run = checkDT
+    print(checkDT)
+    #if checkDT > cb_settings.LAST_RUN:
+        #print("Last time the JSON was pulled exceeded threshold")
+        #crystal_balls_to_json
+    #else:
+        #print("Last time JSON was pulled does not exceed threshold")
+        # crystal_balls_to_list(now.year + 1, )
+
+dummy()

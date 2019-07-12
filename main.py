@@ -275,6 +275,12 @@ async def randomflag(ctx):
 
 
 @client.command()
+async def crappyiowaflag(ctx):
+    await ctx.send("In honor of {}, behold this crappy flag:".format('<@440885775132000266>'))
+    await ctx.send('https://i.imgur.com/xxs49sF.png')
+
+
+@client.command()
 async def iowasux(ctx):
     """ Iowa has the worst corn """
     await ctx.message.channel.send("You're god damn right they do, {0}!".format(ctx.message.author))
