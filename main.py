@@ -5,6 +5,7 @@ import requests
 import sys
 import random
 import json
+from bs4 import BeautifulSoup
 import config
 import crystal_balls
 import time
