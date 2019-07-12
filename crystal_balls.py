@@ -107,4 +107,4 @@ def compile_all_predictions():
         json.dump(cb_list, fp, sort_keys=True, indent=4)
 
 
-compile_all_predictions2()
+compile_all_predictions()
