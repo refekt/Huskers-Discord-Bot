@@ -6,10 +6,11 @@ import time
 import datetime
 import cb_settings
 
+CB_REFRESH_INTERVAL = 120
 cb_list = []
 
 
-def crystal_balls_to_list(year, page=1):
+def pull_crystal_balls_from_pages(year, page=1):
     # Headers are requires to avoid the Interal Server Error (500) when using request.get()
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
@@ -104,32 +105,45 @@ def crystal_balls_to_list(year, page=1):
         # or JSON and add all together for historical data.
 
 
-def crystal_balls_to_json(pages=14, jsonDump=False):
-    now = datetime.datetime.now()
+def load_cb_to_list():
+    return
+
+def move_cb_to_list_and_json(pages=14, json_dump=False):
+    # Loops through pull_crystal_balls_from_pages() 'pages' times.
+    # Dumps to JSON is json_dump == True
+    print("Starting")
     i = 1
     while i <= pages:
         print("*** Starting to pull page {} of data.".format(i))
-        crystal_balls_to_list(now.year + 1, i)
+        now = datetime.datetime.now()
+        pull_crystal_balls_from_pages(now.year + 1, i)
         time.sleep(1)
         print("** Completed page {}.".format(i))
         i += 1
     print("*** All finished")
+    # Sort cb_list[] by 'PredictedDate'
+
     # Dumps cb_list into a JSON file
-    if jsonDump:
+    if json_dump:
         with open('crystal_balls.json', 'w') as fp:
             json.dump(cb_list, fp, sort_keys=True, indent=4)
+        fp.close()
 
 
-def dummy():
-    currentDT = datetime.datetime.now()
-    checkDT = currentDT + datetime.timedelta(minutes=120)
-    cb_settings.last_run = checkDT
-    print(checkDT)
-    #if checkDT > cb_settings.LAST_RUN:
-        #print("Last time the JSON was pulled exceeded threshold")
-        #crystal_balls_to_json
-    #else:
-        #print("Last time JSON was pulled does not exceed threshold")
-        # crystal_balls_to_list(now.year + 1, )
+def check_last_run():
+    now = datetime.datetime.now()
+    check = cb_settings.last_run + + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)
 
-dummy()
+    if now > check:
+        print("Last time the JSON was pulled exceeded threshold")
+        move_cb_to_list_and_json(json_dump=True)
+
+        f = open('cb_settings.py', 'w')
+        f.write('last_run = {}'.format(now))
+        f.close()
+    else:
+        print("Last time JSON was pulled does not exceed threshold")
+        load_cb_to_list()
+
+
+check_last_run()
