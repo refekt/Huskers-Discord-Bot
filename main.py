@@ -1,12 +1,17 @@
+#!/usr/bin/env python3.7
 import discord
 from discord.ext import commands
 import requests
 import sys
 import random
 import json
+from bs4 import BeautifulSoup
 import config
 import crystal_balls
 import time
+from selenium import webdriver
+
+
 
 botPrefix = '$' # The prefix used for all commands
 client = commands.Bot(command_prefix=botPrefix)
@@ -19,6 +24,7 @@ emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
+    
 # Load the long names and abbreviations for recruit positions
 long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'DUAL': 'Dual-Threat Quarterback',
