@@ -357,6 +357,7 @@ async def secretCommand(ctx):
         varPhoto = cbs['Photo']
         varName = cbs['Name']
         varPrediction = cbs['Prediction']
+        varPrediction = cbs['PredictionDate']
         varProfile = cbs['Profile']
         varResult = cbs['Result']
         varTeams = dict(cbs['Teams'])
@@ -368,6 +369,7 @@ async def secretCommand(ctx):
         embed.set_thumbnail(url=varPhoto)
         embed.add_field(name="Player Name", value=varName, inline=True)
         embed.add_field(name="Prediction", value=varPrediction, inline=True)
+        embed.add_field(name="Prediction Date/Time", value=varPrediction, inline=True)
         embed.add_field(name="247Sports Profile", value=varProfile, inline=False)
         embed.add_field(name="Result", value=varResult, inline=False)
         embed.add_field(name="Predicted Teams", value=varTeamString, inline=True)

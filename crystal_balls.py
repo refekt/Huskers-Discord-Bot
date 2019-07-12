@@ -47,7 +47,7 @@ def scrape_crystal_balls(year):
         #since we are looking at a free page, the prediction can differ if its a locked pick or free pick. I'm going to first check if it's locked or not and handle it from there
         unlock = t.find(class_='prediction').find('div').find('div')
         #I noticed locked picks are two nested divs while free picks are one div containing a team image
-        pick = 'Locked'
+        pick = 'VIP'
         if not unlock:
             pick = t.find(class_='prediction').find('div').find('img').get('alt')
         #Correct is tough
@@ -59,7 +59,9 @@ def scrape_crystal_balls(year):
             if correct_incorrect:
                 correct = 'Incorrect'
 
-        # TBD: pull prediction date/time as well
+        # YES!!! WOOO!
+        prediction_time = t.find(class_='prediction-date')
+        prediction_time = prediction_time.get_text().strip()
 
         #Now build the dictionary
         sub_dict = {'Name' : name,
@@ -67,6 +69,7 @@ def scrape_crystal_balls(year):
                     'Profile' : profile,
                     'Teams' : teams,
                     'Prediction' : pick,
+                    'PredictionDate' : str(prediction_time),
                     'Result' : correct
                     }
         cb_list.append(sub_dict)
