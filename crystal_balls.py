@@ -6,15 +6,11 @@ import requests
 cb_list = []
 
 
-def scrape_crystal_balls(year=0):
-    url = 'https://247sports.com/User/Steve%20Wiltfong/Predictions/?PlayerInstitution.PrimaryPlayerSport.Sport=Football&PlayerInstitution.PrimaryPlayerSport.Recruitment.Year={}'.format(year)
-
-
-def scrape_crystal_balls(year):
+def scrape_crystal_balls(page=1, year):
     # Headers are requires to avoid the Interal Server Error (500) when using request.get()
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
-    url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page=1&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(year)
+    url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page={}&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(page, year)
     
     # Pull all data from the aforementioned URL
     page = requests.get(url=url, headers=headers)
@@ -106,4 +102,4 @@ def scrape_crystal_balls(year):
 
 
 now = datetime.datetime.now()
-scrape_crystal_balls(now.year + 1)
+scrape_crystal_balls(year=now.year + 1)
