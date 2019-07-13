@@ -42,23 +42,24 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'LS' : 'Long Snapper',
                   'RET' : 'Returner'
                   }
-ref_dict = {'hold': {'Holding','OFF: 10 yards from the line of scrimmage and replay the down.\nDEF: 10 yards','https://i.imgur.com/iPUNHJi.gif'},
-            'hand2face': {'Hands to the face','OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards, automatic first down','https://i.imgur.com/DNw5Qsq.gif'},
-            'facemask': {'Face mask','OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards from the end spot of the play, automatic first down','https://i.imgur.com/xzsJ8MB.gif'},
-            'persfoal': {'Personal foul','OFF: 15 yards\nDEF: 15 yards from the end spot of the play, automatic first down','https://i.imgur.com/dyWMN7p.gif'},
-            'unsport': {'Unsportsmanlike','OFF: 15 yards\nDEF: 15 yards','https://i.imgur.com/6Cy9UE4.gif'},
-            'encroach': {'Encroachment','DEF: 5 yards','https://i.imgur.com/4ekGPs4.gif'},
-            'illshift': {'Illegal shift','OFF: 5 yards','https://i.imgur.com/RDhSuUw.gif'},
-            'falsestart': {'False start','OFF: 5 yards','https://i.imgur.com/i9ZyMpn.gif'},
-            'illfwd': {'Illegal forward pass','OFF: 5 yards from the spot of the foul and a loss of down','https://i.imgur.com/4CuuTDH.gif'},
-            'ruffkick': {'Roughing/Running into the kicker','DEF: (running) 5 yards, (roughing, personal foul) 15 yards and automatic first down ','https://i.imgur.com/UuTBUJv.gif'},
-            'ruffpass': {'Roughing the passer','DEF: 15 yards and an automatic first down (from the end of the play if pass is completed)','https://i.imgur.com/XqPE1Pf.gif'},
-            'inegrcvr': {'Inelligible receiver downfield','OFF: 5 yards','https://i.imgur.com/hIfsc5D.gif'},
-            'td': {'Touchdown','OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'},
-            'chop': {'Blocking below the waist','OFF: 15 yards\nDEF: 15 yards and an automatic first down','https://i.imgur.com/cuiRu7T.gif'},
-            'chip': {'Blocking below the waist','OFF: 15 yards\nDEF: 15 yards and an automatic first down','https://i.imgur.com/46aDB8t.gif'},
-            'safety': {'Safety','DEF: 2 points and possession, opponent free kicks from their own 20 yard line','https://i.imgur.com/Y8pKXaH.gif'},
-            'pi': {'Pass interference','OFF: 15 yards\nDEF: Lesser of either 15 yards or the spot of the foul, and an automatic first down (ball placed at the 2 yard line if penalty occurs in the endzone)','https://i.imgur.com/w1Tglj4.gif'}}
+ref_dict = {'hold': ['Holding','OFF: 10 yards from the line of scrimmage and replay the down.\nDEF: 10 yards','https://i.imgur.com/iPUNHJi.gif'],
+            'hand2face': ['Hands to the face','OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards, automatic first down','https://i.imgur.com/DNw5Qsq.gif'],
+            'facemask': ['Face mask','OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards from the end spot of the play, automatic first down','https://i.imgur.com/xzsJ8MB.gif'],
+            'persfoal': ['Personal foul','OFF: 15 yards\nDEF: 15 yards from the end spot of the play, automatic first down','https://i.imgur.com/dyWMN7p.gif'],
+            'unsport': ['Unsportsmanlike','OFF: 15 yards\nDEF: 15 yards','https://i.imgur.com/6Cy9UE4.gif'],
+            'encroach': ['Encroachment','DEF: 5 yards','https://i.imgur.com/4ekGPs4.gif'],
+            'illshift': ['Illegal shift','OFF: 5 yards','https://i.imgur.com/RDhSuUw.gif'],
+            'falsestart': ['False start','OFF: 5 yards','https://i.imgur.com/i9ZyMpn.gif'],
+            'illfwd': ['Illegal forward pass','OFF: 5 yards from the spot of the foul and a loss of down','https://i.imgur.com/4CuuTDH.gif'],
+            'ruffkick': ['Roughing/Running into the kicker','DEF: (running) 5 yards, (roughing, personal foul) 15 yards and automatic first down ','https://i.imgur.com/UuTBUJv.gif'],
+            'ruffpass': ['Roughing the passer','DEF: 15 yards and an automatic first down (from the end of the play if pass is completed)','https://i.imgur.com/XqPE1Pf.gif'],
+            'inegrcvr': ['Inelligible receiver downfield','OFF: 5 yards','https://i.imgur.com/hIfsc5D.gif'],
+            'td': ['Touchdown','OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'],
+            'chop': ['Blocking below the waist','OFF: 15 yards\nDEF: 15 yards and an automatic first down','https://i.imgur.com/cuiRu7T.gif'],
+            'chip': ['Blocking below the waist','OFF: 15 yards\nDEF: 15 yards and an automatic first down','https://i.imgur.com/46aDB8t.gif'],
+            'safety': ['Safety','DEF: 2 points and possession, opponent free kicks from their own 20 yard line','https://i.imgur.com/Y8pKXaH.gif'],
+            'pi': ['Pass interference','OFF: 15 yards\nDEF: Lesser of either 15 yards or the spot of the foul, and an automatic first down (ball placed at the 2 yard line if penalty occurs in the endzone)','https://i.imgur.com/w1Tglj4.gif']
+            }
 
 
 @client.event
@@ -387,10 +388,7 @@ async def huskerbotquit(ctx):
 
 @client.command()
 async def secret(ctx):
-    await ctx.send("Short Name: {}\n"
-                   "Long Name: {}\n"
-                   "Description: {}\n"
-                   "URL: {}".format(ref_dict[0], ref_dict[0][0],ref_dict[0][1],ref_dict[0][2]))
+    await ctx.send("Short Name: {}\nLong Name: {}\nDescription: {}\nURL: {}".format(ref_dict['hold'], ref_dict['hold'][0], ref_dict['hold'][1], ref_dict['hold'][2]))
 
 @client.command()
 async def recentballs(ctx, number=0):
