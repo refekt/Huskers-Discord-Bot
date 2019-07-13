@@ -1,5 +1,17 @@
 [
     {
+        "Name": "Jacobe Covington",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/168/141/9141168.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/12/19 6:31PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Jacobe-Covington-at-Saguaro-216650/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Oklahoma": "83%",
+            "Unknown": "17%"
+        }
+    },
+    {
         "Name": "Marcellus Moore",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/814/981/8981814.jpg",
         "Prediction": "VIP",
@@ -280,17 +292,6 @@
         "Teams": {
             "Minnesota": "50%",
             "Unknown": "50%"
-        }
-    },
-    {
-        "Name": "Ryan Brandt",
-        "Photo": "https://s3media.247sports.com/Uploads/Assets/554/427/8427554.jpg",
-        "Prediction": "PUR",
-        "PredictionDate": "7/01/19 10:18PM",
-        "Profile": "https://247sports.com/PlayerInstitution/Ryan-Brandt-at-Angola-211801/CurrentExpertPredictions/",
-        "Result": "Correct",
-        "Teams": {
-            "Purdue": "Committed"
         }
     },
     {

@@ -6,6 +6,7 @@ import time
 import datetime
 import cb_settings
 import threading
+import pandas
 
 CB_REFRESH_INTERVAL = 240
 cb_list = []
@@ -112,6 +113,7 @@ def load_cb_to_list():
     temp_json = f.read()
     global cb_list
     cb_list = json.loads(temp_json)
+    print("Crystal Balls loaded into cb_list.")
 
 
 def move_cb_to_list_and_json(pages=14, json_dump=False):
@@ -123,8 +125,8 @@ def move_cb_to_list_and_json(pages=14, json_dump=False):
         print("*** Starting to pull page {} of data.".format(i))
         now = datetime.datetime.now()
         pull_crystal_balls_from_pages(now.year + 1, i)
-        time.sleep(1)
-        print("** Completed page {}.".format(i))
+        time.sleep(2)
+        print("*** Completed page {}.".format(i))
         i += 1
     print("*** All finished")
     # Sort cb_list[] by 'PredictedDate'
@@ -138,26 +140,19 @@ def move_cb_to_list_and_json(pages=14, json_dump=False):
 
 def check_last_run():
     now = datetime.datetime.now()
-    check = cb_settings.last_run + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)
+    temp_check = cb_settings.last_run
+    check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)# datetime.datetime.strptime(temp_check, '%Y-%d-%M %I:%M')
 
     if now > check:
         print("Last time the JSON was pulled exceeded threshold")
         move_cb_to_list_and_json(json_dump=True)
 
         f = open('cb_settings.py', 'w')
-        f.write('import datetime\nlast_run = datetime.datetime({}, {}, {}), {}, {}\n'.format(now.year, now.month, now.day, now.hour, now.minute))
+        f.write('last_run = \'{}\''.format(datetime.datetime.now()))
         f.close()
     else:
         print("Last time JSON was pulled does not exceed threshold")
         load_cb_to_list()
 
 
-def start_timer():
-    # Start a timer
-    check_timer = threading.Timer(CB_REFRESH_INTERVAL * 60)
-    check_timer.start()
-    print("Starting a timer to check back in {} minutes".format(CB_REFRESH_INTERVAL))
-
-
 check_last_run()
-start_timer()

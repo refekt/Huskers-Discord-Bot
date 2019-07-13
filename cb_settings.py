@@ -1,2 +1,1 @@
-import datetime
-last_run = datetime.datetime(2019, 7, 12), 19, 42
+last_run = '2019-07-12 22:06:53.015283'
