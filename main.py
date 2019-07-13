@@ -7,13 +7,11 @@ import random
 import json
 import config
 import crystal_balls
-import time
 
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
 player_search_list = [] #initialize a global list for crootbot to put search results in
-player_search_list_len = 0 # length storage
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 
 
@@ -32,24 +30,43 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'OG' : 'Offensive Guard',
                   'OC' : 'Center',
                   'SDE' : 'Strong-Side Defensive End',
-                  'WDE' : 'Weak-Side Defensive End', 
+                  'WDE' : 'Weak-Side Defensive End',
                   'DT' : 'Defensive Tackle',
-                  'ILB' : 'Inside Linebacker', 
+                  'ILB' : 'Inside Linebacker',
                   'OLB' : 'Outside Linebacker',
                   'CB' : 'Cornerback',
                   'S' : 'Safety',
                   'ATH' : 'Athlete',
                   'K' : 'Kicker',
-                  'P' : 'Punter', 
+                  'P' : 'Punter',
                   'LS' : 'Long Snapper',
                   'RET' : 'Returner'
                   }
+ref_dict = {'hold': {'Holding','OFF: 10 yards from the line of scrimmage and replay the down.\nDEF: 10 yards','https://i.imgur.com/iPUNHJi.gif'},
+            'hand2face': {'Hands to the face','OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards, automatic first down','https://i.imgur.com/DNw5Qsq.gif'},
+            'facemask': {'Face mask','OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards from the end spot of the play, automatic first down','https://i.imgur.com/xzsJ8MB.gif'},
+            'persfoal': {'Personal foul','OFF: 15 yards\nDEF: 15 yards from the end spot of the play, automatic first down','https://i.imgur.com/dyWMN7p.gif'},
+            'unsport': {'Unsportsmanlike','OFF: 15 yards\nDEF: 15 yards','https://i.imgur.com/6Cy9UE4.gif'},
+            'encroach': {'Encroachment','DEF: 5 yards','https://i.imgur.com/4ekGPs4.gif'},
+            'illshift': {'Illegal shift','OFF: 5 yards','https://i.imgur.com/RDhSuUw.gif'},
+            'falsestart': {'False start','OFF: 5 yards','https://i.imgur.com/i9ZyMpn.gif'},
+            'illfwd': {'Illegal forward pass','OFF: 5 yards from the spot of the foul and a loss of down','https://i.imgur.com/4CuuTDH.gif'},
+            'ruffkick': {'Roughing/Running into the kicker','DEF: (running) 5 yards, (roughing, personal foul) 15 yards and automatic first down ','https://i.imgur.com/UuTBUJv.gif'},
+            'ruffpass': {'Roughing the passer','DEF: 15 yards and an automatic first down (from the end of the play if pass is completed)','https://i.imgur.com/XqPE1Pf.gif'},
+            'inegrcvr': {'Inelligible receiver downfield','OFF: 5 yards','https://i.imgur.com/hIfsc5D.gif'},
+            'td': {'Touchdown','OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'},
+            'chop': {'Blocking below the waist','OFF: 15 yards\nDEF: 15 yards and an automatic first down','https://i.imgur.com/cuiRu7T.gif'},
+            'chip': {'Blocking below the waist','OFF: 15 yards\nDEF: 15 yards and an automatic first down','https://i.imgur.com/46aDB8t.gif'},
+            'safety': {'Safety','DEF: 2 points and possession, opponent free kicks from their own 20 yard line','https://i.imgur.com/Y8pKXaH.gif'},
+            'pi': {'Pass interference','OFF: 15 yards\nDEF: Lesser of either 15 yards or the spot of the foul, and an automatic first down (ball placed at the 2 yard line if penalty occurs in the endzone)','https://i.imgur.com/w1Tglj4.gif'}}
 
 
 @client.event
 async def on_ready():
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
     # print("The client has the following emojis:\n", client.emojis)
+
+# Reference - https://www.cougcenter.com/2013/6/28/4445944/common-ncaa-football-penalties-referee-signals
 
 
 @client.event
@@ -107,7 +124,7 @@ async def on_reaction_add(reaction, user):
                       '🔟' : 9
                       }
         if reaction.emoji in emoji_dict:
-            await parse_search(search = player_search_list[emoji_dict[reaction.emoji]], channel = channel)
+            await parse_search(search=player_search_list[emoji_dict[reaction.emoji]], channel=channel)
 
 
 @client.event
@@ -118,9 +135,9 @@ async def on_command_error(ctx, error):
 
 @client.command()
 async def crootbot(ctx):
-    #pulls a json file from the 247 advanced player search API and parses it to give
-    #info on the croot.
-    #First, pull the message content, split the individual pieces, and make the api call
+    """ CrootBot provides the ability to search for and return information on football recruits """
+    # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
+    # First, pull the message content, split the individual pieces, and make the api call
     croot_info = ctx.message.content.strip().split()
     # Added error handling to prevent bad inputs, not perfect doesn't check each value
     # [0] should be $crootbot
@@ -145,8 +162,7 @@ async def crootbot(ctx):
         players_string = ('''There were multiple matches for {} {} in the {} class. Please react with the corresponding emoji to the player you\'d 
 like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
         players_list = []
-        player_search_list = search       
-        player_search_list_len = range(min(10,len(search)))
+        player_search_list = search
         for i in range(min(10, len(search))):
             player = search[i]['Player']
             first_name = player['FirstName']
@@ -157,13 +173,6 @@ like to see CrootBot results for.\n Search Results:\n''').format(first_name, las
             players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
             players_list.append(['FirstName', 'LastName'])
         await ctx.send(players_string)
-        # new_message = client.
-        # i = 0
-        # Pre-add reactions for users
-        # while i < range(min(10, len(search))):
-            # await ctx.message.add_reaction(emoji_list[i])
-            # i += 1
-
     else:
         channel = ctx.channel
         await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
@@ -275,18 +284,24 @@ async def randomflag(ctx):
 
 
 @client.command()
+async def crappytexasflag(ctx):
+    """ Texas' flag is crap """
+    await ctx.send("In honor of {}, behold this crappy flag: https://i.imgur.com/eRPHKgB.jpg".format('<@519982151698087956>'))
+
+
+@client.command()
 async def crappyiowaflag(ctx):
-    await ctx.send("In honor of {}, behold this crappy flag:".format('<@440885775132000266>'))
-    await ctx.send('https://i.imgur.com/xxs49sF.png')
+    """ Iowa's flag is crap """
+    await ctx.send("In honor of {}, behold this crappy flag: https://i.imgur.com/xxs49sF.png".format('<@440885775132000266>'))
 
 
 @client.command()
 async def iowasux(ctx):
     """ Iowa has the worst corn """
-    await ctx.message.channel.send("You're god damn right they do, {0}!".format(ctx.message.author))
     emoji = client.get_emoji(441038975323471874)
-    await ctx.message.add_reaction(emoji)
-    await ctx.message.channel.send(emoji)
+    embed = discord.Embed(title="{} IOWA SUX {}".format(emoji, emoji))
+    embed.set_image(url='https://i.imgur.com/3jjWG85.gif')
+    await ctx.send(embed=embed)
 
 
 @client.command()
@@ -300,6 +315,14 @@ async def potatoes(ctx):
     """ Potatoes are love; potatoes are life """
     embed = discord.Embed(title="Po-Tay-Toes")
     embed.set_image(url='https://i.imgur.com/Fzw6Gbh.gif')
+    await ctx.send(embed=embed)
+
+
+@client.command()
+async def asparagus(ctx):
+    """ I guess some people like asparagus """
+    embed = discord.Embed(title="Asparagang")
+    embed.set_image(url='https://i.imgur.com/QskqFO0.gif')
     await ctx.send(embed=embed)
 
 
@@ -342,12 +365,32 @@ async def whoami(ctx):
     await ctx.send(embed=embed)
 
 
+@client.command()
+async def thehit(ctx):
+    """ The hardest clean hit ever """
+    embed = discord.Embed(title="CLEAN HIT!")
+    embed.set_image(url='https://i.imgur.com/mKRUPoD.gif')
+    await ctx.send(embed=embed)
+
+
+@client.command()
+async def flag(ctx, penalty):
+    """ Sends a GIF of a referee callling a penalty """
+
+
 @client.command()    
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     print("HuskerBot was terminated by {}.".format(ctx.message.author))
     await client.logout()
 
+
+@client.command()
+async def secret(ctx):
+    await ctx.send("Short Name: {}\n"
+                   "Long Name: {}\n"
+                   "Description: {}\n"
+                   "URL: {}".format(ref_dict[0], ref_dict[0][0],ref_dict[0][1],ref_dict[0][2]))
 
 @client.command()
 async def recentballs(ctx, number=0):
