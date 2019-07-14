@@ -283,21 +283,22 @@ async def randomflag(ctx):
 @client.command()
 async def crappyflag(ctx, state):
     """ Outputs crappy flag.
-    The usage is $crappyflag <state>. The states are iowa, nw, osu, minn, mu, uf, isu, cu, wisc, texas """
+    The usage is $crappyflag <state>. The states are iowa, nw, osu, minn, miami, mu, isu, iu, cu, wisc, texas """
     flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
                  'nw': 'https://i.imgur.com/WG4kFP6.jpg',
                  'osu': 'https://i.imgur.com/coxjUAZ.jpg',
                  'minn': 'https://i.imgur.com/54mF0sK.jpg',
                  'mu': 'https://i.imgur.com/XWEDsFf.jpg',
-                 'uf': 'https://i.imgur.com/MInQMLb.jpg',
+                 'miami': 'https://i.imgur.com/MInQMLb.jpg',
                  'ius': 'https://i.imgur.com/w9vg0QX.jpg',
+                 'iu': 'https://i.imgur.com/uc0Q8Z0.jpg',
                  'cu': 'https://i.imgur.com/XTsKDvc.jpg',
                  'wisc': 'https://i.imgur.com/lgFZFkV.jpg',
                  'texas': 'https://i.imgur.com/rB2Rduq.jpg'
                  }
 
     embed = discord.Embed(title="Crappy Flags")
-    embed.set_image(url=flag_dict[state])
+    embed.set_image(url=flag_dict[state.lower()])
     await ctx.send(embed=embed)
 
 
@@ -406,8 +407,7 @@ async def referee(ctx, call):
 @client.command()
 async def recentballs(ctx, number=0):
     """ Send the last 1-5 crystal ball predictions from Steve Wiltfong. Usage is `$recent_balls [1-5]`. """
-    # Error handling
-    # Random number of 5 to prevent spam
+    # Error handling, Random number of 5 to prevent spam
     if number > 5:  # len(crystal_balls.cb_list):
         await ctx.send("The number of retrieved Crystal Balls must be less than 5.")
         return
@@ -418,7 +418,6 @@ async def recentballs(ctx, number=0):
         number -= 1
 
     for cbs in crystal_balls.cb_list:
-        # print("Number : {} >= limitSpam : {}".format(number, limitSpam))
         if limitSpam >= number:
             return
 
@@ -433,6 +432,7 @@ async def recentballs(ctx, number=0):
 
         for x, y in varTeams.items():
             varTeamString += '{} : {}\n'.format(x, y)
+
         embed = discord.Embed(title="Steve Wiltfong Crystal Ball Predictions", color=0xff0000)
         embed.set_thumbnail(url=varPhoto)
         embed.add_field(name="Player Name", value=varName, inline=False)
