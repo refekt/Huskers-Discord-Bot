@@ -84,7 +84,9 @@ flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'maryland': 'https://i.imgur.com/G6RX8Oz.jpg',
              'michigan_state': 'https://i.imgur.com/90a9g3v.jpg',
              'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
-             'rutgers': 'https://i.imgur.com/lyng39h.jpg'
+             'rutgers': 'https://i.imgur.com/lyng39h.jpg',
+             'south_alabama': 'https://i.imgur.com/BOH5reA.jpg',
+             'northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg'
              }
 
 eight_ball = ['Try again',
@@ -292,6 +294,12 @@ async def parse_search(search, channel):
         global player_search_list
         player_search_list = []
 
+
+@client.command()
+async def cb(ctx):
+    await crootbot.invoke(ctx)
+
+
 @client.command()
 async def billyfacts(ctx):
     """ Real facts about Bill Callahan. """
@@ -324,7 +332,7 @@ async def randomflag(ctx):
 async def crappyflag(ctx, state):
     """ Outputs crappy flag.
     The usage is $crappyflag <state>.
-    The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northwestern, ohio_state, penn_state, purdue, rutgers, texas, wisconsin """
+    The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
 
     state = state.lower()
 
