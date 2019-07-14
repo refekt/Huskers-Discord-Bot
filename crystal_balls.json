@@ -1,5 +1,28 @@
 [
     {
+        "Name": "Chris Morris",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/823/224/9224823.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 6:27AM",
+        "Profile": "https://247sports.com/PlayerInstitution/Chris-Morris-at-Memphis-Central-201600/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Texas A&M": "33%",
+            "Unknown": "67%"
+        }
+    },
+    {
+        "Name": "Daniyel Ngata",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/248/139/9139248.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 5:49AM",
+        "Profile": "https://247sports.com/PlayerInstitution/Daniyel-Ngata-at-Folsom-210325/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Texas A&M": "100%"
+        }
+    },
+    {
         "Name": "Jacobe Covington",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/168/141/9141168.jpg",
         "Prediction": "VIP",
@@ -56,7 +79,7 @@
         "Profile": "https://247sports.com/PlayerInstitution/Makari-Paige-at-West-Bloomfield-205196/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Michigan": "83%",
+            "Michigan": "85%",
             "Ohio State": "8%",
             "Unknown": "8%"
         }
