@@ -283,19 +283,28 @@ async def randomflag(ctx):
 @client.command()
 async def crappyflag(ctx, state):
     """ Outputs crappy flag.
-    The usage is $crappyflag <state>. The states are iowa, nw, osu, minn, miami, mu, isu, iu, cu, wisc, texas """
+    The usage is $crappyflag <state>.
+    The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northwestern, ohio_state, penn_state, purdue, rutgers, texas, wisconsin """
     flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
-                 'nw': 'https://i.imgur.com/WG4kFP6.jpg',
-                 'osu': 'https://i.imgur.com/coxjUAZ.jpg',
-                 'minn': 'https://i.imgur.com/54mF0sK.jpg',
-                 'mu': 'https://i.imgur.com/XWEDsFf.jpg',
+                 'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
+                 'ohio_state': 'https://i.imgur.com/coxjUAZ.jpg',
+                 'minnesota': 'https://i.imgur.com/54mF0sK.jpg',
+                 'michigan': 'https://i.imgur.com/XWEDsFf.jpg',
                  'miami': 'https://i.imgur.com/MInQMLb.jpg',
-                 'ius': 'https://i.imgur.com/w9vg0QX.jpg',
-                 'iu': 'https://i.imgur.com/uc0Q8Z0.jpg',
-                 'cu': 'https://i.imgur.com/XTsKDvc.jpg',
-                 'wisc': 'https://i.imgur.com/lgFZFkV.jpg',
-                 'texas': 'https://i.imgur.com/rB2Rduq.jpg'
+                 'iowa_state': 'https://i.imgur.com/w9vg0QX.jpg',
+                 'indiana': 'https://i.imgur.com/uc0Q8Z0.jpg',
+                 'colorado': 'https://i.imgur.com/XTsKDvc.jpg',
+                 'wisconsin': 'https://i.imgur.com/lgFZFkV.jpg',
+                 'texas': 'https://i.imgur.com/rB2Rduq.jpg',
+                 'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
+                 'illinois': 'https://i.imgur.com/MxMaS3e.jpg',
+                 'maryland': 'https://i.imgur.com/G6RX8Oz.jpg',
+                 'michigan_state': 'https://i.imgur.com/90a9g3v.jpg',
+                 'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
+                 'rutgers': 'https://i.imgur.com/lyng39h.jpg'
                  }
+
+    state = state.lower()
 
     embed = discord.Embed(title="Crappy Flags")
     embed.set_image(url=flag_dict[state.lower()])

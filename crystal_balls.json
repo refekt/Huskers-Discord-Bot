@@ -1,5 +1,17 @@
 [
     {
+        "Name": "Willis Singleton",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/118/227/9227118.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 1:08PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Willis-Singleton-at-Warren-Township-195715/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Illinois": "50%",
+            "Iowa State": "50%"
+        }
+    },
+    {
         "Name": "Chris Morris",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/823/224/9224823.jpg",
         "Prediction": "VIP",
@@ -2771,12 +2783,12 @@
     {
         "Name": "Sam Adams II",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/376/140/9140376.JPG",
-        "Prediction": "VIP",
+        "Prediction": "WASH",
         "PredictionDate": "3/30/19 12:09PM",
         "Profile": "https://247sports.com/PlayerInstitution/Sam-Adams-II-at-Eastside-Catholic-195792/CurrentExpertPredictions/",
-        "Result": "TBD",
+        "Result": "Correct",
         "Teams": {
-            "Washington": "100%"
+            "Washington": "Committed"
         }
     },
     {
