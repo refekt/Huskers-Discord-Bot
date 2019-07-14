@@ -68,6 +68,46 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'RET' : 'Returner'
                   }
 
+flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
+             'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
+             'ohio_state': 'https://i.imgur.com/coxjUAZ.jpg',
+             'minnesota': 'https://i.imgur.com/54mF0sK.jpg',
+             'michigan': 'https://i.imgur.com/XWEDsFf.jpg',
+             'miami': 'https://i.imgur.com/MInQMLb.jpg',
+             'iowa_state': 'https://i.imgur.com/w9vg0QX.jpg',
+             'indiana': 'https://i.imgur.com/uc0Q8Z0.jpg',
+             'colorado': 'https://i.imgur.com/XTsKDvc.jpg',
+             'wisconsin': 'https://i.imgur.com/lgFZFkV.jpg',
+             'texas': 'https://i.imgur.com/rB2Rduq.jpg',
+             'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
+             'illinois': 'https://i.imgur.com/MxMaS3e.jpg',
+             'maryland': 'https://i.imgur.com/G6RX8Oz.jpg',
+             'michigan_state': 'https://i.imgur.com/90a9g3v.jpg',
+             'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
+             'rutgers': 'https://i.imgur.com/lyng39h.jpg'
+             }
+
+eight_ball = ['Try again',
+              'Definitely yes',
+              'It is certain',
+              'It is decidedly so',
+              'Without a doubt',
+              'Yes – definitely',
+              'You may rely on it',
+              'As I see it, yes',
+              'Most Likely',
+              'These are the affirmative answers.',
+              'Don’t count on it',
+              'My reply is no',
+              'My sources say no',
+              'Outlook not so good, and very doubtful',
+              'Reply hazy',
+              'Try again',
+              'Ask again later',
+              'Better not tell you now',
+              'Cannot predict now',
+              'Concentrate and ask again'
+               ]
 
 @client.event
 async def on_ready():
@@ -285,24 +325,6 @@ async def crappyflag(ctx, state):
     """ Outputs crappy flag.
     The usage is $crappyflag <state>.
     The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northwestern, ohio_state, penn_state, purdue, rutgers, texas, wisconsin """
-    flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
-                 'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
-                 'ohio_state': 'https://i.imgur.com/coxjUAZ.jpg',
-                 'minnesota': 'https://i.imgur.com/54mF0sK.jpg',
-                 'michigan': 'https://i.imgur.com/XWEDsFf.jpg',
-                 'miami': 'https://i.imgur.com/MInQMLb.jpg',
-                 'iowa_state': 'https://i.imgur.com/w9vg0QX.jpg',
-                 'indiana': 'https://i.imgur.com/uc0Q8Z0.jpg',
-                 'colorado': 'https://i.imgur.com/XTsKDvc.jpg',
-                 'wisconsin': 'https://i.imgur.com/lgFZFkV.jpg',
-                 'texas': 'https://i.imgur.com/rB2Rduq.jpg',
-                 'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
-                 'illinois': 'https://i.imgur.com/MxMaS3e.jpg',
-                 'maryland': 'https://i.imgur.com/G6RX8Oz.jpg',
-                 'michigan_state': 'https://i.imgur.com/90a9g3v.jpg',
-                 'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
-                 'rutgers': 'https://i.imgur.com/lyng39h.jpg'
-                 }
 
     state = state.lower()
 
@@ -401,6 +423,8 @@ async def referee(ctx, call):
     """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
     The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport """
 
+    call = call.lower()
+
     penalty_name = ref_dict[call][0]
     penalty_comment = ref_dict[call][1]
     penalty_url = ref_dict[call][2]
@@ -411,6 +435,11 @@ async def referee(ctx, call):
     embed.set_thumbnail(url=penalty_url)
     embed.set_footer(text=huskerbot_footer)
     await ctx.send(embed=embed)
+
+
+@client.command()
+async def ref(ctx):
+    await referee.invoke(ctx)
 
 
 @client.command()
@@ -454,6 +483,17 @@ async def recentballs(ctx, number=0):
         await ctx.send(embed=embed)
 
         limitSpam += 1
+
+
+@client.command()
+async def eightball(ctx, *, question):
+    """ Ask a Magic 8-Ball a question. """
+    dice_roll = random.randint(0, len(eight_ball))
+
+    embed = discord.Embed(title=':8ball: HuskerBot 8-Ball :8ball:')
+    embed.add_field(name=question, value=eight_ball[dice_roll])
+
+    await ctx.send(embed=embed)
 
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)
