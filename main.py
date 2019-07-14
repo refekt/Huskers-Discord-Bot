@@ -23,7 +23,8 @@ with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
 # Reference - https://www.cougcenter.com/2013/6/28/4445944/common-ncaa-football-penalties-referee-signals
-ref_dict = {'chip': ['Blocking below the waist', 'OFF: 15 yards\nDEF: 15 yards and an automatic first down', 'https://i.imgur.com/46aDB8t.gif'],
+ref_dict = {'bs': ['Bull shit', 'Referee still gets paid for that horrible call','https://i.imgur.com/0nQGIZs.gif'],
+            'chip': ['Blocking below the waist', 'OFF: 15 yards\nDEF: 15 yards and an automatic first down', 'https://i.imgur.com/46aDB8t.gif'],
             'chop': ['Blocking below the waist', 'OFF: 15 yards\nDEF: 15 yards and an automatic first down', 'https://i.imgur.com/cuiRu7T.gif'],
             'encroachment': ['Encroachment', 'DEF: 5 yards', 'https://i.imgur.com/4ekGPs4.gif'],
             'facemask': ['Face mask', 'OFF: Personal foul, 15 yards\nDEF: Personal foul, 15 yards from the end spot of the play, automatic first down', 'https://i.imgur.com/xzsJ8MB.gif'],
@@ -38,6 +39,7 @@ ref_dict = {'chip': ['Blocking below the waist', 'OFF: 15 yards\nDEF: 15 yards a
             'ruffkick': ['Roughing/Running into the kicker', 'DEF: (running) 5 yards, (roughing, personal foul) 15 yards and automatic first down ', 'https://i.imgur.com/UuTBUJv.gif'],
             'ruffpass': ['Roughing the passer', 'DEF: 15 yards and an automatic first down (from the end of the play if pass is completed)', 'https://i.imgur.com/XqPE1Pf.gif'],
             'safety': ['Safety', 'DEF: 2 points and possession, opponent free kicks from their own 20 yard line', 'https://i.imgur.com/Y8pKXaH.gif'],
+            'targeting': ['Targeting', 'OFF/DEF: 15 yard penalty, ejection ', 'https://i.imgur.com/qOsjBCB.gif'],
             'td': ['Touchdown', 'OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'],
             'unsport': ['Unsportsmanlike', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/6Cy9UE4.gif'],
             }
@@ -69,6 +71,8 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
 
 @client.event
 async def on_ready():
+    game = discord.Game('Husker Football 24/7')
+    await client.change_presence(status=discord.Status.online, activity=game)
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
     # print("The client has the following emojis:\n", client.emojis)
 
@@ -138,27 +142,16 @@ async def on_command_error(ctx, error):
 
 
 @client.command()
-async def crootbot(ctx):
-    """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot [year] [first_name] [last_name]`. The command is able to find partial first and last names. """
+async def crootbot(ctx, year, first_name, last_name):
+    """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
     # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
     # First, pull the message content, split the individual pieces, and make the api call
-    croot_info = ctx.message.content.strip().split()
-    # Added error handling to prevent bad inputs, not perfect doesn't check each value
-    # [0] should be $crootbot
-    # [1] should be a 4 digit int
-    # [2] should be a string
-    # [3] should be a string
-    # print(croot_info, len(croot_info))
-    if len(croot_info) != 4:
-        await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
-        return
-    year = int(croot_info[1])
-    first_name = croot_info[2]
-    last_name = croot_info[3]
+
     url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, first_name, last_name)
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     search = requests.get(url=url, headers=headers)
     search = json.loads(search.text)
+
     if not search:
         await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
     elif len(search) > 1:
@@ -288,15 +281,24 @@ async def randomflag(ctx):
 
 
 @client.command()
-async def crappytexasflag(ctx):
-    """ Texas' flag is crap. """
-    await ctx.send("In honor of {}, behold this crappy flag: https://i.imgur.com/eRPHKgB.jpg".format('<@519982151698087956>'))
+async def crappyflag(ctx, state):
+    """ Outputs crappy flag.
+    The usage is $crappyflag <state>. The states are iowa, nw, osu, minn, mu, uf, isu, cu, wisc, texas """
+    flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
+                 'nw': 'https://i.imgur.com/WG4kFP6.jpg',
+                 'osu': 'https://i.imgur.com/coxjUAZ.jpg',
+                 'minn': 'https://i.imgur.com/54mF0sK.jpg',
+                 'mu': 'https://i.imgur.com/XWEDsFf.jpg',
+                 'uf': 'https://i.imgur.com/MInQMLb.jpg',
+                 'ius': 'https://i.imgur.com/w9vg0QX.jpg',
+                 'cu': 'https://i.imgur.com/XTsKDvc.jpg',
+                 'wisc': 'https://i.imgur.com/lgFZFkV.jpg',
+                 'texas': 'https://i.imgur.com/rB2Rduq.jpg'
+                 }
 
-
-@client.command()
-async def crappyiowaflag(ctx):
-    """ Iowa's flag is crap. """
-    await ctx.send("In honor of {}, behold this crappy flag: https://i.imgur.com/xxs49sF.png".format('<@440885775132000266>'))
+    embed = discord.Embed(title="Crappy Flags")
+    embed.set_image(url=flag_dict[state])
+    await ctx.send(embed=embed)
 
 
 @client.command()
@@ -385,30 +387,13 @@ async def huskerbotquit(ctx):
 
 
 @client.command()
-async def referee(ctx):
-    """ HuskerBot will tell you about common referee calls. Usage is `$refereee [call]`.\n
-    The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, td, unsport """
+async def referee(ctx, call):
+    """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
+    The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport """
 
-    penalty = ctx.message.content.split(' ', 1)
-
-    if len(penalty) <= 1:
-        await ctx.send("Invalid referee call. Please reference `$help ref` for details.")
-        return
-
-    penalty = penalty[1]
-
-    penalty_name = ref_dict[penalty][0]
-    penalty_comment = ref_dict[penalty][1]
-    penalty_url = ref_dict[penalty][2]
-
-    try:
-        penalty_name = ref_dict[penalty][0]
-        penalty_comment = ref_dict[penalty][1]
-        penalty_url = ref_dict[penalty][2]
-
-    except:
-        await ctx.send("Invalid referee call. Please reference `$help ref` for details.")
-        return
+    penalty_name = ref_dict[call][0]
+    penalty_comment = ref_dict[call][1]
+    penalty_url = ref_dict[call][2]
 
     embed = discord.Embed(title='HuskerBot Referee', color=0xff0000)
     embed.add_field(name='Referee Call', value=penalty_name, inline=False)
