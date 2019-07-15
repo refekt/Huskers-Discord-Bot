@@ -87,7 +87,10 @@ async def on_message(message):
             await message.add_reaction(emoji_list[i])
             i += 1
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1b3476de22fa9be2a954476e5453a960b389b459
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
     # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
     # TODO If there are multiple football players with the same name we may get the wrong guy. Especially for croots from previous classes. We will want to add more logic to narrow 
@@ -119,6 +122,10 @@ async def on_message(message):
                 await message.add_reaction('📹')
 
     # Always need this
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1b3476de22fa9be2a954476e5453a960b389b459
     await client.process_commands(message)
 
 
@@ -146,8 +153,11 @@ async def on_reaction_add(reaction, user):
             channel = reaction.message.channel
             await hudl_highlight(channel)
         
+<<<<<<< HEAD
         
 # Catch invalid commands/errors
+=======
+>>>>>>> 1b3476de22fa9be2a954476e5453a960b389b459
 @client.event
 async def on_command_error(ctx, error):
     output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
