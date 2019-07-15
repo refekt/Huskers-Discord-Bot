@@ -76,7 +76,7 @@ flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'miami': 'https://i.imgur.com/MInQMLb.jpg',
              'iowa_state': 'https://i.imgur.com/w9vg0QX.jpg',
              'indiana': 'https://i.imgur.com/uc0Q8Z0.jpg',
-             'colorado': 'https://i.imgur.com/XTsKDvc.jpg',
+             'colorado': 'https://i.imgur.com/If6MPtT.jpg',
              'wisconsin': 'https://i.imgur.com/lgFZFkV.jpg',
              'texas': 'https://i.imgur.com/rB2Rduq.jpg',
              'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
@@ -502,6 +502,38 @@ async def eightball(ctx, *, question):
     embed.add_field(name=question, value=eight_ball[dice_roll])
 
     await ctx.send(embed=embed)
+
+
+@client.command()
+async def cb_search(ctx, *, team):
+    """ Search through all of Steve Wiltfong's crystal ball predictions by team. """
+    search_list = crystal_balls.cb_list
+    saved_results = []
+
+    for key in search_list:
+        first_name = key['Name']
+        prediction = key['Prediction']
+        predictiondate = key['PredictionDate']
+        # profile = key['Profile']
+        result = key['Result']
+
+        search_team = dict(key['Teams'])
+
+        for x, y in search_team.items():
+            if team.lower() in x.lower():
+                saved_results.append("{}: **{}** is pedicted to go to [**{}**]. Result: **{}**".format(predictiondate, first_name, prediction, result))
+
+    output_str = ""
+    i = 1
+
+    for player in saved_results:
+        if i > 10:
+            break
+        i += 1
+
+        output_str += "{}\n".format(player)
+
+    await ctx.send("Steve Wiltfong's Last 10 Predictions for __**{}**__:\n{}".format(team, output_str))
 
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)

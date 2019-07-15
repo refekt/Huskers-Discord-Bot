@@ -8,7 +8,7 @@ import cb_settings
 import threading
 import pandas
 
-CB_REFRESH_INTERVAL = 240
+CB_REFRESH_INTERVAL = 480
 cb_list = []
 updating_cb_list = False
 
