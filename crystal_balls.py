@@ -8,8 +8,9 @@ import cb_settings
 import threading
 import pandas
 
-CB_REFRESH_INTERVAL = 240
+CB_REFRESH_INTERVAL = 480
 cb_list = []
+updating_cb_list = False
 
 
 def pull_crystal_balls_from_pages(year, page=1):
@@ -143,13 +144,18 @@ def check_last_run():
     temp_check = cb_settings.last_run
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)# datetime.datetime.strptime(temp_check, '%Y-%d-%M %I:%M')
 
+    global updating_cb_list
+
     if now > check:
         print("Last time the JSON was pulled exceeded threshold")
+        updating_cb_list = True
         move_cb_to_list_and_json(json_dump=True)
 
         f = open('cb_settings.py', 'w')
         f.write('last_run = \'{}\''.format(datetime.datetime.now()))
         f.close()
+
+        updating_cb_list = False
     else:
         print("Last time JSON was pulled does not exceed threshold")
         load_cb_to_list()
