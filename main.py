@@ -1,28 +1,26 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3.7
 import discord
 from discord.ext import commands
 import requests
 import sys
 import random
 import json
-from bs4 import BeautifulSoup
 import config
+import crystal_balls
+import time
 
 
-
-botPrefix = '$' # The prefix used for all commands
+botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
-player_search_list = [] # initialize a global list for crootbot to put search results in
+player_search_list = [] #initialize a global list for crootbot to put search results in
+player_search_list_len = 0 # length storage
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
-#This is for the hudl highlight puller that is effectively stuck
-#hudl_url = ''
 
-# Load the Team_IDs JSON
+
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
 
-# Load the long names and abbreviations for recruit positions
 long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'DUAL': 'Dual-Threat Quarterback',
                   'APB' : 'All-Purpose Back',
@@ -51,11 +49,13 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
 @client.event
 async def on_ready():
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
+    # print("The client has the following emojis:\n", client.emojis)
 
 
 @client.event
 async def on_message(message):
-    # We do not want to react to the bot itself
+    """ Commands processed as messages are entered """
+
     if not message.author.bot:
         # Good bot, bad bot
         if "good bot" in message.content.lower():
@@ -70,7 +70,7 @@ async def on_message(message):
             if dice_roll >= 90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
                                            "make **shit** up for fake internet points. I’m glad he’s gone.")
-        # Add Upvote and Downvote to the message with this command in it
+        # Add Up Votes and Down Votes
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
@@ -86,7 +86,6 @@ async def on_message(message):
         while i < len(player_search_list):
             await message.add_reaction(emoji_list[i])
             i += 1
-
 
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
     # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
@@ -119,13 +118,13 @@ async def on_message(message):
                 await message.add_reaction('📹')
 
     # Always need this
+
     await client.process_commands(message)
 
 
-# Monitor reactions added to messages
 @client.event
 async def on_reaction_add(reaction, user):
-    # Interfacing with crootbot's search results
+    # print(reaction.emoji)
     if user != client.user and reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
@@ -147,8 +146,6 @@ async def on_reaction_add(reaction, user):
             channel = reaction.message.channel
             await hudl_highlight(channel)
         
-        
-# Catch invalid commands/errors
 @client.event
 async def on_command_error(ctx, error):
     output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
@@ -159,37 +156,33 @@ async def on_command_error(ctx, error):
 async def crootbot(ctx):
     #pulls a json file from the 247 advanced player search API and parses it to give
     #info on the croot.
-    #First pull the message content, split the individual pieces, and make the api call
+    #First, pull the message content, split the individual pieces, and make the api call
     croot_info = ctx.message.content.strip().split()
     # Added error handling to prevent bad inputs, not perfect doesn't check each value
+    # [0] should be $crootbot
+    # [1] should be a 4 digit int
+    # [2] should be a string
+    # [3] should be a string
+    # print(croot_info, len(croot_info))
     if len(croot_info) != 4:
         await ctx.send("Invalid syntax. The proper format is `$crootbot <year> <full name>`.")
         return
-    
-    # Search info
-    year = int(croot_info[1]) # [1] should be a 4 digit int
-    first_name = croot_info[2] # [2] should be a string
-    last_name = croot_info[3] # [3] should be a string
-    
-    # Putting URL and headers together
+    year = int(croot_info[1])
+    first_name = croot_info[2]
+    last_name = croot_info[3]
     url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, first_name, last_name)
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
-    
-    # Perform search
     search = requests.get(url=url, headers=headers)
     search = json.loads(search.text)
-    
     if not search:
         await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
-    elif len(search) > 1: # More than one result returned
+    elif len(search) > 1:
         global player_search_list
         players_string = ('''There were multiple matches for {} {} in the {} class. Please react with the corresponding emoji to the player you\'d 
 like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
-        
         players_list = []
         player_search_list = search       
-        player_search_list_len = range(min(10,len(search))) # Might be able to delete this 
-        
+        player_search_list_len = range(min(10,len(search)))
         for i in range(min(10, len(search))):
             player = search[i]['Player']
             first_name = player['FirstName']
@@ -200,11 +193,17 @@ like to see CrootBot results for.\n Search Results:\n''').format(first_name, las
             players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
             players_list.append(['FirstName', 'LastName'])
         await ctx.send(players_string)
-    else: # Only one result was returned
+        # new_message = client.
+        # i = 0
+        # Pre-add reactions for users
+        # while i < range(min(10, len(search))):
+            # await ctx.message.add_reaction(emoji_list[i])
+            # i += 1
+
+    else:
         channel = ctx.channel
         await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
 
-# Output an embeded Discord message to channel
 async def parse_search(search, channel):
         year = search['Year']
         player = search['Player']
@@ -267,7 +266,6 @@ async def parse_search(search, channel):
                 school = 'Unknown'
             else:
                 school = team_ids[school_id]
-            # Go Big Red!
             if school == 'Nebraska':
                 school += ' 💯:corn::punch:'
             recruitment_status += ' to {}'.format(school)
@@ -279,7 +277,6 @@ async def parse_search(search, channel):
         #Don't want to try to set a thumbnail for a croot who has no image on 247
         if image_url != '/.':
             message_embed.set_thumbnail(url = image_url)
-        message_embed.set_footer(text = "CrootBot message generated by Husker Discord Bot")
         await channel.send(embed=message_embed)
         
         global player_search_list
@@ -333,6 +330,12 @@ async def randomflag(ctx):
     embed = discord.Embed(title="Random Ass Nebraska Flag")
     embed.set_image(url=random.choice(flags))
     await ctx.send(embed=embed)
+
+
+@client.command()
+async def crappyiowaflag(ctx):
+    await ctx.send("In honor of {}, behold this crappy flag:".format('<@440885775132000266>'))
+    await ctx.send('https://i.imgur.com/xxs49sF.png')
 
 
 @client.command()
@@ -403,6 +406,49 @@ async def huskerbotquit(ctx):
     print("HuskerBot was terminated by {}.".format(ctx.message.author))
     await client.logout()
 
+
+@client.command()
+async def recentballs(ctx, number=0):
+    """ Send the last 1-5 crystal ball predictions from Steve Wiltfong. Usage is $recent_balls [1-5]"""
+    # Error handling
+    # Random number of 5 to prevent spam
+    if number > 5:  # len(crystal_balls.cb_list):
+        await ctx.send("The number of retrieved Crystal Balls must be less than 5.")
+        return
+
+    limitSpam = -1
+
+    if number > 0:
+        number -= 1
+
+    for cbs in crystal_balls.cb_list:
+        # print("Number : {} >= limitSpam : {}".format(number, limitSpam))
+        if limitSpam >= number:
+            return
+
+        varPhoto = cbs['Photo']
+        varName = cbs['Name']
+        varPrediction = cbs['Prediction']
+        varPredictionDate = cbs['PredictionDate']
+        varProfile = cbs['Profile']
+        varResult = cbs['Result']
+        varTeams = dict(cbs['Teams'])
+        varTeamString = ""
+
+        for x, y in varTeams.items():
+            varTeamString += '{} : {}\n'.format(x, y)
+        embed = discord.Embed(title="Steve Wiltfong Crystal Ball Predictions", color=0xff0000)
+        embed.set_thumbnail(url=varPhoto)
+        embed.add_field(name="Player Name", value=varName, inline=False)
+        embed.add_field(name="Prediction", value=varPrediction, inline=True)
+        embed.add_field(name="Prediction Date/Time", value=varPredictionDate, inline=True)
+        embed.add_field(name="Result", value=varResult, inline=False)
+        embed.add_field(name="Predicted Teams", value=varTeamString, inline=True)
+        embed.add_field(name="247Sports Profile", value=varProfile, inline=False)
+        embed.set_footer(text="Generated by Husker Discord CrootBot")
+        await ctx.send(embed=embed)
+
+        limitSpam += 1
 
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)
