@@ -1,5 +1,17 @@
 [
     {
+        "Name": "Vernon Broughton",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/491/285/9285491.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 7:09PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Vernon-Broughton-at-Cy-Ridge-216665/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Texas": "92%",
+            "Unknown": "8%"
+        }
+    },
+    {
         "Name": "Willis Singleton",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/118/227/9227118.jpg",
         "Prediction": "VIP",
@@ -19,8 +31,8 @@
         "Profile": "https://247sports.com/PlayerInstitution/Chris-Morris-at-Memphis-Central-201600/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Texas A&M": "33%",
-            "Unknown": "67%"
+            "Texas A&M": "50%",
+            "Unknown": "50%"
         }
     },
     {
@@ -352,19 +364,6 @@
         }
     },
     {
-        "Name": "Vernon Broughton",
-        "Photo": "https://s3media.247sports.com/Uploads/Assets/491/285/9285491.jpg",
-        "Prediction": "VIP",
-        "PredictionDate": "7/01/19 6:46PM",
-        "Profile": "https://247sports.com/PlayerInstitution/Vernon-Broughton-at-Cy-Ridge-216665/CurrentExpertPredictions/",
-        "Result": "TBD",
-        "Teams": {
-            "Texas": "73%",
-            "Texas A&M": "9%",
-            "Unknown": "18%"
-        }
-    },
-    {
         "Name": "Blaise Gunnerson",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/753/437/8437753.jpg",
         "Prediction": "NEB",
@@ -383,7 +382,7 @@
         "Profile": "https://247sports.com/PlayerInstitution/DeArre-McDonald-at-Oakland-224489/CurrentExpertPredictions/",
         "Result": "Correct",
         "Teams": {
-           , "Ole Miss": "Committed"
+            "Ole Miss": "Committed"
         }
     },
     {
