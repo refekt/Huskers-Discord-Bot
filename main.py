@@ -6,7 +6,7 @@ import sys
 import random
 import json
 from bs4 import BeautifulSoup
-#import config
+import config
 
 
 
@@ -405,7 +405,4 @@ async def huskerbotquit(ctx):
 
 
 # Run the Discord bot
-# client.run(config.DISCORD_TOKEN)
-
-TOKEN = 'NTk1NzA1NjYzOTk3NDc2ODg3.XRu4Uw.Urzm-7CPB5y4nSV4I7OR2bKO0Tc'    
-client.run(TOKEN)
+client.run(config.DISCORD_TOKEN)
