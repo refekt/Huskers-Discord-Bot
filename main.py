@@ -426,7 +426,7 @@ async def iowasux(ctx):
     """ Iowa has the worst corn. """
     emoji = client.get_emoji(441038975323471874)
     embed = discord.Embed(title="{} IOWA SUX {}".format(emoji, emoji))
-    embed.set_image(url='https://i.imgur.com/3jjWG85.gif')
+    embed.set_image(url='https://i.imgur.com/j7JDuGe.gif')
     await ctx.send(embed=embed)
 
 
