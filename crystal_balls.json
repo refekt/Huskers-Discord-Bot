@@ -1,5 +1,52 @@
 [
     {
+        "Name": "Vernon Broughton",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/491/285/9285491.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 7:09PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Vernon-Broughton-at-Cy-Ridge-216665/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Texas": "92%",
+            "Unknown": "8%"
+        }
+    },
+    {
+        "Name": "Willis Singleton",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/118/227/9227118.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 1:08PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Willis-Singleton-at-Warren-Township-195715/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Illinois": "50%",
+            "Iowa State": "50%"
+        }
+    },
+    {
+        "Name": "Chris Morris",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/823/224/9224823.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 6:27AM",
+        "Profile": "https://247sports.com/PlayerInstitution/Chris-Morris-at-Memphis-Central-201600/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Texas A&M": "50%",
+            "Unknown": "50%"
+        }
+    },
+    {
+        "Name": "Daniyel Ngata",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/248/139/9139248.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/14/19 5:49AM",
+        "Profile": "https://247sports.com/PlayerInstitution/Daniyel-Ngata-at-Folsom-210325/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Texas A&M": "100%"
+        }
+    },
+    {
         "Name": "Jacobe Covington",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/168/141/9141168.jpg",
         "Prediction": "VIP",
@@ -30,10 +77,10 @@
         "Profile": "https://247sports.com/PlayerInstitution/Michael-Drennen-II-at-Dublin-Coffman-179569/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Kentucky": "14%",
+            "Kentucky": "29%",
             "Ohio State": "43%",
             "Stanford": "14%",
-            "Unknown": "29%"
+            "Unknown": "14%"
         }
     },
     {
@@ -56,7 +103,7 @@
         "Profile": "https://247sports.com/PlayerInstitution/Makari-Paige-at-West-Bloomfield-205196/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Michigan": "83%",
+            "Michigan": "85%",
             "Ohio State": "8%",
             "Unknown": "8%"
         }
@@ -317,19 +364,6 @@
         }
     },
     {
-        "Name": "Vernon Broughton",
-        "Photo": "https://s3media.247sports.com/Uploads/Assets/491/285/9285491.jpg",
-        "Prediction": "VIP",
-        "PredictionDate": "7/01/19 6:46PM",
-        "Profile": "https://247sports.com/PlayerInstitution/Vernon-Broughton-at-Cy-Ridge-216665/CurrentExpertPredictions/",
-        "Result": "TBD",
-        "Teams": {
-            "Texas": "73%",
-            "Texas A&M": "9%",
-            "Unknown": "18%"
-        }
-    },
-    {
         "Name": "Blaise Gunnerson",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/753/437/8437753.jpg",
         "Prediction": "NEB",
@@ -429,10 +463,10 @@
         "Profile": "https://247sports.com/PlayerInstitution/Kendall-Milton-at-Buchanan-192755/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Georgia": "74%",
-            "Oklahoma": "9%",
+            "Georgia": "75%",
+            "Oklahoma": "8%",
             "USC": "4%",
-            "Unknown": "13%"
+            "Unknown": "12%"
         }
     },
     {
@@ -2748,12 +2782,12 @@
     {
         "Name": "Sam Adams II",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/376/140/9140376.JPG",
-        "Prediction": "VIP",
+        "Prediction": "WASH",
         "PredictionDate": "3/30/19 12:09PM",
         "Profile": "https://247sports.com/PlayerInstitution/Sam-Adams-II-at-Eastside-Catholic-195792/CurrentExpertPredictions/",
-        "Result": "TBD",
+        "Result": "Correct",
         "Teams": {
-            "Washington": "100%"
+            "Washington": "Committed"
         }
     },
     {
