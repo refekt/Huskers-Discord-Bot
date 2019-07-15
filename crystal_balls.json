@@ -1,5 +1,17 @@
 [
     {
+        "Name": "Joseph Solomon",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/987/129/9129987.png",
+        "Prediction": "VIP",
+        "PredictionDate": "7/15/19 2:01PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Joseph-Solomon-at-Bishop-Chatard-226794/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Indiana": "33%",
+            "Unknown": "67%"
+        }
+    },
+    {
         "Name": "Vernon Broughton",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/491/285/9285491.jpg",
         "Prediction": "VIP",
@@ -7,8 +19,7 @@
         "Profile": "https://247sports.com/PlayerInstitution/Vernon-Broughton-at-Cy-Ridge-216665/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Texas": "92%",
-            "Unknown": "8%"
+            "Texas": "100%"
         }
     },
     {
@@ -19,8 +30,8 @@
         "Profile": "https://247sports.com/PlayerInstitution/Willis-Singleton-at-Warren-Township-195715/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Illinois": "50%",
-            "Iowa State": "50%"
+            "Iowa State": "67%",
+            "Unknown": "33%"
         }
     },
     {
@@ -103,9 +114,9 @@
         "Profile": "https://247sports.com/PlayerInstitution/Makari-Paige-at-West-Bloomfield-205196/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Michigan": "85%",
-            "Ohio State": "8%",
-            "Unknown": "8%"
+            "Michigan": "86%",
+            "Ohio State": "7%",
+            "Unknown": "7%"
         }
     },
     {
@@ -284,6 +295,17 @@
         }
     },
     {
+        "Name": "Myles Murphy",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/672/239/9239672.jpg",
+        "Prediction": "UNC",
+        "PredictionDate": "7/03/19 4:03PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Myles-Murphy-at-Dudley-232855/CurrentExpertPredictions/",
+        "Result": "Correct",
+        "Teams": {
+            "North Carolina": "Committed"
+        }
+    },
+    {
         "Name": "Miyan Williams",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/0/181/9181000.jpg",
         "Prediction": "IAST",
@@ -439,8 +461,8 @@
         "Profile": "https://247sports.com/PlayerInstitution/Jahari-Rogers-at-Arlington-222008/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Florida": "30%",
-            "Texas": "60%",
+            "Florida": "80%",
+            "Texas": "10%",
             "Unknown": "10%"
         }
     },
@@ -2898,17 +2920,6 @@
         "Result": "Incorrect",
         "Teams": {
             "LSU": "Committed"
-        }
-    },
-    {
-        "Name": "Joseph Solomon",
-        "Photo": "https://s3media.247sports.com/Uploads/Assets/987/129/9129987.png",
-        "Prediction": "VIP",
-        "PredictionDate": "3/21/19 8:46AM",
-        "Profile": "https://247sports.com/PlayerInstitution/Joseph-Solomon-at-Bishop-Chatard-226794/CurrentExpertPredictions/",
-        "Result": "TBD",
-        "Teams": {
-            "Indiana": "100%"
         }
     },
     {
