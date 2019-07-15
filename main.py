@@ -112,8 +112,11 @@ eight_ball = ['Try again',
               'Better not tell you now',
               'Cannot predict now',
               'Concentrate and ask again',
-              'Fuck Iowa'
+              'Fuck Iowa',
+              'Scott Frost approves',
+              'Coach V\'s cigar would like this'
                ]
+
 
 @client.event
 async def on_ready():
@@ -177,7 +180,7 @@ async def on_message(message):
             for r in results:                   
                 if r['name'] == croot_name and (r['primaryTeam']['teamName']=='Boys Varsity Football' or r['primaryTeam']['teamName']=='Husker Football'):
                     matching_players.append(r)
-                    print(r)
+                    # print(r)
             global hudl_url
             if len(matching_players) > 0:  
                 global hudl_location
