@@ -112,8 +112,11 @@ eight_ball = ['Try again',
               'Better not tell you now',
               'Cannot predict now',
               'Concentrate and ask again',
-              'Fuck Iowa'
+              'Fuck Iowa',
+              'Scott Frost approves',
+              'Coach V\'s cigar would like this'
                ]
+
 
 @client.event
 async def on_ready():
