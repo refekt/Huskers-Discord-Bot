@@ -252,6 +252,7 @@ async def crootbot(ctx, year, first_name, last_name):
         channel = ctx.channel
         await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
 
+
 async def parse_search(search, channel):
         year = search['Year']
         player = search['Player']
