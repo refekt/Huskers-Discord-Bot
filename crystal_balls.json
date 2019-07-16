@@ -1,5 +1,40 @@
 [
     {
+        "Name": "Latarie Kinsler",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/173/78/9078173.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/16/19 10:32AM",
+        "Profile": "https://247sports.com/PlayerInstitution/Latarie-Kinsler-at-Pahokee-201499/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Syracuse": "50%",
+            "Unknown": "50%"
+        }
+    },
+    {
+        "Name": "Malachi Melton",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/815/313/8313815.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/16/19 5:11AM",
+        "Profile": "https://247sports.com/PlayerInstitution/Malachi-Melton-at-Cedar-Creek-201081/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Purdue": "100%"
+        }
+    },
+    {
+        "Name": "Arian Smith",
+        "Photo": "https://s3media.247sports.com/Uploads/Assets/945/19/9019945.jpg",
+        "Prediction": "VIP",
+        "PredictionDate": "7/15/19 2:56PM",
+        "Profile": "https://247sports.com/PlayerInstitution/Arian-Smith-at-Lakeland-212826/CurrentExpertPredictions/",
+        "Result": "TBD",
+        "Teams": {
+            "Florida State": "67%",
+            "Georgia": "33%"
+        }
+    },
+    {
         "Name": "Joseph Solomon",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/987/129/9129987.png",
         "Prediction": "VIP",
@@ -7,8 +42,7 @@
         "Profile": "https://247sports.com/PlayerInstitution/Joseph-Solomon-at-Bishop-Chatard-226794/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Indiana": "33%",
-            "Unknown": "67%"
+            "Unknown": "100%"
         }
     },
     {
@@ -25,13 +59,12 @@
     {
         "Name": "Willis Singleton",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/118/227/9227118.jpg",
-        "Prediction": "VIP",
+        "Prediction": "IAST",
         "PredictionDate": "7/14/19 1:08PM",
         "Profile": "https://247sports.com/PlayerInstitution/Willis-Singleton-at-Warren-Township-195715/CurrentExpertPredictions/",
-        "Result": "TBD",
+        "Result": "Correct",
         "Teams": {
-            "Iowa State": "67%",
-            "Unknown": "33%"
+            "Iowa State": "Committed"
         }
     },
     {
@@ -114,8 +147,7 @@
         "Profile": "https://247sports.com/PlayerInstitution/Makari-Paige-at-West-Bloomfield-205196/CurrentExpertPredictions/",
         "Result": "TBD",
         "Teams": {
-            "Michigan": "86%",
-            "Ohio State": "7%",
+            "Michigan": "93%",
             "Unknown": "7%"
         }
     },
@@ -295,17 +327,6 @@
         }
     },
     {
-        "Name": "Myles Murphy",
-        "Photo": "https://s3media.247sports.com/Uploads/Assets/672/239/9239672.jpg",
-        "Prediction": "UNC",
-        "PredictionDate": "7/03/19 4:03PM",
-        "Profile": "https://247sports.com/PlayerInstitution/Myles-Murphy-at-Dudley-232855/CurrentExpertPredictions/",
-        "Result": "Correct",
-        "Teams": {
-            "North Carolina": "Committed"
-        }
-    },
-    {
         "Name": "Miyan Williams",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/0/181/9181000.jpg",
         "Prediction": "IAST",
@@ -456,14 +477,12 @@
     {
         "Name": "Jahari Rogers",
         "Photo": "https://s3media.247sports.com/Uploads/Assets/202/110/9110202.jpg",
-        "Prediction": "VIP",
+        "Prediction": "UF",
         "PredictionDate": "6/30/19 6:31PM",
         "Profile": "https://247sports.com/PlayerInstitution/Jahari-Rogers-at-Arlington-222008/CurrentExpertPredictions/",
-        "Result": "TBD",
+        "Result": "Correct",
         "Teams": {
-            "Florida": "80%",
-            "Texas": "10%",
-            "Unknown": "10%"
+            "Florida": "Committed"
         }
     },
     {
@@ -3897,17 +3916,6 @@
         "Result": "Correct",
         "Teams": {
             "Miami": "Committed"
-        }
-    },
-    {
-        "Name": "Myles Hinton",
-        "Photo": "https://s3media.247sports.com/Uploads/Assets/791/315/5315791.jpg",
-        "Prediction": "MICH",
-        "PredictionDate": "3/31/17 3:46PM",
-        "Profile": "https://247sports.com/PlayerInstitution/Myles-Hinton-at-Greater-Atlanta-Christian-School-183601/CurrentExpertPredictions/",
-        "Result": "Incorrect",
-        "Teams": {
-            "Stanford": "Committed"
         }
     }
 ]
