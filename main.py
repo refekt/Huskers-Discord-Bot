@@ -171,7 +171,7 @@ async def on_message(message):
             while i < min(10, len(player_search_list)):
                 await message.add_reaction(emoji_list[i])
                 i += 1
-        elif message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
+        if message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
             url = 'https://www.hudl.com/api/v3/community-search/feed-users/search'
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
             embed_field_name = message.embeds[0].fields[0].name.split()
@@ -182,11 +182,12 @@ async def on_message(message):
             data = json.loads(page.text)
             results = data['results']
             matching_players = []
+            # print("results:\n{}".format(results))
             for r in results:                   
                 if r['name'] == croot_name and (r['primaryTeam']['teamName']=='Boys Varsity Football' or r['primaryTeam']['teamName']=='Husker Football'):
                     matching_players.append(r)
-                    # print(r)
             global hudl_url
+            # print("len(matching_players) == {}".format(len(matching_players)))
             if len(matching_players) > 0:  
                 global hudl_location
                 hudl_url = 'https://www.hudl.com' + matching_players[0]['url']
