@@ -333,11 +333,11 @@ async def parse_search(search, channel):
         #Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
         if type(composite_rating) is str:
             # body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            body = '**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\n\n'.format(composite_rating, player_url)
-            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n'.format(national_rank, state_rank, position_rank)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
+            rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
         else:
             # body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n'.format(city, high_school, state, height, int(weight), composite_rating, player_url)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
             rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
         
         #Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.
