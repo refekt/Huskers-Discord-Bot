@@ -211,7 +211,7 @@ async def on_message(message):
 @client.event
 async def on_reaction_add(reaction, user):
     # print(reaction.emoji)
-    if user != client.user and reaction.message.author == client.user and 'Search Results:' in reaction.message.content and player_search_list:
+    if user != client.user and reaction.message.author == client.user and player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
                       '2⃣' : 1,
@@ -328,15 +328,17 @@ async def parse_search(search, channel):
             commit_status = 'Uncommitted'
         if type(search['SignedInstitution']) is int:
             commit_status = 'Signed'  
-        title = '**{} {}** - {}\n'.format(first_name, last_name, stars) 
+        title = '{} **{} {}, {} {}**'.format(stars, first_name, last_name, year, position)
         
         #Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
         if type(composite_rating) is str:
-            body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n247 Link - {}\n'.format(national_rank, state_rank, position_rank, player_url)
+            # body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {}\n\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+            body = '**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\n\n'.format(composite_rating, player_url)
+            rankings = '__Rankings__\nNational: {}\nState: {}\nPosition: {}\n'.format(national_rank, state_rank, position_rank)
         else:
-            body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
-            rankings = '__Rankings__\nNational: #{}\nState: #{}\nPosition: #{}\n247 Link - {}\n'.format(national_rank, state_rank, position_rank, player_url)
+            # body = '**{}, Class of {}**\n{}, {}lbs -- From {}, {}({})\n247 Composite Rating: {:.4f}\n\n'.format(position, year, height, int(weight), city, state, high_school, composite_rating)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n'.format(city, high_school, state, height, int(weight), composite_rating, player_url)
+            rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
         
         #Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.
         #I've found that if a team does not have an image on 247, they use a generic image with 0 as the id. Also if the image id is not in the dictionary, we want to say Unknown.
@@ -350,9 +352,10 @@ async def parse_search(search, channel):
             if school == 'Nebraska':
                 school += ' 💯:corn::punch:'
             recruitment_status += ' to {}'.format(school)
-        recruitment_status = '**' + recruitment_status + '**'
+        recruitment_status = '**' + recruitment_status + '**\n\n'
             
-        crootstring = body + rankings + recruitment_status        
+        # crootstring = body + rankings + recruitment_status
+        crootstring = recruitment_status + body + rankings
         message_embed = discord.Embed(name="CrootBot", color=0xd00000)
         message_embed.add_field(name=title, value=crootstring, inline=False)
         #Don't want to try to set a thumbnail for a croot who has no image on 247
@@ -623,11 +626,12 @@ async def cb_search(ctx, *, team):
 
         for x, y in search_team.items():
             if team.lower() in x.lower():
-                saved_results.append("**{}** is pedicted to go to [**{}**]. Result: **{}**".format(first_name, prediction, result))
+                saved_results.append("· **{}** to [**{}**] is/was: **{}**".format(first_name, prediction, result))
 
     output_str = ""
     i = 1
 
+    # Discord errors out if character limit exceeds 2,000
     for player in saved_results:
         if i > 10:
             break
@@ -635,7 +639,12 @@ async def cb_search(ctx, *, team):
 
         output_str += "{}\n".format(player)
 
-    await ctx.send("Steve Wiltfong's Last 10 Predictions for __**{}**__:\n{}".format(team, output_str))
+    embed = discord.Embed(title=" ", color=0xff0000)
+    embed.set_author(name="HuskerBot")
+    embed.add_field(name="Crystal Ball Search Results for {}".format(team), value=output_str, inline=False)
+    await ctx.send(embed=embed)
+
+    # await ctx.send("Steve Wiltfong's Last 10 Predictions for __**{}**__:\n{}".format(team, output_str))
 
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)
