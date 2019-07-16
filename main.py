@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3.7
 import discord
 from discord.ext import commands
@@ -152,21 +153,25 @@ async def on_message(message):
             emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
             await message.add_reaction(emojiUpvote)
             await message.add_reaction(emojiDownvote)
-
-    # Working with crootbot
-    if message.author == client.user and 'Search Results:' in message.content and player_search_list:
-        # Pre-add reactions for users
-        i = 0
-        while i < min(10, len(player_search_list)):
-            await message.add_reaction(emoji_list[i])
-            i += 1
+    elif message.author.bot:
+        if "$crootbot" in message.content or "$cb" in message.content or "$recentballs" in message.content or "$cb_search" in message.content:
+            if crystal_balls.updating_cb_list:
+                await message.send("HuskerBot is in the process of updating the crystal ball database. Try again in 30 seconds.")
 
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
     # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
     # TODO If there are multiple football players with the same name we may get the wrong guy. Especially for croots from previous classes. We will want to add more logic to narrow 
     # it down even more 
     if len(message.embeds) > 0:
-        if message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
+        # Working with crootbot
+        # if message.author == client.user and 'Search Results:' in message.content and player_search_list:
+        if message.author == client.user and player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
+            # Pre-add reactions for users
+            i = 0
+            while i < min(10, len(player_search_list)):
+                await message.add_reaction(emoji_list[i])
+                i += 1
+        elif message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
             url = 'https://www.hudl.com/api/v3/community-search/feed-users/search'
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
             embed_field_name = message.embeds[0].fields[0].name.split()
@@ -191,10 +196,10 @@ async def on_message(message):
                     elif m['primaryTeam']['location'] == hudl_location:
                         hudl_url = 'https://www.hudl.com' + m['url']
                 hudl_location = None
-                page = requests.get(url = hudl_url, headers = headers)                
+                page = requests.get(url=hudl_url, headers=headers)
                 embed_old = message.embeds[0]
-                embed_new = embed_old.set_footer(text = 'Click the video camera emoji to get the most-viewed Hudl highlight for this recruit') 
-                await message.edit(embed = embed_new)
+                embed_new = embed_old.set_footer(text='Click the video camera emoji to get the most-viewed Hudl highlight for this recruit')
+                await message.edit(embed=embed_new)
                 await message.add_reaction('📹')
             #If we can't find a suitable match, then empty the list. Keeps people from pulling up a highlight for a previous crootbot message
             else:
@@ -241,6 +246,9 @@ async def crootbot(ctx, year, first_name, last_name):
     # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
     # First, pull the message content, split the individual pieces, and make the api call
 
+    search_first_name = first_name
+    search_last_name = last_name
+
     url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, first_name, last_name)
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     search = requests.get(url=url, headers=headers)
@@ -250,8 +258,8 @@ async def crootbot(ctx, year, first_name, last_name):
         await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
     elif len(search) > 1:
         global player_search_list
-        players_string = ('''There were multiple matches for {} {} in the {} class. Please react with the corresponding emoji to the player you\'d 
-        like to see CrootBot results for.\n Search Results:\n''').format(first_name, last_name, year)
+        # players_string = 'Mulitple results found for **[{}, {} {}]**. React with the corresponding emoji for CrootBot results.\n__**Search Results:**__\n'.format(year, first_name, last_name)
+        players_string = ''
         players_list = []
         player_search_list = search
         for i in range(min(10, len(search))):
@@ -263,7 +271,15 @@ async def crootbot(ctx, year, first_name, last_name):
                 position = long_positions[position]
             players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
             players_list.append(['FirstName', 'LastName'])
-        await ctx.send(players_string)
+
+        # Embed stuff
+        result_text = 'Mulitple results found for __**[{}, {} {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, search_first_name, search_last_name)
+        embed_text = result_text + players_string
+        embed = discord.Embed(title="Search Results",description=embed_text, color=0xff0000)
+        embed.set_author(name="HuskerBot CrootBot")
+        embed.set_footer(text='Search Results ' + huskerbot_footer)
+        # await ctx.send(players_string)
+        await ctx.send(embed=embed)
     else:
         channel = ctx.channel
         await parse_search(search[0], channel) #The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
@@ -337,8 +353,8 @@ async def parse_search(search, channel):
         recruitment_status = '**' + recruitment_status + '**'
             
         crootstring = body + rankings + recruitment_status        
-        message_embed = discord.Embed(name = "CrootBot", color = 0xd00000)
-        message_embed.add_field(name = title, value = crootstring, inline = False)
+        message_embed = discord.Embed(name="CrootBot", color=0xd00000)
+        message_embed.add_field(name=title, value=crootstring, inline=False)
         #Don't want to try to set a thumbnail for a croot who has no image on 247
         if image_url != '/.':
             message_embed.set_thumbnail(url = image_url)
@@ -363,10 +379,10 @@ async def hudl_highlight(channel):
     url = hudl_url
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     #The original hudl url redirects, so we want to request the page, then get the new url after the redirect
-    page = requests.get(url = url, headers = headers)
+    page = requests.get(url=url, headers=headers)
     url = page.url + '/videos'
-    print("Pulling video for recruit at url {}".format(url))
-    page = requests.get(url = url, headers = headers)
+    # print("Pulling video for recruit at url {}".format(url))
+    page = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
     # This fucking shit. To avoid using a webdriver, we have to take the direct request and find the script section that corresponds to the script that pulls the
     # profile details, then find the video in the resulting dictionary. Took so much bs to find this
@@ -590,6 +606,9 @@ async def eightball(ctx, *, question):
 @client.command()
 async def cb_search(ctx, *, team):
     """ Search through all of Steve Wiltfong's crystal ball predictions by team. """
+
+    crystal_balls.check_last_run()
+
     search_list = crystal_balls.cb_list
     saved_results = []
 
@@ -604,7 +623,7 @@ async def cb_search(ctx, *, team):
 
         for x, y in search_team.items():
             if team.lower() in x.lower():
-                saved_results.append("{}: **{}** is pedicted to go to [**{}**]. Result: **{}**".format(predictiondate, first_name, prediction, result))
+                saved_results.append("**{}** is pedicted to go to [**{}**]. Result: **{}**".format(first_name, prediction, result))
 
     output_str = ""
     i = 1
