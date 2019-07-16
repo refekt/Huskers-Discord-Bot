@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3.7
 import discord
 from discord.ext import commands
@@ -9,12 +8,10 @@ import random
 import json
 import config
 import crystal_balls
-import inspect
-
+import function_helper
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
-# client.remove_command('help')
 
 # initialize a global list for crootbot to put search results in
 player_search_list = []
@@ -132,7 +129,6 @@ async def on_ready():
 @client.event
 async def on_message(message):
     """ Commands processed as messages are entered """
-
     if not message.author.bot:
         # Good bot, bad bot
         if "good bot" in message.content.lower():
@@ -180,7 +176,7 @@ async def on_message(message):
             croot_name = embed_field_name[0] + ' ' + embed_field_name[1]
             croot_name = croot_name.replace('*', '')
             payload = {'query' :  croot_name}
-            page = requests.post(url = url, headers = headers, params = payload)
+            page = requests.post(url=url, headers=headers, params=payload)
             data = json.loads(page.text)
             results = data['results']
             matching_players = []
@@ -210,6 +206,7 @@ async def on_message(message):
 
     # Always need this
     await client.process_commands(message)
+
 
 @client.event
 async def on_reaction_add(reaction, user):
@@ -243,11 +240,18 @@ async def on_command_error(ctx, error):
     output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
     await ctx.send(output_msg)
 
+
 @client.command()
 async def crootbot(ctx, year, first_name, last_name):
     """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
     # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
     # First, pull the message content, split the individual pieces, and make the api call
+
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send("Command sent in the wrong channel.")
+        return
 
     search_first_name = first_name
     search_last_name = last_name
@@ -439,6 +443,12 @@ async def crappyflag(ctx, state):
     The usage is $crappyflag <state>.
     The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
 
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send("Command sent in the wrong channel.")
+        return
+
     state = state.lower()
 
     embed = discord.Embed(title="Crappy Flags")
@@ -483,6 +493,7 @@ async def flex(ctx):
     embed = discord.Embed(title="FLEXXX 😩")
     embed.set_image(url='https://i.imgur.com/92b9uFU.gif')
     await ctx.send(embed=embed)
+
 
 @client.command()
 async def shrug(ctx):
@@ -536,6 +547,12 @@ async def referee(ctx, call):
     """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
     The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport """
 
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send("Command sent in the wrong channel.")
+        return
+
     call = call.lower()
 
     penalty_name = ref_dict[call][0]
@@ -559,6 +576,13 @@ async def ref(ctx):
 async def recentballs(ctx, number=0):
     """ Send the last 1-5 crystal ball predictions from Steve Wiltfong. Usage is `$recent_balls [1-5]`. """
     # Error handling, Random number of 5 to prevent spam
+
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send("Command sent in the wrong channel.")
+        return
+
     if number > 5:  # len(crystal_balls.cb_list):
         await ctx.send("The number of retrieved Crystal Balls must be less than 5.")
         return
@@ -612,6 +636,12 @@ async def eightball(ctx, *, question):
 @client.command()
 async def cb_search(ctx, *, team):
     """ Search through all of Steve Wiltfong's crystal ball predictions by team. """
+
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send("Command sent in the wrong channel.")
+        return
 
     crystal_balls.check_last_run()
 
