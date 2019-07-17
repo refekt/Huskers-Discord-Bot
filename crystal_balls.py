@@ -139,7 +139,7 @@ def move_cb_to_list_and_json(pages=14, json_dump=False):
         fp.close()
 
 
-def check_last_run():
+'''def check_last_run():
     now = datetime.datetime.now()
     temp_check = cb_settings.last_run
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)# datetime.datetime.strptime(temp_check, '%Y-%d-%M %I:%M')
@@ -160,4 +160,4 @@ def check_last_run():
         print("Last time JSON was pulled does not exceed threshold")
         # print(cb_list)
         if len(cb_list) <= 1:
-            load_cb_to_list()
+            load_cb_to_list()'''
