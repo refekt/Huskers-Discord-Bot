@@ -127,7 +127,7 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=game)
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
 
-    # await check_last_run()
+    await check_last_run()
     # print("The client has the following emojis:\n", client.emojis)
 
 
