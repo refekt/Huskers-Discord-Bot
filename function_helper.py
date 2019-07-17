@@ -4,7 +4,7 @@ correct_channel = False
 
 async def check_command_channel(command, channel):
     # Debugging
-    print("***\nCommand: {}\nChannel: {}\nChannel ID: {}\n***\n".format(command, channel, channel.id))
+    # print("***\nCommand: {}\nChannel: {}\nChannel ID: {}\n***\n".format(command, channel, channel.id))
 
     # Bot Spam channel ID
     bot_spam_id = 593984711706279937

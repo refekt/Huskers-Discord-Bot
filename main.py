@@ -9,6 +9,9 @@ import json
 import config
 import crystal_balls
 import function_helper
+import datetime
+import cb_settings
+import pandas
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -124,7 +127,7 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=game)
     print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
 
-    crystal_balls.check_last_run()
+    # await check_last_run()
     # print("The client has the following emojis:\n", client.emojis)
 
 
@@ -235,12 +238,42 @@ async def on_reaction_add(reaction, user):
             if reaction.emoji == '📹':
                 channel = reaction.message.channel
                 await hudl_highlight(channel)
-        
+
+
 # Catch invalid commands/errors
 @client.event
 async def on_command_error(ctx, error):
     output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
     await ctx.send(output_msg)
+
+
+async def check_last_run(ctx=None):
+    """ Check when the last time the JSON was pulled. """
+    now = datetime.datetime.now()
+    temp_check = cb_settings.last_run
+    check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
+
+    global updating_cb_list
+
+    if now > check:
+        print("Last time the JSON was pulled exceeded threshold")
+        updating_cb_list = True
+        if ctx:
+            await ctx.send("The crystal ball database is stale. Updating now; standby...")
+        crystal_balls.move_cb_to_list_and_json(json_dump=True)
+
+        f = open('cb_settings.py', 'w')
+        f.write('last_run = \'{}\''.format(datetime.datetime.now()))
+        f.close()
+
+        updating_cb_list = False
+        if ctx:
+            await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
+    else:
+        print("Last time JSON was pulled does not exceed threshold")
+        # print(cb_list)
+        if len(crystal_balls.cb_list) <= 1:
+            crystal_balls.load_cb_to_list()
 
 
 @client.command()
@@ -504,7 +537,7 @@ async def asparagus(ctx):
         embed.set_image(url='https://i.imgur.com/QskqFO0.gif')
         await ctx.send(embed=embed)
     else:
-        await ctx.send('You are not a member of the glorious Asparagng!')
+        await ctx.send('You are not a member of the glorious Asparagang!')
 
 
 @client.command()
@@ -617,6 +650,8 @@ async def recentballs(ctx, number=0):
         await ctx.send("The number of retrieved Crystal Balls must be less than 5.")
         return
 
+    await check_last_run(ctx)
+
     limitSpam = -1
 
     if number > 0:
@@ -673,7 +708,7 @@ async def cb_search(ctx, *, team):
         await ctx.send(wrong_channel_text)
         return
 
-    crystal_balls.check_last_run()
+    await check_last_run(ctx)
 
     search_list = crystal_balls.cb_list
     saved_results = []
@@ -708,13 +743,6 @@ async def cb_search(ctx, *, team):
     await ctx.send(embed=embed)
 
     # await ctx.send("Steve Wiltfong's Last 10 Predictions for __**{}**__:\n{}".format(team, output_str))
-
-
-@client.command()
-async def secret(ctx):
-    # await ctx.send(ctx.author.roles)
-    for role in ctx.author.roles:
-        await ctx.send(role)
 
 
 # Run the Discord bot
