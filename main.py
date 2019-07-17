@@ -253,6 +253,8 @@ async def check_last_run(ctx=None):
     temp_check = cb_settings.last_run
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
 
+    print("***\nNow: {}\nTemp Check: {}\nCheck: {}\nNow > Check: {}\n***".format(now, temp_check, check, now > check))
+
     if now > check:
         print("Last time the JSON was pulled exceeded threshold")
 
