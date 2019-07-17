@@ -253,22 +253,18 @@ async def check_last_run(ctx=None):
     temp_check = cb_settings.last_run
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
 
-    global updating_cb_list
-
     if now > check:
         print("Last time the JSON was pulled exceeded threshold")
-        updating_cb_list = True
-        if ctx:
-            await ctx.send("The crystal ball database is stale. Updating now; standby...")
+
+        if ctx: await ctx.send("The crystal ball database is stale. Updating now; standby...")
+
         crystal_balls.move_cb_to_list_and_json(json_dump=True)
 
         f = open('cb_settings.py', 'w')
         f.write('last_run = \'{}\''.format(datetime.datetime.now()))
         f.close()
 
-        updating_cb_list = False
-        if ctx:
-            await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
+        if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
     else:
         print("Last time JSON was pulled does not exceed threshold")
         # print(cb_list)
