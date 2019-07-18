@@ -120,7 +120,7 @@ def load_cb_to_list():
 def move_cb_to_list_and_json(pages=14, json_dump=False):
     # Loops through pull_crystal_balls_from_pages() 'pages' times.
     # Dumps to JSON is json_dump == True
-    print("Starting")
+    print("*** Starting")
     i = 1
     while i <= pages:
         print("*** Starting to pull page {} of data.".format(i))
@@ -139,7 +139,7 @@ def move_cb_to_list_and_json(pages=14, json_dump=False):
         fp.close()
 
 
-def check_last_run():
+'''def check_last_run():
     now = datetime.datetime.now()
     temp_check = cb_settings.last_run
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)# datetime.datetime.strptime(temp_check, '%Y-%d-%M %I:%M')
@@ -158,7 +158,6 @@ def check_last_run():
         updating_cb_list = False
     else:
         print("Last time JSON was pulled does not exceed threshold")
-        load_cb_to_list()
-
-
-check_last_run()
+        # print(cb_list)
+        if len(cb_list) <= 1:
+            load_cb_to_list()'''
