@@ -24,6 +24,63 @@ hudl_location = None
 
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
+    
+state_abbr = {'Alabama': 'AL',
+    'Alaska': 'AK',
+    'Arizona': 'AZ',
+    'Arkansas': 'AR',
+    'California': 'CA',
+    'Colorado': 'CO',
+    'Connecticut': 'CT',
+    'Delaware': 'DE',
+    'District of Columbia': 'DC',
+    'Florida': 'FL',
+    'Georgia': 'GA',
+    'Hawaii': 'HI',
+    'Idaho': 'ID',
+    'Illinois': 'IL',
+    'Indiana': 'IN',
+    'Iowa': 'IA',
+    'Kansas': 'KS',
+    'Kentucky': 'KY',
+    'Louisiana': 'LA',
+    'Maine': 'ME',
+    'Maryland': 'MD',
+    'Massachusetts': 'MA',
+    'Michigan': 'MI',
+    'Minnesota': 'MN',
+    'Mississippi': 'MS',
+    'Missouri': 'MO',
+    'Montana': 'MT',
+    'Nebraska': 'NE',
+    'Nevada': 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    'Northern Mariana Islands':'MP',
+    'Ohio': 'OH',
+    'Oklahoma': 'OK',
+    'Oregon': 'OR',
+    'Palau': 'PW',
+    'Pennsylvania': 'PA',
+    'Puerto Rico': 'PR',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    'Tennessee': 'TN',
+    'Texas': 'TX',
+    'Utah': 'UT',
+    'Vermont': 'VT',
+    'Virgin Islands': 'VI',
+    'Virginia': 'VA',
+    'Washington': 'WA',
+    'West Virginia': 'WV',
+    'Wisconsin': 'WI',
+    'Wyoming': 'WY',
+} 
 
 # Reference - https://www.cougcenter.com/2013/6/28/4445944/common-ncaa-football-penalties-referee-signals
 ref_dict = {'bs': ['Bull shit', 'Referee still gets paid for that horrible call','https://i.imgur.com/0nQGIZs.gif'],
@@ -175,18 +232,19 @@ async def on_message(message):
             results = data['results']
             matching_players = []
             for r in results:                   
-                if r['name'] == croot_name and (r['primaryTeam']['teamName']=='Boys Varsity Football' or r['primaryTeam']['teamName']=='Husker Football'):
+                if r['name'] == croot_name and r['primaryTeam']['sportId']== 1:
                     matching_players.append(r)
                     print(r)
             global hudl_url
             if len(matching_players) > 0:  
                 global hudl_location
                 hudl_url = 'https://www.hudl.com' + matching_players[0]['url']
+                second_match = []
                 for m in matching_players:
-                    if m['primaryTeam']['schoolName'] == 'University of Nebraska':
-                        hudl_url = 'https://www.hudl.com' + m['url']
-                    elif m['primaryTeam']['location'] == hudl_location:
-                        hudl_url = 'https://www.hudl.com' + m['url']
+                    if m['primaryTeam']['schoolName'] == 'University of Nebraska' or m['primaryTeam']['location'] == hudl_location:
+                        second_match.append(m)
+
+                   
                 hudl_location = None
                 page = requests.get(url = hudl_url, headers = headers)                
                 embed_old = message.embeds[0]
@@ -343,8 +401,10 @@ async def parse_search(search, channel):
         await channel.send(embed=message_embed)
         #Decided to send a global variable to location to help hudl highlights find the correct player
         global hudl_location
-        hudl_location = '{}, {}'.format(city, state)
-        
+        if state in state_abbr:
+            hudl_location = '{}, {}'.format(city, state_abbr[state])
+        else:
+            hudl_location = '{}, {}'.format(city, state)
         global player_search_list
         player_search_list = []
 
