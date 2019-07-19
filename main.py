@@ -172,7 +172,6 @@ async def on_message(message):
             while i < len(welcome_emoji_list):
                 await message.add_reaction(welcome_emoji_list[i])
                 i += 1
-            await message.add_reaction()
         # CrootBot Search Results detection
         if message.author == client.user and player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             # Pre-add reactions for users
@@ -220,13 +219,16 @@ async def on_member_join(member):
                    "React to this message with the emojis below to automatically join the roles!", inline=False)
     embed.set_footer(text=welcome_footer)
 
-    welcome_channel = client.get_channel(487431877792104470)
-    await welcome_channel.send(embed=embed)
+    # welcome_channel = client.get_channel(487431877792104470)
+    # await welcome_channel.send(embed=embed)
+    await member.send(embed=embed)
 
 
 @client.event
 async def on_reaction_add(reaction, user):
-    # print(reaction.emoji)
+    # Debugging
+    # print("***\nReaction: {}\mUser: {}\m***".format(reaction, user))
+
     if user != client.user and reaction.message.author == client.user and player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
         channel = reaction.message.channel
         emoji_dict = {'1⃣' : 0,
@@ -256,7 +258,7 @@ async def on_reaction_add(reaction, user):
                 video_url = 'https:' + soup.find(class_='video-wrapper').find('iframe').get('src')
                 await channel.send(video_url)
                 highlight_url = None
-        if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Welcome Message' + huskerbot_footer:
+        if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == huskerbot_footer:
             if reaction.emoji == '🍞':
                 role = get(user.server.roles, name='/r/unza')
                 await user.add_roles(role)
@@ -783,7 +785,7 @@ async def on_join_test(ctx):
     for r in ctx.author.roles:
         # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
         if r.id in authorized_to_quit:
-             authorized = True
+            authorized = True
 
     if authorized:
         embed = discord.Embed(title="HuskerBot's Welcome Message", color=0xff0000)
@@ -791,11 +793,7 @@ async def on_join_test(ctx):
                        "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🥪 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
                        "React to this message with the emojis below to automatically join the roles!", inline=False)
         embed.set_footer(text=huskerbot_footer)
-        await ctx.send(embed=embed)
-
-        '''await ctx.send("Welcome __`{}`__ to the Huskers Discord! The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
-                       "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🥪 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
-                       "React to this message with the emojis below to automatically join the roles!".format(ctx.author))'''
+        await ctx.message.author.send(embed=embed)
     else:
         await ctx.send("Not authorized to use this command.")
 
