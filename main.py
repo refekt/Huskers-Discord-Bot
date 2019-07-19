@@ -273,10 +273,10 @@ async def on_reaction_add(reaction, user):
                 except:
                     video_url = soup.find(class_='video-container').find('iframe').get('src')
                 if 'https:' not in video_url:
-                    video_url = 'https:' + video_url
-
-                await channel.send(video_url)
-
+                    video_url = 'https:' + video_url   
+                title = soup.find(class_ = 'video-block').find_all('div')[2].find('h3').get_text()
+                embed = discord.Embed(title = title, url = video_url, color=0xff0000)
+                await channel.send(embed = embed)
                 highlight_url = None
 
         # Adding roles to member
