@@ -787,25 +787,5 @@ async def cb_search(ctx, *, team):
     await ctx.send(embed=embed)
 
 
-@client.command()
-async def on_join_test(ctx):
-    authorized = False
-
-    for r in ctx.author.roles:
-        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
-        if r.id in authorized_to_quit:
-            authorized = True
-
-    if authorized:
-        embed = discord.Embed(title="HuskerBot's Welcome Message", color=0xff0000)
-        embed.add_field(name="Welcome __`{}`__ to the Huskers Discord!".format(ctx.author), value="The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
-                       "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🥪 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
-                       "React to this message with the emojis below to automatically join the roles!", inline=False)
-        embed.set_footer(text=huskerbot_footer)
-        await ctx.message.author.send(embed=embed)
-    else:
-        await ctx.send("Not authorized to use this command.")
-
-
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)
