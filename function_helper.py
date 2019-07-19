@@ -10,11 +10,11 @@ async def check_command_channel(command, channel):
     bot_spam_id = 593984711706279937
 
     # Commands and Channel IDs for CrootBot based commands
-    croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs']
+    croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs', 'cb_refresh']
     croot_channels = [593984711706279937, 507520543096832001, 443822461759520769]
 
     # Commands and Channel ID for Vexillology
-    flag_commands = ['crappyflag']
+    flag_commands = ['crappyflag', 'randomflag']
     flag_channels = [597900461483360287, 442047437561921548]
 
     global correct_channel

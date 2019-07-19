@@ -10,7 +10,6 @@ import pandas
 
 CB_REFRESH_INTERVAL = 480
 cb_list = []
-updating_cb_list = False
 
 
 def pull_crystal_balls_from_pages(year, page=1):
@@ -126,7 +125,7 @@ def move_cb_to_list_and_json(pages=14, json_dump=False):
         print("*** Starting to pull page {} of data.".format(i))
         now = datetime.datetime.now()
         pull_crystal_balls_from_pages(now.year + 1, i)
-        time.sleep(2)
+        time.sleep(1)
         print("*** Completed page {}.".format(i))
         i += 1
     print("*** All finished")

@@ -6,12 +6,12 @@ from bs4 import BeautifulSoup
 import sys
 import random
 import json
-import config
-import crystal_balls
-import function_helper
 import datetime
-import cb_settings
 import pandas
+import config
+import function_helper
+import cb_settings
+import crystal_balls
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -83,7 +83,7 @@ flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'iowa_state': 'https://i.imgur.com/w9vg0QX.jpg',
              'indiana': 'https://i.imgur.com/uc0Q8Z0.jpg',
              'colorado': 'https://i.imgur.com/If6MPtT.jpg',
-             'wisconsin': 'https://i.imgur.com/lgFZFkV.jpg',
+             'wisconsin': 'https://giant.gfycat.com/PolishedFeminineBeardedcollie.gif',
              'texas': 'https://i.imgur.com/rB2Rduq.jpg',
              'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
              'illinois': 'https://i.imgur.com/MxMaS3e.jpg',
@@ -125,10 +125,7 @@ eight_ball = ['Try again',
 async def on_ready():
     game = discord.Game('Husker Football 24/7')
     await client.change_presence(status=discord.Status.online, activity=game)
-    print("Logged in as {0}. Discord.py version is: [{1}] and Discord version is [{2}]".format(client.user, discord.__version__, sys.version))
-
-    # await check_last_run()
-    # print("The client has the following emojis:\n", client.emojis)
+    print("***\nLogged in as [{0}].\nDiscord.py version is: [{1}].\nDiscord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
 
 @client.event
@@ -249,24 +246,23 @@ async def check_last_run(ctx=None):
     temp_check = cb_settings.last_run
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
 
-    global updating_cb_list
+    print("***\nNow: {}\nTemp Check: {}\nCheck: {}\nNow > Check: {}\n***".format(now, temp_check, check, now > check))
 
     if now > check:
         print("Last time the JSON was pulled exceeded threshold")
-        updating_cb_list = True
-        if ctx:
-            await ctx.send("The crystal ball database is stale. Updating now; standby...")
+
+        if ctx: await ctx.send("The crystal ball database is stale. Updating now; standby...")
+
         crystal_balls.move_cb_to_list_and_json(json_dump=True)
 
         f = open('cb_settings.py', 'w')
         f.write('last_run = \'{}\''.format(datetime.datetime.now()))
         f.close()
 
-        updating_cb_list = False
-        if ctx:
-            await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
+        if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
     else:
-        print("Last time JSON was pulled does not exceed threshold")
+        # print("Last time JSON was pulled does not exceed threshold")
+        await ctx.send("The crystal ball database is already fresh.")
         # print(cb_list)
         if len(crystal_balls.cb_list) <= 1:
             crystal_balls.load_cb_to_list()
@@ -426,6 +422,13 @@ async def billyfacts(ctx):
 @client.command()
 async def randomflag(ctx):
     """ A random ass, badly made Nebraska flag. """
+
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send(wrong_channel_text)
+        return
+
     flags = []
     with open("flags.txt") as f:
         for line in f:
@@ -571,6 +574,23 @@ async def huskerbotquit(ctx):
     else:
         await ctx.send("Nice try buddy! 👋")
 
+
+@client.command()
+async def cb_refresh(ctx):
+    """ Did HuskerBot act up? Use this only in emergencies. """
+    authorized = False
+
+    for r in ctx.author.roles:
+        # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
+        if r.id in authorized_to_quit:
+            authorized = True
+
+    if authorized:
+        await check_last_run(ctx)
+    else:
+        await ctx.send("Nice try buddy! 👋")
+
+
 @client.command()
 async def referee(ctx, call):
     """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
@@ -631,7 +651,7 @@ async def recentballs(ctx, number=0):
         varName = cbs['Name']
         varPrediction = cbs['Prediction']
         varPredictionDate = cbs['PredictionDate']
-        varProfile = cbs['Profile']
+        varProfile = "[Profile]({})".format(cbs['Profile'])
         varResult = cbs['Result']
         varTeams = dict(cbs['Teams'])
         varTeamString = ""
@@ -674,7 +694,7 @@ async def cb_search(ctx, *, team):
         await ctx.send(wrong_channel_text)
         return
 
-    await check_last_run(ctx)
+    # await check_last_run(ctx)
 
     search_list = crystal_balls.cb_list
     saved_results = []
