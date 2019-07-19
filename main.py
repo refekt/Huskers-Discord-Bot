@@ -275,10 +275,10 @@ async def crootbot(ctx, year, first_name, last_name):
     # First, pull the message content, split the individual pieces, and make the api call
 
     # This keeps bot spam down to a minimal.
-    # await function_helper.check_command_channel(ctx.command, ctx.channel)
-    # if not function_helper.correct_channel:
-        # await ctx.send(wrong_channel_text)
-        # return
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+    if not function_helper.correct_channel:
+        await ctx.send(wrong_channel_text)
+        return
 
     search_first_name = first_name
     search_last_name = last_name
@@ -562,10 +562,10 @@ async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = True
 
-    # for r in ctx.author.roles:
+    for r in ctx.author.roles:
         # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
-        # if r.id in authorized_to_quit:
-            # authorized = True
+        if r.id in authorized_to_quit:
+             authorized = True
 
     if authorized:
         await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
