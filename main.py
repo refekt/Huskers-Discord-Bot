@@ -229,60 +229,86 @@ async def on_member_join(member):
 @client.event
 async def on_reaction_add(reaction, user):
     # Debugging
-    # print("***\nReaction: {}\mUser: {}\m***".format(reaction, user))
+    print("*** Reaction: {}\mUser: {} ***".format(reaction, user))
 
-    if user != client.user and reaction.message.author == client.user and player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
-        channel = reaction.message.channel
-        emoji_dict = {'1⃣' : 0,
-                      '2⃣' : 1,
-                      '3⃣' : 2,
-                      '4⃣' : 3,
-                      '5⃣' : 4,
-                      '6⃣' : 5,
-                      '7⃣' : 6, 
-                      '8⃣' : 7, 
-                      '9⃣' : 8, 
-                      '🔟' : 9
-                      }
-        if reaction.emoji in emoji_dict:
-            await parse_search(search=player_search_list[emoji_dict[reaction.emoji]], channel=channel)
-    
-    # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
+    # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
+        # Debugging
+        # print("***\nEmbeds > 0")
+
+        if user != client.user and reaction.message.author == client.user and player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
+            channel = reaction.message.channel
+
+            emoji_dict = {'1⃣': 0,
+                          '2⃣': 1,
+                          '3⃣': 2,
+                          '4⃣': 3,
+                          '5⃣': 4,
+                          '6⃣': 5,
+                          '7⃣': 6,
+                          '8⃣': 7,
+                          '9⃣': 8,
+                          '🔟': 9
+                          }
+
+            if reaction.emoji in emoji_dict:
+                await parse_search(search=player_search_list[emoji_dict[reaction.emoji]], channel=channel)
+
+        # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url
+
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:
-            print("***\nHighlight videos\n***")
+            # Debugging
+            print("Highlight videos")
+
             if reaction.emoji == '📹':                
                 channel = reaction.message.channel
                 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
                 url = highlight_url
                 page = requests.get(url = url, headers = headers)
                 soup = BeautifulSoup(page.text, 'html.parser')
+
                 try:
                     video_url = soup.find(class_='video-wrapper').find('iframe').get('src')
                 except:
                     video_url = soup.find(class_='video-container').find('iframe').get('src')
                 if 'https:' not in video_url:
-                    video_url = 'https:' + video_url               
+                    video_url = 'https:' + video_url
+
                 await channel.send(video_url)
+
                 highlight_url = None
-        if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == huskerbot_footer:
-            print("***\nNew member joins\n***")
+
+        # Adding roles to member
+        # if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == huskerbot_footer:
+        if reaction.emoji in welcome_emoji_list and user != client.user:
+            # Debugging
+            print("New member joins")
+
+            server_id = 440632686185414677
+            server = client.get_guild(server_id)
+            member = server.get_member(user.id)
+
             if reaction.emoji == '🍞':
-                role = get(user.server.roles, name='/r/unza')
-                await user.add_roles(role)
+                role = get(server.roles, id=485086088017215500)
+                await member.add_roles(role)
             elif reaction.emoji == '😂':
-                role = get(user.server.roles, name='Meme Team')
-                await user.add_roles(role)
+                role = get(server.roles, id=448690298760200195)
+                await member.add_roles(role)
             elif reaction.emoji == '🥒':
-                role = get(user.server.roles, name='/r/Asparagang')
-                await user.add_roles(role)
+                role = get(server.roles, id=583842403341828115)
+                await member.add_roles(role)
             elif reaction.emoji == '🥔':
-                role = get(user.server.roles, name='POTATO GANG')
-                await user.add_roles(role)
+                role = get(server.roles, id=583842320575889423)
+                await member.add_roles(role)
             elif reaction.emoji == '🔴':
-                role = get(user.server.roles, name='Lil\' Huskers Squad')
-                await user.add_roles(role)
+                role = get(server.roles, id=464903715854483487)
+                await member.add_roles(role)
+    else:
+        # Debugging
+        print("***\nEmbeds <= 0\n***")
+
+    print("***")
 
 
 # Catch invalid commands/errors
@@ -785,26 +811,6 @@ async def cb_search(ctx, *, team):
     embed.set_author(name="HuskerBot")
     embed.add_field(name="Crystal Ball Search Results for {}".format(team), value=output_str, inline=False)
     await ctx.send(embed=embed)
-
-
-@client.command()
-async def on_join_test(ctx):
-    authorized = False
-
-    for r in ctx.author.roles:
-        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
-        if r.id in authorized_to_quit:
-            authorized = True
-
-    if authorized:
-        embed = discord.Embed(title="HuskerBot's Welcome Message", color=0xff0000)
-        embed.add_field(name="Welcome __`{}`__ to the Huskers Discord!".format(ctx.author), value="The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
-                       "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🥪 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
-                       "React to this message with the emojis below to automatically join the roles!", inline=False)
-        embed.set_footer(text=huskerbot_footer)
-        await ctx.message.author.send(embed=embed)
-    else:
-        await ctx.send("Not authorized to use this command.")
 
 
 # Run the Discord bot
