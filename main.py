@@ -195,8 +195,10 @@ async def on_message(message):
                 for v in videos:
                     if 'senior' in v.get('title').lower():                       
                         highlight_url = v.get('href')
+                        break
                     elif 'junior' in v.get('title').lower():
                         highlight_url = v.get('href')
+                        break
                     elif 'sophomore' in v.get('title').lower():
                         highlight_url = v.get('href')
                 print("{}\n***".format(highlight_url))
@@ -256,7 +258,12 @@ async def on_reaction_add(reaction, user):
                 url = highlight_url
                 page = requests.get(url = url, headers = headers)
                 soup = BeautifulSoup(page.text, 'html.parser')
-                video_url = 'https:' + soup.find(class_='video-wrapper').find('iframe').get('src')
+                try:
+                    video_url = soup.find(class_='video-wrapper').find('iframe').get('src')
+                except:
+                    video_url = soup.find(class_='video-container').find('iframe').get('src')
+                if 'https:' not in video_url:
+                    video_url = 'https:' + video_url               
                 await channel.send(video_url)
                 highlight_url = None
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == huskerbot_footer:
@@ -611,7 +618,7 @@ async def strut(ctx):
 @client.command()    
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
-    authorized = True
+    authorized = False
 
     for r in ctx.author.roles:
         # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
