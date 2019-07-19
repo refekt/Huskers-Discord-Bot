@@ -276,9 +276,9 @@ async def crootbot(ctx, year, first_name, last_name):
 
     # This keeps bot spam down to a minimal.
     # await function_helper.check_command_channel(ctx.command, ctx.channel)
-    # if not function_helper.correct_channel:
-        # await ctx.send(wrong_channel_text)
-        # return
+    if not function_helper.correct_channel:
+        await ctx.send(wrong_channel_text)
+        return
 
     search_first_name = first_name
     search_last_name = last_name
@@ -556,16 +556,22 @@ async def thehit(ctx):
     embed.set_image(url='https://i.imgur.com/mKRUPoD.gif')
     await ctx.send(embed=embed)
 
-
+@client.command()
+async def strut(ctx):
+    """ Martinez struttin his stuff """
+    embed = discord.Embed(title = "dat strut")
+    embed.set_image(url = 'https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif')
+    await ctx.send(embed = embed)
+    
 @client.command()    
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = True
 
-    # for r in ctx.author.roles:
-        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
-        # if r.id in authorized_to_quit:
-            # authorized = True
+    for r in ctx.author.roles:
+        # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
+        if r.id in authorized_to_quit:
+            authorized = True
 
     if authorized:
         await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
