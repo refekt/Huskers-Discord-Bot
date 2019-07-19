@@ -227,7 +227,7 @@ async def on_member_join(member):
 @client.event
 async def on_reaction_add(reaction, user):
     # Debugging
-    # print("***\nReaction: {}\mUser: {}\m***".format(reaction, user))
+    print("***\nReaction: {}\mUser: {}\m***".format(reaction, user))
 
     if user != client.user and reaction.message.author == client.user and player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
         channel = reaction.message.channel
