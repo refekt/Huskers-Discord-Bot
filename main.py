@@ -195,8 +195,10 @@ async def on_message(message):
                 for v in videos:
                     if 'senior' in v.get('title').lower():                       
                         highlight_url = v.get('href')
+                        break
                     elif 'junior' in v.get('title').lower():
                         highlight_url = v.get('href')
+                        break
                     elif 'sophomore' in v.get('title').lower():
                         highlight_url = v.get('href')
                 print("{}\n***".format(highlight_url))
@@ -248,17 +250,24 @@ async def on_reaction_add(reaction, user):
     # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
     if len(reaction.message.embeds) > 0:
         global highlight_url
-        if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:            
+        if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:
+            print("***\nHighlight videos\n***")
             if reaction.emoji == '📹':                
                 channel = reaction.message.channel
                 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
                 url = highlight_url
                 page = requests.get(url = url, headers = headers)
                 soup = BeautifulSoup(page.text, 'html.parser')
-                video_url = 'https:' + soup.find(class_='video-wrapper').find('iframe').get('src')
+                try:
+                    video_url = soup.find(class_='video-wrapper').find('iframe').get('src')
+                except:
+                    video_url = soup.find(class_='video-container').find('iframe').get('src')
+                if 'https:' not in video_url:
+                    video_url = 'https:' + video_url               
                 await channel.send(video_url)
                 highlight_url = None
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == huskerbot_footer:
+            print("***\nNew member joins\n***")
             if reaction.emoji == '🍞':
                 role = get(user.server.roles, name='/r/unza')
                 await user.add_roles(role)
@@ -609,7 +618,7 @@ async def strut(ctx):
 @client.command()    
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
-    authorized = True
+    authorized = False
 
     for r in ctx.author.roles:
         # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
