@@ -569,9 +569,9 @@ async def huskerbotquit(ctx):
     authorized = True
 
     for r in ctx.author.roles:
-        # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
+        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
         if r.id in authorized_to_quit:
-            authorized = True
+             authorized = True
 
     if authorized:
         await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
