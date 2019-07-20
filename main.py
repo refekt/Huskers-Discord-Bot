@@ -13,6 +13,7 @@ import config
 import function_helper
 import cb_settings
 import crystal_balls
+import husker_roster
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -812,6 +813,10 @@ async def cb_search(ctx, *, team):
     embed.add_field(name="Crystal Ball Search Results for {}".format(team), value=output_str, inline=False)
     await ctx.send(embed=embed)
 
+
+@client.command()
+async def secret(ctx):
+    await husker_roster.download_roster()
 
 # Run the Discord bot
 client.run(config.DISCORD_TOKEN)
