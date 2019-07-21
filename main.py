@@ -824,7 +824,7 @@ async def secret(ctx, year=2018):
 
     for team in Teams(year):
         if team.conference.lower() == 'big-ten':
-            team_data += "{}, {}-{} ({})\n".format(team.name, team.wins, team.losses, team.win_percentage)
+            team_data += "{}, {}-{} (WinPer: {}, Conf WinPer: {})\n".format(team.name, team.wins, team.losses, team.win_percentage, team.conference_win_percentage)
 
     await msg.edit(content=team_data)
 
