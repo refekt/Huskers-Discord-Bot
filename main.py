@@ -540,7 +540,13 @@ async def crappyflag(ctx, state):
     embed.set_image(url=flag_dict[state.lower()])
     await ctx.send(embed=embed)
 
-
+@client.command()
+async def OHYEAH(ctx):
+    """Pour that koolaid baby"""
+    embed = discord.Embed(title = "OH YEAH!")
+    embed.set_image(url = 'https://media.giphy.com/media/3d9rkLNvMXahgQVpM4/source.gif')
+    await ctx.send(embed=embed)
+    
 @client.command()
 async def iowasux(ctx):
     """ Iowa has the worst corn. """
