@@ -16,6 +16,7 @@ import crystal_balls
 import husker_roster
 import sportsreference
 from sportsreference.ncaaf.teams import Teams
+from sportsreference.ncaaf.conferences import Conferences
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -819,14 +820,16 @@ async def cb_search(ctx, *, team):
 @client.command()
 async def secret(ctx, year=2018):
     # await husker_roster.download_roster()
-    msg = await ctx.send("Loading...")
+    '''msg = await ctx.send("Loading...")
     team_data = ''
 
     for team in Teams(year):
         if team.conference.lower() == 'big-ten':
             team_data += "{}, {}-{} (WinPer: {}, Conf WinPer: {})\n".format(team.name, team.wins, team.losses, team.win_percentage, team.conference_win_percentage)
 
-    await msg.edit(content=team_data)
+    await msg.edit(content=team_data)'''
+    conf = Conferences()
+    print(conf.team_conference)
 
 
 # Run the Discord bot
