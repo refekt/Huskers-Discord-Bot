@@ -356,7 +356,7 @@ async def crootbot(ctx, year, *name):
     # First, pull the message content, split the individual pieces, and make the api call
 
     # This keeps bot spam down to a minimal.
-    # await function_helper.check_command_channel(ctx.command, ctx.channel)
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
     if not function_helper.correct_channel:
         await ctx.send(wrong_channel_text)
         return
@@ -380,7 +380,10 @@ async def crootbot(ctx, year, *name):
         await ctx.send("You need to provide a year and name for me to search. I accept queries in the format $crootbot <year><name>.")
         return
     if not search:
-        await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
+        if len(name) == 1:
+            await ctx.send("I could not find any player named {} in the {} class".format(name[0], year))
+        elif len(name) == 2:
+            await ctx.send("I could not find any player named {} {} in the {} class".format(name[0], name[1], year))
     elif len(search) > 1:
         global player_search_list
         # players_string = 'Mulitple results found for **[{}, {} {}]**. React with the corresponding emoji for CrootBot results.\n__**Search Results:**__\n'.format(year, first_name, last_name)
