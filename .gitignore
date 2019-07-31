@@ -131,3 +131,6 @@ crystal_balls.json
 cb_settings.py
 crystal_balls.json
 team_ids.json
+.idea/vcs.xml
+*.xml
+*.iml
