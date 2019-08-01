@@ -21,11 +21,11 @@ import importlib
 import markovify
 import re
 
-
+# Bot specific stuff
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
 
-# initialize a global list for crootbot to put search results in
+# initialize a global list for CrootBot to put search results in
 player_search_list = []
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']
@@ -35,10 +35,11 @@ profile_url = None
 highlight_url = None
 wrong_channel_text = 'The command you sent is not authorized for use in this channel.'
 authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
-
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
 
+
+# Start dictionaries
 # Reference - https://www.cougcenter.com/2013/6/28/4445944/common-ncaa-football-penalties-referee-signals
 ref_dict = {'bs': ['Bull shit', 'Referee still gets paid for that horrible call','https://i.imgur.com/0nQGIZs.gif'],
             'chip': ['Blocking below the waist', 'OFF: 15 yards\nDEF: 15 yards and an automatic first down', 'https://i.imgur.com/46aDB8t.gif'],
@@ -130,8 +131,9 @@ eight_ball = ['Try again',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
+# End dictionaries
 
-
+# Start bot (client) events
 @client.event
 async def on_ready():
     # https://gist.github.com/scragly/2579b4d335f87e83fbacb7dfd3d32828
@@ -335,6 +337,7 @@ async def on_reaction_add(reaction, user):
 async def on_command_error(ctx, error):
     output_msg = "Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
     await ctx.send(output_msg)
+# End bot (client) events
 
 
 async def check_last_run(ctx=None):
@@ -516,7 +519,8 @@ async def parse_search(search, channel):
         global player_search_list
         player_search_list = []
 
-    
+
+# Text commands
 @client.command()
 async def billyfacts(ctx):
     """ Real facts about Bill Callahan. """
@@ -530,6 +534,19 @@ async def billyfacts(ctx):
     await ctx.message.channel.send(random.choice(facts))
 
 
+@client.command()
+async def eightball(ctx, *, question):
+    """ Ask a Magic 8-Ball a question. """
+    dice_roll = random.randint(0, len(eight_ball))
+
+    embed = discord.Embed(title=':8ball: HuskerBot 8-Ball :8ball:')
+    embed.add_field(name=question, value=eight_ball[dice_roll])
+
+    await ctx.send(embed=embed)
+# Text commands
+
+
+# Start image commands
 @client.command()
 async def randomflag(ctx):
     """ A random ass, badly made Nebraska flag. """
@@ -576,13 +593,15 @@ async def crappyflag(ctx, state=""):
         embed.set_image(url=flag_dict[random_state])
         await ctx.send(embed=embed)
 
-@client.command()
-async def OHYEAH(ctx):
+
+@client.command(case_insensitive=True)
+async def OHYEAH(ctx, ):
     """Pour that koolaid baby"""
     embed = discord.Embed(title = "OH YEAH!")
     embed.set_image(url = 'https://media.giphy.com/media/3d9rkLNvMXahgQVpM4/source.gif')
     await ctx.send(embed=embed)
-    
+
+
 @client.command()
 async def iowasux(ctx):
     """ Iowa has the worst corn. """
@@ -685,39 +704,14 @@ async def strut(ctx):
     embed = discord.Embed(title = "dat strut")
     embed.set_image(url = 'https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif')
     await ctx.send(embed = embed)
-    
-@client.command()    
-async def huskerbotquit(ctx):
-    """ Did HuskerBot act up? Use this only in emergencies. """
-    authorized = False
-
-    for r in ctx.author.roles:
-        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
-        if r.id in authorized_to_quit:
-             authorized = True
-
-    if authorized:
-        await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
-        print("!!! I was turned off by '{}' in '{}'.".format(ctx.author, ctx.channel))
-        await client.logout()
-    else:
-        await ctx.send("Nice try buddy! 👋")
 
 
-@client.command(hidden=True)
-async def cb_refresh(ctx):
-    """ Did HuskerBot act up? Use this only in emergencies. """
-    authorized = False
-    print(ctx.author.roles)
-    for r in ctx.author.roles:
-        # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
-        if r.id in authorized_to_quit:
-            authorized = True
-
-    if authorized:
-        await check_last_run(ctx)
-    else:
-        await ctx.send("Nice try buddy! 👋")
+@client.command()
+async def guzzle(ctx):
+    """ Let the cup runeth over """
+    embed = discord.Embed(title = "Give it to me bb")
+    embed.set_image(url = 'https://i.imgur.com/OW7rChr.gif')
+    await ctx.send(embed = embed)
 
 
 @client.command(aliases=["ref",])
@@ -743,9 +737,46 @@ async def referee(ctx, call):
     embed.set_thumbnail(url=penalty_url)
     embed.set_footer(text=huskerbot_footer)
     await ctx.send(embed=embed)
+# End image commands
 
-
+# Admin command
 @client.command()
+async def huskerbotquit(ctx):
+    """ Did HuskerBot act up? Use this only in emergencies. """
+    authorized = False
+
+    for r in ctx.author.roles:
+        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
+        if r.id in authorized_to_quit:
+             authorized = True
+
+    if authorized:
+        await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
+        print("!!! I was turned off by '{}' in '{}'.".format(ctx.author, ctx.channel))
+        await client.logout()
+    else:
+        await ctx.send("Nice try buddy! 👋")
+# Admin command
+
+
+# CrootBot commands
+@client.command(hidden=True, aliases=["cbr",])
+async def cb_refresh(ctx):
+    """ Did HuskerBot act up? Use this only in emergencies. """
+    authorized = False
+    print(ctx.author.roles)
+    for r in ctx.author.roles:
+        # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
+        if r.id in authorized_to_quit:
+            authorized = True
+
+    if authorized:
+        await check_last_run(ctx)
+    else:
+        await ctx.send("Nice try buddy! 👋")
+
+
+@client.command(aliases=["rb",])
 async def recentballs(ctx, number=0):
     """ Send the last 1-5 crystal ball predictions from Steve Wiltfong. Usage is `$recent_balls [1-5]`. """
     # Error handling, Random number of 5 to prevent spam
@@ -795,17 +826,6 @@ async def recentballs(ctx, number=0):
         await ctx.send(embed=embed)
 
         limitSpam += 1
-
-
-@client.command()
-async def eightball(ctx, *, question):
-    """ Ask a Magic 8-Ball a question. """
-    dice_roll = random.randint(0, len(eight_ball))
-
-    embed = discord.Embed(title=':8ball: HuskerBot 8-Ball :8ball:')
-    embed.add_field(name=question, value=eight_ball[dice_roll])
-
-    await ctx.send(embed=embed)
 
 
 @client.command()
@@ -896,3 +916,11 @@ if len(sys.argv) > 0:
         client.run(config.DISCORD_TOKEN)
     else:
         print("You are error. Good bye!")
+
+for extension in startup_extensions:
+    try:
+        client.load_extension(extension)
+        client.add_cog()
+    except Exception as e:
+        exc = '{}: {}'.format(type(e).__name__, e)
+        print('Failed to load extension {}\n{}'.format(extension, exc))
