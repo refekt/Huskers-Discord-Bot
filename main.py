@@ -818,7 +818,7 @@ async def cb_search(ctx, *, team):
         await ctx.send(wrong_channel_text)
         return
 
-    await check_last_run(ctx)
+    # await check_last_run(ctx)
 
     search_list = crystal_balls.cb_list
     saved_results = []
@@ -857,6 +857,8 @@ async def cb_search(ctx, *, team):
 async def markov(ctx):
     source_data = ''
 
+    edit_msg = await ctx.send("Thinking...")
+
     async for msg in ctx.channel.history(limit=5000):
         if msg.content != "":
                 source_data += msg.content + ". "
@@ -866,8 +868,9 @@ async def markov(ctx):
     sentence = chain.make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
     sentence.replace("$","_")
     sentence.replace("@","~")
+    sentence.replace("..", ".)")
 
-    await ctx.send(sentence)
+    await edit_msg.edit(content=sentence)
 
 
 @client.command(aliases=["cd",], brief="How long until Husker football?")
