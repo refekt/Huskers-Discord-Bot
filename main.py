@@ -369,7 +369,7 @@ async def check_last_run(ctx=None):
 
 
 @client.command(aliases = ["cb",])
-async def crootbot(ctx, year, first_name, last_name):
+async def crootbot(ctx, year, *name):
     """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
     # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
     # First, pull the message content, split the individual pieces, and make the api call
