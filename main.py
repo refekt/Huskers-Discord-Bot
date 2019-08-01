@@ -18,6 +18,7 @@ import sportsreference
 from sportsreference.ncaaf.teams import Teams
 from sportsreference.ncaaf.conferences import Conferences
 import importlib
+import markovify
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -131,7 +132,7 @@ eight_ball = ['Try again',
 
 @client.event
 async def on_ready():
-    game = discord.Game('Husker Football 24/7')
+    game = discord.Game('Husker Football 24/7', activity=3)
     await client.change_presence(status=discord.Status.online, activity=game)
     print("***\nLogged in as [{0}].\nDiscord.py version is: [{1}].\nDiscord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
@@ -671,8 +672,6 @@ async def cb_refresh(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = False
 
-    print(ctx.author.roles)
-
     for r in ctx.author.roles:
         # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
         if r.id in authorized_to_quit:
@@ -820,6 +819,11 @@ async def cb_search(ctx, *, team):
     embed.set_author(name="HuskerBot")
     embed.add_field(name="Crystal Ball Search Results for {}".format(team), value=output_str, inline=False)
     await ctx.send(embed=embed)
+
+
+@client.command()
+async def markov(ctx):
+    source_data = ''
 
 
 @client.command()
