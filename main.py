@@ -17,6 +17,7 @@ import husker_roster
 import sportsreference
 from sportsreference.ncaaf.teams import Teams
 from sportsreference.ncaaf.conferences import Conferences
+import importlib
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -30,7 +31,7 @@ welcome_footer = 'HusekrBot welcomes you!'
 profile_url = None
 highlight_url = None
 wrong_channel_text = 'The command you sent is not authorized for use in this channel.'
-authorized_to_quit = [440639061191950336, 443805741111836693]
+authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344]
 
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
@@ -340,6 +341,8 @@ async def check_last_run(ctx=None):
         f = open('cb_settings.py', 'w')
         f.write('last_run = \'{}\''.format(datetime.datetime.now()))
         f.close()
+
+        imp.reload(cb_settings)
 
         if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
     else:
@@ -668,6 +671,8 @@ async def cb_refresh(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = False
 
+    print(ctx.author.roles)
+
     for r in ctx.author.roles:
         # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
         if r.id in authorized_to_quit:
@@ -833,7 +838,13 @@ async def secret(ctx, year=2018):
 
 
 # Run the Discord bot
-if sys.argv[1] == 'main':
-    client.run(config.DISCORD_TOKEN)
-elif sys.argv[1] == 'dev':
-    client.run(config.TEST_TOKEN)
+# Does nothing if no sys.argv present
+if len(sys.argv) > 0:
+    if sys.argv[1] == 'test':
+        print("*** Running development server")
+        client.run(config.TEST_TOKEN)
+    elif sys.argv[1] == 'prod':
+        print("*** Running production server")
+        client.run(config.DISCORD_TOKEN)
+    else:
+        print("You are error. Good bye!")
