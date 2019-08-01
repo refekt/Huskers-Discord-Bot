@@ -853,10 +853,10 @@ async def cb_search(ctx, *, team):
     await ctx.send(embed=embed)
 
 
-@client.command(brief="HuskerBot scrubs the current channel and comes up with his own message!")
+@client.command()
 async def markov(ctx):
+    """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
     source_data = ''
-
     edit_msg = await ctx.send("Thinking...")
 
     async for msg in ctx.channel.history(limit=5000):
@@ -866,6 +866,8 @@ async def markov(ctx):
 
     chain = markovify.Text(source_data, well_formed=True)
     sentence = chain.make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
+
+    # Get rid of things that would be annoying
     sentence.replace("$","_")
     sentence.replace("@","~")
     sentence.replace("..", ".)")
