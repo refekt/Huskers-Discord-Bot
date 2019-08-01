@@ -121,14 +121,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-testing
 config.txt
-testing
 config.py
-config.py
-cb_settings.py
-crystal_balls.json
-cb_settings.py
 crystal_balls.json
 team_ids.json
 .idea/vcs.xml

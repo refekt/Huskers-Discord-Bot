@@ -19,6 +19,8 @@ from sportsreference.ncaaf.teams import Teams
 from sportsreference.ncaaf.conferences import Conferences
 import importlib
 import markovify
+import re
+
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -141,7 +143,17 @@ async def on_ready():
 async def on_message(message):
     """ Commands processed as messages are entered """
     if not message.author.bot:
-        # Good bot, bad bot
+        #get a list of subreddits mentioned
+        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content)
+        if len(subreddits) > 0:
+            embed = discord.Embed(title="Found Subreddits")
+            for s in subreddits:
+                url = 'https://reddit.com/' + s
+                if '.com//r/' in url:
+                    url = url.replace('.com//r', '.com/r')
+                embed.add_field(name = s, value = url, inline = False)
+            await message.channel.send(embed = embed)
+        # Good bot, bad bot       
         if "good bot" in message.content.lower():
             await message.channel.send("OwO thanks")
         elif "bad bot" in message.content.lower():
@@ -162,6 +174,7 @@ async def on_message(message):
             emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
             await message.add_reaction(emojiUpvote)
             await message.add_reaction(emojiDownvote)
+         
     elif message.author.bot:
         if "$crootbot" in message.content or "$cb" in message.content or "$recentballs" in message.content or "$cb_search" in message.content:
             if crystal_balls.updating_cb_list:
@@ -354,6 +367,7 @@ async def check_last_run(ctx=None):
             crystal_balls.load_cb_to_list()
 
 
+
 @client.command(aliases = ["cb",])
 async def crootbot(ctx, year, first_name, last_name):
     """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
@@ -365,17 +379,30 @@ async def crootbot(ctx, year, first_name, last_name):
     if not function_helper.correct_channel:
         await ctx.send(wrong_channel_text)
         return
-
-    search_first_name = first_name
-    search_last_name = last_name
-
-    url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, first_name, last_name)
-    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
-    search = requests.get(url=url, headers=headers)
-    search = json.loads(search.text)
-
+    if len(name) == 2:
+        url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, name[0], name[1])
+        headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        search = requests.get(url=url, headers=headers)
+        search = json.loads(search.text)
+    elif len(name) == 1:
+        url_first = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}'.format(year, name[0])
+        headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        search_first = requests.get(url=url_first, headers=headers)
+        search_first = json.loads(search_first.text)
+        
+        url_last = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.LastName={}'.format(year, name[0])
+        search_last = requests.get(url=url_last, headers=headers)
+        search_last = json.loads(search_last.text)
+        
+        search = search_first + search_last
+    else:
+        await ctx.send("You need to provide a year and name for me to search. I accept queries in the format $crootbot <year><name>.")
+        return
     if not search:
-        await ctx.send("I could not find any player named {} {} in the {} class".format(first_name, last_name, year))
+        if len(name) == 1:
+            await ctx.send("I could not find any player named {} in the {} class".format(name[0], year))
+        elif len(name) == 2:
+            await ctx.send("I could not find any player named {} {} in the {} class".format(name[0], name[1], year))
     elif len(search) > 1:
         global player_search_list
         # players_string = 'Mulitple results found for **[{}, {} {}]**. React with the corresponding emoji for CrootBot results.\n__**Search Results:**__\n'.format(year, first_name, last_name)
@@ -393,7 +420,10 @@ async def crootbot(ctx, year, first_name, last_name):
             players_list.append(['FirstName', 'LastName'])
 
         # Embed stuff
-        result_text = 'Mulitple results found for __**[{}, {} {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, search_first_name, search_last_name)
+        if len(name) == 2:
+            result_text = 'Mulitple results found for __**[{}, {} {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, name[0], name[1])
+        elif len(name) == 1:
+            result_text = 'Mulitple results found for __**[{}, {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, name[0])
         embed_text = result_text + players_string
         embed = discord.Embed(title="Search Results",description=embed_text, color=0xff0000)
         embed.set_author(name="HuskerBot CrootBot")
@@ -540,7 +570,13 @@ async def crappyflag(ctx, state):
     embed.set_image(url=flag_dict[state.lower()])
     await ctx.send(embed=embed)
 
-
+@client.command()
+async def OHYEAH(ctx):
+    """Pour that koolaid baby"""
+    embed = discord.Embed(title = "OH YEAH!")
+    embed.set_image(url = 'https://media.giphy.com/media/3d9rkLNvMXahgQVpM4/source.gif')
+    await ctx.send(embed=embed)
+    
 @client.command()
 async def iowasux(ctx):
     """ Iowa has the worst corn. """
