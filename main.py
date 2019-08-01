@@ -864,7 +864,7 @@ async def markov(ctx):
     await ctx.send(sentence)
 
 
-@client.command(aliases=["cd",])
+@client.command(aliases=["cd",], brief="How long until Husker football?")
 async def countdown(ctx):
     season_start = datetime.datetime(year=2019, month=8, day=31,hour=11,minute=30)
 
