@@ -250,7 +250,7 @@ async def on_member_join(member):
 @client.event
 async def on_reaction_add(reaction, user):
     # Debugging
-    print("*** Reaction: {}\mUser: {} ***".format(reaction, user))
+    # print("*** Reaction: {}\mUser: {} ***".format(reaction, user))
 
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
@@ -329,7 +329,7 @@ async def on_reaction_add(reaction, user):
         # Debugging
         print("***\nEmbeds <= 0\n***")
 
-    print("***")
+    # print("***")
 
 
 # Catch invalid commands/errors
@@ -594,155 +594,6 @@ async def referee(ctx, call):
 
 
 # CrootBot commands
-@client.command(aliases=["cb", ])
-async def crootbot(ctx, year, *name):
-    """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
-    # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
-    # First, pull the message content, split the individual pieces, and make the api call
-
-    # This keeps bot spam down to a minimal.
-    await function_helper.check_command_channel(ctx.command, ctx.channel)
-    if not function_helper.correct_channel:
-        await ctx.send(wrong_channel_text)
-        return
-    if len(name) == 2:
-        url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, name[0], name[1])
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
-        search = requests.get(url=url, headers=headers)
-        search = json.loads(search.text)
-    elif len(name) == 1:
-        url_first = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}'.format(year, name[0])
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
-        search_first = requests.get(url=url_first, headers=headers)
-        search_first = json.loads(search_first.text)
-
-        url_last = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.LastName={}'.format(year, name[0])
-        search_last = requests.get(url=url_last, headers=headers)
-        search_last = json.loads(search_last.text)
-
-        search = search_first + search_last
-    else:
-        await ctx.send("You need to provide a year and name for me to search. I accept queries in the format $crootbot <year><name>.")
-        return
-    if not search:
-        if len(name) == 1:
-            await ctx.send("I could not find any player named {} in the {} class".format(name[0], year))
-        elif len(name) == 2:
-            await ctx.send("I could not find any player named {} {} in the {} class".format(name[0], name[1], year))
-    elif len(search) > 1:
-        global player_search_list
-        # players_string = 'Mulitple results found for **[{}, {} {}]**. React with the corresponding emoji for CrootBot results.\n__**Search Results:**__\n'.format(year, first_name, last_name)
-        players_string = ''
-        players_list = []
-        player_search_list = search
-        for i in range(min(10, len(search))):
-            player = search[i]['Player']
-            first_name = player['FirstName']
-            last_name = player['LastName']
-            position = player['PrimaryPlayerPosition']['Abbreviation']
-            if position in long_positions:
-                position = long_positions[position]
-            players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
-            players_list.append(['FirstName', 'LastName'])
-
-        # Embed stuff
-        if len(name) == 2:
-            result_text = 'Mulitple results found for __**[{}, {} {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, name[0], name[1])
-        elif len(name) == 1:
-            result_text = 'Mulitple results found for __**[{}, {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, name[0])
-        embed_text = result_text + players_string
-        embed = discord.Embed(title="Search Results", description=embed_text, color=0xff0000)
-        embed.set_author(name="HuskerBot CrootBot")
-        embed.set_footer(text='Search Results ' + huskerbot_footer)
-        # await ctx.send(players_string)
-        await ctx.send(embed=embed)
-    else:
-        channel = ctx.channel
-        await parse_search(search[0], channel)  # The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
-
-
-async def parse_search(search, channel):
-    year = search['Year']
-    player = search['Player']
-    first_name = player['FirstName']
-    last_name = player['LastName']
-    position = player['PrimaryPlayerPosition']['Abbreviation']
-    if position in long_positions:
-        position = long_positions[position]
-    hometown = player['Hometown']
-    state = hometown['State']
-    city = hometown['City']
-    height = player['Height'].replace('-', "'") + '"'
-    weight = player['Weight']
-    high_school = player['PlayerHighSchool']['Name']
-    image_url = player['DefaultAssetUrl']
-    composite_rating = player['CompositeRating']
-    if composite_rating is None:
-        composite_rating = 'N/A'
-    else:
-        composite_rating = player['CompositeRating'] / 100
-    composite_star_rating = player['CompositeStarRating']
-    national_rank = player['NationalRank']
-    if national_rank is None:
-        national_rank = 'N/A'
-    position_rank = player['PositionRank']
-    if position_rank is None:
-        position_rank = 'N/A'
-    state_rank = player['StateRank']
-    if state_rank is None:
-        state_rank = 'N/A'
-    player_url = player['Url']
-    global profile_url
-    profile_url = player_url
-    stars = ''
-    for i in range(int(composite_star_rating)):
-        stars += '\N{WHITE MEDIUM STAR}'
-
-    # Check if they are committed. It's a little different with signed players.
-    commit_status = search['HighestRecruitInterestEventType']
-    if commit_status == 'HardCommit' or commit_status == 'SoftCommit':
-        commit_status = 'Committed'
-    else:
-        commit_status = 'Uncommitted'
-    if type(search['SignedInstitution']) is int:
-        commit_status = 'Signed'
-    title = '{} **{} {}, {} {}**'.format(stars, first_name, last_name, year, position)
-
-    # Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
-    if type(composite_rating) is str:
-        body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
-        rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
-    else:
-        body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
-        rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
-
-    # Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.
-    # I've found that if a team does not have an image on 247, they use a generic image with 0 as the id. Also if the image id is not in the dictionary, we want to say Unknown.
-    recruitment_status = 'Currently {}'.format(commit_status)
-    if commit_status == 'Committed' or commit_status == 'Signed':
-        school_id = str(search['CommitedInstitutionTeamImage'].split('/')[-1].split('.')[0])
-        if school_id == '0' or school_id not in team_ids:
-            school = 'Unknown'
-        else:
-            school = team_ids[school_id]
-        if school == 'Nebraska':
-            school += ' 💯:corn::punch:'
-        recruitment_status += ' to {}'.format(school)
-    recruitment_status = '**' + recruitment_status + '**\n\n'
-
-    crootstring = recruitment_status + body + rankings
-    message_embed = discord.Embed(name="CrootBot", color=0xd00000)
-    message_embed.add_field(name=title, value=crootstring, inline=False)
-    # Don't want to try to set a thumbnail for a croot who has no image on 247
-    if image_url != '/.':
-        message_embed.set_thumbnail(url=image_url)
-    message_embed.set_footer(text=huskerbot_footer)
-    await channel.send(embed=message_embed)
-
-    global player_search_list
-    player_search_list = []
-
-
 @client.command(hidden=True, aliases=["cbr",])
 async def cb_refresh(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
@@ -884,6 +735,156 @@ async def check_last_run(ctx=None):
         # print(cb_list)
         if len(crystal_balls.cb_list) <= 1:
             crystal_balls.load_cb_to_list()
+
+
+@client.command(aliases=["cb", ])
+async def crootbot(ctx, year, *name):
+    """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
+    # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
+    # First, pull the message content, split the individual pieces, and make the api call
+
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
+
+    if not function_helper.correct_channel:
+        await ctx.send(wrong_channel_text)
+        return
+    if len(name) == 2:
+        url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, name[0], name[1])
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        search = requests.get(url=url, headers=headers)
+        search = json.loads(search.text)
+    elif len(name) == 1:
+        url_first = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}'.format(year, name[0])
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        search_first = requests.get(url=url_first, headers=headers)
+        search_first = json.loads(search_first.text)
+
+        url_last = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.LastName={}'.format(year, name[0])
+        search_last = requests.get(url=url_last, headers=headers)
+        search_last = json.loads(search_last.text)
+
+        search = search_first + search_last
+    else:
+        await ctx.send("You need to provide a year and name for me to search. I accept queries in the format $crootbot <year><name>.")
+        return
+    if not search:
+        if len(name) == 1:
+            await ctx.send("I could not find any player named {} in the {} class".format(name[0], year))
+        elif len(name) == 2:
+            await ctx.send("I could not find any player named {} {} in the {} class".format(name[0], name[1], year))
+    elif len(search) > 1:
+        global player_search_list
+        # players_string = 'Mulitple results found for **[{}, {} {}]**. React with the corresponding emoji for CrootBot results.\n__**Search Results:**__\n'.format(year, first_name, last_name)
+        players_string = ''
+        players_list = []
+        player_search_list = search
+        for i in range(min(10, len(search))):
+            player = search[i]['Player']
+            first_name = player['FirstName']
+            last_name = player['LastName']
+            position = player['PrimaryPlayerPosition']['Abbreviation']
+            if position in long_positions:
+                position = long_positions[position]
+            players_string += '{}: {} {} - {}\n'.format(emoji_list[i], first_name, last_name, position)
+            players_list.append(['FirstName', 'LastName'])
+
+        # Embed stuff
+        if len(name) == 2:
+            result_text = 'Mulitple results found for __**[{}, {} {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, name[0], name[1])
+        elif len(name) == 1:
+            result_text = 'Mulitple results found for __**[{}, {}]**__. React with the corresponding emoji for CrootBot results.\n\n'.format(year, name[0])
+        embed_text = result_text + players_string
+        embed = discord.Embed(title="Search Results", description=embed_text, color=0xff0000)
+        embed.set_author(name="HuskerBot CrootBot")
+        embed.set_footer(text='Search Results ' + huskerbot_footer)
+        # await ctx.send(players_string)
+        await ctx.send(embed=embed)
+    else:
+        channel = ctx.channel
+        await parse_search(search[0], channel)  # The json that is returned is a list of dictionaries, I pull the first item in the list (may consider adding complexity)
+
+
+async def parse_search(search, channel):
+    year = search['Year']
+    player = search['Player']
+    first_name = player['FirstName']
+    last_name = player['LastName']
+    position = player['PrimaryPlayerPosition']['Abbreviation']
+    if position in long_positions:
+        position = long_positions[position]
+    hometown = player['Hometown']
+    state = hometown['State']
+    city = hometown['City']
+    height = player['Height'].replace('-', "'") + '"'
+    weight = player['Weight']
+    high_school = player['PlayerHighSchool']['Name']
+    image_url = player['DefaultAssetUrl']
+    composite_rating = player['CompositeRating']
+    if composite_rating is None:
+        composite_rating = 'N/A'
+    else:
+        composite_rating = player['CompositeRating'] / 100
+    composite_star_rating = player['CompositeStarRating']
+    national_rank = player['NationalRank']
+    if national_rank is None:
+        national_rank = 'N/A'
+    position_rank = player['PositionRank']
+    if position_rank is None:
+        position_rank = 'N/A'
+    state_rank = player['StateRank']
+    if state_rank is None:
+        state_rank = 'N/A'
+    player_url = player['Url']
+    global profile_url
+    profile_url = player_url
+    stars = ''
+    for i in range(int(composite_star_rating)):
+        stars += '\N{WHITE MEDIUM STAR}'
+
+    # Check if they are committed. It's a little different with signed players.
+    commit_status = search['HighestRecruitInterestEventType']
+    if commit_status == 'HardCommit' or commit_status == 'SoftCommit':
+        commit_status = 'Committed'
+    else:
+        commit_status = 'Uncommitted'
+    if type(search['SignedInstitution']) is int:
+        commit_status = 'Signed'
+    title = '{} **{} {}, {} {}**'.format(stars, first_name, last_name, year, position)
+
+    # Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
+    if type(composite_rating) is str:
+        body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
+        rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
+    else:
+        body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
+        rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
+
+    # Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.
+    # I've found that if a team does not have an image on 247, they use a generic image with 0 as the id. Also if the image id is not in the dictionary, we want to say Unknown.
+    recruitment_status = 'Currently {}'.format(commit_status)
+    if commit_status == 'Committed' or commit_status == 'Signed':
+        school_id = str(search['CommitedInstitutionTeamImage'].split('/')[-1].split('.')[0])
+        if school_id == '0' or school_id not in team_ids:
+            school = 'Unknown'
+        else:
+            school = team_ids[school_id]
+        if school == 'Nebraska':
+            school += ' 💯:corn::punch:'
+        recruitment_status += ' to {}'.format(school)
+    recruitment_status = '**' + recruitment_status + '**\n\n'
+
+    crootstring = recruitment_status + body + rankings
+    message_embed = discord.Embed(name="CrootBot", color=0xd00000)
+    message_embed.add_field(name=title, value=crootstring, inline=False)
+    # Don't want to try to set a thumbnail for a croot who has no image on 247
+    if image_url != '/.':
+        message_embed.set_thumbnail(url=image_url)
+    message_embed.set_footer(text=huskerbot_footer)
+    await channel.send(embed=message_embed)
+
+    global player_search_list
+    player_search_list = []
 # CrootBot commands
 
 
