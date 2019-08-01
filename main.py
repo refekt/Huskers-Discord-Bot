@@ -833,4 +833,7 @@ async def secret(ctx, year=2018):
 
 
 # Run the Discord bot
-client.run(config.DISCORD_TOKEN)
+if sys.argv[1] == 'main':
+    client.run(config.DISCORD_TOKEN)
+elif sys.argv[1] == 'dev':
+    client.run(config.TEST_TOKEN)
