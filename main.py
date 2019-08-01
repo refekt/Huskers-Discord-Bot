@@ -552,8 +552,8 @@ async def randomflag(ctx):
     await ctx.send(embed=embed)
 
 
-@client.command()
-async def crappyflag(ctx, state):
+@client.command(aliases=["cf",])
+async def crappyflag(ctx, state=""):
     """ Outputs crappy flag. The usage is $crappyflag <state>.
 
     The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
@@ -564,11 +564,17 @@ async def crappyflag(ctx, state):
         await ctx.send(wrong_channel_text)
         return
 
-    state = state.lower()
+    if state:
+        state = state.lower()
 
-    embed = discord.Embed(title="Crappy Flags")
-    embed.set_image(url=flag_dict[state.lower()])
-    await ctx.send(embed=embed)
+        embed = discord.Embed(title="Crappy Flags")
+        embed.set_image(url=flag_dict[state.lower()])
+        await ctx.send(embed=embed)
+    else:
+        embed = discord.Embed(title="Crappy Flags")
+        random_state = random.choice(list(flag_dict.keys()))
+        embed.set_image(url=flag_dict[random_state])
+        await ctx.send(embed=embed)
 
 @client.command()
 async def OHYEAH(ctx):
