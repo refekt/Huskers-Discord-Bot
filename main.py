@@ -340,36 +340,6 @@ async def on_command_error(ctx, error):
 # End bot (client) events
 
 
-async def check_last_run(ctx=None):
-    """ Check when the last time the JSON was pulled. """
-    now = datetime.datetime.now()
-    temp_check = cb_settings.last_run
-    check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
-
-    print("***\nNow: {}\nTemp Check: {}\nCheck: {}\nNow > Check: {}\n***".format(now, temp_check, check, now > check))
-
-    if now > check:
-        print("Last time the JSON was pulled exceeded threshold")
-
-        if ctx: await ctx.send("The crystal ball database is stale. Updating now; standby...")
-
-        crystal_balls.move_cb_to_list_and_json(json_dump=True)
-
-        f = open('cb_settings.py', 'w')
-        f.write('last_run = \'{}\''.format(datetime.datetime.now()))
-        f.close()
-
-        importlib.reload(cb_settings)
-
-        if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
-    else:
-        # print("Last time JSON was pulled does not exceed threshold")
-        await ctx.send("The crystal ball database is already fresh.")
-        # print(cb_list)
-        if len(crystal_balls.cb_list) <= 1:
-            crystal_balls.load_cb_to_list()
-
-
 # Text commands
 @client.command()
 async def markov(ctx):
@@ -417,7 +387,7 @@ async def billyfacts(ctx):
     await ctx.message.channel.send(random.choice(facts))
 
 
-@client.command()
+@client.command(aliases=["8b",])
 async def eightball(ctx, *, question):
     """ Ask a Magic 8-Ball a question. """
     dice_roll = random.randint(0, len(eight_ball))
@@ -430,7 +400,7 @@ async def eightball(ctx, *, question):
 
 
 # Start image commands
-@client.command()
+@client.command(aliases=["rf",])
 async def randomflag(ctx):
     """ A random ass, badly made Nebraska flag. """
 
@@ -772,7 +742,7 @@ async def parse_search(search, channel):
     global player_search_list
     player_search_list = []
 
-    
+
 @client.command(hidden=True, aliases=["cbr",])
 async def cb_refresh(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
@@ -886,8 +856,39 @@ async def cb_search(ctx, *, team):
     await ctx.send(embed=embed)
 
 
+async def check_last_run(ctx=None):
+    """ Check when the last time the JSON was pulled. """
+    now = datetime.datetime.now()
+    temp_check = cb_settings.last_run
+    check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
+
+    print("***\nNow: {}\nTemp Check: {}\nCheck: {}\nNow > Check: {}\n***".format(now, temp_check, check, now > check))
+
+    if now > check:
+        print("Last time the JSON was pulled exceeded threshold")
+
+        if ctx: await ctx.send("The crystal ball database is stale. Updating now; standby...")
+
+        crystal_balls.move_cb_to_list_and_json(json_dump=True)
+
+        f = open('cb_settings.py', 'w')
+        f.write('last_run = \'{}\''.format(datetime.datetime.now()))
+        f.close()
+
+        importlib.reload(cb_settings)
+
+        if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
+    else:
+        # print("Last time JSON was pulled does not exceed threshold")
+        await ctx.send("The crystal ball database is already fresh.")
+        # print(cb_list)
+        if len(crystal_balls.cb_list) <= 1:
+            crystal_balls.load_cb_to_list()
+# CrootBot commands
+
+
 # Admin command
-@client.command()
+@client.command(aliases=["quit", "q"])
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = False
@@ -917,11 +918,3 @@ if len(sys.argv) > 0:
         client.run(config.DISCORD_TOKEN)
     else:
         print("You are error. Good bye!")
-
-for extension in startup_extensions:
-    try:
-        client.load_extension(extension)
-        client.add_cog()
-    except Exception as e:
-        exc = '{}: {}'.format(type(e).__name__, e)
-        print('Failed to load extension {}\n{}'.format(extension, exc))
