@@ -134,8 +134,8 @@ eight_ball = ['Try again',
 
 @client.event
 async def on_ready():
-    game = discord.Game('Husker Football 24/7', activity=3)
-    await client.change_presence(status=discord.Status.online, activity=game)
+    # https://gist.github.com/scragly/2579b4d335f87e83fbacb7dfd3d32828
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
     print("***\nLogged in as [{0}].\nDiscord.py version is: [{1}].\nDiscord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
 
@@ -704,7 +704,7 @@ async def huskerbotquit(ctx):
         await ctx.send("Nice try buddy! 👋")
 
 
-@client.command()
+@client.command(hidden=True)
 async def cb_refresh(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = False
@@ -877,7 +877,7 @@ async def markov(ctx):
 
 @client.command(aliases=["cd",], brief="How long until Husker football?")
 async def countdown(ctx):
-    season_start = datetime.datetime(year=2019, month=8, day=31,hour=11,minute=30)
+    season_start = datetime.datetime(year=2019, month=8, day=31,hour=12,minute=00)
 
     if season_start > datetime.datetime.now():
         days_left = season_start - datetime.datetime.now()
