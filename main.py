@@ -552,8 +552,8 @@ async def randomflag(ctx):
     await ctx.send(embed=embed)
 
 
-@client.command()
-async def crappyflag(ctx, state):
+@client.command(aliases=["cf",])
+async def crappyflag(ctx, state=""):
     """ Outputs crappy flag. The usage is $crappyflag <state>.
 
     The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
@@ -564,11 +564,17 @@ async def crappyflag(ctx, state):
         await ctx.send(wrong_channel_text)
         return
 
-    state = state.lower()
+    if state:
+        state = state.lower()
 
-    embed = discord.Embed(title="Crappy Flags")
-    embed.set_image(url=flag_dict[state.lower()])
-    await ctx.send(embed=embed)
+        embed = discord.Embed(title="Crappy Flags")
+        embed.set_image(url=flag_dict[state.lower()])
+        await ctx.send(embed=embed)
+    else:
+        embed = discord.Embed(title="Crappy Flags")
+        random_state = random.choice(list(flag_dict.keys()))
+        embed.set_image(url=flag_dict[random_state])
+        await ctx.send(embed=embed)
 
 @client.command()
 async def OHYEAH(ctx):
@@ -812,7 +818,7 @@ async def cb_search(ctx, *, team):
         await ctx.send(wrong_channel_text)
         return
 
-    await check_last_run(ctx)
+    # await check_last_run(ctx)
 
     search_list = crystal_balls.cb_list
     saved_results = []
@@ -847,9 +853,11 @@ async def cb_search(ctx, *, team):
     await ctx.send(embed=embed)
 
 
-@client.command(brief="HuskerBot scrubs the current channel and comes up with his own message!")
+@client.command()
 async def markov(ctx):
+    """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
     source_data = ''
+    edit_msg = await ctx.send("Thinking...")
 
     async for msg in ctx.channel.history(limit=5000):
         if msg.content != "":
@@ -858,10 +866,13 @@ async def markov(ctx):
 
     chain = markovify.Text(source_data, well_formed=True)
     sentence = chain.make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
+
+    # Get rid of things that would be annoying
     sentence.replace("$","_")
     sentence.replace("@","~")
+    sentence.replace("..", ".)")
 
-    await ctx.send(sentence)
+    await edit_msg.edit(content=sentence)
 
 
 @client.command(aliases=["cd",], brief="How long until Husker football?")
