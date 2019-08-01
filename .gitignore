@@ -125,3 +125,6 @@ config.txt
 config.py
 crystal_balls.json
 team_ids.json
+.idea/vcs.xml
+*.xml
+*.iml

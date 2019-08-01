@@ -16,7 +16,11 @@ import crystal_balls
 import husker_roster
 import sportsreference
 from sportsreference.ncaaf.teams import Teams
+from sportsreference.ncaaf.conferences import Conferences
+import importlib
+import markovify
 import re
+
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -30,7 +34,7 @@ welcome_footer = 'HusekrBot welcomes you!'
 profile_url = None
 highlight_url = None
 wrong_channel_text = 'The command you sent is not authorized for use in this channel.'
-authorized_to_quit = [440639061191950336, 443805741111836693]
+authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
 
 with open('team_ids.json', 'r') as fp:
     team_ids = json.load(fp)
@@ -130,7 +134,7 @@ eight_ball = ['Try again',
 
 @client.event
 async def on_ready():
-    game = discord.Game('Husker Football 24/7')
+    game = discord.Game('Husker Football 24/7', activity=3)
     await client.change_presence(status=discord.Status.online, activity=game)
     print("***\nLogged in as [{0}].\nDiscord.py version is: [{1}].\nDiscord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
@@ -352,6 +356,8 @@ async def check_last_run(ctx=None):
         f.write('last_run = \'{}\''.format(datetime.datetime.now()))
         f.close()
 
+        importlib.reload(cb_settings)
+
         if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
     else:
         # print("Last time JSON was pulled does not exceed threshold")
@@ -361,8 +367,9 @@ async def check_last_run(ctx=None):
             crystal_balls.load_cb_to_list()
 
 
-@client.command()
-async def crootbot(ctx, year, *name):
+
+@client.command(aliases = ["cb",])
+async def crootbot(ctx, year, first_name, last_name):
     """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
     # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.
     # First, pull the message content, split the individual pieces, and make the api call
@@ -508,11 +515,6 @@ async def parse_search(search, channel):
 
         global player_search_list
         player_search_list = []
-
-        
-@client.command()
-async def cb(ctx):
-    await crootbot.invoke(ctx)
 
     
 @client.command()
@@ -700,7 +702,7 @@ async def huskerbotquit(ctx):
 async def cb_refresh(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = False
-
+    print(ctx.author.roles)
     for r in ctx.author.roles:
         # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
         if r.id in authorized_to_quit:
@@ -712,7 +714,7 @@ async def cb_refresh(ctx):
         await ctx.send("Nice try buddy! 👋")
 
 
-@client.command()
+@client.command(aliases=["ref",])
 async def referee(ctx, call):
     """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
     The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport """
@@ -735,11 +737,6 @@ async def referee(ctx, call):
     embed.set_thumbnail(url=penalty_url)
     embed.set_footer(text=huskerbot_footer)
     await ctx.send(embed=embed)
-
-
-@client.command()
-async def ref(ctx):
-    await referee.invoke(ctx)
 
 
 @client.command()
@@ -815,7 +812,7 @@ async def cb_search(ctx, *, team):
         await ctx.send(wrong_channel_text)
         return
 
-    # await check_last_run(ctx)
+    await check_last_run(ctx)
 
     search_list = crystal_balls.cb_list
     saved_results = []
@@ -850,18 +847,41 @@ async def cb_search(ctx, *, team):
     await ctx.send(embed=embed)
 
 
-@client.command()
-async def secret(ctx, year=2018):
-    # await husker_roster.download_roster()
-    msg = await ctx.send("Loading...")
-    team_data = ''
+@client.command(brief="HuskerBot scrubs the current channel and comes up with his own message!")
+async def markov(ctx):
+    source_data = ''
 
-    for team in Teams(year):
-        if team.conference.lower() == 'big-ten':
-            team_data += "{}, {}-{} (WinPer: {}, Conf WinPer: {})\n".format(team.name, team.wins, team.losses, team.win_percentage, team.conference_win_percentage)
+    async for msg in ctx.channel.history(limit=5000):
+        if msg.content != "":
+                source_data += msg.content + ". "
+    source_data.replace("\n", ". ")
 
-    await msg.edit(content=team_data)
+    chain = markovify.Text(source_data, well_formed=True)
+    sentence = chain.make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
+    sentence.replace("$","_")
+    sentence.replace("@","~")
 
+    await ctx.send(sentence)
+
+
+@client.command(aliases=["cd",])
+async def countdown(ctx):
+    season_start = datetime.datetime(year=2019, month=8, day=31,hour=11,minute=30)
+
+    if season_start > datetime.datetime.now():
+        days_left = season_start - datetime.datetime.now()
+        await ctx.send("There are {} days, {} hours, and {} minutes remaining until the 2019 Husker football season starts!".format(days_left.days, int(days_left.seconds/3600),int((days_left.seconds/60)%60),days_left.seconds))
+    else:
+        await ctx.send("The season has already started dummy!")
 
 # Run the Discord bot
-client.run(config.DISCORD_TOKEN)
+# Does nothing if no sys.argv present
+if len(sys.argv) > 0:
+    if sys.argv[1] == 'test':
+        print("*** Running development server")
+        client.run(config.TEST_TOKEN)
+    elif sys.argv[1] == 'prod':
+        print("*** Running production server")
+        client.run(config.DISCORD_TOKEN)
+    else:
+        print("You are error. Good bye!")
