@@ -565,8 +565,8 @@ async def guzzle(ctx):
 @client.command(aliases=["td",])
 async def touchdown(ctx):
     """ Let the cup runeth over """
-    embed = discord.Embed(title="Give it to me bb")
-    embed.set_image(url='https://i.imgur.com/OW7rChr.gif')
+    embed = discord.Embed(title="🏈🎈🏈🎈")
+    embed.set_image(url='https://i.imgur.com/Wh4aLYo.gif')
     await ctx.send(embed = embed)
 
 

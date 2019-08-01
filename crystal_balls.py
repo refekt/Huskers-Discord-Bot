@@ -13,7 +13,7 @@ def pull_crystal_balls_from_pages(year, page=1):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
     # URL for Steve Wiltfong's Crystal Ball predictdion history
     url = 'https://247sports.com/User/Steve-Wiltfong-73/Predictions/?Page={}&playerinstitution.primaryplayersport.recruitment.year={}&playerinstitution.primaryplayersport.sport=Football'.format(page, year)
-    # print("Opening {}".format(url))
+
     # Pull all data from the aforementioned URL
     page = requests.get(url=url, headers=headers)
     # Convert into a BeautifulSoup4 object
