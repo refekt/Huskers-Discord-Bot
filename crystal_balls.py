@@ -1,12 +1,8 @@
 import json
-import datetime
 from bs4 import BeautifulSoup
 import requests
 import time
 import datetime
-import cb_settings
-import threading
-import pandas
 
 CB_REFRESH_INTERVAL = 480
 cb_list = []
@@ -136,27 +132,3 @@ def move_cb_to_list_and_json(pages=14, json_dump=False):
         with open('crystal_balls.json', 'w') as fp:
             json.dump(cb_list, fp, sort_keys=True, indent=4)
         fp.close()
-
-
-'''def check_last_run():
-    now = datetime.datetime.now()
-    temp_check = cb_settings.last_run
-    check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=CB_REFRESH_INTERVAL)# datetime.datetime.strptime(temp_check, '%Y-%d-%M %I:%M')
-
-    global updating_cb_list
-
-    if now > check:
-        print("Last time the JSON was pulled exceeded threshold")
-        updating_cb_list = True
-        move_cb_to_list_and_json(json_dump=True)
-
-        f = open('cb_settings.py', 'w')
-        f.write('last_run = \'{}\''.format(datetime.datetime.now()))
-        f.close()
-
-        updating_cb_list = False
-    else:
-        print("Last time JSON was pulled does not exceed threshold")
-        # print(cb_list)
-        if len(cb_list) <= 1:
-            load_cb_to_list()'''
