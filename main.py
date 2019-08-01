@@ -16,6 +16,7 @@ import crystal_balls
 import husker_roster
 import sportsreference
 from sportsreference.ncaaf.teams import Teams
+import re
 
 botPrefix = '$'
 client = commands.Bot(command_prefix=botPrefix)
@@ -138,7 +139,17 @@ async def on_ready():
 async def on_message(message):
     """ Commands processed as messages are entered """
     if not message.author.bot:
-        # Good bot, bad bot
+        #get a list of subreddits mentioned
+        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content)
+        if len(subreddits) > 0:
+            embed = discord.Embed(title="Found Subreddits")
+            for s in subreddits:
+                url = 'https://reddit.com/' + s
+                if '.com//r/' in url:
+                    url = url.replace('.com//r', '.com/r')
+                embed.add_field(name = s, value = url, inline = False)
+            await message.channel.send(embed = embed)
+        # Good bot, bad bot       
         if "good bot" in message.content.lower():
             await message.channel.send("OwO thanks")
         elif "bad bot" in message.content.lower():
@@ -159,6 +170,7 @@ async def on_message(message):
             emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
             await message.add_reaction(emojiUpvote)
             await message.add_reaction(emojiDownvote)
+         
     elif message.author.bot:
         if "$crootbot" in message.content or "$cb" in message.content or "$recentballs" in message.content or "$cb_search" in message.content:
             if crystal_balls.updating_cb_list:
