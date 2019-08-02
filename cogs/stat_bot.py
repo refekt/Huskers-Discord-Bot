@@ -18,3 +18,15 @@ class CrootBot(commands.Cog, name="Croot Bot"):
     @commands.command()
     async def roster(self):
         pass
+        
+    @commands.command()
+    async def boxscore(self):
+        pass
+        
+    @commands.command()
+    async def lastplays(self):
+        pass
+    
+    @commands.command()
+    async def schedule(self):
+        pass
