@@ -262,8 +262,8 @@ class CrootBot(commands.Cog, name="Croot Bot"):
         if state_rank is None:
             state_rank = 'N/A'
         player_url = player['Url']
-        global profile_url
-        profile_url = player_url
+        # global profile_url
+        config.profile_url = player_url
         stars = ''
         for i in range(int(composite_star_rating)):
             stars += '\N{WHITE MEDIUM STAR}'

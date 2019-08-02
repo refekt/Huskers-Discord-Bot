@@ -55,6 +55,7 @@ async def on_message(message):
                     url = url.replace('.com//r', '.com/r')
                 embed.add_field(name = s, value = url, inline = False)
             await message.channel.send(embed = embed)
+
         # Good bot, bad bot       
         if "good bot" in message.content.lower():
             await message.channel.send("OwO thanks")
@@ -62,12 +63,14 @@ async def on_message(message):
             embed = discord.Embed(title="I'm a bad, bad bot")
             embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
             await message.channel.send(embed=embed)
+
         # Husker Bot hates Isms
         if "isms" in message.content.lower():
             dice_roll = random.randint(1,101)
             if dice_roll >= 90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
                                            "make **shit** up for fake internet points. I'm glad he's gone.")
+
         # Add Up Votes and Down Votes
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
@@ -88,6 +91,7 @@ async def on_message(message):
             while i < len(welcome_emoji_list):
                 await message.add_reaction(welcome_emoji_list[i])
                 i += 1
+
         # CrootBot Search Results detection
         if message.author == client.user and config.player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             # Pre-add reactions for users
@@ -95,12 +99,12 @@ async def on_message(message):
             while i < min(10, len(config.player_search_list)):
                 await message.add_reaction(emoji_list[i])
                 i += 1
+
         # CrootBot dection
-        print("message.author: {}, client.user: {}, message.embeds[0].footer.text: {}, huskerbot_footer: {}".format(message.author, client.user, message.embeds[0].footer.text, huskerbot_footer))
         if message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
             print("***\nChecking for highlight video")
-            global profile_url
-            url = profile_url + 'videos' #bugging here?
+            # global profile_url
+            url = config.profile_url + 'videos' #bugging here?
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
             page = requests.get(url = url, headers = headers)
             soup = BeautifulSoup(page.text, 'html.parser')
@@ -125,7 +129,8 @@ async def on_message(message):
                 await message.add_reaction('📹')
             else:
                 print("No highlight video found\n***")
-            profile_url = None
+            config.profile_url = None
+
     # Always need this
     await client.process_commands(message)
 
