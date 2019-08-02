@@ -90,10 +90,10 @@ async def on_message(message):
                 i += 1
         # CrootBot Search Results detection
         print("message.author: {}, client.user: {}, player_search_list: {}, message.embeds[0].footer.text: {}, 'Search Results ' + huskerbot_footer: {}.".format(message.author, client.user, player_search_list, message.embeds[0].footer.text, "Search Results " + huskerbot_footer))
-        if message.author == client.user and cogs.croot_bot.player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
+        if message.author == client.user and config.player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             # Pre-add reactions for users
             i = 0
-            while i < min(10, len(cogs.croot_bot.player_search_list)):
+            while i < min(10, len(config.player_search_list)):
                 await message.add_reaction(emoji_list[i])
                 i += 1
         # CrootBot dection
