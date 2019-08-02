@@ -171,7 +171,8 @@ async def on_reaction_add(reaction, user):
                           }
 
             if reaction.emoji in emoji_dict:
-                await cogs.croot_bot.parse_search(search=config.player_search_list[emoji_dict[reaction.emoji]], channel=channel)
+                cb = cogs.croot_bot.CrootBot
+                await cb.parse_search(search=config.player_search_list[emoji_dict[reaction.emoji]], channel=channel)
 
         # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url
