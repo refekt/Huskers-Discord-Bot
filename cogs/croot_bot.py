@@ -7,7 +7,12 @@ import datetime
 import cb_settings
 import pandas
 import crystal_balls
-from .. import config
+import os, sys, inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parrentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parrentdir)
+import config
 
 wrong_channel_text='The command you sent is not authorized for use in this channel.'
 welcome_footer='HusekrBot welcomes you!'

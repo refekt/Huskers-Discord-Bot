@@ -89,7 +89,6 @@ async def on_message(message):
                 await message.add_reaction(welcome_emoji_list[i])
                 i += 1
         # CrootBot Search Results detection
-        print("message.author: {}, client.user: {}, player_search_list: {}, message.embeds[0].footer.text: {}, 'Search Results ' + huskerbot_footer: {}.".format(message.author, client.user, player_search_list, message.embeds[0].footer.text, "Search Results " + huskerbot_footer))
         if message.author == client.user and config.player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             # Pre-add reactions for users
             i = 0
@@ -146,15 +145,12 @@ async def on_member_join(member):
 
 @client.event
 async def on_reaction_add(reaction, user):
-    # Debugging
-    # print("*** Reaction: {}\mUser: {} ***".format(reaction, user))
-
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
         # Debugging
         # print("***\nEmbeds > 0")
 
-        if user != client.user and reaction.message.author == client.user and player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
+        if user != client.user and reaction.message.author == client.user and config.player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             channel = reaction.message.channel
 
             emoji_dict = {'1⃣': 0,
@@ -170,7 +166,7 @@ async def on_reaction_add(reaction, user):
                           }
 
             if reaction.emoji in emoji_dict:
-                await parse_search(search=player_search_list[emoji_dict[reaction.emoji]], channel=channel)
+                await cogs.croot_bot.parse_search(search=config.player_search_list[emoji_dict[reaction.emoji]], channel=channel)
 
         # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url
