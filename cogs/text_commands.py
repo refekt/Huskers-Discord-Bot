@@ -115,7 +115,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 break
 
         # print(current_game)
-        msg_sent = await ctx.send("The next game on the schedule is: __{}__. Use ⬆ to bet for a win. Use ⬇ to bet for a loss.".format(current_game[0]))
+        msg_sent = await ctx.send("The next game on the schedule is at {} and against __{}__. Use ⬆ to bet for a win. Use ⬇ to bet for a loss.".format(current_game[1].strftime("%B %d, %Y at %H:%M CST"), current_game[0]))
         for e in bet_emojis:
             await msg_sent.add_reaction(e)
 
