@@ -1,0 +1,1767 @@
+{
+    "records": {
+        "data": [
+            {
+                "data": {
+                    "loss": "0",
+                    "ties": "",
+                    "wins": "0"
+                },
+                "name": "overall",
+                "show": true
+            },
+            {
+                "data": {
+                    "loss": "0",
+                    "ties": "",
+                    "wins": "0"
+                },
+                "name": "Big Ten",
+                "show": true
+            },
+            {
+                "data": {
+                    "loss": "0",
+                    "ties": "",
+                    "wins": "0"
+                },
+                "name": "home",
+                "show": true
+            },
+            {
+                "data": {
+                    "loss": "0",
+                    "ties": "",
+                    "wins": "0"
+                },
+                "name": "away",
+                "show": true
+            },
+            {
+                "data": {
+                    "loss": "0",
+                    "ties": "",
+                    "wins": "0"
+                },
+                "name": "neutral",
+                "show": true
+            }
+        ],
+        "featuredType": "",
+        "featuredVal": "",
+        "seasonManual": "",
+        "seasonStart": "",
+        "status": "success"
+    },
+    "schedule": {
+        "count": "",
+        "events": [
+            {
+                "albumId": "2206120",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Apr 13",
+                "dateDD": "13",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Apr 13",
+                "dateHH24": "13",
+                "dateJulian": "2458587",
+                "dateMI": "00",
+                "dateMM": "04",
+                "dateNum": "201904131300",
+                "dateTime": "1:00 PM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "13",
+                "endDateHH24": "15",
+                "endDateMI": "23",
+                "endDateMM": "04",
+                "endDateNum": "201904131523",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Apr 13",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 7664907,
+                "isConfGame": "0",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 1,
+                        "name": "tickets",
+                        "text": "Buy Tickets",
+                        "url": "https://huskers.evenue.net/cgi-bin/ncommerce3/SEGetEventList?groupCode=SG&linkID=huskers&shopperContext=&caller=&appCode="
+                    },
+                    {
+                        "contentId": "",
+                        "key": 2,
+                        "name": "tv",
+                        "text": "BTN/BTN2Go",
+                        "url": "https://www.btn2go.com/"
+                    },
+                    {
+                        "contentId": "211799642",
+                        "key": 13,
+                        "name": "recap",
+                        "text": "Recap",
+                        "url": ""
+                    },
+                    {
+                        "contentId": "",
+                        "key": 17,
+                        "name": "stats",
+                        "text": "Stats",
+                        "url": "http://www.huskers.com/pdf9/5486612.pdf"
+                    },
+                    {
+                        "contentId": "1921614",
+                        "key": 23,
+                        "name": "liveEvent",
+                        "text": "Live Audio",
+                        "url": "liveEvents/liveEvents.dbml?DB_OEM_ID=100"
+                    },
+                    {
+                        "contentId": "2206120",
+                        "key": 26,
+                        "name": "album",
+                        "text": "Photos",
+                        "url": ""
+                    },
+                    {
+                        "contentId": "211799642",
+                        "key": 27,
+                        "name": "preview",
+                        "text": "Preview",
+                        "url": ""
+                    }
+                ],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Red-White Spring Game",
+                "opponentSchoolId": "",
+                "opponentScore": "",
+                "order": 1,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "Red 24 - White 13",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "1:00 PM",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Aug 31",
+                "dateDD": "31",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Aug 31",
+                "dateHH24": "11",
+                "dateJulian": "2458727",
+                "dateMI": "00",
+                "dateMM": "08",
+                "dateNum": "201908311100",
+                "dateTime": "11:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "31",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "08",
+                "endDateNum": "201908310000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Aug 31",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 3513152,
+                "isConfGame": "0",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 1,
+                        "name": "tickets",
+                        "text": "Buy Tickets",
+                        "url": "https://huskers.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS%3AIBM%3AF19%3A01%3A&linkID=huskers&shopperContext=&pc=&caller=&appCode=&groupCode=FBHG&cgc=&RSRC=F19SCHED&RDAT=F19SOUTHALA"
+                    },
+                    {
+                        "contentId": "",
+                        "key": 2,
+                        "name": "tv",
+                        "text": "ESPN",
+                        "url": ""
+                    }
+                ],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "South Alabama",
+                "opponentSchoolId": "311",
+                "opponentScore": "",
+                "order": 2,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "11:00 AM",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Sep 07",
+                "dateDD": "07",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Sep 7",
+                "dateHH24": "14",
+                "dateJulian": "2458734",
+                "dateMI": "30",
+                "dateMM": "09",
+                "dateNum": "201909071430",
+                "dateTime": "2:30 PM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "07",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "09",
+                "endDateNum": "201909070000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Sep 07",
+                "gameStatId": "",
+                "homeAway": "A",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 3947661,
+                "isConfGame": "0",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 2,
+                        "name": "tv",
+                        "text": "FOX",
+                        "url": ""
+                    }
+                ],
+                "location": "Boulder, Colo.",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Colorado",
+                "opponentSchoolId": "24",
+                "opponentScore": "",
+                "order": 3,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "2:30 PM",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Sep 14",
+                "dateDD": "14",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Sep 14",
+                "dateHH24": "19",
+                "dateJulian": "2458741",
+                "dateMI": "00",
+                "dateMM": "09",
+                "dateNum": "201909141900",
+                "dateTime": "7:00 PM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "14",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "09",
+                "endDateNum": "201909140000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Sep 14",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 3776761,
+                "isConfGame": "0",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 1,
+                        "name": "tickets",
+                        "text": "Buy Tickets",
+                        "url": "https://huskers.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS%3AIBM%3AF19%3A02%3A&linkID=huskers&shopperContext=&pc=&caller=&appCode=&groupCode=FBHG&cgc=&RSRC=F19SCHED&RDAT=F19NILLINOIS"
+                    },
+                    {
+                        "contentId": "",
+                        "key": 2,
+                        "name": "tv",
+                        "text": "FS1",
+                        "url": ""
+                    }
+                ],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Northern Illinois",
+                "opponentSchoolId": "67",
+                "opponentScore": "",
+                "order": 4,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "7:00 PM",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Sep 21",
+                "dateDD": "21",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Sep 21",
+                "dateHH24": "00",
+                "dateJulian": "2458748",
+                "dateMI": "00",
+                "dateMM": "09",
+                "dateNum": "201909210000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "21",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "09",
+                "endDateNum": "201909210000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Sep 21",
+                "gameStatId": "",
+                "homeAway": "A",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398586,
+                "isConfGame": "1",
+                "links": [],
+                "location": "Champaign, Ill.",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Illinois",
+                "opponentSchoolId": "35",
+                "opponentScore": "",
+                "order": 5,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Sep 28",
+                "dateDD": "28",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Sep 28",
+                "dateHH24": "00",
+                "dateJulian": "2458755",
+                "dateMI": "00",
+                "dateMM": "09",
+                "dateNum": "201909280000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "28",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "09",
+                "endDateNum": "201909280000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Sep 28",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398678,
+                "isConfGame": "1",
+                "links": [],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Ohio State",
+                "opponentSchoolId": "70",
+                "opponentScore": "",
+                "order": 6,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Oct 05",
+                "dateDD": "05",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Oct 5",
+                "dateHH24": "00",
+                "dateJulian": "2458762",
+                "dateMI": "00",
+                "dateMM": "10",
+                "dateNum": "201910050000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "05",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "10",
+                "endDateNum": "201910050000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Oct 05",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398588,
+                "isConfGame": "1",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 1,
+                        "name": "tickets",
+                        "text": "Buy Tickets",
+                        "url": "https://huskers.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS%3AIBM%3AF19%3A04%3A&linkID=huskers&shopperContext=&pc=&caller=&appCode=&groupCode=FBHG&cgc=&RSRC=F19SCHED&RDAT=F19NORTHWESTERN"
+                    },
+                    {
+                        "contentId": "",
+                        "key": 2,
+                        "name": "tv",
+                        "text": "2:30 or 3 PM",
+                        "url": ""
+                    }
+                ],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Northwestern",
+                "opponentSchoolId": "68",
+                "opponentScore": "",
+                "order": 7,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Oct 12",
+                "dateDD": "12",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Oct 12",
+                "dateHH24": "00",
+                "dateJulian": "2458769",
+                "dateMI": "00",
+                "dateMM": "10",
+                "dateNum": "201910120000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "12",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "10",
+                "endDateNum": "201910120000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Oct 12",
+                "gameStatId": "",
+                "homeAway": "A",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398590,
+                "isConfGame": "1",
+                "links": [],
+                "location": "Minneapolis, Minn.",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Minnesota",
+                "opponentSchoolId": "54",
+                "opponentScore": "",
+                "order": 8,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Oct 26",
+                "dateDD": "26",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Oct 26",
+                "dateHH24": "00",
+                "dateJulian": "2458783",
+                "dateMI": "00",
+                "dateMM": "10",
+                "dateNum": "201910260000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "26",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "10",
+                "endDateNum": "201910260000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Oct 26",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398681,
+                "isConfGame": "1",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 1,
+                        "name": "tickets",
+                        "text": "Buy Tickets",
+                        "url": "https://huskers.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS%3AIBM%3AF19%3A05%3A&linkID=huskers&shopperContext=&pc=&caller=&appCode=&groupCode=FBHG&cgc=&RSRC=F19SCHED&RDAT=F19INDIANA"
+                    }
+                ],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Indiana",
+                "opponentSchoolId": "36",
+                "opponentScore": "",
+                "order": 9,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Nov 02",
+                "dateDD": "02",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Nov 2",
+                "dateHH24": "00",
+                "dateJulian": "2458790",
+                "dateMI": "00",
+                "dateMM": "11",
+                "dateNum": "201911020000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "02",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "11",
+                "endDateNum": "201911020000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Nov 02",
+                "gameStatId": "",
+                "homeAway": "A",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398592,
+                "isConfGame": "1",
+                "links": [],
+                "location": "West Lafayette, Ind.",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Purdue",
+                "opponentSchoolId": "78",
+                "opponentScore": "",
+                "order": 10,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Nov 16",
+                "dateDD": "16",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Nov 16",
+                "dateHH24": "00",
+                "dateJulian": "2458804",
+                "dateMI": "00",
+                "dateMM": "11",
+                "dateNum": "201911160000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "16",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "11",
+                "endDateNum": "201911160000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Nov 16",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398593,
+                "isConfGame": "1",
+                "links": [],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Wisconsin",
+                "opponentSchoolId": "114",
+                "opponentScore": "",
+                "order": 11,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Sat, Nov 23",
+                "dateDD": "23",
+                "dateDay": "Saturday ",
+                "dateDy": "SAT",
+                "dateFm": "Sat, Nov 23",
+                "dateHH24": "00",
+                "dateJulian": "2458811",
+                "dateMI": "00",
+                "dateMM": "11",
+                "dateNum": "201911230000",
+                "dateTime": "12:00 AM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "23",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "11",
+                "endDateNum": "201911230000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Sat, Nov 23",
+                "gameStatId": "",
+                "homeAway": "A",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398596,
+                "isConfGame": "1",
+                "links": [],
+                "location": "College Park, Md.",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Maryland",
+                "opponentSchoolId": "47",
+                "opponentScore": "",
+                "order": 12,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "TBA",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            },
+            {
+                "albumId": "",
+                "apRank": "",
+                "awayName": "",
+                "awaySchoolId": "",
+                "awayTeamName": "",
+                "date": "Fri, Nov 29",
+                "dateDD": "29",
+                "dateDay": "Friday   ",
+                "dateDy": "FRI",
+                "dateFm": "Fri, Nov 29",
+                "dateHH24": "13",
+                "dateJulian": "2458817",
+                "dateMI": "30",
+                "dateMM": "11",
+                "dateNum": "201911291330",
+                "dateTime": "1:30 PM",
+                "dateYY": "19",
+                "dateYYYY": "2019",
+                "endDateDD": "29",
+                "endDateHH24": "00",
+                "endDateMI": "00",
+                "endDateMM": "11",
+                "endDateNum": "201911290000",
+                "endDateYYYY": "2019",
+                "endGameDate": "Fri, Nov 29",
+                "gameStatId": "",
+                "homeAway": "H",
+                "homeName": "Nebraska",
+                "homeSchoolId": "59",
+                "homeScore": "",
+                "homeTeamName": "",
+                "id": 5398595,
+                "isConfGame": "1",
+                "links": [
+                    {
+                        "contentId": "",
+                        "key": 2,
+                        "name": "tv",
+                        "text": "BTN",
+                        "url": ""
+                    }
+                ],
+                "location": "Memorial Stadium",
+                "multiDay": "0",
+                "nightGame": "0",
+                "oemId": "100",
+                "opponent": "Iowa",
+                "opponentSchoolId": "38",
+                "opponentScore": "",
+                "order": 13,
+                "pageQSeason": "2019",
+                "periods": "",
+                "scoreInfo": "",
+                "season": "2019",
+                "show": true,
+                "sportForcedSeason": "",
+                "sportId": "22",
+                "sportKey": "M_FOOTBALL",
+                "sportName": "Football",
+                "sportSeason": "FALL",
+                "statAwayId": "",
+                "statFileReceived": "",
+                "statGameStatId": "",
+                "statGmtDate": "",
+                "statHomeId": "",
+                "statOem": "",
+                "statSportId": "",
+                "time": "1:30 PM",
+                "todayJulian": "2458698",
+                "tournamentImage": "/pics/400/107.gif",
+                "tournamentLink": "",
+                "tournamentName": "",
+                "visitorApRank": "",
+                "winLoss": ""
+            }
+        ],
+        "sportForcedSeason": "",
+        "sportMonthSeasonChange": "",
+        "status": "success"
+    },
+    "seasons": {
+        "count": "142",
+        "list": [
+            {
+                "display": "2031-32",
+                "id": "2031"
+            },
+            {
+                "display": "2030-31",
+                "id": "2030"
+            },
+            {
+                "display": "2029-30",
+                "id": "2029"
+            },
+            {
+                "display": "2028-29",
+                "id": "2028"
+            },
+            {
+                "display": "2027-28",
+                "id": "2027"
+            },
+            {
+                "display": "2026-27",
+                "id": "2026"
+            },
+            {
+                "display": "2025-26",
+                "id": "2025"
+            },
+            {
+                "display": "2024-25",
+                "id": "2024"
+            },
+            {
+                "display": "2023-24",
+                "id": "2023"
+            },
+            {
+                "display": "2022-23",
+                "id": "2022"
+            },
+            {
+                "display": "2021-22",
+                "id": "2021"
+            },
+            {
+                "display": "2020-21",
+                "id": "2020"
+            },
+            {
+                "display": "2019-20",
+                "id": "2019"
+            },
+            {
+                "display": "2018-19",
+                "id": "2018"
+            },
+            {
+                "display": "2017-18",
+                "id": "2017"
+            },
+            {
+                "display": "2016-17",
+                "id": "2016"
+            },
+            {
+                "display": "2015-16",
+                "id": "2015"
+            },
+            {
+                "display": "2014-15",
+                "id": "2014"
+            },
+            {
+                "display": "2013-14",
+                "id": "2013"
+            },
+            {
+                "display": "2012-13",
+                "id": "2012"
+            },
+            {
+                "display": "2011-12",
+                "id": "2011"
+            },
+            {
+                "display": "2010-11",
+                "id": "2010"
+            },
+            {
+                "display": "2009-10",
+                "id": "2009"
+            },
+            {
+                "display": "2008-09",
+                "id": "2008"
+            },
+            {
+                "display": "2007-08",
+                "id": "2007"
+            },
+            {
+                "display": "2006-07",
+                "id": "2006"
+            },
+            {
+                "display": "2005-06",
+                "id": "2005"
+            },
+            {
+                "display": "2004-05",
+                "id": "2004"
+            },
+            {
+                "display": "2003-04",
+                "id": "2003"
+            },
+            {
+                "display": "2002-03",
+                "id": "2002"
+            },
+            {
+                "display": "2001-02",
+                "id": "2001"
+            },
+            {
+                "display": "2000-01",
+                "id": "2000"
+            },
+            {
+                "display": "1999-00",
+                "id": "1999"
+            },
+            {
+                "display": "1998-99",
+                "id": "1998"
+            },
+            {
+                "display": "1997-98",
+                "id": "1997"
+            },
+            {
+                "display": "1996-97",
+                "id": "1996"
+            },
+            {
+                "display": "1995-96",
+                "id": "1995"
+            },
+            {
+                "display": "1994-95",
+                "id": "1994"
+            },
+            {
+                "display": "1993-94",
+                "id": "1993"
+            },
+            {
+                "display": "1992-93",
+                "id": "1992"
+            },
+            {
+                "display": "1991-92",
+                "id": "1991"
+            },
+            {
+                "display": "1990-91",
+                "id": "1990"
+            },
+            {
+                "display": "1989-90",
+                "id": "1989"
+            },
+            {
+                "display": "1988-89",
+                "id": "1988"
+            },
+            {
+                "display": "1987-88",
+                "id": "1987"
+            },
+            {
+                "display": "1986-87",
+                "id": "1986"
+            },
+            {
+                "display": "1985-86",
+                "id": "1985"
+            },
+            {
+                "display": "1984-85",
+                "id": "1984"
+            },
+            {
+                "display": "1983-84",
+                "id": "1983"
+            },
+            {
+                "display": "1982-83",
+                "id": "1982"
+            },
+            {
+                "display": "1981-82",
+                "id": "1981"
+            },
+            {
+                "display": "1980-81",
+                "id": "1980"
+            },
+            {
+                "display": "1979-80",
+                "id": "1979"
+            },
+            {
+                "display": "1978-79",
+                "id": "1978"
+            },
+            {
+                "display": "1977-78",
+                "id": "1977"
+            },
+            {
+                "display": "1976-77",
+                "id": "1976"
+            },
+            {
+                "display": "1975-76",
+                "id": "1975"
+            },
+            {
+                "display": "1974-75",
+                "id": "1974"
+            },
+            {
+                "display": "1973-74",
+                "id": "1973"
+            },
+            {
+                "display": "1972-73",
+                "id": "1972"
+            },
+            {
+                "display": "1971-72",
+                "id": "1971"
+            },
+            {
+                "display": "1970-71",
+                "id": "1970"
+            },
+            {
+                "display": "1969-70",
+                "id": "1969"
+            },
+            {
+                "display": "1968-69",
+                "id": "1968"
+            },
+            {
+                "display": "1967-68",
+                "id": "1967"
+            },
+            {
+                "display": "1966-67",
+                "id": "1966"
+            },
+            {
+                "display": "1965-66",
+                "id": "1965"
+            },
+            {
+                "display": "1964-65",
+                "id": "1964"
+            },
+            {
+                "display": "1963-64",
+                "id": "1963"
+            },
+            {
+                "display": "1962-63",
+                "id": "1962"
+            },
+            {
+                "display": "1961-62",
+                "id": "1961"
+            },
+            {
+                "display": "1960-61",
+                "id": "1960"
+            },
+            {
+                "display": "1959-60",
+                "id": "1959"
+            },
+            {
+                "display": "1958-59",
+                "id": "1958"
+            },
+            {
+                "display": "1957-58",
+                "id": "1957"
+            },
+            {
+                "display": "1956-57",
+                "id": "1956"
+            },
+            {
+                "display": "1955-56",
+                "id": "1955"
+            },
+            {
+                "display": "1954-55",
+                "id": "1954"
+            },
+            {
+                "display": "1953-54",
+                "id": "1953"
+            },
+            {
+                "display": "1952-53",
+                "id": "1952"
+            },
+            {
+                "display": "1951-52",
+                "id": "1951"
+            },
+            {
+                "display": "1950-51",
+                "id": "1950"
+            },
+            {
+                "display": "1949-50",
+                "id": "1949"
+            },
+            {
+                "display": "1948-49",
+                "id": "1948"
+            },
+            {
+                "display": "1947-48",
+                "id": "1947"
+            },
+            {
+                "display": "1946-47",
+                "id": "1946"
+            },
+            {
+                "display": "1945-46",
+                "id": "1945"
+            },
+            {
+                "display": "1944-45",
+                "id": "1944"
+            },
+            {
+                "display": "1943-44",
+                "id": "1943"
+            },
+            {
+                "display": "1942-43",
+                "id": "1942"
+            },
+            {
+                "display": "1941-42",
+                "id": "1941"
+            },
+            {
+                "display": "1940-41",
+                "id": "1940"
+            },
+            {
+                "display": "1939-40",
+                "id": "1939"
+            },
+            {
+                "display": "1938-39",
+                "id": "1938"
+            },
+            {
+                "display": "1937-38",
+                "id": "1937"
+            },
+            {
+                "display": "1936-37",
+                "id": "1936"
+            },
+            {
+                "display": "1935-36",
+                "id": "1935"
+            },
+            {
+                "display": "1934-35",
+                "id": "1934"
+            },
+            {
+                "display": "1933-34",
+                "id": "1933"
+            },
+            {
+                "display": "1932-33",
+                "id": "1932"
+            },
+            {
+                "display": "1931-32",
+                "id": "1931"
+            },
+            {
+                "display": "1930-31",
+                "id": "1930"
+            },
+            {
+                "display": "1929-30",
+                "id": "1929"
+            },
+            {
+                "display": "1928-29",
+                "id": "1928"
+            },
+            {
+                "display": "1927-28",
+                "id": "1927"
+            },
+            {
+                "display": "1926-27",
+                "id": "1926"
+            },
+            {
+                "display": "1925-26",
+                "id": "1925"
+            },
+            {
+                "display": "1924-25",
+                "id": "1924"
+            },
+            {
+                "display": "1923-24",
+                "id": "1923"
+            },
+            {
+                "display": "1922-23",
+                "id": "1922"
+            },
+            {
+                "display": "1921-22",
+                "id": "1921"
+            },
+            {
+                "display": "1920-21",
+                "id": "1920"
+            },
+            {
+                "display": "1919-20",
+                "id": "1919"
+            },
+            {
+                "display": "1918-19",
+                "id": "1918"
+            },
+            {
+                "display": "1917-18",
+                "id": "1917"
+            },
+            {
+                "display": "1916-17",
+                "id": "1916"
+            },
+            {
+                "display": "1915-16",
+                "id": "1915"
+            },
+            {
+                "display": "1914-15",
+                "id": "1914"
+            },
+            {
+                "display": "1913-14",
+                "id": "1913"
+            },
+            {
+                "display": "1912-13",
+                "id": "1912"
+            },
+            {
+                "display": "1911-12",
+                "id": "1911"
+            },
+            {
+                "display": "1910-11",
+                "id": "1910"
+            },
+            {
+                "display": "1909-10",
+                "id": "1909"
+            },
+            {
+                "display": "1908-09",
+                "id": "1908"
+            },
+            {
+                "display": "1907-08",
+                "id": "1907"
+            },
+            {
+                "display": "1906-07",
+                "id": "1906"
+            },
+            {
+                "display": "1905-06",
+                "id": "1905"
+            },
+            {
+                "display": "1904-05",
+                "id": "1904"
+            },
+            {
+                "display": "1903-04",
+                "id": "1903"
+            },
+            {
+                "display": "1902-03",
+                "id": "1902"
+            },
+            {
+                "display": "1901-02",
+                "id": "1901"
+            },
+            {
+                "display": "1900-01",
+                "id": "1900"
+            },
+            {
+                "display": "1899-00",
+                "id": "1899"
+            },
+            {
+                "display": "1898-99",
+                "id": "1898"
+            },
+            {
+                "display": "1897-98",
+                "id": "1897"
+            },
+            {
+                "display": "1896-97",
+                "id": "1896"
+            },
+            {
+                "display": "1895-96",
+                "id": "1895"
+            },
+            {
+                "display": "1894-95",
+                "id": "1894"
+            },
+            {
+                "display": "1893-94",
+                "id": "1893"
+            },
+            {
+                "display": "1892-93",
+                "id": "1892"
+            },
+            {
+                "display": "1891-92",
+                "id": "1891"
+            },
+            {
+                "display": "1890-91",
+                "id": "1890"
+            }
+        ],
+        "status": "success"
+    },
+    "sports": {
+        "count": 20,
+        "list": [
+            {
+                "abbr": "Baseball",
+                "id": 33,
+                "name": "Baseball",
+                "tiny": "BSB"
+            },
+            {
+                "abbr": "Beach VB",
+                "id": 123508,
+                "name": "Beach Volleyball",
+                "tiny": "BVB"
+            },
+            {
+                "abbr": "Bowling",
+                "id": 39,
+                "name": "Bowling",
+                "tiny": "BOWL"
+            },
+            {
+                "abbr": "Cross Country",
+                "id": 27,
+                "name": "Cross Country",
+                "tiny": "CC"
+            },
+            {
+                "abbr": "Football",
+                "id": 22,
+                "name": "Football",
+                "tiny": "FB"
+            },
+            {
+                "abbr": "M. Basketball",
+                "id": 24,
+                "name": "Men\\'s Basketball",
+                "tiny": "MBB"
+            },
+            {
+                "abbr": "Men\\'s Golf",
+                "id": 35,
+                "name": "Men\\'s Golf",
+                "tiny": "MGLF"
+            },
+            {
+                "abbr": "M. Gymnastics",
+                "id": 29,
+                "name": "Men\\'s Gymnastics",
+                "tiny": "MGYM"
+            },
+            {
+                "abbr": "Men\\'s Tennis",
+                "id": 37,
+                "name": "Men\\'s Tennis",
+                "tiny": "MTEN"
+            },
+            {
+                "abbr": "Rifle",
+                "id": 40,
+                "name": "Rifle",
+                "tiny": "RFL"
+            },
+            {
+                "abbr": "Soccer",
+                "id": 26,
+                "name": "Soccer",
+                "tiny": "SOC"
+            },
+            {
+                "abbr": "Softball",
+                "id": 34,
+                "name": "Softball",
+                "tiny": "SB"
+            },
+            {
+                "abbr": "Swim\\/Dive",
+                "id": 31,
+                "name": "Swimming and Diving",
+                "tiny": "SWIM"
+            },
+            {
+                "abbr": "Track\\/Field",
+                "id": 32,
+                "name": "Track and Field",
+                "tiny": "T&F"
+            },
+            {
+                "abbr": "Volleyball",
+                "id": 23,
+                "name": "Volleyball",
+                "tiny": "VB"
+            },
+            {
+                "abbr": "W. Basketball",
+                "id": 25,
+                "name": "Women\\'s Basketball",
+                "tiny": "WBB"
+            },
+            {
+                "abbr": "Women\\'s Golf",
+                "id": 36,
+                "name": "Women\\'s Golf",
+                "tiny": "WGLF"
+            },
+            {
+                "abbr": "W. Gymnastics",
+                "id": 30,
+                "name": "Women\\'s Gymnastics",
+                "tiny": "WGYM"
+            },
+            {
+                "abbr": "W. Tennis",
+                "id": 38,
+                "name": "Women\\'s Tennis",
+                "tiny": "WTEN"
+            },
+            {
+                "abbr": "Wrestling",
+                "id": 28,
+                "name": "Wrestling",
+                "tiny": "WR"
+            }
+        ],
+        "status": "success"
+    }
+}

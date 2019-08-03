@@ -18,6 +18,7 @@ client = commands.Bot(command_prefix=botPrefix)
 client.load_extension('cogs.image_commands')
 client.load_extension('cogs.text_commands')
 client.load_extension('cogs.croot_bot')
+client.load_extension('cogs.stat_bot')
 
 # initialize a global list for CrootBot to put search results in
 # player_search_list = []
@@ -102,7 +103,7 @@ async def on_message(message):
 
         # CrootBot dection
         if message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
-            print("***\nChecking for highlight video")
+            # print("***\nChecking for highlight video")
             # global profile_url
             url = config.profile_url + 'videos' #bugging here?
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
@@ -110,7 +111,7 @@ async def on_message(message):
             soup = BeautifulSoup(page.text, 'html.parser')
             videos = soup.find_all(class_='title_lnk')
             if len(videos) > 0:
-                print("Highlight video found")
+                # "Highlight video found")
                 global highlight_url
                 highlight_url = videos[0].get('href')
                 for v in videos:
@@ -122,13 +123,14 @@ async def on_message(message):
                         break
                     elif 'sophomore' in v.get('title').lower():
                         highlight_url = v.get('href')
-                print("{}\n***".format(highlight_url))
+                # print("{}\n***".format(highlight_url))
                 embed_old = message.embeds[0]
                 embed_new = embed_old.set_footer(text='Click the video camera emoji to get a highlight video for this recruit')
                 await message.edit(embed=embed_new)
                 await message.add_reaction('📹')
             else:
-                print("No highlight video found\n***")
+                # "No highlight video found\n***")
+                pass
             config.profile_url = None
 
     # Always need this
@@ -137,6 +139,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
+    print("New member: {}".format(member.name))
     embed = discord.Embed(title="HuskerBot's Welcome Message", color=0xff0000)
     embed.add_field(name="Welcome __`{}`__ to the Huskers Discord!".format(member.name), value="The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
                    "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🍞 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
@@ -179,7 +182,7 @@ async def on_reaction_add(reaction, user):
 
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:
             # Debugging
-            print("Highlight videos")
+            # print("Highlight videos")
 
             if reaction.emoji == '📹':                
                 channel = reaction.message.channel
@@ -226,7 +229,8 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
     else:
         # Debugging
-        print("***\nEmbeds <= 0\n***")
+        # print("***\nEmbeds <= 0\n***")
+        pass
 
     # print("***")
 
