@@ -1,12 +1,10 @@
 from discord.ext import commands
 import discord
 import markovify
-import datetime
 import random
 import json
 import datetime
-from dateutil.parser import parse
-import pandas as pd
+import discord
 
 # Dictionaries
 eight_ball = ['Try again',
@@ -115,7 +113,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 break
 
         # print(current_game)
-        msg_sent = await ctx.send("The next game on the schedule is: __{}__. Use ⬆ to bet for a win. Use ⬇ to bet for a loss.".format(current_game[0]))
+        embed = discord.Embed(title=current_game[0], color=0xff0000)
+        embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+        embed.add_field(name="The next game on the schedule is at {}. All betting must be conducted before the game starts.".format(current_game[1].strftime("%B %d, %Y at %H:%M CST")), value="⬆: Submit a bet to win the game.\n⬇: Submit a bet to lose the game.")
+
+        msg_sent = await ctx.send(embed=embed)
         for e in bet_emojis:
             await msg_sent.add_reaction(e)
 
