@@ -70,10 +70,16 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         husker_schedule = json.loads(temp_str)
 
-        with open("husker_schedule.json", "w") as fp:
-            json.dump(husker_schedule, fp, sort_keys=True, indent=4)
-            # fp.write(temp_str)
-        fp.close()
+        dump = False
+
+        if dump:
+            with open("husker_schedule.json", "w") as fp:
+                json.dump(husker_schedule, fp, sort_keys=True, indent=4)
+                # fp.write(temp_str)
+            fp.close()
+
+        for e in husker_schedule:
+            print(e['events'])
 
 
 def setup(bot):
