@@ -18,6 +18,7 @@ client = commands.Bot(command_prefix=botPrefix)
 client.load_extension('cogs.image_commands')
 client.load_extension('cogs.text_commands')
 client.load_extension('cogs.croot_bot')
+client.load_extension('cogs.stat_bot')
 
 # initialize a global list for CrootBot to put search results in
 # player_search_list = []
@@ -129,6 +130,7 @@ async def on_message(message):
                 await message.add_reaction('📹')
             else:
                 # "No highlight video found\n***")
+                pass
             config.profile_url = None
 
     # Always need this
@@ -137,6 +139,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
+    print("New member: {}".format(member.name))
     embed = discord.Embed(title="HuskerBot's Welcome Message", color=0xff0000)
     embed.add_field(name="Welcome __`{}`__ to the Huskers Discord!".format(member.name), value="The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
                    "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🍞 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
@@ -227,6 +230,7 @@ async def on_reaction_add(reaction, user):
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
+        pass
 
     # print("***")
 
