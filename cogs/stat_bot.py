@@ -84,7 +84,14 @@ class StatBot(commands.Cog, name="CFB Stats"):
         embed.set_thumbnail(url="http://image.cdnllnwnl.xosnetwork.com/fls/100/site_graphics/header_logo.jpg")
 
         for e in husker_schedule['schedule']['events']:
-            value_str = "{}\n{}\n{}".format(e['date'], e['time'], e['location'])
+            game_result_string = ""
+            if e['winLoss']:
+                if e['opponentScore'] > e['homeScore']:
+                    game_result_string = "{} - {}".format(e['opponentScore'], e['homeScore'])
+                else:
+                    game_result_string = "{} - {}".format(e['homeScore'], e['opponentScore'])
+                game_result_string = "Result: {} ({})".format(e['winLoss'], game_result_string)
+            value_str = "{}\n{}\n{}\n{}".format(e['date'], e['time'], e['location'], game_result_string)
             embed.add_field(name=e['opponent'], value=value_str)
 
         embed.set_footer(text=huskerbot_footer)
