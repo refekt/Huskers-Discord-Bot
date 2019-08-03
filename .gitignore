@@ -125,6 +125,9 @@ config.txt
 config.py
 crystal_balls.json
 team_ids.json
+husker_schedule.json
+flags.txt
+facts.txt
 .idea/vcs.xml
 *.xml
 *.iml
