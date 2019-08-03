@@ -3,6 +3,10 @@ import discord
 import markovify
 import datetime
 import random
+import json
+import datetime
+from dateutil.parser import parse
+import pandas as pd
 
 # Dictionaries
 eight_ball = ['Try again',
@@ -29,6 +33,8 @@ eight_ball = ['Try again',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
+husker_schedule = []
+bet_emojis = ["⬆", "⬇"]
 
 class TextCommands(commands.Cog, name="Text Commands"):
     # Text commands
@@ -89,6 +95,30 @@ class TextCommands(commands.Cog, name="Text Commands"):
         embed.add_field(name=question, value=eight_ball[dice_roll])
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def bet(self, ctx):
+        """ Allows a user to bet on the outcome of the next game """
+        f = open('husker_schedule.json', 'r')
+        temp_json = f.read()
+        husker_schedule = json.loads(temp_json)
+        current_game = []
+        for events in husker_schedule['schedule']['events']:
+            # Find first game that is scheduled after now()
+            check_date = datetime.datetime(year=int(events['dateYYYY']), month=int(events['dateMM']), day=int(events['dateDD']), hour=int(events['dateHH24']), minute=int(events['dateMI']))
+            check_now = datetime.datetime.now()
+            # print("Game [{}]\n{}\n{}".format(events['opponent'], check_date, check_now))
+
+            if check_now < check_date:
+                current_game.append(events['opponent'])
+                current_game.append(check_date)
+                break
+
+        # print(current_game)
+        msg_sent = await ctx.send("The next game on the schedule is: __{}__. Use ⬆ to bet for a win. Use ⬇ to bet for a loss.".format(current_game[0]))
+        for e in bet_emojis:
+            await msg_sent.add_reaction(e)
+
     # Text commands
 
 def setup(bot):

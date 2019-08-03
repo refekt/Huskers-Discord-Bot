@@ -40,16 +40,25 @@ class StatBot(commands.Cog, name="CFB Stats"):
         pass
     
     @commands.command()
-    async def roster(self, ctx, year=2018):
+    async def roster(self, ctx, year=2019):
         """ Returns the current roster. """
+        pass
         '''edit_msg = await ctx.send("Loading...")
-        huskers = Roster("NEBRASKA")
-        roster_string = "Nebraska's {} Roster:\n".format(year)
-        print("len(huskers.players): {}".format(len(huskers.players)))
+
+        await ctx.send("Setting up roster: NEBRASKA")
+        huskers = Roster(team="NEBRASKA", year=year, slim=False)
+        await ctx.send("Setup complete")
+        # roster_string = "Nebraska's {} Roster:\n".format(year)
+
+        await ctx.send("Printing players")
+        i = 1
         for player in huskers.players:
+            await ctx.send("{}: Player name: {}".format(i,player.name))
+            i += 1
             # roster_string = roster_string + "Name: {}\nPosition: {}\n".format(player.name, player.position)
-            print(player.name)
-        await edit_msg.edit(content=roster_string)'''
+
+        await ctx.send("Print complete")
+        # await edit_msg.edit(content=roster_string)'''
 
     @commands.command()
     async def boxscore(self, ctx):
