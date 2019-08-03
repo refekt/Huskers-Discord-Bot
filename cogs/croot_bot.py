@@ -8,6 +8,7 @@ import cb_settings
 import pandas
 import crystal_balls
 import os, sys, inspect
+import importlib
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parrentdir = os.path.dirname(currentdir)
@@ -45,8 +46,11 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'RET' : 'Returner'
                   }
 
-with open('team_ids.json', 'r') as fp:
-    team_ids = json.load(fp)
+try:
+    with open('team_ids.json', 'r') as fp:
+        team_ids = json.load(fp)
+except:
+    print("Error opening team_ids.json")
 
 
 class CrootBot(commands.Cog, name="Croot Bot"):
@@ -82,7 +86,8 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             await ctx.send("The number of retrieved Crystal Balls must be less than 5.")
             return
 
-        # await self.check_last_run(ctx)
+        if not crystal_balls.cb_list:
+            crystal_balls.load_cb_to_list()
 
         limitSpam = -1
 
@@ -113,7 +118,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             embed.add_field(name="Result", value=varResult, inline=False)
             embed.add_field(name="Predicted Teams", value=varTeamString, inline=True)
             embed.add_field(name="247Sports Profile", value=varProfile, inline=False)
-            embed.set_footer(text=huskerbot_footer)
+            embed.set_footer(text="Recent Crystal Balls" + huskerbot_footer)
             await ctx.send(embed=embed)
 
             limitSpam += 1
@@ -128,7 +133,8 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             await ctx.send(wrong_channel_text)
             return
 
-        # await check_last_run(self, ctx)
+        if not crystal_balls.cb_list:
+            crystal_balls.load_cb_to_list()
 
         search_list = crystal_balls.cb_list
         saved_results = []
