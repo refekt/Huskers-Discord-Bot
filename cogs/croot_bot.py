@@ -9,6 +9,8 @@ import pandas
 import crystal_balls
 import os, sys, inspect
 import importlib
+from bs4 import BeautifulSoup
+import re
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parrentdir = os.path.dirname(currentdir)
@@ -176,10 +178,10 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
         # This keeps bot spam down to a minimal.
         await function_helper.check_command_channel(ctx.command, ctx.channel)
-
         if not function_helper.correct_channel:
             await ctx.send(wrong_channel_text)
             return
+
         if len(name) == 2:
             url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, name[0], name[1])
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
@@ -270,6 +272,29 @@ class CrootBot(commands.Cog, name="Croot Bot"):
         player_url = player['Url']
         # global profile_url
         config.profile_url = player_url
+
+        # Grab the croot's Twitter handle from their player_url page
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        try:
+            page = requests.get(url=player_url, headers=headers)
+        except requests.exceptions.RequestException as e:
+            print(e)
+
+        soup = BeautifulSoup(page.text, 'html.parser')
+        re_pattern = "data-username=\".{0,}?\""
+        twitter_raw = soup.find_all('div', class_='main-div clearfix')
+        if twitter_raw:
+            twitter_raw = str(twitter_raw[0])
+            twitter_raw2 = re.findall(re_pattern, twitter_raw)
+            twitter_handle = twitter_raw2[0]
+            twitter_handle = "@" + twitter_handle[15:-1]
+            twitter_url = "https://twitter.com/" + twitter_handle
+        else:
+            twitter_handle = "Unable to locate"
+            twitter_url = ""
+            print("really not sure")
+        # Attempting to get twitter handle from player_url
+
         stars = ''
         for i in range(int(composite_star_rating)):
             stars += '\N{WHITE MEDIUM STAR}'
@@ -286,10 +311,10 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
         # Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
         if type(composite_rating) is str:
-            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfile: [Click Me]({})\nTwitter: [{}]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url, twitter_handle, twitter_url)
             rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
         else:
-            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\nTwitter: [{}]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url, twitter_handle, twitter_url)
             rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
 
         # Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.

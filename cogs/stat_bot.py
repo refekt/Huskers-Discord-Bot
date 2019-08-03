@@ -5,6 +5,8 @@ import discord
 from bs4 import BeautifulSoup
 import json
 from ftfy import fix_text
+from sportsreference.ncaaf.roster import Roster
+from sportsreference.ncaaf.rankings import Rankings
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -25,13 +27,30 @@ class StatBot(commands.Cog, name="CFB Stats"):
         # Coaches Poll
         # AP Poll
         # CFP Ranking
+        rankings = Rankings()
+        # Prints a dictionary of just the team abbreviation and rank for the current
+        # week.
+        print(rankings.current)
+        # Prints more detailed information including previous rank, full name, and
+        # movement for all teams for the current week.
+        print(rankings.current_extended)
+        # Prints detailed information for all teams for all weeks where rankings
+        # have been published for the requested season.
+        print(rankings.complete)
         pass
     
     @commands.command()
-    async def roster(self, ctx, ear=2019):
+    async def roster(self, ctx, year=2018):
         """ Returns the current roster. """
-        pass
-        
+        '''edit_msg = await ctx.send("Loading...")
+        huskers = Roster("NEBRASKA")
+        roster_string = "Nebraska's {} Roster:\n".format(year)
+        print("len(huskers.players): {}".format(len(huskers.players)))
+        for player in huskers.players:
+            # roster_string = roster_string + "Name: {}\nPosition: {}\n".format(player.name, player.position)
+            print(player.name)
+        await edit_msg.edit(content=roster_string)'''
+
     @commands.command()
     async def boxscore(self, ctx):
         """ Returns the box score of the searched for game. """
@@ -61,14 +80,13 @@ class StatBot(commands.Cog, name="CFB Stats"):
         find_json = soup.find_all('script')
 
         temp_str = find_json[1].string
-        # This is so ghetto
+        # This is so ghetto, trimming the part of the string we don't want to use for JSON
         # front = "    window.__INITIAL_STATE__ = \'{\"site\":  "
         # end = ",\"status\":\"success\", \"time\":\"08/02/2019 19:25\"}\';  "
         # print("{} {}".format(len(front), len(end)))
         temp_str = temp_str[42:-51]
         fix_text(temp_str)
         temp_str = temp_str.replace("\\", "\\\\")
-        # print(">>{}<<".format(temp_str[23772-5:23772+5]))
 
         husker_schedule = json.loads(temp_str)
 
@@ -77,7 +95,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
         if dump:
             with open("husker_schedule.json", "w") as fp:
                 json.dump(husker_schedule, fp, sort_keys=True, indent=4)
-                # fp.write(temp_str)
             fp.close()
 
         embed = discord.Embed(title="The {} Husker football season".format(year), color=0xff0000)

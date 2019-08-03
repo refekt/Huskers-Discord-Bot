@@ -39,7 +39,7 @@ highlight_url = None
 async def on_ready():
     # https://gist.github.com/scragly/2579b4d335f87e83fbacb7dfd3d32828
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
-    print("***\nLogged in as [{0}].\nDiscord.py version is: [{1}].\nDiscord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
+    print("*** Version Information:\n    Logged in as [{0}].\n    Discord.py version is: [{1}].\n    Discord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
 
 @client.event
@@ -266,10 +266,10 @@ async def huskerbotquit(ctx):
 # Does nothing if no sys.argv present
 if len(sys.argv) > 0:
     if sys.argv[1] == 'test':
-        print("*** Running development server")
+        print("*** Running development server ***")
         client.run(config.TEST_TOKEN)
     elif sys.argv[1] == 'prod':
-        print("*** Running production server")
+        print("*** Running production server ***")
         client.run(config.DISCORD_TOKEN)
     else:
         print("You are error. Good bye!")
