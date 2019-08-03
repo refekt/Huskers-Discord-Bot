@@ -81,18 +81,23 @@ class StatBot(commands.Cog, name="CFB Stats"):
             fp.close()
 
         embed = discord.Embed(title="The {} Husker football season".format(year), color=0xff0000)
-        embed.set_thumbnail(url="http://image.cdnllnwnl.xosnetwork.com/fls/100/site_graphics/header_logo.jpg")
+        # embed.set_thumbnail(url="http://image.cdnllnwnl.xosnetwork.com/fls/100/site_graphics/header_logo.jpg")
 
         for e in husker_schedule['schedule']['events']:
             game_result_string = ""
+
             if e['winLoss']:
                 if e['opponentScore'] > e['homeScore']:
                     game_result_string = "{} - {}".format(e['opponentScore'], e['homeScore'])
                 else:
                     game_result_string = "{} - {}".format(e['homeScore'], e['opponentScore'])
                 game_result_string = "Result: {} ({})".format(e['winLoss'], game_result_string)
-            value_str = "{}\n{}\n{}\n{}".format(e['date'], e['time'], e['location'], game_result_string)
-            embed.add_field(name=e['opponent'], value=value_str)
+            value_str = "{}\n{} @ {}\n{}\n".format(e['location'], e['date'], e['time'], game_result_string)
+            if len(e['opponent']) > 15:
+                oppo = e['opponent'][:18] + "..."
+            else:
+                oppo = e['opponent']
+            embed.add_field(name="{}".format(oppo), value=value_str, inline=True)
 
         embed.set_footer(text=huskerbot_footer)
         await edit_msg.edit(content="", embed=embed)
