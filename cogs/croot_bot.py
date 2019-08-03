@@ -45,8 +45,11 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'RET' : 'Returner'
                   }
 
-with open('team_ids.json', 'r') as fp:
-    team_ids = json.load(fp)
+try:
+    with open('team_ids.json', 'r') as fp:
+        team_ids = json.load(fp)
+except:
+    print("Error opening team_ids.json")
 
 
 class CrootBot(commands.Cog, name="Croot Bot"):
