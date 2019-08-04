@@ -119,6 +119,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     break
 
             embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")))
+            embed.add_field(name="Spread", value="TBD")
             embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n")
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
