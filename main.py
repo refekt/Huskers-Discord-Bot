@@ -14,6 +14,9 @@ import cogs.croot_bot
 botPrefix='$'
 client = commands.Bot(command_prefix=botPrefix)
 
+# Dicts
+# opponent : "", {"user": "", "choice": "", "datetime": ""}
+
 # Cogs
 client.load_extension('cogs.image_commands')
 client.load_extension('cogs.text_commands')

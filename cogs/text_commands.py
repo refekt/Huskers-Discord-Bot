@@ -33,6 +33,20 @@ eight_ball = ['Try again',
                ]
 husker_schedule = []
 bet_emojis = ["⬆", "⬇", "⏫", "⏬"]
+game_bets = {
+    "south alabama": {
+        "psyspoopino#8880": {
+             "winorlose": True,
+             "spread": False,
+             "datetime": "2019-09-11 11:39"
+             },
+        "aargonz#3345": {
+            "winorlose": True,
+            "spread": False,
+            "datetime": "2019-09-11 11:39"
+        }
+    }
+}
 
 class TextCommands(commands.Cog, name="Text Commands"):
     # Text commands
@@ -130,7 +144,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
         elif cmd == "my_bet":
-            embed.add_field(name="{}'s Bet".format(ctx.message.author), value="TBD")
+            results = game_bets['south alabama'][str(ctx.message.author).lower()]['winorlose']
+            if results:
+                output_msg = "Win over {}".format(game_bets['south alabama'])
+            else:
+                output_msg = "Loss over {}".format(game_bets['south alabama'])
+
+            embed.add_field(name="{}'s Bet".format(ctx.message.author), value=output_msg)
             await ctx.send(embed=embed)
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
