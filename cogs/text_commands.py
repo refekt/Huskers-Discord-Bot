@@ -7,6 +7,7 @@ import datetime
 import discord
 import config
 
+
 # Dictionaries
 eight_ball = ['Try again',
               'Definitely yes',
@@ -34,46 +35,16 @@ eight_ball = ['Try again',
                ]
 husker_schedule = []
 current_game = []
-bet_emojis = ["⬆", "⬇", "⏫", "⏬"]
-season_bets = {
-    "game_details": [
-        {
-            "game": "South Alabama",
-            "bets": [
-                {
-                "user": "psypoopino#8800",
-                "winorlose": True,
-                "spread": False,
-                "datetime": "2019-09-11 11:30"
-                },
-                {
-                "user": "aargonz#3345",
-                "winorlose": True,
-                "spread": False,
-                "datetime": "2019-09-11 11:30"
-                }
-            ]
-        },
-        {
-            "game": "Colorado",
-            "bets": [
-                {
-                "user": "aargonz#3345",
-                "winorlose": "",
-                "spread": "",
-                "datetime": "2019-09-11 11:30"
-                },
-                {
-                "user": "psypoopino#8800",
-                "winorlose": True,
-                "spread": False,
-                "datetime": "2019-09-11 11:30"
-                }
-            ]
-        }
-    ]
-}
 stored_bets = dict()
+
+
+# Load season bets
+def load_season_bets():
+    f = open('season_bets.json', 'r')
+    temp_json = f.read()
+    global config.season_bets
+    configseason_bets = json.loads(temp_json)
+
 
 class TextCommands(commands.Cog, name="Text Commands"):
     # Text commands
@@ -181,13 +152,15 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
-            for e in bet_emojis:
+            for e in config.bet_emojis:
                 await msg_sent.add_reaction(e)
 
         # Show the user's current bet(s)
         elif cmd == "show":
-            # Load next opponent
+            # Load next opponent and bets
             store_next_opponent()
+            load_season_bets()
+
             game = current_game[2]
 
             for users in season_bets['game_details'][game]['bets']:
@@ -222,8 +195,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)
-
     # Text commands
+
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))

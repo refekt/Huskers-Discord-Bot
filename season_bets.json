@@ -1,0 +1,38 @@
+{
+  "game_details": [
+    {
+      "game": "South Alabama",
+      "bets": [
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "aargonz#3345",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Colorado",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    }
+  ]
+}

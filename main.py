@@ -158,9 +158,7 @@ async def on_member_join(member):
 async def on_reaction_add(reaction, user):
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
-        # Debugging
-        # print("***\nEmbeds > 0")
-
+        # CrootBot search results
         if user != client.user and reaction.message.author == client.user and config.player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             channel = reaction.message.channel
 
@@ -182,7 +180,6 @@ async def on_reaction_add(reaction, user):
 
         # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url
-
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:
             # Debugging
             # print("Highlight videos")
@@ -206,11 +203,7 @@ async def on_reaction_add(reaction, user):
                 highlight_url = None
 
         # Adding roles to member
-        # if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == huskerbot_footer:
-        if reaction.emoji in welcome_emoji_list and user != client.user:
-            # Debugging
-            print("New member joins")
-
+        if reaction.emoji in welcome_emoji_list and user != client.user and reaction.message.embeds[0].footer.text == welcome_footer:
             server_id = 440632686185414677
             server = client.get_guild(server_id)
             member = server.get_member(user.id)
@@ -230,12 +223,17 @@ async def on_reaction_add(reaction, user):
             elif reaction.emoji == '🔴':
                 role = get(server.roles, id=464903715854483487)
                 await member.add_roles(role)
+
+        # Updating season_bets JSON for reacting to a $bet message
+        if reaction.emoji in config.bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
+            print(reaction.message.embeds[0].footer.text)
+            # Load season_bets.json if season_bets{} is empty
+            if bool(config.)
+            pass
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
         pass
-
-    # print("***")
 
 
 @client.event
