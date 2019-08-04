@@ -233,6 +233,7 @@ async def on_reaction_add(reaction, user):
             # Load current game if empty
             if not bool(config.current_game):
                 store_next_opponent()
+            # Grabs an index to use for the JSON
             game = config.current_game[2]
 
             raw_username = "{}#{}".format(user.name, user.discriminator)
@@ -259,7 +260,8 @@ async def on_reaction_add(reaction, user):
 
             await reaction.message.channel.send(new_bet)
 
-            json.dumps(config.season_bets)
+            with open("season_bets.json", "w") as json_file:
+                json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
