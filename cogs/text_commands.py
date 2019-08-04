@@ -123,8 +123,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n")
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
-                                               "⏫: Submits a bet that we will beast the spread.\n"
-                                               "⏬: Submits a bet that we will lose the spread.")
+                                               "~~⏫: Submits a bet that we will beast the spread.~~\n"
+                                               "~~⏬: Submits a bet that we will lose the spread.~~")
 
             msg_sent = await ctx.send(embed=embed)
             for e in bet_emojis:
