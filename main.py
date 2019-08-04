@@ -236,6 +236,19 @@ async def on_reaction_add(reaction, user):
 
 
 @client.event
+async def on_command_completion(ctx):
+    banned_channels = [440868279150444544, 607399402881024009]
+    if ctx.channel.id in banned_channels:
+        not_authed = "⚠ This channel is banned from using commands ⚠"
+
+        async for message in ctx.channel.history(limit=2, oldest_first=False):
+            if message.author == client.user:
+                await message.delete()
+
+        await ctx.send(not_authed)
+
+
+@client.event
 async def on_command_error(ctx, error):
     output_msg="Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
     await ctx.send(output_msg)

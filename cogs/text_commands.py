@@ -32,7 +32,7 @@ eight_ball = ['Try again',
               'Coach V\'s cigar would like this'
                ]
 husker_schedule = []
-bet_emojis = ["⬆", "⬇"]
+bet_emojis = ["⬆", "⬇", "⏫", "⏬"]
 
 class TextCommands(commands.Cog, name="Text Commands"):
     # Text commands
@@ -100,6 +100,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         f = open('husker_schedule.json', 'r')
         temp_json = f.read()
         husker_schedule = json.loads(temp_json)
+
         current_game = []
         for events in husker_schedule['schedule']['events']:
             # Find first game that is scheduled after now()
@@ -112,10 +113,10 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 current_game.append(check_date)
                 break
 
-        # print(current_game)
-        embed = discord.Embed(title=current_game[0], color=0xff0000)
+        embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-        embed.add_field(name="The next game on the schedule is at {}. All betting must be conducted before the game starts.".format(current_game[1].strftime("%B %d, %Y at %H:%M CST")), value="⬆: Submit a bet to win the game.\n⬇: Submit a bet to lose the game.")
+        embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")))
+        embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.")
 
         msg_sent = await ctx.send(embed=embed)
         for e in bet_emojis:

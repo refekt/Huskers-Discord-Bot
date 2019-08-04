@@ -3,6 +3,9 @@ correct_channel = False
 
 
 async def check_command_channel(command: str, channel):
+    global correct_channel
+    flag = False
+
     #print("*** check_command_channel [command: {}, channel: {}({})]:".format(command, channel, channel.id))
     # Commands to check for
     croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs', 'cb_refresh']
@@ -39,8 +42,6 @@ async def check_command_channel(command: str, channel):
     croot_channels = [525519594417291284, 507520543096832001, 593984711706279937, 442047437561921548, 443822461759520769]
     flag_channels = [593984711706279937, 597900461483360287, 442047437561921548]
 
-    global correct_channel
-    flag = False
 
     # All commands authorized within Direct Messages
     if dm_str in str(channel):
