@@ -116,7 +116,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
         embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
         embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")))
-        embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.")
+        embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n"
+                                            "⬆: Submits a bet that we will win the game.\n"
+                                            "⬇: Submits a bet that we will lose the game.\n"
+                                            "⏫: Submits a bet that we will beast the spread.\n"
+                                            "⏬: Submits a bet that we will lose the spread.")
 
         msg_sent = await ctx.send(embed=embed)
         for e in bet_emojis:
