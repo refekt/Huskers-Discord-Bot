@@ -5,6 +5,7 @@ import random
 import json
 import datetime
 import discord
+import config
 
 # Dictionaries
 eight_ball = ['Try again',
@@ -34,18 +35,42 @@ eight_ball = ['Try again',
 husker_schedule = []
 bet_emojis = ["⬆", "⬇", "⏫", "⏬"]
 game_bets = {
-    "south alabama": {
-        "psyspoopino#8880": {
-             "winorlose": True,
-             "spread": False,
-             "datetime": "2019-09-11 11:39"
-             },
-        "aargonz#3345": {
-            "winorlose": True,
-            "spread": False,
-            "datetime": "2019-09-11 11:39"
+    "game_details": [
+        {
+            "game": "South Alabama",
+            "bets": [
+                {
+                "user": "psypoopino#8800",
+                "winorlose": True,
+                "spread": False,
+                "datetime": "2019-09-11 11:30"
+                },
+                {
+                "user": "aargonz#3345",
+                "winorlose": True,
+                "spread": False,
+                "datetime": "2019-09-11 11:30"
+                }
+            ]
+        },
+        {
+            "game": "Colorado",
+            "bets": [
+                {
+                "user": "aargonz#3345",
+                "winorlose": True,
+                "spread": False,
+                "datetime": "2019-09-11 11:30"
+                },
+                {
+                "user": "psypoopino#8800",
+                "winorlose": True,
+                "spread": False,
+                "datetime": "2019-09-11 11:30"
+                }
+            ]
         }
-    }
+    ]
 }
 
 class TextCommands(commands.Cog, name="Text Commands"):
@@ -143,14 +168,24 @@ class TextCommands(commands.Cog, name="Text Commands"):
             msg_sent = await ctx.send(embed=embed)
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
-        elif cmd == "my_bet":
-            results = game_bets['south alabama'][str(ctx.message.author).lower()]['winorlose']
-            if results:
-                output_msg = "Win over {}".format(game_bets['south alabama'])
-            else:
-                output_msg = "Loss over {}".format(game_bets['south alabama'])
+        elif cmd == "show":
+            stored_bets = dict()
+            game = 1
 
-            embed.add_field(name="{}'s Bet".format(ctx.message.author), value=output_msg)
+            for users in game_bets['game_details'][game]['bets']:
+                if users['user'] == str(ctx.message.author):
+                    stored_bets['user'] = users['user']
+                    stored_bets['winorlose'] = users['winorlose']
+                    stored_bets['spread'] = users['spread']
+                    stored_bets['datetime'] = users['datetime']
+
+            if stored_bets['winorlose']:
+                output_msg =
+            output_msg = "Win/Loss: {}\nSpread: {}".format(stored_bets['winorlose'], stored_bets['spread'])
+
+            embed.add_field(name="User", value=str(ctx.message.author))
+            embed.add_field(name="Opponent", value=str(game_bets['game_details'][game]['game']))
+            embed.add_field(name="Bet(s)", value=output_msg)
             await ctx.send(embed=embed)
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
