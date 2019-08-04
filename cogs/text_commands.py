@@ -95,36 +95,45 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def bet(self, ctx):
+    async def bet(self, ctx, cmd=None):
         """ Allows a user to bet on the outcome of the next game """
-        f = open('husker_schedule.json', 'r')
-        temp_json = f.read()
-        husker_schedule = json.loads(temp_json)
-
-        current_game = []
-        for events in husker_schedule['schedule']['events']:
-            # Find first game that is scheduled after now()
-            check_date = datetime.datetime(year=int(events['dateYYYY']), month=int(events['dateMM']), day=int(events['dateDD']), hour=int(events['dateHH24']), minute=int(events['dateMI']))
-            check_now = datetime.datetime.now()
-            # print("Game [{}]\n{}\n{}".format(events['opponent'], check_date, check_now))
-
-            if check_now < check_date:
-                current_game.append(events['opponent'])
-                current_game.append(check_date)
-                break
 
         embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-        embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")))
-        embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n"
-                                            "⬆: Submits a bet that we will win the game.\n"
-                                            "⬇: Submits a bet that we will lose the game.\n"
-                                            "⏫: Submits a bet that we will beast the spread.\n"
-                                            "⏬: Submits a bet that we will lose the spread.")
 
-        msg_sent = await ctx.send(embed=embed)
-        for e in bet_emojis:
-            await msg_sent.add_reaction(e)
+        if cmd == None:
+            f = open('husker_schedule.json', 'r')
+            temp_json = f.read()
+            husker_schedule = json.loads(temp_json)
+
+            current_game = []
+            for events in husker_schedule['schedule']['events']:
+                # Find first game that is scheduled after now()
+                check_date = datetime.datetime(year=int(events['dateYYYY']), month=int(events['dateMM']), day=int(events['dateDD']), hour=int(events['dateHH24']), minute=int(events['dateMI']))
+                check_now = datetime.datetime.now()
+                # print("Game [{}]\n{}\n{}".format(events['opponent'], check_date, check_now))
+
+                if check_now < check_date:
+                    current_game.append(events['opponent'])
+                    current_game.append(check_date)
+                    break
+
+            embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")))
+            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n")
+            embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
+                                               "⬇: Submits a bet that we will lose the game.\n"
+                                               "⏫: Submits a bet that we will beast the spread.\n"
+                                               "⏬: Submits a bet that we will lose the spread.")
+
+            msg_sent = await ctx.send(embed=embed)
+            for e in bet_emojis:
+                await msg_sent.add_reaction(e)
+        elif cmd == "my_bet":
+            embed.add_field(name="{}'s Bet".format(ctx.message.author), value="TBD")
+            await ctx.send(embed=embed)
+        else:
+            embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
+            await ctx.send(embed=embed)
 
     # Text commands
 
