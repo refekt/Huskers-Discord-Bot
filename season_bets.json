@@ -1,0 +1,208 @@
+{
+  "game_details": [
+    {
+      "game": "South Alabama",
+      "bets": [
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "aargonz#3345",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Colorado",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Northern Illinois",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Illinois",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Ohio State",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Northwestern",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Minnesota",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Indiana",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Purdue",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Wisconsin",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Maryland",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    },
+    {
+      "game": "Iowa",
+      "bets": [
+        {
+          "user": "aargonz#3345",
+          "winorlose": "",
+          "spread": "",
+          "datetime": "2019-09-11 11:30"
+        },
+        {
+          "user": "psypoopino#8800",
+          "winorlose": "True",
+          "spread": "False",
+          "datetime": "2019-09-11 11:30"
+        }
+      ]
+    }
+  ]
+}
