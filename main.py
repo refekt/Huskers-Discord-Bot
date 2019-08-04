@@ -12,6 +12,7 @@ import cogs.croot_bot
 from cogs.text_commands import load_season_bets
 from cogs.text_commands import store_next_opponent
 import datetime
+import json
 
 # Bot specific stuff
 botPrefix='$'
@@ -234,36 +235,31 @@ async def on_reaction_add(reaction, user):
                 store_next_opponent()
             game = config.current_game[2]
 
-            config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
-            config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
-            config.season_bets['game_details'][game]['bets']['spread'] = "False"
-            store_now = datetime.datetime.strftime("%B %d, %Y at %H:%M CST")
-            config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+            raw_username = "{}#{}".format(user.name, user.discriminator)
+            raw_winorlose = "False"
+            raw_spread = "False"
+            raw_datetime = datetime.datetime.now().strftime("%Y-%M-%d %I:%M")
 
             # Record vote in season_bets.json
             # This might be fucky...and over write values
             if reaction.emoji == "⬆":
-                config.season_bets['game_details'][game]['bets'].update({"user": str(reaction.message.author)})
-                #config.season_bets['game_details'][game]['bets']['winorlose'] = "True"
-                #config.season_bets['game_details'][game]['bets']['spread'] = "False"
-                #config.season_bets['game_details'][game]['bets']['datetime'] = store_now
-            '''elif reaction.emoji == "⬇":
-                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
-                config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
-                config.season_bets['game_details'][game]['bets']['spread'] = "False"
-                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+                new_bet = dict(user=raw_username, winorlose="True", spread=raw_spread, datetime=raw_datetime)
+                config.season_bets['game_details'][game]['bets'].append(new_bet)
+            elif reaction.emoji == "⬇":
+                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
+                config.season_bets['game_details'][game]['bets'].append(new_bet)
             elif reaction.emoji == "⏫":
-                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
-                config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
-                config.season_bets['game_details'][game]['bets']['spread'] = "True"
-                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread="True", datetime=raw_datetime)
+                config.season_bets['game_details'][game]['bets'].append(new_bet)
             elif reaction.emoji == "⏬":
-                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
-                config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
-                config.season_bets['game_details'][game]['bets']['spread'] = "False"
-                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
+                config.season_bets['game_details'][game]['bets'].append(new_bet)
             else:
-                pass'''
+                pass
+
+            await reaction.message.channel.send(new_bet)
+
+            json.dumps(config.season_bets)
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
