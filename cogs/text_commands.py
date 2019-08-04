@@ -164,6 +164,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         # Creates the embed object for all messages within method
         embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+        embed.set_footer(text=config.bet_footer)
 
         # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
         if cmd == None:
