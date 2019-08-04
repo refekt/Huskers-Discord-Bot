@@ -243,11 +243,11 @@ async def on_reaction_add(reaction, user):
             # Record vote in season_bets.json
             # This might be fucky...and over write values
             if reaction.emoji == "⬆":
-                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
-                config.season_bets['game_details'][game]['bets']['winorlose'] = "True"
-                config.season_bets['game_details'][game]['bets']['spread'] = "False"
-                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
-            elif reaction.emoji == "⬇":
+                config.season_bets['game_details'][game]['bets'].update({"user": str(reaction.message.author)})
+                #config.season_bets['game_details'][game]['bets']['winorlose'] = "True"
+                #config.season_bets['game_details'][game]['bets']['spread'] = "False"
+                #config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+            '''elif reaction.emoji == "⬇":
                 config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
                 config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
                 config.season_bets['game_details'][game]['bets']['spread'] = "False"
@@ -263,7 +263,7 @@ async def on_reaction_add(reaction, user):
                 config.season_bets['game_details'][game]['bets']['spread'] = "False"
                 config.season_bets['game_details'][game]['bets']['datetime'] = store_now
             else:
-                pass
+                pass'''
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
