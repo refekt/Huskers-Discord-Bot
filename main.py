@@ -9,6 +9,9 @@ import random
 import config
 import re
 import cogs.croot_bot
+from cogs.text_commands import load_season_bets
+from cogs.text_commands import store_next_opponent
+import datetime
 
 # Bot specific stuff
 botPrefix='$'
@@ -181,9 +184,6 @@ async def on_reaction_add(reaction, user):
         # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:
-            # Debugging
-            # print("Highlight videos")
-
             if reaction.emoji == '📹':                
                 channel = reaction.message.channel
                 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
@@ -226,10 +226,44 @@ async def on_reaction_add(reaction, user):
 
         # Updating season_bets JSON for reacting to a $bet message
         if reaction.emoji in config.bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
-            print(reaction.message.embeds[0].footer.text)
             # Load season_bets.json if season_bets{} is empty
-            if bool(config.)
-            pass
+            if not bool(config.season_bets):
+                load_season_bets()
+            # Load current game if empty
+            if not bool(config.current_game):
+                store_next_opponent()
+            game = config.current_game[2]
+
+            config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
+            config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
+            config.season_bets['game_details'][game]['bets']['spread'] = "False"
+            store_now = datetime.datetime.strftime("%B %d, %Y at %H:%M CST")
+            config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+
+            # Record vote in season_bets.json
+            # This might be fucky...and over write values
+            if reaction.emoji == "⬆":
+                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
+                config.season_bets['game_details'][game]['bets']['winorlose'] = "True"
+                config.season_bets['game_details'][game]['bets']['spread'] = "False"
+                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+            elif reaction.emoji == "⬇":
+                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
+                config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
+                config.season_bets['game_details'][game]['bets']['spread'] = "False"
+                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+            elif reaction.emoji == "⏫":
+                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
+                config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
+                config.season_bets['game_details'][game]['bets']['spread'] = "True"
+                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+            elif reaction.emoji == "⏬":
+                config.season_bets['game_details'][game]['bets']['user'] = str(reaction.message.author)
+                config.season_bets['game_details'][game]['bets']['winorlose'] = "False"
+                config.season_bets['game_details'][game]['bets']['spread'] = "False"
+                config.season_bets['game_details'][game]['bets']['datetime'] = store_now
+            else:
+                pass
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
