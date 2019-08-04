@@ -33,8 +33,9 @@ eight_ball = ['Try again',
               'Coach V\'s cigar would like this'
                ]
 husker_schedule = []
+current_game = []
 bet_emojis = ["⬆", "⬇", "⏫", "⏬"]
-game_bets = {
+season_bets = {
     "game_details": [
         {
             "game": "South Alabama",
@@ -58,8 +59,8 @@ game_bets = {
             "bets": [
                 {
                 "user": "aargonz#3345",
-                "winorlose": True,
-                "spread": False,
+                "winorlose": "",
+                "spread": "",
                 "datetime": "2019-09-11 11:30"
                 },
                 {
@@ -72,6 +73,7 @@ game_bets = {
         }
     ]
 }
+stored_bets = dict()
 
 class TextCommands(commands.Cog, name="Text Commands"):
     # Text commands
@@ -137,55 +139,84 @@ class TextCommands(commands.Cog, name="Text Commands"):
     async def bet(self, ctx, cmd=None):
         """ Allows a user to bet on the outcome of the next game """
 
-        embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
-        embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-
-        if cmd == None:
+        # Allows the ability to load next opponent for sub commands.
+        def store_next_opponent():
+            # Open previously generated JSON from $schedule.
+            # To refresh change dump = True manually
             f = open('husker_schedule.json', 'r')
             temp_json = f.read()
             husker_schedule = json.loads(temp_json)
 
-            current_game = []
+            counter = 0
             for events in husker_schedule['schedule']['events']:
                 # Find first game that is scheduled after now()
                 check_date = datetime.datetime(year=int(events['dateYYYY']), month=int(events['dateMM']), day=int(events['dateDD']), hour=int(events['dateHH24']), minute=int(events['dateMI']))
                 check_now = datetime.datetime.now()
-                # print("Game [{}]\n{}\n{}".format(events['opponent'], check_date, check_now))
 
                 if check_now < check_date:
                     current_game.append(events['opponent'])
                     current_game.append(check_date)
+                    current_game.append(counter-1)
                     break
+                # Used for navigating season_bets JSON
+                counter += 1
 
-            embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")))
-            embed.add_field(name="Spread", value="TBD")
-            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n")
+        # Creates the embed object for all messages within method
+        embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+        embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+
+        # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
+        if cmd == None:
+            # Load next opponent
+            store_next_opponent()
+
+            embed.add_field(name="Opponent", value="{}\n{}".format(current_game[0], current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
+            embed.add_field(name="Spread", value="TBD", inline=False)
+            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n", inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
                                                "~~⏫: Submits a bet that we will beast the spread.~~\n"
-                                               "~~⏬: Submits a bet that we will lose the spread.~~")
+                                               "~~⏬: Submits a bet that we will lose the spread.~~", inline=False)
 
+            # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
-        elif cmd == "show":
-            stored_bets = dict()
-            game = 1
 
-            for users in game_bets['game_details'][game]['bets']:
+        # Show the user's current bet(s)
+        elif cmd == "show":
+            # Load next opponent
+            store_next_opponent()
+            game = current_game[2]
+
+            for users in season_bets['game_details'][game]['bets']:
                 if users['user'] == str(ctx.message.author):
                     stored_bets['user'] = users['user']
                     stored_bets['winorlose'] = users['winorlose']
                     stored_bets['spread'] = users['spread']
                     stored_bets['datetime'] = users['datetime']
 
-            if stored_bets['winorlose']:
-                output_msg =
-            output_msg = "Win/Loss: {}\nSpread: {}".format(stored_bets['winorlose'], stored_bets['spread'])
+            winorloss = ""
+            spread = ""
 
-            embed.add_field(name="User", value=str(ctx.message.author))
-            embed.add_field(name="Opponent", value=str(game_bets['game_details'][game]['game']))
-            embed.add_field(name="Bet(s)", value=output_msg)
+            if stored_bets['winorlose'] != "":
+                if stored_bets['winorlose']:
+                    winorloss = config.bet_descriptions[0]
+                else:
+                    winorloss = config.bet_descriptions[1]
+
+            if stored_bets['spread'] != "":
+                if stored_bets['spread']:
+                    spread = config.bet_descriptions[2]
+                else:
+                    spread = config.bet_descriptions[3]
+
+            embed.add_field(name="User", value=str(ctx.message.author), inline=False)
+            embed.add_field(name="Opponent", value=str(season_bets['game_details'][game]['game']), inline=False)
+            if winorloss:
+                embed.add_field(name="Win/Loss", value=winorloss, inline=False)
+            if spread:
+                embed.add_field(name="Spread", value=spread, inline=False)
             await ctx.send(embed=embed)
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
