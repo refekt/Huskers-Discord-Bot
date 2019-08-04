@@ -42,8 +42,7 @@ stored_bets = dict()
 def load_season_bets():
     f = open('season_bets.json', 'r')
     temp_json = f.read()
-    global config.season_bets
-    configseason_bets = json.loads(temp_json)
+    config.season_bets = json.loads(temp_json)
 
 
 class TextCommands(commands.Cog, name="Text Commands"):
@@ -163,7 +162,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             game = current_game[2]
 
-            for users in season_bets['game_details'][game]['bets']:
+            for users in config.season_bets['game_details'][game]['bets']:
                 if users['user'] == str(ctx.message.author):
                     stored_bets['user'] = users['user']
                     stored_bets['winorlose'] = users['winorlose']
@@ -186,7 +185,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     spread = config.bet_descriptions[3]
 
             embed.add_field(name="User", value=str(ctx.message.author), inline=False)
-            embed.add_field(name="Opponent", value=str(season_bets['game_details'][game]['game']), inline=False)
+            embed.add_field(name="Opponent", value=str(config.season_bets['game_details'][game]['game']), inline=False)
             if winorloss:
                 embed.add_field(name="Win/Loss", value=winorloss, inline=False)
             if spread:
