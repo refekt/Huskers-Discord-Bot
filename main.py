@@ -243,12 +243,14 @@ async def on_reaction_add(reaction, user):
 
             # Record vote in season_bets.json
             # This might be fucky...and over write values
+            new_bet = None
             if reaction.emoji == "⬆":
                 new_bet = dict(user=raw_username, winorlose="True", spread=raw_spread, datetime=raw_datetime)
-                config.season_bets['game_details'][game]['bets'].append(new_bet)
+                # config.season_bets['game_details'][game]['bets'].append(new_bet)
+                config.season_bets['game_details'][game]['bets'] = new_bet
             elif reaction.emoji == "⬇":
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
-                config.season_bets['game_details'][game]['bets'].append(new_bet)
+                config.season_bets['game_details'][game]['bets'] = new_bet
             elif reaction.emoji == "⏫":
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread="True", datetime=raw_datetime)
                 config.season_bets['game_details'][game]['bets'].append(new_bet)
@@ -258,7 +260,11 @@ async def on_reaction_add(reaction, user):
             else:
                 pass
 
+            # Send a message alerting the channel that a user has placed a bet.
+            # A timer should be added to prevent spam. Maybe 5 seconds or so? Could be checked by 'datetime' value in JSON
             await reaction.message.channel.send(new_bet)
+            # Remove reaction to prevent user from voting for both
+            await reaction.remove(reaction.message.author)
 
             with open("season_bets.json", "w") as json_file:
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)

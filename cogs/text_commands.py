@@ -129,7 +129,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     @commands.command()
     async def bet(self, ctx, cmd=None):
-        """ Allows a user to bet on the outcome of the next game """
+        """ Allows a user to bet on the outcome of the next game.
+         Commands include: show. """
         # Creates the embed object for all messages within method
         embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
@@ -140,8 +141,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
             # Load next opponent
             store_next_opponent()
 
+            ###
+            # https://mybookie.ag/sportsbook/college-football/nebraska/
+            # This site could be used to pull spread information.
+            ###
+
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
-            embed.add_field(name="Spread", value="TBD", inline=False)
+            embed.add_field(name="Spread", value="[Betting on the spread is a work in progress and may come later in the season. Sorry!]", inline=False)
             embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n", inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
@@ -188,7 +194,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             if winorloss:
                 embed.add_field(name="Win/Loss", value=winorloss, inline=False)
             if spread:
-                embed.add_field(name="Spread", value=spread, inline=False)
+                embed.add_field(name="~~Spread~~", value="~~{}~~".format(spread), inline=False)
             await ctx.send(embed=embed)
 
         else:
