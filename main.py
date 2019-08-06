@@ -271,7 +271,11 @@ async def on_reaction_add(reaction, user):
             # A timer should be added to prevent spam. Maybe 5 seconds or so? Could be checked by 'datetime' value in JSON
             await reaction.message.channel.send(new_bet)
             # Remove reaction to prevent user from voting for both
-            await reaction.remove(user)
+            try:
+                await reaction.remove(user)
+            except:
+                print("Couldn't remove reaction.")
+
 
             with open("season_bets.json", "w") as json_file:
                 print("### Season Bets JSON\n    Dumping JSON file")
