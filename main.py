@@ -274,7 +274,9 @@ async def on_reaction_add(reaction, user):
             await reaction.remove(user)
 
             with open("season_bets.json", "w") as json_file:
+                print("### Season Bets JSON\n    Dumping JSON file")
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+                print("    Complete\n###")
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")

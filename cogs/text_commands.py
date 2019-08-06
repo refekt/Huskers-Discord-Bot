@@ -147,8 +147,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
             ###
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
+            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread.\n", inline=False)
             embed.add_field(name="Spread", value="[Betting on the spread is a work in progress and may come later in the season. Sorry!]", inline=False)
-            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n", inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
                                                "~~⏫: Submits a bet that we will beast the spread.~~\n"
