@@ -133,7 +133,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
          Show: show your current bet.
          All: show all current bets."""
         # Creates the embed object for all messages within method
-        embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+        embed = discord.Embed(title="Husker Game Betting", description="How do you think the Huskers will do in their next game? Place your bets below!", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
         embed.set_footer(text=config.bet_footer)
 
@@ -218,6 +218,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             total_winorlose = total_losses + total_wins
             total_spread = total_cover + total_not_cover
 
+            embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
             embed.add_field(name="Wins", value="{} ({:.2f}%)".format(total_wins, (total_wins/total_winorlose) * 100))
             embed.add_field(name="Losses", value="{} ({:.2f}%)".format(total_losses, (total_losses / total_winorlose) * 100))
             embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover, (total_cover / total_spread) * 100))

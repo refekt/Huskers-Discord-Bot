@@ -286,10 +286,14 @@ class CrootBot(commands.Cog, name="Croot Bot"):
         if twitter_raw:
             twitter_raw = str(twitter_raw[0])
             twitter_raw2 = re.findall(re_pattern, twitter_raw)
-            twitter_handle = twitter_raw2[0]
-            twitter_handle = twitter_handle.replace("@","")
-            twitter_handle = "@" + twitter_handle[15:-1]
-            twitter_url = "https://twitter.com/" + twitter_handle
+            if len(twitter_raw2) > 0:
+                twitter_handle = twitter_raw2[0]
+                twitter_handle = twitter_handle.replace("@","")
+                twitter_handle = "@" + twitter_handle[15:-1]
+                twitter_url = "https://twitter.com/" + twitter_handle
+            else:
+                twitter_handle = "N/A"
+                twitter_url = ""
         else:
             twitter_handle = "Unable to locate"
             twitter_url = ""
