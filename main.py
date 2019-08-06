@@ -281,6 +281,7 @@ async def on_reaction_add(reaction, user):
             global bet_counter
             # global config.new_dict
 
+            # *** Maybe change to a PM instead ***
             # Creates the embed object for all messages within method
             embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
@@ -292,7 +293,8 @@ async def on_reaction_add(reaction, user):
                     embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
                     embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
                     embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
-                    await reaction.message.channel.send(embed=embed)
+                    #await reaction.message.channel.send(embed=embed)
+                    await user.send(embed=embed)
             bet_counter = -1
             # Remove reaction to prevent user from voting for both
             try:
