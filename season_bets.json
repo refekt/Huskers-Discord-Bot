@@ -1,309 +1,306 @@
-{
-  "season": 2019,
-  "opponents": [
-    {
-      "opponent": {
-        "red-white spring game": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "south alabama": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "colorado": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "northern illinois": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "illinois": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "ohio state": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "northwestern": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "minnesota": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "indiana": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "purdue": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "wisconsin": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "maryland": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "iowa": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "tbd1": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        },
-        "tbd2": {
-          "bets": [
-            {
-              "aargonz#3345": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ],
-              "psyspoopino#8880": [
-                {
-                  "winorlose": "True",
-                  "spread": "True",
-                  "datetime": "2019-01-09 11:59"
-                }
-              ]
-            }
-          ]
-        }
+[
+  {
+    "opponent": {
+      "red-white spring game": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "south alabama": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "colorado": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "northern illinois": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "illinois": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "ohio state": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "northwestern": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "minnesota": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "indiana": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "purdue": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "wisconsin": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "maryland": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "iowa": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "tbd1": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
+      },
+      "tbd2": {
+        "bets": [
+          {
+            "aargonz#3345": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ],
+            "psyspoopino#8880": [
+              {
+                "winorlose": "True",
+                "spread": "True",
+                "datetime": "2019-01-09 11:59"
+              }
+            ]
+          }
+        ]
       }
     }
-  ]
-}
+  }
+]
