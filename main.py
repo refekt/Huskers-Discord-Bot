@@ -244,6 +244,22 @@ async def on_reaction_add(reaction, user):
             season_year = int(datetime.date.today().year) - 2019  # Future proof
             game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
+            # Check if the user betting has already placed a bet
+            try:
+                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
+                config.season_bets[season_year]['opponent'][game]['bets'][raw_username] = new_bet
+            except:
+                new_dict = {
+                    raw_username: [{
+                        "datetime": raw_datetime, "winorlose": raw_winorlose, "spread": raw_spread
+                    }]
+                }
+                #print(new_dict)
+                config.season_bets[season_year]['opponent'][game]['bets'].append(new_dict)
+
+                with open("season_bets.json", "w") as json_file:
+                    json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+
             if reaction.emoji == "⬆":
                 new_bet = dict(user=raw_username, winorlose="True", spread=raw_spread, datetime=raw_datetime)
                 for bets in config.season_bets[season_year]['opponent'][game]['bets']:
