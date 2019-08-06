@@ -39,6 +39,32 @@ wrong_channel_text='The command you sent is not authorized for use in this chann
 
 profile_url = None
 highlight_url = None
+season_year = int(datetime.date.today().year) - 2019  # Future proof
+bet_counter = -1
+
+
+def try_adding_new_dict(bet_username: str, bet_winorlose = None, bet_spread = None):
+    # Check if the user betting has already placed a bet
+    raw_username = bet_username  # "{}#{}".format(user.name, user.discriminator)
+    raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    new_dict = {"datetime": raw_datetime, "winorlose": bet_winorlose, "spread": bet_spread}
+    game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
+
+    global bet_counter
+    try:
+        print("*** Trying: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
+        for bet_users in config.season_bets[season_year]['opponent'][game]['bets']:
+            bet_users[raw_username] = new_dict
+            bet_counter += 1
+        print("*** Success ***")
+    # Setup a new nested mess of variables to translate into JSON
+    except:
+        print("*** Erroring: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
+        config.season_bets[season_year]['opponent'][game]['bets'][raw_username].append(new_dict)
+        # Write to JSON file
+        with open("season_bets.json", "w") as json_file:
+            json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+        print("*** Errored ***")
 
 
 # Start bot (client) events
@@ -235,68 +261,35 @@ async def on_reaction_add(reaction, user):
                 store_next_opponent()
 
             raw_username = "{}#{}".format(user.name, user.discriminator)
-            raw_winorlose = "False"
-            raw_spread = "False"
-            raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
-
-            # Record vote in season_bets.json
-            new_bet = None
-            season_year = int(datetime.date.today().year) - 2019  # Future proof
             game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
-            # Check if the user betting has already placed a bet
-            try:
-                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
-                config.season_bets[season_year]['opponent'][game]['bets'][raw_username] = new_bet
-            except:
-                # Setup a new nested mess of variables to translate into JSON
-                new_dict = {
-                    raw_username: [{
-                        "datetime": raw_datetime, "winorlose": raw_winorlose, "spread": raw_spread
-                    }]
-                }
-                config.season_bets[season_year]['opponent'][game]['bets'].append(new_dict)
-                # Write to JSON file
-                with open("season_bets.json", "w") as json_file:
-                    json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
-
             if reaction.emoji == "⬆":
-                new_bet = dict(user=raw_username, winorlose="True", spread=raw_spread, datetime=raw_datetime)
-                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
-                    if bets[raw_username] == raw_username:
-                        bets[raw_username] = new_bet
+                try_adding_new_dict(raw_username, True, False)
             elif reaction.emoji == "⬇":
-                new_bet = dict(user=raw_username, winorlose="False", spread=raw_spread, datetime=raw_datetime)
-                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
-                    if bets[raw_username] == raw_username:
-                        bets[raw_username] = new_bet
+                try_adding_new_dict(raw_username, False, False)
             elif reaction.emoji == "⏫":
-                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread="True", datetime=raw_datetime)
-                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
-                    if bets[raw_username] == raw_username:
-                        bets[raw_username] = new_bet
+                try_adding_new_dict(raw_username, False, False)
             elif reaction.emoji == "⏬":
-                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread="False", datetime=raw_datetime)
-                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
-                    if bets[raw_username] == raw_username:
-                        bets[raw_username] = new_bet
+                try_adding_new_dict(raw_username, False, True)
             else:
                 pass
 
             # Send a message alerting the channel that a user has placed a bet.
             # A timer should be added to prevent spam. Maybe 5 seconds or so? Could be checked by 'datetime' value in JSON
-            await reaction.message.channel.send(new_bet)
+            global bet_counter
+            print(bet_counter)
+            await reaction.message.channel.send(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter])
+            bet_counter = -1
             # Remove reaction to prevent user from voting for both
             try:
                 await reaction.remove(user)
             except:
                 print("Couldn't remove reaction.")
 
-
             with open("season_bets.json", "w") as json_file:
-                print("### Season Bets JSON\n    Dumping JSON file")
+                #print("### Season Bets JSON\n    Dumping JSON file")
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
-                print("    Complete\n###")
+                #print("    Complete\n###")
     else:
         # Debugging
         # print("***\nEmbeds <= 0\n***")
