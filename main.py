@@ -300,7 +300,7 @@ async def on_reaction_add(reaction, user):
             try:
                 await reaction.remove(user)
             except:
-                print("Couldn't remove reaction.")
+                print("Couldn't remove {}'s reaction.".format(user.name))
 
             with open("season_bets.json", "w") as json_file:
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
