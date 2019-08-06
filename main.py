@@ -249,14 +249,14 @@ async def on_reaction_add(reaction, user):
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
                 config.season_bets[season_year]['opponent'][game]['bets'][raw_username] = new_bet
             except:
+                # Setup a new nested mess of variables to translate into JSON
                 new_dict = {
                     raw_username: [{
                         "datetime": raw_datetime, "winorlose": raw_winorlose, "spread": raw_spread
                     }]
                 }
-                #print(new_dict)
                 config.season_bets[season_year]['opponent'][game]['bets'].append(new_dict)
-
+                # Write to JSON file
                 with open("season_bets.json", "w") as json_file:
                     json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
 
@@ -266,7 +266,7 @@ async def on_reaction_add(reaction, user):
                     if bets[raw_username] == raw_username:
                         bets[raw_username] = new_bet
             elif reaction.emoji == "⬇":
-                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
+                new_bet = dict(user=raw_username, winorlose="False", spread=raw_spread, datetime=raw_datetime)
                 for bets in config.season_bets[season_year]['opponent'][game]['bets']:
                     if bets[raw_username] == raw_username:
                         bets[raw_username] = new_bet
@@ -276,7 +276,7 @@ async def on_reaction_add(reaction, user):
                     if bets[raw_username] == raw_username:
                         bets[raw_username] = new_bet
             elif reaction.emoji == "⏬":
-                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
+                new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread="False", datetime=raw_datetime)
                 for bets in config.season_bets[season_year]['opponent'][game]['bets']:
                     if bets[raw_username] == raw_username:
                         bets[raw_username] = new_bet
