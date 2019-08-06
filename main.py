@@ -246,7 +246,6 @@ async def on_reaction_add(reaction, user):
             new_bet = None
             if reaction.emoji == "⬆":
                 new_bet = dict(user=raw_username, winorlose="True", spread=raw_spread, datetime=raw_datetime)
-                # config.season_bets['game_details'][game]['bets'].append(new_bet)
                 config.season_bets['game_details'][game]['bets'] = new_bet
             elif reaction.emoji == "⬇":
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
