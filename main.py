@@ -43,28 +43,30 @@ season_year = int(datetime.date.today().year) - 2019  # Future proof
 bet_counter = -1
 
 
-def try_adding_new_dict(bet_username: str, bet_winorlose = None, bet_spread = None):
+
+def try_adding_new_dict(bet_username: str, bet_winorlose=None, bet_spread=None):
     # Check if the user betting has already placed a bet
     raw_username = bet_username  # "{}#{}".format(user.name, user.discriminator)
     raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-    new_dict = {"datetime": raw_datetime, "winorlose": bet_winorlose, "spread": bet_spread}
+    #global config.new_dict
+    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_winorlose, "spread": bet_spread}
     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
     global bet_counter
     try:
-        print("*** Trying: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
+        #print("*** Trying: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
         for bet_users in config.season_bets[season_year]['opponent'][game]['bets']:
-            bet_users[raw_username] = new_dict
+            bet_users[raw_username] = config.new_dict
             bet_counter += 1
-        print("*** Success ***")
+        # print("*** Success ***")
     # Setup a new nested mess of variables to translate into JSON
     except:
-        print("*** Erroring: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
-        config.season_bets[season_year]['opponent'][game]['bets'][raw_username].append(new_dict)
+        # print("*** Erroring: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
+        config.season_bets[season_year]['opponent'][game]['bets'][raw_username].append(config.new_dict)
         # Write to JSON file
         with open("season_bets.json", "w") as json_file:
             json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
-        print("*** Errored ***")
+        #print("*** Errored ***")
 
 
 # Start bot (client) events
@@ -277,8 +279,20 @@ async def on_reaction_add(reaction, user):
             # Send a message alerting the channel that a user has placed a bet.
             # A timer should be added to prevent spam. Maybe 5 seconds or so? Could be checked by 'datetime' value in JSON
             global bet_counter
-            print(bet_counter)
-            await reaction.message.channel.send(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter])
+            # global config.new_dict
+
+            # Creates the embed object for all messages within method
+            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            embed.set_footer(text=config.bet_footer)
+
+            for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
+                if u == raw_username:
+                    embed.add_field(name="Author", value=raw_username, inline=False)
+                    embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+                    embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
+                    embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
+                    await reaction.message.channel.send(embed=embed)
             bet_counter = -1
             # Remove reaction to prevent user from voting for both
             try:
@@ -287,12 +301,8 @@ async def on_reaction_add(reaction, user):
                 print("Couldn't remove reaction.")
 
             with open("season_bets.json", "w") as json_file:
-                #print("### Season Bets JSON\n    Dumping JSON file")
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
-                #print("    Complete\n###")
     else:
-        # Debugging
-        # print("***\nEmbeds <= 0\n***")
         pass
 
 

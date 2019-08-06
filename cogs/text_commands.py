@@ -1,5 +1,4 @@
 from discord.ext import commands
-import discord
 import markovify
 import random
 import json
@@ -129,8 +128,10 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     @commands.command()
     async def bet(self, ctx, cmd=None):
-        """ Allows a user to bet on the outcome of the next game.
-         Commands include: show. """
+        """ Allows a user to bet on the outcome of the next game. Commands include: show, all.
+
+         Show: show your current bet.
+         All: show all current bets."""
         # Creates the embed object for all messages within method
         embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
@@ -147,7 +148,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             ###
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
-            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread.\n", inline=False)
+            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread. Bets are stored by your _Discord username_. If you change your username you will lose your bet history.\n", inline=False)
             embed.add_field(name="Spread", value="[Betting on the spread is a work in progress and may come later in the season. Sorry!]", inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
@@ -165,36 +166,62 @@ class TextCommands(commands.Cog, name="Text Commands"):
             store_next_opponent()
             load_season_bets()
 
-            game = config.current_game[2]
+            game = config.current_game[0].lower()
+            season_year = int(datetime.date.today().year) - 2019  # Future proof
+            raw_username = "{}".format(ctx.author)
 
-            for users in config.season_bets['game_details'][game]['bets']:
-                if users['user'] == str(ctx.message.author):
-                    stored_bets['user'] = users['user']
-                    stored_bets['winorlose'] = users['winorlose']
-                    stored_bets['spread'] = users['spread']
-                    stored_bets['datetime'] = users['datetime']
+            # Creates the embed object for all messages within method
+            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            embed.set_footer(text=config.bet_footer)
 
-            winorloss = ""
-            spread = ""
+            temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
+            for usr in temp_dict:
+                if usr == raw_username:
+                    embed.add_field(name="Author", value=raw_username, inline=False)
+                    embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+                    embed.add_field(name="Win or Loss", value=temp_dict[usr]['winorlose'], inline=True)
+                    embed.add_field(name="Spread", value=temp_dict[usr]['spread'], inline=True)
+                    await ctx.send(embed=embed)
 
-            if stored_bets['winorlose'] != "":
-                if stored_bets['winorlose']:
-                    winorloss = config.bet_descriptions[0]
+        # Show all bets for the current game
+        elif cmd == "all":
+            # Load next opponent and bets
+            store_next_opponent()
+            load_season_bets()
+
+            game = config.current_game[0].lower()
+            season_year = int(datetime.date.today().year) - 2019  # Future proof
+            raw_username = "{}".format(ctx.author)
+
+            # Creates the embed object for all messages within method
+            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            embed.set_footer(text=config.bet_footer)
+
+            temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
+
+            total_wins = 0
+            total_losses = 0
+            total_cover = 0
+            total_not_cover = 0
+
+            for usr in temp_dict:
+                if temp_dict[usr]['winorlose']:
+                    total_wins += 1
                 else:
-                    winorloss = config.bet_descriptions[1]
-
-            if stored_bets['spread'] != "":
-                if stored_bets['spread']:
-                    spread = config.bet_descriptions[2]
+                    total_losses += 1
+                if temp_dict[usr]['spread']:
+                    total_cover += 1
                 else:
-                    spread = config.bet_descriptions[3]
+                    total_not_cover += 1
+            total_winorlose = total_losses + total_wins
+            total_spread = total_cover + total_not_cover
 
-            embed.add_field(name="User", value=str(ctx.message.author), inline=False)
-            embed.add_field(name="Opponent", value=str(config.season_bets['game_details'][game]['game']), inline=False)
-            if winorloss:
-                embed.add_field(name="Win/Loss", value=winorloss, inline=False)
-            if spread:
-                embed.add_field(name="~~Spread~~", value="~~{}~~".format(spread), inline=False)
+            embed.add_field(name="Wins", value="{} ({:.2f}%)".format(total_wins, (total_wins/total_winorlose) * 100))
+            embed.add_field(name="Losses", value="{} ({:.2f}%)".format(total_losses, (total_losses / total_winorlose) * 100))
+            embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover, (total_cover / total_spread) * 100))
+            embed.add_field(name="Not Cover Spread", value="{} ({:.2f}%)".format(total_not_cover, (total_not_cover / total_spread) * 100))
             await ctx.send(embed=embed)
 
         else:
