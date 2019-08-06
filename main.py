@@ -233,29 +233,37 @@ async def on_reaction_add(reaction, user):
             # Load current game if empty
             if not bool(config.current_game):
                 store_next_opponent()
-            # Grabs an index to use for the JSON
-            game = config.current_game[2]
 
             raw_username = "{}#{}".format(user.name, user.discriminator)
             raw_winorlose = "False"
             raw_spread = "False"
-            raw_datetime = datetime.datetime.now().strftime("%Y-%M-%d %I:%M")
+            raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
 
             # Record vote in season_bets.json
-            # This might be fucky...and over write values
             new_bet = None
+            season_year = int(datetime.date.today().year) - 2019  # Future proof
+            game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
+
             if reaction.emoji == "⬆":
                 new_bet = dict(user=raw_username, winorlose="True", spread=raw_spread, datetime=raw_datetime)
-                config.season_bets['game_details'][game]['bets'] = new_bet
+                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
+                    if bets[raw_username] == raw_username:
+                        bets[raw_username] = new_bet
             elif reaction.emoji == "⬇":
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
-                config.season_bets['game_details'][game]['bets'] = new_bet
+                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
+                    if bets[raw_username] == raw_username:
+                        bets[raw_username] = new_bet
             elif reaction.emoji == "⏫":
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread="True", datetime=raw_datetime)
-                config.season_bets['game_details'][game]['bets'].append(new_bet)
+                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
+                    if bets[raw_username] == raw_username:
+                        bets[raw_username] = new_bet
             elif reaction.emoji == "⏬":
                 new_bet = dict(user=raw_username, winorlose=raw_winorlose, spread=raw_spread, datetime=raw_datetime)
-                config.season_bets['game_details'][game]['bets'].append(new_bet)
+                for bets in config.season_bets[season_year]['opponent'][game]['bets']:
+                    if bets[raw_username] == raw_username:
+                        bets[raw_username] = new_bet
             else:
                 pass
 
@@ -263,7 +271,7 @@ async def on_reaction_add(reaction, user):
             # A timer should be added to prevent spam. Maybe 5 seconds or so? Could be checked by 'datetime' value in JSON
             await reaction.message.channel.send(new_bet)
             # Remove reaction to prevent user from voting for both
-            await reaction.remove(reaction.message.author)
+            await reaction.remove(user)
 
             with open("season_bets.json", "w") as json_file:
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
