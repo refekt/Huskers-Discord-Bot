@@ -127,7 +127,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def bet(self, ctx, cmd=None):
+    async def bet(self, ctx, cmd=None, *, team=None):
         """ Allows a user to bet on the outcome of the next game. Commands include: show, all.
 
          Show: show your current bet.
@@ -137,11 +137,16 @@ class TextCommands(commands.Cog, name="Text Commands"):
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
         embed.set_footer(text=config.bet_footer)
 
+        # Load next opponent and bets
+        store_next_opponent()
+        load_season_bets()
+
+        game = config.current_game[0].lower()
+        season_year = int(datetime.date.today().year) - 2019  # Future proof
+        raw_username = "{}".format(ctx.author)
+
         # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
         if cmd == None:
-            # Load next opponent
-            store_next_opponent()
-
             ###
             # https://mybookie.ag/sportsbook/college-football/nebraska/
             # This site could be used to pull spread information.
@@ -162,14 +167,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         # Show the user's current bet(s)
         elif cmd == "show":
-            # Load next opponent and bets
-            store_next_opponent()
-            load_season_bets()
-
-            game = config.current_game[0].lower()
-            season_year = int(datetime.date.today().year) - 2019  # Future proof
-            raw_username = "{}".format(ctx.author)
-
             # Creates the embed object for all messages within method
             embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
@@ -186,14 +183,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         # Show all bets for the current game
         elif cmd == "all":
-            # Load next opponent and bets
-            store_next_opponent()
-            load_season_bets()
-
-            game = config.current_game[0].lower()
-            season_year = int(datetime.date.today().year) - 2019  # Future proof
-            raw_username = "{}".format(ctx.author)
-
             # Creates the embed object for all messages within method
             embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
@@ -224,6 +213,26 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover, (total_cover / total_spread) * 100))
             embed.add_field(name="Not Cover Spread", value="{} ({:.2f}%)".format(total_not_cover, (total_not_cover / total_spread) * 100))
             await ctx.send(embed=embed)
+
+        # Show all winners for game
+        elif cmd == "winners":
+            if team:
+                winnners_winorlose = []
+                winners_spread = []
+                try:
+                    temp_dict = config.season_bets[season_year]['opponent'][team.lower()]['bets'][0]
+                    for usr in temp_dict:
+                        if temp_dict[usr][0]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose']:
+                            winnners_winorlose.append(usr)
+                        if temp_dict[usr][0]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread']:
+                            winners_spread.append(usr)
+                    await ctx.send("{}\n{}".format(winnners_winorlose, winners_spread))
+                except:
+                    await ctx.send("Please verify the team is on the schedule for the {} season and it is spelled correctly. Opponents can be found by using `$schedule|shed <year=2019>`".format(2019+season_year))
+                    print("Error in team")
+            else:
+                await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
+            pass
 
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
