@@ -1,208 +1,276 @@
-{
-    "game_details": [
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "aargonz#3345",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "South Alabama"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Colorado"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Northern Illinois"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Illinois"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Ohio State"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Northwestern"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Minnesota"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Indiana"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Purdue"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Wisconsin"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Maryland"
-        },
-        {
-            "bets": [
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "",
-                    "user": "aargonz#3345",
-                    "winorlose": ""
-                },
-                {
-                    "datetime": "2019-09-11 11:30",
-                    "spread": "False",
-                    "user": "psypoopino#8800",
-                    "winorlose": "True"
-                }
-            ],
-            "game": "Iowa"
+[
+    {
+        "opponent": {
+            "colorado": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "illinois": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "indiana": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "iowa": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "maryland": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "minnesota": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "northern illinois": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "northwestern": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "ohio state": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "purdue": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "red-white spring game": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "south alabama": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:48:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "tbd1": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "tbd2": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            },
+            "wisconsin": {
+                "bets": [
+                    {
+                        "aargonz#3345": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "psyspoopino#8880": {
+                            "datetime": "06-08-2019 21:37:50",
+                            "spread": "False",
+                            "winorlose": "True"
+                        }
+                    }
+                ],
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
+            }
         }
-    ]
-}
+    }
+]

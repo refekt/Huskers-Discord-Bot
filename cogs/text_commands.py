@@ -1,11 +1,11 @@
 from discord.ext import commands
-import discord
 import markovify
 import random
 import json
 import datetime
 import discord
 import config
+import urllib3
 
 
 # Dictionaries
@@ -128,21 +128,37 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def bet(self, ctx, cmd=None):
-        """ Allows a user to bet on the outcome of the next game """
+    async def bet(self, ctx, cmd=None, *, team=None):
+        """ Allows a user to place a bet on the upcoming Husker game. Bets are placed by reacting to the bot's message. Bets are recorded by Discord username. Changing your username will result in lost bets. All bets must be completed prior to kickoff. Bets after that will not be accepted. Winners will be tallied on the next calendar day after the game.
+        There are 3 sub commands: all, show, and winners.
+
+        Show: show your current bet.
+        All: show all current bets.
+        Winners <team>: show all the winners of a specific game.
+        """
         # Creates the embed object for all messages within method
-        embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+        embed = discord.Embed(title="Husker Game Betting", description="How do you think the Huskers will do in their next game? Place your bets below!", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
         embed.set_footer(text=config.bet_footer)
 
+        # Load next opponent and bets
+        store_next_opponent()
+        load_season_bets()
+
+        game = config.current_game[0].lower()
+        season_year = int(datetime.date.today().year) - 2019  # Future proof
+        raw_username = "{}".format(ctx.author)
+
         # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
         if cmd == None:
-            # Load next opponent
-            store_next_opponent()
+            ###
+            # https://mybookie.ag/sportsbook/college-football/nebraska/
+            # This site could be used to pull spread information.
+            ###
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
-            embed.add_field(name="Spread", value="TBD", inline=False)
-            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts.\n", inline=False)
+            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread. Bets are stored by your _Discord username_. If you change your username you will lose your bet history.\n", inline=False)
+            embed.add_field(name="Spread", value="[Betting on the spread is a work in progress and may come later in the season. Sorry!]", inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
                                                "~~⏫: Submits a bet that we will beast the spread.~~\n"
@@ -155,41 +171,104 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         # Show the user's current bet(s)
         elif cmd == "show":
-            # Load next opponent and bets
-            store_next_opponent()
-            load_season_bets()
+            # Creates the embed object for all messages within method
+            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            embed.set_footer(text=config.bet_footer)
 
-            game = config.current_game[2]
+            temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
+            for usr in temp_dict:
+                if usr == raw_username:
+                    embed.add_field(name="Author", value=raw_username, inline=False)
+                    embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+                    embed.add_field(name="Win or Loss", value=temp_dict[usr]['winorlose'], inline=True)
+                    embed.add_field(name="Spread", value=temp_dict[usr]['spread'], inline=True)
+                    await ctx.send(embed=embed)
 
-            for users in config.season_bets['game_details'][game]['bets']:
-                if users['user'] == str(ctx.message.author):
-                    stored_bets['user'] = users['user']
-                    stored_bets['winorlose'] = users['winorlose']
-                    stored_bets['spread'] = users['spread']
-                    stored_bets['datetime'] = users['datetime']
+        # Show all bets for the current game
+        elif cmd == "all":
+            # Creates the embed object for all messages within method
+            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            embed.set_footer(text=config.bet_footer)
 
-            winorloss = ""
-            spread = ""
+            temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
+            total_wins = 0
+            total_losses = 0
+            total_cover = 0
+            total_not_cover = 0
 
-            if stored_bets['winorlose'] != "":
-                if stored_bets['winorlose']:
-                    winorloss = config.bet_descriptions[0]
+            for usr in temp_dict:
+                if temp_dict[usr]['winorlose']:
+                    total_wins += 1
                 else:
-                    winorloss = config.bet_descriptions[1]
-
-            if stored_bets['spread'] != "":
-                if stored_bets['spread']:
-                    spread = config.bet_descriptions[2]
+                    total_losses += 1
+                if temp_dict[usr]['spread']:
+                    total_cover += 1
                 else:
-                    spread = config.bet_descriptions[3]
+                    total_not_cover += 1
 
-            embed.add_field(name="User", value=str(ctx.message.author), inline=False)
-            embed.add_field(name="Opponent", value=str(config.season_bets['game_details'][game]['game']), inline=False)
-            if winorloss:
-                embed.add_field(name="Win/Loss", value=winorloss, inline=False)
-            if spread:
-                embed.add_field(name="Spread", value=spread, inline=False)
+            total_winorlose = total_losses + total_wins
+            total_spread = total_cover + total_not_cover
+
+            embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+            embed.add_field(name="Wins", value="{} ({:.2f}%)".format(total_wins, (total_wins/total_winorlose) * 100))
+            embed.add_field(name="Losses", value="{} ({:.2f}%)".format(total_losses, (total_losses / total_winorlose) * 100))
+            embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover, (total_cover / total_spread) * 100))
+            embed.add_field(name="Not Cover Spread", value="{} ({:.2f}%)".format(total_not_cover, (total_not_cover / total_spread) * 100))
             await ctx.send(embed=embed)
+
+        # Show all winners for game
+        elif cmd == "winners":
+            # Need to add check if command is run the day after the game
+            if team:
+                winners_winorlose = []
+                winners_spread = []
+                try:
+                    # Creates the embed object for all messages within method
+                    embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+                    embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+                    embed.set_footer(text=config.bet_footer)
+
+                    temp_dict = config.season_bets[season_year]['opponent'][team.lower()]['bets'][0]
+
+                    for usr in temp_dict:
+                        if temp_dict[usr]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose']:
+                            winners_winorlose.append(usr)
+                        if temp_dict[usr]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread']:
+                            winners_spread.append(usr)
+
+                    win_winorlose_string = ""
+                    win_spread_string = ""
+
+                    if winners_winorlose:
+                        for winner in winners_winorlose:
+                            win_winorlose_string = win_winorlose_string + "{}\n".format(winner)
+
+                    if winners_spread:
+                        for winner in winners_spread:
+                            win_spread_string = win_spread_string + "{}\n".format(winner)
+
+                    embed.add_field(name="Opponent", value=team.title(), inline=False)
+                    if win_winorlose_string:
+                        embed.add_field(name="Win/Loss Winners", value=win_winorlose_string, inline=True)
+                    else:
+                        embed.add_field(name="Win/Loss Winners", value="N/A", inline=True)
+                    if win_spread_string:
+                        embed.add_field(name="Spread Winners", value=win_spread_string, inline=True)
+                    else:
+                        embed.add_field(name="Spread Winners", value="N/A", inline=True)
+                    await ctx.send(embed=embed)
+
+                except discord.HTTPException as err:
+                    print("Embed Name: {}\nEmbed Value: {}".format(embed.fields[1].name, embed.fields[1].value))
+                    print("Error Text: {}".format(err.text))
+                    await ctx.send("Something happened in the backend of hte program. Please alert the bot owners!")
+                except:
+                    await ctx.send("Cannot find the opponent \"{}\". Please verify the team is on the schedule for the {} season and it is spelled correctly. Opponents can be found by using `$schedule|shed {}`".format(team, 2019+season_year, 2019+season_year))
+            else:
+                await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
+            pass
 
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
