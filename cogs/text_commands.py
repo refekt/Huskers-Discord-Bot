@@ -129,10 +129,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     @commands.command()
     async def bet(self, ctx, cmd=None, *, team=None):
-        """ Allows a user to bet on the outcome of the next game. Commands include: show, all.
+        """ Allows a user to place a bet on the upcoming Husker game. Bets are placed by reacting to the bot's message. Bets are recorded by Discord username. Changing your username will result in lost bets. All bets must be completed prior to kickoff. Bets after that will not be accepted. Winners will be tallied on the next calendar day after the game.
+        There are 3 sub commands: all, show, and winners.
 
-         Show: show your current bet.
-         All: show all current bets."""
+        Show: show your current bet.
+        All: show all current bets.
+        Winners <team>: show all the winners of a specific game.
+        """
         # Creates the embed object for all messages within method
         embed = discord.Embed(title="Husker Game Betting", description="How do you think the Huskers will do in their next game? Place your bets below!", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")

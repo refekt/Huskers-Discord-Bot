@@ -82,7 +82,7 @@ async def on_message(message):
     """ Commands processed as messages are entered """
     if not message.author.bot:
         #get a list of subreddits mentioned
-        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content)
+        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
         if len(subreddits) > 0:
             embed = discord.Embed(title="Found Subreddits")
             for s in subreddits:
