@@ -44,7 +44,7 @@ bet_counter = -1
 
 
 
-def try_adding_new_dict(bet_username: str, bet_winorlose=None, bet_spread=None):
+def try_adding_new_dict(bet_username: str, bet_winorlose="False", bet_spread="False"):
     # Check if the user betting has already placed a bet
     raw_username = bet_username  # "{}#{}".format(user.name, user.discriminator)
     raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
@@ -266,13 +266,13 @@ async def on_reaction_add(reaction, user):
             game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
             if reaction.emoji == "⬆":
-                try_adding_new_dict(raw_username, True, False)
+                try_adding_new_dict(raw_username, "True", "False")
             elif reaction.emoji == "⬇":
-                try_adding_new_dict(raw_username, False, False)
+                try_adding_new_dict(raw_username, "False", "False")
             elif reaction.emoji == "⏫":
-                try_adding_new_dict(raw_username, False, False)
+                try_adding_new_dict(raw_username, "False", "False")
             elif reaction.emoji == "⏬":
-                try_adding_new_dict(raw_username, False, True)
+                try_adding_new_dict(raw_username, "False", "True")
             else:
                 pass
 

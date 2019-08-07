@@ -5,6 +5,7 @@ import json
 import datetime
 import discord
 import config
+import urllib3
 
 
 # Dictionaries
@@ -189,7 +190,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.set_footer(text=config.bet_footer)
 
             temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
-
             total_wins = 0
             total_losses = 0
             total_cover = 0
@@ -204,6 +204,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     total_cover += 1
                 else:
                     total_not_cover += 1
+
             total_winorlose = total_losses + total_wins
             total_spread = total_cover + total_not_cover
 
@@ -216,20 +217,52 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         # Show all winners for game
         elif cmd == "winners":
+            # Need to add check if command is run the day after the game
             if team:
-                winnners_winorlose = []
+                winners_winorlose = []
                 winners_spread = []
                 try:
+                    # Creates the embed object for all messages within method
+                    embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+                    embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+                    embed.set_footer(text=config.bet_footer)
+
                     temp_dict = config.season_bets[season_year]['opponent'][team.lower()]['bets'][0]
+
                     for usr in temp_dict:
-                        if temp_dict[usr][0]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose']:
-                            winnners_winorlose.append(usr)
-                        if temp_dict[usr][0]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread']:
+                        if temp_dict[usr]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose']:
+                            winners_winorlose.append(usr)
+                        if temp_dict[usr]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread']:
                             winners_spread.append(usr)
-                    await ctx.send("{}\n{}".format(winnners_winorlose, winners_spread))
+
+                    win_winorlose_string = ""
+                    win_spread_string = ""
+
+                    if winners_winorlose:
+                        for winner in winners_winorlose:
+                            win_winorlose_string = win_winorlose_string + "{}\n".format(winner)
+
+                    if winners_spread:
+                        for winner in winners_spread:
+                            win_spread_string = win_spread_string + "{}\n".format(winner)
+
+                    embed.add_field(name="Opponent", value=team.title(), inline=False)
+                    if win_winorlose_string:
+                        embed.add_field(name="Win/Loss Winners", value=win_winorlose_string, inline=True)
+                    else:
+                        embed.add_field(name="Win/Loss Winners", value="N/A", inline=True)
+                    if win_spread_string:
+                        embed.add_field(name="Spread Winners", value=win_spread_string, inline=True)
+                    else:
+                        embed.add_field(name="Spread Winners", value="N/A", inline=True)
+                    await ctx.send(embed=embed)
+
+                except discord.HTTPException as err:
+                    print("Embed Name: {}\nEmbed Value: {}".format(embed.fields[1].name, embed.fields[1].value))
+                    print("Error Text: {}".format(err.text))
+                    await ctx.send("Something happened in the backend of hte program. Please alert the bot owners!")
                 except:
-                    await ctx.send("Please verify the team is on the schedule for the {} season and it is spelled correctly. Opponents can be found by using `$schedule|shed <year=2019>`".format(2019+season_year))
-                    print("Error in team")
+                    await ctx.send("Cannot find the opponent \"{}\". Please verify the team is on the schedule for the {} season and it is spelled correctly. Opponents can be found by using `$schedule|shed {}`".format(team, 2019+season_year, 2019+season_year))
             else:
                 await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
             pass
