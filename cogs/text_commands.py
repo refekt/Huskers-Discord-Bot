@@ -121,7 +121,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
     async def eightball(self, ctx, *, question):
         """ Ask a Magic 8-Ball a question. """
         random.shuffle(eight_ball)
-        dic1e_roll = random.randint(0, len(eight_ball))
+        dice_roll = random.randint(0, len(eight_ball))
 
         embed = discord.Embed(title=':8ball: HuskerBot 8-Ball :8ball:')
         embed.add_field(name=question, value=eight_ball[dice_roll])

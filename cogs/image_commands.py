@@ -2,6 +2,9 @@ from discord.ext import commands
 import discord
 import function_helper
 import random
+from PIL import Image, ImageDraw
+from os import listdir
+from os.path import isfile, join
 
 wrong_channel_text='The command you sent is not authorized for use in this channel.'
 welcome_footer='HusekrBot welcomes you!'
@@ -247,6 +250,25 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         embed.set_thumbnail(url=penalty_url)
         embed.set_footer(text="Referee calls " + huskerbot_footer)
         await ctx.send(embed=embed)
+
+
+    @commands.command()
+    async def flag_gen(self, ctx):
+        created_flag = "media/saved/{}created_flag.png".format(str(ctx.author))
+        blank_flag = "media/blank_flag.png"
+        poop_files = [f for f in listdir("media/") if isfile(join("media/", f))]
+        for p in poop_files:
+            if not "poop" in p.lower():
+                poop_files.remove(p)
+        random.shuffle(poop_files)
+
+        img_poop = Image.open("media/{}".format(poop_files[0]))
+        img_poop.resize((200, 200), Image.BILINEAR)
+        img_blank_flag = Image.open(blank_flag)
+        img_blank_flag.paste(img_poop, (650, 250))
+        img_blank_flag.save(created_flag)
+
+        await ctx.send(file=discord.File(created_flag))
     # End image commands
 
 
