@@ -289,7 +289,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             if len(twitter_raw2) > 0:
                 twitter_handle = twitter_raw2[0]
                 twitter_handle = twitter_handle.replace("@","")
-                twitter_handle = "@" + twitter_handle[15:-1]
+                # twitter_handle = "@" + twitter_handle[15:-1]
                 twitter_url = "https://twitter.com/" + twitter_handle
             else:
                 twitter_handle = "N/A"
