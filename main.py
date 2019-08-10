@@ -348,6 +348,11 @@ async def huskerbotquit(ctx):
 # Admin command
 
 
+@client.command()
+async def about(ctx):
+    await ctx.send("HuskerBot was created by aagonz and psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
+
+
 # Run the Discord bot
 # Does nothing if no sys.argv present
 if len(sys.argv) > 0:
