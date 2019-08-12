@@ -136,4 +136,4 @@ team_ids.json
 *.json
 
 .media/
-.media/saved
+.media/saved/
