@@ -2,6 +2,9 @@ from discord.ext import commands
 import discord
 import function_helper
 import random
+from PIL import Image, ImageDraw
+from os import listdir
+from os.path import isfile, join
 
 wrong_channel_text='The command you sent is not authorized for use in this channel.'
 welcome_footer='HusekrBot welcomes you!'
@@ -27,6 +30,7 @@ ref_dict = {'bs': ['Bull shit', 'Referee still gets paid for that horrible call'
             'targeting': ['Targeting', 'OFF/DEF: 15 yard penalty, ejection ', 'https://i.imgur.com/qOsjBCB.gif'],
             'td': ['Touchdown', 'OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'],
             'unsport': ['Unsportsmanlike', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/6Cy9UE4.gif'],
+            'hornsdown': ['Horns Down', 'Tuck Fexas', 'https://i.imgur.com/w8ACfmn.gif']
             }
 flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
@@ -188,12 +192,26 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         embed.set_image(url='https://i.imgur.com/mKRUPoD.gif')
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['allluck','luck','al', 'whatusay'])
+    async def uwot(self, ctx):
+        """ EXCUSE ME WHAT? """
+        embed = discord.Embed(title="What did you just say?!")
+        embed.set_image(url='https://i.imgur.com/XpFWJp9.gif')
+        await ctx.send(embed=embed)
+
     @commands.command()
     async def strut(self, ctx):
         """ Martinez struttin his stuff """
         embed = discord.Embed(title="dat strut")
         embed.set_image(url='https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif')
         await ctx.send(embed = embed)
+
+    @commands.command(aliases=['flip',])
+    async def theflip(self, ctx):
+        """ Frost doing frosty thigns """
+        embed = discord.Embed(title="Too Cool")
+        embed.set_image(url='https://media.giphy.com/media/lllup6g803SaeRUwiM/giphy.gif')
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def guzzle(self, ctx):
@@ -232,6 +250,25 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         embed.set_thumbnail(url=penalty_url)
         embed.set_footer(text="Referee calls " + huskerbot_footer)
         await ctx.send(embed=embed)
+
+
+    @commands.command()
+    async def flag_gen(self, ctx):
+        created_flag = "media/saved/{}created_flag.png".format(str(ctx.author))
+        blank_flag = "media/blank_flag.png"
+        poop_files = [f for f in listdir("media/") if isfile(join("media/", f))]
+        for p in poop_files:
+            if not "poop" in p.lower():
+                poop_files.remove(p)
+        random.shuffle(poop_files)
+
+        img_poop = Image.open("media/{}".format(poop_files[0]))
+        img_poop.resize((200, 200), Image.BILINEAR)
+        img_blank_flag = Image.open(blank_flag)
+        img_blank_flag.paste(img_poop, (650, 250))
+        img_blank_flag.save(created_flag)
+
+        await ctx.send(file=discord.File(created_flag))
     # End image commands
 
 

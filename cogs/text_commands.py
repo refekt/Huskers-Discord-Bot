@@ -120,6 +120,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command(aliases=["8b",])
     async def eightball(self, ctx, *, question):
         """ Ask a Magic 8-Ball a question. """
+        random.shuffle(eight_ball)
         dice_roll = random.randint(0, len(eight_ball))
 
         embed = discord.Embed(title=':8ball: HuskerBot 8-Ball :8ball:')

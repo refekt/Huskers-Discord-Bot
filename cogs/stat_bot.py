@@ -7,6 +7,7 @@ import json
 from ftfy import fix_text
 from sportsreference.ncaaf.roster import Roster
 from sportsreference.ncaaf.rankings import Rankings
+from sportsreference.ncaaf.boxscore import Boxscore
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -61,9 +62,56 @@ class StatBot(commands.Cog, name="CFB Stats"):
         # await edit_msg.edit(content=roster_string)'''
 
     @commands.command()
-    async def boxscore(self, ctx):
+    async def boxscore(self, ctx, week: int, detailed=False):
         """ Returns the box score of the searched for game. """
-        pass
+        boxscore_date = ""
+        if week == 1:
+            boxscore_date = "2018-09-08"  # South Alabama
+        elif week == 2:
+            boxscore_date = "2019-09-07"  # Colorado
+        elif week == 3:
+            boxscore_date = "2019-09-14"  # Northern Illinois
+        elif week == 4:
+            boxscore_date = "2019-09-21"  # Illinois
+        elif week == 5:
+            boxscore_date = "2019-09-28"  # Ohio State
+        elif week == 6:
+            boxscore_date = "2019-10-05"  # Northwestern
+        elif week == 7:
+            boxscore_date = "2019-10-12"  # Minnesota
+        elif week == 8:
+            boxscore_date = "2019-10-26"  # Indiana
+        elif week == 9:
+            boxscore_date = "2019-11-02"  # Purdue
+        elif week == 10:
+            boxscore_date = "2019-11-16"  # Wisconsin
+        elif week == 11:
+            boxscore_date = "2019-11-23"  # Maryland
+        elif week == 12:
+            boxscore_date = "2019-11-29"  # Iowa
+
+        edit_msg = await ctx.send("Thinking...")
+
+        game = Boxscore("{}-nebraska".format(boxscore_date))
+        embed = discord.Embed(title="Boxscore for {} vs. {}".format(game.winning_name, game.losing_name))
+
+        # Basic
+        basic_string = "Location: {} | Time: {}".format(game.stadium, game.time)
+        embed.add_field(name="Game Info", value=basic_string)
+
+        # Home
+        i = 0
+        for p in game.home_players:
+            if i < 1:
+                embed.add_field(name="Player", value=p.name)
+                for stat in p.dataframe:
+                    if stat:
+                        embed.add_field(name="{}".format(p), value=p)
+            i += 1
+        i = 0
+        # Away
+
+        await edit_msg.edit(embed=embed, content="")
         
     @commands.command()
     async def lastplays(self, ctx):

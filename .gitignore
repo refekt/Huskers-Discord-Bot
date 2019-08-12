@@ -132,5 +132,9 @@ team_ids.json
 .idea/vcs.xml
 *.xml
 *.iml
-teams_id.json
-teams_ids.json
+
+*.json
+
+.media/
+.media/saved/
+*.png

@@ -316,10 +316,10 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
         # Now that composite rating can be str or float, we need to handle both cases. Also, don't want the pound sign in front of N/A values.
         if type(composite_rating) is str:
-            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfiles: [Click Me]({})\n\n**Twitter**\n[{}]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url, twitter_handle, twitter_url)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {}\nProfiles: [Click Me]({})\n\n**Twitter**\n[@{}]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url, twitter_handle, twitter_url)
             rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
         else:
-            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n**Twitter**\n[{}]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url, twitter_handle, twitter_url)
+            body = '**Player Bio**\nHome Town: {}, {}\nHigh School: {}\nHeight: {}\nWeight: {}\n\n**247Sports Info**\nComposite Rating: {:.4f}\nProfile: [Click Me]({})\n\n**Twitter**\n[@{}]({})\n\n'.format(city, state, high_school, height, int(weight), composite_rating, player_url, twitter_handle, twitter_url)
             rankings = '**Rankings**\nNational: #{}\nState: #{}\nPosition: #{}\n'.format(national_rank, state_rank, position_rank)
 
         # Create a recruitment status string. If they are committed, use our scraped json team_ids dictionary to get the team name from the id in the committed team image url.
