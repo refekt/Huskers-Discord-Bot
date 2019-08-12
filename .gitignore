@@ -135,4 +135,4 @@ team_ids.json
 
 *.json
 
-media/*
+.media/
