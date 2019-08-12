@@ -203,8 +203,8 @@
                 "bets": [
                     {
                         "09570957#2811": {
-                            "datetime": "07-08-2019 21:17:54",
-                            "spread": "False",
+                            "datetime": "12-08-2019 16:18:38",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "Adam7X#2383": {
@@ -218,13 +218,13 @@
                             "winorlose": "True"
                         },
                         "Mobius One#3960": {
-                            "datetime": "07-08-2019 20:44:18",
-                            "spread": "False",
+                            "datetime": "12-08-2019 16:21:36",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "ModestBeaver#0849": {
-                            "datetime": "07-08-2019 20:55:01",
-                            "spread": "False",
+                            "datetime": "12-08-2019 16:17:37",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "NotaVirus_Click#3411": {
@@ -243,7 +243,7 @@
                             "winorlose": "True"
                         },
                         "aargonz#3345": {
-                            "datetime": "12-08-2019 16:15:45",
+                            "datetime": "12-08-2019 16:17:41",
                             "spread": "True",
                             "winorlose": "True"
                         },

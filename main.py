@@ -56,10 +56,8 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
             if str(users) == raw_username:
                 if which == "winorlose":
                     config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[users]['spread']}
-                    print("winorlose", config.new_dict)
                 elif which == "spread":
                     config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": placed_bet}
-                    print("spread", config.new_dict)
             else:
                 pass               # print("No match")
 
