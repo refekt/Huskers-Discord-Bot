@@ -101,7 +101,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         if season_start > datetime.datetime.now():
             days_left = season_start - datetime.datetime.now()
-            await ctx.send("📢 There are {} days, {} hours, and {} minutes remaining until the Husker 2019 season kicks off!".format(days_left.days, int(days_left.seconds/3600),int((days_left.seconds/60)%60),days_left.seconds))
+            await ctx.send("📢 There are {} days, {} hours, and {} minutes remaining until the Husker 2019 season kicks off! _This is a countdown to the South Alabama 11:30 AM CST kick off_".format(days_left.days, int(days_left.seconds/3600),int((days_left.seconds/60)%60),days_left.seconds))
         else:
             await ctx.send("The season has already started dummy!")
 
@@ -157,13 +157,16 @@ class TextCommands(commands.Cog, name="Text Commands"):
             # This site could be used to pull spread information.
             ###
 
+            if not team:
+                team = config.current_game[0].lower()
+
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
             embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread. Bets are stored by your _Discord username_. If you change your username you will lose your bet history.\n", inline=False)
-            embed.add_field(name="Spread", value="[Betting on the spread is a work in progress and may come later in the season. Sorry!]", inline=False)
+            embed.add_field(name="Spread", value="{}\n__Manually__ updated by checking theScore.com".format(config.season_bets[season_year]['opponent'][team.lower()]['spread']), inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
-                                               "~~⏫: Submits a bet that we will beast the spread.~~\n"
-                                               "~~⏬: Submits a bet that we will lose the spread.~~", inline=False)
+                                               "⏫: Submits a bet that we will beast the spread.\n"
+                                               "⏬: Submits a bet that we will lose the spread.", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
