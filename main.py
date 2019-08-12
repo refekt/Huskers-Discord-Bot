@@ -43,30 +43,38 @@ season_year = int(datetime.date.today().year) - 2019  # Future proof
 bet_counter = -1
 
 
-
-def try_adding_new_dict(bet_username: str, bet_winorlose="False", bet_spread="False"):
+def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
     # Check if the user betting has already placed a bet
-    raw_username = bet_username  # "{}#{}".format(user.name, user.discriminator)
+    raw_username = bet_username
     raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-    #global config.new_dict
-    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_winorlose, "spread": bet_spread}
-    game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
-    global bet_counter
+    game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
+    game_bets = config  .season_bets[season_year]['opponent'][game]['bets']
+
+    for bet_users in game_bets:
+        for users in bet_users:
+            if str(users) == raw_username:
+                if which == "winorlose":
+                    config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[users]['spread']}
+                    print("winorlose", config.new_dict)
+                elif which == "spread":
+                    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": placed_bet}
+                    print("spread", config.new_dict)
+            else:
+                pass               # print("No match")
+
+    global bet_counter  # I don't think this actually does anything. Probably can be replaced with 0 or 1
     try:
-        #print("*** Trying: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
         for bet_users in config.season_bets[season_year]['opponent'][game]['bets']:
             bet_users[raw_username] = config.new_dict
             bet_counter += 1
-        # print("*** Success ***")
+
     # Setup a new nested mess of variables to translate into JSON
     except:
-        # print("*** Erroring: {} {} {} ***".format(bet_username, bet_winorlose, bet_spread))
-        config.season_bets[season_year]['opponent'][game]['bets'][raw_username].append(config.new_dict)
         # Write to JSON file
+        config.season_bets[season_year]['opponent'][game]['bets'][raw_username].append(config.new_dict)
         with open("season_bets.json", "w") as json_file:
             json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
-        #print("*** Errored ***")
 
 
 # Start bot (client) events
@@ -266,20 +274,18 @@ async def on_reaction_add(reaction, user):
             game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
             if reaction.emoji == "⬆":
-                try_adding_new_dict(raw_username, "True", "False")
+                try_adding_new_dict(raw_username, "winorlose", "True")
             elif reaction.emoji == "⬇":
-                try_adding_new_dict(raw_username, "False", "False")
+                try_adding_new_dict(raw_username, "winorlose", "False")
             elif reaction.emoji == "⏫":
-                try_adding_new_dict(raw_username, "False", "False")
+                try_adding_new_dict(raw_username, "spread", "True")
             elif reaction.emoji == "⏬":
-                try_adding_new_dict(raw_username, "False", "True")
+                try_adding_new_dict(raw_username, "spread", "False")
             else:
                 pass
 
             # Send a message alerting the channel that a user has placed a bet.
-            # A timer should be added to prevent spam. Maybe 5 seconds or so? Could be checked by 'datetime' value in JSON
             global bet_counter
-            # global config.new_dict
 
             # *** Maybe change to a PM instead ***
             # Creates the embed object for all messages within method
@@ -293,9 +299,9 @@ async def on_reaction_add(reaction, user):
                     embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
                     embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
                     embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
-                    #await reaction.message.channel.send(embed=embed)
                     await user.send(embed=embed)
             bet_counter = -1
+
             # Remove reaction to prevent user from voting for both
             try:
                 await reaction.remove(user)

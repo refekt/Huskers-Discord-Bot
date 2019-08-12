@@ -104,9 +104,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         for p in game.home_players:
             if i < 1:
                 embed.add_field(name="Player", value=p.name)
-                for stat in p.dataframe:
-                    if stat:
-                        embed.add_field(name="{}".format(p), value=p)
+                await ctx.send(p.home_players)
             i += 1
         i = 0
         # Away
