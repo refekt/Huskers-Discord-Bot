@@ -124,9 +124,9 @@ async def on_message(message):
 
         # Reply to NotA_Virus
         notavirus = "NotaVirus_Click#3411"
-        if message.author == notavirus:
+        if str(message.author).lower() == notavirus.lower():
             if "you suck" in message.content.lower():
-                await message.channel.send("HEY NOW! I am on to you {}...".format(message.author))
+                await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
 
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
     # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
