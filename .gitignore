@@ -128,7 +128,7 @@ team_ids.json
 husker_schedule.json
 flags.txt
 facts.txt
-team_ids.json
+*.txt
 .idea/vcs.xml
 *.xml
 *.iml
