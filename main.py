@@ -57,7 +57,11 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
             if str(users) == raw_username:
                 if which == "winorlose":
                     config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[users]['spread']}
+                elif which == "canx_winorlose":
+                    config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[users]['spread']}
                 elif which == "spread":
+                    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": placed_bet}
+                elif which == "canx_spread":
                     config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": placed_bet}
             else:
                 pass               # print("No match")
@@ -290,10 +294,14 @@ async def on_reaction_add(reaction, user):
                 try_adding_new_dict(raw_username, "winorlose", "True")
             elif reaction.emoji == "⬇":
                 try_adding_new_dict(raw_username, "winorlose", "False")
+            elif reaction.emoji == "❎":
+                try_adding_new_dict(raw_username, "canx_winorlose", "None")
             elif reaction.emoji == "⏫":
                 try_adding_new_dict(raw_username, "spread", "True")
             elif reaction.emoji == "⏬":
                 try_adding_new_dict(raw_username, "spread", "False")
+            elif reaction.emoji == "❌":
+                try_adding_new_dict(raw_username, "canx_spread", "None")
             else:
                 pass
 
