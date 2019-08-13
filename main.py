@@ -131,7 +131,7 @@ async def on_message(message):
                 if dice_roll > 85:
                     if "you suck" in message.content.lower():
                         await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
-                    elif "eggplant" in message.content.lower() or "🍆" in message.conent:
+                    elif "eggplant" in message.content.lower() or "🍆" in message.content:
                         await message.channel.send("Attention: {} loves eggplant.".format(message.author.mention))
 
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
