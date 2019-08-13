@@ -30,6 +30,7 @@ client.load_extension('cogs.stat_bot')
 # initialize a global list for CrootBot to put search results in
 # player_search_list = []
 authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
+banned_channels = [440868279150444544, 607399402881024009]
 
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
@@ -123,10 +124,13 @@ async def on_message(message):
             await message.add_reaction(emojiDownvote)
 
         # Reply to NotA_Virus
-        notavirus = "NotaVirus_Click#3411"
-        if str(message.author).lower() == notavirus.lower():
-            if "you suck" in message.content.lower():
-                await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
+        if not message.channel in banned_channels:
+            notavirus = "NotaVirus_Click#3411"
+            if str(message.author).lower() == notavirus.lower():
+                if "you suck" in message.content.lower():
+                    await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
+                elif "eggplant" in message.content.lower():
+                    await message.channel.send("Attention: {} loves eggplant.".format(message.author.mention))
 
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
     # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
@@ -161,20 +165,23 @@ async def on_message(message):
                 # "Highlight video found")
                 global highlight_url
                 highlight_url = videos[0].get('href')
-                for v in videos:
-                    if 'senior' in v.get('title').lower():                       
-                        highlight_url = v.get('href')
-                        break
-                    elif 'junior' in v.get('title').lower():
-                        highlight_url = v.get('href')
-                        break
-                    elif 'sophomore' in v.get('title').lower():
-                        highlight_url = v.get('href')
-                # print("{}\n***".format(highlight_url))
-                embed_old = message.embeds[0]
-                embed_new = embed_old.set_footer(text='Click the video camera emoji to get a highlight video for this recruit')
-                await message.edit(embed=embed_new)
-                await message.add_reaction('📹')
+                if videos:
+                    for v in videos:
+                        if 'senior' in v.get('title').lower():
+                            highlight_url = v.get('href')
+                            break
+                        elif 'junior' in v.get('title').lower():
+                            highlight_url = v.get('href')
+                            break
+                        elif 'sophomore' in v.get('title').lower():
+                            highlight_url = v.get('href')
+                    # print("{}\n***".format(highlight_url))
+                    embed_old = message.embeds[0]
+                    embed_new = embed_old.set_footer(text='Click the video camera emoji to get a highlight video for this recruit')
+                    await message.edit(embed=embed_new)
+                    await message.add_reaction('📹')
+                else:
+                    print("No videos found?")
             else:
                 # "No highlight video found\n***")
                 pass
@@ -320,7 +327,8 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_command_completion(ctx):
-    banned_channels = [440868279150444544, 607399402881024009]
+    global banned_channels
+
     if ctx.channel.id in banned_channels:
         not_authed = "⚠ This channel is banned from using commands ⚠"
 
