@@ -351,7 +351,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
     async def check_last_run(self, ctx=None):
         """ Check when the last time the JSON was pulled. """
         now = datetime.datetime.now()
-        temp_check = cb_settings.last_run
+        temp_check = config.last_run
         check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
 
         print("***\nNow: {}\nTemp Check: {}\nCheck: {}\nNow > Check: {}\n***".format(now, temp_check, check, now > check))
