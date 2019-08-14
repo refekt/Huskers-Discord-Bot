@@ -212,6 +212,11 @@
                             "spread": "True",
                             "winorlose": "True"
                         },
+                        "All_Luck#3656": {
+                            "datetime": "13-08-2019 21:10:14",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
                         "AlwaysBlue7#2411": {
                             "datetime": "07-08-2019 20:49:05",
                             "spread": "False",
@@ -233,8 +238,8 @@
                             "winorlose": "True"
                         },
                         "NotaVirus_Click#3411": {
-                            "datetime": "12-08-2019 16:26:20",
-                            "spread": "True",
+                            "datetime": "13-08-2019 20:24:49",
+                            "spread": "None",
                             "winorlose": "True"
                         },
                         "Psyspoopino#8880": {
@@ -253,9 +258,9 @@
                             "winorlose": "True"
                         },
                         "deeretech129#1440": {
-                            "datetime": "13-08-2019 19:48:34",
+                            "datetime": "13-08-2019 22:25:57",
                             "spread": "False",
-                            "winorlose": "True"
+                            "winorlose": "None"
                         },
                         "economypie#6181": {
                             "datetime": "07-08-2019 12:25:25",
