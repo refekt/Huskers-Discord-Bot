@@ -103,7 +103,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             embed.set_image(url=flag_dict[random_state])
             await ctx.send(embed=embed)
 
-    @commands.command(case_insensitive=False)
+    @commands.command(case_insensitive=False, aliases=["ohyeah",])
     async def OHYEAH(self, ctx):
         """Pour that koolaid baby"""
         embed = discord.Embed(title="OH YEAH!")

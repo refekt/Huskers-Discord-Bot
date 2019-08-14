@@ -92,43 +92,43 @@ async def on_ready():
 async def on_message(message):
     """ Commands processed as messages are entered """
     if not message.author.bot:
-        #get a list of subreddits mentioned
-        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
-        if len(subreddits) > 0:
-            embed = discord.Embed(title="Found Subreddits")
-            for s in subreddits:
-                url='https://reddit.com/' + s
-                if '.com//r/' in url:
-                    url = url.replace('.com//r', '.com/r')
-                embed.add_field(name = s, value = url, inline = False)
-            await message.channel.send(embed = embed)
-
-        # Good bot, bad bot       
-        if "good bot" in message.content.lower():
-            await message.channel.send("OwO thanks")
-        elif "bad bot" in message.content.lower():
-            embed = discord.Embed(title="I'm a bad, bad bot")
-            embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
-            await message.channel.send(embed=embed)
-
-        # Husker Bot hates Isms
-        if "isms" in message.content.lower():
-            dice_roll = random.randint(1,101)
-            if dice_roll >= 90:
-                await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
-                                           "make **shit** up for fake internet points. I'm glad he's gone.")
-
         # Add Up Votes and Down Votes
         if (".addvotes") in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
-            emojiUpvote="\N{UPWARDS BLACK ARROW}"
-            emojiDownvote="\N{DOWNWARDS BLACK ARROW}"
+            emojiUpvote = "\N{UPWARDS BLACK ARROW}"
+            emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
             await message.add_reaction(emojiUpvote)
             await message.add_reaction(emojiDownvote)
 
         # Reply to NotA_Virus
         if not message.channel in banned_channels:
+            #get a list of subreddits mentioned
+            subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
+            if len(subreddits) > 0:
+                embed = discord.Embed(title="Found Subreddits")
+                for s in subreddits:
+                    url='https://reddit.com/' + s
+                    if '.com//r/' in url:
+                        url = url.replace('.com//r', '.com/r')
+                    embed.add_field(name = s, value = url, inline = False)
+                await message.channel.send(embed = embed)
+
+            # Good bot, bad bot
+            if "good bot" in message.content.lower():
+                await message.channel.send("OwO thanks")
+            elif "bad bot" in message.content.lower():
+                embed = discord.Embed(title="I'm a bad, bad bot")
+                embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
+                await message.channel.send(embed=embed)
+
+            # Husker Bot hates Isms
+            if "isms" in message.content.lower():
+                dice_roll = random.randint(1,101)
+                if dice_roll >= 90:
+                    await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
+                                               "make **shit** up for fake internet points. I'm glad he's gone.")
+
             notavirus = "NotaVirus_Click#3411"
             if str(message.author).lower() == notavirus.lower():
                 dice_roll = random.randint(1, 101)
@@ -326,8 +326,12 @@ async def on_reaction_add(reaction, user):
             # Remove reaction to prevent user from voting for both
             try:
                 await reaction.remove(user)
+            except discord.Forbidden as forb:
+                print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
+            except discord.HTTPException as err:
+                print("Error removing reaction from {}: {}".format(user, err))
             except:
-                print("Couldn't remove {}'s reaction.".format(user.name))
+                print("I don't know why we can't remove {}'s reaction.".format(user))
 
             with open("season_bets.json", "w") as json_file:
                 json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
@@ -378,7 +382,9 @@ async def huskerbotquit(ctx):
 
 @client.command()
 async def about(ctx):
-    await ctx.send("HuskerBot was created by aagonz and psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
+    embed = discord.Embed(title="HuskerBot's CV", author=client.user, thumbnail="https://i.imgur.com/Ah3x5NA.png")
+    embed.add_field(name="About", value="HuskerBot was created by /u/refekt and /u/psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
+    await ctx.send(embed=embed)
 
 
 # Run the Discord bot
