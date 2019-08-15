@@ -4,7 +4,7 @@ import function_helper
 import requests
 import json
 import datetime
-import cb_settings
+#import cb_settings
 import pandas
 import crystal_balls
 import os, sys, inspect
@@ -363,11 +363,23 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
             crystal_balls.move_cb_to_list_and_json(json_dump=True)
 
-            f = open('cb_settings.py', 'w')
-            f.write('last_run = \'{}\''.format(datetime.datetime.now()))
+            f = open('config.py', 'r')
+            lines = f.readlines()
+            temp = ""
+            for l in lines:
+                if not "last_run" in l:
+                    temp = temp + l
+            temp = temp + "last_run = \'{}\'\n".format(datetime.datetime.now())
             f.close()
 
-            importlib.reload(cb_settings)
+            print(temp)
+
+            f = open("config.py", "w+")
+            f.write(temp)
+            f.close()
+
+            #importlib.reload(cb_settings)
+            importlib.reload(config)
 
             if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
         else:

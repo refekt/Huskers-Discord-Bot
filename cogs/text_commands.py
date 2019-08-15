@@ -33,6 +33,7 @@ eight_ball = ['Try again',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
+bet_emojis = ["⬆", "⬇", "❎" , "⏫", "⏬", "❌"]
 husker_schedule = []
 stored_bets = dict()
 
@@ -172,7 +173,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
-            for e in config.bet_emojis:
+            for e in bet_emojis:
                 await msg_sent.add_reaction(e)
 
         # Show the user's current bet(s)
