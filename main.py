@@ -358,10 +358,10 @@ async def on_command_completion(ctx):
         await ctx.send(not_authed)
 
 
-# @client.event
-# async def on_command_error(ctx, error):
-#     output_msg="Whoa there {}! Something went wrong. {}. Please review `$help` for a list of all available commands.".format(ctx.message.author, error)
-#     await ctx.send(output_msg)
+@client.event
+async def on_command_error(ctx, error):
+    output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
+    await ctx.send(output_msg)
 # End bot (client) events
 
 
@@ -389,6 +389,7 @@ async def huskerbotquit(ctx):
 async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, thumbnail="https://i.imgur.com/Ah3x5NA.png")
     embed.add_field(name="About", value="HuskerBot was created by /u/refekt and /u/psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
+    embed.add_field(name="Current Latency", value=client.latency)
     await ctx.send(embed=embed)
 
 
