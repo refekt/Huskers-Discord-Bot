@@ -50,7 +50,15 @@ flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
              'rutgers': 'https://i.imgur.com/lyng39h.jpg',
              'south_alabama': 'https://i.imgur.com/BOH5reA.jpg',
-             'northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg'
+             'northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg',
+             'kstate': 'https://i.imgur.com/qtxrPn7.png',
+             'kansas': 'https://i.imgur.com/BL4jQfx.png',
+             'alabama': 'https://i.imgur.com/uHXPo4n.png',
+             'ttu': 'https://i.imgur.com/lpOSpH7.png',
+             'usc': 'https://i.imgur.com/GrA4M0X.png',
+             'notredame': 'https://i.imgur.com/Ofoaz7U.png',
+             'stanford': 'https://gfycat.com/passionaterepentantcoelacanth',
+             'tulane': 'https://gfycat.com/selfassuredtediousirukandjijellyfish'
              }
 
 
@@ -250,7 +258,6 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         embed.set_thumbnail(url=penalty_url)
         embed.set_footer(text="Referee calls " + huskerbot_footer)
         await ctx.send(embed=embed)
-
 
     @commands.command()
     async def flag_gen(self, ctx):

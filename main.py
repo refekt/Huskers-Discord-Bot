@@ -133,11 +133,15 @@ async def on_message(message):
             notavirus = "NotaVirus_Click#3411"
             if str(message.author).lower() == notavirus.lower():
                 dice_roll = random.randint(1, 101)
-                if dice_roll > 85:
+                if dice_roll > 65:
                     if "you suck" in message.content.lower():
                         await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
-                    elif "eggplant" in message.content.lower() or "🍆" in message.content:
+                    elif "eggplant" in message.content.lower():
                         await message.channel.send("Attention: {} loves eggplant.".format(message.author.mention))
+                    elif "🍆" in message.content:
+                        await message.channel.send("🍆💦")
+                else:
+                    print("Missed dice roll for {}".format(notavirus))
 
     # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
     # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
