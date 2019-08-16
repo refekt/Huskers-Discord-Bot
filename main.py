@@ -210,10 +210,49 @@ async def on_member_join(member):
                    "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🍞 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
                    "React to this message with the emojis below to automatically join the roles!", inline=False)
     embed.set_footer(text=welcome_footer)
-
-    # welcome_channel = client.get_channel(487431877792104470)
-    # await welcome_channel.send(embed=embed)
     await member.send(embed=embed)
+
+    channel_join = client.get_channel(458474143403212801)
+    embed_join = discord.Embed(title="Member Joined", color=0xFF0000)
+    embed_join.add_field(name="Member Name", value=member.name)
+    embed_join.add_field(name="ID", value=member.id)
+    await channel_join.send(embed=embed_join)
+
+
+@client.event
+async def on_member_remove(member):
+    channel_join = client.get_channel(458474143403212801)
+    embed_join = discord.Embed(title="Member Left", color=0xFF0000)
+    embed_join.add_field(name="Member Name", value=member.name)
+    embed_join.add_field(name="ID", value=member.id)
+    await channel_join.send(embed=embed_join)
+
+
+@client.event
+async def on_member_ban(guild, user):
+    channel_join = client.get_channel(458474143403212801)
+    embed_join = discord.Embed(title="Member Banned", color=0xFF0000)
+    embed_join.add_field(name="Member Name", value=user.name)
+    embed_join.add_field(name="ID", value=user.id)
+    await channel_join.send(embed=embed_join)
+
+
+@client.event
+async def on_member_unban(guild, user):
+    channel_join = client.get_channel(458474143403212801)
+    embed_join = discord.Embed(title="Member Unbanned", color=0xFF0000)
+    embed_join.add_field(name="Member Name", value=user.name)
+    embed_join.add_field(name="ID", value=user.id)
+    await channel_join.send(embed=embed_join)
+
+
+@client.event
+async def on_user_update(before, after):
+    channel_join = client.get_channel(458474143403212801)
+    embed_join = discord.Embed(title="Member Updated", color=0xFF0000)
+    embed_join.add_field(name="Member Name Before", value=before.name)
+    embed_join.add_field(name="Member Name After", value=after.name)
+    await channel_join.send(embed=embed_join)
 
 
 @client.event
@@ -393,12 +432,6 @@ async def about(ctx):
     await ctx.send(embed=embed)
 
 
-@client.command()
-async def temp(ctx):
-    f = open("config.py", "r+")
-    lines = f.readlines()
-    await ctx.send(lines)
-
 # Run the Discord bot
 # Does nothing if no sys.argv present
 if len(sys.argv) > 0:
@@ -410,3 +443,5 @@ if len(sys.argv) > 0:
         client.run(config.DISCORD_TOKEN)
     else:
         print("You are error. Good bye!")
+else:
+    print("No arguments presented.")
