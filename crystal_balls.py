@@ -112,7 +112,7 @@ def load_cb_to_list():
     print("Crystal Balls loaded into cb_list.")
 
 
-def move_cb_to_list_and_json(pages=14, json_dump=False):
+def move_cb_to_list_and_json(pages=6, json_dump=False):
     # Loops through pull_crystal_balls_from_pages() 'pages' times.
     # Dumps to JSON is json_dump == True
     print("*** Starting")

@@ -16,8 +16,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "illinois": {
                 "bets": [
@@ -34,8 +34,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "indiana": {
                 "bets": [
@@ -52,8 +52,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "iowa": {
                 "bets": [
@@ -70,8 +70,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "maryland": {
                 "bets": [
@@ -88,8 +88,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "minnesota": {
                 "bets": [
@@ -106,8 +106,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "northern illinois": {
                 "bets": [
@@ -124,8 +124,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "northwestern": {
                 "bets": [
@@ -142,8 +142,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "ohio state": {
                 "bets": [
@@ -160,8 +160,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "purdue": {
                 "bets": [
@@ -178,8 +178,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "red-white spring game": {
                 "bets": [
@@ -196,20 +196,25 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "south alabama": {
                 "bets": [
                     {
                         "09570957#2811": {
-                            "datetime": "07-08-2019 21:17:54",
-                            "spread": "False",
+                            "datetime": "12-08-2019 16:18:38",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "Adam7X#2383": {
-                            "datetime": "07-08-2019 20:58:59",
-                            "spread": "False",
+                            "datetime": "13-08-2019 19:56:18",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "All_Luck#3656": {
+                            "datetime": "13-08-2019 21:10:14",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "AlwaysBlue7#2411": {
@@ -217,40 +222,45 @@
                             "spread": "False",
                             "winorlose": "True"
                         },
+                        "IDontBelieveInIsms#1838": {
+                            "datetime": "13-08-2019 19:34:01",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
                         "Mobius One#3960": {
-                            "datetime": "07-08-2019 20:44:18",
-                            "spread": "False",
+                            "datetime": "15-08-2019 13:41:22",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "ModestBeaver#0849": {
-                            "datetime": "07-08-2019 20:55:01",
-                            "spread": "False",
+                            "datetime": "12-08-2019 16:17:37",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "NotaVirus_Click#3411": {
-                            "datetime": "07-08-2019 20:54:06",
+                            "datetime": "15-08-2019 12:56:03",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "Psyspoopino#8880": {
-                            "datetime": "07-08-2019 20:48:40",
+                            "datetime": "13-08-2019 19:35:22",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "Renfah87#6439": {
-                            "datetime": "08-08-2019 14:48:18",
+                            "datetime": "13-08-2019 10:15:29",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "aargonz#3345": {
-                            "datetime": "12-08-2019 16:15:45",
+                            "datetime": "14-08-2019 20:16:17",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "deeretech129#1440": {
-                            "datetime": "06-08-2019 22:04:58",
+                            "datetime": "13-08-2019 22:25:57",
                             "spread": "False",
-                            "winorlose": "False"
+                            "winorlose": "None"
                         },
                         "economypie#6181": {
                             "datetime": "07-08-2019 12:25:25",
@@ -264,8 +274,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False",
+                "outcome_spread": "None",
+                "outcome_winorlose": "None",
                 "spread": -35.5
             },
             "tbd1": {
@@ -283,8 +293,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "tbd2": {
                 "bets": [
@@ -301,8 +311,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             },
             "wisconsin": {
                 "bets": [
@@ -319,8 +329,8 @@
                         }
                     }
                 ],
-                "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_spread": "None",
+                "outcome_winorlose": "None"
             }
         }
     }

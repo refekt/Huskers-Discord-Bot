@@ -33,6 +33,7 @@ eight_ball = ['Try again',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
+bet_emojis = ["⬆", "⬇", "❎" , "⏫", "⏬", "❌"]
 husker_schedule = []
 stored_bets = dict()
 
@@ -165,12 +166,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Spread", value="{}\n__Manually__ updated by checking theScore.com".format(config.season_bets[season_year]['opponent'][team.lower()]['spread']), inline=False)
             embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
                                                "⬇: Submits a bet that we will lose the game.\n"
-                                               "⏫: Submits a bet that we will beast the spread.\n"
-                                               "⏬: Submits a bet that we will lose the spread.", inline=False)
+                                               "❎: Clears your bet for winning or losing the game.\n"
+                                               "⏫: Submits a bet that we will beat the spread.\n"
+                                               "⏬: Submits a bet that we will lose the spread.\n"
+                                               "❌: Clears your bet for beating or losing the spread.", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
-            for e in config.bet_emojis:
+            for e in bet_emojis:
                 await msg_sent.add_reaction(e)
 
         # Show the user's current bet(s)

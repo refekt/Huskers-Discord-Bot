@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import json
 from ftfy import fix_text
 from sportsreference.ncaaf.roster import Roster
+from sportsreference.ncaaf.conferences import Conferences
 from sportsreference.ncaaf.rankings import Rankings
 from sportsreference.ncaaf.boxscore import Boxscore
 
@@ -41,29 +42,35 @@ class StatBot(commands.Cog, name="CFB Stats"):
         pass
     
     @commands.command()
-    async def roster(self, ctx, year=2019):
-        """ Returns the current roster. """
-        pass
-        '''edit_msg = await ctx.send("Loading...")
+    async def roster(self, ctx, team, year=2019):
+        """ Returns the current roster.
+        $roster nebraska 2018
+        $roster purdue 2017"""
+        edit_msg = await ctx.send("Loading...This may take awhile...")
+        print("Edit msg set")
+        cornhuskers = Roster(team=team, year=year, slim=True)
+        print("Roster created")
+        if len(cornhuskers.players) > 0:
+            embed = discord.Embed(title="{}'s {} Roster".format(team, year), color=0xFF0000)
+            plyrs = ""
+            for p in cornhuskers.players:
+                plyrs = plyrs + "{}\n".format(cornhuskers.players[p])
+                if len(plyrs) > 999:
+                    plyrs = plyrs + "[...]"
+                    break
+            embed.add_field(name="Players", value=plyrs)
 
-        await ctx.send("Setting up roster: NEBRASKA")
-        huskers = Roster(team="NEBRASKA", year=year, slim=False)
-        await ctx.send("Setup complete")
-        # roster_string = "Nebraska's {} Roster:\n".format(year)
-
-        await ctx.send("Printing players")
-        i = 1
-        for player in huskers.players:
-            await ctx.send("{}: Player name: {}".format(i,player.name))
-            i += 1
-            # roster_string = roster_string + "Name: {}\nPosition: {}\n".format(player.name, player.position)
-
-        await ctx.send("Print complete")
-        # await edit_msg.edit(content=roster_string)'''
+            await edit_msg.edit(content="", embed=embed)
+        else:
+            await edit_msg.edit(content="No players found for {}".format(cornhuskers._team))
 
     @commands.command()
     async def boxscore(self, ctx, week: int, detailed=False):
         """ Returns the box score of the searched for game. """
+
+        await ctx.send("This function is under construction. Sorry!")
+        return
+
         boxscore_date = ""
         if week == 1:
             boxscore_date = "2018-09-08"  # South Alabama
@@ -91,25 +98,74 @@ class StatBot(commands.Cog, name="CFB Stats"):
             boxscore_date = "2019-11-29"  # Iowa
 
         edit_msg = await ctx.send("Thinking...")
-
         game = Boxscore("{}-nebraska".format(boxscore_date))
-        embed = discord.Embed(title="Boxscore for {} vs. {}".format(game.winning_name, game.losing_name))
 
-        # Basic
-        basic_string = "Location: {} | Time: {}".format(game.stadium, game.time)
-        embed.add_field(name="Game Info", value=basic_string)
+        # Game Info
+        vs_str =""
+        if game.winning_name == "Nebraska":
+            vs_str = "{} vs {}".format(game.winning_name, game.losing_name)
+        else:
+            vs_str = "{} vs {}".format(game.losing_name, game.winning_name)
 
-        # Home
+        nebraska_str = ""
+        if game.winning_name == "Nebraska":
+            nebraska_str = game.winning_name
+        else:
+            nebraska_str = game.losing_name
+
+        oppo_str = ""
+        if game.winning_name != "Nebraska":
+            oppo_str = game.winning_name
+        else:
+            oppo_str = game.losing_name
+
+        embed_game_info = discord.Embed(title="Boxscore for {}".format(vs_str), description="Location: {} | Time: {}".format(game.stadium, game.time), color=0xFF0000)
+
+
+        qb_str = ""
         i = 0
         for p in game.home_players:
-            if i < 1:
-                embed.add_field(name="Player", value=p.name)
-                await ctx.send(p.home_players)
+            if game.home_players[i].attempted_passes:
+                qb_str = qb_str + "Name: {}\n" \
+                                  "Pass Yards per Attempt: {}\n" \
+                                  "Passing Completion: {}%\n" \
+                                  "Passing Touchdowns: {}\n" \
+                                  "Passing Yards: {}\n" \
+                                  "Passing Yards per Attempt: {}\n" \
+                                  "Quarterback Rating: {}\n" \
+                                  "Rush Attempts: {}\n" \
+                                  "Rush Touchdowns: {}\n" \
+                                  "Rush Yards: {}\n" \
+                                  "Rush Yards per Attempt: {}\n\n".format(
+                                                                        game.home_players[i].name,
+                                                                        game.home_players[i].pass_yards_per_attempt,
+                                                                        game.home_players[i].passing_completion,
+                                                                        game.home_players[i].passing_touchdowns,
+                                                                        game.home_players[i].passing_yards,
+                                                                        game.home_players[i].passing_yards_per_attempt,
+                                                                        game.home_players[i].quarterback_rating,
+                                                                        game.home_players[i].rush_attempts,
+                                                                        game.home_players[i].rush_touchdowns,
+                                                                        game.home_players[i].rush_yards,
+                                                                        game.home_players[i].rush_yards_per_attempt)
             i += 1
-        i = 0
-        # Away
 
-        await edit_msg.edit(embed=embed, content="")
+        embed_game_info.add_field(name="Players", value=qb_str)
+
+        # embed_game_info.add_field(name="{} Total Yards".format(nebraska_str), value=game.home_total_yards)
+        # embed_game_info.add_field(name="{} First Downs".format(nebraska_str), value=game.home_first_downs)
+        # embed_game_info.add_field(name="{} Penalties".format(nebraska_str), value="Total: {}\nYards: {}\nPer Penalty Average: {:.2f}".format(game.home_penalties, game.home_yards_from_penalties, game.home_yards_from_penalties/game.home_penalties))
+        # embed_game_info.add_field(name="{} Turnovers".format(nebraska_str), value="Interceptions: {}\nFumbles: {} out of {}".format(game.home_interceptions, game.home_fumbles_lost, game.home_fumbles))
+        # embed_game_info.add_field(name="{} Penalties".format(oppo_str), value="Total: {}\nYards: {}\nPer Penalty Average: {:.2f}".format(game.away_penalties, game.away_yards_from_penalties, game.away_yards_from_penalties / game.away_penalties))
+        # embed_game_info.add_field(name="{} Turnovers".format(oppo_str), value="Interceptions: {}\nFumbles: {} out of {}".format(game.away_interceptions, game.away_fumbles_lost, game.away_fumbles))
+        # embed_game_info.add_field(name="Home Passing", value="Completions: {}\nAttempts: {}\nPassing Yards: {}\nPassing Touchdowns: {}".format(game.home_pass_completions,game.home_pass_attempts, game.home_pass_yards, game.home_pass_touchdowns), inline=False)
+        # embed_game_info.add_field(name="Home Rush", value="Attempts: {}\nYards Per Attempt: {:.2f}\nRushing Touchdowns: {}".format(game.home_rush_attempts, game.home_rush_yards/game.home_rush_attempts, game.home_rush_touchdowns), inline=False)
+
+        await edit_msg.delete()
+        await ctx.send(embed=embed_game_info)
+
+        # Away
+        pass
         
     @commands.command()
     async def lastplays(self, ctx):
