@@ -250,8 +250,8 @@ async def on_member_unban(guild, user):
 async def on_user_update(before, after):
     channel_join = client.get_channel(458474143403212801)
     embed_join = discord.Embed(title="Member Updated", color=0xFF0000)
-    embed_join.add_field(name="Member Name Before", value=before.name)
-    embed_join.add_field(name="Member Name After", value=after.name)
+    embed_join.add_field(name="Member Name Before", value="{}#{} (Nickname: {})".format(before.name, before.discriminator, before.nick))
+    embed_join.add_field(name="Member Name After", value="{}#{} (Nickname: {})".format(after.name, after.discriminator, after.nick))
     await channel_join.send(embed=embed_join)
 
 
