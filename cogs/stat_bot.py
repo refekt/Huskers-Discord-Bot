@@ -43,13 +43,16 @@ class StatBot(commands.Cog, name="CFB Stats"):
     
     @commands.command()
     async def roster(self, ctx, team, year=2019):
-        """ Returns the current roster. """
+        """ Returns the current roster.
+        $roster nebraska 2018
+        $roster purdue 2017"""
         edit_msg = await ctx.send("Loading...This may take awhile...")
         print("Edit msg set")
         cornhuskers = Roster(team=team, year=year, slim=True)
         print("Roster created")
         if len(cornhuskers.players) > 0:
             embed = discord.Embed(title="{}'s {} Roster".format(team, year), color=0xFF0000)
+            plyrs = ""
             for p in cornhuskers.players:
                 plyrs = plyrs + "{}\n".format(cornhuskers.players[p])
                 if len(plyrs) > 999:
