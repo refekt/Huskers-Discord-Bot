@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import json
 from ftfy import fix_text
 from sportsreference.ncaaf.roster import Roster
+from sportsreference.ncaaf.conferences import Conferences
 from sportsreference.ncaaf.rankings import Rankings
 from sportsreference.ncaaf.boxscore import Boxscore
 
@@ -41,25 +42,24 @@ class StatBot(commands.Cog, name="CFB Stats"):
         pass
     
     @commands.command()
-    async def roster(self, ctx, year=2019):
+    async def roster(self, ctx, team, year=2019):
         """ Returns the current roster. """
-        pass
-        '''edit_msg = await ctx.send("Loading...")
+        edit_msg = await ctx.send("Loading...This may take awhile...")
+        print("Edit msg set")
+        cornhuskers = Roster(team=team, year=year, slim=True)
+        print("Roster created")
+        if len(cornhuskers.players) > 0:
+            embed = discord.Embed(title="{}'s {} Roster".format(team, year), color=0xFF0000)
+            for p in cornhuskers.players:
+                plyrs = plyrs + "{}\n".format(cornhuskers.players[p])
+                if len(plyrs) > 999:
+                    plyrs = plyrs + "[...]"
+                    break
+            embed.add_field(name="Players", value=plyrs)
 
-        await ctx.send("Setting up roster: NEBRASKA")
-        huskers = Roster(team="NEBRASKA", year=year, slim=False)
-        await ctx.send("Setup complete")
-        # roster_string = "Nebraska's {} Roster:\n".format(year)
-
-        await ctx.send("Printing players")
-        i = 1
-        for player in huskers.players:
-            await ctx.send("{}: Player name: {}".format(i,player.name))
-            i += 1
-            # roster_string = roster_string + "Name: {}\nPosition: {}\n".format(player.name, player.position)
-
-        await ctx.send("Print complete")
-        # await edit_msg.edit(content=roster_string)'''
+            await edit_msg.edit(content="", embed=embed)
+        else:
+            await edit_msg.edit(content="No players found for {}".format(cornhuskers._team))
 
     @commands.command()
     async def boxscore(self, ctx, week: int, detailed=False):
