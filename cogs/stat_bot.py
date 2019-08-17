@@ -1,4 +1,5 @@
 import requests
+import CFBScrapy as cfb
 from requests.exceptions import HTTPError
 from discord.ext import commands
 import discord
@@ -65,8 +66,27 @@ class StatBot(commands.Cog, name="CFB Stats"):
             await edit_msg.edit(content="No players found for {}".format(cornhuskers._team))
 
     @commands.command()
+    async def lines(self, ctx, team, season="regular", year=2019):
+        url = "https://api.collegefootballdata.com/lines?year={}&seasonType={}&team={}".format(year, season, team)
+        page = None
+        lines = []
+
+        try:
+            page = requests.get(headers="", url=url)
+            lines = page
+
+            for key in lines:
+                print(key)
+            await ctx.send(page)
+        except:
+            print("Error")
+
+    @commands.command()
     async def boxscore(self, ctx, week: int, detailed=False):
         """ Returns the box score of the searched for game. """
+
+        # TODO https://api.collegefootballdata.com/games/teams?year=2018&week=8&seasonType=regular&team=nebraska&conference=b1g
+        # TODO Work this into boxscores
 
         await ctx.send("This function is under construction. Sorry!")
         return
