@@ -5,6 +5,7 @@ from discord.ext import commands
 import discord
 from bs4 import BeautifulSoup
 import json
+from pandas.io.json import json_normalize
 from ftfy import fix_text
 from sportsreference.ncaaf.roster import Roster
 from sportsreference.ncaaf.conferences import Conferences
@@ -23,7 +24,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
     async def stats(self, ctx, year, *, name):
         """ Returns the current season's stats for searched player. """
         pass
-        
+
     @commands.command()
     async def poll(self, ctx):
         """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking. """
@@ -65,6 +66,46 @@ class StatBot(commands.Cog, name="CFB Stats"):
         else:
             await edit_msg.edit(content="No players found for {}".format(cornhuskers._team))
 
+    @commands.command(aliases=["gstats", "gs",])
+    async def gamestats(self, ctx, season="regular", year=2019, week=1, *team):
+        """ Returns game stats for a completed game. """
+        if week >= 13 and season == "regular":
+            await ctx.send("Regular seasons weeks are only 1-12. Please enter a correct week.")
+            return
+
+        try:
+            t = cfb.get_game_team_stats(year=year, week=week, seasonType=season, team=team)
+        except:
+            await ctx.send("There are no stats for {}'s Week {} game. Please try again.".format(team, week))
+            return
+
+        game_data_str = t.to_json(orient="table")
+        game_data = json.loads(game_data_str)
+
+        embed = discord.Embed(title="**{}'s and {}'s Game Stats**".format(game_data['data'][0]['school'], game_data['data'][15]['school']), color=0xFF0000)
+
+        i = 0
+        counter = 0
+        temp_str = ""
+        stat_list = ("Poss. Time", "Interceptions", "Fumbles Lost", "Turnovers", "Total Pen Yd", "YPR", "Rushing Attempts", "Rushing yards", "YPP",
+                     "Comp-Att", "TPY", "Total Yards", "4th Down Eff", "3rd Down Eff", "1st Downs")
+
+        while i < 30:
+            temp_str = temp_str + "{} : {}\n".format(stat_list[counter], game_data['data'][i]['stat'])
+
+            if i == 14:
+                embed.add_field(name="{}".format(game_data['data'][i]['school']), value="{}\n".format(temp_str))
+                temp_str = ""
+                counter = -1
+            elif i == 29:
+                embed.add_field(name="{}".format(game_data['data'][i]['school']), value="{}\n".format(temp_str))
+                temp_str = ""
+                break
+            i += 1
+            counter += 1
+
+        await ctx.send(embed=embed)
+
     @commands.command()
     async def lines(self, ctx, team, season="regular", year=2019):
         url = "https://api.collegefootballdata.com/lines?year={}&seasonType={}&team={}".format(year, season, team)
@@ -87,9 +128,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         # TODO https://api.collegefootballdata.com/games/teams?year=2018&week=8&seasonType=regular&team=nebraska&conference=b1g
         # TODO Work this into boxscores
-
-        await ctx.send("This function is under construction. Sorry!")
-        return
 
         boxscore_date = ""
         if week == 1:

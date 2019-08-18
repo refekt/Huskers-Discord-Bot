@@ -6,26 +6,21 @@ async def check_command_channel(command: str, channel):
     global correct_channel
     flag = False
 
-    #print("*** check_command_channel [command: {}, channel: {}({})]:".format(command, channel, channel.id))
     # Commands to check for
     croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs', 'cb_refresh']
     flag_commands = ['crappyflag', 'randomflag']
-
     commandFound = False
 
     for c in croot_commands:
         if str(c) == str(command):
-            #print("    Found command [{}] in croot_commands".format(command))
             commandFound = True
 
     for cc in flag_commands:
         if str(cc) == str(command):
-            #print("    Found command [{}] in flag_commands".format(command))
             commandFound = True
 
     # Exit function if the command isn't listed
     if commandFound == False:
-        #print("    Command [{}] not found\n*** check_command_channel".format(command))
         return
 
     #   Production Server:
@@ -45,7 +40,6 @@ async def check_command_channel(command: str, channel):
 
     # All commands authorized within Direct Messages
     if dm_str in str(channel):
-        #print("    command [{}] sent within a direct message".format(command))
         flag = True
     else:
         if channel.id in bot_spam_channels:
@@ -57,7 +51,4 @@ async def check_command_channel(command: str, channel):
         elif str(command) in flag_commands and channel.id in flag_channels:
             flag = True
         # All commands authorized within bot_spam_channels
-
-    #print("    correct_channel = {}".format(flag))
     correct_channel = flag
-    #print("*** check_command_channel")
