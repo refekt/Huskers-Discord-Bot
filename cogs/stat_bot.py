@@ -51,7 +51,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
                 json.dump(poll_json, fp, sort_keys=True, indent=4)
             fp.close()
 
-        # The second [0] represents a poll. 
+        # The second [0] represents a poll.
         temp_poll = poll_json[0]["polls"][0]["ranks"]
 
     # TODO Discord 2,000 char limit per message really limits this command. Need to make output more readable.

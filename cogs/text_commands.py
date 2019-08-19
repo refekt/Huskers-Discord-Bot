@@ -30,6 +30,7 @@ eight_ball = ['Try again',
               'Yes – definitely',
               'You may rely on it',
               'Fuck Iowa',
+              'Frosty',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
