@@ -1,4 +1,7 @@
 #!/usr/bin/env python3.7
+
+# Bot name ideas: Bot Frost, Mario Verbotzco, Adrian Botinez, Bot Devaney, Mike Rilbot, Robo Pelini, Devine Ozigbot, Mo Botty, Bot Moos, 
+
 import discord
 from discord.ext import commands
 from discord.utils import get
@@ -370,6 +373,7 @@ async def on_reaction_add(reaction, user):
 
             # Remove reaction to prevent user from voting for both
             try:
+                print("Bot's add_reaction permission: {}".format(ctx.user.))
                 await reaction.remove(user)
             except discord.Forbidden as forb:
                 print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
