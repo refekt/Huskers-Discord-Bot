@@ -1,4 +1,7 @@
 #!/usr/bin/env python3.7
+
+# Bot name ideas: Bot Frost, Mario Verbotzco, Adrian Botinez, Bot Devaney, Mike Rilbot, Robo Pelini, Devine Ozigbot, Mo Botty, Bot Moos,
+
 import discord
 from discord.ext import commands
 from discord.utils import get
@@ -17,9 +20,6 @@ import json
 # Bot specific stuff
 botPrefix='$'
 client = commands.Bot(command_prefix=botPrefix)
-
-# Dicts
-# opponent : "", {"user": "", "choice": "", "datetime": ""}
 
 # Cogs
 client.load_extension('cogs.image_commands')
@@ -122,6 +122,8 @@ async def on_message(message):
                 embed = discord.Embed(title="I'm a bad, bad bot")
                 embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
                 await message.channel.send(embed=embed)
+            elif "fuck you bot" in message.content.lower():
+                await message.channel.send("Whoa {}, that's not very nice!".format(message.author.mention))
 
             # Husker Bot hates Isms
             if "isms" in message.content.lower():
@@ -141,21 +143,21 @@ async def on_message(message):
                     elif "🍆" in message.content:
                         await message.channel.send("🍆💦")
                 else:
-                    print("Missed dice roll for {}".format(notavirus))
+                    # print("Missed dice roll for {}".format(notavirus))
+                    pass
 
-    # HUDL highlight puller on react. This section is to take the crootbot message, find if a hudl profile exists, and pull the video. 
-    # Next would be to monitor reactions and post the video if someone reacted to the video camera emoji.
-    # TODO If there are multiple football players with the same name we may get the wrong guy. Especially for croots from previous classes. We will want to add more logic to narrow 
-    # TODO it down even more
+    # Check for HuskerBot embedded messages.
     if len(message.embeds) > 0:
-        # Welcome message detection
+        # Welcome message detection. Adds reactions to message to allow user to self-assign "fun roles."
         if message.author == client.user and message.embeds[0].footer.text == welcome_footer:
             i = 0
             while i < len(welcome_emoji_list):
                 await message.add_reaction(welcome_emoji_list[i])
                 i += 1
 
-        # CrootBot Search Results detection
+        # CrootBot Search Results detection. Adds reactions to message to allow user to click to pull a search result.
+        # TODO If there are multiple football players with the same name we may get the wrong guy. Especially for croots from previous classes. We will want to add more logic to narrow
+        # TODO it down even more
         if message.author == client.user and config.player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             # Pre-add reactions for users
             i = 0
@@ -163,7 +165,7 @@ async def on_message(message):
                 await message.add_reaction(emoji_list[i])
                 i += 1
 
-        # CrootBot dection
+        # $CrootBot message dection. Looks for a HUDL profile and attempts to pull a highlight video from the player's profile. Adds a reaction 🎥 to click on to show video.
         if message.author == client.user and message.embeds[0].footer.text == huskerbot_footer:
             # print("***\nChecking for highlight video")
             # global profile_url
@@ -210,17 +212,57 @@ async def on_member_join(member):
                    "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🍞 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
                    "React to this message with the emojis below to automatically join the roles!", inline=False)
     embed.set_footer(text=welcome_footer)
-
-    # welcome_channel = client.get_channel(487431877792104470)
-    # await welcome_channel.send(embed=embed)
     await member.send(embed=embed)
+
+    # channel_join = client.get_channel(458474143403212801)
+    # embed_join = discord.Embed(title="Member Joined", color=0xFF0000)
+    # embed_join.add_field(name="Member Name", value=member.name)
+    # embed_join.add_field(name="ID", value=member.id)
+    # await channel_join.send(embed=embed_join)
+    pass
+
+# Client events for member leave, ban, unban, etc.
+# @client.event
+# async def on_member_remove(member):
+#     channel_join = client.get_channel(458474143403212801)
+#     embed_join = discord.Embed(title="Member Left", color=0xFF0000)
+#     embed_join.add_field(name="Member Name", value=member.name)
+#     embed_join.add_field(name="ID", value=member.id)
+#     await channel_join.send(embed=embed_join)
+#
+#
+# @client.event
+# async def on_member_ban(guild, user):
+#     channel_join = client.get_channel(458474143403212801)
+#     embed_join = discord.Embed(title="Member Banned", color=0xFF0000)
+#     embed_join.add_field(name="Member Name", value=user.name)
+#     embed_join.add_field(name="ID", value=user.id)
+#     await channel_join.send(embed=embed_join)
+#
+#
+# @client.event
+# async def on_member_unban(guild, user):
+#     channel_join = client.get_channel(458474143403212801)
+#     embed_join = discord.Embed(title="Member Unbanned", color=0xFF0000)
+#     embed_join.add_field(name="Member Name", value=user.name)
+#     embed_join.add_field(name="ID", value=user.id)
+#     await channel_join.send(embed=embed_join)
+#
+#
+# @client.event
+# async def on_user_update(before, after):
+#     channel_join = client.get_channel(458474143403212801)
+#     embed_join = discord.Embed(title="Member Updated", color=0xFF0000)
+#     embed_join.add_field(name="Member Name Before", value="{}#{}".format(before.name, before.discriminator))
+#     embed_join.add_field(name="Member Name After", value="{}#{}".format(after.name, after.discriminator))
+#     await channel_join.send(embed=embed_join)
 
 
 @client.event
 async def on_reaction_add(reaction, user):
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
-        # CrootBot search results
+        # Checking for $CrootBot search results embedded message. Responds to added reactions by searching for and outputting a 247Sports profile for that player.
         if user != client.user and reaction.message.author == client.user and config.player_search_list and reaction.message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             channel = reaction.message.channel
 
@@ -240,10 +282,10 @@ async def on_reaction_add(reaction, user):
                 cb = cogs.croot_bot.CrootBot
                 await cb.parse_search(self=reaction, search=config.player_search_list[emoji_dict[reaction.emoji]], channel=channel)
 
-        # If a 247 highlight is found for a crootbot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
+        # If a 247 highlight is found for a $CrootBot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url
         if user != client.user and reaction.message.author == client.user and reaction.message.embeds[0].footer.text == 'Click the video camera emoji to get a highlight video for this recruit' and highlight_url is not None:
-            if reaction.emoji == '📹':                
+            if reaction.emoji == '📹':
                 channel = reaction.message.channel
                 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
                 url = highlight_url
@@ -261,7 +303,7 @@ async def on_reaction_add(reaction, user):
                 await channel.send(embed = embed)
                 highlight_url = None
 
-        # Adding roles to member
+        # Checking for on_member_join() embedded message. Adds "fun role" to member based on which reaction is sent.
         if reaction.emoji in welcome_emoji_list and user != client.user and reaction.message.embeds[0].footer.text == welcome_footer:
             server_id = 440632686185414677
             server = client.get_guild(server_id)
@@ -284,6 +326,7 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
         # Updating season_bets JSON for reacting to a $bet message
+        # TODO Add checks to determine if a bet is placed after kickoff through 11:59 PM the same day. This will prevent a bet being placed during the game.
         if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
             # Load season_bets.json if season_bets{} is empty
             if not bool(config.season_bets):
@@ -330,6 +373,7 @@ async def on_reaction_add(reaction, user):
 
             # Remove reaction to prevent user from voting for both
             try:
+                print("Bot's add_reaction permission: {}".format(user))
                 await reaction.remove(user)
             except discord.Forbidden as forb:
                 print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
@@ -359,6 +403,7 @@ async def on_command_completion(ctx):
 
 
 @client.event
+# TODO A more robust error handling should be implemented.
 async def on_command_error(ctx, error):
     output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
     await ctx.send(output_msg)
@@ -386,18 +431,13 @@ async def huskerbotquit(ctx):
 
 
 @client.command()
+# TODO Output information could be improved.
 async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, thumbnail="https://i.imgur.com/Ah3x5NA.png")
     embed.add_field(name="About", value="HuskerBot was created by /u/refekt and /u/psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
     embed.add_field(name="Current Latency", value=client.latency)
     await ctx.send(embed=embed)
 
-
-@client.command()
-async def temp(ctx):
-    f = open("config.py", "r+")
-    lines = f.readlines()
-    await ctx.send(lines)
 
 # Run the Discord bot
 # Does nothing if no sys.argv present
@@ -410,3 +450,5 @@ if len(sys.argv) > 0:
         client.run(config.DISCORD_TOKEN)
     else:
         print("You are error. Good bye!")
+else:
+    print("No arguments presented.")

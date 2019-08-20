@@ -236,9 +236,13 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         await ctx.send(embed = embed)
 
     @commands.command(aliases=["ref",])
-    async def referee(self, ctx, call):
+    async def referee(self, ctx, call=None):
         """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
         The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport """
+
+        if not call:
+            await ctx.send("A penalty must be included. `$referee|ref <call>`. Check `$help referee` for more informaiton.")
+            return
 
         # This keeps bot spam down to a minimal.
         await function_helper.check_command_channel(ctx.command, ctx.channel)
@@ -259,6 +263,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         embed.set_footer(text="Referee calls " + huskerbot_footer)
         await ctx.send(embed=embed)
 
+    # TODO Make this command generate better flags.
     @commands.command()
     async def flag_gen(self, ctx):
         created_flag = "media/saved/{}created_flag.png".format(str(ctx.author))

@@ -12,10 +12,10 @@ import urllib3
 eight_ball = ['Try again',
               'Definitely yes',
               'It is certain',
-              'It is decidedly so',
-              'Without a doubt',
-              'Yes – definitely',
-              'You may rely on it',
+              'Ask again later',
+              'Better not tell you now',
+              'Cannot predict now',
+              'Concentrate and ask again',
               'As I see it, yes',
               'Most Likely',
               'These are the affirmative answers.',
@@ -25,11 +25,12 @@ eight_ball = ['Try again',
               'Outlook not so good, and very doubtful',
               'Reply hazy',
               'Try again',
-              'Ask again later',
-              'Better not tell you now',
-              'Cannot predict now',
-              'Concentrate and ask again',
+              'It is decidedly so',
+              'Without a doubt',
+              'Yes – definitely',
+              'You may rely on it',
               'Fuck Iowa',
+              'Frosty',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
@@ -70,11 +71,13 @@ def store_next_opponent():
 
 class TextCommands(commands.Cog, name="Text Commands"):
     # Text commands
+    # TODO Possibly remove this command.
     @commands.command()
     async def stonk(self, ctx):
         """ Isms hates stocks. """
         await ctx.send("Stonk!")
 
+    # TODO Maybe tweak this to make it a big more realistic.
     @commands.command(aliases=["mkv",])
     async def markov(self, ctx):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
@@ -102,11 +105,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         if season_start > datetime.datetime.now():
             days_left = season_start - datetime.datetime.now()
-            await ctx.send("📢 There are {} days, {} hours, and {} minutes remaining until the Husker 2019 season kicks off! _This is a countdown to the South Alabama 11:30 AM CST kick off_".format(days_left.days, int(days_left.seconds/3600),int((days_left.seconds/60)%60),days_left.seconds))
+            await ctx.send("📢📅 There are {} days, {} hours, and {} minutes remaining until the Nebraska vs. South Alabama game kicks off at 11:00 AM CST!".format(days_left.days, int(days_left.seconds/3600),int((days_left.seconds/60)%60),days_left.seconds))
         else:
             await ctx.send("The season has already started dummy!")
 
-    @commands.command()
+    @commands.command(aliases=["bf", "facts",])
     async def billyfacts(self, ctx):
         """ Real facts about Bill Callahan. """
         facts = []
@@ -129,6 +132,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         await ctx.send(embed=embed)
 
+    # TODO Check if bets happen after kickoff and block request if they do.
     @commands.command()
     async def bet(self, ctx, cmd=None, *, team=None):
         """ Allows a user to place a bet on the upcoming Husker game. Bets are placed by reacting to the bot's message. Bets are recorded by Discord username. Changing your username will result in lost bets. All bets must be completed prior to kickoff. Bets after that will not be accepted. Winners will be tallied on the next calendar day after the game.
