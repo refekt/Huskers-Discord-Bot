@@ -1,12 +1,12 @@
 import requests
 import CFBScrapy as cfb
-from requests.exceptions import HTTPError
 from discord.ext import commands
 import discord
-from bs4 import BeautifulSoup
 import json
-from ftfy import fix_text
 from sportsreference.ncaaf.roster import Roster
+import datetime
+import dateutil.parser
+
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -16,6 +16,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
     def __init__(self, bot):
         self.bot = bot
         
+    # TODO Not started.
     @commands.command()
     async def stats(self, ctx, year, *, name):
         """ Returns the current season's stats for searched player. """
@@ -257,64 +258,51 @@ class StatBot(commands.Cog, name="CFB Stats"):
     async def schedule(self, ctx, year=2019):
         """ Returns the Nebraska Huskers football schedule. """
 
-        await ctx.send("This command is under construction.")
-        return
-
         edit_msg = await ctx.send("Loading...")
 
-        url = "http://www.huskers.com/SportSelect.dbml?DB_OEM_ID=100&SPID=22&SPSID=3&q_season=" + str(year)
-        page = None
-
+        url = "https://api.collegefootballdata.com/games?year={}&seasonType=regular&team=nebraska".format(year)
         try:
-            page = requests.get(headers=headers, url=url)
-            page.raise_for_status()
-        except HTTPError as http_err:
-            print("HTTP error occurred: {}".format(http_err))
-        except Exception as err:
-            print("Other error:".format(err))
+            r = requests.get(url)
+            schedule_list = r.json() # Actually imports a list
+        except:
+            await ctx.send("An error occurred retrieving poll data.")
+            return
 
-        soup = BeautifulSoup(page.text, 'html.parser')
-        find_json = soup.find_all('script')
-
-        temp_str = find_json[1].string
-        # This is so ghetto, trimming the part of the string we don't want to use for JSON
-        # front = "    window.__INITIAL_STATE__ = \'{\"site\":  "
-        # end = ",\"status\":\"success\", \"time\":\"08/02/2019 19:25\"}\';  "
-        # print("{} {}".format(len(front), len(end)))
-        temp_str = temp_str[42:-51]
-        fix_text(temp_str)
-        temp_str = temp_str.replace("\\", "\\\\")
-
-        husker_schedule = json.loads(temp_str)
-
-        dump = True
-
+        dump = False
         if dump:
             with open("husker_schedule.json", "w") as fp:
-                json.dump(husker_schedule, fp, sort_keys=True, indent=4)
+                json.dump(schedule_list, fp, sort_keys=True, indent=4)
             fp.close()
 
-        embed = discord.Embed(title="The {} Husker football season".format(year), color=0xff0000)
-        # embed.set_thumbnail(url="http://image.cdnllnwnl.xosnetwork.com/fls/100/site_graphics/header_logo.jpg")
+        embed = discord.Embed(title="{} Husker Schedule".format(year), color=0xFF0000)
+        for game in schedule_list:
+            # TODO Change the ISO 8601 format to something easier to read.
+            # game_start_raw = str(game["start_date"]).split("T")
+            # game_date = datetime.datetime.strptime(game_start_raw[0],"%b %d %y")
 
-        for e in husker_schedule['schedule']['events']:
-            game_result_string = ""
+            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game["start_date"])
 
-            if e['winLoss']:
-                if e['opponentScore'] > e['homeScore']:
-                    game_result_string = "{} - {}".format(e['opponentScore'], e['homeScore'])
-                else:
-                    game_result_string = "{} - {}".format(e['homeScore'], e['opponentScore'])
-                game_result_string = "Result: {} ({})".format(e['winLoss'], game_result_string)
-            value_str = "🏟: {}\n🕐: {} @ {}\n{}".format(e['location'], e['date'], e['time'], game_result_string)
-            if len(e['opponent']) > 15:
-                oppo = e['opponent'][:18] + "..."
+            home_team = ""
+            away_team = ""
+            name_len = 12
+
+            if len(game["home_team"]) > name_len:
+                home_team = "{}...".format(game["home_team"][:name_len])
             else:
-                oppo = e['opponent']
-            embed.add_field(name="⚔: {}".format(oppo), value=value_str, inline=True)
+                home_team = game["home_team"]
 
-        embed.set_footer(text=huskerbot_footer)
+            if len(game["away_team"]) > name_len:
+                away_team = "{}...".format(game["away_team"][:name_len])
+            else:
+                away_team = game["away_team"]
+
+            if game["home_points"]:
+                embed.add_field(name="{} ({}) vs {} ({})".format(home_team, game["home_points"], away_team, game["away_points"]), value=game_info_str)
+            else:
+                embed.add_field(name="{} vs {}".format(home_team, away_team), value=game_info_str)
+
         await edit_msg.edit(content="", embed=embed)
+
 
 
 def setup(bot):

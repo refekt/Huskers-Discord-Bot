@@ -328,6 +328,7 @@ async def on_reaction_add(reaction, user):
         # Updating season_bets JSON for reacting to a $bet message
         # TODO Add checks to determine if a bet is placed after kickoff through 11:59 PM the same day. This will prevent a bet being placed during the game.
         if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
+
             # Load season_bets.json if season_bets{} is empty
             if not bool(config.season_bets):
                 load_season_bets()
@@ -402,11 +403,11 @@ async def on_command_completion(ctx):
         await ctx.send(not_authed)
 
 
-@client.event
-# TODO A more robust error handling should be implemented.
-async def on_command_error(ctx, error):
-    output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
-    await ctx.send(output_msg)
+# # TODO A more robust error handling should be implemented.
+# @client.event
+# async def on_command_error(ctx, error):
+#     output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
+#     await ctx.send(output_msg)
 # End bot (client) events
 
 
@@ -430,8 +431,8 @@ async def huskerbotquit(ctx):
 # Admin command
 
 
-@client.command()
 # TODO Output information could be improved.
+@client.command()
 async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, thumbnail="https://i.imgur.com/Ah3x5NA.png")
     embed.add_field(name="About", value="HuskerBot was created by /u/refekt and /u/psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
