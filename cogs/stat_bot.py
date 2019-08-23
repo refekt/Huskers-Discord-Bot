@@ -251,10 +251,15 @@ class StatBot(commands.Cog, name="CFB Stats"):
     # TODO Not started. Intention is to output the last few plays of the current Nebraska game.
     async def lastplays(self, ctx):
         pass
-    
+
+    # TODO Huskers.com updated their website and broek this command.
     @commands.command(aliases=["sched",])
     async def schedule(self, ctx, year=2019):
         """ Returns the Nebraska Huskers football schedule. """
+
+        await ctx.send("This command is under construction.")
+        return
+
         edit_msg = await ctx.send("Loading...")
 
         url = "http://www.huskers.com/SportSelect.dbml?DB_OEM_ID=100&SPID=22&SPSID=3&q_season=" + str(year)
@@ -282,7 +287,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         husker_schedule = json.loads(temp_str)
 
-        dump = False
+        dump = True
 
         if dump:
             with open("husker_schedule.json", "w") as fp:
