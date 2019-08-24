@@ -6,6 +6,8 @@ import json
 from sportsreference.ncaaf.roster import Roster
 import datetime
 import dateutil.parser
+import operator
+import collections
 
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
@@ -26,8 +28,8 @@ class StatBot(commands.Cog, name="CFB Stats"):
     @commands.command(aliases=["polls",])
     async def poll(self, ctx, year=2019, week=None, seasonType=None):
         """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking. """
-        await ctx.send("This command is under construction")
-        return
+        # await ctx.send("This command is under construction")
+        # return
 
         url = "https://api.collegefootballdata.com/rankings?year={}".format(year)
 
@@ -46,14 +48,31 @@ class StatBot(commands.Cog, name="CFB Stats"):
             await ctx.send("An error occurred retrieving poll data.")
             return
 
-        dump = False
+        dump = True
         if dump:
             with open("cfb_polls.json", "w") as fp:
                 json.dump(poll_json, fp, sort_keys=True, indent=4)
             fp.close()
 
-        # The second [0] represents a poll.
-        temp_poll = poll_json[0]["polls"][0]["ranks"]
+        embed = discord.Embed(title="{} {} Season Week {} Poll".format(poll_json[0]['season'], str(poll_json[0]['seasonType']).capitalize(), poll_json[0]['week']), color=0xFF0000)
+
+        ap_poll_raw = poll_json[0]['polls'][0]['ranks']
+        last_rank = 1
+
+        x = 0
+        y = 0
+        while x < len(ap_poll_raw):
+            while y < len(ap_poll_raw):
+                if ap_poll_raw[y]['rank'] == last_rank:
+                    embed.add_field(name="#{}".format(ap_poll_raw[y]['rank']), value="{}\n{}\nPoints: {}\nFirst Place Votes: {}".format(ap_poll_raw[y]['school'], ap_poll_raw[y]['conference'], ap_poll_raw[y]['points'], ap_poll_raw[y]['firstPlaceVotes']))
+                    last_rank += 1
+                    y = 0
+                    break
+                y += 1
+            x += 1
+
+        await ctx.send(embed=embed)
+
 
     # TODO Discord 2,000 char limit per message really limits this command. Need to make output more readable.
     # Possibly add ability to filter by offense, defense, special teams, etc.
