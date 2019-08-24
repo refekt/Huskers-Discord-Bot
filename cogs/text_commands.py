@@ -188,11 +188,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
             embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread. Bets are stored by your _Discord username_. If you change your username you will lose your bet history.\n", inline=False)
             embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
-            embed.add_field(name="Moneyline ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
+            embed.add_field(name="Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
             embed.add_field(name="Vote Instructions", value=""
                                                             "Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\n"
                                                             "Bets over (⏫) or under (⏬) on the spread. Clear bet (❌).\n"
-                                                            "Bets over (🔼) or under (🔽) on the moneyline. Clear bet (✖).\n", inline=False)
+                                                            "Bets over (🔼) or under (🔽) on total points. Clear bet (✖).\n", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)

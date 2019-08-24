@@ -57,8 +57,9 @@ flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'ttu': 'https://i.imgur.com/lpOSpH7.png',
              'usc': 'https://i.imgur.com/GrA4M0X.png',
              'notredame': 'https://i.imgur.com/Ofoaz7U.png',
-             'stanford': 'https://gfycat.com/passionaterepentantcoelacanth',
-             'tulane': 'https://gfycat.com/selfassuredtediousirukandjijellyfish'
+             'stanford': 'https://giant.gfycat.com/PassionateRepentantCoelacanth.gif',
+             'tulane': 'https://gfycat.com/braveanotherdodobird',
+             'nebraska': 'https://i.imgur.com/q2em9Qw.jpg'
              }
 
 
@@ -101,9 +102,12 @@ class ImageCommands(commands.Cog, name="Image Commands"):
 
         if state:
             state = state.lower()
-
-            embed = discord.Embed(title="Crappy Flags")
-            embed.set_image(url=flag_dict[state.lower()])
+            if state == "nebraska":
+                embed = discord.Embed(title="Amazing Flag")
+                embed.set_image(url=flag_dict[state.lower()])
+            else:
+                embed = discord.Embed(title="Crappy Flags")
+                embed.set_image(url=flag_dict[state.lower()])
             await ctx.send(embed=embed)
         else:
             embed = discord.Embed(title="Crappy Flags")
