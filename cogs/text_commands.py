@@ -188,15 +188,9 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
             embed.add_field(name="Moneyline ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
             embed.add_field(name="Vote Instructions", value=""
-                                                            "⬆: Submits a bet that we will win the game.\n"
-                                                            "⬇: Submits a bet that we will lose the game.\n"
-                                                            "❎: Clears your win or lose bet.\n"
-                                                            "⏫: Bets over on the spread.\n"
-                                                            "⏬: Bets under on the spread.\n"
-                                                            "❌: Clears your spread bet.\n"
-                                                            "🔼: Bets over on the moneyline.\n"
-                                                            "🔽: Bets under on the moneyline.\n"
-                                                            "✖: Clears your moneyline bet.", inline=False)
+                                                            "Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\n"
+                                                            "Bets over (⏫) or under (⏬) on the spread. Clear bet (❌).\n"
+                                                            "Bets over (🔼) or under (🔽) on the moneyline. Clear bet (✖).\n", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
