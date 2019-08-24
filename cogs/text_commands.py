@@ -3,6 +3,7 @@ import markovify
 import random
 import json
 import datetime
+import dateutil.parser
 import discord
 import config
 import urllib3
@@ -54,14 +55,21 @@ def store_next_opponent():
     temp_json = f.read()
     husker_schedule = json.loads(temp_json)
 
+    # Find first game that is scheduled after now()
     counter = 0
-    for events in husker_schedule['schedule']['events']:
-        # Find first game that is scheduled after now()
-        check_date = datetime.datetime(year=int(events['dateYYYY']), month=int(events['dateMM']), day=int(events['dateDD']), hour=int(events['dateHH24']), minute=int(events['dateMI']))
+    for events in husker_schedule:
+        # The date/time is stored in ISO 8601 format. It sucks. Take raw data and manually convert it to the default format.
+        check_date_raw = dateutil.parser.parse(events["start_date"])
+        check_date = datetime.datetime(day=check_date_raw.day, month=check_date_raw.month, year=check_date_raw.year, hour=check_date_raw.hour, minute=check_date_raw.minute)
+
         check_now = datetime.datetime.now()
+        #check_now = datetime.datetime(day=check_now_raw.day, month=check_now_raw.month, year=check_now_raw.year, hour=check_now_raw.hour, minute=check_now_raw.minute)
 
         if check_now < check_date:
-            config.current_game.append(events['opponent'])
+            if events["home_team"] != "Nebraska":
+                config.current_game.append(events["home_team"])
+            else:
+                config.current_game.append(events["away_team"])
             config.current_game.append(check_date)
             config.current_game.append(counter - 1)
             break

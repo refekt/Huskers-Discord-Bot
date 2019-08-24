@@ -20,7 +20,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
     @commands.command()
     async def stats(self, ctx, year, *, name):
         """ Returns the current season's stats for searched player. """
-        pass
+        await ctx.send("This command is under construction.")
 
     # TODO Iterate through each poll available, sort it, and spit out in a pretty message.
     @commands.command(aliases=["polls",])
@@ -85,6 +85,9 @@ class StatBot(commands.Cog, name="CFB Stats"):
     @commands.command(aliases=["gstats", "gs",])
     async def gamestats(self, ctx, season="regular", year=2018, week=1, *team):
         """ Returns game stats for a completed game. """
+        await ctx.send("This command is under construction")
+        return
+
         if week >= 13 and season == "regular":
             await ctx.send("Regular seasons weeks are only 1-12. Please enter a correct week.")
             return
@@ -146,7 +149,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
     """
     # TODO See above.
     @commands.command()
-    async def boxscore(self, ctx, week: int, detailed=False):
+    async def boxscore(self, ctx):
         """ Returns the box score of the searched for game. """
 
         await ctx.send("This command is under construction.")
@@ -247,11 +250,11 @@ class StatBot(commands.Cog, name="CFB Stats"):
         #
         # # Away
         # pass
-        
-    @commands.command()
+
     # TODO Not started. Intention is to output the last few plays of the current Nebraska game.
-    async def lastplays(self, ctx):
-        pass
+    # @commands.command()
+    # async def lastplays(self, ctx):
+    #     pass
 
     # TODO Huskers.com updated their website and broek this command.
     @commands.command(aliases=["sched",])
@@ -277,27 +280,40 @@ class StatBot(commands.Cog, name="CFB Stats"):
         embed = discord.Embed(title="{} Husker Schedule".format(year), color=0xFF0000)
         for game in schedule_list:
             # TODO Change the ISO 8601 format to something easier to read.
-            # game_start_raw = str(game["start_date"]).split("T")
-            # game_date = datetime.datetime.strptime(game_start_raw[0],"%b %d %y")
-
-            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game["start_date"])
+            game_start_datetime_raw = dateutil.parser.parse(game['start_date'])
+            game_start_datetime_raw = game_start_datetime_raw + datetime.timedelta(hours=7)
+            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %I:%M"))
 
             home_team = ""
+            home_split = []
             away_team = ""
-            name_len = 12
+            away_split = []
+            name_len = 8
 
-            if len(game["home_team"]) > name_len:
-                home_team = "{}...".format(game["home_team"][:name_len])
+            # Abbreviate team names with two words in it.
+            if " " in game["home_team"]:
+                home_split = game["home_team"].split(" ")
+                home_team = "{}. {}".format(home_split[0][0], home_split[1])
             else:
                 home_team = game["home_team"]
 
-            if len(game["away_team"]) > name_len:
-                away_team = "{}...".format(game["away_team"][:name_len])
+            if " " in game["away_team"]:
+                away_split = game["away_team"].split(" ")
+                away_team = "{}. {}".format(away_split[0][0], away_split[1])
             else:
                 away_team = game["away_team"]
 
+            # Truncate the names if they are too long.
+            if len(home_team) > name_len:
+                home_team = "{}...".format(home_team[:name_len])
+
+            if len(away_team) > name_len:
+                away_team = "{}...".format(away_team[:name_len])
+
+            # Add points next to names if they exist
             if game["home_points"]:
                 embed.add_field(name="{} ({}) vs {} ({})".format(home_team, game["home_points"], away_team, game["away_points"]), value=game_info_str)
+            # No points added
             else:
                 embed.add_field(name="{} vs {}".format(home_team, away_team), value=game_info_str)
 
