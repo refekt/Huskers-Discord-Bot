@@ -330,15 +330,21 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
         # Updating season_bets JSON for reacting to a $bet message
-        # TODO Add checks to determine if a bet is placed after kickoff through 11:59 PM the same day. This will prevent a bet being placed during the game.
         if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
-
             # Load season_bets.json if season_bets{} is empty
             if not bool(config.season_bets):
                 load_season_bets()
             # Load current game if empty
             if not bool(config.current_game):
                 store_next_opponent()
+
+            check_now = datetime.datetime.now()
+            check_game_datetime_raw = config.current_game[1]
+            check_game_datetime = datetime.datetime(day=check_game_datetime_raw.day, month=check_game_datetime_raw.month, year=check_game_datetime_raw.year, hour=check_game_datetime_raw.hour, minute=check_game_datetime_raw.minute, second=check_game_datetime_raw.second, microsecond=check_game_datetime_raw.microsecond)
+
+            if check_now > config.current_game[1]:
+                await user.send("Unable to place bet because the game has started. You can review your placed bets by using `$bet show`.")
+                return
 
             raw_username = "{}#{}".format(user.name, user.discriminator)
             game = config.current_game[0].lower()  # Grabs the opponent from current_game[]

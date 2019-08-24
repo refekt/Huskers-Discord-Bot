@@ -45,6 +45,7 @@ def load_season_bets():
     f = open('season_bets.json', 'r')
     temp_json = f.read()
     config.season_bets = json.loads(temp_json)
+    f.close()
 
 
 # Allows the ability to load next opponent for sub commands.
@@ -54,6 +55,7 @@ def store_next_opponent():
     f = open('husker_schedule.json', 'r')
     temp_json = f.read()
     husker_schedule = json.loads(temp_json)
+    f.close()
 
     # Find first game that is scheduled after now()
     counter = 1
