@@ -238,7 +238,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.command(aliases=["ref",])
     async def referee(self, ctx, call=None):
         """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
-        The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport """
+        The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport, bs, hornsdown """
 
         if not call:
             await ctx.send("A penalty must be included. `$referee|ref <call>`. Check `$help referee` for more informaiton.")

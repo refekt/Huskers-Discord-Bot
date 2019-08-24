@@ -18,7 +18,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         
     # TODO Not started.
     @commands.command()
-    async def stats(self, ctx, year, *, name):
+    async def stats(self, ctx):  #, year, *, name):
         """ Returns the current season's stats for searched player. """
         await ctx.send("This command is under construction.")
 
@@ -58,10 +58,14 @@ class StatBot(commands.Cog, name="CFB Stats"):
     # TODO Discord 2,000 char limit per message really limits this command. Need to make output more readable.
     # Possibly add ability to filter by offense, defense, special teams, etc.
     @commands.command()
-    async def roster(self, ctx, team, year=2019):
+    async def roster(self, ctx, team="NEBRASKA", year=2019):
         """ Returns the current roster.
         $roster nebraska 2018
         $roster purdue 2017"""
+
+        await ctx.send("This command is under construction.")
+        return
+
         edit_msg = await ctx.send("Loading...This may take awhile...")
         cornhuskers = Roster(team=team, year=year, slim=True)  # slime=True only returns player names for each index. slime=False will return a dataframe.
 
@@ -281,8 +285,8 @@ class StatBot(commands.Cog, name="CFB Stats"):
         for game in schedule_list:
             # TODO Change the ISO 8601 format to something easier to read.
             game_start_datetime_raw = dateutil.parser.parse(game['start_date'])
-            game_start_datetime_raw = game_start_datetime_raw + datetime.timedelta(hours=7)
-            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %I:%M"))
+            game_start_datetime_raw = game_start_datetime_raw + datetime.timedelta(hours=-5)
+            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %H:%M %p"))
 
             home_team = ""
             home_split = []
