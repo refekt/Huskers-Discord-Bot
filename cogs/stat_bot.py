@@ -1,12 +1,12 @@
 import requests
 import CFBScrapy as cfb
-from requests.exceptions import HTTPError
 from discord.ext import commands
 import discord
-from bs4 import BeautifulSoup
 import json
-from ftfy import fix_text
 from sportsreference.ncaaf.roster import Roster
+import datetime
+import dateutil.parser
+
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -16,10 +16,11 @@ class StatBot(commands.Cog, name="CFB Stats"):
     def __init__(self, bot):
         self.bot = bot
         
+    # TODO Not started.
     @commands.command()
-    async def stats(self, ctx, year, *, name):
+    async def stats(self, ctx):  #, year, *, name):
         """ Returns the current season's stats for searched player. """
-        pass
+        await ctx.send("This command is under construction.")
 
     # TODO Iterate through each poll available, sort it, and spit out in a pretty message.
     @commands.command(aliases=["polls",])
@@ -57,10 +58,14 @@ class StatBot(commands.Cog, name="CFB Stats"):
     # TODO Discord 2,000 char limit per message really limits this command. Need to make output more readable.
     # Possibly add ability to filter by offense, defense, special teams, etc.
     @commands.command()
-    async def roster(self, ctx, team, year=2019):
+    async def roster(self, ctx, team="NEBRASKA", year=2019):
         """ Returns the current roster.
         $roster nebraska 2018
         $roster purdue 2017"""
+
+        await ctx.send("This command is under construction.")
+        return
+
         edit_msg = await ctx.send("Loading...This may take awhile...")
         cornhuskers = Roster(team=team, year=year, slim=True)  # slime=True only returns player names for each index. slime=False will return a dataframe.
 
@@ -84,6 +89,9 @@ class StatBot(commands.Cog, name="CFB Stats"):
     @commands.command(aliases=["gstats", "gs",])
     async def gamestats(self, ctx, season="regular", year=2018, week=1, *team):
         """ Returns game stats for a completed game. """
+        await ctx.send("This command is under construction")
+        return
+
         if week >= 13 and season == "regular":
             await ctx.send("Regular seasons weeks are only 1-12. Please enter a correct week.")
             return
@@ -145,7 +153,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
     """
     # TODO See above.
     @commands.command()
-    async def boxscore(self, ctx, week: int, detailed=False):
+    async def boxscore(self, ctx):
         """ Returns the box score of the searched for game. """
 
         await ctx.send("This command is under construction.")
@@ -246,70 +254,75 @@ class StatBot(commands.Cog, name="CFB Stats"):
         #
         # # Away
         # pass
-        
-    @commands.command()
+
     # TODO Not started. Intention is to output the last few plays of the current Nebraska game.
-    async def lastplays(self, ctx):
-        pass
-    
+    # @commands.command()
+    # async def lastplays(self, ctx):
+    #     pass
+
+    # TODO Huskers.com updated their website and broek this command.
     @commands.command(aliases=["sched",])
     async def schedule(self, ctx, year=2019):
         """ Returns the Nebraska Huskers football schedule. """
+
         edit_msg = await ctx.send("Loading...")
 
-        url = "http://www.huskers.com/SportSelect.dbml?DB_OEM_ID=100&SPID=22&SPSID=3&q_season=" + str(year)
-        page = None
-
+        url = "https://api.collegefootballdata.com/games?year={}&seasonType=regular&team=nebraska".format(year)
         try:
-            page = requests.get(headers=headers, url=url)
-            page.raise_for_status()
-        except HTTPError as http_err:
-            print("HTTP error occurred: {}".format(http_err))
-        except Exception as err:
-            print("Other error:".format(err))
-
-        soup = BeautifulSoup(page.text, 'html.parser')
-        find_json = soup.find_all('script')
-
-        temp_str = find_json[1].string
-        # This is so ghetto, trimming the part of the string we don't want to use for JSON
-        # front = "    window.__INITIAL_STATE__ = \'{\"site\":  "
-        # end = ",\"status\":\"success\", \"time\":\"08/02/2019 19:25\"}\';  "
-        # print("{} {}".format(len(front), len(end)))
-        temp_str = temp_str[42:-51]
-        fix_text(temp_str)
-        temp_str = temp_str.replace("\\", "\\\\")
-
-        husker_schedule = json.loads(temp_str)
+            r = requests.get(url)
+            schedule_list = r.json() # Actually imports a list
+        except:
+            await ctx.send("An error occurred retrieving poll data.")
+            return
 
         dump = False
-
         if dump:
             with open("husker_schedule.json", "w") as fp:
-                json.dump(husker_schedule, fp, sort_keys=True, indent=4)
+                json.dump(schedule_list, fp, sort_keys=True, indent=4)
             fp.close()
 
-        embed = discord.Embed(title="The {} Husker football season".format(year), color=0xff0000)
-        # embed.set_thumbnail(url="http://image.cdnllnwnl.xosnetwork.com/fls/100/site_graphics/header_logo.jpg")
+        embed = discord.Embed(title="{} Husker Schedule".format(year), color=0xFF0000)
+        for game in schedule_list:
+            # TODO Change the ISO 8601 format to something easier to read.
+            game_start_datetime_raw = dateutil.parser.parse(game['start_date'])
+            game_start_datetime_raw = game_start_datetime_raw + datetime.timedelta(hours=-5)
+            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %H:%M %p"))
 
-        for e in husker_schedule['schedule']['events']:
-            game_result_string = ""
+            home_team = ""
+            home_split = []
+            away_team = ""
+            away_split = []
+            name_len = 8
 
-            if e['winLoss']:
-                if e['opponentScore'] > e['homeScore']:
-                    game_result_string = "{} - {}".format(e['opponentScore'], e['homeScore'])
-                else:
-                    game_result_string = "{} - {}".format(e['homeScore'], e['opponentScore'])
-                game_result_string = "Result: {} ({})".format(e['winLoss'], game_result_string)
-            value_str = "🏟: {}\n🕐: {} @ {}\n{}".format(e['location'], e['date'], e['time'], game_result_string)
-            if len(e['opponent']) > 15:
-                oppo = e['opponent'][:18] + "..."
+            # Abbreviate team names with two words in it.
+            if " " in game["home_team"]:
+                home_split = game["home_team"].split(" ")
+                home_team = "{}. {}".format(home_split[0][0], home_split[1])
             else:
-                oppo = e['opponent']
-            embed.add_field(name="⚔: {}".format(oppo), value=value_str, inline=True)
+                home_team = game["home_team"]
 
-        embed.set_footer(text=huskerbot_footer)
+            if " " in game["away_team"]:
+                away_split = game["away_team"].split(" ")
+                away_team = "{}. {}".format(away_split[0][0], away_split[1])
+            else:
+                away_team = game["away_team"]
+
+            # Truncate the names if they are too long.
+            if len(home_team) > name_len:
+                home_team = "{}...".format(home_team[:name_len])
+
+            if len(away_team) > name_len:
+                away_team = "{}...".format(away_team[:name_len])
+
+            # Add points next to names if they exist
+            if game["home_points"]:
+                embed.add_field(name="{} ({}) vs {} ({})".format(home_team, game["home_points"], away_team, game["away_points"]), value=game_info_str)
+            # No points added
+            else:
+                embed.add_field(name="{} vs {}".format(home_team, away_team), value=game_info_str)
+
         await edit_msg.edit(content="", embed=embed)
+
 
 
 def setup(bot):

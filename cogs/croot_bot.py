@@ -125,6 +125,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
             limitSpam += 1
 
+    # TODO Add error handling for `team` to be missing.
     @commands.command()
     async def cb_search(self, ctx, *, team):
         """ Search through all of Steve Wiltfong's crystal ball predictions by team. """
@@ -170,6 +171,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
         embed.add_field(name="Crystal Ball Search Results for {}".format(team), value=output_str, inline=False)
         await ctx.send(embed=embed)
 
+    # TODO Instead of adding a new message after clicking a search result...edit the search result message.
     @commands.command(aliases=["cb", ])
     async def crootbot(self, ctx, year, *name):
         """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """

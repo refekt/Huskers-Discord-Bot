@@ -3,9 +3,10 @@ import markovify
 import random
 import json
 import datetime
+import dateutil.parser
 import discord
 import config
-import urllib3
+import requests
 
 
 # Dictionaries
@@ -34,7 +35,7 @@ eight_ball = ['Try again',
               'Scott Frost approves',
               'Coach V\'s cigar would like this'
                ]
-bet_emojis = ["⬆", "⬇", "❎" , "⏫", "⏬", "❌"]
+bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 husker_schedule = []
 stored_bets = dict()
 
@@ -44,6 +45,7 @@ def load_season_bets():
     f = open('season_bets.json', 'r')
     temp_json = f.read()
     config.season_bets = json.loads(temp_json)
+    f.close()
 
 
 # Allows the ability to load next opponent for sub commands.
@@ -53,17 +55,26 @@ def store_next_opponent():
     f = open('husker_schedule.json', 'r')
     temp_json = f.read()
     husker_schedule = json.loads(temp_json)
+    f.close()
 
-    counter = 0
-    for events in husker_schedule['schedule']['events']:
-        # Find first game that is scheduled after now()
-        check_date = datetime.datetime(year=int(events['dateYYYY']), month=int(events['dateMM']), day=int(events['dateDD']), hour=int(events['dateHH24']), minute=int(events['dateMI']))
+    # Find first game that is scheduled after now()
+    counter = 1
+    for events in husker_schedule:
+        # The date/time is stored in ISO 8601 format. It sucks. Take raw data and manually convert it to the default format.
+        check_date_raw = dateutil.parser.parse(events["start_date"])
+        check_date = datetime.datetime(day=check_date_raw.day, month=check_date_raw.month, year=check_date_raw.year, hour=check_date_raw.hour, minute=check_date_raw.minute)
+        check_date = check_date - datetime.timedelta(hours=5)
+
         check_now = datetime.datetime.now()
+        #check_now = datetime.datetime(day=check_now_raw.day, month=check_now_raw.month, year=check_now_raw.year, hour=check_now_raw.hour, minute=check_now_raw.minute)
 
         if check_now < check_date:
-            config.current_game.append(events['opponent'])
+            if events["home_team"] != "Nebraska":
+                config.current_game.append(events["home_team"])
+            else:
+                config.current_game.append(events["away_team"])
             config.current_game.append(check_date)
-            config.current_game.append(counter - 1)
+            config.current_game.append(counter)
             break
         # Used for navigating season_bets JSON
         counter += 1
@@ -157,23 +168,31 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
         if cmd == None:
-            ###
-            # https://mybookie.ag/sportsbook/college-football/nebraska/
-            # This site could be used to pull spread information.
-            ###
-
             if not team:
                 team = config.current_game[0].lower()
 
-            embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M CST")), inline=False)
+            url = "https://api.collegefootballdata.com/lines?year={}&week={}&seasonType=regular&team=nebraska".format(config.current_game[1].year, config.current_game[2])
+            game_date = []
+            try:
+                r = requests.get(url)
+                game_data_raw = r.json()
+            except:
+                await ctx.send("An error occurred retrieving line data.")
+                return
+
+            lines = {}
+            for lines_raw in game_data_raw:
+                lines = lines_raw["lines"]
+            lines = lines[0]
+
+            embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
             embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread. Bets are stored by your _Discord username_. If you change your username you will lose your bet history.\n", inline=False)
-            embed.add_field(name="Spread", value="{}\n__Manually__ updated by checking theScore.com".format(config.season_bets[season_year]['opponent'][team.lower()]['spread']), inline=False)
-            embed.add_field(name="Vote", value="⬆: Submits a bet that we will win the game.\n"
-                                               "⬇: Submits a bet that we will lose the game.\n"
-                                               "❎: Clears your bet for winning or losing the game.\n"
-                                               "⏫: Submits a bet that we will beat the spread.\n"
-                                               "⏬: Submits a bet that we will lose the spread.\n"
-                                               "❌: Clears your bet for beating or losing the spread.", inline=False)
+            embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
+            embed.add_field(name="Moneyline ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
+            embed.add_field(name="Vote Instructions", value=""
+                                                            "Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\n"
+                                                            "Bets over (⏫) or under (⏬) on the spread. Clear bet (❌).\n"
+                                                            "Bets over (🔼) or under (🔽) on the moneyline. Clear bet (✖).\n", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
             msg_sent = await ctx.send(embed=embed)
@@ -190,10 +209,35 @@ class TextCommands(commands.Cog, name="Text Commands"):
             temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
             for usr in temp_dict:
                 if usr == raw_username:
+                    winorlose = temp_dict[usr]['winorlose']
+                    if winorlose == "True":
+                        winorlose = "Win"
+                    elif winorlose == "False":
+                        winorlose = "Lose"
+                    else:
+                        winorlose = "N/A"
+
+                    spread = temp_dict[usr]['spread']
+                    if spread == "True":
+                        spread = "Over"
+                    elif spread == "False":
+                        spread = "Under"
+                    else:
+                        spread = "N/A"
+
+                    moneyline = temp_dict[usr]['moneyline']
+                    if moneyline == "True":
+                        moneyline = "Over"
+                    elif moneyline == "False":
+                        moneyline = "Under"
+                    else:
+                        moneyline = "N/A"
+
                     embed.add_field(name="Author", value=raw_username, inline=False)
                     embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
-                    embed.add_field(name="Win or Loss", value=temp_dict[usr]['winorlose'], inline=True)
-                    embed.add_field(name="Spread", value=temp_dict[usr]['spread'], inline=True)
+                    embed.add_field(name="Win or Loss", value=winorlose, inline=True)
+                    embed.add_field(name="Spread", value=spread, inline=True)
+                    embed.add_field(name="Moneyline", value=moneyline, inline=True)
                     await ctx.send(embed=embed)
 
         # Show all bets for the current game
@@ -206,27 +250,40 @@ class TextCommands(commands.Cog, name="Text Commands"):
             temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
             total_wins = 0
             total_losses = 0
-            total_cover = 0
-            total_not_cover = 0
+            total_cover_spread = 0
+            total_not_cover_spread = 0
+            total_cover_moneyline = 0
+            total_not_cover_moneyline = 0
 
             for usr in temp_dict:
-                if temp_dict[usr]['winorlose']:
+                if temp_dict[usr]['winorlose'] == "True":
                     total_wins += 1
                 else:
                     total_losses += 1
-                if temp_dict[usr]['spread']:
-                    total_cover += 1
+
+                if temp_dict[usr]['spread'] == "True":
+                    total_cover_spread += 1
                 else:
-                    total_not_cover += 1
+                    total_not_cover_spread += 1
+
+                if temp_dict[usr]['moneyline'] == "True":
+                    total_cover_moneyline += 1
+                else:
+                    total_not_cover_moneyline += 1
 
             total_winorlose = total_losses + total_wins
-            total_spread = total_cover + total_not_cover
+            total_spread = total_cover_spread + total_not_cover_spread
+            total_moneyline = total_cover_moneyline + total_not_cover_moneyline
 
             embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
             embed.add_field(name="Wins", value="{} ({:.2f}%)".format(total_wins, (total_wins/total_winorlose) * 100))
             embed.add_field(name="Losses", value="{} ({:.2f}%)".format(total_losses, (total_losses / total_winorlose) * 100))
-            embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover, (total_cover / total_spread) * 100))
-            embed.add_field(name="Not Cover Spread", value="{} ({:.2f}%)".format(total_not_cover, (total_not_cover / total_spread) * 100))
+
+            embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover_spread, (total_cover_spread / total_spread) * 100))
+            embed.add_field(name="Not Cover Spread", value="{} ({:.2f}%)".format(total_not_cover_spread, (total_not_cover_spread / total_spread) * 100))
+
+            embed.add_field(name="Cover Moneyline", value="{} ({:.2f}%)".format(total_cover_moneyline, (total_cover_moneyline / total_moneyline) * 100))
+            embed.add_field(name="Not Cover Moneyline", value="{} ({:.2f}%)".format(total_not_cover_moneyline, (total_not_cover_moneyline / total_moneyline) * 100))
             await ctx.send(embed=embed)
 
         # Show all winners for game
@@ -235,6 +292,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
             if team:
                 winners_winorlose = []
                 winners_spread = []
+                winners_moneyline = []
+
                 try:
                     # Creates the embed object for all messages within method
                     embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
@@ -243,14 +302,32 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
                     temp_dict = config.season_bets[season_year]['opponent'][team.lower()]['bets'][0]
 
+                    outcome_winorlose = True
+                    outcome_spread = True
+                    outcome_moneyline = True
+
+                    if config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose'] == "None":
+                        outcome_winorlose = False
+
+                    if config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread'] == "None":
+                        outcome_spread = False
+
+                    if config.season_bets[season_year]['opponent'][team.lower()]['outcome_moneyline'] == "None":
+                        outcome_moneyline = False
+
                     for usr in temp_dict:
-                        if temp_dict[usr]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose']:
+                        if temp_dict[usr]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose'] and outcome_winorlose:
                             winners_winorlose.append(usr)
-                        if temp_dict[usr]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread']:
+
+                        if temp_dict[usr]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread'] and outcome_spread:
                             winners_spread.append(usr)
+
+                        if temp_dict[usr]['moneyline'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_moneyline'] and outcome_moneyline:
+                            winners_moneyline.append(usr)
 
                     win_winorlose_string = ""
                     win_spread_string = ""
+                    win_moneyline_string = ""
 
                     if winners_winorlose:
                         for winner in winners_winorlose:
@@ -260,15 +337,27 @@ class TextCommands(commands.Cog, name="Text Commands"):
                         for winner in winners_spread:
                             win_spread_string = win_spread_string + "{}\n".format(winner)
 
+                    if winners_moneyline:
+                        for winner in winners_moneyline:
+                            win_moneyline_string = win_moneyline_string + "{}\n".format(winner)
+
                     embed.add_field(name="Opponent", value=team.title(), inline=False)
+
                     if win_winorlose_string:
                         embed.add_field(name="Win/Loss Winners", value=win_winorlose_string, inline=True)
                     else:
                         embed.add_field(name="Win/Loss Winners", value="N/A", inline=True)
+
                     if win_spread_string:
                         embed.add_field(name="Spread Winners", value=win_spread_string, inline=True)
                     else:
                         embed.add_field(name="Spread Winners", value="N/A", inline=True)
+
+                    if win_moneyline_string:
+                        embed.add_field(name="Spread Winners", value=win_moneyline_string, inline=True)
+                    else:
+                        embed.add_field(name="Spread Winners", value="N/A", inline=True)
+
                     await ctx.send(embed=embed)
 
                 except discord.HTTPException as err:

@@ -204,81 +204,109 @@
                     {
                         "09570957#2811": {
                             "datetime": "19-08-2019 11:52:48",
+                            "moneyline": "None",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "Adam7X#2383": {
                             "datetime": "13-08-2019 19:56:18",
+                            "moneyline": "None",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "All_Luck#3656": {
-                            "datetime": "13-08-2019 21:10:14",
+                            "datetime": "24-08-2019 15:22:45",
+                            "moneyline": "True",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "AlwaysBlue7#2411": {
                             "datetime": "07-08-2019 20:49:05",
+                            "moneyline": "None",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "GumbyShrimp#2359": {
                             "datetime": "19-08-2019 11:52:48",
+                            "moneyline": "None",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "IDontBelieveInIsms#1838": {
                             "datetime": "13-08-2019 19:34:01",
+                            "moneyline": "None",
                             "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "Jeyrad#4441": {
+                            "datetime": "23-08-2019 21:12:59",
+                            "moneyline": "None",
+                            "spread": "False",
                             "winorlose": "True"
                         },
                         "Mobius One#3960": {
                             "datetime": "15-08-2019 13:41:22",
+                            "moneyline": "None",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "ModestBeaver#0849": {
                             "datetime": "12-08-2019 16:17:37",
+                            "moneyline": "None",
                             "spread": "True",
                             "winorlose": "True"
                         },
                         "NotaVirus_Click#3411": {
-                            "datetime": "15-08-2019 12:56:03",
-                            "spread": "False",
+                            "datetime": "24-08-2019 08:15:55",
+                            "moneyline": "True",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "Psyspoopino#8880": {
                             "datetime": "13-08-2019 19:35:22",
+                            "moneyline": "None",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "Renfah87#6439": {
                             "datetime": "13-08-2019 10:15:29",
+                            "moneyline": "None",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "aargonz#3345": {
-                            "datetime": "19-08-2019 16:22:27",
+                            "datetime": "24-08-2019 12:13:13",
+                            "moneyline": "True",
                             "spread": "False",
                             "winorlose": "True"
                         },
                         "deeretech129#1440": {
-                            "datetime": "13-08-2019 22:25:57",
-                            "spread": "False",
-                            "winorlose": "None"
-                        },
-                        "economypie#6181": {
-                            "datetime": "07-08-2019 12:25:25",
+                            "datetime": "23-08-2019 22:40:47",
+                            "moneyline": "None",
                             "spread": "False",
                             "winorlose": "True"
                         },
+                        "economypie#6181": {
+                            "datetime": "23-08-2019 21:55:16",
+                            "moneyline": "None",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
                         "poglife1990#5240": {
-                            "datetime": "07-08-2019 12:40:46",
-                            "spread": "False",
+                            "datetime": "23-08-2019 23:01:17",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "psyspoop#8880": {
+                            "datetime": "23-08-2019 23:01:17",
+                            "moneyline": "True",
+                            "spread": "True",
                             "winorlose": "True"
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None",
                 "spread": -36
