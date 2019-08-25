@@ -64,7 +64,10 @@ class StatBot(commands.Cog, name="CFB Stats"):
         while x < len(ap_poll_raw):
             while y < len(ap_poll_raw):
                 if ap_poll_raw[y]['rank'] == last_rank:
-                    embed.add_field(name="#{}".format(ap_poll_raw[y]['rank']), value="{}\n{}\nPoints: {}\nFirst Place Votes: {}".format(ap_poll_raw[y]['school'], ap_poll_raw[y]['conference'], ap_poll_raw[y]['points'], ap_poll_raw[y]['firstPlaceVotes']))
+                    if ap_poll_raw[y]['firstPlaceVotes']:
+                        embed.add_field(name="#{} {}".format(ap_poll_raw[y]['rank'], ap_poll_raw[y]['school']), value="{}\nPoints: {}\nFirst Place Votes: {}".format(ap_poll_raw[y]['conference'], ap_poll_raw[y]['points'], ap_poll_raw[y]['firstPlaceVotes']))
+                    else:
+                        embed.add_field(name="#{} {}".format(ap_poll_raw[y]['rank'], ap_poll_raw[y]['school']), value="{}\nPoints: {}".format(ap_poll_raw[y]['conference'], ap_poll_raw[y]['points']))
                     last_rank += 1
                     y = 0
                     break
