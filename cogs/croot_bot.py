@@ -203,6 +203,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
         else:
             await ctx.send("You need to provide a year and name for me to search. I accept queries in the format $crootbot <year><name>.")
             return
+
         if not search:
             if len(name) == 1:
                 await ctx.send("I could not find any player named {} in the {} class".format(name[0], year))

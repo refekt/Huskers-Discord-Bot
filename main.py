@@ -419,11 +419,11 @@ async def on_command_completion(ctx):
         await ctx.send(not_authed)
 
 
-# # TODO A more robust error handling should be implemented.
-# @client.event
-# async def on_command_error(ctx, error):
-#     output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
-#     await ctx.send(output_msg)
+# TODO A more robust error handling should be implemented.
+@client.event
+async def on_command_error(ctx, error):
+    output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
+    await ctx.send(output_msg)
 # End bot (client) events
 
 
