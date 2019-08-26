@@ -144,7 +144,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         await ctx.send(embed=embed)
 
-    # TODO Check if bets happen after kickoff and block request if they do.
     @commands.command()
     async def bet(self, ctx, cmd=None, *, team=None):
         """ Allows a user to place a bet on the upcoming Husker game. Bets are placed by reacting to the bot's message. Bets are recorded by Discord username. Changing your username will result in lost bets. All bets must be completed prior to kickoff. Bets after that will not be accepted. Winners will be tallied on the next calendar day after the game.

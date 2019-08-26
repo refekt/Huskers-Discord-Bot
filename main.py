@@ -160,8 +160,7 @@ async def on_message(message):
                 i += 1
 
         # CrootBot Search Results detection. Adds reactions to message to allow user to click to pull a search result.
-        # TODO If there are multiple football players with the same name we may get the wrong guy. Especially for croots from previous classes. We will want to add more logic to narrow
-        # TODO it down even more
+        # TODO If there are multiple football players with the same name we may get the wrong guy. Especially for croots from previous classes. We will want to add more logic to narrow it down even more
         if message.author == client.user and config.player_search_list and message.embeds[0].footer.text == 'Search Results ' + huskerbot_footer:
             # Pre-add reactions for users
             i = 0
@@ -342,7 +341,7 @@ async def on_reaction_add(reaction, user):
             check_game_datetime_raw = config.current_game[1]
             check_game_datetime = datetime.datetime(day=check_game_datetime_raw.day, month=check_game_datetime_raw.month, year=check_game_datetime_raw.year, hour=check_game_datetime_raw.hour, minute=check_game_datetime_raw.minute, second=check_game_datetime_raw.second, microsecond=check_game_datetime_raw.microsecond)
 
-            if check_now > config.current_game[1]:
+            if check_now > check_game_datetime:
                 await user.send("Unable to place bet because the game has started. You can review your placed bets by using `$bet show`.")
                 return
 
@@ -419,10 +418,15 @@ async def on_command_completion(ctx):
         await ctx.send(not_authed)
 
 
-# TODO A more robust error handling should be implemented.
 @client.event
 async def on_command_error(ctx, error):
-    output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nError: {}".format(ctx.message.author, error)
+    #output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nCommand sent: {}\nError: `{}`.".format(ctx.message.author.mention, ctx.message, error)
+    output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                "```Message ID: {}\n" \
+                "Channel: {} / {}\n" \
+                "Author: {}\n" \
+                "Content: {}\n" \
+                "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
     await ctx.send(output_msg)
 # End bot (client) events
 
@@ -430,7 +434,7 @@ async def on_command_error(ctx, error):
 # Admin command
 @client.command(hidden=True)
 async def squirrel(ctx, chan, *, message):
-    if str(ctx.author) == "IDontBelieveInIsms#1838" or str(ctx.author) == "aargonz#3345":
+    if str(ctx.author) == "IDontBelieveInIsms#1838":
         if chan.lower() == "war":
             channel = client.get_channel(525519594417291284)
             embed = discord.Embed(title="Secret Squirrel Message", color=0xFF0000)
@@ -464,12 +468,16 @@ async def huskerbotquit(ctx):
 # Admin command
 
 
-# TODO Output information could be improved.
 @client.command()
 async def about(ctx):
-    embed = discord.Embed(title="HuskerBot's CV", author=client.user, thumbnail="https://i.imgur.com/Ah3x5NA.png")
-    embed.add_field(name="About", value="HuskerBot was created by /u/refekt and /u/psypoopino. Source code is located on https://www.github.com/refekt/Husker-Bot.")
-    embed.add_field(name="Current Latency", value=client.latency)
+    embed = discord.Embed(title="HuskerBot's CV", author=client.user, color=0xFF0000)
+    embed.set_thumbnail(url="https://i.imgur.com/Ah3x5NA.png")
+    embed.add_field(name="About HuskerBot", value="HuskerBot was created by [/u/refekt](https://reddit.com/u/refekt) and "
+                                                  "[/u/psyspoop](https://reddit.com/u/psyspoop). Source code is located on "
+                                                  "[GitHub](https://www.github.com/refekt/Husker-Bot).")
+    embed.add_field(name="Current Latency", value="{:.2f} ms".format(client.latency*1000))
+    embed.add_field(name="Client User", value=client.user)
+    embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)
 
 

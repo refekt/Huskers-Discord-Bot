@@ -27,9 +27,8 @@ class StatBot(commands.Cog, name="CFB Stats"):
     # TODO Iterate through each poll available, sort it, and spit out in a pretty message.
     @commands.command(aliases=["polls",])
     async def poll(self, ctx, year=2019, week=None, seasonType=None):
-        """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking. """
-        # await ctx.send("This command is under construction")
-        # return
+        """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking.
+        Usage is: `$poll <year> <week>"""
 
         url = "https://api.collegefootballdata.com/rankings?year={}".format(year)
 
@@ -175,114 +174,38 @@ class StatBot(commands.Cog, name="CFB Stats"):
     """
     # TODO See above.
     @commands.command()
-    async def boxscore(self, ctx):
+    async def boxscore(self, ctx, year, week):
         """ Returns the box score of the searched for game. """
 
-        await ctx.send("This command is under construction.")
-        return
+        url = "https://api.collegefootballdata.com/games/teams?year={}&week={}&seasonType=regular&team=nebraska".format(year, week)
+        try:
+            r = requests.get(url)
+            boxscore_json = r.json() # Actually imports a list
+        except:
+            await ctx.send("An error occurred retrieving boxscore data.")
+            return
 
-        # boxscore_date = ""
-        # if week == 1:
-        #     boxscore_date = "2018-09-08"  # South Alabama
-        # elif week == 2:
-        #     boxscore_date = "2019-09-07"  # Colorado
-        # elif week == 3:
-        #     boxscore_date = "2019-09-14"  # Northern Illinois
-        # elif week == 4:
-        #     boxscore_date = "2019-09-21"  # Illinois
-        # elif week == 5:
-        #     boxscore_date = "2019-09-28"  # Ohio State
-        # elif week == 6:
-        #     boxscore_date = "2019-10-05"  # Northwestern
-        # elif week == 7:
-        #     boxscore_date = "2019-10-12"  # Minnesota
-        # elif week == 8:
-        #     boxscore_date = "2019-10-26"  # Indiana
-        # elif week == 9:
-        #     boxscore_date = "2019-11-02"  # Purdue
-        # elif week == 10:
-        #     boxscore_date = "2019-11-16"  # Wisconsin
-        # elif week == 11:
-        #     boxscore_date = "2019-11-23"  # Maryland
-        # elif week == 12:
-        #     boxscore_date = "2019-11-29"  # Iowa
-        #
-        # edit_msg = await ctx.send("Thinking...")
-        # game = Boxscore("{}-nebraska".format(boxscore_date))
-        #
-        # # Game Info
-        # vs_str =""
-        # if game.winning_name == "Nebraska":
-        #     vs_str = "{} vs {}".format(game.winning_name, game.losing_name)
-        # else:
-        #     vs_str = "{} vs {}".format(game.losing_name, game.winning_name)
-        #
-        # nebraska_str = ""
-        # if game.winning_name == "Nebraska":
-        #     nebraska_str = game.winning_name
-        # else:
-        #     nebraska_str = game.losing_name
-        #
-        # oppo_str = ""
-        # if game.winning_name != "Nebraska":
-        #     oppo_str = game.winning_name
-        # else:
-        #     oppo_str = game.losing_name
-        #
-        # embed_game_info = discord.Embed(title="Boxscore for {}".format(vs_str), description="Location: {} | Time: {}".format(game.stadium, game.time), color=0xFF0000)
-        #
-        #
-        # qb_str = ""
-        # i = 0
-        # for p in game.home_players:
-        #     if game.home_players[i].attempted_passes:
-        #         qb_str = qb_str + "Name: {}\n" \
-        #                           "Pass Yards per Attempt: {}\n" \
-        #                           "Passing Completion: {}%\n" \
-        #                           "Passing Touchdowns: {}\n" \
-        #                           "Passing Yards: {}\n" \
-        #                           "Passing Yards per Attempt: {}\n" \
-        #                           "Quarterback Rating: {}\n" \
-        #                           "Rush Attempts: {}\n" \
-        #                           "Rush Touchdowns: {}\n" \
-        #                           "Rush Yards: {}\n" \
-        #                           "Rush Yards per Attempt: {}\n\n".format(
-        #                                                                 game.home_players[i].name,
-        #                                                                 game.home_players[i].pass_yards_per_attempt,
-        #                                                                 game.home_players[i].passing_completion,
-        #                                                                 game.home_players[i].passing_touchdowns,
-        #                                                                 game.home_players[i].passing_yards,
-        #                                                                 game.home_players[i].passing_yards_per_attempt,
-        #                                                                 game.home_players[i].quarterback_rating,
-        #                                                                 game.home_players[i].rush_attempts,
-        #                                                                 game.home_players[i].rush_touchdowns,
-        #                                                                 game.home_players[i].rush_yards,
-        #                                                                 game.home_players[i].rush_yards_per_attempt)
-        #     i += 1
-        #
-        # embed_game_info.add_field(name="Players", value=qb_str)
-        #
-        # # embed_game_info.add_field(name="{} Total Yards".format(nebraska_str), value=game.home_total_yards)
-        # # embed_game_info.add_field(name="{} First Downs".format(nebraska_str), value=game.home_first_downs)
-        # # embed_game_info.add_field(name="{} Penalties".format(nebraska_str), value="Total: {}\nYards: {}\nPer Penalty Average: {:.2f}".format(game.home_penalties, game.home_yards_from_penalties, game.home_yards_from_penalties/game.home_penalties))
-        # # embed_game_info.add_field(name="{} Turnovers".format(nebraska_str), value="Interceptions: {}\nFumbles: {} out of {}".format(game.home_interceptions, game.home_fumbles_lost, game.home_fumbles))
-        # # embed_game_info.add_field(name="{} Penalties".format(oppo_str), value="Total: {}\nYards: {}\nPer Penalty Average: {:.2f}".format(game.away_penalties, game.away_yards_from_penalties, game.away_yards_from_penalties / game.away_penalties))
-        # # embed_game_info.add_field(name="{} Turnovers".format(oppo_str), value="Interceptions: {}\nFumbles: {} out of {}".format(game.away_interceptions, game.away_fumbles_lost, game.away_fumbles))
-        # # embed_game_info.add_field(name="Home Passing", value="Completions: {}\nAttempts: {}\nPassing Yards: {}\nPassing Touchdowns: {}".format(game.home_pass_completions,game.home_pass_attempts, game.home_pass_yards, game.home_pass_touchdowns), inline=False)
-        # # embed_game_info.add_field(name="Home Rush", value="Attempts: {}\nYards Per Attempt: {:.2f}\nRushing Touchdowns: {}".format(game.home_rush_attempts, game.home_rush_yards/game.home_rush_attempts, game.home_rush_touchdowns), inline=False)
-        #
-        # await edit_msg.delete()
-        # await ctx.send(embed=embed_game_info)
-        #
-        # # Away
-        # pass
+        dump = False
+        if dump:
+            with open("boxscore_json.json", "w") as fp:
+                json.dump(boxscore_json, fp, sort_keys=True, indent=4)
+            fp.close()
 
-    # TODO Not started. Intention is to output the last few plays of the current Nebraska game.
-    # @commands.command()
-    # async def lastplays(self, ctx):
-    #     pass
+        boxscore_winner = boxscore_json[0]['teams'][0]['stats']
+        boxscore_loser = boxscore_json[0]['teams'][1]['stats']
 
-    # TODO Huskers.com updated their website and broek this command.
+        embed_winner = discord.Embed(title="{}'s Stats".format(boxscore_json[0]['teams'][0]['school']))
+        for stat in boxscore_winner:
+            embed_winner.add_field(name=stat['category'], value=stat['stat'])
+
+        embed_loser = discord.Embed(title="{}'s Stats".format(boxscore_json[0]['teams'][1]['school']))
+        for stat in boxscore_loser:
+            embed_loser.add_field(name=stat['category'], value=stat['stat'])
+
+        await ctx.send(embed=embed_winner)
+        await ctx.send(embed=embed_loser)
+
+
     @commands.command(aliases=["sched",])
     async def schedule(self, ctx, year=2019):
         """ Returns the Nebraska Huskers football schedule. """
@@ -304,11 +227,16 @@ class StatBot(commands.Cog, name="CFB Stats"):
             fp.close()
 
         embed = discord.Embed(title="{} Husker Schedule".format(year), color=0xFF0000)
+
         for game in schedule_list:
-            # TODO Change the ISO 8601 format to something easier to read.
             game_start_datetime_raw = dateutil.parser.parse(game['start_date'])
             game_start_datetime_raw = game_start_datetime_raw + datetime.timedelta(hours=-5)
-            game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %H:%M %p"))
+
+            # collegefootballdata.com puts TBD times as 23 or 0. ¯\_(ツ)_/¯
+            if game_start_datetime_raw.hour == 23 or game_start_datetime_raw.hour == 0:
+                game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y TBD"))
+            else:
+                game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %H:%M %p"))
 
             home_team = ""
             home_split = []
@@ -343,6 +271,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
             else:
                 embed.add_field(name="{} vs {}".format(home_team, away_team), value=game_info_str)
 
+        embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Nebraska_Cornhuskers_logo.svg/1200px-Nebraska_Cornhuskers_logo.svg.png")
         await edit_msg.edit(content="", embed=embed)
 
 
