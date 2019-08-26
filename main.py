@@ -28,7 +28,6 @@ client.load_extension('cogs.croot_bot')
 client.load_extension('cogs.stat_bot')
 
 # initialize a global list for CrootBot to put search results in
-# player_search_list = []
 authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
 banned_channels = [440868279150444544, 607399402881024009]
 
@@ -430,7 +429,6 @@ async def on_command_error(ctx, error):
     await ctx.send(output_msg)
 # End bot (client) events
 
-
 # Admin command
 @client.command(hidden=True)
 async def squirrel(ctx, chan, *, message):
@@ -467,7 +465,6 @@ async def huskerbotquit(ctx):
         await ctx.send("Nice try buddy! 👋")
 # Admin command
 
-
 @client.command()
 async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, color=0xFF0000)
@@ -480,9 +477,6 @@ async def about(ctx):
     embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)
 
-
-# Run the Discord bot
-# Does nothing if no sys.argv present
 if len(sys.argv) > 0:
     if sys.argv[1] == 'test':
         print("*** Running development server ***")

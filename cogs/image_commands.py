@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 import function_helper
 import random
-from PIL import Image, ImageDraw
+from PIL import Image
 from os import listdir
 from os.path import isfile, join
 

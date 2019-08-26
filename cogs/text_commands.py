@@ -1,5 +1,4 @@
 from discord.ext import commands
-import discord
 import markovify
 import random
 import json
@@ -8,7 +7,6 @@ import dateutil.parser
 import discord
 import config
 import requests
-
 
 # Dictionaries
 eight_ball = ['Try again',
@@ -111,6 +109,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         await edit_msg.edit(content=sentence)
 
+    # TODO Update this to coutndown each subsequent game instead of just kick off.
     @commands.command(aliases=["cd",], brief="How long until Husker football?")
     async def countdown(self, ctx):
         season_start = datetime.datetime(year=2019, month=8, day=31,hour=12,minute=00)
