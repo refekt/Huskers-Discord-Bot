@@ -4,7 +4,6 @@ import function_helper
 import requests
 import json
 import datetime
-#import cb_settings
 import pandas
 import crystal_balls
 import os, sys, inspect
