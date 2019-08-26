@@ -428,6 +428,23 @@ async def on_command_error(ctx, error):
 
 
 # Admin command
+@client.command(hidden=True)
+async def squirrel(ctx, chan, *, message):
+    if str(ctx.author) == "IDontBelieveInIsms#1838" or str(ctx.author) == "aargonz#3345":
+        if chan.lower() == "war":
+            channel = client.get_channel(525519594417291284)
+            embed = discord.Embed(title="Secret Squirrel Message", color=0xFF0000)
+            embed.add_field(name="Content", value=message)
+            await channel.send(embed=embed)
+        elif chan.lower() == "scott":
+            channel = client.get_channel(507520543096832001)
+            embed = discord.Embed(title="Secret Squirrel Message", color=0xFF0000)
+            embed.add_field(name="Content", value=message)
+            await channel.send(embed=embed)
+        else:
+            await ctx.send("Incorrect channel provided. \"war\" and \"scott\" are the only options.")
+            return
+
 @client.command(aliases=["quit", "q"])
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
