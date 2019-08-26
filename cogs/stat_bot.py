@@ -167,17 +167,22 @@ class StatBot(commands.Cog, name="CFB Stats"):
     #     except:
     #         print("Error")
 
-    """
-    Complete overhaul. Need to determine what stats to output and filterability within command. Discord limiting messages to 2,000 chars
-    prevents a lot of work.
-    https://api.collegefootballdata.com/games/teams?year=2018&week=8&seasonType=regular&team=nebraska&conference=b1g
-    """
-    # TODO See above.
+
+    # TODO Format the output string to be better aligned. Also add error handling for incorrect weeks.
     @commands.command()
-    async def boxscore(self, ctx, year, week):
+    async def boxscore(self, ctx, year: int, week: int):
         """ Returns the box score of the searched for game. """
 
+        if not type(year) is int:
+            await ctx.send("You must enter a numerical year.")
+            return
+
+        if not type(week) is int:
+            await ctx.send("You must enter a numerical week.")
+            return
+
         url = "https://api.collegefootballdata.com/games/teams?year={}&week={}&seasonType=regular&team=nebraska".format(year, week)
+
         try:
             r = requests.get(url)
             boxscore_json = r.json() # Actually imports a list
@@ -191,20 +196,39 @@ class StatBot(commands.Cog, name="CFB Stats"):
                 json.dump(boxscore_json, fp, sort_keys=True, indent=4)
             fp.close()
 
+        category_dict = {"rushingTDs": "Rushing TDs", "puntReturnYards": "Punt Return Yards", "puntReturnTDs": "Punt Return TDs", "puntReturns": "Punt Returns", "passingTDs": "Passing TDs",
+                         "interceptionYards": "Interception Yards", "interceptionTDs": "Interception TDs", "passesIntercepted": "Passes Intercepted", "fumblesRecovered": "Fumbles Recovered",
+                         "totalFumbles": "Total Fumbles", "tacklesForLoss": "Tackles For Loss", "defensiveTDs": "Defensive TDs", "tackles": "Tackles", "sacks": "Sacks", "qbHurries": "QB Hurries",
+                         "passesDeflected": "Passes Defelcted", "possessionTime": "Possesion Time", "interceptions": "Interceptions", "fumblesLost": "Fumbles Lost", "turnovers": "Turnovers",
+                         "totalPenaltiesYards": "Total Penalties Yards", "yardsPerRushAttempt": "Yards Per Rush Attempt", "rushingAttempts": "Rushing Attempts", "rushingYards": "Rushing Yards",
+                         "yardsPerPass": "Yards Per Pass", "kickReturnYards": "Kick Return Yards", "kickReturnTDs": "Kick Return TDs", "kickReturns": "Kick Returns", "completionAttempts": "Completion Attempts",
+                         "netPassingYards": "Net Passing Yards", "totalYards": "Total Yards", "fourthDownEff": "Fourth Down Eff", "thirdDownEff": "Third Down Eff", "firstDowns": "First Downs"}
+
         boxscore_winner = boxscore_json[0]['teams'][0]['stats']
         boxscore_loser = boxscore_json[0]['teams'][1]['stats']
 
-        embed_winner = discord.Embed(title="{}'s Stats".format(boxscore_json[0]['teams'][0]['school']))
+        await ctx.send("`Boxscore Stats for {} Week {}: {} vs {}`".format(year, week, boxscore_json[0]['teams'][0]['school'], boxscore_json[0]['teams'][1]['school']))
+
+        winner_str = "```\n{}\n".format(boxscore_json[0]['teams'][0]['school'])
+        i = 0
         for stat in boxscore_winner:
-            embed_winner.add_field(name=stat['category'], value=stat['stat'])
+            winner_str = winner_str + "{}: {}\t".format(category_dict[stat['category']], stat['stat'])
+            if i % 2 == 0:
+                winner_str = winner_str + "\n"
+            i += 1
+        winner_str = winner_str + "```"
 
-        embed_loser = discord.Embed(title="{}'s Stats".format(boxscore_json[0]['teams'][1]['school']))
+        loser_str = "```\n{}\n".format(boxscore_json[0]['teams'][1]['school'])
+        i = 0
         for stat in boxscore_loser:
-            embed_loser.add_field(name=stat['category'], value=stat['stat'])
+            loser_str = loser_str + "{}: {}\t".format(category_dict[stat['category']], stat['stat'])
+            if i % 2 == 0:
+                loser_str = loser_str + "\n"
+            i += 1
+        loser_str = loser_str + "```"
 
-        await ctx.send(embed=embed_winner)
-        await ctx.send(embed=embed_loser)
-
+        await ctx.send(winner_str)
+        await ctx.send(loser_str)
 
     @commands.command(aliases=["sched",])
     async def schedule(self, ctx, year=2019):
