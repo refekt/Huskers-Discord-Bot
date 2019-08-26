@@ -72,12 +72,15 @@ class StatBot(commands.Cog, name="CFB Stats"):
         return
 
     # TODO Format the output string to be better aligned. Also add error handling for incorrect weeks.
-    @commands.command()
+    @commands.command(aliases=["bs",])
     async def boxscore(self, ctx, year: int, week: int):
         """ Returns the box score of the searched for game. """
 
         if not type(year) is int:
             await ctx.send("You must enter a numerical year.")
+            return
+        elif year < 2004:
+            await ctx.send("Data is not available prior to 2004.")
             return
 
         if not type(week) is int:
@@ -91,6 +94,10 @@ class StatBot(commands.Cog, name="CFB Stats"):
             boxscore_json = r.json() # Actually imports a list
         except:
             await ctx.send("An error occurred retrieving boxscore data.")
+            return
+
+        if not boxscore_json:
+            await ctx.send("This was a bye week. Try again.")
             return
 
         dump = False
@@ -107,31 +114,39 @@ class StatBot(commands.Cog, name="CFB Stats"):
                          "yardsPerPass": "Yards Per Pass", "kickReturnYards": "Kick Return Yards", "kickReturnTDs": "Kick Return TDs", "kickReturns": "Kick Returns", "completionAttempts": "Completion Attempts",
                          "netPassingYards": "Net Passing Yards", "totalYards": "Total Yards", "fourthDownEff": "Fourth Down Eff", "thirdDownEff": "Third Down Eff", "firstDowns": "First Downs"}
 
-        boxscore_winner = boxscore_json[0]['teams'][0]['stats']
-        boxscore_loser = boxscore_json[0]['teams'][1]['stats']
+        home_team = "({}) {}".format(boxscore_json[0]['teams'][0]['points'], boxscore_json[0]['teams'][0]['school'])
+        away_team = "{} ({})\n".format(boxscore_json[0]['teams'][1]['school'], boxscore_json[0]['teams'][1]['points'])
 
-        await ctx.send("`Boxscore Stats for {} Week {}: {} vs {}`".format(year, week, boxscore_json[0]['teams'][0]['school'], boxscore_json[0]['teams'][1]['school']))
+        boxscore = "```\nBoxscore Stats for {} Week {}\n\n".format(year, week)
+        boxscore += " " * (25 - len(home_team))
+        boxscore += home_team
+        boxscore += " " * 8
+        boxscore += away_team
+        boxscore += "-" * 50
+        boxscore += "\n"
 
-        winner_str = "```\n{}\n".format(boxscore_json[0]['teams'][0]['school'])
         i = 0
-        for stat in boxscore_winner:
-            winner_str = winner_str + "{}: {}\t".format(category_dict[stat['category']], stat['stat'])
-            if i % 2 == 0:
-                winner_str = winner_str + "\n"
-            i += 1
-        winner_str = winner_str + "```"
 
-        loser_str = "```\n{}\n".format(boxscore_json[0]['teams'][1]['school'])
-        i = 0
-        for stat in boxscore_loser:
-            loser_str = loser_str + "{}: {}\t".format(category_dict[stat['category']], stat['stat'])
-            if i % 2 == 0:
-                loser_str = loser_str + "\n"
+        while i < len(boxscore_json[0]['teams'][0]['stats']):
+            boxscore += " " * (23 - len(category_dict[boxscore_json[0]['teams'][0]['stats'][i]['category']])) # Spaces
+            boxscore += "{} ".format(category_dict[boxscore_json[0]['teams'][0]['stats'][i]['category']]) # Friendly category
+            boxscore += "|" # Bar
+            try:
+                boxscore += "{}".format(boxscore_json[0]['teams'][0]['stats'][i]['stat']) # Home Stat
+            except:
+                pass
+            boxscore += " " * (8 - len(boxscore_json[0]['teams'][0]['stats'][i]['stat'])) # Spaces
+            boxscore += "|" # Bar
+            try:
+                boxscore += "{}\n".format(boxscore_json[0]['teams'][1]['stats'][i]['stat']) # Away Stat
+            except:
+                boxscore += "\n"
             i += 1
-        loser_str = loser_str + "```"
 
-        await ctx.send(winner_str)
-        await ctx.send(loser_str)
+        boxscore = boxscore + "\n```"
+
+        await ctx.send(boxscore)
+
 
     @commands.command(aliases=["sched",])
     async def schedule(self, ctx, year=2019):
