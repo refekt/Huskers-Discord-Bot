@@ -147,7 +147,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         await ctx.send(boxscore)
 
-
     @commands.command(aliases=["sched",])
     async def schedule(self, ctx, year=2019):
         """ Returns the Nebraska Huskers football schedule. """
