@@ -2,7 +2,9 @@ from discord.ext import commands
 import discord
 import function_helper
 import random
+import PIL
 from PIL import Image
+from PIL import ImageOps
 from os import listdir
 from os.path import isfile, join
 
@@ -267,24 +269,43 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         embed.set_footer(text="Referee calls " + huskerbot_footer)
         await ctx.send(embed=embed)
 
-    # TODO Make this command generate better flags.
     @commands.command()
     async def flag_gen(self, ctx):
-        created_flag = "media/saved/{}created_flag.png".format(str(ctx.author))
-        blank_flag = "media/blank_flag.png"
-        poop_files = [f for f in listdir("media/") if isfile(join("media/", f))]
-        for p in poop_files:
-            if not "poop" in p.lower():
-                poop_files.remove(p)
-        random.shuffle(poop_files)
+        async def tint_image(src, color="#FFFFFF"):
+            src.load()
+            r, g, b, alpha = src.split()
+            gray = ImageOps.grayscale(src)
+            result = ImageOps.colorize(gray, (0, 0, 0, 0), color)
+            result.putalpha(alpha)
+            return result
 
-        img_poop = Image.open("media/{}".format(poop_files[0]))
-        img_poop.resize((200, 200), Image.BILINEAR)
-        img_blank_flag = Image.open(blank_flag)
-        img_blank_flag.paste(img_poop, (650, 250))
-        img_blank_flag.save(created_flag)
+        try:
+            # Directory strings
+            emojis_dir = "media/emojis"
+            blank_flag = "media/raw/blank_flag.png"
+            created_flag = "media/saved/{}_created_flag.png".format(str(ctx.author))
 
-        await ctx.send(file=discord.File(created_flag))
+            # Get list of emojis, shuffle the list, pick random emoji, and create an Image.
+            poop_files = [f for f in listdir(emojis_dir) if isfile(join(emojis_dir, f))]
+            random.shuffle(poop_files)
+            print("Poop: {}".format(poop_files[0]))
+            img_poop_raw = Image.open("{}/{}".format(emojis_dir, poop_files[0]))
+            sizes = img_poop_raw.width * 3, img_poop_raw.height * 3
+            img_poop = img_poop_raw.resize(size=sizes, resample=PIL.Image.NEAREST)
+
+            # Turn the blank flag into a random color.
+            img_flag = Image.open(blank_flag)
+            random_color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+            tinted_flag = await tint_image(img_flag, random_color)
+
+            new_img = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+            new_img.paste(tinted_flag, ((new_img.width - tinted_flag.width) // 2, (new_img.height - tinted_flag.height) // 2))
+            new_img.paste(img_poop, ((new_img.width - img_poop.width) // 2, (new_img.height - img_poop.height) // 2), mask=img_poop)
+            new_img.save(created_flag)
+
+            await ctx.send(file=discord.File(created_flag))
+        except:
+            await ctx.send("Error occured trying to use `{}` mask. Try again!".format(poop_files[0]))
     # End image commands
 
 
