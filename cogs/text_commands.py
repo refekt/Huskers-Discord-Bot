@@ -111,14 +111,70 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     # TODO Update this to coutndown each subsequent game instead of just kick off.
     @commands.command(aliases=["cd",], brief="How long until Husker football?")
-    async def countdown(self, ctx):
-        season_start = datetime.datetime(year=2019, month=8, day=31,hour=12,minute=00)
+    async def countdown(self, ctx, *, input=None):
+        """ Returns the time until the next game if no input is provide or returns time to a specific game if provided.
+        Usage: `$[countdown|cd] [team on current schedule]`
+        """
+        cd_string = ""
+        counter = -1
+        opponentsDict = {}
+        i = 0
 
-        if season_start > datetime.datetime.now():
-            days_left = season_start - datetime.datetime.now()
-            await ctx.send("📢📅 There are {} days, {} hours, and {} minutes remaining until the Nebraska vs. South Alabama game kicks off at 11:00 AM CST!".format(days_left.days, int(days_left.seconds/3600),int((days_left.seconds/60)%60),days_left.seconds))
+        with open('husker_schedule.json', 'r') as fp:
+            husker_sched = json.load(fp)
+
+        if input:
+            for game in husker_sched:
+                if game["home_team"] != "Nebraska":
+                    opponentsDict.update({game["home_team"].lower(): i})
+                else:
+                    opponentsDict.update({game["away_team"].lower(): i})
+                i += 1
+
+            try:
+                game_index = opponentsDict[input.lower()]
+            except KeyError:
+                await ctx.send("`{}` does not exist on the current schedule. Please review `$schedule` and try again.".format(input))
+                return
+
+            game_datetime_raw = husker_sched[game_index]['start_date'].split("T")
+            game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S")  # "%b %d, %Y %I:%M %p"
+            game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+
+            days_left = game_datetime - datetime.datetime.now()
+            cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
+                days_left.days,
+                int(days_left.seconds / 3600),
+                int((days_left.seconds / 60) % 60),
+                husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
+                datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
+                game_datetime.month,
+                game_datetime.day,
+                game_datetime.year)
         else:
-            await ctx.send("The season has already started dummy!")
+            for game in husker_sched:
+                game_datetime_raw = game['start_date'].split("T")
+                game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S") # "%b %d, %Y %I:%M %p"
+                game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+
+                if datetime.datetime.now() < game_datetime and datetime.datetime.now():
+                    days_left = game_datetime - datetime.datetime.now()
+                    cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
+                        days_left.days,
+                        int(days_left.seconds/3600),
+                        int((days_left.seconds/60)%60),
+                        game['home_team'], game['away_team'],
+                        datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
+                        game_datetime.month,
+                        game_datetime.day,
+                        game_datetime.year)
+                    break
+                else:
+                    cd_string = "Something went wrong 🤫!"
+
+                counter += 1
+
+        await ctx.send(cd_string)
 
     @commands.command(aliases=["bf", "facts",])
     async def billyfacts(self, ctx):
