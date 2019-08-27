@@ -26,6 +26,7 @@ client.load_extension('cogs.image_commands')
 client.load_extension('cogs.text_commands')
 client.load_extension('cogs.croot_bot')
 client.load_extension('cogs.stat_bot')
+client.load_extension('cogs.sched_commands')
 
 # initialize a global list for CrootBot to put search results in
 authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
