@@ -135,8 +135,7 @@ facts.txt
 
 *.json
 
-.media/
 .media/saved/
 *.png
 season_bets.json
-season_bets.json
+
