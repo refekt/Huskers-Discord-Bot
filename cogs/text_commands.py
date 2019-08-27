@@ -109,7 +109,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         await edit_msg.edit(content=sentence)
 
-    # TODO Update this to coutndown each subsequent game instead of just kick off.
     @commands.command(aliases=["cd",], brief="How long until Husker football?")
     async def countdown(self, ctx, *, input=None):
         """ Returns the time until the next game if no input is provide or returns time to a specific game if provided.
@@ -157,7 +156,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S") # "%b %d, %Y %I:%M %p"
                 game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
 
-                if datetime.datetime.now() < game_datetime and datetime.datetime.now():
+                if datetime.datetime.now() < game_datetime:
                     days_left = game_datetime - datetime.datetime.now()
                     cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
                         days_left.days,
@@ -428,6 +427,85 @@ class TextCommands(commands.Cog, name="Text Commands"):
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)
+
+    @commands.command()
+    async def weather(self, ctx, which="current"):
+        """ Checks the weather for game day.
+        $weather current  : returns current weather data for the location of Nebraska's next game.
+        $weather forecast : returns the current 5 day forecast for the location of Nebraska's next game.
+        """
+
+        # Load schedule to get venue
+        with open('husker_schedule.json', 'r') as fp:
+            husker_sched = json.load(fp)
+
+        venue = ""
+        for game in husker_sched:
+            game_datetime_raw = game['start_date'].split("T")
+            game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S")  # "%b %d, %Y %I:%M %p"
+            game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+
+            if datetime.datetime.now() < game_datetime:
+                venue = game["venue"]
+                break
+            else:
+                venue = None
+
+        if venue:
+            r = requests.get(url="https://api.collegefootballdata.com/venues")
+            venue_dict = r.json()
+
+            coords = {}
+            for venues in venue_dict:
+                if venues["name"] == venue and venues["state"] == "NE":
+                    coords = venues["location"]
+        else:
+            await ctx.send("Unable to locate venue.")
+            return
+
+        if which == "current":
+            r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
+            weather_dict = r.json()
+
+            dump = False
+            if dump:
+                with open("weather_json.json", "w") as fp:
+                    json.dump(weather_dict, fp, sort_keys=True, indent=4)
+                fp.close()
+
+            embed = discord.Embed(title="Current weather forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]), color=0xFF0000)
+            embed.add_field(name="Cloud Coverage", value="{}%".format(weather_dict["data"][0]["clouds"]))
+            embed.add_field(name="Wind Speed", value="{} MPH / {}".format(weather_dict["data"][0]["wind_spd"], weather_dict["data"][0]["wind_cdir"]))
+            embed.add_field(name="Snow Chance", value="{:.2f}%".format(weather_dict["data"][0]["snow"]*100))
+            embed.add_field(name="Precipitation Chance", value="{:.2f}%".format(weather_dict["data"][0]["precip"]*100))
+            embed.add_field(name="Temperature", value="{} F".format(weather_dict["data"][0]["temp"]))
+        elif which == "forecast":
+            r = requests.get(url="https://api.weatherbit.io/v2.0/forecast/daily?key={}&lang=en&units=I&lat={}&lon={}&days=7".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
+            weather_dict = r.json()
+
+            dump = True
+            if dump:
+                with open("weather_json.json", "w") as fp:
+                    json.dump(weather_dict, fp, sort_keys=True, indent=4)
+                fp.close()
+
+            embed = discord.Embed(title="5 day forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["city_name"], weather_dict["state_code"]), color=0xFF0000)
+            for days in weather_dict["data"]:
+                day_str = "Cloud Coverage: {}%\n" \
+                          "Wind: {} MPH {}\n" \
+                          "Snow Chance: {:.2f}%\n" \
+                          "Precip Chance: {:.2f}%\n" \
+                          "High Temp: {} F\n" \
+                          "Low Temp: {} F\n".format(days["clouds"], days["wind_spd"], days["wind_cdir"], days["snow"]*100, days["precip"]*100, days["max_temp"], days["min_temp"])
+                embed.add_field(name="{}".format(days["datetime"]), value=day_str)
+        else:
+            await ctx.send("`Current` and `forecast` are the only options for `$weather`. Please try again.")
+            return
+
+        embed.set_footer(text="There is a 500 call limit to the API used for this command. Do not abuse it.")
+        await ctx.send(embed=embed)
+
+        #await ctx.send(ow.get_weather(station))
     # Text commands
 
 

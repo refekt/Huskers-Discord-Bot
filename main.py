@@ -418,16 +418,15 @@ async def on_command_completion(ctx):
         await ctx.send(not_authed)
 
 
-# @client.event
-# async def on_command_error(ctx, error):
-#     #output_msg="Whoa there {}! Something went wrong. Please review `$help` for a list of all available commands.\n\nCommand sent: {}\nError: `{}`.".format(ctx.message.author.mention, ctx.message, error)
-#     output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-#                 "```Message ID: {}\n" \
-#                 "Channel: {} / {}\n" \
-#                 "Author: {}\n" \
-#                 "Content: {}\n" \
-#                 "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-#     await ctx.send(output_msg)
+@client.event
+async def on_command_error(ctx, error):
+    output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                "```Message ID: {}\n" \
+                "Channel: {} / {}\n" \
+                "Author: {}\n" \
+                "Content: {}\n" \
+                "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+    await ctx.send(output_msg)
 # End bot (client) events
 
 # Admin command
@@ -448,6 +447,7 @@ async def squirrel(ctx, chan, *, message):
             await ctx.send("Incorrect channel provided. \"war\" and \"scott\" are the only options.")
             return
 
+
 @client.command(aliases=["quit", "q"])
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
@@ -465,6 +465,7 @@ async def huskerbotquit(ctx):
     else:
         await ctx.send("Nice try buddy! 👋")
 # Admin command
+
 
 @client.command()
 async def about(ctx):
