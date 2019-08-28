@@ -154,7 +154,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             for game in husker_sched:
                 game_datetime_raw = game['start_date'].split("T")
                 game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S") # "%b %d, %Y %I:%M %p"
-                game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+                game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour-5, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
 
                 if datetime.datetime.now() < game_datetime:
                     days_left = game_datetime - datetime.datetime.now()
