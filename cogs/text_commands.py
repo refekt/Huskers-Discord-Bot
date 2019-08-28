@@ -144,7 +144,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
                 days_left.days,
                 int(days_left.seconds / 3600),
-                int((days_left.seconds / 60) % 60),
+                int((days_left.seconds / 60) % 60)-1,
                 husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
                 datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
                 game_datetime.month,
@@ -161,7 +161,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
                         days_left.days,
                         int(days_left.seconds/3600),
-                        int((days_left.seconds/60)%60),
+                        int((days_left.seconds/60)%60)-1,
                         game['home_team'], game['away_team'],
                         datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
                         game_datetime.month,
