@@ -138,30 +138,30 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             game_datetime_raw = husker_sched[game_index]['start_date'].split("T")
             game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S")  # "%b %d, %Y %I:%M %p"
-            game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+            game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour - 4, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
 
             days_left = game_datetime - datetime.datetime.now()
             cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
                 days_left.days,
                 int(days_left.seconds / 3600),
-                int((days_left.seconds / 60) % 60)-1,
+                int((days_left.seconds / 60) % 60),
                 husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
-                datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
+                datetime.time(hour=game_datetime.hour-4, minute=game_datetime.minute),
                 game_datetime.month,
                 game_datetime.day,
                 game_datetime.year)
-        else:
+        else:  # No team provided
             for game in husker_sched:
                 game_datetime_raw = game['start_date'].split("T")
                 game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S") # "%b %d, %Y %I:%M %p"
-                game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour-5, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+                game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour - 4, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
 
                 if datetime.datetime.now() < game_datetime:
                     days_left = game_datetime - datetime.datetime.now()
                     cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
                         days_left.days,
                         int(days_left.seconds/3600),
-                        int((days_left.seconds/60)%60)-1,
+                        int((days_left.seconds / 60) % 60),
                         game['home_team'], game['away_team'],
                         datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
                         game_datetime.month,
