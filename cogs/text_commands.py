@@ -146,7 +146,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 int(days_left.seconds / 3600),
                 int((days_left.seconds / 60) % 60),
                 husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
-                datetime.time(hour=game_datetime.hour-4, minute=game_datetime.minute),
+                datetime.time(hour=game_datetime.hour-1, minute=game_datetime.minute),
                 game_datetime.month,
                 game_datetime.day,
                 game_datetime.year)
@@ -163,7 +163,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                         int(days_left.seconds/3600),
                         int((days_left.seconds / 60) % 60),
                         game['home_team'], game['away_team'],
-                        datetime.time(hour=game_datetime.hour, minute=game_datetime.minute),
+                        datetime.time(hour=game_datetime.hour-1, minute=game_datetime.minute),
                         game_datetime.month,
                         game_datetime.day,
                         game_datetime.year)
