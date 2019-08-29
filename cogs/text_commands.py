@@ -240,9 +240,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
             lines = lines[0]
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
-            embed.add_field(name="Rules", value="All bets must be made before kick off and only the most recent bet counts. You can only vote for a win or loss and cover or not covering spread. Bets are stored by your _Discord username_. If you change your username you will lose your bet history.\n", inline=False)
+            embed.add_field(name="Rules", value=""
+                                                "All bets must be made before kick off and only the most recent bet counts. "
+                                                "You can bet on winning or losing the game, covering or not covering the spread, and covering or not covering the total points of the game. "
+                                                "Bets are stored by your __Discord username__. "
+                                                "If you change your username you will lose your bet history.\n", inline=False)
             embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
-            embed.add_field(name="Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
+            embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
             embed.add_field(name="Vote Instructions", value=""
                                                             "Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\n"
                                                             "Bets over (⏫) or under (⏬) on the spread. Clear bet (❌).\n"
@@ -291,7 +295,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
                     embed.add_field(name="Win or Loss", value=winorlose, inline=True)
                     embed.add_field(name="Spread", value=spread, inline=True)
-                    embed.add_field(name="Moneyline", value=moneyline, inline=True)
+                    embed.add_field(name="Over Under", value=moneyline, inline=True)
                     await ctx.send(embed=embed)
 
         # Show all bets for the current game
@@ -452,7 +456,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     next_game = game["home_team"]
                 elif game["home_team"] == "Nebraska":
                     next_game = game["away_team"]
-
                 break
             else:
                 venue = None
@@ -516,7 +519,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await ctx.send("`Current` and `forecast` are the only options for `$weather`. Please try again.")
             return
 
-        embed.set_footer(text="There is a 500 call limit to the API used for this command. Do not abuse it.")
+        embed.set_footer(text="There is a daily 500 call limit to the API used for this command. Do not abuse it.")
         await ctx.send(embed=embed)
 
         #await ctx.send(ow.get_weather(station))
