@@ -245,6 +245,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                                                 "You can bet on winning or losing the game, covering or not covering the spread, and covering or not covering the total points of the game. "
                                                 "Bets are stored by your __Discord username__. "
                                                 "If you change your username you will lose your bet history.\n", inline=False)
+            embed.add_field(name="Prizes", value="To be determined!")
             embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
             embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
             embed.add_field(name="Vote Instructions", value=""
