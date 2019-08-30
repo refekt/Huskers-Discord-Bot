@@ -418,15 +418,16 @@ async def on_command_completion(ctx):
         await ctx.send(not_authed)
 
 
-@client.event
-async def on_command_error(ctx, error):
-    output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-                "```Message ID: {}\n" \
-                "Channel: {} / {}\n" \
-                "Author: {}\n" \
-                "Content: {}\n" \
-                "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-    await ctx.send(output_msg)
+# TODO Check if command is Animal: Hashed-username
+# @client.event
+# async def on_command_error(ctx, error):
+#     output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+#                 "```Message ID: {}\n" \
+#                 "Channel: {} / {}\n" \
+#                 "Author: {}\n" \
+#                 "Content: {}\n" \
+#                 "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+#     await ctx.send(output_msg)
 # End bot (client) events
 
 # Admin command
@@ -447,6 +448,28 @@ async def squirrel(ctx, chan, *, message):
             await ctx.send("Incorrect channel provided. \"war\" and \"scott\" are the only options.")
             return
 
+@client.command(hidden=True)
+async def chipmunk(ctx, chan, *, message):
+    authorized = False
+
+    for r in ctx.author.roles:
+        if r.id == 443805741111836693 or r.id == 440639061191950336:
+            authorized = True
+
+    if authorized:
+        if chan.lower() == "war":
+            channel = client.get_channel(525519594417291284)
+            embed = discord.Embed(title="Secret Chipmunk Message", color=0xFF0000)
+            embed.add_field(name="Content", value=message)
+            await channel.send(embed=embed)
+        elif chan.lower() == "scott":
+            channel = client.get_channel(507520543096832001)
+            embed = discord.Embed(title="Secret Chipmunk Message", color=0xFF0000)
+            embed.add_field(name="Content", value=message)
+            await channel.send(embed=embed)
+        else:
+            await ctx.send("Incorrect channel provided. \"war\" and \"scott\" are the only options.")
+            return
 
 @client.command(aliases=["quit", "q"])
 async def huskerbotquit(ctx):
