@@ -243,8 +243,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Rules", value=""
                                                 "All bets must be made before kick off and only the most recent bet counts. "
                                                 "You can bet on winning or losing the game, covering or not covering the spread, and covering or not covering the total points of the game. "
-                                                "Bets are stored by your __Discord username__. "
-                                                "If you change your username you will lose your bet history.\n", inline=False)
+                                                "Bets are stored by your __Discord username__. If you change your username you will lose your bet history.\n"
+                                                "\nBets for winning or losing are worth +/- 1 point. \nBets for the spread are worth +/- 2 points. \nBets for the over under are worth +/- 2 points.\n", inline=False)
             embed.add_field(name="Prizes", value="To be determined!")
             embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
             embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
@@ -296,7 +296,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
                     embed.add_field(name="Win or Loss", value=winorlose, inline=True)
                     embed.add_field(name="Spread", value=spread, inline=True)
-                    embed.add_field(name="Over Under", value=moneyline, inline=True)
+                    embed.add_field(name="Total Points/Over Under", value=moneyline, inline=True)
                     await ctx.send(embed=embed)
 
         # Show all bets for the current game
@@ -341,8 +341,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Cover Spread", value="{} ({:.2f}%)".format(total_cover_spread, (total_cover_spread / total_spread) * 100))
             embed.add_field(name="Not Cover Spread", value="{} ({:.2f}%)".format(total_not_cover_spread, (total_not_cover_spread / total_spread) * 100))
 
-            embed.add_field(name="Cover Moneyline", value="{} ({:.2f}%)".format(total_cover_moneyline, (total_cover_moneyline / total_moneyline) * 100))
-            embed.add_field(name="Not Cover Moneyline", value="{} ({:.2f}%)".format(total_not_cover_moneyline, (total_not_cover_moneyline / total_moneyline) * 100))
+            embed.add_field(name="Total Points Over", value="{} ({:.2f}%)".format(total_cover_moneyline, (total_cover_moneyline / total_moneyline) * 100))
+            embed.add_field(name="Total Points Under", value="{} ({:.2f}%)".format(total_not_cover_moneyline, (total_not_cover_moneyline / total_moneyline) * 100))
             await ctx.send(embed=embed)
 
         # Show all winners for game

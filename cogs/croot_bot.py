@@ -53,7 +53,7 @@ try:
 except:
     print("Error opening team_ids.json")
 
-# TODO Look at and revamp 
+# TODO Look at and revamp
 class CrootBot(commands.Cog, name="Croot Bot"):
     def __init__(self, bot):
             self.bot = bot
