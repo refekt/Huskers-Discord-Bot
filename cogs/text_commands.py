@@ -254,6 +254,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                                                             "Bets over (🔼) or under (🔽) on total points. Clear bet (✖).\n", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
+            # TODO add datetime checking. Don't add if after kick off through midnight that day.
             msg_sent = await ctx.send(embed=embed)
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
