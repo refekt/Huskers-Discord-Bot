@@ -72,7 +72,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
         await ctx.send("This command is under construction.")
         return
 
-    # TODO Format the output string to be better aligned. Also add error handling for incorrect weeks.
     @commands.command(aliases=["bs",])
     async def boxscore(self, ctx, year: int, week: int):
         """ Returns the box score of the searched for game. """
