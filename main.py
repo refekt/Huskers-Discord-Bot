@@ -439,48 +439,47 @@ async def on_command_completion(ctx):
 @client.event
 async def on_command_error(ctx, error):
     if ctx.message.content.startswith("$secret"):
-        context = ctx.message.content.split(" ")
+        try:
+            context = ctx.message.content.split(" ")
 
-        if context[0].lower() != "$secret":
-            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+            if context[0].lower() != "$secret":
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-        if not context[1].isalpha() and not context[2].isalpha():
-            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+            if not context[1].isalpha() and not context[2].isalpha():
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-        if context[2].lower() != "war" and context[2].lower() != "scott":
-            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+            if context[2].lower() != "war" and context[2].lower() != "scott":
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-        f = open('mammals.json', 'r')
-        temp_json = f.read()
-        mammals = json.loads(temp_json)
-        f.close()
+            f = open('mammals.json', 'r')
+            temp_json = f.read()
+            mammals = json.loads(temp_json)
+            f.close()
 
-        checkID = hashlib.md5(str(ctx.message.author.id).encode())
+            checkID = hashlib.md5(str(ctx.message.author.id).encode())
 
-        channel = 0
-        if context[2].lower() == "war":
-            channel = client.get_channel(525519594417291284)
-        elif context[2].lower() == "scott":
-            channel = client.get_channel(507520543096832001)
-        else:
-            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+            channel = 0
+            if context[2].lower() == "war":
+                channel = client.get_channel(525519594417291284)
+            elif context[2].lower() == "scott":
+                channel = client.get_channel(507520543096832001)
+            elif context[2].lower() == "spam":
+                channel = client.get_channel(595705205069185047)
+            else:
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-        if checkID.hexdigest() == mammals[context[1]]:
-            context_commands = "{} {} {}".format(context[0], context[1], context[2])
-            message = ctx.message.content[len(context_commands):]
+            if checkID.hexdigest() == mammals[context[1]]:
+                context_commands = "{} {} {}".format(context[0], context[1], context[2])
+                message = ctx.message.content[len(context_commands):]
 
-            embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
-            embed.add_field(name="Message", value=message)
+                embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
+                embed.add_field(name="Message", value=message)
 
-            await channel.send(embed=embed)
-        else:
-            await ctx.message.author.send("Incorrect mammal provided. Try again.")
-
-
-        #
-        # for user in mammals:
-        #     if ctx.message.author.id == 1:
-
+                await channel.send(embed=embed)
+            else:
+                await ctx.message.author.send("Incorrect mammal provided. Try again.")
+        except:
+            await ctx.message.author.send(error)
     else:
         print("An error occured: {}".format(error))
         output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
