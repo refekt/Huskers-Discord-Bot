@@ -505,14 +505,11 @@ async def about(ctx):
     embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)
 
-if len(sys.argv) > 0:
+if len(sys.argv) == 0:
+    print("*** Running production server ***")
+    client.run(config.DISCORD_TOKEN)
+else:
     if sys.argv[1] == 'test':
         print("*** Running development server ***")
         client.run(config.TEST_TOKEN)
-    elif sys.argv[1] == 'prod':
-        print("*** Running production server ***")
-        client.run(config.DISCORD_TOKEN)
-    else:
-        print("You are error. Good bye!")
-else:
-    print("No arguments presented.")
+    print("You are error. Good bye!")
