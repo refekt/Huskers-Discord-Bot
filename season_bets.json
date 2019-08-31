@@ -312,9 +312,9 @@
                         }
                     }
                 ],
-                "outcome_moneyline": "None",
-                "outcome_spread": "None",
-                "outcome_winorlose": "None",
+                "outcome_moneyline": "False",
+                "outcome_spread": "False",
+                "outcome_winorlose": "True",
                 "spread": -36
             },
             "tbd1": {

@@ -363,6 +363,10 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         # Show all winners for game
         elif cmd == "winners":
+            if not team:
+                return
+
+
             # Need to add check if command is run the day after the game
             if team:
                 winners_winorlose = []
@@ -429,9 +433,9 @@ class TextCommands(commands.Cog, name="Text Commands"):
                         embed.add_field(name="Spread Winners", value="N/A", inline=True)
 
                     if win_moneyline_string:
-                        embed.add_field(name="Spread Winners", value=win_moneyline_string, inline=True)
+                        embed.add_field(name="Over Under/Total Points Winners", value=win_moneyline_string, inline=True)
                     else:
-                        embed.add_field(name="Spread Winners", value="N/A", inline=True)
+                        embed.add_field(name="Over Under/Total Points Winners", value="N/A", inline=True)
 
                     await ctx.send(embed=embed)
 
