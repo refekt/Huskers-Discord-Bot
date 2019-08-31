@@ -478,8 +478,8 @@ async def on_command_error(ctx, error):
                 await channel.send(embed=embed)
             # else:
             #     await ctx.message.author.send("Incorrect mammal provided. Try again.")
-        except:
-            await ctx.message.author.send(error)
+        # except:
+        #     await ctx.message.author.send(error)
     else:
         print("An error occured: {}".format(error))
         output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
