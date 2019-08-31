@@ -438,6 +438,12 @@ async def on_command_completion(ctx):
 
 
 @client.event
+async def on_connecdt():
+    channel = client.get_channel(593984711706279937)
+    await channel.send("https://imagizer.imageshack.com/a/img923/111/fdKVHl.gif")
+    pass
+
+@client.event
 async def on_command_error(ctx, error):
     if ctx.message.content.startswith("$secret"):
         try:
