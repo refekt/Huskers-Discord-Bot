@@ -54,6 +54,11 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
     game_bets = config.season_bets[season_year]['opponent'][game]['bets']
 
+    try:
+        config.season_bets[season_year]['opponent'][game]['bets'][0][raw_username] = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": "None"}
+    except:
+        print("somethig??")
+
     for bet_users in game_bets:
         for users in bet_users:
             if str(users) == raw_username:
@@ -77,7 +82,6 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
         for bet_users in config.season_bets[season_year]['opponent'][game]['bets']:
             bet_users[raw_username] = config.new_dict
             bet_counter += 1
-
     # Setup a new nested mess of variables to translate into JSON
     except:
         # Write to JSON file
@@ -375,20 +379,25 @@ async def on_reaction_add(reaction, user):
             # Send a message alerting the channel that a user has placed a bet.
             global bet_counter
 
+            print(config.new_dict)
+
             # *** Maybe change to a PM instead ***
             # Creates the embed object for all messages within method
             embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
             embed.set_footer(text=config.bet_footer)
 
-            for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
-                if u == raw_username:
-                    embed.add_field(name="Author", value=raw_username, inline=False)
-                    embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
-                    embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
-                    embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
-                    await user.send(embed=embed)
-            bet_counter = -1
+            if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
+                for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
+                    if u == raw_username:
+                        embed.add_field(name="Author", value=raw_username, inline=False)
+                        embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+                        embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
+                        embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
+                        await user.send(embed=embed)
+                bet_counter = -1
+            else:
+                pass
 
             # Remove reaction to prevent user from voting for both
             try:
