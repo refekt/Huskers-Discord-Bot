@@ -32,7 +32,8 @@ ref_dict = {'bs': ['Bull shit', 'Referee still gets paid for that horrible call'
             'targeting': ['Targeting', 'OFF/DEF: 15 yard penalty, ejection ', 'https://i.imgur.com/qOsjBCB.gif'],
             'td': ['Touchdown', 'OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'],
             'unsport': ['Unsportsmanlike', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/6Cy9UE4.gif'],
-            'hornsdown': ['Horns Down', 'Tuck Fexas', 'https://i.imgur.com/w8ACfmn.gif']
+            'hornsdown': ['Horns Down', 'Tuck Fexas', 'https://i.imgur.com/w8ACfmn.gif'],
+            'blindside': ['Blindside Block', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/dyWMN7p.gif']
             }
 flag_dict = {'iowa': 'https://i.imgur.com/xoeCOwp.png',
              'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
@@ -244,7 +245,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.command(aliases=["ref",])
     async def referee(self, ctx, call=None):
         """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
-        The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport, bs, hornsdown """
+        The calls include: chip, chop, encroachment, facemask, hand2face, hold, illfwd, illshift, inelrec, persfoul, pi, ruffkick, ruffpas, safety, targeting, td, unsport, bs, hornsdown, blindside """
 
         if not call:
             await ctx.send("A penalty must be included. `$referee|ref <call>`. Check `$help referee` for more informaiton.")
