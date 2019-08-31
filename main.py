@@ -421,14 +421,14 @@ async def on_command_completion(ctx):
 
 # TODO Check if command is Animal: Hashed-username
 # @client.event
-# async def on_command_error(ctx, error):
-#     output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-#                 "```Message ID: {}\n" \
-#                 "Channel: {} / {}\n" \
-#                 "Author: {}\n" \
-#                 "Content: {}\n" \
-#                 "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-#     await ctx.send(output_msg)
+async def on_command_error(ctx, error):
+    output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                "```Message ID: {}\n" \
+                "Channel: {} / {}\n" \
+                "Author: {}\n" \
+                "Content: {}\n" \
+                "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+    await ctx.send(output_msg)
 # End bot (client) events
 
 # Admin command
@@ -498,6 +498,7 @@ async def about(ctx):
     embed.add_field(name="About HuskerBot", value="HuskerBot was created by [/u/refekt](https://reddit.com/u/refekt) and "
                                                   "[/u/psyspoop](https://reddit.com/u/psyspoop). Source code is located on "
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
+    embed.add_field(name="Hosted On", value="VPS Servery by Jeyrad")
     embed.add_field(name="Current Latency", value="{:.2f} ms".format(client.latency*1000))
     embed.add_field(name="Client User", value=client.user)
     embed.add_field(name="Ready Status", value=client.is_ready())
