@@ -496,7 +496,8 @@ async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, color=0xFF0000)
     embed.set_thumbnail(url="https://i.imgur.com/Ah3x5NA.png")
     embed.add_field(name="About HuskerBot", value="HuskerBot was created by [/u/refekt](https://reddit.com/u/refekt) and "
-                                                  "[/u/psyspoop](https://reddit.com/u/psyspoop). Source code is located on "
+                                                  "[/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assist greatly with coding. "
+                                                  "Source code is located on "
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
     embed.add_field(name="Hosting Location", value="Jeyrad's VPS Server. Thank you!")
     embed.add_field(name="Current Latency", value="{:.2f} ms".format(client.latency*1000))
