@@ -6,6 +6,11 @@ async def check_command_channel(command: str, channel):
     global correct_channel
     flag = False
 
+    gameDay = True
+    if gameDay:
+        correct_channel = True
+        return
+
     # Commands to check for
     croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs', 'cb_refresh']
     flag_commands = ['crappyflag', 'randomflag']
