@@ -512,4 +512,3 @@ else:
     if sys.argv[1] == 'test':
         print("*** Running development server ***")
         client.run(config.TEST_TOKEN)
-    print("You are error. Good bye!")
