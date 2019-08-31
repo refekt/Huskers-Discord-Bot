@@ -419,23 +419,23 @@ async def on_command_completion(ctx):
 
         await ctx.send(not_authed)
 
-async def makeMD5():
-    names = ["229077183245582336", "205458138764279808", "142645994935418880", "289262536740569088", "425574994995838977", "283717434375012355", "189554873778307073"]
-    animals = ["bear", "leopard", "tiger", "fox", "lion", "panda", "gorilla", "seal", "rabbit", "elephant"]
-    mammals = dict()
-    i = 0
-    for name in names:
-        hash_object = hashlib.md5(name.encode())
-        mammals.update({animals[i]: hash_object.hexdigest()})
-        i += 1
+# async def makeMD5():
+#     names = ["229077183245582336", "205458138764279808", "142645994935418880", "289262536740569088", "425574994995838977", "283717434375012355", "189554873778307073"]
+#     animals = ["bear", "leopard", "tiger", "fox", "lion", "panda", "gorilla", "seal", "rabbit", "elephant"]
+#     mammals = dict()
+#     i = 0
+#     for name in names:
+#         hash_object = hashlib.md5(name.encode())
+#         mammals.update({animals[i]: hash_object.hexdigest()})
+#         i += 1
+#
+#     print(mammals)
+#
+#     with open("mammals.json", "w") as fp:
+#         json.dump(mammals, fp, sort_keys=True, indent=4)
+#     fp.close()
 
-    print(mammals)
 
-    with open("mammals.json", "w") as fp:
-        json.dump(mammals, fp, sort_keys=True, indent=4)
-    fp.close()
-
-# TODO Check if command is Animal: Hashed-username
 @client.event
 async def on_command_error(ctx, error):
     if ctx.message.content.startswith("$secret"):
@@ -471,7 +471,7 @@ async def on_command_error(ctx, error):
 
             embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
             embed.add_field(name="Message", value=message)
-            
+
             await channel.send(embed=embed)
         else:
             await ctx.message.author.send("Incorrect mammal provided. Try again.")
