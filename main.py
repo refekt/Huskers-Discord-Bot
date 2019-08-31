@@ -16,6 +16,7 @@ from cogs.text_commands import load_season_bets
 from cogs.text_commands import store_next_opponent
 import datetime
 import json
+import hashlib
 
 # Bot specific stuff
 botPrefix='$'
@@ -418,60 +419,71 @@ async def on_command_completion(ctx):
 
         await ctx.send(not_authed)
 
+async def makeMD5():
+    names = ["229077183245582336", "205458138764279808", "142645994935418880", "289262536740569088", "425574994995838977", "283717434375012355", "189554873778307073"]
+    animals = ["bear", "leopard", "tiger", "fox", "lion", "panda", "gorilla", "seal", "rabbit", "elephant"]
+    mammals = dict()
+    i = 0
+    for name in names:
+        hash_object = hashlib.md5(name.encode())
+        mammals.update({animals[i]: hash_object.hexdigest()})
+        i += 1
+
+    print(mammals)
+
+    with open("mammals.json", "w") as fp:
+        json.dump(mammals, fp, sort_keys=True, indent=4)
+    fp.close()
 
 # TODO Check if command is Animal: Hashed-username
 @client.event
 async def on_command_error(ctx, error):
-    print("An error occured: {}".format(error))
-    output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-                "```Message ID: {}\n" \
-                "Channel: {} / {}\n" \
-                "Author: {}\n" \
-                "Content: {}\n" \
-                "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-    await ctx.send(output_msg)
+    if ctx.message.content.startswith("$secret"):
+        context = ctx.message.content.split(" ")
+
+        if context[0].lower() != "$secret":
+            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+
+        if not context[1].isalpha() and not context[2].isalpha():
+            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+
+        if context[2].lower() != "war" and context[2].lower() != "scott":
+            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+
+        f = open('mammals.json', 'r')
+        temp_json = f.read()
+        mammals = json.loads(temp_json)
+        f.close()
+
+        checkID = hashlib.md5(str(ctx.message.author.id).encode())
+
+        if checkID.hexdigest() == mammals[context[1]]:
+            context_commands = "{} {} {}".format(context[0], context[1], context[2])
+            message = ctx.message.content[len(context_commands):]
+
+            embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
+            embed.add_field(name="Message", value=message)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.message.author.send("Incorrect mammal provided. Try again.")
+
+
+        #
+        # for user in mammals:
+        #     if ctx.message.author.id == 1:
+
+    else:
+        print("An error occured: {}".format(error))
+        output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                    "```Message ID: {}\n" \
+                    "Channel: {} / {}\n" \
+                    "Author: {}\n" \
+                    "Content: {}\n" \
+                    "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+        await ctx.send(output_msg)
 # End bot (client) events
 
 # Admin command
-@client.command(hidden=True)
-async def squirrel(ctx, chan, *, message):
-    if str(ctx.author) == "IDontBelieveInIsms#1838":
-        if chan.lower() == "war":
-            channel = client.get_channel(525519594417291284)
-            embed = discord.Embed(title="Secret Squirrel Message", color=0xFF0000)
-            embed.add_field(name="Content", value=message)
-            await channel.send(embed=embed)
-        elif chan.lower() == "scott":
-            channel = client.get_channel(507520543096832001)
-            embed = discord.Embed(title="Secret Squirrel Message", color=0xFF0000)
-            embed.add_field(name="Content", value=message)
-            await channel.send(embed=embed)
-        else:
-            await ctx.send("Incorrect channel provided. \"war\" and \"scott\" are the only options.")
-            return
-
-@client.command(hidden=True)
-async def chipmunk(ctx, chan, *, message):
-    authorized = False
-
-    for r in ctx.author.roles:
-        if r.id == 443805741111836693 or r.id == 440639061191950336:
-            authorized = True
-
-    if authorized:
-        if chan.lower() == "war":
-            channel = client.get_channel(525519594417291284)
-            embed = discord.Embed(title="Secret Chipmunk Message", color=0xFF0000)
-            embed.add_field(name="Content", value=message)
-            await channel.send(embed=embed)
-        elif chan.lower() == "scott":
-            channel = client.get_channel(507520543096832001)
-            embed = discord.Embed(title="Secret Chipmunk Message", color=0xFF0000)
-            embed.add_field(name="Content", value=message)
-            await channel.send(embed=embed)
-        else:
-            await ctx.send("Incorrect channel provided. \"war\" and \"scott\" are the only options.")
-            return
 
 @client.command(aliases=["quit", "q"])
 async def huskerbotquit(ctx):
@@ -490,7 +502,6 @@ async def huskerbotquit(ctx):
     else:
         await ctx.send("Nice try buddy! 👋")
 # Admin command
-
 
 @client.command()
 async def about(ctx):
