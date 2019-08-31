@@ -224,10 +224,10 @@ class ImageCommands(commands.Cog, name="Image Commands"):
 
     @commands.command()
     async def bones(self, ctx):
-        """ Martinez struttin his stuff """
+        """ Throwing bones! """
         embed = discord.Embed(title="☠ Bones ☠")
         embed.set_image(url='https://i.imgur.com/xENcy9O.jpg')
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['flip',])
     async def theflip(self, ctx):
