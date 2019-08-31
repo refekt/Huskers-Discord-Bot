@@ -50,8 +50,5 @@ async def check_command_channel(command: str, channel):
         # Command is within flag_commands and the channel ID is within flag_channels
         elif str(command) in flag_commands and channel.id in flag_channels:
             flag = True
-
-    if str(channel) == 440868279150444544:
-        flag = True
         # All commands authorized within bot_spam_channels
     correct_channel = flag

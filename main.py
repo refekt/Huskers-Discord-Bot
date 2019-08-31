@@ -407,18 +407,18 @@ async def on_reaction_add(reaction, user):
         pass
 
 
-@client.event
-async def on_command_completion(ctx):
-    global banned_channels
-
-    if ctx.channel.id in banned_channels:
-        not_authed = "⚠ This channel is banned from using commands ⚠"
-
-        async for message in ctx.channel.history(limit=2, oldest_first=False):
-            if message.author == client.user:
-                await message.delete()
-
-        await ctx.send(not_authed)
+# @client.event
+# async def on_command_completion(ctx):
+#     global banned_channels
+#
+#     if ctx.channel.id in banned_channels:
+#         not_authed = "⚠ This channel is banned from using commands ⚠"
+#
+#         async for message in ctx.channel.history(limit=2, oldest_first=False):
+#             if message.author == client.user:
+#                 await message.delete()
+#
+#         await ctx.send(not_authed)
 
 # async def makeMD5():
 #     names = ["229077183245582336", "205458138764279808", "142645994935418880", "289262536740569088", "425574994995838977", "283717434375012355", "189554873778307073"]
