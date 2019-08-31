@@ -90,6 +90,7 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
 @client.event
 async def on_ready():
     # https://gist.github.com/scragly/2579b4d335f87e83fbacb7dfd3d32828
+
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
     print("*** Version Information:\n    Logged in as [{0}].\n    Discord.py version is: [{1}].\n    Discord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
@@ -439,15 +440,14 @@ async def on_command_completion(ctx):
 @client.event
 async def on_command_error(ctx, error):
     if ctx.message.content.startswith("$secret"):
-        # try:
         context = ctx.message.content.split(" ")
-
+        # $secret
         if context[0].lower() != "$secret":
             await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-
+        # mammal | channel
         if not context[1].isalpha() and not context[2].isalpha():
             await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-
+        # channel must be "war" or "scott"
         if context[2].lower() != "war" and context[2].lower() != "scott":
             await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
@@ -458,7 +458,8 @@ async def on_command_error(ctx, error):
 
         checkID = hashlib.md5(str(ctx.message.author.id).encode())
 
-        channel = 0
+        print(context[2])
+
         if context[2].lower() == "war":
             channel = client.get_channel(525519594417291284)
         elif context[2].lower() == "scott":
@@ -468,6 +469,8 @@ async def on_command_error(ctx, error):
         else:
             await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
+        print(checkID.hexdigest(), mammals[context[1]])
+
         if checkID.hexdigest() == mammals[context[1]]:
                 context_commands = "{} {} {}".format(context[0], context[1], context[2])
                 message = ctx.message.content[len(context_commands):]
@@ -476,10 +479,8 @@ async def on_command_error(ctx, error):
                 embed.add_field(name="Message", value=message)
 
                 await channel.send(embed=embed)
-            # else:
-            #     await ctx.message.author.send("Incorrect mammal provided. Try again.")
-        # except:
-        #     await ctx.message.author.send(error)
+        else:
+            await ctx.message.author.send("Shit didn't add up")
     else:
         print("An error occured: {}".format(error))
         output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
