@@ -498,7 +498,7 @@ async def about(ctx):
     embed.add_field(name="About HuskerBot", value="HuskerBot was created by [/u/refekt](https://reddit.com/u/refekt) and "
                                                   "[/u/psyspoop](https://reddit.com/u/psyspoop). Source code is located on "
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
-    embed.add_field(name="Hosted On", value="Jeyrad's VPS Server. Thank you!")
+    embed.add_field(name="Hosting Location", value="Jeyrad's VPS Server. Thank you!")
     embed.add_field(name="Current Latency", value="{:.2f} ms".format(client.latency*1000))
     embed.add_field(name="Client User", value=client.user)
     embed.add_field(name="Ready Status", value=client.is_ready())
