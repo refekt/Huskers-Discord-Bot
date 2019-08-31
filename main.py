@@ -438,7 +438,7 @@ async def on_command_completion(ctx):
 
 
 @client.event
-async def on_connecdt():
+async def on_connect():
     channel = client.get_channel(593984711706279937)
     await channel.send("https://imagizer.imageshack.com/a/img923/111/fdKVHl.gif")
     pass
