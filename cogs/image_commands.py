@@ -305,7 +305,8 @@ class ImageCommands(commands.Cog, name="Image Commands"):
 
             await ctx.send(file=discord.File(created_flag))
         except:
-            await ctx.send("Error occured trying to use `{}` mask. Try again!".format(poop_files[0]))
+            await ctx.send("Error trying to make a flag.")
+            #await ctx.send("Error occured trying to use `{}` mask. Try again!".format(poop_files[0]))
     # End image commands
 
 
