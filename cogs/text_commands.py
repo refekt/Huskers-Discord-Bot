@@ -234,10 +234,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 await ctx.send("An error occurred retrieving line data.")
                 return
 
-            lines = {}
-            for lines_raw in game_data_raw:
-                lines = lines_raw["lines"]
-            lines = lines[0]
+            try:
+                lines = {}
+                for lines_raw in game_data_raw:
+                    lines = lines_raw["lines"]
+                lines = lines[0]
+            except:
+                print("No lines available")
+
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
             embed.add_field(name="Rules", value=""
@@ -246,8 +250,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
                                                 "Bets are stored by your __Discord username__. If you change your username you will lose your bet history.\n"
                                                 "\nBets for winning or losing are worth +/- 1 point. \nBets for the spread are worth +/- 2 points. \nBets for the over under are worth +/- 2 points.\n", inline=False)
             embed.add_field(name="Prizes", value="To be determined!")
-            embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
-            embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
+            if lines:
+                embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
+                embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
+            else:
+                embed.add_field(name="Spread (TBD)", value="TBD")
+                embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
+
             embed.add_field(name="Vote Instructions", value=""
                                                             "Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\n"
                                                             "Bets over (⏫) or under (⏬) on the spread. Clear bet (❌).\n"
