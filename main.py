@@ -422,6 +422,7 @@ async def on_command_completion(ctx):
 # TODO Check if command is Animal: Hashed-username
 # @client.event
 async def on_command_error(ctx, error):
+    print("An error occured: {}".format(error))
     output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
                 "```Message ID: {}\n" \
                 "Channel: {} / {}\n" \
