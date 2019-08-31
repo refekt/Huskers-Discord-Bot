@@ -279,33 +279,33 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             result.putalpha(alpha)
             return result
 
-        try:
-            # Directory strings
-            emojis_dir = "media/emojis"
-            blank_flag = "media/raw/blank_flag.png"
-            created_flag = "media/saved/{}_created_flag.png".format(str(ctx.author))
+        #try:
+        # Directory strings
+        emojis_dir = "media/emojis"
+        blank_flag = "media/raw/blank_flag.png"
+        created_flag = "media/saved/{}_created_flag.png".format(str(ctx.author))
 
-            # Get list of emojis, shuffle the list, pick random emoji, and create an Image.
-            poop_files = [f for f in listdir(emojis_dir) if isfile(join(emojis_dir, f))]
-            random.shuffle(poop_files)
-            print("Poop: {}".format(poop_files[0]))
-            img_poop_raw = Image.open("{}/{}".format(emojis_dir, poop_files[0]))
-            sizes = img_poop_raw.width * 3, img_poop_raw.height * 3
-            img_poop = img_poop_raw.resize(size=sizes, resample=PIL.Image.NEAREST)
+        # Get list of emojis, shuffle the list, pick random emoji, and create an Image.
+        poop_files = [f for f in listdir(emojis_dir) if isfile(join(emojis_dir, f))]
+        random.shuffle(poop_files)
+        print("Poop: {}".format(poop_files[0]))
+        img_poop_raw = Image.open("{}/{}".format(emojis_dir, poop_files[0]))
+        sizes = img_poop_raw.width * 3, img_poop_raw.height * 3
+        img_poop = img_poop_raw.resize(size=sizes, resample=PIL.Image.NEAREST)
 
-            # Turn the blank flag into a random color.
-            img_flag = Image.open(blank_flag)
-            random_color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
-            tinted_flag = await tint_image(img_flag, random_color)
+        # Turn the blank flag into a random color.
+        img_flag = Image.open(blank_flag)
+        random_color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+        tinted_flag = await tint_image(img_flag, random_color)
 
-            new_img = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
-            new_img.paste(tinted_flag, ((new_img.width - tinted_flag.width) // 2, (new_img.height - tinted_flag.height) // 2))
-            new_img.paste(img_poop, ((new_img.width - img_poop.width) // 2, (new_img.height - img_poop.height) // 2), mask=img_poop)
-            new_img.save(created_flag)
+        new_img = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        new_img.paste(tinted_flag, ((new_img.width - tinted_flag.width) // 2, (new_img.height - tinted_flag.height) // 2))
+        new_img.paste(img_poop, ((new_img.width - img_poop.width) // 2, (new_img.height - img_poop.height) // 2), mask=img_poop)
+        new_img.save(created_flag)
 
-            await ctx.send(file=discord.File(created_flag))
-        except:
-            await ctx.send("Error trying to make a flag.")
+        await ctx.send(file=discord.File(created_flag))
+        # except:
+        #     await ctx.send("Error trying to make a flag.")
             #await ctx.send("Error occured trying to use `{}` mask. Try again!".format(poop_files[0]))
     # End image commands
 
