@@ -473,8 +473,9 @@ async def on_command_error(ctx, error):
                 context_commands = "{} {} {}".format(context[0], context[1], context[2])
                 message = ctx.message.content[len(context_commands):]
 
-                embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
+                embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xFF0000)
                 embed.add_field(name="Message", value=message)
+                embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
 
                 await channel.send(embed=embed)
             else:
