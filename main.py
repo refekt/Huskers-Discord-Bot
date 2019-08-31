@@ -457,13 +457,20 @@ async def on_command_error(ctx, error):
 
         checkID = hashlib.md5(str(ctx.message.author.id).encode())
 
+        if context[2].lower() == "war":
+            channel = client.get_channel(525519594417291284)
+        elif context[2].lower() == "scott":
+            channel = client.get_channel(507520543096832001)
+        else:
+            await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+
         if checkID.hexdigest() == mammals[context[1]]:
             context_commands = "{} {} {}".format(context[0], context[1], context[2])
             message = ctx.message.content[len(context_commands):]
 
             embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
             embed.add_field(name="Message", value=message)
-            await ctx.send(embed=embed)
+            await channel.send(embed=embed)
         else:
             await ctx.message.author.send("Incorrect mammal provided. Try again.")
 
