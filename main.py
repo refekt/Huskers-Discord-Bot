@@ -441,33 +441,23 @@ async def on_command_completion(ctx):
 async def on_command_error(ctx, error):
     if ctx.message.content.startswith("$secret"):
         try:
-            print("Split the context.message.content")
             context = ctx.message.content.split(" ")
             # $secret
-            print("Check for $secret")
             if context[0].lower() != "$secret":
                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
             # mammal | channel
-            print("Check for mammal and channel as strings.")
             if not context[1].isalpha() and not context[2].isalpha():
                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
             # channel must be "war" or "scott"
-            print("Check for 'war' or 'scott'")
             if context[2].lower() != "war" and context[2].lower() != "scott":
                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-            print("Open mammals.json")
             f = open('mammals.json', 'r')
             temp_json = f.read()
             mammals = json.loads(temp_json)
             f.close()
 
-            print("Generate md5")
             checkID = hashlib.md5(str(ctx.message.author.id).encode())
-
-            print(context[2])
-            print("Find which channel to use")
-
             channel = int()
 
             if context[2].lower() == "war":
@@ -479,21 +469,14 @@ async def on_command_error(ctx, error):
             else:
                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-            print(checkID.hexdigest(), mammals[context[1]])
-            print(type(checkID.hexdigest()), type(mammals[context[1]]))
-
             if checkID.hexdigest() == mammals[context[1]]:
-                print("MD5 matched")
                 context_commands = "{} {} {}".format(context[0], context[1], context[2])
                 message = ctx.message.content[len(context_commands):]
 
-                print("Make embed")
                 embed = discord.Embed(title="Secret {} Alert".format(str(context[1]).capitalize()), color=0xFF0000)
                 embed.add_field(name="Message", value=message)
 
-                print("Send embed")
                 await channel.send(embed=embed)
-                print("Embed sent")
             else:
                 await ctx.message.author.send("Shit didn't add up")
         except:
