@@ -255,9 +255,24 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             # Store message sent in an object to allow for reactions afterwards
             # TODO add datetime checking. Don't add if after kick off through midnight that day.
+            check_now_raw = datetime.datetime.now()
+            check_now = dateutil.parser.parse(str(check_now_raw))
+
+            index = config.current_game[2] -1
+            f = open('husker_schedule.json', 'r')
+            temp_json = f.read()
+            husker_schedule = json.loads(temp_json)
+            f.close()
+
             msg_sent = await ctx.send(embed=embed)
-            for e in bet_emojis:
-                await msg_sent.add_reaction(e)
+
+            #debug_datetime = datetime.datetime.strptime("2019-08-20T16:00:00.000Z", "%Y-%m-%dT%H:%M:%S.%fZ")
+            check_game_datetime = datetime.datetime.strptime(husker_schedule[(config.current_game[2]-1)]["start_date"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if check_now < check_game_datetime:
+                for e in bet_emojis:
+                    await msg_sent.add_reaction(e)
+            else:
+                print("Reactions not applied because datetime is after kickoff.")
 
         # Show the user's current bet(s)
         elif cmd == "show":
@@ -478,7 +493,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
             weather_dict = r.json()
 
-            dump = False
+            dump = True
             if dump:
                 with open("weather_json.json", "w") as fp:
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)
@@ -498,7 +513,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             r = requests.get(url="https://api.weatherbit.io/v2.0/forecast/daily?key={}&lang=en&units=I&lat={}&lon={}&days=7".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
             weather_dict = r.json()
 
-            dump = False
+            dump = True
             if dump:
                 with open("weather_json.json", "w") as fp:
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)

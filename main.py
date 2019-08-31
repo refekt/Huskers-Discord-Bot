@@ -421,14 +421,14 @@ async def on_command_completion(ctx):
 
 # TODO Check if command is Animal: Hashed-username
 # @client.event
-# async def on_command_error(ctx, error):
-#     output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-#                 "```Message ID: {}\n" \
-#                 "Channel: {} / {}\n" \
-#                 "Author: {}\n" \
-#                 "Content: {}\n" \
-#                 "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-#     await ctx.send(output_msg)
+async def on_command_error(ctx, error):
+    output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                "```Message ID: {}\n" \
+                "Channel: {} / {}\n" \
+                "Author: {}\n" \
+                "Content: {}\n" \
+                "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+    await ctx.send(output_msg)
 # End bot (client) events
 
 # Admin command
