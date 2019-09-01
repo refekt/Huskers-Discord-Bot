@@ -7,6 +7,7 @@ import dateutil.parser
 import discord
 import config
 import requests
+import time
 
 # Dictionaries
 eight_ball = ['Try again',
@@ -553,6 +554,21 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send(embed=embed)
 
         #await ctx.send(ow.get_weather(station))
+
+    @commands.command()
+    async def balloons(self, ctx):
+        balloons = [
+            "```\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈🎈🎈🎈\n🎈        🎈    🎈  🎈    🎈\n🎈  🎈🎈  🎈🎈🎈    🎈🎈🎈\n🎈    🎈  🎈    🎈  🎈    🎈\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈    🎈\n```"
+        ]
+
+        loops = len(balloons)
+        i = 0
+
+        msg = await ctx.send(balloons[0])
+        while i < loops:
+            await msg.edit(content=balloons[i])
+            i += 1
+            time.sleep(0.5)
     # Text commands
 
 
