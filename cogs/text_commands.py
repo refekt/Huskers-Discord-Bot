@@ -39,7 +39,6 @@ husker_schedule = []
 
 
 class TextCommands(commands.Cog, name="Text Commands"):
-    # Text commands
     # TODO Possibly remove this command.
     @commands.command()
     async def stonk(self, ctx):

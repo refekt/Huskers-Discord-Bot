@@ -50,7 +50,7 @@ def store_next_opponent():
         counter += 1
 
 
-class BetCommands(commands.Cog, name="Text Commands"):
+class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.command()
     async def bet(self, ctx, cmd=None, *, team=None):
         """ Allows a user to place a bet on the upcoming Husker game. Bets are placed by reacting to the bot's message. Bets are recorded by Discord username. Changing your username will result in lost bets. All bets must be completed prior to kickoff. Bets after that will not be accepted. Winners will be tallied on the next calendar day after the game.
