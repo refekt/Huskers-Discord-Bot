@@ -5,10 +5,10 @@
                 "bets": [
                     {
                         "aargonz#3345": {
-                            "datetime": "01-09-2019 20:24:44",
-                            "moneyline": "None",
+                            "datetime": "02-09-2019 16:37:59",
+                            "moneyline": "True",
                             "spread": "True",
-                            "winorlose": "None"
+                            "winorlose": "True"
                         },
                         "bot": {
                             "datetime": "19-08-2019 11:52:48",

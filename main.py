@@ -12,8 +12,8 @@ import random
 import config
 import re
 import cogs.croot_bot
-from cogs.text_commands import load_season_bets
-from cogs.text_commands import store_next_opponent
+from cogs.betting_commands import load_season_bets
+from cogs.betting_commands import store_next_opponent
 import datetime
 import json
 import hashlib
@@ -28,6 +28,7 @@ client.load_extension('cogs.text_commands')
 client.load_extension('cogs.croot_bot')
 client.load_extension('cogs.stat_bot')
 client.load_extension('cogs.sched_commands')
+client.load_extension('cogs.betting_commands')
 
 # initialize a global list for CrootBot to put search results in
 authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
@@ -83,11 +84,26 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
             json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
 
 
+async def makeMD5():
+    names = ["229077183245582336", "205458138764279808", "142645994935418880", "289262536740569088", "425574994995838977", "283717434375012355", "189554873778307073"]
+    animals = ["bear", "leopard", "tiger", "fox", "lion", "panda", "gorilla", "seal", "rabbit", "elephant"]
+    mammals = dict()
+    i = 0
+    for name in names:
+        hash_object = hashlib.md5(name.encode())
+        mammals.update({animals[i]: hash_object.hexdigest()})
+        i += 1
+
+    print(mammals)
+
+    with open("mammals.json", "w") as fp:
+        json.dump(mammals, fp, sort_keys=True, indent=4)
+    fp.close()
+
+
 # Start bot (client) events
 @client.event
 async def on_ready():
-    # https://gist.github.com/scragly/2579b4d335f87e83fbacb7dfd3d32828
-
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
     print("*** Version Information:\n    Logged in as [{0}].\n    Discord.py version is: [{1}].\n    Discord version is [{2}].\n***".format(client.user, discord.__version__, sys.version))
 
@@ -216,50 +232,8 @@ async def on_member_join(member):
     embed.set_footer(text=welcome_footer)
     await member.send(embed=embed)
 
-    # channel_join = client.get_channel(458474143403212801)
-    # embed_join = discord.Embed(title="Member Joined", color=0xFF0000)
-    # embed_join.add_field(name="Member Name", value=member.name)
-    # embed_join.add_field(name="ID", value=member.id)
-    # await channel_join.send(embed=embed_join)
-    pass
 
 # Client events for member leave, ban, unban, etc.
-# @client.event
-# async def on_member_remove(member):
-#     channel_join = client.get_channel(458474143403212801)
-#     embed_join = discord.Embed(title="Member Left", color=0xFF0000)
-#     embed_join.add_field(name="Member Name", value=member.name)
-#     embed_join.add_field(name="ID", value=member.id)
-#     await channel_join.send(embed=embed_join)
-#
-#
-# @client.event
-# async def on_member_ban(guild, user):
-#     channel_join = client.get_channel(458474143403212801)
-#     embed_join = discord.Embed(title="Member Banned", color=0xFF0000)
-#     embed_join.add_field(name="Member Name", value=user.name)
-#     embed_join.add_field(name="ID", value=user.id)
-#     await channel_join.send(embed=embed_join)
-#
-#
-# @client.event
-# async def on_member_unban(guild, user):
-#     channel_join = client.get_channel(458474143403212801)
-#     embed_join = discord.Embed(title="Member Unbanned", color=0xFF0000)
-#     embed_join.add_field(name="Member Name", value=user.name)
-#     embed_join.add_field(name="ID", value=user.id)
-#     await channel_join.send(embed=embed_join)
-#
-#
-# @client.event
-# async def on_user_update(before, after):
-#     channel_join = client.get_channel(458474143403212801)
-#     embed_join = discord.Embed(title="Member Updated", color=0xFF0000)
-#     embed_join.add_field(name="Member Name Before", value="{}#{}".format(before.name, before.discriminator))
-#     embed_join.add_field(name="Member Name After", value="{}#{}".format(after.name, after.discriminator))
-#     await channel_join.send(embed=embed_join)
-
-
 @client.event
 async def on_reaction_add(reaction, user):
     # Checking for an embedded message
@@ -409,103 +383,81 @@ async def on_reaction_add(reaction, user):
         pass
 
 
-# @client.event
-# async def on_command_completion(ctx):
-#     global banned_channels
-#
-#     if ctx.channel.id in banned_channels:
-#         not_authed = "⚠ This channel is banned from using commands ⚠"
-#
-#         async for message in ctx.channel.history(limit=2, oldest_first=False):
-#             if message.author == client.user:
-#                 await message.delete()
-#
-#         await ctx.send(not_authed)
+@client.event
+async def on_command_completion(ctx):
+    global banned_channels
 
-# async def makeMD5():
-#     names = ["229077183245582336", "205458138764279808", "142645994935418880", "289262536740569088", "425574994995838977", "283717434375012355", "189554873778307073"]
-#     animals = ["bear", "leopard", "tiger", "fox", "lion", "panda", "gorilla", "seal", "rabbit", "elephant"]
-#     mammals = dict()
-#     i = 0
-#     for name in names:
-#         hash_object = hashlib.md5(name.encode())
-#         mammals.update({animals[i]: hash_object.hexdigest()})
-#         i += 1
-#
-#     print(mammals)
-#
-#     with open("mammals.json", "w") as fp:
-#         json.dump(mammals, fp, sort_keys=True, indent=4)
-#     fp.close()
+    if ctx.channel.id in banned_channels:
+        not_authed = "⚠ This channel is banned from using commands ⚠"
+
+        async for message in ctx.channel.history(limit=2, oldest_first=False):
+            if message.author == client.user:
+                await message.delete()
+
+        await ctx.send(not_authed)
 
 
-# @client.event
-# async def on_connect():
-#     channel = client.get_channel(593984711706279937)
-#     await channel.send("https://imagizer.imageshack.com/a/img923/111/fdKVHl.gif")
-#     pass
+@client.event
+async def on_command_error(ctx, error):
+    if ctx.message.content.startswith("$secret"):
+        try:
+            context = ctx.message.content.split(" ")
+            # $secret
+            if context[0].lower() != "$secret":
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+            # mammal | channel
+            if not context[1].isalpha() and not context[2].isalpha():
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+            # channel must be "war" or "scott"
+            if context[2].lower() != "war" and context[2].lower() != "scott":
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
 
-# @client.event
-# async def on_command_error(ctx, error):
-#     if ctx.message.content.startswith("$secret"):
-#         try:
-#             context = ctx.message.content.split(" ")
-#             # $secret
-#             if context[0].lower() != "$secret":
-#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-#             # mammal | channel
-#             if not context[1].isalpha() and not context[2].isalpha():
-#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-#             # channel must be "war" or "scott"
-#             if context[2].lower() != "war" and context[2].lower() != "scott":
-#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-#
-#             f = open('mammals.json', 'r')
-#             temp_json = f.read()
-#             mammals = json.loads(temp_json)
-#             f.close()
-#
-#             checkID = hashlib.md5(str(ctx.message.author.id).encode())
-#             channel = int()
-#
-#             if context[2].lower() == "war":
-#                 channel = client.get_channel(525519594417291284)
-#             elif context[2].lower() == "scott":
-#                 channel = client.get_channel(507520543096832001)
-#             elif context[2].lower() == "spam":
-#                 channel = client.get_channel(595705205069185047)
-#             else:
-#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-#
-#             if checkID.hexdigest() == mammals[context[1]]:
-#                 context_commands = "{} {} {}".format(context[0], context[1], context[2])
-#                 message = ctx.message.content[len(context_commands):]
-#
-#                 embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xFF0000)
-#                 embed.add_field(name="Message", value=message)
-#                 embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
-#
-#                 await channel.send(embed=embed)
-#             else:
-#                 await ctx.message.author.send("Shit didn't add up")
-#         except:
-#             print("An error occured: {}".format(error))
-#             output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-#                          "```Message ID: {}\n" \
-#                          "Channel: {} / {}\n" \
-#                          "Author: {}\n" \
-#                          "Content: {}\n" \
-#                          "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-#             await ctx.send(output_msg)
-#     else:
-#         print("An error occured: {}".format(error))
-#         output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-#                     "```Message ID: {}\n" \
-#                     "Channel: {} / {}\n" \
-#                     "Author: {}\n" \
-#                     "Content: {}\n" \
-#                     "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-#         await ctx.send(output_msg)
+            f = open('mammals.json', 'r')
+            temp_json = f.read()
+            mammals = json.loads(temp_json)
+            f.close()
+
+            checkID = hashlib.md5(str(ctx.message.author.id).encode())
+            channel = int()
+
+            if context[2].lower() == "war":
+                channel = client.get_channel(525519594417291284)
+            elif context[2].lower() == "scott":
+                channel = client.get_channel(507520543096832001)
+            elif context[2].lower() == "spam":
+                channel = client.get_channel(595705205069185047)
+            else:
+                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+
+            if checkID.hexdigest() == mammals[context[1]]:
+                context_commands = "{} {} {}".format(context[0], context[1], context[2])
+                message = ctx.message.content[len(context_commands):]
+
+                embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xFF0000)
+                embed.add_field(name="Message", value=message)
+                embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
+
+                await channel.send(embed=embed)
+            else:
+                await ctx.message.author.send("Shit didn't add up")
+        except:
+            print("An error occured: {}".format(error))
+            output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                         "```Message ID: {}\n" \
+                         "Channel: {} / {}\n" \
+                         "Author: {}\n" \
+                         "Content: {}\n" \
+                         "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+            await ctx.send(output_msg)
+    else:
+        print("An error occured: {}".format(error))
+        output_msg ="Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+                    "```Message ID: {}\n" \
+                    "Channel: {} / {}\n" \
+                    "Author: {}\n" \
+                    "Content: {}\n" \
+                    "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+        await ctx.send(output_msg)
 # End bot (client) events
 
 # Admin command
@@ -526,7 +478,50 @@ async def huskerbotquit(ctx):
         await client.logout()
     else:
         await ctx.send("Nice try buddy! 👋")
+
+
+@client.command()
+async def purge(ctx, command, qty=0):
+    """ Delete Husker Bot's previous messages. """
+
+    return
+
+    if not command:
+        await ctx.send("A purge option must be included. Review `$help purge` for details.")
+        return
+
+    if command == "all":
+        await ctx.send("Deleting last 1,000 messages in all text channels. This may take a __long__ time and will occupy the bot until it's done. This should be the last deleted message.")
+        for guild in client.guilds:
+            for channel in guild.channels:
+                if channel.type == discord.ChannelType.text:
+                    print("   *** {}".format(channel.type))
+                    async for message in channel.history(limit=1000, oldest_first=True):
+                        print("      *** {}".format(message.author))
+                        if message.author == client.user:
+                            print("      ~~~ {}".format(message.author))
+                            await message.delete()
+    if command == "here":
+        await ctx.send("Deleting last 1,000 messages in this channel.")
+        channel = client.get_channel(ctx.message.channel.id)
+        async for message in channel.history(limit=1000):
+            if message.author == client.user:
+                await message.delete()
+    if command == "recent":
+        if qty:
+            await ctx.send("Deleting last {} messages from current channel.".format(qty))
+
+            channel = client.get_channel(ctx.message.channel.id)
+            print(channel.name, channel.type)
+            async for message in channel.history(limit=qty):
+                print(message.author)
+                if message.author == client.user:
+                    print(message.author, client.user)
+                    await message.delete()
+        else:
+            await ctx.send("A number of recent messages to be deleted is required.")
 # Admin command
+
 
 @client.command()
 async def about(ctx):
@@ -550,9 +545,6 @@ if len(sys.argv) > 0:
         print("*** Running production server ***")
         client.run(config.DISCORD_TOKEN)
     else:
-        if sys.argv[1] == 'test':
-            print("*** Running development server ***")
-            client.run(config.TEST_TOKEN)
         print("You are error. Good bye!")
 else:
     print("No arguments presented.")
