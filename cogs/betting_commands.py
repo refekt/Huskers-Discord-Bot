@@ -194,18 +194,18 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             for usr in temp_dict:
                 if temp_dict[usr]['winorlose'] == "True":
                     total_wins += 1
-                else:
+                elif temp_dict[usr]['winorlose'] == "False":
                     total_losses += 1
 
                 if temp_dict[usr]['spread'] == "True":
                     total_cover_spread += 1
-                else:
-                    total_not_cover_spread += 1
+                elif temp_dict[usr]['spread'] == "False":
+                    total_losses += 1
 
                 if temp_dict[usr]['moneyline'] == "True":
                     total_cover_moneyline += 1
-                else:
-                    total_not_cover_moneyline += 1
+                elif temp_dict[usr]['moneyline'] == "False":
+                    total_losses += 1
 
             total_winorlose = total_losses + total_wins
             total_spread = total_cover_spread + total_not_cover_spread
