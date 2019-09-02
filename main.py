@@ -125,7 +125,7 @@ async def on_message(message):
             await message.add_reaction(emojiUpvote)
             await message.add_reaction(emojiDownvote)
 
-        # Reply to NotA_Virus
+        # Link a subreddit
         if not message.channel in banned_channels:
             #get a list of subreddits mentioned
             subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
@@ -147,6 +147,10 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             elif "fuck you bot" in message.content.lower():
                 await message.channel.send("Whoa {}, that's not very nice!".format(message.author.mention))
+            elif "love you bot" in message.content.lower() or "love u bot" in message.content.lower() or "luv u bot" in message.content.lower() or "luv you bot" in message.content.lower():
+                embed = discord.Embed(title="Shut Up Baby, I Know It")
+                embed.set_image(url="https://media1.tenor.com/images/c1fd95af4433edf940fdc8d08b411622/tenor.gif?itemid=7506108")
+                await message.channel.send(embed=embed)
 
             # Husker Bot hates Isms
             if "isms" in message.content.lower():

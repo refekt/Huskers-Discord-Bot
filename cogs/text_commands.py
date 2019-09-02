@@ -239,6 +239,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 title="5 day forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["city_name"], weather_dict["state_code"]),
                 color=0xFF0000,
                 description="Nebraska's next game is __[{}]__".format(next_game))
+            embed.set_thumbnail(url="https://i.imgur.com/EjAlGCb.png")
 
             for days in weather_dict["data"]:
                 datetime_obj = datetime.datetime.strptime(days["datetime"], "%Y-%m-%d")
