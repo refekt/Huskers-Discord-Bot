@@ -54,11 +54,6 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
     game_bets = config.season_bets[season_year]['opponent'][game]['bets']
 
-    try:
-        config.season_bets[season_year]['opponent'][game]['bets'][0][raw_username] = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": "None"}
-    except:
-        print("somethig??")
-
     for bet_users in game_bets:
         for users in bet_users:
             if str(users) == raw_username:
@@ -74,8 +69,6 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
                     config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": bet_users[users]['spread'], "moneyline": placed_bet}
                 elif which == "canx_moneyline":
                     config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": bet_users[users]['spread'], "moneyline": placed_bet}
-            else:
-                pass               # print("No match")
 
     global bet_counter  # I don't think this actually does anything. Probably can be replaced with 0 or 1
     try:
