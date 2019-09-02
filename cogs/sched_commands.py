@@ -5,6 +5,8 @@ from discord.ext import commands
 import datetime
 import dateutil.parser
 import pytz
+import json
+import discord
 
 leagueDict = {
     'top25': 0,
@@ -65,6 +67,74 @@ nflWeeks = [
 class StatBot(commands.Cog, name="Football Schedules and Scores"):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(aliases=["sched",])
+    async def schedule(self, ctx, year=2019):
+        """ Returns the Nebraska Huskers football schedule. """
+
+        edit_msg = await ctx.send("Loading...")
+
+        url = "https://api.collegefootballdata.com/games?year={}&seasonType=regular&team=nebraska".format(year)
+        try:
+            r = requests.get(url)
+            schedule_list = r.json() # Actually imports a list
+        except:
+            await ctx.send("An error occurred retrieving poll data.")
+            return
+
+        dump = False
+        if dump:
+            with open("husker_schedule.json", "w") as fp:
+                json.dump(schedule_list, fp, sort_keys=True, indent=4)
+            fp.close()
+
+        embed = discord.Embed(title="{} Husker Schedule".format(year), color=0xFF0000)
+
+        for game in schedule_list:
+            game_start_datetime_raw = dateutil.parser.parse(game['start_date'])
+            game_start_datetime_raw = game_start_datetime_raw + datetime.timedelta(hours=-5)
+
+            # collegefootballdata.com puts TBD times as 23 or 0. ¯\_(ツ)_/¯
+            if game_start_datetime_raw.hour == 23 or game_start_datetime_raw.hour == 0:
+                game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y TBD"))
+            else:
+                game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %H:%M %p"))
+
+            home_team = ""
+            home_split = []
+            away_team = ""
+            away_split = []
+            name_len = 8
+
+            # Abbreviate team names with two words in it.
+            if " " in game["home_team"]:
+                home_split = game["home_team"].split(" ")
+                home_team = "{}. {}".format(home_split[0][0], home_split[1])
+            else:
+                home_team = game["home_team"]
+
+            if " " in game["away_team"]:
+                away_split = game["away_team"].split(" ")
+                away_team = "{}. {}".format(away_split[0][0], away_split[1])
+            else:
+                away_team = game["away_team"]
+
+            # Truncate the names if they are too long.
+            if len(home_team) > name_len:
+                home_team = "{}...".format(home_team[:name_len])
+
+            if len(away_team) > name_len:
+                away_team = "{}...".format(away_team[:name_len])
+
+            # Add points next to names if they exist
+            if game["home_points"]:
+                embed.add_field(name="{} ({}) vs {} ({})".format(home_team, game["home_points"], away_team, game["away_points"]), value=game_info_str)
+            # No points added
+            else:
+                embed.add_field(name="{} vs {}".format(home_team, away_team), value=game_info_str)
+
+        embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Nebraska_Cornhuskers_logo.svg/1200px-Nebraska_Cornhuskers_logo.svg.png")
+        await edit_msg.edit(content="", embed=embed)
 
     @commands.command()
     async def cfbsched(self, ctx, league='top25', week=-1, year=2019):
