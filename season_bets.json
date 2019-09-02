@@ -4,9 +4,57 @@
             "colorado": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "02-09-2019 16:37:59",
+                        "Adam7X#2383": {
+                            "datetime": "02-09-2019 15:36:12",
                             "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "All_Luck#3656": {
+                            "datetime": "01-09-2019 20:43:58",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "Gravy On Tap#3096": {
+                            "datetime": "02-09-2019 14:28:11",
+                            "moneyline": "True",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "GumbyShrimp#2359": {
+                            "datetime": "01-09-2019 20:31:33",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "Jarbone#8803": {
+                            "datetime": "01-09-2019 22:21:24",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "Jeyrad#4441": {
+                            "datetime": "02-09-2019 12:58:10",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "Mobius One#3960": {
+                            "datetime": "02-09-2019 15:36:12",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "NotaVirus_Click#3411": {
+                            "datetime": "01-09-2019 21:07:43",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "aargonz#3345": {
+                            "datetime": "02-09-2019 15:08:47",
+                            "moneyline": "None",
                             "spread": "True",
                             "winorlose": "True"
                         },
@@ -15,6 +63,30 @@
                             "moneyline": "None",
                             "spread": "None",
                             "winorlose": "None"
+                        },
+                        "deeretech129#1440": {
+                            "datetime": "02-09-2019 18:13:15",
+                            "moneyline": "True",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "economypie#6181": {
+                            "datetime": "02-09-2019 15:12:54",
+                            "moneyline": "None",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "hurdizzle94#6245": {
+                            "datetime": "02-09-2019 15:07:27",
+                            "moneyline": "True",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "poglife1990#5240": {
+                            "datetime": "01-09-2019 21:10:36",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
                         }
                     }
                 ],

@@ -3,38 +3,13 @@ import markovify
 import random
 import json
 import datetime
-import dateutil.parser
 import discord
-import config
 import requests
 import time
+import calendar
 
 # Dictionaries
-eight_ball = ['Try again',
-              'Definitely yes',
-              'It is certain',
-              'Ask again later',
-              'Better not tell you now',
-              'Cannot predict now',
-              'Concentrate and ask again',
-              'As I see it, yes',
-              'Most Likely',
-              'These are the affirmative answers.',
-              'Don’t count on it',
-              'My reply is no',
-              'My sources say no',
-              'Outlook not so good, and very doubtful',
-              'Reply hazy',
-              'Try again',
-              'It is decidedly so',
-              'Without a doubt',
-              'Yes – definitely',
-              'You may rely on it',
-              'Fuck Iowa',
-              'Frosty',
-              'Scott Frost approves',
-              'Coach V\'s cigar would like this'
-               ]
+eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
 husker_schedule = []
 
 
@@ -136,6 +111,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command(aliases=["bf", "facts",])
     async def billyfacts(self, ctx):
         """ Real facts about Bill Callahan. """
+        msg = await ctx.send("Loading...")
+
         facts = []
         with open("facts.txt") as f:
             for line in f:
@@ -143,7 +120,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         f.close()
 
         random.shuffle(facts)
-        await ctx.message.channel.send(random.choice(facts))
+        await msg.edit(content=random.choice(facts))
 
     @commands.command(aliases=["8b",])
     async def eightball(self, ctx, *, question):
@@ -151,9 +128,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         random.shuffle(eight_ball)
         dice_roll = random.randint(0, len(eight_ball))
 
-        embed = discord.Embed(title=':8ball: HuskerBot 8-Ball :8ball:')
-        embed.add_field(name=question, value=eight_ball[dice_roll])
-
+        embed = discord.Embed(title="The HuskerBot 8-Ball :8ball: says...", description=eight_ball[dice_roll], color=0xFF0000)
+        embed.set_thumbnail(url="https://i.imgur.com/L5Gpu0z.png")
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -169,6 +145,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         venue = ""
         next_game = ""
+
         for game in husker_sched:
             game_datetime_raw = game['start_date'].split("T")
             game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S")  # "%b %d, %Y %I:%M %p"
@@ -190,37 +167,69 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             coords = {}
             for venues in venue_dict:
-                if venues["name"] == venue and venues["state"] == "NE":
+                if venues["name"] == venue:
                     coords = venues["location"]
         else:
             await ctx.send("Unable to locate venue.")
             return
 
+        sky_description = "Sunny"
+        sky_conditions = [
+            ("Cloudy", 100),
+            ("Mostly Cloudy", (7/8)*100),
+            ("Partly Cloudy", (5/8)*100),
+            ("Mostly Sunny", (3/8)*100)
+        ]
+
+        wind_description = "None"
+        wind_conditions = [
+            ("Strong Winds", 999),
+            ("Very Windy", 40),
+            ("Windy", 30),
+            ("Breezy", 25),
+            ("Light", 5),
+            ("Very Light", 1)
+        ]
+
         if which == "current":
             r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
             weather_dict = r.json()
 
-            dump = True
+            dump = False
             if dump:
                 with open("weather_json.json", "w") as fp:
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)
                 fp.close()
 
             embed = discord.Embed(
-                title="Current weather forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
+                title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venue, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
                 color=0xFF0000,
-                description="Nebraska's next game is __[{}]__".format(next_game))
+                description="Nebraska's next opponent is __[{}]__".format(next_game))
+            embed.set_thumbnail(url="https://i.imgur.com/EjAlGCb.png")
 
-            embed.add_field(name="Cloud Coverage", value="{}%".format(weather_dict["data"][0]["clouds"]))
-            embed.add_field(name="Wind Speed", value="{} MPH / {}".format(weather_dict["data"][0]["wind_spd"], weather_dict["data"][0]["wind_cdir"]))
+            embed.add_field(name="Temperature", value="{} F".format(weather_dict["data"][0]["temp"]))
+
+            for condition in sky_conditions:
+                if weather_dict["data"][0]["clouds"] == condition[1]:
+                    break
+                elif weather_dict["data"][0]["clouds"] > condition[1]:
+                    sky_description = condition[0]
+            embed.add_field(name="Cloud Coverage", value="{} ({}% )".format(sky_description, weather_dict["data"][0]["clouds"]))
+
+            for condition in wind_conditions:
+                if (weather_dict["data"][0]["wind_spd"] * 100) == condition[1]:
+                    break
+                elif (weather_dict["data"][0]["wind_spd"] * 100) > condition[1]:
+                    wind_description = condition[0]
+            embed.add_field(name="Wind Speed", value="{} ({} MPH / {})".format(wind_description, weather_dict["data"][0]["wind_spd"], weather_dict["data"][0]["wind_cdir"]))
+
             embed.add_field(name="Snow Chance", value="{:.2f}%".format(weather_dict["data"][0]["snow"]*100))
             embed.add_field(name="Precipitation Chance", value="{:.2f}%".format(weather_dict["data"][0]["precip"]*100))
-            embed.add_field(name="Temperature", value="{} F".format(weather_dict["data"][0]["temp"]))
         elif which == "forecast":
             r = requests.get(url="https://api.weatherbit.io/v2.0/forecast/daily?key={}&lang=en&units=I&lat={}&lon={}&days=7".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
             weather_dict = r.json()
 
-            dump = True
+            dump = False
             if dump:
                 with open("weather_json.json", "w") as fp:
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)
@@ -232,13 +241,16 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 description="Nebraska's next game is __[{}]__".format(next_game))
 
             for days in weather_dict["data"]:
+                datetime_obj = datetime.datetime.strptime(days["datetime"], "%Y-%m-%d")
+                print(datetime_obj)
+
                 day_str = "Cloud Coverage: {}%\n" \
                           "Wind: {} MPH {}\n" \
                           "Snow Chance: {:.2f}%\n" \
                           "Precip Chance: {:.2f}%\n" \
                           "High Temp: {} F\n" \
                           "Low Temp: {} F\n".format(days["clouds"], days["wind_spd"], days["wind_cdir"], days["snow"]*100, days["precip"]*100, days["max_temp"], days["min_temp"])
-                embed.add_field(name="{}".format(days["datetime"]), value=day_str)
+                embed.add_field(name="{}".format("{}, {}/{}/{}".format(calendar.day_name[datetime_obj.weekday()], datetime_obj.day, datetime_obj.month, datetime_obj.year)), value=day_str)
         else:
             await ctx.send("`Current` and `forecast` are the only options for `$weather`. Please try again.")
             return
