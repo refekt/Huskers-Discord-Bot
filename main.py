@@ -106,7 +106,7 @@ async def on_ready():
           "    Logged in as [{0}].\n"
           "    Discord.py version is: [{1}].\n"
           "    Discord version is [{2}].\n"
-          "    Owner ID: {3}"
+          "    Owner ID: {3}\n"
           "***".format(client.user, discord.__version__, sys.version, client.owner_id))
 
 
@@ -143,7 +143,7 @@ async def on_message(message):
                 embed = discord.Embed(title="I'm a bad, bad bot")
                 embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
                 await message.channel.send(embed=embed)
-            elif "fuck you bot" in message.content.lower() or "you suck bot" in message.content.llwer():
+            elif "fuck you bot" in message.content.lower() or "you suck bot" in message.content.lower():
                 myass = ["https://66.media.tumblr.com/b9a4c96d0c83bace5e3ff303abc08f1f/tumblr_oywc87sfsP1w8f7y5o3_500.gif", "https://66.media.tumblr.com/2ae73f93fcc20311b00044abc5bad05f/tumblr_oywc87sfsP1w8f7y5o1_500.gif", "https://66.media.tumblr.com/102d761d769840a541443da82e0b211a/tumblr_oywc87sfsP1w8f7y5o5_500.gif", "https://66.media.tumblr.com/252fd1a689f0f64cb466b4eced502af7/tumblr_oywc87sfsP1w8f7y5o2_500.gif", "https://66.media.tumblr.com/83eb614389b1621be0ce9890b1998644/tumblr_oywc87sfsP1w8f7y5o4_500.gif", "https://66.media.tumblr.com/f833da26820867601cd7ad3a7c2d96a5/tumblr_oywc87sfsP1w8f7y5o6_500.gif"]
                 random.shuffle(myass)
                 embed = discord.Embed(title="Excuse me..", color=0xFF0000)
