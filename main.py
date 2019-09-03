@@ -91,8 +91,6 @@ async def makeMD5():
         mammals.update({animals[i]: hash_object.hexdigest()})
         i += 1
 
-    print(mammals)
-
     with open("mammals.json", "w") as fp:
         json.dump(mammals, fp, sort_keys=True, indent=4)
     fp.close()
@@ -353,8 +351,6 @@ async def on_reaction_add(reaction, user):
 
             # Send a message alerting the channel that a user has placed a bet.
             global bet_counter
-
-            print(config.new_dict)
 
             # *** Maybe change to a PM instead ***
             # Creates the embed object for all messages within method

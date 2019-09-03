@@ -102,6 +102,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                                                 "Bets are stored by your __Discord username__. If you change your username you will lose your bet history.\n"
                                                 "\nBets for winning or losing are worth +/- 1 point. \nBets for the spread are worth +/- 2 points. \nBets for the over under are worth +/- 2 points.\n", inline=False)
             embed.add_field(name="Prizes", value="To be determined!")
+
             if lines:
                 embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
                 embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
@@ -192,8 +193,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             total_not_cover_moneyline = 0
 
             for usr in temp_dict:
-                print("winorlose: {}, spread: {}, overunder: {}".format(temp_dict[usr]['winorlose'], temp_dict[usr]['spread'], temp_dict[usr]['moneyline']))
-
                 if temp_dict[usr]['winorlose'] == "True":
                     total_wins += 1
                 elif temp_dict[usr]['winorlose'] == "False":
