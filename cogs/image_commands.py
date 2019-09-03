@@ -206,7 +206,12 @@ class ImageCommands(commands.Cog, name="Image Commands"):
 
         async def random_words(source: list):
             random.shuffle(source)
-            return "{} {} {}".format(source[0], source[1], source[2])
+
+            titles = ["The Great Seal of", "The Commonwealth of", "Republic", "Great Seal of the State of", "Commonwealth of", "Seal of the State of", "State of", "Sigillum Republicae" ]
+            return_string = titles[random.randint(0,len(titles))]
+            return_string += "\n{:>15}\n".format("of")
+            return_string += "{} {}".format(source[0].strip(), source[1].strip())
+            return return_string
 
         # Directory strings
         emojis_dir = "media/emojis"
@@ -238,9 +243,10 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         f.close()
 
         draw = ImageDraw.Draw(new_img)
-        font = ImageFont.truetype("media/font.ttf", 180)
-        draw.text((new_img.width/6, new_img.height/5), await random_words(words), (255, 255, 255, 255), font=font)
+        font = ImageFont.truetype("media/font.ttf", 100)
+        draw.text((new_img.width/6, new_img.height/3), await random_words(words), (255, 255, 255, 255), font=font)
 
+        # Save and send
         new_img.save(created_flag)
         await ctx.send(file=discord.File(created_flag))
     # End image commands
