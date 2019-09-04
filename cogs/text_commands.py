@@ -80,15 +80,24 @@ class TextCommands(commands.Cog, name="Text Commands"):
             cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
 
             days_left = game_datetime_cst - cst_now
-            cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(
-                days_left.days,
-                int(days_left.seconds / 3600) + server_timezone_offset,
-                int((days_left.seconds / 60) % 60),
-                husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
-                datetime.time(hour=game_datetime_cst.hour, minute=game_datetime_cst.minute),
-                game_datetime_cst.month,
-                game_datetime_cst.day,
-                game_datetime_cst.year)
+
+            if game_datetime_utc.hour == 0 or game_datetime_utc.hour == 4 or game_datetime_utc.hour == 5:
+                cd_string = "📢📅 There are __[{} days]__ remaining until the __[{} vs. {}]__ game kicks off on __[{}/{}/{}]__".format(
+                    days_left.days,
+                    husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
+                    game_datetime_cst.month,
+                    game_datetime_cst.day,
+                    game_datetime_cst.year)
+            else:
+                cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(
+                    days_left.days,
+                    int(days_left.seconds / 3600) + server_timezone_offset,
+                    int((days_left.seconds / 60) % 60),
+                    husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
+                    datetime.time(hour=game_datetime_cst.hour, minute=game_datetime_cst.minute),
+                    game_datetime_cst.month,
+                    game_datetime_cst.day,
+                    game_datetime_cst.year)
         else:  # No team provided
             for game in husker_sched:
                 game_datetime_raw = datetime.datetime.strptime(game['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
