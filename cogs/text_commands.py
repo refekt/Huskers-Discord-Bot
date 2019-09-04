@@ -279,7 +279,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         #await ctx.send(ow.get_weather(station))
 
-    @commands.command()
+    @commands.command(aliases=["gbr",])
     async def balloons(self, ctx):
         balloons = [
             "```\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈🎈🎈🎈\n🎈        🎈    🎈  🎈    🎈\n🎈  🎈🎈  🎈🎈🎈    🎈🎈🎈\n🎈    🎈  🎈    🎈  🎈    🎈\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈    🎈\n```"
