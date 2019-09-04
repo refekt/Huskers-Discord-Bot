@@ -52,6 +52,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         y = 0
         while x < len(ap_poll_raw):
             while y < len(ap_poll_raw):
+                print("Raw Rank: {}, Last Rank: {}".format(ap_poll_raw[y]['rank'], last_rank))
                 if ap_poll_raw[y]['rank'] == last_rank:
                     if ap_poll_raw[y]['firstPlaceVotes']:
                         embed.add_field(name="#{} {}".format(ap_poll_raw[y]['rank'], ap_poll_raw[y]['school']), value="{}\nPoints: {}\nFirst Place Votes: {}".format(ap_poll_raw[y]['conference'], ap_poll_raw[y]['points'], ap_poll_raw[y]['firstPlaceVotes']))
@@ -109,7 +110,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         category_dict = {"rushingTDs": "Rushing TDs", "puntReturnYards": "Punt Return Yards", "puntReturnTDs": "Punt Return TDs", "puntReturns": "Punt Returns", "passingTDs": "Passing TDs",
                          "interceptionYards": "Interception Yards", "interceptionTDs": "Interception TDs", "passesIntercepted": "Passes Intercepted", "fumblesRecovered": "Fumbles Recovered",
                          "totalFumbles": "Total Fumbles", "tacklesForLoss": "Tackles For Loss", "defensiveTDs": "Defensive TDs", "tackles": "Tackles", "sacks": "Sacks", "qbHurries": "QB Hurries",
-                         "passesDeflected": "Passes Defelcted", "possessionTime": "Possesion Time", "interceptions": "Interceptions", "fumblesLost": "Fumbles Lost", "turnovers": "Turnovers",
+                         "passesDeflected": "Passes Deflected", "possessionTime": "Possesion Time", "interceptions": "Interceptions", "fumblesLost": "Fumbles Lost", "turnovers": "Turnovers",
                          "totalPenaltiesYards": "Total Penalties Yards", "yardsPerRushAttempt": "Yards Per Rush Attempt", "rushingAttempts": "Rushing Attempts", "rushingYards": "Rushing Yards",
                          "yardsPerPass": "Yards Per Pass", "kickReturnYards": "Kick Return Yards", "kickReturnTDs": "Kick Return TDs", "kickReturns": "Kick Returns", "completionAttempts": "Completion Attempts",
                          "netPassingYards": "Net Passing Yards", "totalYards": "Total Yards", "fourthDownEff": "Fourth Down Eff", "thirdDownEff": "Third Down Eff", "firstDowns": "First Downs"}
