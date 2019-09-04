@@ -82,7 +82,7 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
             await ctx.send("An error occurred retrieving poll data.")
             return
 
-        dump = False
+        dump = True
         if dump:
             with open("husker_schedule.json", "w") as fp:
                 json.dump(schedule_list, fp, sort_keys=True, indent=4)

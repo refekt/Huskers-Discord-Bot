@@ -166,6 +166,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         """ Let the cup runeth over """
         await ctx.send(embed= await sendImage("🏈🎈🏈🎈", "https://i.imgur.com/Wh4aLYo.gif"))
 
+    # TODO Scrub penalties...there are some obvious calls missing
     @commands.command(aliases=["ref",])
     async def referee(self, ctx, call=None):
         """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
