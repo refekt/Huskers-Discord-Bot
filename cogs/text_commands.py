@@ -3,6 +3,7 @@ import markovify
 import random
 import json
 import datetime
+import pytz
 import discord
 import requests
 import time
@@ -51,6 +52,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         counter = -1
         opponentsDict = {}
         i = 0
+        cst_timezone_location = "America/Chicago"
+        server_timezone_offset = 1  # Server in EST?
 
         with open('husker_schedule.json', 'r') as fp:
             husker_sched = json.load(fp)
@@ -69,37 +72,43 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 await ctx.send("`{}` does not exist on the current schedule. Please review `$schedule` and try again.".format(input))
                 return
 
-            game_datetime_raw = husker_sched[game_index]['start_date'].split("T")
-            game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S")  # "%b %d, %Y %I:%M %p"
-            game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour - 4, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+            game_datetime_raw = datetime.datetime.strptime(husker_sched[game_index]['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            game_datetime_utc = pytz.utc.localize(game_datetime_raw)
+            game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location))
 
-            days_left = game_datetime - datetime.datetime.now()
-            cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
+            cst_now_raw = pytz.utc.localize(datetime.datetime.utcnow())
+            cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
+
+            days_left = game_datetime_cst - cst_now
+            cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(
                 days_left.days,
-                int(days_left.seconds / 3600),
+                int(days_left.seconds / 3600) + server_timezone_offset,
                 int((days_left.seconds / 60) % 60),
                 husker_sched[game_index]['home_team'], husker_sched[game_index]['away_team'],
-                datetime.time(hour=game_datetime.hour-1, minute=game_datetime.minute),
-                game_datetime.month,
-                game_datetime.day,
-                game_datetime.year)
+                datetime.time(hour=game_datetime_cst.hour, minute=game_datetime_cst.minute),
+                game_datetime_cst.month,
+                game_datetime_cst.day,
+                game_datetime_cst.year)
         else:  # No team provided
             for game in husker_sched:
-                game_datetime_raw = game['start_date'].split("T")
-                game_datetime = datetime.datetime.strptime("{} {}".format(game_datetime_raw[0], game_datetime_raw[1][:-5]), "%Y-%m-%d %H:%M:%S") # "%b %d, %Y %I:%M %p"
-                game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour - 4, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
+                game_datetime_raw = datetime.datetime.strptime(game['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                game_datetime_utc = pytz.utc.localize(game_datetime_raw)
+                game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location))
 
-                if datetime.datetime.now() < game_datetime:
-                    days_left = game_datetime - datetime.datetime.now()
-                    cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{}]__ on __[{}/{}/{}]__".format(
+                cst_now_raw = pytz.utc.localize(datetime.datetime.utcnow())
+                cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
+
+                if cst_now < game_datetime_cst:
+                    days_left = game_datetime_cst - cst_now
+                    cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(
                         days_left.days,
-                        int(days_left.seconds/3600),
+                        int(days_left.seconds/3600) + server_timezone_offset,
                         int((days_left.seconds / 60) % 60),
                         game['home_team'], game['away_team'],
-                        datetime.time(hour=game_datetime.hour-1, minute=game_datetime.minute),
-                        game_datetime.month,
-                        game_datetime.day,
-                        game_datetime.year)
+                        datetime.time(hour=game_datetime_cst.hour, minute=game_datetime_cst.minute),
+                        game_datetime_cst.month,
+                        game_datetime_cst.day,
+                        game_datetime_cst.year)
                     break
                 else:
                     cd_string = "Something went wrong 🤫!"
