@@ -33,8 +33,11 @@ class StatBot(commands.Cog, name="CFB Stats"):
             fp.close()
 
         embed = discord.Embed(title="Match up history between Nebraska and {}".format(team.capitalize()), color=0xFF0000)
+
         embed.add_field(name="{} Wins".format(matchup_json["team1"]), value=matchup_json["team1Wins"])
         embed.add_field(name="{} Wins".format(matchup_json["team2"]), value=matchup_json["team2Wins"])
+        embed.add_field(name="Ties", value=matchup_json["ties"])
+
         gameHistLen = len(matchup_json["games"])
         gameHistLen -= 1
 
