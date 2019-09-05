@@ -14,6 +14,12 @@ class StatBot(commands.Cog, name="CFB Stats"):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command()
+    async def seasonstats(self, ctx, year=2019):
+        """ Returns current season stats """
+        url = "https://api.collegefootballdata.com/stats/season?year={}&team=nebraska".format(year)
+
+
     @commands.command(aliases=["mu",])
     async def matchup(self, ctx, *, team):
         """ Shows matchup history between Nebraska and another team. """
@@ -31,6 +37,8 @@ class StatBot(commands.Cog, name="CFB Stats"):
             with open("matchup_json.json", "w") as fp:
                 json.dump(matchup_json, fp, sort_keys=True, indent=4)
             fp.close()
+
+        msg = await ctx.send("Loading...")
 
         embed = discord.Embed(title="Match up history between Nebraska and {}".format(team.capitalize()), color=0xFF0000)
 
@@ -52,7 +60,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
             matchup_json["games"][gameHistLen]["homeScore"],
             matchup_json["games"][gameHistLen]["awayScore"],
             matchup_json["games"][gameHistLen]["awayTeam"]))
-        await ctx.send(embed=embed)
+        await msg.edit(content="", embed=embed)
 
 
     # TODO Maybe have option to pick from various polls. Use reactions?
