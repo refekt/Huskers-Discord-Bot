@@ -15,7 +15,6 @@ husker_schedule = []
 
 
 class TextCommands(commands.Cog, name="Text Commands"):
-    # TODO Possibly remove this command.
     @commands.command()
     async def stonk(self, ctx):
         """ Isms hates stocks. """

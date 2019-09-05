@@ -310,7 +310,6 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
         # Updating season_bets JSON for reacting to a $bet message
-        # TODO Add datetime checking for kickoff through midnight of the same day.
         if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
             # Load season_bets.json if season_bets{} is empty
             if not bool(config.season_bets):
