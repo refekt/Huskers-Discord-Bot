@@ -41,10 +41,12 @@ class StatBot(commands.Cog, name="CFB Stats"):
         msg = await ctx.send("Loading...")
 
         embed = discord.Embed(title="Match up history between Nebraska and {}".format(team.capitalize()), color=0xFF0000)
+        embed.set_thumbnail(url="https://i.imgur.com/aaqkw35.png")
 
-        embed.add_field(name="{} Wins".format(matchup_json["team1"]), value=matchup_json["team1Wins"])
-        embed.add_field(name="{} Wins".format(matchup_json["team2"]), value=matchup_json["team2Wins"])
-        embed.add_field(name="Ties", value=matchup_json["ties"])
+        embed.add_field(name="{} Wins".format(matchup_json["team1"]), value=matchup_json["team1Wins"], inline=False)
+        embed.add_field(name="{} Wins".format(matchup_json["team2"]), value=matchup_json["team2Wins"], inline=False)
+        if matchup_json["ties"]:
+            embed.add_field(name="Ties", value=matchup_json["ties"], inline=False)
 
         gameHistLen = len(matchup_json["games"])
         gameHistLen -= 1
@@ -54,7 +56,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone("America/Chicago"))
 
         embed.add_field(name="Most Recent Match Up", value="Date: {}\nLocation: {}\n{} : {} - {} : {}\n".format(
-            game_datetime_cst,
+            str(game_datetime_cst)[:-15],
             matchup_json["games"][gameHistLen]["venue"],
             matchup_json["games"][gameHistLen]["homeTeam"],
             matchup_json["games"][gameHistLen]["homeScore"],

@@ -96,6 +96,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 print("No lines available")
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
+            embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
             embed.add_field(name="Rules", value=""
                                                 "All bets must be made before kick off and only the most recent bet counts. "
                                                 "You can bet on winning or losing the game, covering or not covering the spread, and covering or not covering the total points of the game. "
