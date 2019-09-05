@@ -310,7 +310,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             else:
                 await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
             pass
-
+        elif cmd == "leaderboard":
+            await ctx.send("This is under construction.")
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)

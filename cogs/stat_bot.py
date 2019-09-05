@@ -17,8 +17,51 @@ class StatBot(commands.Cog, name="CFB Stats"):
     @commands.command()
     async def seasonstats(self, ctx, year=2019):
         """ Returns current season stats """
+
+        msg = await ctx.send("Loading...")
+
         url = "https://api.collegefootballdata.com/stats/season?year={}&team=nebraska".format(year)
 
+        try:
+            r = requests.get(url)
+            seasonstats_json = r.json()
+        except:
+            await ctx.send("An error occurred retrieving poll data.")
+            return
+
+        dump = True
+        if dump:
+            with open("seasonstats_json.json", "w") as fp:
+                json.dump(seasonstats_json, fp, sort_keys=True, indent=4)
+            fp.close()
+
+        message_string = "```\n{} Season Stats for Nebraska\n".format(year)
+        for stat in seasonstats_json:
+            if stat["statName"] == "possessionTime":
+                posTime = (stat["statValue"] / 60) / 60
+                postimeRaw = str(posTime).split(".")
+
+                posTimeHr = 0
+
+                if int(postimeRaw[0]) > 60:
+                    postimeRawRaw = str(int(postimeRaw[0]) / 60).split(".")
+                    print(postimeRawRaw)
+                    posTimeHr = int(postimeRawRaw[0])
+                    posTimeMin = str(int(float(".{}".format(postimeRawRaw[1])) * 60))#[0:2]
+                else:
+                    posTimeMin = int(postimeRaw[0])
+
+                posTimeSec = str(int(float(".{}".format(postimeRaw[1])) * 60))#[0:2]
+
+                print("hour: {}\nminutes: {}\nseconds: {}".format(posTimeHr, posTimeMin,posTimeSec))
+
+                message_string += "{:<22} : {}\n".format(stat["statName"], "{}:{}:{}".format(str(posTimeHr).zfill(2), str(posTimeMin).zfill(2), str(posTimeSec).zfill(2)))
+            else:
+                message_string += "{:<22} : {}\n".format(stat["statName"], stat["statValue"])
+
+        message_string += "\n```"
+
+        await msg.edit(content=message_string)
 
     @commands.command(aliases=["mu",])
     async def matchup(self, ctx, *, team):
