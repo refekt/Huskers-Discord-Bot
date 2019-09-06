@@ -54,7 +54,7 @@
                         },
                         "aargonz#3345": {
                             "datetime": "02-09-2019 15:08:47",
-                            "moneyline": "None",
+                            "moneyline": "True",
                             "spread": "True",
                             "winorlose": "True"
                         },
