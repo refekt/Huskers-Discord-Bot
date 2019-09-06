@@ -42,6 +42,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         await edit_msg.edit(content=sentence)
 
+    # TODO Correct for daylight savings time.
     @commands.command(aliases=["cd",], brief="How long until Husker football?")
     async def countdown(self, ctx, *, input=None):
         """ Returns the time until the next game if no input is provide or returns time to a specific game if provided.
@@ -51,11 +52,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
         counter = -1
         opponentsDict = {}
         i = 0
-        cst_timezone_location = "America/Chicago"
         server_timezone_offset = 1  # Server in EST?
 
         with open('husker_schedule.json', 'r') as fp:
             husker_sched = json.load(fp)
+
+        with open('venue_dict.json', 'r') as fp:
+            venues_json = json.load(fp)
 
         if input:
             for game in husker_sched:
@@ -71,9 +74,18 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 await ctx.send("`{}` does not exist on the current schedule. Please review `$schedule` and try again.".format(input))
                 return
 
+            cst_timezone_location = "America/Chicago"
+
+            # Sets the CST Locale to America/[city name]
+            # for venue in venues_json:
+            #     if venue["name"] == husker_sched[game_index]["venue"]:
+            #         cst_timezone_location = "America/{}".format(venue["city"])
+
             game_datetime_raw = datetime.datetime.strptime(husker_sched[game_index]['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
             game_datetime_utc = pytz.utc.localize(game_datetime_raw)
-            game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location))
+            t = datetime.timedelta(days=game_datetime_utc.day, hours=game_datetime_utc.hour, minutes=game_datetime_utc.minute, seconds=game_datetime_utc.second)
+            isDST = time.localtime(t.total_seconds())
+            game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location)) - datetime.timedelta(hours=isDST.tm_isdst)
 
             cst_now_raw = pytz.utc.localize(datetime.datetime.utcnow())
             cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
@@ -99,9 +111,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     game_datetime_cst.year)
         else:  # No team provided
             for game in husker_sched:
+                cst_timezone_location = "America/Chicago"
+
                 game_datetime_raw = datetime.datetime.strptime(game['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                 game_datetime_utc = pytz.utc.localize(game_datetime_raw)
-                game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location))
+                t = datetime.timedelta(days=game_datetime_utc.day, hours=game_datetime_utc.hour, minutes=game_datetime_utc.minute, seconds=game_datetime_utc.second)
+                isDST = time.localtime(t.total_seconds())
+                game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location)) - datetime.timedelta(hours=isDST.tm_isdst)
+                print(game_datetime_cst, isDST.tm_isdst)
 
                 cst_now_raw = pytz.utc.localize(datetime.datetime.utcnow())
                 cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
@@ -182,6 +199,12 @@ class TextCommands(commands.Cog, name="Text Commands"):
             r = requests.get(url="https://api.collegefootballdata.com/venues")
             venue_dict = r.json()
 
+            dump = True
+            if dump:
+                with open("venue_dict.json", "w") as fp:
+                    json.dump(venue_dict, fp, sort_keys=True, indent=4)
+                fp.close()
+
             coords = {}
             for venues in venue_dict:
                 if venues["name"] == venue:
@@ -189,6 +212,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         else:
             await ctx.send("Unable to locate venue.")
             return
+
+
 
         sky_description = "Sunny"
         sky_conditions = [
