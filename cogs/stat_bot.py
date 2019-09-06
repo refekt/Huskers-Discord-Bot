@@ -4,6 +4,7 @@ import discord
 import json
 import datetime
 import pytz
+import math
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -38,24 +39,17 @@ class StatBot(commands.Cog, name="CFB Stats"):
         message_string = "```\n{} Season Stats for Nebraska\n".format(year)
         for stat in seasonstats_json:
             if stat["statName"] == "possessionTime":
-                posTime = (stat["statValue"] / 60) / 60
-                postimeRaw = str(posTime).split(".")
-
+                totalSeconds = math.floor(stat["statValue"] / 60)
                 posTimeHr = 0
+                posTimerMin = totalSeconds / 60
+                posTimeSec = (posTimerMin - int(posTimerMin)) * 60
 
-                if int(postimeRaw[0]) > 60:
-                    postimeRawRaw = str(int(postimeRaw[0]) / 60).split(".")
-                    print(postimeRawRaw)
-                    posTimeHr = int(postimeRawRaw[0])
-                    posTimeMin = str(int(float(".{}".format(postimeRawRaw[1])) * 60))#[0:2]
-                else:
-                    posTimeMin = int(postimeRaw[0])
+                if posTimerMin > 60:
+                    posTimeHr = math.floor(posTimerMin / 60)
+                    posTimeSec = (posTimerMin - int(posTimerMin)) * 60
+                    posTimerMin = posTimerMin - (posTimeHr * 60)
 
-                posTimeSec = str(int(float(".{}".format(postimeRaw[1])) * 60))#[0:2]
-
-                print("hour: {}\nminutes: {}\nseconds: {}".format(posTimeHr, posTimeMin,posTimeSec))
-
-                message_string += "{:<22} : {}\n".format(stat["statName"], "{}:{}:{}".format(str(posTimeHr).zfill(2), str(posTimeMin).zfill(2), str(posTimeSec).zfill(2)))
+                message_string += "{:<22} : {}\n".format(stat["statName"], "{:02d}:{:02d}:{:02d}".format(math.floor(posTimeHr), math.floor(posTimerMin), math.floor(posTimeSec)))
             else:
                 message_string += "{:<22} : {}\n".format(stat["statName"], stat["statValue"])
 
