@@ -39,17 +39,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         message_string = "```\n{} Season Stats for Nebraska\n".format(year)
         for stat in seasonstats_json:
             if stat["statName"] == "possessionTime":
-                totalSeconds = math.floor(stat["statValue"] / 60)
-                posTimeHr = 0
-                posTimerMin = totalSeconds / 60
-                posTimeSec = (posTimerMin - int(posTimerMin)) * 60
-
-                if posTimerMin > 60:
-                    posTimeHr = math.floor(posTimerMin / 60)
-                    posTimeSec = (posTimerMin - int(posTimerMin)) * 60
-                    posTimerMin = posTimerMin - (posTimeHr * 60)
-
-                message_string += "{:<22} : {}\n".format(stat["statName"], "{:02d}:{:02d}:{:02d}".format(math.floor(posTimeHr), math.floor(posTimerMin), math.floor(posTimeSec)))
+                message_string += "{:<22} : {}\n".format(stat["statName"], datetime.timedelta(seconds=math.floor(stat["statValue"] / 60)))
             else:
                 message_string += "{:<22} : {}\n".format(stat["statName"], stat["statValue"])
 
