@@ -6,7 +6,7 @@ async def check_command_channel(command: str, channel):
     global correct_channel
     flag = False
 
-    gameDay = False
+    gameDay = True
     if gameDay:
         correct_channel = True
         return
