@@ -7,8 +7,6 @@ import pytz
 import discord
 import requests
 import time
-import timezonefinder
-
 import calendar
 
 # Dictionaries
