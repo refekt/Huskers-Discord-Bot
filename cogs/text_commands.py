@@ -7,6 +7,8 @@ import pytz
 import discord
 import requests
 import time
+import timezonefinder
+
 import calendar
 
 # Dictionaries
@@ -116,14 +118,21 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 game_datetime_raw = datetime.datetime.strptime(game['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                 game_datetime_utc = pytz.utc.localize(game_datetime_raw)
                 t = datetime.timedelta(days=game_datetime_utc.day, hours=game_datetime_utc.hour, minutes=game_datetime_utc.minute, seconds=game_datetime_utc.second)
+
                 isDST = time.localtime(t.total_seconds())
                 game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location)) - datetime.timedelta(hours=isDST.tm_isdst)
-                print(game_datetime_cst, isDST.tm_isdst)
 
                 cst_now_raw = pytz.utc.localize(datetime.datetime.utcnow())
                 cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
 
                 if cst_now < game_datetime_cst:
+                    # coords = {}
+                    # for venues in venues_json:
+                    #     if venues["name"] == venue:
+                    #         coords = venues["location"]
+                    #
+                    # tf = timezonefinder.TimezoneFinder.timezone_at(lng=coords[0], lat=coords[1])
+
                     days_left = game_datetime_cst - cst_now
                     cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(
                         days_left.days,
