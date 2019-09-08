@@ -115,16 +115,6 @@
             "illinois": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -134,16 +124,6 @@
             "indiana": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -153,16 +133,6 @@
             "iowa": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -172,16 +142,6 @@
             "maryland": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -191,16 +151,6 @@
             "minnesota": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -211,16 +161,10 @@
                 "bets": [
                     {
                         "aargonz#3345": {
-                            "datetime": "08-09-2019 16:28:46",
-                            "moneyline": "None",
-                            "spread": "None",
+                            "datetime": "08-09-2019 16:39:52",
+                            "moneyline": "False",
+                            "spread": "False",
                             "winorlose": "True"
-                        },
-                        "bot#3345": {
-                            "datetime": "08-09-2019 16:20:36",
-                            "moneyline": "None",
-                            "spread": "None",
-                            "winorlose": "None"
                         }
                     }
                 ],
@@ -231,16 +175,6 @@
             "northwestern": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -250,16 +184,6 @@
             "ohio state": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -269,16 +193,6 @@
             "purdue": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -424,16 +338,6 @@
             "tbd1": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -443,16 +347,6 @@
             "tbd2": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",
@@ -462,16 +356,6 @@
             "wisconsin": {
                 "bets": [
                     {
-                        "aargonz#3345": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        },
-                        "psyspoopino#8880": {
-                            "datetime": "06-08-2019 21:37:50",
-                            "spread": "False",
-                            "winorlose": "True"
-                        }
                     }
                 ],
                 "outcome_moneyline": "None",

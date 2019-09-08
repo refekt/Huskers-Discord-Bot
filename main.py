@@ -52,35 +52,35 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
     game_bets = config.season_bets[season_year]['opponent'][game]['bets'][0]
 
-    for bet_users in game_bets:
-        if raw_username in bet_users: # This does work for a check
-            if which == "winorlose":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[raw_username]['spread'], "moneyline": bet_users[raw_username]['moneyline']}
-            elif which == "canx_winorlose":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[raw_username]['spread'], "moneyline": bet_users[raw_username]['moneyline']}
-            elif which == "spread":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": placed_bet, "moneyline": bet_users[raw_username]['moneyline']}
-            elif which == "canx_spread":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": placed_bet, "moneyline": bet_users[raw_username]['moneyline']}
-            elif which == "moneyline":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": bet_users[raw_username]['spread'], "moneyline": placed_bet}
-            elif which == "canx_moneyline":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": bet_users[raw_username]['spread'], "moneyline": placed_bet}
-        else:
-            config.new_dict = {"datetimem": "None", "winorlose": "None", "moneyline": "None"} # Do the default
+    #for bet_users in game_bets:
+    if raw_username in game_bets: # This does work for a check
+        if which == "winorlose":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": game_bets[raw_username]['spread'], "moneyline": game_bets[raw_username]['moneyline']}
+        elif which == "canx_winorlose":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": game_bets[raw_username]['spread'], "moneyline": game_bets[raw_username]['moneyline']}
+        elif which == "spread":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": placed_bet, "moneyline": game_bets[raw_username]['moneyline']}
+        elif which == "canx_spread":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": placed_bet, "moneyline": game_bets[raw_username]['moneyline']}
+        elif which == "moneyline":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": game_bets[raw_username]['spread'], "moneyline": placed_bet}
+        elif which == "canx_moneyline":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": game_bets[raw_username]['spread'], "moneyline": placed_bet}
+    else:
+        config.new_dict = {"datetimem": "None", "winorlose": "None", "moneyline": "None"} # Do the default
 
-            if which == "winorlose":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
-            elif which == "canx_winorlose":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
-            elif which == "spread":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
-            elif which == "canx_spread":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
-            elif which == "moneyline":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
-            elif which == "canx_moneyline":
-                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
+        if which == "winorlose":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
+        elif which == "canx_winorlose":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
+        elif which == "spread":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
+        elif which == "canx_spread":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
+        elif which == "moneyline":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
+        elif which == "canx_moneyline":
+            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
 
 
     global bet_counter  # I don't think this actually does anything. Probably can be replaced with 0 or 1
