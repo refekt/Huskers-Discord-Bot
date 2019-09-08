@@ -98,7 +98,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
             embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
             embed.add_field(name="Rules", value=""
-                                                "All bets must be made before kick off and only the most recent bet counts. "
+                                                "All bets must be made before kick off, only the most recent bet counts, and the final odds are used to determine winning or losing. "
                                                 "You can bet on winning or losing the game, covering or not covering the spread, and covering or not covering the total points of the game. "
                                                 "Bets are stored by your __Discord username__. If you change your username you will lose your bet history.\n"
                                                 "\nBets for winning or losing are worth +/- 1 point. \nBets for the spread are worth +/- 2 points. \nBets for the over under are worth +/- 2 points.\n", inline=False)
@@ -140,6 +140,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         # Show the user's current bet(s)
         elif cmd == "show":
             temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
+            print("Length of temp_dict: {}".format(len(temp_dict)))
             if len(temp_dict) == 0:
                 await ctx.send("No placed bet(s) found for this game.")
                 return
@@ -150,6 +151,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.set_footer(text=config.bet_footer)
 
             for usr in temp_dict:
+                print("usr: {} == raw_username: {}".format(usr, raw_username))
                 if usr == raw_username:
                     try:
                         winorlose = temp_dict[usr]['winorlose']
@@ -185,6 +187,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     embed.add_field(name="Total Points/Over Under", value=moneyline, inline=True)
                     await ctx.send(embed=embed)
                 else:
+                    print(raw_username)
                     await ctx.send("You have no placed bet(s) on this game.")
 
         # Show all bets for the current game
@@ -319,6 +322,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             else:
                 await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
             pass
+
+        # Show the current leader board. +/- 1 point for winorlose, +/- 2 points for spread and total points
         elif cmd == "leaderboard":
             await ctx.send("This is under construction.")
         else:
