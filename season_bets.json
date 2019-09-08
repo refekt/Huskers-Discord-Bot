@@ -11,8 +11,8 @@
                             "winorlose": "True"
                         },
                         "All_Luck#3656": {
-                            "datetime": "01-09-2019 20:43:58",
-                            "moneyline": "True",
+                            "datetime": "07-09-2019 09:29:05",
+                            "moneyline": "False",
                             "spread": "True",
                             "winorlose": "True"
                         },
@@ -24,6 +24,12 @@
                         },
                         "GumbyShrimp#2359": {
                             "datetime": "01-09-2019 20:31:33",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "IDontBelieveInIsms#1838": {
+                            "datetime": "07-09-2019 11:38:39",
                             "moneyline": "True",
                             "spread": "True",
                             "winorlose": "True"
@@ -52,6 +58,12 @@
                             "spread": "True",
                             "winorlose": "True"
                         },
+                        "Renfah87#6439": {
+                            "datetime": "07-09-2019 13:12:14",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
                         "aargonz#3345": {
                             "datetime": "02-09-2019 15:08:47",
                             "moneyline": "True",
@@ -59,9 +71,9 @@
                             "winorlose": "True"
                         },
                         "deeretech129#1440": {
-                            "datetime": "02-09-2019 18:13:15",
-                            "moneyline": "True",
-                            "spread": "False",
+                            "datetime": "07-09-2019 10:27:26",
+                            "moneyline": "False",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "economypie#6181": {
@@ -70,10 +82,22 @@
                             "spread": "True",
                             "winorlose": "True"
                         },
+                        "epk#8863": {
+                            "datetime": "07-09-2019 14:18:12",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
                         "hurdizzle94#6245": {
                             "datetime": "02-09-2019 15:07:27",
                             "moneyline": "True",
                             "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "huskersgoinhusk#2464": {
+                            "datetime": "07-09-2019 11:38:39",
+                            "moneyline": "True",
+                            "spread": "True",
                             "winorlose": "True"
                         },
                         "poglife1990#5240": {
@@ -84,9 +108,9 @@
                         }
                     }
                 ],
-                "outcome_moneyline": "None",
-                "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_moneyline": "False",
+                "outcome_spread": "False",
+                "outcome_winorlose": "False"
             },
             "illinois": {
                 "bets": [
@@ -103,6 +127,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -121,6 +146,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -139,6 +165,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -157,6 +184,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -175,6 +203,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -193,6 +222,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -211,6 +241,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -229,6 +260,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -247,6 +279,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -265,6 +298,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -400,6 +434,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -418,6 +453,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             },
@@ -436,6 +472,7 @@
                         }
                     }
                 ],
+                "outcome_moneyline": "None",
                 "outcome_spread": "None",
                 "outcome_winorlose": "None"
             }

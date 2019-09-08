@@ -139,36 +139,43 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         # Show the user's current bet(s)
         elif cmd == "show":
+            temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
+            if len(temp_dict) == 0:
+                await ctx.send("No placed bet(s) found for this game.")
+                return
+
             # Creates the embed object for all messages within method
             embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
             embed.set_footer(text=config.bet_footer)
 
-            temp_dict = config.season_bets[season_year]['opponent'][game]['bets'][0]
             for usr in temp_dict:
                 if usr == raw_username:
-                    winorlose = temp_dict[usr]['winorlose']
-                    if winorlose == "True":
-                        winorlose = "Win"
-                    elif winorlose == "False":
-                        winorlose = "Lose"
-                    else:
+                    try:
+                        winorlose = temp_dict[usr]['winorlose']
+                        if winorlose == "True":
+                            winorlose = "Win"
+                        elif winorlose == "False":
+                            winorlose = "Lose"
+                    except:
                         winorlose = "N/A"
 
-                    spread = temp_dict[usr]['spread']
-                    if spread == "True":
-                        spread = "Over"
-                    elif spread == "False":
-                        spread = "Under"
-                    else:
+                    try:
+                        spread = temp_dict[usr]['spread']
+                        if spread == "True":
+                            spread = "Over"
+                        elif spread == "False":
+                            spread = "Under"
+                    except:
                         spread = "N/A"
 
-                    moneyline = temp_dict[usr]['moneyline']
-                    if moneyline == "True":
-                        moneyline = "Over"
-                    elif moneyline == "False":
-                        moneyline = "Under"
-                    else:
+                    try:
+                        moneyline = temp_dict[usr]['moneyline']
+                        if moneyline == "True":
+                            moneyline = "Over"
+                        elif moneyline == "False":
+                            moneyline = "Under"
+                    except:
                         moneyline = "N/A"
 
                     embed.add_field(name="Author", value=raw_username, inline=False)
@@ -177,6 +184,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     embed.add_field(name="Spread", value=spread, inline=True)
                     embed.add_field(name="Total Points/Over Under", value=moneyline, inline=True)
                     await ctx.send(embed=embed)
+                else:
+                    await ctx.send("You have no placed bet(s) on this game.")
 
         # Show all bets for the current game
         elif cmd == "all":

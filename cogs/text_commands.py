@@ -8,6 +8,7 @@ import discord
 import requests
 import time
 import calendar
+from timezonefinder import TimezoneFinder
 
 # Dictionaries
 eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
@@ -54,14 +55,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
         i = 0
         server_timezone_offset = 1  # Server in EST?
 
-        with open('husker_schedule.json', 'r') as fp:
+        with open('husker_schedule.json', 'r') as fp: # Open the Husker schedule JSON for use
             husker_sched = json.load(fp)
 
-        with open('venue_dict.json', 'r') as fp:
+        with open('venue_dict.json', 'r') as fp: # Open the venue JSON for finding coordinates
             venues_json = json.load(fp)
 
-        if input:
-            for game in husker_sched:
+        if input: # I.e.; $countdown iowa
+            for game in husker_sched: # Record an index within husker_sched
                 if game["home_team"] != "Nebraska":
                     opponentsDict.update({game["home_team"].lower(): i})
                 else:
@@ -74,24 +75,25 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 await ctx.send("`{}` does not exist on the current schedule. Please review `$schedule` and try again.".format(input))
                 return
 
-            cst_timezone_location = "America/Chicago"
+            cst_timezone_location = "CST6CDT" # Set all games to CST
 
-            # Sets the CST Locale to America/[city name]
-            # for venue in venues_json:
-            #     if venue["name"] == husker_sched[game_index]["venue"]:
-            #         cst_timezone_location = "America/{}".format(venue["city"])
-
+            # Convert the data from husker_sched to a datetime object in ISO 8601 format
             game_datetime_raw = datetime.datetime.strptime(husker_sched[game_index]['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            # Convert to UTC
             game_datetime_utc = pytz.utc.localize(game_datetime_raw)
+            # Prepping to check for DST
             t = datetime.timedelta(days=game_datetime_utc.day, hours=game_datetime_utc.hour, minutes=game_datetime_utc.minute, seconds=game_datetime_utc.second)
-            isDST = time.localtime(t.total_seconds())
+            isDST = time.localtime(t.total_seconds()) # Returns 0 or 1
+            # Convert to CST and subtract isDST from hour
             game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location)) - datetime.timedelta(hours=isDST.tm_isdst)
 
+            # Converting datetime.now to CST
             cst_now_raw = pytz.utc.localize(datetime.datetime.utcnow())
             cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
 
+            # Used to show whole days instead of down to the second when no game time is set
             days_left = game_datetime_cst - cst_now
-
+            # collegefootballdata api stores game with no set time as hour 0, 4, or 5
             if game_datetime_utc.hour == 0 or game_datetime_utc.hour == 4 or game_datetime_utc.hour == 5:
                 cd_string = "📢📅 There are __[{} days]__ remaining until the __[{} vs. {}]__ game kicks off on __[{}/{}/{}]__".format(
                     days_left.days,
@@ -99,7 +101,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     game_datetime_cst.month,
                     game_datetime_cst.day,
                     game_datetime_cst.year)
-            else:
+            else: # A game time was set
                 cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(
                     days_left.days,
                     int(days_left.seconds / 3600) + server_timezone_offset,
@@ -111,12 +113,22 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     game_datetime_cst.year)
         else:  # No team provided
             for game in husker_sched:
-                cst_timezone_location = "America/Chicago"
+                # coords = []
+                # for venues in venues_json:
+                #     if venues["name"] == game["venue"]:
+                #         coords = venues["location"]
+                # url = "http://api.geonames.org/timezoneJSON?lat={}lng={}&username=refekt".format(coords["x"], coords["y"])
+                # print(url)
+                # r = requests.get(url=url)
+                # tzJSON = r.json()
+                # cst_timezone_location =  tzJSON[0]["timezoneId"] # "America/Chicago"
+                # print(cst_timezone_location)
+                cst_timezone_location = "CST6CDT"
 
                 game_datetime_raw = datetime.datetime.strptime(game['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                 game_datetime_utc = pytz.utc.localize(game_datetime_raw)
-                t = datetime.timedelta(days=game_datetime_utc.day, hours=game_datetime_utc.hour, minutes=game_datetime_utc.minute, seconds=game_datetime_utc.second)
 
+                t = datetime.timedelta(days=game_datetime_utc.day, hours=game_datetime_utc.hour, minutes=game_datetime_utc.minute, seconds=game_datetime_utc.second)
                 isDST = time.localtime(t.total_seconds())
                 game_datetime_cst = game_datetime_utc.astimezone(pytz.timezone(cst_timezone_location)) - datetime.timedelta(hours=isDST.tm_isdst)
 
@@ -124,12 +136,16 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 cst_now = cst_now_raw.astimezone(pytz.timezone(cst_timezone_location))
 
                 if cst_now < game_datetime_cst:
-                    # coords = {}
+                    # Getting coordinates for the city, state of the stadium
+                    # coords = []
                     # for venues in venues_json:
-                    #     if venues["name"] == venue:
+                    #     if venues["name"] == game["venue"]:
                     #         coords = venues["location"]
                     #
-                    # tf = timezonefinder.TimezoneFinder.timezone_at(lng=coords[0], lat=coords[1])
+                    # long = coords["x"]
+                    # lat = coords["y"]
+                    # # I don't know why, but this isn't working. It should be working. It's asking for `self`
+                    # tf = TimezoneFinder.timezone_at(lng=long, lat=lat)
 
                     days_left = game_datetime_cst - cst_now
                     cd_string = "📢📅 There are __[{} days, {} hours, and {} minutes]__ remaining until the __[{} vs. {}]__ game kicks off at __[{} CST]__ on __[{}/{}/{}]__".format(

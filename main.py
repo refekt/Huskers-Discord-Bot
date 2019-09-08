@@ -393,7 +393,7 @@ async def on_command_completion(ctx):
     gameDay = True
     if gameDay:
         return
-    
+
     global banned_channels
 
     if ctx.channel.id in banned_channels:
