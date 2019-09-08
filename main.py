@@ -374,10 +374,8 @@ async def on_reaction_add(reaction, user):
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
             embed.set_footer(text=config.bet_footer)
 
-            print(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter])
             if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
                 for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
-                    print(u)
                     if u == raw_username:
                         embed.add_field(name="Author", value=raw_username, inline=False)
                         embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
