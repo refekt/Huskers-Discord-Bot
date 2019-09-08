@@ -56,7 +56,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """ Allows a user to place a bet on the upcoming Husker game. Bets are placed by reacting to the bot's message. Bets are recorded by Discord username. Changing your username will result in lost bets. All bets must be completed prior to kickoff. Bets after that will not be accepted. Winners will be tallied on the next calendar day after the game.
         There are 3 sub commands: all, show, and winners.
 
-        Show: show your current bet.
+        Show <optional team>: show your current or previous bet.
         All: show all current bets.
         Winners <team>: show all the winners of a specific game.
         """
@@ -87,26 +87,26 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 await ctx.send("An error occurred retrieving line data.")
                 return
 
+            lines = {}
             try:
-                lines = {}
                 for lines_raw in game_data_raw:
                     lines = lines_raw["lines"]
-                lines = lines[0]
             except:
                 print("No lines available")
 
             embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
+            embed.add_field(name="Rules", value="1. All bets must be placed prior to kick off.\n"
+                                                "2. The final odds are used for scoring purposes.\n"
+                                                "3. Only one bet per user per game.\n"
+                                                "4. Bets are stored by __Discord__ username.")
+            embed.add_field(name="Scoring", value="±1 Point: winning or losing the game.\n"
+                                                  "±2 Points: covering or not covering the spread and total points.\n"
+                                                  "\nPrizes haven't been determined yet.", inline=False)
             embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
-            embed.add_field(name="Rules", value=""
-                                                "All bets must be made before kick off, only the most recent bet counts, and the final odds are used to determine winning or losing. "
-                                                "You can bet on winning or losing the game, covering or not covering the spread, and covering or not covering the total points of the game. "
-                                                "Bets are stored by your __Discord username__. If you change your username you will lose your bet history.\n"
-                                                "\nBets for winning or losing are worth +/- 1 point. \nBets for the spread are worth +/- 2 points. \nBets for the over under are worth +/- 2 points.\n", inline=False)
-            embed.add_field(name="Prizes", value="To be determined!")
 
             if lines:
-                embed.add_field(name="Spread ({})".format(lines["provider"]), value="{}".format(lines["spread"]), inline=False)
-                embed.add_field(name="Total Points/Over Under ({})".format(lines["provider"]), value="{}".format(lines["overUnder"]), inline=False)
+                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["spread"]), inline=False)
+                embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
             else:
                 embed.add_field(name="Spread (TBD)", value="TBD")
                 embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
@@ -144,7 +144,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             season_bets_JSON = json.loads(temp_json)
             f.close()
 
-            temp_dict = season_bets_JSON[season_year]['opponent'][game]['bets'][0]
+            if team:
+                temp_dict = season_bets_JSON[season_year]['opponent'][team]['bets'][0]
+            else:
+                temp_dict = season_bets_JSON[season_year]['opponent'][game]['bets'][0]
 
             if len(temp_dict) == 0:
                 await ctx.send("No placed bet(s) found for this game.")
@@ -184,7 +187,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     moneyline = "N/A"
 
                 embed.add_field(name="Author", value=raw_username, inline=False)
-                embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+                if team:
+                    embed.add_field(name="Opponent", value=str(team).capitalize(), inline=False)
+                else:
+                    embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
                 embed.add_field(name="Win or Loss", value=winorlose, inline=True)
                 embed.add_field(name="Spread", value=spread, inline=True)
                 embed.add_field(name="Total Points/Over Under", value=moneyline, inline=True)
@@ -333,6 +339,26 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         # Show the current leader board. +/- 1 point for winorlose, +/- 2 points for spread and total points
         elif cmd == "leaderboard":
             await ctx.send("This is under construction.")
+            return
+            # [ {"username": points}, {"username": points} ]
+            load_season_bets()
+            leaderboard = []
+            season_bets = config.season_bets[0]["opponent"]
+            # 1.  Loop through games for "finished" == "True"
+            for game in season_bets:
+                if config.season_bets[0]["opponent"][game]["finished"] == "True":
+                    # 1.1 Create a dictionary of usernames from bets within finished games
+                    for bets in config.season_bets[0]["opponent"][game]["bets"]:
+                        # 2.1 Loop through bets to compare "outcome_winorlose", add or subtract points for username
+                        for user in bets:
+                            # print(config.season_bets[0]["opponent"][game]["outcome_winorlose"])
+                            # print(bets[user]["winorlose"])
+                            if config.season_bets[0]["opponent"][game]["outcome_winorlose"] == bets[user]["winorlose"]:
+                                temp = {user: 1}
+                                leaderboard.append(dict(temp))
+            # 2.2 Loop through bets to compare "outcome_spread", add or subtract points for username
+            # 2.3 Loop through bets to compare "outcome_moneyline", add or subtract points for username
+            # 3.  Print out the dictionary
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)

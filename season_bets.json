@@ -110,58 +110,77 @@
                 ],
                 "outcome_moneyline": "False",
                 "outcome_spread": "False",
-                "outcome_winorlose": "False"
+                "outcome_winorlose": "False",
+                "finished": "True"
             },
             "illinois": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "indiana": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "iowa": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "maryland": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "minnesota": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "northern illinois": {
                 "bets": [
                     {
+                        "Adam7X#2383": {
+                            "datetime": "08-09-2019 16:47:23",
+                            "moneyline": "False",
+                            "spread": "None",
+                            "winorlose": "True"
+                        },
+                        "GumbyShrimp#2359": {
+                            "datetime": "08-09-2019 16:59:30",
+                            "moneyline": "None",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "ModestBeaver#0849": {
+                            "datetime": "08-09-2019 17:00:05",
+                            "moneyline": "None",
+                            "spread": "None",
+                            "winorlose": "True"
+                        },
                         "aargonz#3345": {
-                            "datetime": "08-09-2019 16:39:52",
+                            "datetime": "08-09-2019 16:58:37",
                             "moneyline": "False",
                             "spread": "False",
                             "winorlose": "True"
@@ -170,34 +189,35 @@
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "northwestern": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "ohio state": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "purdue": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "red-white spring game": {
                 "bets": [
@@ -216,7 +236,8 @@
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "south alabama": {
                 "bets": [
@@ -333,34 +354,35 @@
                 ],
                 "outcome_moneyline": "False",
                 "outcome_spread": "False",
-                "outcome_winorlose": "True"
+                "outcome_winorlose": "True",
+                "finished": "True"
             },
             "tbd1": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "tbd2": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             },
             "wisconsin": {
                 "bets": [
-                    {
-                    }
+                    {}
                 ],
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None"
+                "outcome_winorlose": "None",
+                "finished": "False"
             }
         }
     }
