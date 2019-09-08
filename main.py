@@ -50,23 +50,38 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
     raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
-    game_bets = config.season_bets[season_year]['opponent'][game]['bets']
+    game_bets = config.season_bets[season_year]['opponent'][game]['bets'][0]
 
     for bet_users in game_bets:
-        for users in bet_users:
-            if str(users) == raw_username:
-                if which == "winorlose":
-                    config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[users]['spread'], "moneyline": bet_users[users]['moneyline']}
-                elif which == "canx_winorlose":
-                    config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[users]['spread'], "moneyline": bet_users[users]['moneyline']}
-                elif which == "spread":
-                    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": placed_bet, "moneyline": bet_users[users]['moneyline']}
-                elif which == "canx_spread":
-                    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": placed_bet, "moneyline": bet_users[users]['moneyline']}
-                elif which == "moneyline":
-                    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": bet_users[users]['spread'], "moneyline": placed_bet}
-                elif which == "canx_moneyline":
-                    config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[users]['winorlose'], "spread": bet_users[users]['spread'], "moneyline": placed_bet}
+        if raw_username in bet_users: # This does work for a check
+            if which == "winorlose":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[raw_username]['spread'], "moneyline": bet_users[raw_username]['moneyline']}
+            elif which == "canx_winorlose":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": bet_users[raw_username]['spread'], "moneyline": bet_users[raw_username]['moneyline']}
+            elif which == "spread":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": placed_bet, "moneyline": bet_users[raw_username]['moneyline']}
+            elif which == "canx_spread":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": placed_bet, "moneyline": bet_users[raw_username]['moneyline']}
+            elif which == "moneyline":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": bet_users[raw_username]['spread'], "moneyline": placed_bet}
+            elif which == "canx_moneyline":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": bet_users[raw_username]['winorlose'], "spread": bet_users[raw_username]['spread'], "moneyline": placed_bet}
+        else:
+            config.new_dict = {"datetimem": "None", "winorlose": "None", "moneyline": "None"} # Do the default
+
+            if which == "winorlose":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
+            elif which == "canx_winorlose":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
+            elif which == "spread":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
+            elif which == "canx_spread":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
+            elif which == "moneyline":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
+            elif which == "canx_moneyline":
+                config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
+
 
     global bet_counter  # I don't think this actually does anything. Probably can be replaced with 0 or 1
     try:
@@ -359,13 +374,17 @@ async def on_reaction_add(reaction, user):
             embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
             embed.set_footer(text=config.bet_footer)
 
+            print(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter])
             if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
                 for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
+                    print(u)
                     if u == raw_username:
                         embed.add_field(name="Author", value=raw_username, inline=False)
                         embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
                         embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
                         embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
+                        embed.add_field(name="Over/Under Total Points", value=config.new_dict['moneyline'], inline=True)
+
                         await user.send(embed=embed)
                 bet_counter = -1
             else:

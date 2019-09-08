@@ -211,10 +211,16 @@
                 "bets": [
                     {
                         "aargonz#3345": {
-                            "datetime": "08-09-2019 16:00:48",
-                            "moneyline": "False",
-                            "spread": "False",
+                            "datetime": "08-09-2019 16:28:46",
+                            "moneyline": "None",
+                            "spread": "None",
                             "winorlose": "True"
+                        },
+                        "bot#3345": {
+                            "datetime": "08-09-2019 16:20:36",
+                            "moneyline": "None",
+                            "spread": "None",
+                            "winorlose": "None"
                         }
                     }
                 ],
