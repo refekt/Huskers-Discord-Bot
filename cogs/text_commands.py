@@ -33,17 +33,15 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 if msg.content != "" and not msg.author.bot:
                     source_data += msg.content + ". "
         else:
-            async for msg in ctx.channel.history(limit=5000):
-                if msg.content != "" and str(msg.author) == str(user) and not msg.author.bot:
-                    source_data += msg.content + ". "
+            try:
+                async for msg in ctx.channel.history(limit=5000):
+                    if msg.content != "" and str(msg.author) == str(user) and not msg.author.bot:
+                        source_data += msg.content + ". "
+            except:
+                await edit_msg.edit(content="⚠ Something went wrong. You broke me! ⚠")
 
         chain = markovify.Text(source_data, well_formed=True)
         sentence = chain.make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
-
-        # Get rid of things that would be annoying
-        sentence.replace("$","_")
-        sentence.replace("@","~")
-        sentence.replace("..", ".)")
 
         await edit_msg.edit(content=sentence)
 
