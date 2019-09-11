@@ -74,7 +74,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         raw_username = "{}".format(ctx.author)
 
         # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
-        if cmd == None:
+        if cmd is None:
             if not team:
                 team = config.current_game[0].lower()
 
@@ -342,85 +342,52 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return
 
             def createBlankLeaderboard():
-                # { "leaderboard": { "user#1111": { "winorlose": 0, "spread": 0, "moneyline": 0 } } }
-                leaderboard = {
-                    "leaderboard": {
-                        "bot": {
-                            "winorlose": 0,
-                            "spread": 0,
-                            "moneyline": 0
-                        }
-                    }
-                }
+                newLB = "{\"season\": \"2019\", \"user\": []}"
 
                 with open("season_leaderboard.json", "w") as json_file:
-                    json.dump(leaderboard, json_file, sort_keys=True, indent=4)
+                    json_file.seek(0)
+                    json_file.write(str(newLB))
+                    #json.dump(leaderboard, json_file, sort_keys=True, indent=4)
 
-            # Load the leaderboard JSON
+            createBlankLeaderboard() # Load a blank leaderboard -- erases everything
+
             f = open('season_leaderboard.json', 'r')
             temp_json = f.read()
             leaderboard = json.loads(temp_json)
             f.close()
 
-            szn = datetime.datetime.now().year - 2019
-
             def isInLeaderboard(user: str):
-                # /0/season/bets/0/bot
-                tempLeadboard = leaderboard[szn]["season"]["bets"]
-                userFound = False
+                for lb in leaderboard["user"]:
+                    if lb["name"] == user:
+                        #print("User [{}] was found.".format(user))
+                        return True
 
-                for userStats in tempLeadboard:
-                    # pass
-                    # if userStats[user] in tempLeadboard:  # [0] = 2019 season
-                    try:
-                        print(userStats[user].get())
-                        userFound = True
-                    except KeyError:
-                        print(userStats[user].get())
-                        userFound = False
-                    except:
-                        print("Not sure what happened.")
-                        userFound = False
-
-                return userFound
+                #print("User [{}] was not found.".format(user))
+                return False
 
             load_season_bets()
 
-            # createBlankLeaderboard() # Load a blank leaderboard -- erases everything
-
-            season_bets = config.season_bets[0]["opponent"]
+            seasonBets = config.season_bets[0]["opponent"]
             # 1.  Loop through games for "finished" == "True"
-            for game in season_bets:
+            for game in seasonBets:
                 if config.season_bets[0]["opponent"][game]["finished"] == "True":
                     # 1.1 Create a dictionary of usernames from bets within finished games
                     for bets in config.season_bets[0]["opponent"][game]["bets"]:
                         # 2.1 Loop through bets to compare "outcome_winorlose", add or subtract points for username
                         for user in bets:
-                            # print("{}'s winorlose = {} || {}'s winorlose = {}".format(game, config.season_bets[0]["opponent"][game]["outcome_winorlose"], user, bets[user]["winorlose"]))
                             if config.season_bets[0]["opponent"][game]["outcome_winorlose"] == bets[user]["winorlose"]:
                                 if isInLeaderboard(user):
                                     pass
-                                    # leaderboard["season"][szn][user] = {
-                                    #     "winorlose": int(leaderboard["season"][szn][user]["winorlose"]) + 1,
-                                    #     "spread": int(leaderboard["season"][szn][user]["spread"]),
-                                    #     "moneyline": int(leaderboard["season"][szn][user]["moneyline"])
-                                    # }
                                 else:
+                                    print("Appending leaderboard with [{}].".format(user))
+                                    leaderboard["user"].append(dict(name=user, winorlose=1, spread=0, moneyline=0, rank=0))
                                     pass
-                                    # leaderboard["season"][szn] = {
-                                    #     user: {
-                                    #         "winorlose": 1,
-                                    #         "spread": 0,
-                                    #         "moneyline": 0
-                                    #     }
-                                    # }
-
-            # 2.2 Loop through bets to compare "outcome_spread", add or subtract points for username
-            # 2.3 Loop through bets to compare "outcome_moneyline", add or subtract points for username
+                        # 2.2 Loop through bets to compare "outcome_spread", add or subtract points for username
+                        # 2.3 Loop through bets to compare "outcome_moneyline", add or subtract points for username
             # 3.  Print out the dictionary
 
-            # with open("season_leaderboard.json", "w") as json_file:
-            #     json.dump(leaderboard, json_file, sort_keys=True, indent=4)
+            with open("season_leaderboard.json", "w") as json_file:
+                json.dump(leaderboard, json_file, sort_keys=True, indent=4)
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)
