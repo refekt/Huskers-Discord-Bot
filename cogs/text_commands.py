@@ -8,7 +8,6 @@ import discord
 import requests
 import time
 import calendar
-from timezonefinder import TimezoneFinder
 
 # Dictionaries
 eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
@@ -25,24 +24,29 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command(aliases=["mkv",])
     async def markov(self, ctx, *, user: discord.Member = None):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
-        source_data=''
+        source_data = ""
         edit_msg = await ctx.send("Thinking...")
 
         if user is None:
             async for msg in ctx.channel.history(limit=5000):
                 if msg.content != "" and not msg.author.bot:
-                    source_data += msg.content + ". "
+                    source_data += "\r\n" + str(msg.content).capitalize()
         else:
             if user.bot:
-                await edit_msg.edit(content="You can't do that!")
+                embed = discord.Embed(title="You can't do that!", color=0xFF0000)
+                embed.set_image(url="http://m.quickmeme.com/img/96/9651e121dac222fdac699ca6d962b84f288c75e6ec120f4a06e3c04f139ee8ec.jpg")
+                await edit_msg.edit(content="", embed=embed)
                 return
 
             async for msg in ctx.channel.history(limit=5000):
                 if msg.content != "" and str(msg.author) == str(user) and not msg.author.bot:
-                    source_data += msg.content + ". "
+                    source_data += "\r\n" + str(msg.content).capitalize()
 
         if not source_data:
             await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
+            return
+        elif len(source_data) < 10:
+            await edit_msg.edit(content="Not enough data! Good bye.")
             return
 
         chain = markovify.Text(source_data, well_formed=True)
