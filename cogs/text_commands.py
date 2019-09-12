@@ -38,7 +38,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 if msg.content != "" and not msg.author.bot:
                     source_data += "\r\n" + msg.content
         except:
-            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissioned for {})_".format(chan))
+            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for {})_".format(chan))
             return
 
         if not source_data:
