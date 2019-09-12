@@ -21,6 +21,36 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send("Stonk!")
 
     # TODO Make $channelmarkov|cmkv to call a specific channel for the Markov chain
+    @commands.command(aliases=["cmkv",])
+    async def channelmarkov(self, ctx, *, chan: discord.TextChannel):
+        """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
+        source_data = ""
+        edit_msg = await ctx.send("Thinking...")
+
+        if chan is None:
+            embed = discord.Embed(title="You can't do that!", color=0xFF0000)
+            embed.set_image(url="http://m.quickmeme.com/img/96/9651e121dac222fdac699ca6d962b84f288c75e6ec120f4a06e3c04f139ee8ec.jpg")
+            await edit_msg.edit(content="", embed=embed)
+            return
+
+        async for msg in chan.history(limit=5000):
+            if msg.content != "" and not msg.author.bot:
+                source_data += "\r\n" + msg.content
+
+        if not source_data:
+            await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
+            return
+        elif len(source_data) < 10:
+            await edit_msg.edit(content="Not enough data! Good bye.")
+            return
+
+        chain = markovify.NewlineText(source_data, well_formed=True)
+        sentence = chain.make_short_sentence(max_chars=300)
+
+        if sentence is None:
+            await edit_msg.edit(content="Text channel [{}] does not have enough data. They suck!".format(chan))
+        else:
+            await edit_msg.edit(content=sentence)
 
     @commands.command(aliases=["mkv",])
     async def markov(self, ctx, *, user: discord.Member = None):

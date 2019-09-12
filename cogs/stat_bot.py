@@ -213,40 +213,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
         await ctx.send(away_message)
         return
 
-        # home_team = "({}) {}".format(boxscore_json[0]['teams'][0]['points'], boxscore_json[0]['teams'][0]['school'])
-        # away_team = "{} ({})\n".format(boxscore_json[0]['teams'][1]['school'], boxscore_json[0]['teams'][1]['points'])
-        #
-        # boxscore = "```\nBoxscore Stats for {} Week {}\n\n".format(year, week)
-        # boxscore += " " * (25 - len(home_team))
-        # boxscore += home_team
-        # boxscore += " " * 8
-        # boxscore += away_team
-        # boxscore += "-" * 50
-        # boxscore += "\n"
-        #
-        # i = 0
-        #
-        # while i < len(boxscore_json[0]['teams'][0]['stats']):
-        #     print("i: {}".format(i))
-        #     boxscore += " " * (23 - len(category_dict[boxscore_json[0]['teams'][0]['stats'][i]['category']])) # Spaces
-        #     boxscore += "{} ".format(category_dict[boxscore_json[0]['teams'][0]['stats'][i]['category']]) # Friendly category
-        #     boxscore += "|" # Bar
-        #     try:
-        #         boxscore += "{}".format(boxscore_json[0]['teams'][0]['stats'][i]['stat']) # Home Stat
-        #     except:
-        #         pass
-        #     boxscore += " " * (8 - len(boxscore_json[0]['teams'][0]['stats'][i]['stat'])) # Spaces
-        #     boxscore += "|" # Bar
-        #     try:
-        #         boxscore += "{}\n".format(boxscore_json[0]['teams'][1]['stats'][i]['stat']) # Away Stat
-        #     except:
-        #         boxscore += "\n"
-        #     i += 1
-        #
-        # boxscore = boxscore + "\n```"
-
-        # await ctx.send(boxscore)
-
 
 def setup(bot):
     bot.add_cog(StatBot(bot))

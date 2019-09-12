@@ -36,9 +36,9 @@ def store_next_opponent():
         check_date = check_date - datetime.timedelta(hours=5)
 
         check_now = datetime.datetime.now()
-        #check_now = datetime.datetime(day=check_now_raw.day, month=check_now_raw.month, year=check_now_raw.year, hour=check_now_raw.hour, minute=check_now_raw.minute)
+        hourPadding = datetime.timedelta(hours=5)
 
-        if check_now < check_date:
+        if (check_now + hourPadding) < check_date:
             if events["home_team"] != "Nebraska":
                 config.current_game.append(events["home_team"])
             else:
@@ -117,7 +117,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                                                             "Bets over (🔼) or under (🔽) on total points. Clear bet (✖).\n", inline=False)
 
             # Store message sent in an object to allow for reactions afterwards
-            # TODO add datetime checking. Don't add if after kick off through midnight that day.
             check_now_raw = datetime.datetime.now()
             check_now = dateutil.parser.parse(str(check_now_raw))
 
