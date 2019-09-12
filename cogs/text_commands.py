@@ -20,7 +20,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         """ Isms hates stocks. """
         await ctx.send("Stonk!")
 
-    # TODO Maybe tweak this to make it a big more realistic.
+    # TODO Make $channelmarkov|cmkv to call a specific channel for the Markov chain
+
     @commands.command(aliases=["mkv",])
     async def markov(self, ctx, *, user: discord.Member = None):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
