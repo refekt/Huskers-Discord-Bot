@@ -33,9 +33,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await edit_msg.edit(content="", embed=embed)
             return
 
-        async for msg in chan.history(limit=5000):
-            if msg.content != "" and not msg.author.bot:
-                source_data += "\r\n" + msg.content
+        try:
+            async for msg in chan.history(limit=5000):
+                if msg.content != "" and not msg.author.bot:
+                    source_data += "\r\n" + msg.content
+        except:
+            await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
+            return
 
         if not source_data:
             await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
