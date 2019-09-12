@@ -50,9 +50,12 @@ class TextCommands(commands.Cog, name="Text Commands"):
             return
 
         chain = markovify.Text(source_data, well_formed=True)
-        sentence = chain.make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
+        sentence = chain.make_short_sentence(max_chars=300, min_chars=50)#make_sentence(tries=100, max_chars=60, max_overlap_ratio=.78)
 
-        await edit_msg.edit(content=sentence)
+        if sentence is None:
+            await edit_msg.edit(content="User [{}] does not have enough data. They suck!".format(user))
+        else:
+            await edit_msg.edit(content=sentence)
 
     # TODO Correct for daylight savings time.
     @commands.command(aliases=["cd",], brief="How long until Husker football?")
