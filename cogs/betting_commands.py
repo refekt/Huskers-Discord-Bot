@@ -338,8 +338,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         # Show the current leader board. +/- 1 point for winorlose, +/- 2 points for spread and total points
         elif cmd == "leaderboard" or cmd == "lb":
-            await ctx.send("This command is under constructdion.")
-            return
+            # await ctx.send("This command is under constructdion.")
+            # return
 
             def createBlankLeaderboard():
                 newLB = "{\"season\": \"2019\", \"user\": []}"
