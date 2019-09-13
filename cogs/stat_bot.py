@@ -182,52 +182,11 @@ class StatBot(commands.Cog, name="CFB Stats"):
             await ctx.send("This was a bye week. Try again.")
             return
 
-        dump = False
+        dump = True
         if dump:
             with open("boxscore_json.json", "w") as fp:
                 json.dump(boxscore_json, fp, sort_keys=True, indent=4)
             fp.close()
-
-        # statFullName = {
-        #     "completionAttempts": "Completion Attempts",
-        #     "defensiveTDs": "Defensive TDs",
-        #     "extraPoints": "Extra Points",
-        #     "fieldGoalPct": "Field Goal Pct",
-        #     "fieldGoals": "Field Goals",
-        #     "firstDowns": "First Downs",
-        #     "fourthDownEff": "Fourth Down Eff",
-        #     "fumblesLost": "Fumbles Lost",
-        #     "fumblesRecovered": "Fumbles Recovered",
-        #     "interceptions": "Interceptions",
-        #     "interceptionTDs": "Interception TDs",
-        #     "interceptionYards": "Interception Yards",
-        #     "kickingPoints": "Kicking Points",
-        #     "kickReturns": "Kick Returns",
-        #     "kickReturnTDs": "Kick Return TDs",
-        #     "kickReturnYards": "Kick Return Yards",
-        #     "netPassingYards": "Net Passing Yards",
-        #     "passesDeflected": "Passes Deflected",
-        #     "passesIntercepted": "Passes Intercepted",
-        #     "passingTDs": "Passing TDs",
-        #     "possessionTime": "Time of Possession",
-        #     "puntReturns": "Punt Returns",
-        #     "puntReturnTDs": "Punt Return Yards",
-        #     "puntReturnYards": "Punt Return TDs",
-        #     "qbHurries": "QB Hurries",
-        #     "rushingAttempts": "Rushing Attempts",
-        #     "rushingTDs": "Rushing TDs",
-        #     "rushingYards": "Rushing Yards",
-        #     "sacks": "Sacks",
-        #     "tackles": "Tackles",
-        #     "tacklesForLoss": "Tackles For Loss",
-        #     "thirdDownEff": "Third Down Eff",
-        #     "totalFumbles": "Total Fumbles",
-        #     "totalPenaltiesYards": "Total Penalties Yards",
-        #     "totalYards": "Total Yards",
-        #     "turnovers": "Turnovers",
-        #     "yardsPerPass": "Yards Per Pass",
-        #     "yardsPerRushAttempt": "Yards Per Rush Attempt"
-        # }
 
         statFullName = [
             dict(stat="completionAttempts", longName="Completion Attempts", homeStat="", awayStat=""),
@@ -287,7 +246,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
                     stats.update(awayStat=awayStat["stat"])
                     break
 
-            boxscoreString += "{:>25}: {:<7} | {:>7}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
+            boxscoreString += "{:>23}: {:<5} | {:>5}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
 
         boxscoreString += "\n```"
 
