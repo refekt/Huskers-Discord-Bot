@@ -246,7 +246,8 @@ class StatBot(commands.Cog, name="CFB Stats"):
                     stats.update(awayStat=awayStat["stat"])
                     break
 
-            boxscoreString += "{:>23}: {:<5} | {:>5}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
+            if not (stats["homeStat"] == "" and stats["awayStat"] == ""):
+                boxscoreString += "{:>23}: {:<5} | {:>5}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
 
         boxscoreString += "\n```"
 
