@@ -188,30 +188,110 @@ class StatBot(commands.Cog, name="CFB Stats"):
                 json.dump(boxscore_json, fp, sort_keys=True, indent=4)
             fp.close()
 
-        statFullName = {"rushingTDs": "Rushing TDs", "puntReturnYards": "Punt Return Yards", "puntReturnTDs": "Punt Return TDs", "puntReturns": "Punt Returns", "passingTDs": "Passing TDs",
-                         "interceptionYards": "Interception Yards", "interceptionTDs": "Interception TDs", "passesIntercepted": "Passes Intercepted", "fumblesRecovered": "Fumbles Recovered",
-                         "totalFumbles": "Total Fumbles", "tacklesForLoss": "Tackles For Loss", "defensiveTDs": "Defensive TDs", "tackles": "Tackles", "sacks": "Sacks", "qbHurries": "QB Hurries",
-                         "passesDeflected": "Passes Deflected", "possessionTime": "Possesion Time", "interceptions": "Interceptions", "fumblesLost": "Fumbles Lost", "turnovers": "Turnovers",
-                         "totalPenaltiesYards": "Total Penalties Yards", "yardsPerRushAttempt": "Yards Per Rush Attempt", "rushingAttempts": "Rushing Attempts", "rushingYards": "Rushing Yards",
-                         "yardsPerPass": "Yards Per Pass", "kickReturnYards": "Kick Return Yards", "kickReturnTDs": "Kick Return TDs", "kickReturns": "Kick Returns", "completionAttempts": "Completion Attempts",
-                         "netPassingYards": "Net Passing Yards", "totalYards": "Total Yards", "fourthDownEff": "Fourth Down Eff", "thirdDownEff": "Third Down Eff", "firstDowns": "First Downs"}
+        # statFullName = {
+        #     "completionAttempts": "Completion Attempts",
+        #     "defensiveTDs": "Defensive TDs",
+        #     "extraPoints": "Extra Points",
+        #     "fieldGoalPct": "Field Goal Pct",
+        #     "fieldGoals": "Field Goals",
+        #     "firstDowns": "First Downs",
+        #     "fourthDownEff": "Fourth Down Eff",
+        #     "fumblesLost": "Fumbles Lost",
+        #     "fumblesRecovered": "Fumbles Recovered",
+        #     "interceptions": "Interceptions",
+        #     "interceptionTDs": "Interception TDs",
+        #     "interceptionYards": "Interception Yards",
+        #     "kickingPoints": "Kicking Points",
+        #     "kickReturns": "Kick Returns",
+        #     "kickReturnTDs": "Kick Return TDs",
+        #     "kickReturnYards": "Kick Return Yards",
+        #     "netPassingYards": "Net Passing Yards",
+        #     "passesDeflected": "Passes Deflected",
+        #     "passesIntercepted": "Passes Intercepted",
+        #     "passingTDs": "Passing TDs",
+        #     "possessionTime": "Time of Possession",
+        #     "puntReturns": "Punt Returns",
+        #     "puntReturnTDs": "Punt Return Yards",
+        #     "puntReturnYards": "Punt Return TDs",
+        #     "qbHurries": "QB Hurries",
+        #     "rushingAttempts": "Rushing Attempts",
+        #     "rushingTDs": "Rushing TDs",
+        #     "rushingYards": "Rushing Yards",
+        #     "sacks": "Sacks",
+        #     "tackles": "Tackles",
+        #     "tacklesForLoss": "Tackles For Loss",
+        #     "thirdDownEff": "Third Down Eff",
+        #     "totalFumbles": "Total Fumbles",
+        #     "totalPenaltiesYards": "Total Penalties Yards",
+        #     "totalYards": "Total Yards",
+        #     "turnovers": "Turnovers",
+        #     "yardsPerPass": "Yards Per Pass",
+        #     "yardsPerRushAttempt": "Yards Per Rush Attempt"
+        # }
+
+        statFullName = [
+            dict(stat="completionAttempts", longName="Completion Attempts", homeStat="", awayStat=""),
+            dict(stat="defensiveTDs", longName="Defensive TDs", homeStat="", awayStat=""),
+            dict(stat="extraPoints", longName="Extra Points", homeStat="", awayStat=""),
+            dict(stat="fieldGoalPct", longName="Field Goal Pct", homeStat="", awayStat=""),
+            dict(stat="fieldGoals", longName="Field Goals", homeStat="", awayStat=""),
+            dict(stat="firstDowns", longName="First Downs", homeStat="", awayStat=""),
+            dict(stat="fourthDownEff", longName="Fourth Down Eff", homeStat="", awayStat=""),
+            dict(stat="fumblesLost", longName="Fumbles Lost", homeStat="", awayStat=""),
+            dict(stat="fumblesRecovered", longName="Fumbles Recovered", homeStat="", awayStat=""),
+            dict(stat="interceptions", longName="Interceptions", homeStat="", awayStat=""),
+            dict(stat="interceptionTDs", longName="Interception TDs", homeStat="", awayStat=""),
+            dict(stat="interceptionYards", longName="Interception Yards", homeStat="", awayStat=""),
+            dict(stat="kickingPoints", longName="Kicking Points", homeStat="", awayStat=""),
+            dict(stat="kickReturns", longName="Kick Returns", homeStat="", awayStat=""),
+            dict(stat="kickReturnTDs", longName="Kick Return TDs", homeStat="", awayStat=""),
+            dict(stat="kickReturnYards", longName="Kick Return Yards", homeStat="", awayStat=""),
+            dict(stat="netPassingYards", longName="Net Passing Yards", homeStat="", awayStat=""),
+            dict(stat="passesDeflected", longName="Passes Deflected", homeStat="", awayStat=""),
+            dict(stat="passesIntercepted", longName="Passes Intercepted", homeStat="", awayStat=""),
+            dict(stat="passingTDs", longName="Passing TDs", homeStat="", awayStat=""),
+            dict(stat="possessionTime", longName="Time of Possession", homeStat="", awayStat=""),
+            dict(stat="puntReturns", longName="Punt Returns", homeStat="", awayStat=""),
+            dict(stat="puntReturnTDs", longName="Punt Return Yards", homeStat="", awayStat=""),
+            dict(stat="puntReturnYards", longName="Punt Return TDs", homeStat="", awayStat=""),
+            dict(stat="qbHurries", longName="QB Hurries", homeStat="", awayStat=""),
+            dict(stat="rushingAttempts", longName="Rushing Attempts", homeStat="", awayStat=""),
+            dict(stat="rushingTDs", longName="Rushing TDs", homeStat="", awayStat=""),
+            dict(stat="rushingYards", longName="Rushing Yards", homeStat="", awayStat=""),
+            dict(stat="sacks", longName="Sacks", homeStat="", awayStat=""),
+            dict(stat="tackles", longName="Tackles", homeStat="", awayStat=""),
+            dict(stat="tacklesForLoss", longName="Tackles For Loss", homeStat="", awayStat=""),
+            dict(stat="thirdDownEff", longName="Third Down Eff", homeStat="", awayStat=""),
+            dict(stat="totalFumbles", longName="Total Fumbles", homeStat="", awayStat=""),
+            dict(stat="totalPenaltiesYards", longName="Total Penalties Yards", homeStat="", awayStat=""),
+            dict(stat="totalYards", longName="Total Yards", homeStat="", awayStat=""),
+            dict(stat="turnovers", longName="Turnovers", homeStat="", awayStat=""),
+            dict(stat="yardsPerPass", longName="Yards Per Pass", homeStat="", awayStat=""),
+            dict(stat="yardsPerRushAttempt", longName="Yards Per Rush Attempt", homeStat="", awayStat="")
+        ]
 
         home_stats = boxscore_json[0]["teams"][0]
-        home_message = "{} ({})\n{}\n".format(home_stats["school"], home_stats["points"],"-" * 30)
-
-        for stat in home_stats["stats"]:
-            home_message += "{}\: {}\n".format(statFullName[stat["category"]], stat["stat"])
-
-        await edit_msg.edit(content=home_message)
-
         away_stats = boxscore_json[0]["teams"][1]
-        away_message = "{} ({})\n{}\n".format(away_stats["school"], away_stats["points"],"-" * 30)
 
-        for stat in away_stats["stats"]:
-            away_message += "{}\: {}\n".format(statFullName[stat["category"]], stat["stat"])
+        boxscoreString = "```\nBoxscore for: {} ({}) vs {} ({})\n\n".format(home_stats["school"], home_stats["points"], away_stats["school"], away_stats["points"])
 
-        await ctx.send(away_message)
-        return
+        for stats in statFullName:
+            # stats.update(dict(homeStat=home_stats["stats"][i]["stat"]))
+            for homeStat in home_stats["stats"]:
+                if stats["stat"] == homeStat["category"]:
+                    stats.update(homeStat=homeStat["stat"])
+                    break
+
+            for awayStat in away_stats["stats"]:
+                if stats["stat"] == awayStat["category"]:
+                    stats.update(awayStat=awayStat["stat"])
+                    break
+
+            boxscoreString += "{:>25}: {:<7} | {:>7}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
+
+        boxscoreString += "\n```"
+
+        await edit_msg.edit(content=boxscoreString)
 
 
 def setup(bot):

@@ -108,59 +108,65 @@
                         }
                     }
                 ],
+                "finished": "True",
                 "outcome_moneyline": "False",
                 "outcome_spread": "False",
-                "outcome_winorlose": "False",
-                "finished": "True"
+                "outcome_winorlose": "False"
             },
             "illinois": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "indiana": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "iowa": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "maryland": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "minnesota": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "northern illinois": {
                 "bets": [
                     {
+                        "09570957#2811": {
+                            "datetime": "13-09-2019 10:13:40",
+                            "moneyline": "False",
+                            "spread": "False",
+                            "winorlose": "True"
+                        },
                         "Adam7X#2383": {
                             "datetime": "08-09-2019 16:47:23",
                             "moneyline": "False",
@@ -179,45 +185,63 @@
                             "spread": "None",
                             "winorlose": "True"
                         },
+                        "NotaVirus_Click#3411": {
+                            "datetime": "13-09-2019 11:47:53",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
+                        "TIVman5#0562": {
+                            "datetime": "13-09-2019 10:05:55",
+                            "moneyline": "True",
+                            "spread": "True",
+                            "winorlose": "True"
+                        },
                         "aargonz#3345": {
-                            "datetime": "08-09-2019 16:58:37",
+                            "datetime": "12-09-2019 22:42:14",
                             "moneyline": "False",
                             "spread": "False",
+                            "winorlose": "True"
+                        },
+                        "deeretech129#1440": {
+                            "datetime": "12-09-2019 22:43:19",
+                            "moneyline": "None",
+                            "spread": "None",
                             "winorlose": "True"
                         }
                     }
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "northwestern": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "ohio state": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "purdue": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "red-white spring game": {
                 "bets": [
@@ -234,10 +258,10 @@
                         }
                     }
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "south alabama": {
                 "bets": [
@@ -352,37 +376,37 @@
                         }
                     }
                 ],
+                "finished": "True",
                 "outcome_moneyline": "False",
                 "outcome_spread": "False",
-                "outcome_winorlose": "True",
-                "finished": "True"
+                "outcome_winorlose": "True"
             },
             "tbd1": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "tbd2": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             },
             "wisconsin": {
                 "bets": [
                     {}
                 ],
+                "finished": "False",
                 "outcome_moneyline": "None",
                 "outcome_spread": "None",
-                "outcome_winorlose": "None",
-                "finished": "False"
+                "outcome_winorlose": "None"
             }
         }
     }

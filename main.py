@@ -504,46 +504,46 @@ async def huskerbotquit(ctx):
         await ctx.send("Nice try buddy! 👋")
 
 
-@client.command()
-async def purge(ctx, command, qty=0):
-    """ Delete Husker Bot's previous messages. """
-
-    return
-
-    if not command:
-        await ctx.send("A purge option must be included. Review `$help purge` for details.")
-        return
-
-    if command == "all":
-        await ctx.send("Deleting last 1,000 messages in all text channels. This may take a __long__ time and will occupy the bot until it's done. This should be the last deleted message.")
-        for guild in client.guilds:
-            for channel in guild.channels:
-                if channel.type == discord.ChannelType.text:
-                    print("   *** {}".format(channel.type))
-                    async for message in channel.history(limit=1000, oldest_first=True):
-                        print("      *** {}".format(message.author))
-                        if message.author == client.user:
-                            print("      ~~~ {}".format(message.author))
-                            await message.delete()
-    if command == "here":
-        await ctx.send("Deleting last 1,000 messages in this channel.")
-        channel = client.get_channel(ctx.message.channel.id)
-        async for message in channel.history(limit=1000):
-            if message.author == client.user:
-                await message.delete()
-    if command == "recent":
-        if qty:
-            await ctx.send("Deleting last {} messages from current channel.".format(qty))
-
-            channel = client.get_channel(ctx.message.channel.id)
-            print(channel.name, channel.type)
-            async for message in channel.history(limit=qty):
-                print(message.author)
-                if message.author == client.user:
-                    print(message.author, client.user)
-                    await message.delete()
-        else:
-            await ctx.send("A number of recent messages to be deleted is required.")
+# @client.command()
+# async def purge(ctx, command, qty=0):
+#     """ Delete Husker Bot's previous messages. """
+#
+#     return
+#
+#     if not command:
+#         await ctx.send("A purge option must be included. Review `$help purge` for details.")
+#         return
+#
+#     if command == "all":
+#         await ctx.send("Deleting last 1,000 messages in all text channels. This may take a __long__ time and will occupy the bot until it's done. This should be the last deleted message.")
+#         for guild in client.guilds:
+#             for channel in guild.channels:
+#                 if channel.type == discord.ChannelType.text:
+#                     print("   *** {}".format(channel.type))
+#                     async for message in channel.history(limit=1000, oldest_first=True):
+#                         print("      *** {}".format(message.author))
+#                         if message.author == client.user:
+#                             print("      ~~~ {}".format(message.author))
+#                             await message.delete()
+#     if command == "here":
+#         await ctx.send("Deleting last 1,000 messages in this channel.")
+#         channel = client.get_channel(ctx.message.channel.id)
+#         async for message in channel.history(limit=1000):
+#             if message.author == client.user:
+#                 await message.delete()
+#     if command == "recent":
+#         if qty:
+#             await ctx.send("Deleting last {} messages from current channel.".format(qty))
+#
+#             channel = client.get_channel(ctx.message.channel.id)
+#             print(channel.name, channel.type)
+#             async for message in channel.history(limit=qty):
+#                 print(message.author)
+#                 if message.author == client.user:
+#                     print(message.author, client.user)
+#                     await message.delete()
+#         else:
+#             await ctx.send("A number of recent messages to be deleted is required.")
 
 
 @client.command()
