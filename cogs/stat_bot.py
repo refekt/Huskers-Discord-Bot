@@ -226,7 +226,8 @@ class StatBot(commands.Cog, name="CFB Stats"):
             dict(stat="turnovers", longName="Turnovers", homeStat="", awayStat=""),
             dict(stat="firstDowns", longName="First Downs", homeStat="", awayStat=""),
             dict(stat="thirdDownEff", longName="Third Down Eff", homeStat="", awayStat=""),
-            dict(stat="fourthDownEff", longName="Fourth Down Eff", homeStat="", awayStat="")        ]
+            dict(stat="fourthDownEff", longName="Fourth Down Eff", homeStat="", awayStat="")
+        ]
 
         home_stats = boxscore_json[0]["teams"][0]
         away_stats = boxscore_json[0]["teams"][1]
@@ -245,7 +246,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
                     break
 
             if not (stats["homeStat"] == "" and stats["awayStat"] == ""):
-                boxscoreString += "{:>23}: {:<5} | {:>5}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
+                boxscoreString += "{:>23}: {:<7} | {:>7}\n".format(stats["longName"], stats["homeStat"], stats["awayStat"])
 
         boxscoreString += "\n```"
 
