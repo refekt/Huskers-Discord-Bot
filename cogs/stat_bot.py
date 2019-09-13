@@ -189,45 +189,44 @@ class StatBot(commands.Cog, name="CFB Stats"):
             fp.close()
 
         statFullName = [
+            dict(stat="possessionTime", longName="Time of Possession", homeStat="", awayStat=""),
+            dict(stat="totalPenaltiesYards", longName="Total Penalties Yards", homeStat="", awayStat=""),
             dict(stat="completionAttempts", longName="Completion Attempts", homeStat="", awayStat=""),
-            dict(stat="defensiveTDs", longName="Defensive TDs", homeStat="", awayStat=""),
-            dict(stat="extraPoints", longName="Extra Points", homeStat="", awayStat=""),
-            dict(stat="fieldGoalPct", longName="Field Goal Pct", homeStat="", awayStat=""),
-            dict(stat="fieldGoals", longName="Field Goals", homeStat="", awayStat=""),
-            dict(stat="firstDowns", longName="First Downs", homeStat="", awayStat=""),
-            dict(stat="fourthDownEff", longName="Fourth Down Eff", homeStat="", awayStat=""),
-            dict(stat="fumblesLost", longName="Fumbles Lost", homeStat="", awayStat=""),
-            dict(stat="fumblesRecovered", longName="Fumbles Recovered", homeStat="", awayStat=""),
-            dict(stat="interceptions", longName="Interceptions", homeStat="", awayStat=""),
-            dict(stat="interceptionTDs", longName="Interception TDs", homeStat="", awayStat=""),
-            dict(stat="interceptionYards", longName="Interception Yards", homeStat="", awayStat=""),
-            dict(stat="kickingPoints", longName="Kicking Points", homeStat="", awayStat=""),
-            dict(stat="kickReturns", longName="Kick Returns", homeStat="", awayStat=""),
-            dict(stat="kickReturnTDs", longName="Kick Return TDs", homeStat="", awayStat=""),
-            dict(stat="kickReturnYards", longName="Kick Return Yards", homeStat="", awayStat=""),
             dict(stat="netPassingYards", longName="Net Passing Yards", homeStat="", awayStat=""),
+            dict(stat="passingTDs", longName="Passing TDs", homeStat="", awayStat=""),
+            dict(stat="rushingAttempts", longName="Rushing Attempts", homeStat="", awayStat=""),
+            dict(stat="rushingYards", longName="Rushing Yards", homeStat="", awayStat=""),
+            dict(stat="rushingTDs", longName="Rushing TDs", homeStat="", awayStat=""),
+            dict(stat="yardsPerPass", longName="Yards Per Pass", homeStat="", awayStat=""),
+            dict(stat="yardsPerRushAttempt", longName="Yards Per Rush Attempt", homeStat="", awayStat=""),
+            dict(stat="totalYards", longName="Total Yards", homeStat="", awayStat=""),
+            dict(stat="tacklesForLoss", longName="Tackles For Loss", homeStat="", awayStat=""),
+            dict(stat="sacks", longName="Sacks", homeStat="", awayStat=""),
+            dict(stat="qbHurries", longName="QB Hurries", homeStat="", awayStat=""),
             dict(stat="passesDeflected", longName="Passes Deflected", homeStat="", awayStat=""),
             dict(stat="passesIntercepted", longName="Passes Intercepted", homeStat="", awayStat=""),
-            dict(stat="passingTDs", longName="Passing TDs", homeStat="", awayStat=""),
-            dict(stat="possessionTime", longName="Time of Possession", homeStat="", awayStat=""),
-            dict(stat="puntReturns", longName="Punt Returns", homeStat="", awayStat=""),
-            dict(stat="puntReturnTDs", longName="Punt Return Yards", homeStat="", awayStat=""),
-            dict(stat="puntReturnYards", longName="Punt Return TDs", homeStat="", awayStat=""),
-            dict(stat="qbHurries", longName="QB Hurries", homeStat="", awayStat=""),
-            dict(stat="rushingAttempts", longName="Rushing Attempts", homeStat="", awayStat=""),
-            dict(stat="rushingTDs", longName="Rushing TDs", homeStat="", awayStat=""),
-            dict(stat="rushingYards", longName="Rushing Yards", homeStat="", awayStat=""),
-            dict(stat="sacks", longName="Sacks", homeStat="", awayStat=""),
+            dict(stat="defensiveTDs", longName="Defensive TDs", homeStat="", awayStat=""),
             dict(stat="tackles", longName="Tackles", homeStat="", awayStat=""),
-            dict(stat="tacklesForLoss", longName="Tackles For Loss", homeStat="", awayStat=""),
-            dict(stat="thirdDownEff", longName="Third Down Eff", homeStat="", awayStat=""),
+            dict(stat="fieldGoals", longName="Field Goals", homeStat="", awayStat=""),
+            dict(stat="extraPoints", longName="Extra Points", homeStat="", awayStat=""),
+            dict(stat="fieldGoalPct", longName="Field Goal Pct", homeStat="", awayStat=""),
+            dict(stat="kickingPoints", longName="Kicking Points", homeStat="", awayStat=""),
+            dict(stat="kickReturns", longName="Kick Returns", homeStat="", awayStat=""),
+            dict(stat="kickReturnYards", longName="Kick Return Yards", homeStat="", awayStat=""),
+            dict(stat="kickReturnTDs", longName="Kick Return TDs", homeStat="", awayStat=""),
+            dict(stat="puntReturns", longName="Punt Returns", homeStat="", awayStat=""),
+            dict(stat="puntReturnYards", longName="Punt Return Yards", homeStat="", awayStat=""),
+            dict(stat="puntReturnTDs", longName="Punt Return TDs", homeStat="", awayStat=""),
+            dict(stat="fumblesLost", longName="Fumbles Lost", homeStat="", awayStat=""),
+            dict(stat="fumblesRecovered", longName="Fumbles Recovered", homeStat="", awayStat=""),
             dict(stat="totalFumbles", longName="Total Fumbles", homeStat="", awayStat=""),
-            dict(stat="totalPenaltiesYards", longName="Total Penalties Yards", homeStat="", awayStat=""),
-            dict(stat="totalYards", longName="Total Yards", homeStat="", awayStat=""),
+            dict(stat="interceptions", longName="Interceptions", homeStat="", awayStat=""),
+            dict(stat="interceptionYards", longName="Interception Yards", homeStat="", awayStat=""),
+            dict(stat="interceptionTDs", longName="Interception TDs", homeStat="", awayStat=""),
             dict(stat="turnovers", longName="Turnovers", homeStat="", awayStat=""),
-            dict(stat="yardsPerPass", longName="Yards Per Pass", homeStat="", awayStat=""),
-            dict(stat="yardsPerRushAttempt", longName="Yards Per Rush Attempt", homeStat="", awayStat="")
-        ]
+            dict(stat="firstDowns", longName="First Downs", homeStat="", awayStat=""),
+            dict(stat="thirdDownEff", longName="Third Down Eff", homeStat="", awayStat=""),
+            dict(stat="fourthDownEff", longName="Fourth Down Eff", homeStat="", awayStat="")        ]
 
         home_stats = boxscore_json[0]["teams"][0]
         away_stats = boxscore_json[0]["teams"][1]
@@ -235,7 +234,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
         boxscoreString = "```\nBoxscore for: {} ({}) vs {} ({})\n\n".format(home_stats["school"], home_stats["points"], away_stats["school"], away_stats["points"])
 
         for stats in statFullName:
-            # stats.update(dict(homeStat=home_stats["stats"][i]["stat"]))
             for homeStat in home_stats["stats"]:
                 if stats["stat"] == homeStat["category"]:
                     stats.update(homeStat=homeStat["stat"])
