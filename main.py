@@ -129,7 +129,7 @@ async def on_message(message):
     """ Commands processed as messages are entered """
     if not message.author.bot:
         # Add Up Votes and Down Votes
-        if (".addvotes") in message.content.lower():
+        if ".addvotes" in message.content.lower():
             # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
             # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
             emojiUpvote = "\N{UPWARDS BLACK ARROW}"

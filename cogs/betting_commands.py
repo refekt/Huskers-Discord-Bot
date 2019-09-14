@@ -79,7 +79,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 team = config.current_game[0].lower()
 
             url = "https://api.collegefootballdata.com/lines?year={}&week={}&seasonType=regular&team=nebraska".format(config.current_game[1].year, config.current_game[2])
-            game_date = []
             try:
                 r = requests.get(url)
                 game_data_raw = r.json()
@@ -120,7 +119,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             check_now_raw = datetime.datetime.now()
             check_now = dateutil.parser.parse(str(check_now_raw))
 
-            index = config.current_game[2] - 1
             f = open('husker_schedule.json', 'r')
             temp_json = f.read()
             husker_schedule = json.loads(temp_json)

@@ -200,7 +200,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await msg.edit(content=random.choice(facts))
 
     @commands.command(aliases=["8b",])
-    async def eightball(self, ctx, *, question):
+    async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
         random.shuffle(eight_ball)
         dice_roll = random.randint(0, len(eight_ball))

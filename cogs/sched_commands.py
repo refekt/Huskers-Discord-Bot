@@ -100,10 +100,6 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
             else:
                 game_info_str = "Week {}\n{}\n{}".format(game["week"], game["venue"], game_start_datetime_raw.strftime("%b %d, %Y %H:%M %p"))
 
-            home_team = ""
-            home_split = []
-            away_team = ""
-            away_split = []
             name_len = 8
 
             # Abbreviate team names with two words in it.

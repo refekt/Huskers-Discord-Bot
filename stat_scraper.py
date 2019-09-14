@@ -73,15 +73,15 @@ def stat_scraper(team = "Nebraska", year = 2018):
                 yards_returned_per_interception\
                 ) \
                 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                (s['name'], s['team_abbreviation'], s['position'], s['year'], s['season'], s['adjusted_yards_per_attempt'], s['assists_on_tackles'], \
-                s['attempted_passes'], s['completed_passes'], s['passing_yards'], s['extra_points_made'], s['field_goals_made'], s['fumbles_forced'], \
-                s['fumbles_recovered'], s['fumbles_recovered_for_touchdown'], s['games'], s['height'], s['interceptions'], s['interceptions_returned_for_touchdown'], \
-                s['interceptions_thrown'], s['kickoff_return_touchdowns'], s['other_touchdowns'], s['passes_defended'], s['passing_completion'], \
-                s['passing_touchdowns'], s['passing_yards_per_attempt'], s['player_id'], s['plays_from_scrimmage'], s['points'], s['punt_return_touchdowns'], \
-                s['quarterback_rating'], s['receiving_touchdowns'], s['receiving_yards'], s['receiving_yards_per_reception'], s['receptions'], s['rush_attempts'], \
-                s['rush_touchdowns'], s['rush_yards'], s['rush_yards_per_attempt'], s['rushing_and_receiving_touchdowns'], s['sacks'], s['safeties'], s['solo_tackles'], s['tackles_for_loss'], \
-                s['total_tackles'], s['total_touchdowns'], s['two_point_conversions'], s['weight'], s['yards_from_scrimmage'], s['yards_from_scrimmage_per_play'], s['yards_recovered_from_fumble'], \
-                s['yards_returned_from_interceptions'], s['yards_returned_per_interception']))
+                (s['name'], s['team_abbreviation'], s['position'], s['year'], s['season'], s['adjusted_yards_per_attempt'], s['assists_on_tackles'],
+                 s['attempted_passes'], s['completed_passes'], s['passing_yards'], s['extra_points_made'], s['field_goals_made'], s['fumbles_forced'],
+                 s['fumbles_recovered'], s['fumbles_recovered_for_touchdown'], s['games'], s['height'], s['interceptions'], s['interceptions_returned_for_touchdown'],
+                 s['interceptions_thrown'], s['kickoff_return_touchdowns'], s['other_touchdowns'], s['passes_defended'], s['passing_completion'],
+                 s['passing_touchdowns'], s['passing_yards_per_attempt'], s['player_id'], s['plays_from_scrimmage'], s['points'], s['punt_return_touchdowns'],
+                 s['quarterback_rating'], s['receiving_touchdowns'], s['receiving_yards'], s['receiving_yards_per_reception'], s['receptions'], s['rush_attempts'],
+                 s['rush_touchdowns'], s['rush_yards'], s['rush_yards_per_attempt'], s['rushing_and_receiving_touchdowns'], s['sacks'], s['safeties'], s['solo_tackles'], s['tackles_for_loss'],
+                 s['total_tackles'], s['total_touchdowns'], s['two_point_conversions'], s['weight'], s['yards_from_scrimmage'], s['yards_from_scrimmage_per_play'], s['yards_recovered_from_fumble'],
+                 s['yards_returned_from_interceptions'], s['yards_returned_per_interception']))
                 con.commit()
             
     closeDB()

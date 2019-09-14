@@ -21,11 +21,11 @@ def pull_crystal_balls_from_pages(year, page=1):
 
     # Estbalishing variables for all desired data
     # We are pulling data from the HTML element <li class='...'></li>
-    main_photo = soup.find_all('li', class_='main-photo')
-    name = soup.find_all('li', class_='name')
-    predicted_by = soup.find_all('li', class_='predicted-by')
-    prediction = soup.find_all('li', class_='prediction')
-    correct = soup.find_all('li', class_='correct')
+    # main_photo = soup.find_all('li', class_='main-photo')
+    # name = soup.find_all('li', class_='name')
+    # predicted_by = soup.find_all('li', class_='predicted-by')
+    # prediction = soup.find_all('li', class_='prediction')
+    # correct = soup.find_all('li', class_='correct')
 
     # This is a tough cookie. I'm going to loop over every target block we pulled and grab the info you want
     # Then store in a nested dictionary, then add it to a list.
