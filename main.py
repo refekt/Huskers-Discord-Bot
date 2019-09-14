@@ -508,12 +508,13 @@ async def huskerbotquit(ctx):
 async def purge(ctx):
     """ Delete Husker Bot's previous messages. """
     print("!!! User [{}] initiated $purge.".format(ctx.message.author))
-    # test admin - 606301197426753536
-    # prod admin - 440639061191950336
+
+    if ctx.message.channel.id == 458474143403212801:  # prevent from deleting #botlogs
+        return
 
     auth = False
     for roles in ctx.message.author.roles:
-        if roles.id == 606301197426753536 or roles.id == 440639061191950336:
+        if roles.id == 606301197426753536 or roles.id == 440639061191950336:  # test admin - 606301197426753536, prod admin - 440639061191950336
             auth = True
 
     if auth:
