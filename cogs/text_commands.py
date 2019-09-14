@@ -97,7 +97,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
         """ Returns the time until the next game if no input is provide or returns time to a specific game if provided.
         Usage: `$[countdown|cd] [team on current schedule]`
         """
-
         i = 0
         timezone_cst = "CST6CDT"
         opponentsList = {}
@@ -106,16 +105,17 @@ class TextCommands(commands.Cog, name="Text Commands"):
             huskerSchedule = json.load(fp)
         fp.close()
 
-        with open('venue_dict.json', 'r') as fp:  # Open the venue JSON for finding coordinates
-            venuesJSON = json.load(fp)
-        fp.close()
-
         for game in huskerSchedule:  # Record an index within huskerSchedule
             if game["home_team"] != "Nebraska":
                 opponentsList.update({game["home_team"].lower(): i})
             else:
                 opponentsList.update({game["away_team"].lower(): i})
             i += 1
+
+        def isDST():
+            x = datetime.datetime(datetime.datetime.now().year, 1, 1, 0, 0, 0, tzinfo=pytz.timezone(timezone_cst))  # Jan 1 of this year
+            y = datetime.datetime.now(pytz.timezone(timezone_cst))
+            return int(not (y.utcoffset() == x.utcoffset()))
 
         def cstNow():
             cst_now = pytz.utc.localize(datetime.datetime.utcnow())
@@ -133,7 +133,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             gameDT = pytz.utc.localize(gameDT)
 
             totalRemaining = gameDT - cstNow()
-            hrs = int(totalRemaining.seconds / 3600)
+            hrs = int(totalRemaining.seconds / 3600) - isDST()
             min = int((totalRemaining.seconds / 60) % 60)
 
             # CollegeFootballData API stores game with no set time as hour 4 or 5
@@ -161,7 +161,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
                 if cstNow() < gameDT:
                     totalRemaining = gameDT - cstNow()
-                    hrs = int(totalRemaining.seconds / 3600)
+                    hrs = int(totalRemaining.seconds / 3600) - isDST()
                     min = int((totalRemaining.seconds / 60) % 60)
 
                     if game["home_team"] == "Nebraska":
@@ -178,7 +178,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     ))
                     break
 
-    # # TODO Correct for daylight savings time.
     # @commands.command(aliases=["cd",], brief="How long until Husker football?")
     # async def countdown(self, ctx, *, input=None):
     #     """ Returns the time until the next game if no input is provide or returns time to a specific game if provided.

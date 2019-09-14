@@ -209,7 +209,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             random.shuffle(source)
 
             titles = ["The Great Seal of", "The Commonwealth of", "Republic", "Great Seal of the State of", "Commonwealth of", "Seal of the State of", "State of", "Sigillum Republicae" ]
-            return_string = titles[random.randint(0,len(titles))]
+            return_string = titles[random.randint(0, len(titles)-1)]  # Calling out of range errors
             return_string += "\n{:>15}\n".format("of")
             return_string += "{} {}".format(source[0].strip(), source[1].strip())
             return return_string
