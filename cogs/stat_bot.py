@@ -144,14 +144,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         await ctx.send(embed=embed)
 
-    # TODO Discord 2,000 char limit per message really limits this command. Need to make output more readable. Possibly add ability to filter by offense, defense, special teams, etc.
-    @commands.command()
-    async def roster(self, ctx, team="NEBRASKA", year=2019):
-        """ Returns the current roster """
-        await ctx.send("This command is under construction.")
-        return
-
-    # TODO This need to be reworked. Home and away teams don't have the same length of stats.
     @commands.command(aliases=["bs",])
     async def boxscore(self, ctx, year: int, week: int):
         """ Returns the box score of the searched for game. """
