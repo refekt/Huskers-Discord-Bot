@@ -7,7 +7,6 @@ import pytz
 import discord
 import requests
 import time
-import calendar
 
 # Dictionaries
 eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
@@ -257,31 +256,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await ctx.send("Unable to locate venue.")
             return
 
-
-
-        sky_description = "Sunny"
-        sky_conditions = [
-            ("Cloudy", 100),
-            ("Mostly Cloudy", (7/8)*100),
-            ("Partly Cloudy", (5/8)*100),
-            ("Mostly Sunny", (3/8)*100)
-        ]
-
-        wind_description = "None"
-        wind_conditions = [
-            ("Strong Winds", 999),
-            ("Very Windy", 40),
-            ("Windy", 30),
-            ("Breezy", 25),
-            ("Light", 5),
-            ("Very Light", 1)
-        ]
-
         if which == "current":
             r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
             weather_dict = r.json()
 
-            dump = False
+            dump = True
             if dump:
                 with open("weather_json.json", "w") as fp:
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)
@@ -291,61 +270,41 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venue, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
                 color=0xFF0000,
                 description="Nebraska's next opponent is __[{}]__".format(next_game))
-            embed.set_thumbnail(url="https://i.imgur.com/EjAlGCb.png")
-
+            embed.set_thumbnail(url="https://www.weatherbit.io/static/img/icons/{}.png".format(weather_dict["data"][0]["weather"]["icon"]))
             embed.add_field(name="Temperature", value="{} F".format(weather_dict["data"][0]["temp"]))
-
-            for condition in sky_conditions:
-                if weather_dict["data"][0]["clouds"] == condition[1]:
-                    break
-                elif weather_dict["data"][0]["clouds"] > condition[1]:
-                    sky_description = condition[0]
-            embed.add_field(name="Cloud Coverage", value="{} ({}% )".format(sky_description, weather_dict["data"][0]["clouds"]))
-
-            for condition in wind_conditions:
-                if (weather_dict["data"][0]["wind_spd"] * 100) == condition[1]:
-                    break
-                elif (weather_dict["data"][0]["wind_spd"] * 100) > condition[1]:
-                    wind_description = condition[0]
-            embed.add_field(name="Wind Speed", value="{} ({} MPH / {})".format(wind_description, weather_dict["data"][0]["wind_spd"], weather_dict["data"][0]["wind_cdir"]))
-
+            embed.add_field(name="Cloud Coverage", value="{}%".format(weather_dict["data"][0]["clouds"]))
+            embed.add_field(name="Wind Speed", value="{} MPH / {}".format(weather_dict["data"][0]["wind_spd"], weather_dict["data"][0]["wind_cdir"]))
             embed.add_field(name="Snow Chance", value="{:.2f}%".format(weather_dict["data"][0]["snow"]*100))
             embed.add_field(name="Precipitation Chance", value="{:.2f}%".format(weather_dict["data"][0]["precip"]*100))
         elif which == "forecast":
             r = requests.get(url="https://api.weatherbit.io/v2.0/forecast/daily?key={}&lang=en&units=I&lat={}&lon={}&days=7".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
             weather_dict = r.json()
 
-            dump = False
+            dump = True
             if dump:
                 with open("weather_json.json", "w") as fp:
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)
                 fp.close()
 
             embed = discord.Embed(
-                title="5 day forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["city_name"], weather_dict["state_code"]),
+                title="Game day forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["city_name"], weather_dict["state_code"]),
                 color=0xFF0000,
                 description="Nebraska's next game is __[{}]__".format(next_game))
-            embed.set_thumbnail(url="https://i.imgur.com/EjAlGCb.png")
-
             for days in weather_dict["data"]:
                 datetime_obj = datetime.datetime.strptime(days["datetime"], "%Y-%m-%d")
-                print(datetime_obj)
-
-                day_str = "Cloud Coverage: {}%\n" \
-                          "Wind: {} MPH {}\n" \
-                          "Snow Chance: {:.2f}%\n" \
-                          "Precip Chance: {:.2f}%\n" \
-                          "High Temp: {} F\n" \
-                          "Low Temp: {} F\n".format(days["clouds"], days["wind_spd"], days["wind_cdir"], days["snow"]*100, days["precip"]*100, days["max_temp"], days["min_temp"])
-                embed.add_field(name="{}".format("{}, {}/{}/{}".format(calendar.day_name[datetime_obj.weekday()], datetime_obj.day, datetime_obj.month, datetime_obj.year)), value=day_str)
+                if datetime_obj.weekday() == 5:
+                    embed.set_thumbnail(url="https://www.weatherbit.io/static/img/icons/{}.png".format(days["weather"]["icon"]))
+                    embed.add_field(name="Temperature", value="{} F".format(days["temp"]))
+                    embed.add_field(name="Cloud Coverage", value="{}%".format(days["clouds"]))
+                    embed.add_field(name="Wind Speed", value="{} MPH / {}".format(days["wind_spd"], days["wind_cdir"]))
+                    embed.add_field(name="Snow Chance", value="{:.2f}%".format(days["snow"] * 100))
+                    embed.add_field(name="Precipitation Chance", value="{:.2f}%".format(days["precip"] * 100))
         else:
             await ctx.send("`Current` and `forecast` are the only options for `$weather`. Please try again.")
             return
 
         embed.set_footer(text="There is a daily 500 call limit to the API used for this command. Do not abuse it.")
         await ctx.send(embed=embed)
-
-        #await ctx.send(ow.get_weather(station))
 
     @commands.command(aliases=["gbr",])
     async def balloons(self, ctx):
