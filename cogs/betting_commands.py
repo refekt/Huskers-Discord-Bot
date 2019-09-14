@@ -33,12 +33,12 @@ def store_next_opponent():
         # The date/time is stored in ISO 8601 format. It sucks. Take raw data and manually convert it to the default format.
         check_date_raw = dateutil.parser.parse(events["start_date"])
         check_date = datetime.datetime(day=check_date_raw.day, month=check_date_raw.month, year=check_date_raw.year, hour=check_date_raw.hour, minute=check_date_raw.minute)
-        check_date = check_date - datetime.timedelta(hours=5)
+        #check_date = check_date - datetime.timedelta(hours=5)
 
         check_now = datetime.datetime.now()
-        hourPadding = datetime.timedelta(hours=5)
+        # hourPadding = datetime.timedelta(hours=5)
 
-        if (check_now + hourPadding) < check_date:
+        if check_now  < check_date:
             if events["home_team"] != "Nebraska":
                 config.current_game.append(events["home_team"])
             else:
