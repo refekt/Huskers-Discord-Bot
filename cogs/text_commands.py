@@ -81,9 +81,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         elif len(source_data) < 10:
             await edit_msg.edit(content="Not enough data! Good bye.")
             return
-
         chain = markovify.NewlineText(source_data, well_formed=True)
-        sentence = chain.make_short_sentence(max_chars=300)
+        sentence = chain.make_short_sentence(max_chars=400)
 
         if sentence is None:
             await edit_msg.edit(content="User [{}] does not have enough data. They suck!".format(user))
