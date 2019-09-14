@@ -346,9 +346,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 with open("season_leaderboard.json", "w") as json_file:
                     json_file.seek(0)
                     json_file.write(str(newLB))
-                    #json.dump(leaderboard, json_file, sort_keys=True, indent=4)
+                    # json.dump(leaderboard, json_file, sort_keys=True, indent=4)
 
-            createBlankLeaderboard() # Load a blank leaderboard -- erases everything
+            createBlankLeaderboard()  # Load a blank leaderboard -- erases everything
 
             f = open('season_leaderboard.json', 'r')
             temp_json = f.read()
@@ -358,10 +358,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             def isInLeaderboard(user: str):
                 for lb in leaderboard["user"]:
                     if lb["name"] == user:
-                        #print("User [{}] was found.".format(user))
+                        # print("User [{}] was found.".format(user))
                         return True
 
-                #print("User [{}] was not found.".format(user))
+                # print("User [{}] was not found.".format(user))
                 return False
 
             load_season_bets()

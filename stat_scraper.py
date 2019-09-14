@@ -13,60 +13,9 @@ def stat_scraper(team = "Nebraska", year = 2018):
         stats = player.dataframe
         if stats is not None:
             for index, row in stats.iterrows():
-                stat_dict = {}
-                stat_dict['name'] = player.name
-                stat_dict['team_abbreviation'] = row.team_abbreviation
-                stat_dict['position'] = row.position
-                stat_dict['year'] = row.year
-                stat_dict['season'] = row.season
-                stat_dict['adjusted_yards_per_attempt'] = row.adjusted_yards_per_attempt
-                stat_dict['assists_on_tackles'] = row.assists_on_tackles
-                stat_dict['attempted_passes'] = row.attempted_passes
-                stat_dict['completed_passes'] = row.completed_passes
-                stat_dict['passing_yards'] = None # the api doesn't return passing yards right now
-                stat_dict['extra_points_made'] = row.extra_points_made
-                stat_dict['field_goals_made'] = row.field_goals_made
-                stat_dict['fumbles_forced'] = row.fumbles_forced
-                stat_dict['fumbles_recovered'] = row.fumbles_recovered
-                stat_dict['fumbles_recovered_for_touchdown'] = row.fumbles_recovered_for_touchdown
-                stat_dict['games'] = row.games
-                stat_dict['height'] = row.height
-                stat_dict['interceptions'] = row.interceptions
-                stat_dict['interceptions_returned_for_touchdown'] = row.interceptions_returned_for_touchdown
-                stat_dict['interceptions_thrown'] = row.interceptions_thrown
-                stat_dict['kickoff_return_touchdowns'] = row.kickoff_return_touchdowns
-                stat_dict['other_touchdowns'] = row.other_touchdowns
-                stat_dict['passes_defended'] = row.passes_defended
-                stat_dict['passing_completion'] = row.passing_completion
-                stat_dict['passing_touchdowns'] = row.passing_touchdowns
-                stat_dict['passing_yards_per_attempt'] = row.passing_yards_per_attempt
-                stat_dict['player_id'] = row.player_id
-                stat_dict['plays_from_scrimmage'] = row.plays_from_scrimmage
-                stat_dict['points'] = row.points
-                stat_dict['punt_return_touchdowns'] = row.punt_return_touchdowns
-                stat_dict['quarterback_rating'] = row.quarterback_rating
-                stat_dict['receiving_touchdowns'] = row.receiving_touchdowns
-                stat_dict['receiving_yards'] = row.receiving_yards
-                stat_dict['receiving_yards_per_reception'] = row.receiving_yards_per_reception
-                stat_dict['receptions'] = row.receptions
-                stat_dict['rush_attempts'] = row.rush_attempts
-                stat_dict['rush_touchdowns'] = row.rush_touchdowns
-                stat_dict['rush_yards'] = row.rush_yards
-                stat_dict['rush_yards_per_attempt'] = row.rush_yards_per_attempt
-                stat_dict['rushing_and_receiving_touchdowns'] = row.rushing_and_receiving_touchdowns
-                stat_dict['sacks'] = row.sacks
-                stat_dict['safeties'] = row.safeties
-                stat_dict['solo_tackles'] = row.solo_tackles
-                stat_dict['tackles_for_loss'] = row.tackles_for_loss
-                stat_dict['total_tackles'] = row.total_tackles
-                stat_dict['total_touchdowns'] = row.total_touchdowns
-                stat_dict['two_point_conversions'] = row.two_point_conversions
-                stat_dict['weight'] = row.weight
-                stat_dict['yards_from_scrimmage'] = row.yards_from_scrimmage
-                stat_dict['yards_from_scrimmage_per_play'] = row.yards_from_scrimmage_per_play
-                stat_dict['yards_recovered_from_fumble'] = row.yards_recovered_from_fumble
-                stat_dict['yards_returned_from_interceptions'] = row.yards_returned_from_interceptions
-                stat_dict['yards_returned_per_interception'] = row.yards_returned_per_interception
+                stat_dict = {'name': player.name, 'team_abbreviation': row.team_abbreviation, 'position': row.position, 'year': row.year, 'season': row.season, 'adjusted_yards_per_attempt': row.adjusted_yards_per_attempt, 'assists_on_tackles': row.assists_on_tackles, 'attempted_passes': row.attempted_passes, 'completed_passes': row.completed_passes, 'passing_yards': None, 'extra_points_made': row.extra_points_made, 'field_goals_made': row.field_goals_made, 'fumbles_forced': row.fumbles_forced, 'fumbles_recovered': row.fumbles_recovered, 'fumbles_recovered_for_touchdown': row.fumbles_recovered_for_touchdown, 'games': row.games, 'height': row.height, 'interceptions': row.interceptions, 'interceptions_returned_for_touchdown': row.interceptions_returned_for_touchdown, 'interceptions_thrown': row.interceptions_thrown, 'kickoff_return_touchdowns': row.kickoff_return_touchdowns, 'other_touchdowns': row.other_touchdowns, 'passes_defended': row.passes_defended,
+                             'passing_completion': row.passing_completion, 'passing_touchdowns': row.passing_touchdowns, 'passing_yards_per_attempt': row.passing_yards_per_attempt, 'player_id': row.player_id, 'plays_from_scrimmage': row.plays_from_scrimmage, 'points': row.points, 'punt_return_touchdowns': row.punt_return_touchdowns, 'quarterback_rating': row.quarterback_rating, 'receiving_touchdowns': row.receiving_touchdowns, 'receiving_yards': row.receiving_yards, 'receiving_yards_per_reception': row.receiving_yards_per_reception, 'receptions': row.receptions, 'rush_attempts': row.rush_attempts, 'rush_touchdowns': row.rush_touchdowns, 'rush_yards': row.rush_yards, 'rush_yards_per_attempt': row.rush_yards_per_attempt, 'rushing_and_receiving_touchdowns': row.rushing_and_receiving_touchdowns, 'sacks': row.sacks, 'safeties': row.safeties, 'solo_tackles': row.solo_tackles, 'tackles_for_loss': row.tackles_for_loss, 'total_tackles': row.total_tackles,
+                             'total_touchdowns': row.total_touchdowns, 'two_point_conversions': row.two_point_conversions, 'weight': row.weight, 'yards_from_scrimmage': row.yards_from_scrimmage, 'yards_from_scrimmage_per_play': row.yards_from_scrimmage_per_play, 'yards_recovered_from_fumble': row.yards_recovered_from_fumble, 'yards_returned_from_interceptions': row.yards_returned_from_interceptions, 'yards_returned_per_interception': row.yards_returned_per_interception}
                 s = stat_dict
                 cur.execute('INSERT INTO stats(\
                 name,\

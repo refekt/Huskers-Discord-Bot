@@ -25,7 +25,7 @@ async def check_command_channel(command: str, channel):
             commandFound = True
 
     # Exit function if the command isn't listed
-    if commandFound == False:
+    if not commandFound:
         return
 
     #   Production Server:
