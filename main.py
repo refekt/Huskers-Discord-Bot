@@ -565,4 +565,4 @@ if len(sys.argv) > 0:
     else:
         print("You are error. Good bye!")
 else:
-    print("No arguments presented.")
+    print("No arguments presented!")
