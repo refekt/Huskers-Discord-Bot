@@ -510,32 +510,34 @@ async def purge(ctx):
     print("!!! User [{}] initiated $purge.".format(ctx.message.author))
     # test admin - 606301197426753536
     # prod admin - 440639061191950336
-    print(ctx.message.author.roles)
-    for role in ctx.message.author.roles:
-        if role.id == 606301197426753536 or role.id == 440639061191950336:
-            print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
 
-            channel = client.get_channel(ctx.message.channel.id)
-            deleteCounter = 0
-            missedCounter = 0
+    auth = False
+    for roles in ctx.message.author.roles:
+        if roles.id == 606301197426753536 or roles.id == 440639061191950336:
+            auth = True
 
-            async for message in channel.history(limit=500):
-                if message.author == client.user:
-                    print("{}: Deleting [{}...]".format(deleteCounter, message.content[:25]))
-                    await message.delete()
-                    deleteCounter += 1
-                else:
-                    missedCounter += 1
-                    if missedCounter > 25:
-                        break  # Stop searching forever
-                if deleteCounter > 50:
-                    print("Last 50 messages have been deleted.")
-                    break  # stop looking through messages
+    if auth:
+        print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
 
-            break  # Stop looking through roles
-        else:
-            await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
-            print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
+        channel = client.get_channel(ctx.message.channel.id)
+        deleteCounter = 0
+        missedCounter = 0
+
+        async for message in channel.history(limit=500):
+            if message.author == client.user:
+                print("{}: Deleting [{}...]".format(deleteCounter, message.content[:25]))
+                await message.delete()
+                deleteCounter += 1
+            else:
+                missedCounter += 1
+                if missedCounter > 25:
+                    break  # Stop searching forever
+            if deleteCounter > 50:
+                print("Last 50 messages have been deleted.")
+                break  # stop looking through messages
+    else:
+        await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
+        print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
 
 
 @client.command()
