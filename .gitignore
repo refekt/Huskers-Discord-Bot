@@ -140,3 +140,5 @@ facts.txt
 season_bets.json
 
 restartbot.sh
+*.json
+season_bets.json
