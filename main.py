@@ -524,7 +524,7 @@ async def purge(ctx):
         deleteCounter = 0
         missedCounter = 0
 
-        async for message in channel.history(limit=500):
+        async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
             if message.author == client.user:
                 print("{}: Deleting [{}...]".format(deleteCounter, message.content[:25]))
                 await message.delete()
@@ -534,7 +534,7 @@ async def purge(ctx):
                 if missedCounter > 25:
                     break  # Stop searching forever
             if deleteCounter > 50:
-                print("Last 50 messages have been deleted.")
+                print("!!! Recent messages have been deleted by [{}].".format(ctx.message.author))
                 break  # stop looking through messages
     else:
         await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
