@@ -209,7 +209,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
         with open('husker_schedule.json', 'r') as fp:
             husker_sched = json.load(fp)
 
-        venue = ""
+        venueID = ""
+        venueName = ""
         next_game = ""
 
         for game in husker_sched:
@@ -218,16 +219,17 @@ class TextCommands(commands.Cog, name="Text Commands"):
             game_datetime = datetime.datetime(year=game_datetime.year, month=game_datetime.month, day=game_datetime.day, hour=game_datetime.hour, minute=game_datetime.minute, second=game_datetime.second, tzinfo=game_datetime.tzinfo)
 
             if datetime.datetime.now() < game_datetime:
-                venue = game["venue"]
+                venueID = game["venue_id"]
+                venueName = game["venue"]
                 if game["away_team"] == "Nebraska":
                     next_game = game["home_team"]
                 elif game["home_team"] == "Nebraska":
                     next_game = game["away_team"]
                 break
             else:
-                venue = None
+                venueID = None
 
-        if venue:
+        if venueID:
             r = requests.get(url="https://api.collegefootballdata.com/venues")
             venue_dict = r.json()
 
@@ -239,7 +241,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             coords = {}
             for venues in venue_dict:
-                if venues["name"] == venue:
+                if venues["id"] == venueID:
                     coords = venues["location"]
         else:
             await ctx.send("Unable to locate venue.")
@@ -256,7 +258,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 fp.close()
 
             embed = discord.Embed(
-                title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venue, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
+                title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venueName, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
                 color=0xFF0000,
                 description="Nebraska's next opponent is __[{}]__".format(next_game))
             embed.set_thumbnail(url="https://www.weatherbit.io/static/img/icons/{}.png".format(weather_dict["data"][0]["weather"]["icon"]))
@@ -276,7 +278,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 fp.close()
 
             embed = discord.Embed(
-                title="Game day forecast for Nebraska's next game at {} in {}, {}".format(venue, weather_dict["city_name"], weather_dict["state_code"]),
+                title="Game day forecast for Nebraska's next game at {} in {}, {}".format(venueName, weather_dict["city_name"], weather_dict["state_code"]),
                 color=0xFF0000,
                 description="Nebraska's next game is __[{}]__".format(next_game))
             for days in weather_dict["data"]:
