@@ -110,14 +110,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 opponentsList.update({game["away_team"].lower(): i})
             i += 1
 
-        # def isDST():
-        #     """ Compares January 1st of the current year to datetime.now() """
-        #     x = datetime.datetime(datetime.datetime.now().year, 1, 1, 0, 0, 0, tzinfo=pytz.timezone(timezone_cst))
-        #     y = datetime.datetime.now(pytz.timezone(timezone_cst))
-        #     val = int(not (y.utcoffset() == x.utcoffset()))
-        #     print("isDST == {}".format(val))
-        #     return val
-
         def cstNow():
             cst_now = pytz.utc.localize(datetime.datetime.utcnow())
             cst_now = cst_now.astimezone(pytz.timezone(timezone_cst))
@@ -132,7 +124,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
             gameDT = datetime.datetime.strptime(huskerSchedule[game_index]['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
             gameDT = pytz.utc.localize(gameDT)
-            #gameDT -= datetime.timedelta(hours=isDST())
 
             totalRemaining = gameDT - cstNow()
             hrs = int(totalRemaining.seconds / 3600)
@@ -158,11 +149,10 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     input.title(),
                     gameDT.strftime("%x %X")
                 ))
-        else:
+        else:  # $countdown|cd
             for game in huskerSchedule:
                 gameDT = datetime.datetime.strptime(game['start_date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                 gameDT = pytz.utc.localize(gameDT)
-                #gameDT -= datetime.timedelta(hours=isDST())
 
                 if cstNow() < gameDT:
                     totalRemaining = gameDT - cstNow()
