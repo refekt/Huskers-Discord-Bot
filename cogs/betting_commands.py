@@ -38,7 +38,7 @@ def store_next_opponent():
         check_now = datetime.datetime.now()
         # hourPadding = datetime.timedelta(hours=5)
 
-        if check_now  < check_date:
+        if check_now < check_date:
             if events["home_team"] != "Nebraska":
                 config.current_game.append(events["home_team"])
             else:
