@@ -184,23 +184,27 @@ class StatBot(commands.Cog, name="CFB Stats"):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["bs",])
-    async def boxscore(self, ctx, year: int, week: int):
+    async def boxscore(self, ctx, year=None, week=None, *, team="Nebraska"):
         """ Returns the box score of the searched for game. """
 
-        if not type(year) is int:
-            await ctx.send("You must enter a numerical year.")
+        if not year or not week:
+            await ctx.send("A year and week are required.")
             return
-        elif year < 2004:
+
+        if int(year) < 2004:
             await ctx.send("Data is not available prior to 2004.")
             return
 
-        if not type(week) is int:
+        if not type(int(week)) is int:
             await ctx.send("You must enter a numerical week.")
             return
 
         edit_msg = await ctx.send("Loading...")
 
-        url = "https://api.collegefootballdata.com/games/teams?year={}&week={}&seasonType=regular&team=nebraska".format(year, week)
+        if team == "Nebraska":
+            url = "https://api.collegefootballdata.com/games/teams?year={}&week={}&seasonType=regular&team=nebraska".format(year, week)
+        else:
+            url = "https://api.collegefootballdata.com/games/teams?year={}&week={}&seasonType=regular&team={}".format(year, week, team)
 
         try:
             r = requests.get(url)

@@ -247,20 +247,21 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await ctx.send("Unable to locate venue.")
             return
 
+        r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
+        weather_dict = r.json()
+
+        dump = True
+        if dump:
+            with open("weather_json.json", "w") as fp:
+                json.dump(weather_dict, fp, sort_keys=True, indent=4)
+            fp.close()
+
+        embed = discord.Embed(
+            title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venueName, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
+            color=0xFF0000,
+            description="Nebraska's next opponent is __[{}]__".format(next_game))
+
         if which == "current":
-            r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
-            weather_dict = r.json()
-
-            dump = True
-            if dump:
-                with open("weather_json.json", "w") as fp:
-                    json.dump(weather_dict, fp, sort_keys=True, indent=4)
-                fp.close()
-
-            embed = discord.Embed(
-                title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venueName, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
-                color=0xFF0000,
-                description="Nebraska's next opponent is __[{}]__".format(next_game))
             embed.set_thumbnail(url="https://www.weatherbit.io/static/img/icons/{}.png".format(weather_dict["data"][0]["weather"]["icon"]))
             embed.add_field(name="Temperature", value="{} F".format(weather_dict["data"][0]["temp"]))
             embed.add_field(name="Cloud Coverage", value="{}%".format(weather_dict["data"][0]["clouds"]))
@@ -277,13 +278,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     json.dump(weather_dict, fp, sort_keys=True, indent=4)
                 fp.close()
 
-            embed = discord.Embed(
-                title="Game day forecast for Nebraska's next game at {} in {}, {}".format(venueName, weather_dict["city_name"], weather_dict["state_code"]),
-                color=0xFF0000,
-                description="Nebraska's next game is __[{}]__".format(next_game))
             for days in weather_dict["data"]:
                 datetime_obj = datetime.datetime.strptime(days["datetime"], "%Y-%m-%d")
                 if datetime_obj.weekday() == 5:
+                    embed = discord.Embed(
+                        title="Game day forecast for Nebraska's next game at {} in {}, {}".format(venueName, weather_dict["city_name"], weather_dict["state_code"]),
+                        color=0xFF0000,
+                        description="Nebraska's next game is __[{}]__ supposed to be __[{}]__".format(next_game, days["weather"]["description"]))
+
                     embed.set_thumbnail(url="https://www.weatherbit.io/static/img/icons/{}.png".format(days["weather"]["icon"]))
                     embed.add_field(name="Temperature", value="{} F".format(days["temp"]))
                     embed.add_field(name="Cloud Coverage", value="{}%".format(days["clouds"]))
