@@ -99,6 +99,10 @@ class StatBot(commands.Cog, name="CFB Stats"):
             await ctx.send("An error occurred retrieving poll data.")
             return
 
+        if not matchup_json["games"]:
+            await ctx.send("No games found between Nebraska and {}!".format(team))
+            return
+
         dump = True
         if dump:
             with open("matchup_json.json", "w") as fp:
