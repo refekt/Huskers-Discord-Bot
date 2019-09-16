@@ -402,7 +402,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             except:
                 print("No lines available")
 
-            embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
+            if lines:
+                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
+                embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
+            else:
+                embed.add_field(name="Spread (TBD)", value="TBD")
+                embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
+
             await ctx.send(embed=embed)
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
