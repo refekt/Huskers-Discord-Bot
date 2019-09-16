@@ -134,7 +134,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
     @commands.command(aliases=["polls",])
     async def poll(self, ctx, year=2019, week=None, seasonType="regular"):
         """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking.
-        Usage is: `$poll <year> <week>"""
+        Usage is: `$poll [year] [week] [seasonType=regular]` """
 
         url = "https://api.collegefootballdata.com/rankings?year={}".format(year)
 
