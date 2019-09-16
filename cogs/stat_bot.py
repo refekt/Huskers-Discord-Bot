@@ -192,19 +192,19 @@ class StatBot(commands.Cog, name="CFB Stats"):
     async def boxscore(self, ctx, year=None, week=None, *, team="Nebraska"):
         """ Returns the box score of the searched for game. """
 
+        edit_msg = await ctx.send("Loading...")
+
         if not year or not week:
-            await ctx.send("A year and week are required.")
+            await edit_msg.edit(content="A year and week are required.")
             return
 
         if int(year) < 2004:
-            await ctx.send("Data is not available prior to 2004.")
+            await edit_msg.edit(content="Data is not available prior to 2004.")
             return
 
         if not type(int(week)) is int:
-            await ctx.send("You must enter a numerical week.")
+            await edit_msg.edit(content="You must enter a numerical week.")
             return
-
-        edit_msg = await ctx.send("Loading...")
 
         if team == "Nebraska":
             url = "https://api.collegefootballdata.com/games/teams?year={}&week={}&seasonType=regular&team=nebraska".format(year, week)
@@ -215,11 +215,11 @@ class StatBot(commands.Cog, name="CFB Stats"):
             r = requests.get(url)
             boxscore_json = r.json() # Actually imports a list
         except:
-            await ctx.send("An error occurred retrieving boxscore data.")
+            await edit_msg.edit(content="An error occurred retrieving boxscore data.")
             return
 
         if not boxscore_json:
-            await ctx.send("This was a bye week. Try again.")
+            await edit_msg.edit(content="This was a bye week. Try again.")
             return
 
         dump = True
