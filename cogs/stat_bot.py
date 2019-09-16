@@ -131,18 +131,20 @@ class StatBot(commands.Cog, name="CFB Stats"):
             matchup_json["games"][gameHistLen]["awayTeam"]))
         await msg.edit(content="", embed=embed)
 
-    # TODO Maybe have option to pick from various polls. Use reactions?
     @commands.command(aliases=["polls",])
-    async def poll(self, ctx, year=2019, week=None, seasonType=None):
+    async def poll(self, ctx, year=2019, week=None, seasonType="regular"):
         """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking.
         Usage is: `$poll <year> <week>"""
 
         url = "https://api.collegefootballdata.com/rankings?year={}".format(year)
 
-        if not seasonType:
+        if seasonType == "regular":
             url = url + "&seasonType=regular"
-        else:
+        elif seasonType == "postseason":
             url = url + "&seasonType=postseason"
+        else:
+            await ctx.send("The season type is either `regular` or `postseason`. Try again!")
+            return
 
         if week:
             url = url + "&week={}".format(week)
@@ -160,7 +162,11 @@ class StatBot(commands.Cog, name="CFB Stats"):
                 json.dump(poll_json, fp, sort_keys=True, indent=4)
             fp.close()
 
-        embed = discord.Embed(title="{} {} Season Week {} Poll".format(poll_json[0]['season'], str(poll_json[0]['seasonType']).capitalize(), poll_json[0]['week']), color=0xFF0000)
+        try:
+            embed = discord.Embed(title="{} {} Season Week {} Poll".format(poll_json[0]['season'], str(poll_json[0]['seasonType']).capitalize(), poll_json[0]['week']), color=0xFF0000)
+        except IndexError:
+            await ctx.send("Invalid week. Try again!")
+            return
 
         ap_poll_raw = poll_json[0]['polls'][0]['ranks']
         last_rank = 1
@@ -169,7 +175,6 @@ class StatBot(commands.Cog, name="CFB Stats"):
         y = 0
         while x < len(ap_poll_raw):
             while y < len(ap_poll_raw):
-                print("Raw Rank: {}, Last Rank: {}".format(ap_poll_raw[y]['rank'], last_rank))
                 if ap_poll_raw[y]['rank'] == last_rank:
                     if ap_poll_raw[y]['firstPlaceVotes']:
                         embed.add_field(name="#{} {}".format(ap_poll_raw[y]['rank'], ap_poll_raw[y]['school']), value="{}\nPoints: {}\nFirst Place Votes: {}".format(ap_poll_raw[y]['conference'], ap_poll_raw[y]['points'], ap_poll_raw[y]['firstPlaceVotes']))
