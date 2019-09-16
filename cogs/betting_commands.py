@@ -104,7 +104,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
 
             if lines:
-                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["spread"]), inline=False)
+                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
                 embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
             else:
                 embed.add_field(name="Spread (TBD)", value="TBD")
@@ -385,6 +385,25 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
             with open("season_leaderboard.json", "w") as json_file:
                 json.dump(leaderboard, json_file, sort_keys=True, indent=4)
+
+        elif cmd == "lines":
+            url = "https://api.collegefootballdata.com/lines?year={}&week={}&seasonType=regular&team=nebraska".format(config.current_game[1].year, config.current_game[2])
+            try:
+                r = requests.get(url)
+                game_data_raw = r.json()
+            except:
+                await ctx.send("An error occurred retrieving line data.")
+                return
+
+            lines = {}
+            try:
+                for lines_raw in game_data_raw:
+                    lines = lines_raw["lines"]
+            except:
+                print("No lines available")
+
+            embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
+            await ctx.send(embed=embed)
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)
