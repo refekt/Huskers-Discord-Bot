@@ -66,16 +66,17 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     source_data += "\r\n" + str(msg.content).capitalize()
         else:
             if user.bot:
-                embed = discord.Embed(title="You can't do that!", color=0xFF0000)
-                embed.set_image(url="http://m.quickmeme.com/img/96/9651e121dac222fdac699ca6d962b84f288c75e6ec120f4a06e3c04f139ee8ec.jpg")
-                await edit_msg.edit(content="", embed=embed)
-                return
-
-            async for msg in ctx.channel.history(limit=5000):
-                if msg.content != "" and str(msg.author) == str(user) and not msg.author.bot:
-                    source_data += "\r\n" + str(msg.content).capitalize()
+                f = open("scofro.txt", "r")
+                if f.mode == "r":
+                    source_data = f.read()
+                f.close()
+            else:
+                async for msg in ctx.channel.history(limit=5000):
+                    if msg.content != "" and str(msg.author) == str(user) and not msg.author.bot:
+                        source_data += "\r\n" + str(msg.content).capitalize()
 
         if not source_data:
+            print("##\n{}\n##".format(source_data))
             await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
             return
         elif len(source_data) < 10:
