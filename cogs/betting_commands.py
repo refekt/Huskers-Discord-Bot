@@ -56,6 +56,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """ Allows users to place bets for Husker games.
 
         Command usage:
+        $bet: show default message and place bets.
         $bet all: show all current bets.
         $bet lines: shows the current lines.
         $bet show <optional, team>: show your most recent bet or bet for another team
