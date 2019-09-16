@@ -57,8 +57,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         There are 3 sub commands: all, show, and winners.
 
         Show <optional team>: show your current or previous bet.
-        All: show all current bets.
-        Winners <team>: show all the winners of a specific game.
+        all: show all current bets.
+        lines: shows the current lines.
+        show <optional, team>: show your most recent bet or bet for another team
+        winners <team>: show all the winners of a specific game.
         """
         # Creates the embed object for all messages within method
         embed = discord.Embed(title="Husker Game Betting", description="How do you think the Huskers will do in their next game? Place your bets below!", color=0xff0000)
