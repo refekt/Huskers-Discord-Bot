@@ -510,7 +510,35 @@ async def huskerbotquit(ctx):
         await ctx.send("Nice try buddy! 👋")
 
 
-@client.command()
+@client.command(hidden=True)
+async def purgeall(ctx):
+    """ Delete Husker Bot's previous messages. """
+    print("!!! User [{}] initiated $purge.".format(ctx.message.author))
+
+    chanID = int(ctx.message.channel.id)
+    authedChanIDs = (622581511488667699, 595705205069185047)
+    if not chanID in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
+        print("!!! Incorrect channel: {}".format(ctx.message.channel.id))
+        return
+
+    auth = False
+    for roles in ctx.message.author.roles:
+        if roles.id == 606301197426753536 or roles.id == 440639061191950336:  # test admin - 606301197426753536, prod admin - 440639061191950336
+            auth = True
+
+    if auth:
+        print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
+
+        chan = ctx.message.channel
+        async for message in chan.history(limit=100):
+            print("Deleting [{}...]".format(message.content[:25]))
+            await message.delete()
+    else:
+        await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
+        print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
+
+
+@client.command(hidden=True)
 async def purge(ctx):
     """ Delete Husker Bot's previous messages. """
     print("!!! User [{}] initiated $purge.".format(ctx.message.author))
