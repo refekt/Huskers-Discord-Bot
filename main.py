@@ -257,6 +257,97 @@ async def on_member_join(member):
 
 
 @client.event
+async def on_raw_reaction_add(payload):
+    # Putting the payload into objects and variables
+    messageID = payload.message_id
+    channelID = client.get_channel(payload.channel_id)
+    message = await channelID.fetch_message(messageID)
+    userID = payload.user_id
+    user = client.get_user(userID)
+    guildID = client.get_guild(payload.guild_id)
+    emoji = payload.emoji.name
+
+    if len(message.embeds) > 0:
+        # Updating season_bets JSON for reacting to a $bet message
+        if emoji in bet_emojis and user != client.user and message.embeds[0].footer.text == config.bet_footer:
+            # Load season_bets.json if season_bets{} is empty
+            if not bool(config.season_bets):
+                load_season_bets()
+            # Load current game if empty
+            if not bool(config.current_game):
+                store_next_opponent()
+
+            check_now = datetime.datetime.now()
+            check_game_datetime_raw = config.current_game[1]
+            check_game_datetime = datetime.datetime(day=check_game_datetime_raw.day, month=check_game_datetime_raw.month, year=check_game_datetime_raw.year, hour=check_game_datetime_raw.hour, minute=check_game_datetime_raw.minute, second=check_game_datetime_raw.second, microsecond=check_game_datetime_raw.microsecond)
+
+            if check_now > check_game_datetime:
+                await user.send("Unable to place bet because the game has started. You can review your placed bets by using `$bet show`.")
+                return
+
+            raw_username = "{}#{}".format(user.name, user.discriminator)
+            game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
+
+            if emoji == "⬆":
+                try_adding_new_dict(raw_username, "winorlose", "True")
+            elif emoji == "⬇":
+                try_adding_new_dict(raw_username, "winorlose", "False")
+            elif emoji == "❎":
+                try_adding_new_dict(raw_username, "canx_winorlose", "None")
+            elif emoji == "⏫":
+                try_adding_new_dict(raw_username, "spread", "True")
+            elif emoji == "⏬":
+                try_adding_new_dict(raw_username, "spread", "False")
+            elif emoji == "❌":
+                try_adding_new_dict(raw_username, "canx_spread", "None")
+            elif emoji == "🔼":
+                try_adding_new_dict(raw_username, "moneyline", "True")
+            elif emoji == "🔽":
+                try_adding_new_dict(raw_username, "moneyline", "False")
+            elif emoji == "✖":
+                try_adding_new_dict(raw_username, "canx_moneyline", "None")
+            else:
+                pass
+
+            # Send a message alerting the channel that a user has placed a bet.
+            global bet_counter
+
+            # Creates the embed object for all messages within method
+            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            embed.set_footer(text=config.bet_footer)
+
+            if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
+                for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
+                    if u == raw_username:
+                        embed.add_field(name="Author", value=raw_username, inline=False)
+                        embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+                        embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
+                        embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
+                        embed.add_field(name="Over/Under Total Points", value=config.new_dict['moneyline'], inline=True)
+
+                        await user.send(embed=embed)
+                bet_counter = -1
+            else:
+                pass
+
+            with open("season_bets.json", "w") as json_file:
+                json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+
+            # Remove reaction to prevent user from voting for both
+            try:
+                for reaction in message.reactions:
+                    if emoji == reaction.emoji:
+                        await reaction.remove(user)
+            except discord.Forbidden as forb:
+                print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
+            except discord.HTTPException as err:
+                print("Error removing reaction from {}: {}".format(user, err))
+            except:
+                print("I don't know why we can't remove {}'s reaction.".format(user))
+
+
+@client.event
 async def on_reaction_add(reaction, user):
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
@@ -324,82 +415,82 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
         # Updating season_bets JSON for reacting to a $bet message
-        if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
-            # Load season_bets.json if season_bets{} is empty
-            if not bool(config.season_bets):
-                load_season_bets()
-            # Load current game if empty
-            if not bool(config.current_game):
-                store_next_opponent()
-
-            check_now = datetime.datetime.now()
-            check_game_datetime_raw = config.current_game[1]
-            check_game_datetime = datetime.datetime(day=check_game_datetime_raw.day, month=check_game_datetime_raw.month, year=check_game_datetime_raw.year, hour=check_game_datetime_raw.hour, minute=check_game_datetime_raw.minute, second=check_game_datetime_raw.second, microsecond=check_game_datetime_raw.microsecond)
-
-            if check_now > check_game_datetime:
-                await user.send("Unable to place bet because the game has started. You can review your placed bets by using `$bet show`.")
-                return
-
-            raw_username = "{}#{}".format(user.name, user.discriminator)
-            game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
-
-            if reaction.emoji == "⬆":
-                try_adding_new_dict(raw_username, "winorlose", "True")
-            elif reaction.emoji == "⬇":
-                try_adding_new_dict(raw_username, "winorlose", "False")
-            elif reaction.emoji == "❎":
-                try_adding_new_dict(raw_username, "canx_winorlose", "None")
-            elif reaction.emoji == "⏫":
-                try_adding_new_dict(raw_username, "spread", "True")
-            elif reaction.emoji == "⏬":
-                try_adding_new_dict(raw_username, "spread", "False")
-            elif reaction.emoji == "❌":
-                try_adding_new_dict(raw_username, "canx_spread", "None")
-            elif reaction.emoji == "🔼":
-                try_adding_new_dict(raw_username, "moneyline", "True")
-            elif reaction.emoji == "🔽":
-                try_adding_new_dict(raw_username, "moneyline", "False")
-            elif reaction.emoji == "✖":
-                try_adding_new_dict(raw_username, "canx_moneyline", "None")
-            else:
-                pass
-
-            # Send a message alerting the channel that a user has placed a bet.
-            global bet_counter
-
-            # *** Maybe change to a PM instead ***
-            # Creates the embed object for all messages within method
-            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
-            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-            embed.set_footer(text=config.bet_footer)
-
-            if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
-                for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
-                    if u == raw_username:
-                        embed.add_field(name="Author", value=raw_username, inline=False)
-                        embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
-                        embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
-                        embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
-                        embed.add_field(name="Over/Under Total Points", value=config.new_dict['moneyline'], inline=True)
-
-                        await user.send(embed=embed)
-                bet_counter = -1
-            else:
-                pass
-
-            # Remove reaction to prevent user from voting for both
-            try:
-                #print("Bot's add_reaction permission: {}".format(user))
-                await reaction.remove(user)
-            except discord.Forbidden as forb:
-                print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
-            except discord.HTTPException as err:
-                print("Error removing reaction from {}: {}".format(user, err))
-            except:
-                print("I don't know why we can't remove {}'s reaction.".format(user))
-
-            with open("season_bets.json", "w") as json_file:
-                json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+        # if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
+        #     # Load season_bets.json if season_bets{} is empty
+        #     if not bool(config.season_bets):
+        #         load_season_bets()
+        #     # Load current game if empty
+        #     if not bool(config.current_game):
+        #         store_next_opponent()
+        #
+        #     check_now = datetime.datetime.now()
+        #     check_game_datetime_raw = config.current_game[1]
+        #     check_game_datetime = datetime.datetime(day=check_game_datetime_raw.day, month=check_game_datetime_raw.month, year=check_game_datetime_raw.year, hour=check_game_datetime_raw.hour, minute=check_game_datetime_raw.minute, second=check_game_datetime_raw.second, microsecond=check_game_datetime_raw.microsecond)
+        #
+        #     if check_now > check_game_datetime:
+        #         await user.send("Unable to place bet because the game has started. You can review your placed bets by using `$bet show`.")
+        #         return
+        #
+        #     raw_username = "{}#{}".format(user.name, user.discriminator)
+        #     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
+        #
+        #     if reaction.emoji == "⬆":
+        #         try_adding_new_dict(raw_username, "winorlose", "True")
+        #     elif reaction.emoji == "⬇":
+        #         try_adding_new_dict(raw_username, "winorlose", "False")
+        #     elif reaction.emoji == "❎":
+        #         try_adding_new_dict(raw_username, "canx_winorlose", "None")
+        #     elif reaction.emoji == "⏫":
+        #         try_adding_new_dict(raw_username, "spread", "True")
+        #     elif reaction.emoji == "⏬":
+        #         try_adding_new_dict(raw_username, "spread", "False")
+        #     elif reaction.emoji == "❌":
+        #         try_adding_new_dict(raw_username, "canx_spread", "None")
+        #     elif reaction.emoji == "🔼":
+        #         try_adding_new_dict(raw_username, "moneyline", "True")
+        #     elif reaction.emoji == "🔽":
+        #         try_adding_new_dict(raw_username, "moneyline", "False")
+        #     elif reaction.emoji == "✖":
+        #         try_adding_new_dict(raw_username, "canx_moneyline", "None")
+        #     else:
+        #         pass
+        #
+        #     # Send a message alerting the channel that a user has placed a bet.
+        #     global bet_counter
+        #
+        #     # *** Maybe change to a PM instead ***
+        #     # Creates the embed object for all messages within method
+        #     embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+        #     embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+        #     embed.set_footer(text=config.bet_footer)
+        #
+        #     if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
+        #         for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
+        #             if u == raw_username:
+        #                 embed.add_field(name="Author", value=raw_username, inline=False)
+        #                 embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
+        #                 embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
+        #                 embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
+        #                 embed.add_field(name="Over/Under Total Points", value=config.new_dict['moneyline'], inline=True)
+        #
+        #                 await user.send(embed=embed)
+        #         bet_counter = -1
+        #     else:
+        #         pass
+        #
+        #     # Remove reaction to prevent user from voting for both
+        #     try:
+        #         #print("Bot's add_reaction permission: {}".format(user))
+        #         await reaction.remove(user)
+        #     except discord.Forbidden as forb:
+        #         print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
+        #     except discord.HTTPException as err:
+        #         print("Error removing reaction from {}: {}".format(user, err))
+        #     except:
+        #         print("I don't know why we can't remove {}'s reaction.".format(user))
+        #
+        #     with open("season_bets.json", "w") as json_file:
+        #         json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
     else:
         pass
 
