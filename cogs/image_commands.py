@@ -95,12 +95,14 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             random_state = random.choice(list(flag_dict.keys()))
             await ctx.send(embed=await sendImage("Crappy Flags", flag_dict[random_state]))
 
-    @commands.command(case_insensitive=False, aliases=["ohyeah",])
-    async def OHYEAH(self, ctx):
+    @commands.command()
+    async def ohyeah(self, ctx):
+        """Oh yeah. It's all coming together."""
+        await ctx.send(embed=await sendImage("If we have Frost, we have national championships.", "https://i.imgur.com/tdN5IEG.png"))
+
+    @commands.command()
+    async def pour(self, ctx):
         """Pour that koolaid baby"""
-        # embed = discord.Embed(title="OH YEAH!")
-        # embed.set_image(url='https://media.giphy.com/media/3d9rkLNvMXahgQVpM4/source.gif')
-        # await ctx.send(embed=embed)
         await ctx.send(embed=await sendImage("OH YEAH!", "https://media.giphy.com/media/3d9rkLNvMXahgQVpM4/source.gif"))
 
     @commands.command()
