@@ -77,7 +77,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     async def crappyflag(self, ctx, state=""):
         """ Outputs crappy flag. The usage is $crappyflag <state>.
 
-        The states are colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
+        The states are bluejay, colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, notredame, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
 
         # This keeps bot spam down to a minimal.
         await function_helper.check_command_channel(ctx.command, ctx.channel)
