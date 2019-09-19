@@ -41,7 +41,36 @@ ref_dict = {"backblock": ["Block in the back", "OFF: 10 yards\nDEF: 10 yards", "
             'td': ['Touchdown', 'OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'],
             'unsport': ['Unsportsmanlike', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/6Cy9UE4.gif']
             }
-flag_dict = {'alabama': 'https://i.imgur.com/uHXPo4n.png','colorado': 'https://i.imgur.com/If6MPtT.jpg','illinois': 'https://i.imgur.com/MxMaS3e.jpg','indiana': 'https://i.imgur.com/uc0Q8Z0.jpg','iowa': 'https://i.imgur.com/xoeCOwp.png','iowa_state': 'https://i.imgur.com/w9vg0QX.jpg','kansas': 'https://i.imgur.com/BL4jQfx.png','kstate': 'https://i.imgur.com/qtxrPn7.png','maryland': 'https://i.imgur.com/G6RX8Oz.jpg','miami': 'https://i.imgur.com/MInQMLb.jpg','michigan': 'https://i.imgur.com/XWEDsFf.jpg','michigan_state': 'https://i.imgur.com/90a9g3v.jpg','minnesota': 'https://i.imgur.com/54mF0sK.jpg','nebraska': 'https://i.imgur.com/q2em9Qw.jpg','northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg','northwestern': 'https://i.imgur.com/WG4kFP6.jpg','notredame': 'https://i.imgur.com/Ofoaz7U.png','ohio_state': 'https://i.imgur.com/coxjUAZ.jpg','penn_state': 'https://i.imgur.com/JkQuMXf.jpg','purdue': 'https://i.imgur.com/8SYhZKc.jpg','rutgers': 'https://i.imgur.com/lyng39h.jpg','south_alabama': 'https://i.imgur.com/BOH5reA.jpg','stanford': 'https://giant.gfycat.com/PassionateRepentantCoelacanth.gif','texas': 'https://i.imgur.com/rB2Rduq.jpg','ttu': 'https://i.imgur.com/lpOSpH7.png','tulane': 'https://gfycat.com/braveanotherdodobird','usc': 'https://i.imgur.com/GrA4M0X.png','wisconsin': 'https://giant.gfycat.com/PolishedFeminineBeardedcollie.gif', 'bluejay': 'https://i.imgur.com/OxVze61.png'}
+flag_dict = {
+    'alabama': 'https://i.imgur.com/uHXPo4n.png',
+    'colorado': 'https://i.imgur.com/If6MPtT.jpg',
+    'illinois': 'https://i.imgur.com/MxMaS3e.jpg',
+    'indiana': 'https://i.imgur.com/uc0Q8Z0.jpg',
+    'iowa': 'https://i.imgur.com/xoeCOwp.png',
+    'iowa_state': 'https://i.imgur.com/w9vg0QX.jpg',
+    'kansas': 'https://i.imgur.com/BL4jQfx.png',
+    'kstate': 'https://i.imgur.com/qtxrPn7.png',
+    'maryland': 'https://i.imgur.com/G6RX8Oz.jpg',
+    'miami': 'https://i.imgur.com/MInQMLb.jpg',
+    'michigan': 'https://i.imgur.com/XWEDsFf.jpg',
+    'michigan_state': 'https://i.imgur.com/90a9g3v.jpg',
+    'minnesota': 'https://i.imgur.com/54mF0sK.jpg',
+    'nebraska': 'https://i.imgur.com/q2em9Qw.jpg',
+    'northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg',
+    'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
+    'notredame': 'https://i.imgur.com/Ofoaz7U.png',
+    'ohio_state': 'https://i.imgur.com/coxjUAZ.jpg',
+    'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
+    'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
+    'rutgers': 'https://i.imgur.com/lyng39h.jpg',
+    'south_alabama': 'https://i.imgur.com/BOH5reA.jpg',
+    'stanford': 'https://giant.gfycat.com/PassionateRepentantCoelacanth.gif',
+    'texas': 'https://i.imgur.com/rB2Rduq.jpg',
+    'ttu': 'https://i.imgur.com/lpOSpH7.png',
+    'tulane': 'https://gfycat.com/braveanotherdodobird',
+    'usc': 'https://i.imgur.com/GrA4M0X.png',
+    'wisconsin': 'https://giant.gfycat.com/PolishedFeminineBeardedcollie.gif',
+    'creighton': 'https://i.imgur.com/OxVze61.png'}
 
 async def sendImage(title: str, url: str):
     embed = discord.Embed(title=title, color=0xFF0000)
@@ -77,7 +106,12 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     async def crappyflag(self, ctx, state=""):
         """ Outputs crappy flag. The usage is $crappyflag <state>.
 
-        The states are bluejay, colorado, illinois, indiana, iowa, iowa_state, maryland:, miami, michigan, michigan_state, minnesota, northern_illinois, northwestern, notredame, ohio_state, penn_state, purdue, south_alabama, rutgers, texas, wisconsin """
+        The states are:
+        creighton, alabama, colorado, illinois, indiana, iowa, iowa_state,
+        maryland, miami, michigan, michigan_state, minnesota,
+        northern_illinois, northwestern, notredame, ohio_state,
+        penn_state, purdue, south_alabama, rutgers, stanford, texas, ttu,
+        tulane, usc, wisconsin """
 
         # This keeps bot spam down to a minimal.
         await function_helper.check_command_channel(ctx.command, ctx.channel)
@@ -86,8 +120,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             return
 
         if state:
-            state = state.lower()
-            if state == "nebraska":
+            if state.lower() == "nebraska":
                 await ctx.send(embed=await sendImage("Amazing Flag", flag_dict[state.lower()]))
             else:
                 await ctx.send(embed=await sendImage("Crappy Flag", flag_dict[state.lower()]))
