@@ -135,8 +135,19 @@ class ImageCommands(commands.Cog, name="Image Commands"):
 
     @commands.command()
     async def crabfrost(self, ctx):
-        """Oh yeah. It's all coming together."""
+        """CELEBRATE"""
         await ctx.send(embed=await sendImage("🦀D🦀A🦀N🦀C🦀E🦀P🦀A🦀R🦀T🦀Y🦀", "https://thumbs.gfycat.com/FalseTestyDotterel-size_restricted.gif"))
+
+    @commands.command(aliases=["dance",])
+    async def danceparty(self, ctx):
+        """Get on the floooooor!"""
+        await ctx.send(embed=await sendImage("🕺💃👯‍♂️👯‍♀️", "https://thumbs.gfycat.com/GiddyOldfashionedBluebreastedkookaburra-size_restricted.gif"))
+
+    @commands.command()
+    async def fuckiowa(self, ctx):
+        """Get on the floooooor!"""
+        await ctx.send(embed=await sendImage("FUCK IOWA", "https://thumbs.gfycat.com/CanineEssentialGelding-size_restricted.gif"))
+
 
     @commands.command()
     async def pour(self, ctx):
