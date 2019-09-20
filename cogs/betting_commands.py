@@ -5,6 +5,7 @@ import dateutil
 import datetime
 import config
 import requests
+import mysql
 
 bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 stored_bets = dict()
@@ -338,107 +339,126 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         # Show the current leader board. +/- 1 point for winorlose, +/- 2 points for spread and total points
         elif cmd == "leaderboard" or cmd == "lb":
-            def createBlankLeaderboard():
-                newLB = "{\"season\": \"2019\", \"users\": [{\"bot\": {\"winorlose\": 0, \"spread\": 0, \"moneyline\": 0, \"_total\": 0}}]}"
+            # def createBlankLeaderboard():
+            #     newLB = "{\"season\": \"2019\", \"users\": [{\"bot\": {\"winorlose\": 0, \"spread\": 0, \"moneyline\": 0, \"_total\": 0}}]}"
+            #
+            #     with open("season_leaderboard.json", "w") as json_file:
+            #         json_file.seek(0)
+            #         json_file.write(str(newLB))
+            #
+            # createBlankLeaderboard()  # Load a blank leaderboard -- erases everything
+            #
+            # f = open('season_leaderboard.json', 'r')
+            # temp_json = f.read()
+            # leaderboard = json.loads(temp_json)
+            # f.close()
+            #
+            # def isInLeaderboard(user: str):
+            #     if user in leaderboard["users"][0].keys():
+            #         # print("User [{}] was found.".format(user))
+            #         return True
+            #
+            #     # print("User [{}] was not found.".format(user))
+            #     return False
+            #
+            # load_season_bets()
+            #
+            # seasonBets = config.season_bets[0]["opponent"]
+            # # 1.  Loop through games for "finished" == "True"
+            # for game in seasonBets:
+            #     if config.season_bets[0]["opponent"][game]["finished"] == "True":
+            #         # 1.1 Create a dictionary of usernames from bets within finished games
+            #         for bets in config.season_bets[0]["opponent"][game]["bets"]:
+            #             # Add put all points in
+            #             for user in bets:
+            #                 # 2.1 Loop through bets to compare "outcome_winorlose", add or subtract points for username
+            #                 if config.season_bets[0]["opponent"][game]["outcome_winorlose"] == bets[user]["winorlose"]:
+            #                     if isInLeaderboard(user):
+            #                         leaderboard["users"][0][user] = dict(
+            #                             moneyline=leaderboard["users"][0][user]["moneyline"],
+            #                             spread=leaderboard["users"][0][user]["spread"],
+            #                             winorlose=leaderboard["users"][0][user]["winorlose"] + 1,
+            #                             _total=0
+            #                         )
+            #                     else:
+            #                         leaderboard["users"][0][user] = dict(moneyline=0, spread=0, winorlose=1, total=0)
+            #                 # 2.2 Loop through bets to compare "outcome_spread", add or subtract points for username
+            #                 if config.season_bets[0]["opponent"][game]["outcome_spread"] == bets[user]["spread"]:
+            #                     if isInLeaderboard(user):
+            #                         leaderboard["users"][0][user] = dict(
+            #                             moneyline=leaderboard["users"][0][user]["moneyline"],
+            #                             spread=leaderboard["users"][0][user]["spread"] + 2,
+            #                             winorlose=leaderboard["users"][0][user]["winorlose"],
+            #                             _total=0
+            #                         )
+            #                     else:
+            #                         leaderboard["users"][0][user] = dict(moneyline=0, spread=2, winorlose=0, total=0)
+            #                 # 2.3 Loop through bets to compare "outcome_moneyline", add or subtract points for username
+            #                 if config.season_bets[0]["opponent"][game]["outcome_moneyline"] == bets[user]["moneyline"]:
+            #                     if isInLeaderboard(user):
+            #                         leaderboard["users"][0][user] = dict(
+            #                             moneyline=leaderboard["users"][0][user]["moneyline"] + 2,
+            #                             spread=leaderboard["users"][0][user]["spread"],
+            #                             winorlose=leaderboard["users"][0][user]["winorlose"],
+            #                             _total=0
+            #                         )
+            #                     else:
+            #                         leaderboard["users"][0][user] = dict(moneyline=2, spread=0, winorlose=0, total=0)
+            #
+            # # 3.  Print out the dictionary
+            # del leaderboard["users"][0]["bot"]
+            #
+            # for user in leaderboard["users"][0]:
+            #     if not user == "bot":
+            #         total = \
+            #             leaderboard["users"][0][user]["moneyline"] + \
+            #             leaderboard["users"][0][user]["spread"] + \
+            #             leaderboard["users"][0][user]["winorlose"]
+            #
+            #         leaderboard["users"][0][user]["_total"] = total
+            #
+            # def secondKey(elem):
+            #     return elem[1]
+            #
+            # sortedLeaderboard = []
+            #
+            # for user in leaderboard["users"][0]:
+            #     sortedLeaderboard += [(user, leaderboard["users"][0][user]["_total"])]
+            # sortedLeaderboard = sorted(sortedLeaderboard, key=secondKey, reverse=True)
+            #
+            # sortedString = ""
+            # for user in sortedLeaderboard:
+            #     if user != "bot":
+            #         sortedString += "{}: {}\n".format(user[0], user[1])
+            #
+            # #embed.add_field(name="Leaderboard", value=sortedString[:1024])
+            # #await ctx.send(embed=embed)
+            #
+            # # 4 Save.
+            # dump = True
+            # if dump:
+            #     with open("season_leaderboard.json", "w") as json_file:
+            #         json.dump(leaderboard, json_file, sort_keys=True, indent=4)
+            #     json_file.close()
 
-                with open("season_leaderboard.json", "w") as json_file:
-                    json_file.seek(0)
-                    json_file.write(str(newLB))
 
-            createBlankLeaderboard()  # Load a blank leaderboard -- erases everything
+            # try:
+            with mysql.sqlConnection.cursor() as cursor:
+                cursor.execute(config.sqlLeaderboard)
+                # sqlLb = cursor.fetchall()
+                sqlLb = cursor.fetchmany(size=10)
 
-            f = open('season_leaderboard.json', 'r')
-            temp_json = f.read()
-            leaderboard = json.loads(temp_json)
-            f.close()
+            mysql.sqlConnection.commit()
+            # finally:
+            #     mysql.sqlConnection.close()
 
-            def isInLeaderboard(user: str):
-                if user in leaderboard["users"][0].keys():
-                    # print("User [{}] was found.".format(user))
-                    return True
+            strLeader = ""
+            for user in sqlLb:
+                strLeader += "[{} pts] {}\n".format(int(user["total_points"]), user["user"])
 
-                # print("User [{}] was not found.".format(user))
-                return False
 
-            load_season_bets()
-
-            seasonBets = config.season_bets[0]["opponent"]
-            # 1.  Loop through games for "finished" == "True"
-            for game in seasonBets:
-                if config.season_bets[0]["opponent"][game]["finished"] == "True":
-                    # 1.1 Create a dictionary of usernames from bets within finished games
-                    for bets in config.season_bets[0]["opponent"][game]["bets"]:
-                        # Add put all points in
-                        for user in bets:
-                            # 2.1 Loop through bets to compare "outcome_winorlose", add or subtract points for username
-                            if config.season_bets[0]["opponent"][game]["outcome_winorlose"] == bets[user]["winorlose"]:
-                                if isInLeaderboard(user):
-                                    leaderboard["users"][0][user] = dict(
-                                        moneyline=leaderboard["users"][0][user]["moneyline"],
-                                        spread=leaderboard["users"][0][user]["spread"],
-                                        winorlose=leaderboard["users"][0][user]["winorlose"] + 1,
-                                        _total=0
-                                    )
-                                else:
-                                    leaderboard["users"][0][user] = dict(moneyline=0, spread=0, winorlose=1, total=0)
-                            # 2.2 Loop through bets to compare "outcome_spread", add or subtract points for username
-                            if config.season_bets[0]["opponent"][game]["outcome_spread"] == bets[user]["spread"]:
-                                if isInLeaderboard(user):
-                                    leaderboard["users"][0][user] = dict(
-                                        moneyline=leaderboard["users"][0][user]["moneyline"],
-                                        spread=leaderboard["users"][0][user]["spread"] + 2,
-                                        winorlose=leaderboard["users"][0][user]["winorlose"],
-                                        _total=0
-                                    )
-                                else:
-                                    leaderboard["users"][0][user] = dict(moneyline=0, spread=2, winorlose=0, total=0)
-                            # 2.3 Loop through bets to compare "outcome_moneyline", add or subtract points for username
-                            if config.season_bets[0]["opponent"][game]["outcome_moneyline"] == bets[user]["moneyline"]:
-                                if isInLeaderboard(user):
-                                    leaderboard["users"][0][user] = dict(
-                                        moneyline=leaderboard["users"][0][user]["moneyline"] + 2,
-                                        spread=leaderboard["users"][0][user]["spread"],
-                                        winorlose=leaderboard["users"][0][user]["winorlose"],
-                                        _total=0
-                                    )
-                                else:
-                                    leaderboard["users"][0][user] = dict(moneyline=2, spread=0, winorlose=0, total=0)
-
-            # 3.  Print out the dictionary
-            del leaderboard["users"][0]["bot"]
-
-            for user in leaderboard["users"][0]:
-                if not user == "bot":
-                    total = \
-                        leaderboard["users"][0][user]["moneyline"] + \
-                        leaderboard["users"][0][user]["spread"] + \
-                        leaderboard["users"][0][user]["winorlose"]
-
-                    leaderboard["users"][0][user]["_total"] = total
-
-            def secondKey(elem):
-                return elem[1]
-
-            sortedLeaderboard = []
-
-            for user in leaderboard["users"][0]:
-                sortedLeaderboard += [(user, leaderboard["users"][0][user]["_total"])]
-            sortedLeaderboard = sorted(sortedLeaderboard, key=secondKey, reverse=True)
-
-            sortedString = ""
-            for user in sortedLeaderboard:
-                if user != "bot":
-                    sortedString += "{}: {}\n".format(user[0], user[1])
-
-            embed.add_field(name="Leaderboard", value=sortedString[:1024])
+            embed.add_field(name="Ranking", value=strLeader)
             await ctx.send(embed=embed)
-
-            # 4 Save.
-            dump = True
-            if dump:
-                with open("season_leaderboard.json", "w") as json_file:
-                    json.dump(leaderboard, json_file, sort_keys=True, indent=4)
-                json_file.close()
 
         # Show the current lines if available
         elif cmd == "lines":
