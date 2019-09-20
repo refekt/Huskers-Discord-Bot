@@ -136,7 +136,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.command()
     async def crabfrost(self, ctx):
         """Oh yeah. It's all coming together."""
-        await ctx.send(embed=await sendImage("🦀🦀🦀🦀🦀🦀", "https://thumbs.gfycat.com/FalseTestyDotterel-size_restricted.gif"))
+        await ctx.send(embed=await sendImage("🦀D🦀A🦀N🦀C🦀E🦀P🦀A🦀R🦀T🦀Y🦀", "https://thumbs.gfycat.com/FalseTestyDotterel-size_restricted.gif"))
 
     @commands.command()
     async def pour(self, ctx):
