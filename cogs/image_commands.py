@@ -148,6 +148,10 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         """Get on the floooooor!"""
         await ctx.send(embed=await sendImage("FUCK IOWA", "https://thumbs.gfycat.com/CanineEssentialGelding-size_restricted.gif"))
 
+    @commands.command(aliases=["possum",])
+    async def possums(self, ctx):
+        """Possum Palace"""
+        await ctx.send(embed=await sendImage("Possum", "https://i.imgur.com/UI3l2Xu.jpg"))
 
     @commands.command()
     async def pour(self, ctx):
