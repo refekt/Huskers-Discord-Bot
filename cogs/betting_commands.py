@@ -457,7 +457,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 strLeader += "[{} pts] {}\n".format(int(user["total_points"]), user["user"])
 
 
-            embed.add_field(name="Ranking", value=strLeader)
+            embed.add_field(name="Top 10 Ranking", value=strLeader)
             await ctx.send(embed=embed)
 
         # Show the current lines if available
@@ -489,6 +489,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)
+
+    @commands.command()
+    async def procbets(self, ctx):
+        pass
 
 
 def setup(bot):
