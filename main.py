@@ -681,24 +681,36 @@ async def gameday(ctx, command=None):
 
     chanList = [440868279150444544, 595705205069185047]
 
+    def updateChan(chan, name, reason="Game day mode activation/deactivation"):
+        try:
+            await chan.edit(name=name, reason=reason)
+        except discord.Forbidden:
+            print("Forbidden!")
+        except discord.HTTPException:
+            print("Editing failed.")
+        except:
+            print("Unknown error!")
+        return
+
     if command == "on":
         for channel in ctx.guild.channels:
             if channel.id in chanList:
-                await channel.set_permissions(client.user, send_messages=True, read_messages=True)
+                await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=True)
 
             if channel.id == 440868279150444544:
-                await channel.edit(name="game-chat")
+                updateChan(chan=channel.id, name="game-chat")
             elif channel.id == 507520543096832001:
-                await channel.edit(name="delayed-game-chat")
+                updateChan(chan=channel.id, name="delayed-game-chat")
+
     elif command == "off":
         for channel in ctx.guild.channels:
             if channel.id in chanList:
-                await channel.set_permissions(client.user, send_messages=False, read_messages=False)
+                await channel.set_permissions(client.user, send_messages=False, read_messages=False, manage_channels=False)
 
                 if channel.id == 440868279150444544:
-                    await channel.edit(name="huskerchat")
+                    updateChan(chan=channel.id, name="huskerchat")
                 elif channel.id == 507520543096832001:
-                    await channel.edit(name="💯🌽👊scotts-tots")
+                    updateChan(chan=channel.id, name="💯🌽👊scotts-tots")
     else:
         await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
 
