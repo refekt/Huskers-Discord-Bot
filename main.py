@@ -666,6 +666,35 @@ async def purge(ctx):
         print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
 
 
+@client.command(hidden=True)
+async def gameday(ctx, command=None):
+    """ Turn on or off game day mode for the bot. """
+
+    auth = False
+    for roles in ctx.message.author.roles:
+        if roles.id == 606301197426753536 or roles.id == 440639061191950336:
+            auth = True
+            break
+    if not auth:
+        print("Not authorized to use ")
+        return
+
+    chanList = [440868279150444544, 595705205069185047]
+
+    if command == "on":
+        for channel in ctx.guild.channels:
+            if channel.id in chanList:
+                await channel.set_permissions(client.user, send_messages=True, read_messages=True)
+                break
+    elif command == "off":
+        for channel in ctx.guild.channels:
+            if channel.id in chanList:
+                await channel.set_permissions(client.user, send_messages=False, read_messages=False)
+                break
+    else:
+        await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
+
+
 @client.command()
 async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, color=0xFF0000)
