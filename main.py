@@ -687,18 +687,18 @@ async def gameday(ctx, command=None):
                 await channel.set_permissions(client.user, send_messages=True, read_messages=True)
 
             if channel.id == 440868279150444544:
-                channel.name = "game-chat"
+                await channel.edit(name="game-chat")
             elif channel.id == 507520543096832001:
-                channel.name = "delayed-game-chat"
+                await channel.edit(name="delayed-game-chat")
     elif command == "off":
         for channel in ctx.guild.channels:
             if channel.id in chanList:
                 await channel.set_permissions(client.user, send_messages=False, read_messages=False)
 
                 if channel.id == 440868279150444544:
-                    channel.name = "huskerchat"
+                    await channel.edit(name="huskerchat")
                 elif channel.id == 507520543096832001:
-                    channel.name = "💯🌽👊scotts-tots"
+                    await channel.edit(name="💯🌽👊scotts-tots")
     else:
         await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
 
