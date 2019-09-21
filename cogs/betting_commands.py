@@ -257,84 +257,109 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
             # Need to add check if command is run the day after the game
             if team:
-                winners_winorlose = []
-                winners_spread = []
-                winners_moneyline = []
+                with mysql.sqlConnection.cursor() as cursor:
+                    cursor.execute(config.sqlGetWinWinners, team)
+                    winners_winorlose = cursor.fetchall()
 
-                try:
-                    # Creates the embed object for all messages within method
-                    embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
-                    embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-                    embed.set_footer(text=config.bet_footer)
+                    cursor.execute(config.sqlGetSpreadWinners, team)
+                    winners_spread = cursor.fetchall()
 
-                    temp_dict = config.season_bets[season_year]['opponent'][team.lower()]['bets'][0]
+                    cursor.execute(config.sqlGetMoneylineWinners, team)
+                    winners_moneyline = cursor.fetchall()
 
-                    outcome_winorlose = True
-                    outcome_spread = True
-                    outcome_moneyline = True
+                mysql.sqlConnection.commit()
 
-                    if config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose'] == "None":
-                        outcome_winorlose = False
+                def flattenList(param):
+                    flat = ""
+                    for item in param:
+                        flat += item["user"] + "\n"
+                    if not flat:
+                        flat = "N/A"
+                    return flat
 
-                    if config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread'] == "None":
-                        outcome_spread = False
+                winners_winorlose = flattenList(winners_winorlose)
+                winners_spread = flattenList(winners_spread)
+                winners_moneyline = flattenList(winners_moneyline)
 
-                    if config.season_bets[season_year]['opponent'][team.lower()]['outcome_moneyline'] == "None":
-                        outcome_moneyline = False
+                embed.add_field(name="Win or Lose Winners", value=winners_winorlose)
+                embed.add_field(name="Win or Lose Winners", value=winners_spread)
+                embed.add_field(name="Win or Lose Winners", value=winners_moneyline)
 
-                    for usr in temp_dict:
-                        if temp_dict[usr]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose'] and outcome_winorlose:
-                            winners_winorlose.append(usr)
-
-                        if temp_dict[usr]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread'] and outcome_spread:
-                            winners_spread.append(usr)
-
-                        if temp_dict[usr]['moneyline'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_moneyline'] and outcome_moneyline:
-                            winners_moneyline.append(usr)
-
-                    win_winorlose_string = ""
-                    win_spread_string = ""
-                    win_moneyline_string = ""
-
-                    if winners_winorlose:
-                        for winner in winners_winorlose:
-                            win_winorlose_string = win_winorlose_string + "{}\n".format(winner)
-
-                    if winners_spread:
-                        for winner in winners_spread:
-                            win_spread_string = win_spread_string + "{}\n".format(winner)
-
-                    if winners_moneyline:
-                        for winner in winners_moneyline:
-                            win_moneyline_string = win_moneyline_string + "{}\n".format(winner)
-
-                    embed.add_field(name="Opponent", value=team.title(), inline=False)
-
-                    if win_winorlose_string:
-                        embed.add_field(name="⭐ Win/Loss Winners", value=win_winorlose_string, inline=True)
-                    else:
-                        embed.add_field(name="⭐ Win/Loss Winners", value="N/A", inline=True)
-
-                    if win_spread_string:
-                        embed.add_field(name="⭐ Spread Winners", value=win_spread_string, inline=True)
-                    else:
-                        embed.add_field(name="⭐ Spread Winners", value="N/A", inline=True)
-
-                    if win_moneyline_string:
-                        embed.add_field(name="⭐ Over Under/Total Points Winners", value=win_moneyline_string, inline=True)
-                    else:
-                        embed.add_field(name="⭐ Over Under/Total Points Winners", value="N/A", inline=True)
-
-                    await ctx.send(embed=embed)
-
-                except discord.HTTPException as err:
-                    print("Embed Name: {}\nEmbed Value: {}".format(embed.fields[1].name, embed.fields[1].value))
-                    print("Error Text: {}".format(err.text))
-                    await ctx.send("Something happened in the backend of hte program. Please alert the bot owners!")
-                except:
-                    await ctx.send("Cannot find the opponent \"{}\". Please verify the team is on the schedule for the {} season and it is spelled correctly. Opponents can be found by using `$schedule|shed {}`".format(team, 2019 + season_year, 2019 + season_year))
-            else:
-                await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
+                await ctx.send(embed=embed)
+            #     try:
+            #         # Creates the embed object for all messages within method
+            #         embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+            #         embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+            #         embed.set_footer(text=config.bet_footer)
+            #
+            #         temp_dict = config.season_bets[season_year]['opponent'][team.lower()]['bets'][0]
+            #
+            #         outcome_winorlose = True
+            #         outcome_spread = True
+            #         outcome_moneyline = True
+            #
+            #         if config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose'] == "None":
+            #             outcome_winorlose = False
+            #
+            #         if config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread'] == "None":
+            #             outcome_spread = False
+            #
+            #         if config.season_bets[season_year]['opponent'][team.lower()]['outcome_moneyline'] == "None":
+            #             outcome_moneyline = False
+            #
+            #         for usr in temp_dict:
+            #             if temp_dict[usr]['winorlose'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_winorlose'] and outcome_winorlose:
+            #                 winners_winorlose.append(usr)
+            #
+            #             if temp_dict[usr]['spread'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_spread'] and outcome_spread:
+            #                 winners_spread.append(usr)
+            #
+            #             if temp_dict[usr]['moneyline'] == config.season_bets[season_year]['opponent'][team.lower()]['outcome_moneyline'] and outcome_moneyline:
+            #                 winners_moneyline.append(usr)
+            #
+            #         win_winorlose_string = ""
+            #         win_spread_string = ""
+            #         win_moneyline_string = ""
+            #
+            #         if winners_winorlose:
+            #             for winner in winners_winorlose:
+            #                 win_winorlose_string = win_winorlose_string + "{}\n".format(winner)
+            #
+            #         if winners_spread:
+            #             for winner in winners_spread:
+            #                 win_spread_string = win_spread_string + "{}\n".format(winner)
+            #
+            #         if winners_moneyline:
+            #             for winner in winners_moneyline:
+            #                 win_moneyline_string = win_moneyline_string + "{}\n".format(winner)
+            #
+            #         embed.add_field(name="Opponent", value=team.title(), inline=False)
+            #
+            #         if win_winorlose_string:
+            #             embed.add_field(name="⭐ Win/Loss Winners", value=win_winorlose_string, inline=True)
+            #         else:
+            #             embed.add_field(name="⭐ Win/Loss Winners", value="N/A", inline=True)
+            #
+            #         if win_spread_string:
+            #             embed.add_field(name="⭐ Spread Winners", value=win_spread_string, inline=True)
+            #         else:
+            #             embed.add_field(name="⭐ Spread Winners", value="N/A", inline=True)
+            #
+            #         if win_moneyline_string:
+            #             embed.add_field(name="⭐ Over Under/Total Points Winners", value=win_moneyline_string, inline=True)
+            #         else:
+            #             embed.add_field(name="⭐ Over Under/Total Points Winners", value="N/A", inline=True)
+            #
+            #         await ctx.send(embed=embed)
+            #
+            #     except discord.HTTPException as err:
+            #         print("Embed Name: {}\nEmbed Value: {}".format(embed.fields[1].name, embed.fields[1].value))
+            #         print("Error Text: {}".format(err.text))
+            #         await ctx.send("Something happened in the backend of hte program. Please alert the bot owners!")
+            #     except:
+            #         await ctx.send("Cannot find the opponent \"{}\". Please verify the team is on the schedule for the {} season and it is spelled correctly. Opponents can be found by using `$schedule|shed {}`".format(team, 2019 + season_year, 2019 + season_year))
+            # else:
+            #     await ctx.send("An opponent team must be included. Example: `$bet winners South Alabama` or `$bet winners Iowa`")
             pass
 
         # Show the current leader board. +/- 1 point for winorlose, +/- 2 points for spread and total points
