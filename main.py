@@ -9,12 +9,13 @@ import random
 import config
 import re
 import cogs.croot_bot
-from cogs.betting_commands import load_season_bets
+# from cogs.betting_commands import load_season_bets
 from cogs.betting_commands import store_next_opponent
 import datetime
 import json
 import hashlib
 import time
+import mysql
 
 # Bot specific stuff
 botPrefix='$'
@@ -41,59 +42,35 @@ wrong_channel_text='The command you sent is not authorized for use in this chann
 
 profile_url = None
 highlight_url = None
-season_year = int(datetime.date.today().year) - 2019  # Future proof
-bet_counter = -1
 
 
-def try_adding_new_dict(bet_username: str, which: str, placed_bet: str):
-    # Check if the user betting has already placed a bet
-    raw_username = bet_username
-    raw_datetime = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+def try_adding_new_dict(bet_username: str, which: str, placed_bet):
+    if which == "winorlose":
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertWinorlose, (config.current_game[2], bet_username, int(placed_bet), int(placed_bet)))
+        mysql.sqlConnection.commit()
+    elif which == "canx_winorlose":
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertWinorlose, (config.current_game[2], bet_username, -1, -1))
+        mysql.sqlConnection.commit()
 
-    game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
-    game_bets = config.season_bets[season_year]['opponent'][game]['bets'][0]
+    elif which == "spread":
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertSpread, (config.current_game[2], bet_username, placed_bet, placed_bet))
+        mysql.sqlConnection.commit()
+    elif which == "canx_spread":
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertSpread, (config.current_game[2], bet_username, -1, -1))
+        mysql.sqlConnection.commit()
 
-    #for bet_users in game_bets:
-    if raw_username in game_bets: # This does work for a check
-        if which == "winorlose":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": game_bets[raw_username]['spread'], "moneyline": game_bets[raw_username]['moneyline']}
-        elif which == "canx_winorlose":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": game_bets[raw_username]['spread'], "moneyline": game_bets[raw_username]['moneyline']}
-        elif which == "spread":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": placed_bet, "moneyline": game_bets[raw_username]['moneyline']}
-        elif which == "canx_spread":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": placed_bet, "moneyline": game_bets[raw_username]['moneyline']}
-        elif which == "moneyline":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": game_bets[raw_username]['spread'], "moneyline": placed_bet}
-        elif which == "canx_moneyline":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": game_bets[raw_username]['winorlose'], "spread": game_bets[raw_username]['spread'], "moneyline": placed_bet}
-    else:
-        config.new_dict = {"datetimem": "None", "winorlose": "None", "moneyline": "None"} # Do the default
-
-        if which == "winorlose":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
-        elif which == "canx_winorlose":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": placed_bet, "spread": "None", "moneyline": "None"}
-        elif which == "spread":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
-        elif which == "canx_spread":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": placed_bet, "moneyline": "None"}
-        elif which == "moneyline":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
-        elif which == "canx_moneyline":
-            config.new_dict = {"datetime": raw_datetime, "winorlose": "None", "spread": "None", "moneyline": placed_bet}
-
-    global bet_counter  # I don't think this actually does anything. Probably can be replaced with 0 or 1
-    try:
-        for bet_users in config.season_bets[season_year]['opponent'][game]['bets']:
-            bet_users[raw_username] = config.new_dict
-            bet_counter += 1
-    # Setup a new nested mess of variables to translate into JSON
-    except:
-        # Write to JSON file
-        config.season_bets[season_year]['opponent'][game]['bets'][raw_username].append(config.new_dict)
-        with open("season_bets.json", "w") as json_file:
-            json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+    elif which == "moneyline":
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertMoneyline, (config.current_game[2], bet_username, placed_bet, placed_bet))
+        mysql.sqlConnection.commit()
+    elif which == "canx_moneyline":
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertMoneyline, (config.current_game[2], bet_username, -1, -1))
+        mysql.sqlConnection.commit()
 
 
 def makeMD5():
@@ -130,8 +107,6 @@ async def on_message(message):
     if not message.author.bot:
         # Add Up Votes and Down Votes
         if ".addvotes" in message.content.lower():
-            # Upvote = u"\u2B06" or "\N{UPWARDS BLACK ARROW}"
-            # Downvote = u"\u2B07" or "\N{DOWNWARDS BLACK ARROW}"
             emojiUpvote = "\N{UPWARDS BLACK ARROW}"
             emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
             await message.add_reaction(emojiUpvote)
@@ -190,9 +165,6 @@ async def on_message(message):
                         await message.channel.send("Attention: {} loves eggplant.".format(message.author.mention))
                     elif "🍆" in message.content:
                         await message.channel.send("🍆💦")
-                else:
-                    # print("Missed dice roll for {}".format(notavirus))
-                    pass
 
     # Check for HuskerBot embedded messages.
     if len(message.embeds) > 0:
@@ -276,10 +248,6 @@ async def on_raw_reaction_add(payload):
     if len(message.embeds) > 0:
         # Updating season_bets JSON for reacting to a $bet message
         if emoji in bet_emojis and user != client.user and message.embeds[0].footer.text == config.bet_footer:
-            # Load season_bets.json if season_bets{} is empty
-            if not bool(config.season_bets):
-                load_season_bets()
-            # Load current game if empty
             if not bool(config.current_game):
                 store_next_opponent()
 
@@ -292,55 +260,68 @@ async def on_raw_reaction_add(payload):
                 return
 
             raw_username = "{}#{}".format(user.name, user.discriminator)
-            game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
 
             if emoji == "⬆":
-                try_adding_new_dict(raw_username, "winorlose", "True")
+                try_adding_new_dict(raw_username, "winorlose", True)
             elif emoji == "⬇":
-                try_adding_new_dict(raw_username, "winorlose", "False")
+                try_adding_new_dict(raw_username, "winorlose", False)
             elif emoji == "❎":
-                try_adding_new_dict(raw_username, "canx_winorlose", "None")
+                try_adding_new_dict(raw_username, "canx_winorlose", "")
             elif emoji == "⏫":
-                try_adding_new_dict(raw_username, "spread", "True")
+                try_adding_new_dict(raw_username, "spread", True)
             elif emoji == "⏬":
-                try_adding_new_dict(raw_username, "spread", "False")
+                try_adding_new_dict(raw_username, "spread", False)
             elif emoji == "❌":
-                try_adding_new_dict(raw_username, "canx_spread", "None")
+                try_adding_new_dict(raw_username, "canx_spread", "")
             elif emoji == "🔼":
-                try_adding_new_dict(raw_username, "moneyline", "True")
+                try_adding_new_dict(raw_username, "moneyline", True)
             elif emoji == "🔽":
-                try_adding_new_dict(raw_username, "moneyline", "False")
+                try_adding_new_dict(raw_username, "moneyline", False)
             elif emoji == "✖":
-                try_adding_new_dict(raw_username, "canx_moneyline", "None")
-            else:
-                pass
+                try_adding_new_dict(raw_username, "canx_moneyline", "")
 
-            # Send a message alerting the channel that a user has placed a bet.
-            global bet_counter
+            with mysql.sqlConnection.cursor() as cursor:
+                cursor.execute(config.sqlRetrieveBet, (raw_username))
+                userBetsDict = cursor.fetchall()
+            mysql.sqlConnection.commit()
 
-            # Creates the embed object for all messages within method
-            embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
-            embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-            embed.set_footer(text=config.bet_footer)
+            for userBet in userBetsDict:
+                if userBet["user"] == raw_username and userBet["game_number"] == config.current_game[2]:
+                    userBetWin = "N/A"
+                    userBetSpread = "N/A"
+                    userBetMoneyline = "N/A"
 
-            if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
-                for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
-                    if u == raw_username:
-                        embed.add_field(name="Author", value=raw_username, inline=False)
-                        embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
-                        embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
-                        embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
-                        embed.add_field(name="Over/Under Total Points", value=config.new_dict['moneyline'], inline=True)
+                    if userBet["win"] == 1:
+                        userBetWin = "Win"
+                    elif userBet["win"] == 0:
+                        userBetWin = "Lose"
 
-                        await user.send(embed=embed)
-                bet_counter = -1
-            else:
-                pass
+                    if userBet["spread"] == 1:
+                        userBetSpread = "Over"
+                    elif userBet["spread"] == 0:
+                        userBetSpread = "Under"
 
-            with open("season_bets.json", "w") as json_file:
-                json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
+                    if userBet["moneyline"] == 1:
+                        userBetMoneyline = "Over"
+                    elif userBet["moneyline"] == 0:
+                        userBetMoneyline = "Under"
 
-            # Remove reaction to prevent user from voting for both
+                    userBetTime = userBet["date_updated"]
+
+                    # Creates the embed object for all messages within method
+                    embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
+                    embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
+                    embed.set_footer(text=config.bet_footer)
+                    embed.add_field(name="Author", value=raw_username, inline=False)
+                    embed.add_field(name="Opponent", value=config.current_game[0].title(), inline=False)
+                    embed.add_field(name="Win or Loss", value=userBetWin, inline=True)
+                    embed.add_field(name="Spread", value=userBetSpread, inline=True)
+                    embed.add_field(name="Over/Under Total Points", value=userBetMoneyline, inline=True)
+                    embed.add_field(name="Time Placed", value=userBetTime)
+
+                    await user.send(embed=embed)
+                    break
+
             try:
                 for reaction in message.reactions:
                     if emoji == reaction.emoji:
@@ -420,93 +401,9 @@ async def on_reaction_add(reaction, user):
                 role = get(server.roles, id=464903715854483487)
                 await member.add_roles(role)
 
-        # Updating season_bets JSON for reacting to a $bet message
-        # if reaction.emoji in bet_emojis and user != client.user and reaction.message.embeds[0].footer.text == config.bet_footer:
-        #     # Load season_bets.json if season_bets{} is empty
-        #     if not bool(config.season_bets):
-        #         load_season_bets()
-        #     # Load current game if empty
-        #     if not bool(config.current_game):
-        #         store_next_opponent()
-        #
-        #     check_now = datetime.datetime.now()
-        #     check_game_datetime_raw = config.current_game[1]
-        #     check_game_datetime = datetime.datetime(day=check_game_datetime_raw.day, month=check_game_datetime_raw.month, year=check_game_datetime_raw.year, hour=check_game_datetime_raw.hour, minute=check_game_datetime_raw.minute, second=check_game_datetime_raw.second, microsecond=check_game_datetime_raw.microsecond)
-        #
-        #     if check_now > check_game_datetime:
-        #         await user.send("Unable to place bet because the game has started. You can review your placed bets by using `$bet show`.")
-        #         return
-        #
-        #     raw_username = "{}#{}".format(user.name, user.discriminator)
-        #     game = config.current_game[0].lower()  # Grabs the opponent from current_game[]
-        #
-        #     if reaction.emoji == "⬆":
-        #         try_adding_new_dict(raw_username, "winorlose", "True")
-        #     elif reaction.emoji == "⬇":
-        #         try_adding_new_dict(raw_username, "winorlose", "False")
-        #     elif reaction.emoji == "❎":
-        #         try_adding_new_dict(raw_username, "canx_winorlose", "None")
-        #     elif reaction.emoji == "⏫":
-        #         try_adding_new_dict(raw_username, "spread", "True")
-        #     elif reaction.emoji == "⏬":
-        #         try_adding_new_dict(raw_username, "spread", "False")
-        #     elif reaction.emoji == "❌":
-        #         try_adding_new_dict(raw_username, "canx_spread", "None")
-        #     elif reaction.emoji == "🔼":
-        #         try_adding_new_dict(raw_username, "moneyline", "True")
-        #     elif reaction.emoji == "🔽":
-        #         try_adding_new_dict(raw_username, "moneyline", "False")
-        #     elif reaction.emoji == "✖":
-        #         try_adding_new_dict(raw_username, "canx_moneyline", "None")
-        #     else:
-        #         pass
-        #
-        #     # Send a message alerting the channel that a user has placed a bet.
-        #     global bet_counter
-        #
-        #     # *** Maybe change to a PM instead ***
-        #     # Creates the embed object for all messages within method
-        #     embed = discord.Embed(title="Husker Game Betting", color=0xff0000)
-        #     embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
-        #     embed.set_footer(text=config.bet_footer)
-        #
-        #     if len(config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]) > 0:
-        #         for u in config.season_bets[season_year]['opponent'][game]['bets'][bet_counter]:
-        #             if u == raw_username:
-        #                 embed.add_field(name="Author", value=raw_username, inline=False)
-        #                 embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
-        #                 embed.add_field(name="Win or Loss", value=config.new_dict['winorlose'], inline=True)
-        #                 embed.add_field(name="Spread", value=config.new_dict['spread'], inline=True)
-        #                 embed.add_field(name="Over/Under Total Points", value=config.new_dict['moneyline'], inline=True)
-        #
-        #                 await user.send(embed=embed)
-        #         bet_counter = -1
-        #     else:
-        #         pass
-        #
-        #     # Remove reaction to prevent user from voting for both
-        #     try:
-        #         #print("Bot's add_reaction permission: {}".format(user))
-        #         await reaction.remove(user)
-        #     except discord.Forbidden as forb:
-        #         print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
-        #     except discord.HTTPException as err:
-        #         print("Error removing reaction from {}: {}".format(user, err))
-        #     except:
-        #         print("I don't know why we can't remove {}'s reaction.".format(user))
-        #
-        #     with open("season_bets.json", "w") as json_file:
-        #         json.dump(config.season_bets, json_file, sort_keys=True, indent=4)
-    else:
-        pass
-
 
 @client.event
 async def on_command_completion(ctx):
-    gameDay = True
-    if gameDay:
-        return
-
     global banned_channels
 
     if ctx.channel.id in banned_channels:
@@ -593,9 +490,7 @@ async def on_command_error(ctx, error):
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
     authorized = False
-
     for r in ctx.author.roles:
-        # # await ctx.send("Name: `{}`\n, ID: `{}`".format(r.name, r.id))
         if r.id in authorized_to_quit:
              authorized = True
 
@@ -680,11 +575,10 @@ async def gameday(ctx, command=None):
         if roles.id == 606301197426753536 or roles.id == 440639061191950336:
             auth = True
             break
+
     if not auth:
         print("Not authorized to use ")
         return
-
-    chanList = [440868279150444544, 595705205069185047]
 
     async def updateChan(chan: discord.TextChannel, name: str, gameday: bool, reason="Game day mode activation/deactivation"):
         try:
@@ -726,7 +620,7 @@ async def gameday(ctx, command=None):
                 await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
         await edit_msg.edit(content="Game day mode off!")
     else:
-        await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
+        await edit_msg.edit(content="{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
 
 
 @client.command()
