@@ -152,9 +152,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     elif checkUserBet["moneyline"] == 0:
                         userBetMoneyline = "Under"
 
-                    if checkUserBet["date_udpated"]:
+                    try:
                         lastUpdate = checkUserBet["date_updated"]
-                    else:
+                    except:
                         lastUpdate = "N/A"
 
                     opponentName = team.title()
@@ -185,10 +185,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     elif checkUserBet["moneyline"] == 0:
                         userBetMoneyline = "Under"
 
-                    print(checkUserBet)
-                    if checkUserBet["date_udpated"]:
+                    try:
                         lastUpdate = checkUserBet["date_updated"]
-                    else:
+                    except:
                         lastUpdate = "N/A"
 
                     opponentName = config.current_game[0].title()
