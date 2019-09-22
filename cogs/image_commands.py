@@ -59,7 +59,7 @@ flag_dict = {
     'northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg',
     'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
     'notredame': 'https://i.imgur.com/Ofoaz7U.png',
-    'ohio_state': 'https://i.imgur.com/coxjUAZ.jpg',
+    'ohio_state': 'https://i.imgur.com/8QwoYgm.jpg',
     'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
     'purdue': 'https://i.imgur.com/8SYhZKc.jpg',
     'rutgers': 'https://i.imgur.com/lyng39h.jpg',
