@@ -120,41 +120,87 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         # Show the user's current bet(s)
         elif cmd == "show":
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveBet, (raw_username))
-                userBetsDict = cursor.fetchall()
-            mysql.sqlConnection.commit()
-
             userBetWin = "N/A"
             userBetSpread = "N/A"
             userBetMoneyline = "N/A"
 
-            checkUserBet = userBetsDict[len(userBetsDict) - 1]
-            if checkUserBet["game_number"] == config.current_game[2]:
-                if checkUserBet["win"] == 1:
-                    userBetWin = "Win"
-                elif checkUserBet["win"] == 0:
-                    userBetWin = "Lose"
+            if team:
+                if team:
+                    with mysql.sqlConnection.cursor() as cursor:
+                        cursor.execute(config.sqlRetrieveGameNumber, (team.lower()))
+                        gameNumber = cursor.fetchone()
+                    mysql.sqlConnection.commit()
+                    gameNumber = int(gameNumber["game_number"])
 
-                if checkUserBet["spread"] == 1:
-                    userBetSpread = "Over"
-                elif checkUserBet["spread"] == 0:
-                    userBetSpread = "Under"
+                    with mysql.sqlConnection.cursor() as cursor:
+                        cursor.execute(config.sqlRetrieveSpecificBet, (gameNumber, raw_username))
+                        checkUserBet = cursor.fetchone()
+                    mysql.sqlConnection.commit()
 
-                if checkUserBet["moneyline"] == 1:
-                    userBetMoneyline = "Over"
-                elif checkUserBet["moneyline"] == 0:
-                    userBetMoneyline = "Under"
+                    if checkUserBet["win"] == 1:
+                        userBetWin = "Win"
+                    elif checkUserBet["win"] == 0:
+                        userBetWin = "Lose"
+
+                    if checkUserBet["spread"] == 1:
+                        userBetSpread = "Over"
+                    elif checkUserBet["spread"] == 0:
+                        userBetSpread = "Under"
+
+                    if checkUserBet["moneyline"] == 1:
+                        userBetMoneyline = "Over"
+                    elif checkUserBet["moneyline"] == 0:
+                        userBetMoneyline = "Under"
+
+                    try:
+                        lastUpdate = checkUserBet["date_udpated"]
+                    except:
+                        lastUpdate = "N/A"
+
+                    opponentName = team.title()
+                else:
+                    await ctx.send("You have no bets for the next game against {}. Check out `$bet` to place your bets!".format(config.current_game[0].title()))
+                    return
             else:
-                await ctx.send("You have no bets for the next game against {}. Check out `$bet` to place your bets!".format(config.current_game[0].title()))
-                return
+                with mysql.sqlConnection.cursor() as cursor:
+                    cursor.execute(config.sqlRetrieveBet, (raw_username))
+                    userBetsDict = cursor.fetchall()
+                mysql.sqlConnection.commit()
+
+                checkUserBet = userBetsDict[len(userBetsDict) - 1]
+
+                if checkUserBet["game_number"] == config.current_game[2]:
+                    if checkUserBet["win"] == 1:
+                        userBetWin = "Win"
+                    elif checkUserBet["win"] == 0:
+                        userBetWin = "Lose"
+
+                    if checkUserBet["spread"] == 1:
+                        userBetSpread = "Over"
+                    elif checkUserBet["spread"] == 0:
+                        userBetSpread = "Under"
+
+                    if checkUserBet["moneyline"] == 1:
+                        userBetMoneyline = "Over"
+                    elif checkUserBet["moneyline"] == 0:
+                        userBetMoneyline = "Under"
+
+                    try:
+                        lastUpdate = checkUserBet["date_udpated"]
+                    except:
+                        lastUpdate = "N/A"
+
+                    opponentName = config.current_game[0].title()
+                else:
+                    await ctx.send("You have no bets for the next game against {}. Check out `$bet` to place your bets!".format(config.current_game[0].title()))
+                    return
 
             embed.add_field(name="Author", value=raw_username, inline=False)
-            embed.add_field(name="Opponent", value=config.current_game[0].title(), inline=False)
+            embed.add_field(name="Opponent", value=opponentName, inline=False)
             embed.add_field(name="Win or Loss", value=userBetWin, inline=True)
             embed.add_field(name="Spread", value=userBetSpread, inline=True)
             embed.add_field(name="Over/Under Total Points", value=userBetMoneyline, inline=True)
-            embed.add_field(name="Time Placed", value=checkUserBet["date_updated"])
+            embed.add_field(name="Time Placed", value=lastUpdate)
             await ctx.send(embed=embed)
 
         # Show all bets for the current game
