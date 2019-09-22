@@ -152,14 +152,14 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     elif checkUserBet["moneyline"] == 0:
                         userBetMoneyline = "Under"
 
-                    try:
-                        lastUpdate = checkUserBet["date_udpated"]
-                    except:
+                    if checkUserBet["date_udpated"]:
+                        lastUpdate = checkUserBet["date_updated"]
+                    else:
                         lastUpdate = "N/A"
 
                     opponentName = team.title()
                 else:
-                    await ctx.send("You have no bets for the next game against {}. Check out `$bet` to place your bets!".format(config.current_game[0].title()))
+                    await ctx.send("You have no bets for the next game against {}. Check out `$bet` to place your bets!".format(team.title()))
                     return
             else:
                 with mysql.sqlConnection.cursor() as cursor:
@@ -185,9 +185,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     elif checkUserBet["moneyline"] == 0:
                         userBetMoneyline = "Under"
 
-                    try:
-                        lastUpdate = checkUserBet["date_udpated"]
-                    except:
+                    print(checkUserBet)
+                    if checkUserBet["date_udpated"]:
+                        lastUpdate = checkUserBet["date_updated"]
+                    else:
                         lastUpdate = "N/A"
 
                     opponentName = config.current_game[0].title()
