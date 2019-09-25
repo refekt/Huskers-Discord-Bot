@@ -19,7 +19,7 @@ async def check_command_channel(command: str, channel):
 
     # print("Regulated command found. Checking channel [#{}]".format(channel))
 
-    #   Production Server:
+    #   Production Server:...
     #   the-war-room = 525519594417291284
     #   💯🌽👊 scotts-tots = 507520543096832001
     #   bot-spam = 593984711706279937
