@@ -21,7 +21,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send("Stonk!")
 
     @commands.command(aliases=["cmkv",])
-    async def channelmarkov(self, ctx, *, chan: discord.TextChannel):
+    async def channelmarkov(self, ctx, *chan: discord.TextChannel):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
@@ -33,9 +33,10 @@ class TextCommands(commands.Cog, name="Text Commands"):
             return
 
         try:
-            async for msg in chan.history(limit=5000):
-                if msg.content != "" and not msg.author.bot:
-                    source_data += "\r\n" + msg.content
+            for c in chan:
+                async for msg in c.history(limit=5000):
+                    if msg.content != "" and not msg.author.bot:
+                        source_data += "\r\n" + msg.content
         except:
             await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for {})_".format(chan))
             return
