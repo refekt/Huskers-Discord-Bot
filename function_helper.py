@@ -10,15 +10,14 @@ async def check_command_channel(command: str, channel):
     mkv_commands = ["markov", "channelmarkov"]
     all_commands = croot_commands + flag_commands + mkv_commands
 
-    print("Checking command [${}]".format(command))
+    # print("Checking command [${}]".format(command))
 
-    # if command in croot_commands or command in flag_commands or command in mkv_commands:
-    if command in all_commands:
-        print("Command [${}] doesn't need to be regulated".format(command))
+    if command not in all_commands:
+        # print("Command [${}] doesn't need to be regulated".format(command))
         correct_channel = True
         return
 
-    print("Regulated command found. Checking channel [#{}]".format(channel))
+    # print("Regulated command found. Checking channel [#{}]".format(channel))
 
     #   Production Server:
     #   the-war-room = 525519594417291284
@@ -42,14 +41,6 @@ async def check_command_channel(command: str, channel):
         flag = True
     else:
         flag = False
-        # if channel.id in bot_spam_channels:
-        #     flag = True
-        # elif channel.id in croot_channels:
-        #     flag = True
-        # elif channel.id in flag_channels:
-        #     flag = True
-        # elif channel.id in markov_channels:
-        #     flag = True
 
-    print("Regulation of [${}] == [{}]".format(command, flag))
+    # print("Regulation of [${}] == [{}]".format(command, flag))
     correct_channel = flag
