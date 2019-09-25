@@ -12,7 +12,7 @@ async def check_command_channel(command: str, channel):
 
     # print("Checking command [${}]".format(command))
 
-    if command not in all_commands:
+    if str(command) not in all_commands:
         # print("Command [${}] doesn't need to be regulated".format(command))
         correct_channel = True
         return
