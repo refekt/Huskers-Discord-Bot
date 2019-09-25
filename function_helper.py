@@ -6,27 +6,29 @@ async def check_command_channel(command: str, channel):
     global correct_channel
     flag = False
 
-    gameDay = True
-    if gameDay:
-        correct_channel = True
-        return
-
     # Commands to check for
     croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs', 'cb_refresh']
     flag_commands = ['crappyflag', 'randomflag']
-    commandFound = False
+    mkv_commands = ['markov', 'channelmarkov']
+    all_commands = [croot_commands, flag_commands, mkv_commands]
+    print(all_commands)
 
-    for c in croot_commands:
-        if str(c) == str(command):
-            commandFound = True
+    # commandFound = False
 
-    for cc in flag_commands:
-        if str(cc) == str(command):
-            commandFound = True
+    # for c in croot_commands:
+    #     if str(c) == str(command):
+    #         commandFound = True
+    #
+    # for cc in flag_commands:
+    #     if str(cc) == str(command):
+    #         commandFound = True
+
+    if not str(command) in all_commands:
+        return
 
     # Exit function if the command isn't listed
-    if not commandFound:
-        return
+    # if not commandFound:
+    #     return
 
     #   Production Server:
     #   the-war-room = 525519594417291284
@@ -38,10 +40,10 @@ async def check_command_channel(command: str, channel):
     # Test Server:
     #   discussion = 606655884340232192
     #   spam = 595705205069185047
+
     bot_spam_channels = [606655884340232192, 595705205069185047, 593984711706279937, 442047437561921548]
     croot_channels = [525519594417291284, 507520543096832001, 593984711706279937, 442047437561921548, 443822461759520769, 538419127535271946]
     flag_channels = [593984711706279937, 597900461483360287, 442047437561921548]
-
 
     # All commands authorized within Direct Messages
     if dm_str in str(channel):

@@ -236,6 +236,7 @@ async def on_member_join(member):
 
 @client.event
 async def on_raw_reaction_add(payload):
+
     # Putting the payload into objects and variables
     messageID = payload.message_id
     channelID = client.get_channel(payload.channel_id)
@@ -244,6 +245,11 @@ async def on_raw_reaction_add(payload):
     user = client.get_user(userID)
     guildID = client.get_guild(payload.guild_id)
     emoji = payload.emoji.name
+
+    dbAvailable = config.pingMySQL()
+    if not dbAvailable:
+        await channelID.send("The MySQL database is currently unavailable. Please try again later.")
+        return
 
     if len(message.embeds) > 0:
         # Updating season_bets JSON for reacting to a $bet message

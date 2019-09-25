@@ -8,6 +8,8 @@ import discord
 import requests
 import time
 import re
+import function_helper
+import config
 
 # Dictionaries
 eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
@@ -23,6 +25,12 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command(aliases=["cmkv",])
     async def channelmarkov(self, ctx, *, chan: discord.TextChannel):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
+        # This keeps bot spam down to a minimal.
+        await function_helper.check_command_channel(ctx.command, ctx.channel)
+        if not function_helper.correct_channel:
+            await ctx.send(config.wrong_channel_text)
+            return
+
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
 
@@ -58,6 +66,12 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command(aliases=["mkv",])
     async def markov(self, ctx, *, user: discord.Member = None):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
+        # This keeps bot spam down to a minimal.
+        await function_helper.check_command_channel(ctx.command, ctx.channel)
+        if not function_helper.correct_channel:
+            await ctx.send(config.wrong_channel_text)
+            return
+
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
 

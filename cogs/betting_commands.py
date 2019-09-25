@@ -60,6 +60,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         $bet show <optional, team>: show your most recent bet or bet for another team
         $bet winners <team>: show all the winners of a specific game.
         """
+        dbAvailable = config.pingMySQL()
+        if not dbAvailable:
+            await ctx.send("The MySQL database is currently unavailable. Please try again later.")
+            return
 
         # Creates the embed object for all messages within method
         embed = discord.Embed(title="Husker Game Betting", description="How do you think the Huskers will do in their next game? Place your bets below!", color=0xff0000)
