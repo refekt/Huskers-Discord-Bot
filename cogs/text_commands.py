@@ -57,7 +57,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await edit_msg.edit(content=sentence)
 
     @commands.command(aliases=["mkv",])
-    async def markov(self, ctx, *, user: discord.Member = None):
+    async def markov(self, ctx, *user: discord.Member):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
@@ -67,17 +67,18 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 if msg.content != "" and not msg.author.bot:
                     source_data += "\r\n" + str(msg.content).capitalize()
         else:
-            if user.bot:
-                scottFrost = ""
-                f = open("scofro.txt", "r")
-                if f.mode == "r":
-                    scottFrost = f.read()
-                f.close()
-                source_data = re.sub(r'[^\x00-\x7f]',r'', scottFrost)
-            else:
-                async for msg in ctx.channel.history(limit=5000):
-                    if msg.content != "" and str(msg.author) == str(user) and not msg.author.bot:
-                        source_data += "\r\n" + str(msg.content).capitalize()
+            for u in user:
+                if u.bot:
+                    scottFrost = ""
+                    f = open("scofro.txt", "r")
+                    if f.mode == "r":
+                        scottFrost = f.read()
+                    f.close()
+                    source_data = re.sub(r'[^\x00-\x7f]',r'', scottFrost)
+                else:
+                    async for msg in ctx.channel.history(limit=5000):
+                        if msg.content != "" and str(msg.author) == str(u) and not msg.author.bot:
+                            source_data += "\r\n" + str(msg.content).capitalize()
 
         if not source_data:
             print("##\n{}\n##".format(source_data))
