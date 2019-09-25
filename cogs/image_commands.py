@@ -88,10 +88,9 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         """ A random ass, badly made Nebraska flag. """
 
         # This keeps bot spam down to a minimal.
-        await function_helper.check_command_channel(ctx.command, ctx.channel)
-        if not function_helper.correct_channel:
-            await ctx.send(config.wrong_channel_text)
-            return
+        # await function_helper.check_command_channel(ctx.command, ctx.channel)
+        # if not function_helper.correct_channel:
+        #     return
 
         flags = []
         with open("flags.txt") as f:
@@ -114,10 +113,9 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         tulane, usc, wisconsin """
 
         # This keeps bot spam down to a minimal.
-        await function_helper.check_command_channel(ctx.command, ctx.channel)
-        if not function_helper.correct_channel:
-            await ctx.send(config.wrong_channel_text)
-            return
+        # await function_helper.check_command_channel(ctx.command, ctx.channel)
+        # if not function_helper.correct_channel:
+        #     return
 
         if state:
             if state.lower() == "nebraska":
@@ -261,10 +259,9 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             return
 
         # This keeps bot spam down to a minimal.
-        await function_helper.check_command_channel(ctx.command, ctx.channel)
-        if not function_helper.correct_channel:
-            await ctx.send(config.wrong_channel_text)
-            return
+        # await function_helper.check_command_channel(ctx.command, ctx.channel)
+        # if not function_helper.correct_channel:
+        #     return
 
         call = call.lower()
 

@@ -4,31 +4,21 @@ correct_channel = False
 
 async def check_command_channel(command: str, channel):
     global correct_channel
-    flag = False
 
-    # Commands to check for
-    croot_commands = ['crootbot', 'referee', 'cb_search', 'recentballs', 'cb_refresh']
-    flag_commands = ['crappyflag', 'randomflag']
-    mkv_commands = ['markov', 'channelmarkov']
-    all_commands = [croot_commands, flag_commands, mkv_commands]
-    print(all_commands)
+    croot_commands = ["crootbot", "referee", "cb_search", "recentballs", "cb_refresh"]
+    flag_commands = ["crappyflag", "randomflag"]
+    mkv_commands = ["markov", "channelmarkov"]
+    all_commands = croot_commands + flag_commands + mkv_commands
 
-    # commandFound = False
+    print("Checking command [${}]".format(command))
 
-    # for c in croot_commands:
-    #     if str(c) == str(command):
-    #         commandFound = True
-    #
-    # for cc in flag_commands:
-    #     if str(cc) == str(command):
-    #         commandFound = True
-
-    if not str(command) in all_commands:
+    # if command in croot_commands or command in flag_commands or command in mkv_commands:
+    if command in all_commands:
+        print("Command [${}] doesn't need to be regulated".format(command))
+        correct_channel = True
         return
 
-    # Exit function if the command isn't listed
-    # if not commandFound:
-    #     return
+    print("Regulated command found. Checking channel [#{}]".format(channel))
 
     #   Production Server:
     #   the-war-room = 525519594417291284
@@ -41,21 +31,25 @@ async def check_command_channel(command: str, channel):
     #   discussion = 606655884340232192
     #   spam = 595705205069185047
 
-    bot_spam_channels = [606655884340232192, 595705205069185047, 593984711706279937, 442047437561921548]
-    croot_channels = [525519594417291284, 507520543096832001, 593984711706279937, 442047437561921548, 443822461759520769, 538419127535271946]
-    flag_channels = [593984711706279937, 597900461483360287, 442047437561921548]
+    bot_spam_channels = [595705205069185047, 593984711706279937, 442047437561921548]
+    croot_channels = [525519594417291284, 507520543096832001, 443822461759520769, 538419127535271946]
+    flag_channels = [597900461483360287]
+    all_channels = bot_spam_channels + croot_channels + flag_channels
 
-    # All commands authorized within Direct Messages
     if dm_str in str(channel):
         flag = True
+    elif channel.id in all_channels:
+        flag = True
     else:
-        if channel.id in bot_spam_channels:
-            flag = True
-        # Command is within croot_commands and the channel ID is within croot_channels
-        elif str(command) in croot_commands and channel.id in croot_channels:
-            flag = True
-        # Command is within flag_commands and the channel ID is within flag_channels
-        elif str(command) in flag_commands and channel.id in flag_channels:
-            flag = True
-        # All commands authorized within bot_spam_channels
+        flag = False
+        # if channel.id in bot_spam_channels:
+        #     flag = True
+        # elif channel.id in croot_channels:
+        #     flag = True
+        # elif channel.id in flag_channels:
+        #     flag = True
+        # elif channel.id in markov_channels:
+        #     flag = True
+
+    print("Regulation of [${}] == [{}]".format(command, flag))
     correct_channel = flag

@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import sys
 import random
 import config
+import function_helper
 import re
 import cogs.croot_bot
 # from cogs.betting_commands import load_season_bets
@@ -31,7 +32,6 @@ client.load_extension('cogs.betting_commands')
 
 # initialize a global list for CrootBot to put search results in
 authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
-banned_channels = [440868279150444544, 607399402881024009]
 
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
@@ -113,58 +113,57 @@ async def on_message(message):
             await message.add_reaction(emojiDownvote)
 
         # Link a subreddit
-        if not message.channel in banned_channels:
-            #get a list of subreddits mentioned
-            subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
-            if len(subreddits) > 0:
-                embed = discord.Embed(title="Found Subreddits")
-                for s in subreddits:
-                    if "huskers" in s:
-                        break
-                    elif "cfb" in s:
-                        break
+        #get a list of subreddits mentioned
+        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
+        if len(subreddits) > 0:
+            embed = discord.Embed(title="Found Subreddits")
+            for s in subreddits:
+                if "huskers" in s:
+                    break
+                elif "cfb" in s:
+                    break
 
-                    url='https://reddit.com/' + s
-                    if '.com//r/' in url:
-                        url = url.replace('.com//r', '.com/r')
-                    embed.add_field(name = s, value = url, inline = False)
-                    await message.channel.send(embed = embed)
+                url='https://reddit.com/' + s
+                if '.com//r/' in url:
+                    url = url.replace('.com//r', '.com/r')
+                embed.add_field(name = s, value = url, inline = False)
+                await message.channel.send(embed = embed)
 
-            # Good bot, bad bot
-            if "good bot" in message.content.lower():
-                await message.channel.send("OwO thanks")
-            elif "bad bot" in message.content.lower():
-                embed = discord.Embed(title="I'm a bad, bad bot")
-                embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
-                await message.channel.send(embed=embed)
-            elif "fuck you bot" in message.content.lower() or "you suck bot" in message.content.lower():
-                myass = ["https://66.media.tumblr.com/b9a4c96d0c83bace5e3ff303abc08f1f/tumblr_oywc87sfsP1w8f7y5o3_500.gif", "https://66.media.tumblr.com/2ae73f93fcc20311b00044abc5bad05f/tumblr_oywc87sfsP1w8f7y5o1_500.gif", "https://66.media.tumblr.com/102d761d769840a541443da82e0b211a/tumblr_oywc87sfsP1w8f7y5o5_500.gif", "https://66.media.tumblr.com/252fd1a689f0f64cb466b4eced502af7/tumblr_oywc87sfsP1w8f7y5o2_500.gif", "https://66.media.tumblr.com/83eb614389b1621be0ce9890b1998644/tumblr_oywc87sfsP1w8f7y5o4_500.gif", "https://66.media.tumblr.com/f833da26820867601cd7ad3a7c2d96a5/tumblr_oywc87sfsP1w8f7y5o6_500.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo1_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo2_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo3_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo4_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo6_250.gif"]
-                random.shuffle(myass)
-                embed = discord.Embed(title="Excuse me..", color=0xFF0000)
-                embed.set_image(url=myass[0])
-                await message.channel.send(embed=embed, content=message.author.mention)
-            elif "love you bot" in message.content.lower() or "love u bot" in message.content.lower() or "luv u bot" in message.content.lower() or "luv you bot" in message.content.lower():
-                embed = discord.Embed(title="Shut Up Baby, I Know It")
-                embed.set_image(url="https://media1.tenor.com/images/c1fd95af4433edf940fdc8d08b411622/tenor.gif?itemid=7506108")
-                await message.channel.send(embed=embed)
+        # Good bot, bad bot
+        if "good bot" in message.content.lower():
+            await message.channel.send("OwO thanks")
+        elif "bad bot" in message.content.lower():
+            embed = discord.Embed(title="I'm a bad, bad bot")
+            embed.set_image(url='https://i.imgur.com/qDuOctd.gif')
+            await message.channel.send(embed=embed)
+        elif "fuck you bot" in message.content.lower() or "you suck bot" in message.content.lower():
+            myass = ["https://66.media.tumblr.com/b9a4c96d0c83bace5e3ff303abc08f1f/tumblr_oywc87sfsP1w8f7y5o3_500.gif", "https://66.media.tumblr.com/2ae73f93fcc20311b00044abc5bad05f/tumblr_oywc87sfsP1w8f7y5o1_500.gif", "https://66.media.tumblr.com/102d761d769840a541443da82e0b211a/tumblr_oywc87sfsP1w8f7y5o5_500.gif", "https://66.media.tumblr.com/252fd1a689f0f64cb466b4eced502af7/tumblr_oywc87sfsP1w8f7y5o2_500.gif", "https://66.media.tumblr.com/83eb614389b1621be0ce9890b1998644/tumblr_oywc87sfsP1w8f7y5o4_500.gif", "https://66.media.tumblr.com/f833da26820867601cd7ad3a7c2d96a5/tumblr_oywc87sfsP1w8f7y5o6_500.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo1_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo2_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo3_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo4_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo6_250.gif"]
+            random.shuffle(myass)
+            embed = discord.Embed(title="Excuse me..", color=0xFF0000)
+            embed.set_image(url=myass[0])
+            await message.channel.send(embed=embed, content=message.author.mention)
+        elif "love you bot" in message.content.lower() or "love u bot" in message.content.lower() or "luv u bot" in message.content.lower() or "luv you bot" in message.content.lower():
+            embed = discord.Embed(title="Shut Up Baby, I Know It")
+            embed.set_image(url="https://media1.tenor.com/images/c1fd95af4433edf940fdc8d08b411622/tenor.gif?itemid=7506108")
+            await message.channel.send(embed=embed)
 
-            # Husker Bot hates Isms
-            if "isms" in message.content.lower():
-                dice_roll = random.randint(1,101)
-                if dice_roll >= 90:
-                    await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
-                                               "make **shit** up for fake internet points. I'm glad he's gone.")
+        # Husker Bot hates Isms
+        if "isms" in message.content.lower():
+            dice_roll = random.randint(1,101)
+            if dice_roll >= 90:
+                await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and "
+                                           "make **shit** up for fake internet points. I'm glad he's gone.")
 
-            notavirus = "NotaVirus_Click#3411"
-            if str(message.author).lower() == notavirus.lower():
-                dice_roll = random.randint(1, 101)
-                if dice_roll > 65:
-                    if "you suck" in message.content.lower():
-                        await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
-                    elif "eggplant" in message.content.lower():
-                        await message.channel.send("Attention: {} loves eggplant.".format(message.author.mention))
-                    elif "🍆" in message.content:
-                        await message.channel.send("🍆💦")
+        notavirus = "NotaVirus_Click#3411"
+        if str(message.author).lower() == notavirus.lower():
+            dice_roll = random.randint(1, 101)
+            if dice_roll > 65:
+                if "you suck" in message.content.lower():
+                    await message.channel.send("HEY NOW! I am on to you {}...".format(message.author.mention))
+                elif "eggplant" in message.content.lower():
+                    await message.channel.send("Attention: {} loves eggplant.".format(message.author.mention))
+                elif "🍆" in message.content:
+                    await message.channel.send("🍆💦")
 
     # Check for HuskerBot embedded messages.
     if len(message.embeds) > 0:
@@ -410,16 +409,14 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_command_completion(ctx):
-    global banned_channels
+    # This keeps bot spam down to a minimal.
+    await function_helper.check_command_channel(ctx.command, ctx.channel)
 
-    if ctx.channel.id in banned_channels:
-        not_authed = "⚠ This channel is banned from using commands ⚠"
-
-        async for message in ctx.channel.history(limit=2, oldest_first=False):
-            if message.author == client.user:
-                await message.delete()
-
-        await ctx.send(not_authed)
+    if not function_helper.correct_channel:
+        botname = str(client.user).split("#")
+        del_msg = await ctx.channel.history().get(author__name=botname[0])
+        await del_msg.delete()
+        await ctx.send("⚠ This channel is banned from using commands ⚠")
 
 
 @client.event

@@ -25,11 +25,9 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command(aliases=["cmkv",])
     async def channelmarkov(self, ctx, *, chan: discord.TextChannel):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
-        # This keeps bot spam down to a minimal.
-        await function_helper.check_command_channel(ctx.command, ctx.channel)
-        if not function_helper.correct_channel:
-            await ctx.send(config.wrong_channel_text)
-            return
+        # await function_helper.check_command_channel(ctx.command, ctx.channel)
+        # if not function_helper.correct_channel:
+        #     return
 
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
@@ -67,10 +65,9 @@ class TextCommands(commands.Cog, name="Text Commands"):
     async def markov(self, ctx, *, user: discord.Member = None):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
         # This keeps bot spam down to a minimal.
-        await function_helper.check_command_channel(ctx.command, ctx.channel)
-        if not function_helper.correct_channel:
-            await ctx.send(config.wrong_channel_text)
-            return
+        # await function_helper.check_command_channel(ctx.command, ctx.channel)
+        # if not function_helper.correct_channel:
+        #     return
 
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
