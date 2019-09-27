@@ -26,7 +26,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
 
-        if chan is None:
+        if not chan:
             embed = discord.Embed(title="You can't do that!", color=0xFF0000)
             embed.set_image(url="http://m.quickmeme.com/img/96/9651e121dac222fdac699ca6d962b84f288c75e6ec120f4a06e3c04f139ee8ec.jpg")
             await edit_msg.edit(content="", embed=embed)
@@ -38,21 +38,18 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     if msg.content != "" and not msg.author.bot:
                         source_data += "\r\n" + msg.content
         except:
-            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for {})_".format(chan))
+            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.")
             return
 
         if not source_data:
             await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
-            return
-        elif len(source_data) < 10:
-            await edit_msg.edit(content="Not enough data! Good bye.")
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
         sentence = chain.make_short_sentence(max_chars=300)
 
         if sentence is None:
-            await edit_msg.edit(content="Text channel [{}] does not have enough data. They suck!".format(chan))
+            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.")
         else:
             await edit_msg.edit(content=sentence)
 
@@ -62,7 +59,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
 
-        if user is None:
+        def is_empty(any_structure):
+            try:
+                print(any_structure(1))
+                return True
+            except:
+                return False
+
+        if not is_empty(user):
             async for msg in ctx.channel.history(limit=5000):
                 if msg.content != "" and not msg.author.bot:
                     source_data += "\r\n" + str(msg.content).capitalize()
@@ -81,12 +85,9 @@ class TextCommands(commands.Cog, name="Text Commands"):
                             source_data += "\r\n" + str(msg.content).capitalize()
 
         if not source_data:
-            print("##\n{}\n##".format(source_data))
             await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
             return
-        elif len(source_data) < 10:
-            await edit_msg.edit(content="Not enough data! Good bye.")
-            return
+
         chain = markovify.NewlineText(source_data, well_formed=True)
         sentence = chain.make_short_sentence(max_chars=400)
 
