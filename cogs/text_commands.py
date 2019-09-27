@@ -38,7 +38,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     if msg.content != "" and not msg.author.bot:
                         source_data += "\r\n" + msg.content
         except:
-            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.")
+            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.)_")
             return
 
         if not source_data:
@@ -49,7 +49,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         sentence = chain.make_short_sentence(max_chars=300)
 
         if sentence is None:
-            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.")
+            await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.)_")
         else:
             await edit_msg.edit(content=sentence)
 
@@ -92,7 +92,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         sentence = chain.make_short_sentence(max_chars=400)
 
         if sentence is None:
-            await edit_msg.edit(content="User [{}] does not have enough data. They suck!".format(user))
+            await edit_msg.edit(content="User(s) may not have enough data. They suck!".format(user))
         else:
             await edit_msg.edit(content=sentence)
 
