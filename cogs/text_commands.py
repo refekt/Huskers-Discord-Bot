@@ -61,14 +61,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
 
-        def is_empty(any_structure):
-            try:
-                print(any_structure(1))
-                return True
-            except:
-                return False
-
-        if not is_empty(user):
+        if len(user) == 0:
             async for msg in ctx.channel.history(limit=5000):
                 if msg.content != "" and not msg.author.bot:
                     source_data += "\r\n" + str(msg.content).capitalize()
@@ -79,13 +72,14 @@ class TextCommands(commands.Cog, name="Text Commands"):
             for u in user:
                 if u.bot:
                     if f.mode == "r":
-                        scottFrost = f.read()
-                    f.close()
+                        scottFrost += f.read()
                     source_data = re.sub(r'[^\x00-\x7f]',r'', scottFrost)
                 else:
                     async for msg in ctx.channel.history(limit=5000):
                         if msg.content != "" and str(msg.author) == str(u) and not msg.author.bot:
                             source_data += "\r\n" + str(msg.content).capitalize()
+                print(source_data)
+            f.close()
 
         if not source_data:
             await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
