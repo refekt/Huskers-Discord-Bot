@@ -10,13 +10,13 @@ import config
 import function_helper
 import re
 import cogs.croot_bot
-# from cogs.betting_commands import load_season_bets
 from cogs.betting_commands import store_next_opponent
 import datetime
 import json
 import hashlib
 import time
 import mysql
+import asyncio
 
 # Bot specific stuff
 botPrefix='$'
@@ -92,13 +92,21 @@ def makeMD5():
 async def on_ready():
     # nicks = ["Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos"]
     # random.shuffle(nicks)
-    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
-    print("*** Version Information:\n"
-          "    Logged in as [{0}].\n"
-          "    Discord.py version is: [{1}].\n"
-          "    Discord version is [{2}].\n"
-          "    Owner ID: {3}\n"
-          "***".format(client.user, discord.__version__, sys.version, client.owner_id))
+    try:
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
+        print("*** Version Information:\n"
+              "    Logged in as [{}].\n"
+              "    Ready: [{}]\n"
+              "    Discord.py version is: [{}].\n"
+              "    Discord version is [{}].\n"
+              "***".format(client.user, client.is_ready(), discord.__version__, sys.version, client.owner_id))
+    except asyncio.TimeoutError as e:
+        print("*** Client timed out!\n"
+              "*** {}\n"
+              "***".format(e))
+    except:
+        print("*** Unknown exception happened!\n"
+              "***")
 
 
 @client.event
@@ -639,6 +647,7 @@ async def about(ctx):
     embed.add_field(name="Client User", value=client.user)
     embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)
+
 
 if len(sys.argv) > 0:
     if sys.argv[1] == 'test':
