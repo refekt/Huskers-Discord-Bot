@@ -90,15 +90,16 @@ def makeMD5():
 
 @client.event
 async def on_ready():
-    # nicks = ["Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos"]
-    # random.shuffle(nicks)
+    nicks = ["Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos"]
+    random.shuffle(nicks)
+
     try:
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
         print("*** Version Information:\n"
               "    Logged in as [{}].\n"
               "    Ready: [{}]\n"
               "    Discord.py version is: [{}].\n"
-              "    Discord version is [{}].\n"
+              "    Discord version is: [{}].\n"
               "***".format(client.user, client.is_ready(), discord.__version__, sys.version, client.owner_id))
     except asyncio.TimeoutError as e:
         print("*** Client timed out!\n"
@@ -107,6 +108,14 @@ async def on_ready():
     except:
         print("*** Unknown exception happened!\n"
               "***")
+
+    try:
+        for members in client.get_all_members():
+            if members.name == client.user.name:
+                await members.edit(nick=nicks[0])
+                break
+    except:
+        print("Nickname change didn't work lol")
 
 
 @client.event
@@ -643,6 +652,7 @@ async def about(ctx):
                                                   "Source code is located on "
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
     embed.add_field(name="Hosting Location", value="Jeyrad's VPS Server. Thank you!")
+    embed.add_field(name="Ready Status", value=client.is_ready())
     embed.add_field(name="Current Latency", value="{:.2f} ms".format(client.latency*1000))
     embed.add_field(name="Client User", value=client.user)
     embed.add_field(name="Ready Status", value=client.is_ready())
