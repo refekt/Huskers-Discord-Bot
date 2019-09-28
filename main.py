@@ -97,9 +97,10 @@ async def on_ready():
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker football 24/7"))
         print("*** Version Information:\n"
               "    Logged in as [{}].\n"
+              "    Login time: [{}]\n"
               "    Ready: [{}]\n"
               "    Discord.py version is: [{}].\n"
-              "    Discord version is: [{}].".format(client.user, client.is_ready(), discord.__version__, sys.version, client.owner_id))
+              "    Discord version is: [{}].".format(client.user, datetime.datetime.now(), client.is_ready(), discord.__version__, sys.version, client.owner_id))
     except asyncio.TimeoutError as e:
         print("*** Client timed out!\n"
               "*** {}\n"
