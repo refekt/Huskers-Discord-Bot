@@ -25,6 +25,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
         source_data = ""
         edit_msg = await ctx.send("Thinking...")
+        bannedchannels = ["test-banned", "news-politics", "huskerchat"]
 
         if not chan:
             embed = discord.Embed(title="You can't do that!", color=0xFF0000)
@@ -34,15 +35,16 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         try:
             for c in chan:
-                async for msg in c.history(limit=5000):
-                    if msg.content != "" and not msg.author.bot:
-                        source_data += "\r\n" + msg.content
+                if c.name not in bannedchannels:
+                    async for msg in c.history(limit=5000):
+                        if msg.content != "" and not msg.author.bot:
+                            source_data += "\r\n" + msg.content
         except:
             await edit_msg.edit(content="You broke me! _(I'm most likely missing permissions for a channel.)_")
             return
 
         if not source_data:
-            await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel.)_")
+            await edit_msg.edit(content="You broke me! _(Most likely the user hasn't commented in this channel or the channel is banned.)_")
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
@@ -71,10 +73,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
                 if msg.content != "" and not msg.author.bot:
                     source_data += "\r\n" + str(msg.content).capitalize()
         else:
+            f = open("scofro.txt", "r")
+            scottFrost = ""
+
             for u in user:
                 if u.bot:
-                    scottFrost = ""
-                    f = open("scofro.txt", "r")
                     if f.mode == "r":
                         scottFrost = f.read()
                     f.close()
