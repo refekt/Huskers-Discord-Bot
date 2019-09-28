@@ -99,8 +99,7 @@ async def on_ready():
               "    Logged in as [{}].\n"
               "    Ready: [{}]\n"
               "    Discord.py version is: [{}].\n"
-              "    Discord version is: [{}].\n"
-              "***".format(client.user, client.is_ready(), discord.__version__, sys.version, client.owner_id))
+              "    Discord version is: [{}].".format(client.user, client.is_ready(), discord.__version__, sys.version, client.owner_id))
     except asyncio.TimeoutError as e:
         print("*** Client timed out!\n"
               "*** {}\n"
@@ -113,6 +112,7 @@ async def on_ready():
         for members in client.get_all_members():
             if members.name == client.user.name:
                 await members.edit(nick=nicks[0])
+                print("    Nickname: {}\n***".format(members.nick))
                 break
     except:
         print("Nickname change didn't work lol")
