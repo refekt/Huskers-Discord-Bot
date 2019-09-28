@@ -7,8 +7,8 @@ async def check_command_channel(command: str, channel):
 
     croot_commands = ["crootbot", "referee", "cb_search", "recentballs", "cb_refresh"]
     flag_commands = ["crappyflag", "randomflag"]
-    mkv_commands = ["markov", "channelmarkov"]
-    all_commands = croot_commands + flag_commands + mkv_commands
+    # mkv_commands = ["markov", "channelmarkov"]
+    all_commands = croot_commands + flag_commands #+ mkv_commands
 
     # print("Checking command [${}]".format(command))
 
