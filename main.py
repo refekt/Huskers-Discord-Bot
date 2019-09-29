@@ -489,7 +489,7 @@ async def on_command_error(ctx, error):
             await ctx.send(output_msg)
     else:
         err = getattr(error, "original", error)
-        print(err)
+        print("Error occurred!\n{}\n{}".format(error, err))
 
         if isinstance(err, commands.CommandNotFound):
             return
