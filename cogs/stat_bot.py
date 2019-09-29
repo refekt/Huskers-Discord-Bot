@@ -49,6 +49,8 @@ statFullName = [
     dict(stat="thirdDownEff", longName="Third Down Eff", homeStat="", awayStat=""),
     dict(stat="fourthDownEff", longName="Fourth Down Eff", homeStat="", awayStat="")
 ]
+globalRate = 3
+globalPer = 30
 
 
 class StatBot(commands.Cog, name="CFB Stats"):
@@ -56,6 +58,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         self.bot = bot
 
     @commands.command(aliases=["sznstats"])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def seasonstats(self, ctx, year=2019):
         """ Returns current season stats """
 
@@ -88,6 +91,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         await msg.edit(content=message_string)
 
     @commands.command(aliases=["mu",])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def matchup(self, ctx, *, team):
         """ Shows matchup history between Nebraska and another team. """
         url = "https://api.collegefootballdata.com/teams/matchup?team1=nebraska&team2={}".format(team)
@@ -136,6 +140,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         await msg.edit(content="", embed=embed)
 
     @commands.command(aliases=["polls",])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def poll(self, ctx, year=2019, week=None, seasonType="regular"):
         """ Returns current Top 25 ranking from the Coach's Poll, AP Poll, and College Football Playoff ranking.
         Usage is: `$poll [year] [week] [seasonType=regular]` """
@@ -193,6 +198,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["bs",])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def boxscore(self, ctx, year=None, week=None, *, team="Nebraska"):
         """ Returns the box score of the searched for game. """
 

@@ -45,6 +45,8 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
                   'LS' : 'Long Snapper',
                   'RET' : 'Returner'
                   }
+globalRate = 3
+globalPer = 30
 
 try:
     with open('team_ids.json', 'r') as fp:
@@ -59,6 +61,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             self.bot = bot
 
     @commands.command(hidden=True, aliases=["cbr", ])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def cb_refresh(self, ctx):
         """ Did HuskerBot act up? Use this only in emergencies. """
         authorized = False
@@ -74,6 +77,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             await ctx.send("Nice try buddy! 👋")
 
     @commands.command(aliases=["rb", ])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def recentballs(self, ctx, number=0):
         """ Send the last 1-5 crystal ball predictions from Steve Wiltfong. Usage is `$recent_balls [1-5]`. """
         # Error handling, Random number of 5 to prevent spam
@@ -127,6 +131,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
     # TODO Add error handling for `team` to be missing.
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def cb_search(self, ctx, *, team):
         """ Search through all of Steve Wiltfong's crystal ball predictions by team. """
 
@@ -173,6 +178,7 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
     # TODO Instead of adding a new message after clicking a search result...edit the search result message.
     @commands.command(aliases=["cb", ])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def crootbot(self, ctx, year, *name):
         """ CrootBot provides the ability to search for and return information on football recruits. Usage is `$crootbot <year> <first_name> <last_name>`. The command is able to find partial first and last names. """
         # pulls a json file from the 247 advanced player search API and parses it to give info on the croot.

@@ -62,6 +62,8 @@ nflWeeks = [
     datetime.datetime(2019, 12, 18),
     datetime.datetime(2019, 12, 25)
 ]
+globalRate = 3
+globalPer = 30
 
 
 class StatBot(commands.Cog, name="Football Schedules and Scores"):
@@ -69,6 +71,7 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
         self.bot = bot
 
     @commands.command(aliases=["sched",])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def schedule(self, ctx, year=2019):
         """ Returns the Nebraska Huskers football schedule. """
 
@@ -133,6 +136,7 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
         await edit_msg.edit(content="", embed=embed)
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def cfbsched(self, ctx, league='top25', week=-1, year=2019):
         """ Returns a schedule w/ scores (if in past or in progress) from ESPN for a given league, week and year.
         Usage is: `cfbsched <league> <week> <year>"""
@@ -161,6 +165,7 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
             return
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def nflsched(self, ctx, week=-1, year=2019):
         """ Returns a schedule w/ scores (if in past or in progress) from ESPN for a given week and year.
         Usage is: `nflsched <week> <year>"""

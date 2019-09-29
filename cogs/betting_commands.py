@@ -9,7 +9,8 @@ import mysql
 import pytz
 
 bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
-
+globalRate = 3
+globalPer = 30
 
 # Load season bets
 def load_season_bets():
@@ -53,6 +54,7 @@ def store_next_opponent():
 
 class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def bet(self, ctx, cmd=None, *, team=None):
         """ Allows users to place bets for Husker games.
 
@@ -371,6 +373,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @commands.command(hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def tallybets(self, ctx):
         print(ctx.author.roles)
 

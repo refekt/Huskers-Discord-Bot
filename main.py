@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import sys
 import random
 import config
-import function_helper
+# import function_helper
 import re
 import cogs.croot_bot
 from cogs.betting_commands import store_next_opponent
@@ -423,16 +423,16 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
 
-@client.event
-async def on_command_completion(ctx):
-    # This keeps bot spam down to a minimal.
-    await function_helper.check_command_channel(ctx.command, ctx.channel)
-
-    if not function_helper.correct_channel:
-        botname = str(client.user).split("#")
-        del_msg = await ctx.channel.history().get(author__name=botname[0])
-        await del_msg.delete()
-        await ctx.send("⚠ This channel is banned from using commands ⚠")
+# @client.event
+# async def on_command_completion(ctx):
+#     # This keeps bot spam down to a minimal.
+#     await function_helper.check_command_channel(ctx.command, ctx.channel)
+#
+#     if not function_helper.correct_channel:
+#         botname = str(client.user).split("#")
+#         del_msg = await ctx.channel.history().get(author__name=botname[0])
+#         await del_msg.delete()
+#         await ctx.send("⚠ This channel is banned from using commands ⚠")
 
 
 @client.event
@@ -489,7 +489,7 @@ async def on_command_error(ctx, error):
             await ctx.send(output_msg)
     else:
         err = getattr(error, "original", error)
-        print("Error occurred!\n{}\n{}".format(error, err))
+        print("!!! Error occurred\n!!!! {}\n!!! ".format(error))
 
         if isinstance(err, commands.CommandNotFound):
             return
