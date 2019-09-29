@@ -31,8 +31,6 @@ client.load_extension('cogs.sched_commands')
 client.load_extension('cogs.betting_commands')
 
 # initialize a global list for CrootBot to put search results in
-authorized_to_quit = [440639061191950336, 443805741111836693, 189554873778307073, 339903241204793344, 606301197426753536]
-
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']
 emoji_list = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
@@ -491,13 +489,20 @@ async def on_command_error(ctx, error):
             await ctx.send(output_msg)
     else:
         err = getattr(error, "original", error)
+        print(err)
 
         if isinstance(err, commands.CommandNotFound):
             return
         elif isinstance(err, commands.BadArgument):
             return await ctx.send("Command `${}` received a bad argument. Review `$help {}` for more information.".format(ctx.command.qualified_name, ctx.command.qualified_name))
+        elif isinstance(err, discord.ext.commands.CommandOnCooldown):
+            err = str(error).split(".")
+            return await ctx.send("HOLD UP {}!  ${} is on cooldown. {} seconds.".format(ctx.message.author.mention, ctx.command.qualified_name, err[1]))
+        elif isinstance(err, discord.ext.commands.MissingAnyRole):
+            return await ctx.send("{}! You are not authorized to use this command!".format(ctx.message.author.mention))
+        elif isinstance(err, discord.ext.commands.MissingRole):
+            return await ctx.send("{}! You are not authorized to use this command!".format(ctx.message.author.mention))
         else:
-            print("An error occured: {}".format(error))
             output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
                          "```Message ID: {}\n" \
                          "Channel: {} / {}\n" \
@@ -508,22 +513,16 @@ async def on_command_error(ctx, error):
 
 
 @client.command(aliases=["quit", "q"])
+@commands.has_any_role(606301197426753536, 440639061191950336)
 async def huskerbotquit(ctx):
     """ Did HuskerBot act up? Use this only in emergencies. """
-    authorized = False
-    for r in ctx.author.roles:
-        if r.id in authorized_to_quit:
-             authorized = True
-
-    if authorized:
-        await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
-        print("!!! I was turned off by '{}' in '{}'.".format(ctx.author, ctx.channel))
-        await client.logout()
-    else:
-        await ctx.send("Nice try buddy! 👋")
+    await ctx.send("You are authorized to turn me off. Good bye cruel world 😭.")
+    print("!!! I was turned off by '{}' in '{}'.".format(ctx.author, ctx.channel))
+    await client.logout()
 
 
 @client.command(hidden=True)
+@commands.has_any_role(606301197426753536, 440639061191950336)
 async def purgeall(ctx):
     """ Delete Husker Bot's previous messages. """
     print("!!! User [{}] initiated $purge.".format(ctx.message.author))
@@ -534,24 +533,18 @@ async def purgeall(ctx):
         print("!!! Incorrect channel: {}".format(ctx.message.channel.id))
         return
 
-    auth = False
-    for roles in ctx.message.author.roles:
-        if roles.id == 606301197426753536 or roles.id == 440639061191950336:  # test admin - 606301197426753536, prod admin - 440639061191950336
-            auth = True
+    print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
 
-    if auth:
-        print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
-
-        chan = ctx.message.channel
-        async for message in chan.history(limit=100):
-            print("Deleting [{}...]".format(message.content[:25]))
-            await message.delete()
-    else:
-        await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
-        print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
+    chan = ctx.message.channel
+    async for message in chan.history(limit=100):
+        print("Deleting [{}...]".format(message.content[:25]))
+        await message.delete()
+    # await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
+    # print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
 
 
 @client.command(hidden=True)
+@commands.has_any_role(606301197426753536, 440639061191950336)
 async def purge(ctx):
     """ Delete Husker Bot's previous messages. """
     print("!!! User [{}] initiated $purge.".format(ctx.message.author))
@@ -559,48 +552,32 @@ async def purge(ctx):
     if ctx.message.channel.id == 458474143403212801:  # prevent from deleting #botlogs
         return
 
-    auth = False
-    for roles in ctx.message.author.roles:
-        if roles.id == 606301197426753536 or roles.id == 440639061191950336:  # test admin - 606301197426753536, prod admin - 440639061191950336
-            auth = True
+    print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
 
-    if auth:
-        print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
+    channel = client.get_channel(ctx.message.channel.id)
+    deleteCounter = 0
+    missedCounter = 0
 
-        channel = client.get_channel(ctx.message.channel.id)
-        deleteCounter = 0
-        missedCounter = 0
-
-        async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
-            if message.author == client.user:
-                print("{}: Deleting [{}...]".format(deleteCounter, message.content[:25]))
-                await message.delete()
-                deleteCounter += 1
-            else:
-                missedCounter += 1
-                if missedCounter > 25:
-                    break  # Stop searching forever
-            if deleteCounter > 50:
-                print("!!! Recent messages have been deleted by [{}].".format(ctx.message.author))
-                break  # stop looking through messages
-    else:
-        await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
-        print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
+    async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
+        if message.author == client.user:
+            print("{}: Deleting [{}...]".format(deleteCounter, message.content[:25]))
+            await message.delete()
+            deleteCounter += 1
+        else:
+            missedCounter += 1
+            if missedCounter > 25:
+                break  # Stop searching forever
+        if deleteCounter > 50:
+            print("!!! Recent messages have been deleted by [{}].".format(ctx.message.author))
+            break  # stop looking through messages
+    # await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
+    # print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
 
 
 @client.command(hidden=True)
+@commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
 async def gameday(ctx, command=None):
     """ Turn on or off game day mode for the bot. """
-    auth = False
-    for roles in ctx.message.author.roles:
-        if roles.id == 606301197426753536 or roles.id == 440639061191950336:
-            auth = True
-            break
-
-    if not auth:
-        print("Not authorized to use ")
-        return
-
     async def updateChan(chan: discord.TextChannel, name: str, gameday: bool, reason="Game day mode activation/deactivation"):
         try:
             await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=True)
