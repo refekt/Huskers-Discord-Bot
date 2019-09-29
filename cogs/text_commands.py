@@ -12,15 +12,19 @@ import re
 # Dictionaries
 eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
 husker_schedule = []
+globalPer = 5
+globalRate = 30
 
 
 class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def stonk(self, ctx):
         """ Isms hates stocks. """
         await ctx.send("Stonk!")
 
     @commands.command(aliases=["cmkv",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def channelmarkov(self, ctx, *chan: discord.TextChannel):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
         source_data = ""
@@ -56,6 +60,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await edit_msg.edit(content=sentence)
 
     @commands.command(aliases=["mkv",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def markov(self, ctx, *user: discord.Member):
         """A Markov chain is a model of some random process that happens over time. Markov chains are called that because they follow a rule called the Markov property. The Markov property says that whatever happens next in a process only depends on how it is right now (the state). It doesn't have a "memory" of how it was before. It is helpful to think of a Markov chain as evolving through discrete steps in time, although the "step" doesn't need to have anything to do with time. """
         source_data = ""
@@ -94,6 +99,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await edit_msg.edit(content=sentence)
 
     @commands.command(aliases=["cd",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def countdown(self, ctx, *, input=None):
         """ Returns the time until the next game if no input is provide or returns time to a specific game if provided.
         Usage: `$[countdown|cd] [team on current schedule]`
@@ -179,6 +185,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     break
 
     @commands.command(aliases=["bf", "facts",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def billyfacts(self, ctx):
         """ Real facts about Bill Callahan. """
         msg = await ctx.send("Loading...")
@@ -193,6 +200,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await msg.edit(content=random.choice(facts))
 
     @commands.command(aliases=["8b",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
         random.shuffle(eight_ball)
@@ -203,6 +211,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def weather(self, ctx, which="current"):
         """ Checks the weather for game day.
         $weather current  : returns current weather data for the location of Nebraska's next game.
@@ -304,6 +313,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["gbr",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def balloons(self, ctx):
         balloons = [
             "```\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈🎈🎈🎈\n🎈        🎈    🎈  🎈    🎈\n🎈  🎈🎈  🎈🎈🎈    🎈🎈🎈\n🎈    🎈  🎈    🎈  🎈    🎈\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈    🎈\n```"
@@ -317,7 +327,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
             await msg.edit(content=balloons[i])
             i += 1
             time.sleep(0.5)
-    # Text commands
 
 
 def setup(bot):

@@ -369,6 +369,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.add_field(name="Error", value="Unknown command. Please reference `$help bet`.")
             await ctx.send(embed=embed)
 
+    @commands.command(hidden=True)
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    async def tallybets(self, ctx):
+        print(ctx.author.roles)
+
 
 def setup(bot):
     bot.add_cog(BetCommands(bot))

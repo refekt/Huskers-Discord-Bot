@@ -69,6 +69,9 @@ flag_dict = {
     'usc': 'https://i.imgur.com/GrA4M0X.png',
     'wisconsin': 'https://giant.gfycat.com/PolishedFeminineBeardedcollie.gif',
     'creighton': 'https://i.imgur.com/OxVze61.png'}
+globalRate = 3
+globalPer = 30
+
 
 async def sendImage(title: str, url: str):
     embed = discord.Embed(title=title, color=0xFF0000)
@@ -82,6 +85,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
 
     # Start image commands
     @commands.command(aliases=["rf",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def randomflag(self, ctx):
         """ A random ass, badly made Nebraska flag. """
         flags = []
@@ -94,6 +98,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         await ctx.send(embed=await sendImage("Random Ass Nebraska Flag", random.choice(flags)))
 
     @commands.command(aliases=["cf",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def crappyflag(self, ctx, state=""):
         """ Outputs crappy flag. The usage is $crappyflag <state>.
 
@@ -114,129 +119,135 @@ class ImageCommands(commands.Cog, name="Image Commands"):
             await ctx.send(embed=await sendImage("Crappy Flags", flag_dict[random_state]))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def ohyeah(self, ctx):
         """Oh yeah. It's all coming together."""
         await ctx.send(embed=await sendImage("If we have Frost, we have national championships.", "https://i.imgur.com/tdN5IEG.png"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def crabfrost(self, ctx):
         """CELEBRATE"""
         await ctx.send(embed=await sendImage("🦀D🦀A🦀N🦀C🦀E🦀P🦀A🦀R🦀T🦀Y🦀", "https://thumbs.gfycat.com/FalseTestyDotterel-size_restricted.gif"))
 
     @commands.command(aliases=["dance",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def danceparty(self, ctx):
         """Get on the floooooor!"""
         await ctx.send(embed=await sendImage("🕺💃👯‍♂️👯‍♀️", "https://thumbs.gfycat.com/GiddyOldfashionedBluebreastedkookaburra-size_restricted.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def fuckiowa(self, ctx):
         """Get on the floooooor!"""
         await ctx.send(embed=await sendImage("FUCK IOWA", "https://thumbs.gfycat.com/CanineEssentialGelding-size_restricted.gif"))
 
     @commands.command(aliases=["possum",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def possums(self, ctx):
         """Possum Palace"""
         await ctx.send(embed=await sendImage("Possum", "https://i.imgur.com/UI3l2Xu.jpg"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def pour(self, ctx):
         """Pour that koolaid baby"""
         await ctx.send(embed=await sendImage("OH YEAH!", "https://media.giphy.com/media/3d9rkLNvMXahgQVpM4/source.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def iowasux(self, ctx):
         """ Iowa has the worst corn. """
         await ctx.send(embed=await sendImage("IOWA SUX", "https://i.imgur.com/j7JDuGe.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
+    @commands.has_role(583842320575889423)
     async def potatoes(self, ctx):
         """ Potatoes are love; potatoes are life. """
-        authorized = False
-
-        for r in ctx.author.roles:
-            if r.id == 583842320575889423:
-                authorized = True
-
-        if authorized:
-            await ctx.send(embed=await sendImage("Po-Tay-Toes", "https://i.imgur.com/Fzw6Gbh.gif"))
-        else:
-            await ctx.send('You are not a member of the glorious Potato Gang!')
+        await ctx.send(embed=await sendImage("Po-Tay-Toes", "https://i.imgur.com/Fzw6Gbh.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
+    @commands.has_role(583842403341828115)
     async def asparagus(self, ctx):
         """ I guess some people like asparagus. """
-        authorized = False
-
-        for r in ctx.author.roles:
-            if r.id == 583842403341828115:
-                authorized = True
-
-        if authorized:
-            await ctx.send(embed=await sendImage("Asparagan", "https://i.imgur.com/QskqFO0.gif"))
-        else:
-            await ctx.send('You are not a member of the glorious Asparagang!')
+        await ctx.send(embed=await sendImage("Asparagan", "https://i.imgur.com/QskqFO0.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def flex(self, ctx):
         """ S T R O N K """
         await ctx.send(embed=await sendImage("FLEXXX", "https://i.imgur.com/92b9uFU.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def shrug(self, ctx):
         """ Who knows 😉 """
         await ctx.send(embed=await sendImage("🤷‍♀", "https://i.imgur.com/Yt63gGE.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def ohno(self, ctx):
         """ This is not ideal. """
         await ctx.send(embed=await sendImage("Big OOOOOOF", "https://i.imgur.com/f4P6jBO.png"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def bigsexy(self, ctx):
         """ Give it to me Kool Aid man. """
         await ctx.send(embed=await sendImage("OOOHHH YEEAAAHHH", "https://i.imgur.com/UpKIx5I.png"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def whoami(self, ctx):
         """ OH YEAH! """
         await ctx.send(embed=await sendImage("Who the F I am?", "https://i.imgur.com/jgvr8pd.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def thehit(self, ctx):
         """ The hardest clean hit ever. """
         await ctx.send(embed=await sendImage("CLEAN HIT (AT THE TIME)!", "https://i.imgur.com/mKRUPoD.gif"))
 
     @commands.command(aliases=['allluck','luck','al', 'whatusay'])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def uwot(self, ctx):
         """ EXCUSE ME WHAT? """
         await ctx.send(embed=await sendImage("What did you just say?!", "https://i.imgur.com/XpFWJp9.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def strut(self, ctx):
         """ Martinez struttin his stuff """
         await ctx.send(embed= await sendImage("Dat Strut", "https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def bones(self, ctx):
         """ Throwing bones! """
         await ctx.send(embed=await sendImage("☠ Bones ☠", "https://i.imgur.com/0gcawNo.jpg"))
 
     @commands.command(aliases=['flip',])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def theflip(self, ctx):
         """ Frost doing frosty things """
         await ctx.send(embed=await sendImage("Too Cool", "https://media.giphy.com/media/lllup6g803SaeRUwiM/giphy.gif"))
 
     @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def guzzle(self, ctx):
         """ Let the cup runeth over """
         await ctx.send(embed= await sendImage("Give it to me bb", "https://i.imgur.com/OW7rChr.gif"))
 
     @commands.command(aliases=["td",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def touchdown(self, ctx):
         """ Let the cup runeth over """
         await ctx.send(embed= await sendImage("🏈🎈🏈🎈", "https://i.imgur.com/Wh4aLYo.gif"))
 
     @commands.command(aliases=["ref",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def referee(self, ctx, call=None):
         """ HuskerBot will tell you about common referee calls. Usage is `$refereee <call>`.\n
         The calls are: blackblock, blindside, bs, lowblock, chip, clip, delay, encroachment, facemask, false, grounding, hands2face, hold, horsecollar, hornsdown, illform, illfwd, illmotion, offside, persfoul, pi, ruffkick, ruffpass, safety, sideline, sub, targeting, td, unsport  """
@@ -259,6 +270,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["fg",])
+    @commands.cooldown(rate=globalRate, per=globalPer)
     async def flag_gen(self, ctx):
         async def tint_image(src, color="#FFFFFF"):
             src.load()
