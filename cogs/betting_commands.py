@@ -6,6 +6,7 @@ import datetime
 import config
 import requests
 import mysql
+import pytz
 
 bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
@@ -46,6 +47,8 @@ def store_next_opponent():
             break
         # Used for navigating season_bets JSON
         counter += 1
+
+    print(config.current_game)
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
@@ -96,7 +99,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             except:
                 print("No lines available")
 
-            embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], config.current_game[1].strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
+            game_dt_raw = config.current_game[1]
+            game_dt_utc = pytz.timezone("UTC").localize(game_dt_raw)
+            tz_target = pytz.timezone("CST6CDT")
+            game_dt_cst = game_dt_utc.astimezone(tz_target)
+
+            embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0],game_dt_cst.strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
             embed.add_field(name="Rules", value="1. All bets must be placed prior to kick off.\n2. The final odds are used for scoring purposes.\n3. Only one bet per user per game.\n4. Bets are stored by __Discord__ username.")
             embed.add_field(name="Scoring", value="1 Point : winning or losing the game.\n2 Points: covering or not covering the spread and total points.", inline=False)
             embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
