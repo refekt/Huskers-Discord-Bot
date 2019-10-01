@@ -14,6 +14,7 @@ globalRate = 5
 globalPer = 60
 embed = None
 
+
 # Load season bets
 def load_season_bets():
     f = open('season_bets.json', 'r')
@@ -52,6 +53,17 @@ def store_next_opponent():
         counter += 1
 
 
+def game_number(team):
+    # Retrieve the current game number
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlRetrieveGameNumber, (team.lower()))
+        gameNumber = cursor.fetchone()
+    mysql.sqlConnection.commit()
+    gameNumber = int(gameNumber["game_number"])
+
+    return int(gameNumber)
+
+
 def create_embed():
     # Creates the embed object for all messages within method
     global embed
@@ -62,7 +74,7 @@ def create_embed():
 
 class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.group()
-    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    # @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def bet(self, ctx):
         """ Allows users to place bets for Husker games."""
         dbAvailable = config.pingMySQL()
@@ -131,7 +143,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             print("Reactions not applied because datetime is after kickoff.")
 
     @bet.command(aliases=["a",])
-    async def all(self, ctx, team=None):
+    async def all(self, ctx, *, team=None):
         """Show all the bets for the current or provided opponent."""
         global embed
 
@@ -141,12 +153,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 userBetsDict = cursor.fetchall()
             mysql.sqlConnection.commit()
         else:
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveGameNumber, (team.lower()))
-                gameNumber = cursor.fetchone()
-            mysql.sqlConnection.commit()
-            gameNumber = int(gameNumber["game_number"])
-
+            gameNumber = game_number(team.lower())
             with mysql.sqlConnection.cursor() as cursor:
                 cursor.execute(config.sqlRetrieveAllBet, (gameNumber))
                 userBetsDict = cursor.fetchall()
@@ -187,7 +194,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.add_field(name="Opponent", value=config.current_game[0], inline=False)
         else:
             embed.add_field(name="Opponent", value=str(team).capitalize(), inline=False)
-
 
         if total_wins and total_winorlose:
             embed.add_field(name="Wins", value="{} ({:.2f}%)".format(total_wins, (total_wins / total_winorlose) * 100))
@@ -290,20 +296,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         global embed
 
         if team:
-            # Retrieve the current game number
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveGameNumber, (team.lower()))
-                gameNumber = cursor.fetchone()
-            mysql.sqlConnection.commit()
-            gameNumber = int(gameNumber["game_number"])
+            gameNumber = game_number(team.lower())
 
             # Retrieve the user's bet
             with mysql.sqlConnection.cursor() as cursor:
                 cursor.execute(config.sqlRetrieveSpecificBet, (gameNumber, raw_username))
                 checkUserBet = cursor.fetchone()
             mysql.sqlConnection.commit()
-
-            print(checkUserBet)
 
             if checkUserBet["win"] == 1:
                 userBetWin = "Win"
@@ -374,19 +373,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """Shows the current or provided opponent lines."""
         global embed
 
-        # Retrieve the current game number
         if team is None:
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveGameNumber, (config.current_game[0].lower()))
-                gameNumber = cursor.fetchone()
-            mysql.sqlConnection.commit()
+            gameNumber = game_number(config.current_game[0].lower())
         else:
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveGameNumber, (team.lower()))
-                gameNumber = cursor.fetchone()
-            mysql.sqlConnection.commit()
-
-        gameNumber = int(gameNumber["game_number"])
+            gameNumber = game_number(team.lower())
 
         url = "https://api.collegefootballdata.com/lines?year=2019&seasonType=regular&team=nebraska&week={}".format(gameNumber)
 
@@ -405,19 +395,68 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             print("No lines available")
 
         if lines:
-            embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
-            embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
+            for line in lines:
+                if line["provider"] == "Bovada":
+                    embed.add_field(name="Spread ({})".format(line["provider"]), value="{}".format(line["formattedSpread"]), inline=False)
+                    embed.add_field(name="Total Points/Over Under ({})".format(line["provider"]), value="{}".format(line["overUnder"]), inline=False)
+                    break
         else:
             embed.add_field(name="Spread", value="TBD")
             embed.add_field(name="Total Points/Over Under", value="TBD")
 
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True)
+    @bet.command(hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
-    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def tallybets(self, ctx):
-        pass
+    async def scores(self, ctx, score, oppo_score, *, team):
+        gameNumber = game_number(team.lower())
+
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlUpdateScores, (gameNumber, score, oppo_score, score, oppo_score))
+        mysql.sqlConnection.commit()
+
+        await ctx.send("Update complete!")
+
+    @bet.command(hidden=True)
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    async def tally(self, ctx, *, team):
+        gameNumber = game_number(team.lower())
+
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlRetrieveGameInfo, (gameNumber))
+            game_info = cursor.fetchone()
+        mysql.sqlConnection.commit()
+
+        result_winorlose = bool(
+            int(game_info["score"]) > int(game_info["opponent_score"])
+        )
+
+        result_spread = None
+        if game_info["spread_value"] > 0:
+            result_spread = bool(
+                int(
+                    abs(int(game_info["score"]) - int(game_info["opponent_score"])) > game_info["spread_value"]
+                )
+            )
+        elif game_info["spread_value"] < 0:
+            result_spread = bool(
+                int(
+                    abs(int(game_info["score"]) - int(game_info["opponent_score"])) > abs(game_info["spread_value"])
+                )
+            )
+
+        result_moneyline = bool(
+            int(
+                (game_info["score"] + game_info["opponent_score"]) > game_info["moneyline_value"]
+            )
+        )
+
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlUpdateAllBetCategories, (gameNumber, result_winorlose, result_spread, result_moneyline, result_winorlose, result_spread, result_moneyline))
+            game_info = cursor.fetchone()
+        mysql.sqlConnection.commit()
+
+        await ctx.send("Updated! The results are:\nWin: {}\nSpread: {}\nTotal Points:{}".format(result_winorlose, result_spread, result_moneyline))
 
 
 def setup(bot):
