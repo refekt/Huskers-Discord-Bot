@@ -8,6 +8,7 @@ import discord
 import requests
 import time
 import re
+import typing
 
 # Dictionaries
 eight_ball = ['As I see it, yes','Ask again later','Better not tell you now','Cannot predict now','Coach V\'s cigar would like this','Concentrate and ask again','Definitely yes','Don’t count on it','Frosty','Fuck Iowa','It is certain','It is decidedly so','Most Likely','My reply is no','My sources say no','Outlook not so good, and very doubtful','Reply hazy','Scott Frost approves','These are the affirmative answers.','Try again','Try again','Without a doubt','Yes – definitely','You may rely on it']
@@ -25,7 +26,8 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def newmarkov(self, ctx, *input):
+    async def newmarkov(self, ctx, *what: typing.Union[discord.Member, discord.TextChannel]):
+        await ctx.send(what)
         pass
 
     @commands.command(aliases=["cmkv",])
