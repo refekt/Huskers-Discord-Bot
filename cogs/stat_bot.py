@@ -78,7 +78,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
                 json.dump(seasonstats_json, fp, sort_keys=True, indent=4)
             fp.close()
 
-        message_string = "```\n{} Season Stats for Nebraska\n".format(year)
+        message_string = "```\n[{}] Season Stats for Nebraska\n".format(year)
         seasonstats_json = sorted(seasonstats_json, key=lambda i: i["statName"])
 
         for stat in seasonstats_json:
@@ -165,19 +165,21 @@ class StatBot(commands.Cog, name="CFB Stats"):
             await ctx.send("An error occurred retrieving poll data.")
             return
 
-        dump = True
-        if dump:
-            with open("cfb_polls.json", "w") as fp:
-                json.dump(poll_json, fp, sort_keys=True, indent=4)
-            fp.close()
+        # dump = False
+        # if dump:
+        #     with open("cfb_polls.json", "w") as fp:
+        #         json.dump(poll_json, fp, sort_keys=True, indent=4)
+        #     fp.close()
+
+        week_count = len(poll_json) - 1
 
         try:
-            embed = discord.Embed(title="{} {} Season Week {} Poll".format(poll_json[0]['season'], str(poll_json[0]['seasonType']).capitalize(), poll_json[0]['week']), color=0xFF0000)
+            embed = discord.Embed(title="{} {} Season Week {} Poll".format(poll_json[0]['season'], str(poll_json[0]['seasonType']).capitalize(), poll_json[week_count]['week']), color=0xFF0000)
         except IndexError:
             await ctx.send("Invalid week. Try again!")
             return
 
-        ap_poll_raw = poll_json[0]['polls'][0]['ranks']
+        ap_poll_raw = poll_json[week_count]['polls'][0]['ranks']
         last_rank = 1
 
         x = 0

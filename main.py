@@ -11,6 +11,7 @@ import config
 import re
 import cogs.croot_bot
 from cogs.betting_commands import store_next_opponent
+# from cogs.betting_commands import *
 import datetime
 import json
 import hashlib
@@ -423,18 +424,6 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
 
-# @client.event
-# async def on_command_completion(ctx):
-#     # This keeps bot spam down to a minimal.
-#     await function_helper.check_command_channel(ctx.command, ctx.channel)
-#
-#     if not function_helper.correct_channel:
-#         botname = str(client.user).split("#")
-#         del_msg = await ctx.channel.history().get(author__name=botname[0])
-#         await del_msg.delete()
-#         await ctx.send("⚠ This channel is banned from using commands ⚠")
-
-
 @client.event
 async def on_command_error(ctx, error):
     if ctx.message.content.startswith("$secret"):
@@ -523,55 +512,36 @@ async def huskerbotquit(ctx):
 
 @client.command(hidden=True)
 @commands.has_any_role(606301197426753536, 440639061191950336)
-async def purgeall(ctx):
+async def purge(ctx, cmd=None):
     """ Delete Husker Bot's previous messages. """
-    print("!!! User [{}] initiated $purge.".format(ctx.message.author))
-
-    chanID = int(ctx.message.channel.id)
-    authedChanIDs = (622581511488667699, 595705205069185047)
-    if not chanID in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
-        print("!!! Incorrect channel: {}".format(ctx.message.channel.id))
-        return
-
-    print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
-
-    chan = ctx.message.channel
-    async for message in chan.history(limit=100):
-        print("Deleting [{}...]".format(message.content[:25]))
-        await message.delete()
-    # await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
-    # print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
-
-
-@client.command(hidden=True)
-@commands.has_any_role(606301197426753536, 440639061191950336)
-async def purge(ctx):
-    """ Delete Husker Bot's previous messages. """
-    print("!!! User [{}] initiated $purge.".format(ctx.message.author))
-
     if ctx.message.channel.id == 458474143403212801:  # prevent from deleting #botlogs
         return
-
-    print("!!! User [{}] authorized to use $purge.".format(ctx.message.author))
 
     channel = client.get_channel(ctx.message.channel.id)
     deleteCounter = 0
     missedCounter = 0
 
-    async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
-        if message.author == client.user:
-            print("{}: Deleting [{}...]".format(deleteCounter, message.content[:25]))
+    cmd = str(cmd).lower()
+
+    if cmd == "none":
+        async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
+            if message.author == client.user:
+                await message.delete()
+                deleteCounter += 1
+            else:
+                missedCounter += 1
+                if missedCounter > 25:
+                    break  # Stop searching forever
+            if deleteCounter > 50:
+                break  # stop looking through messages
+    elif cmd in ("all", "a"):
+        authedChanIDs = (622581511488667699, 595705205069185047)
+        if channel.id in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
+            async for message in channel.history(limit=100):
+                await message.delete()
+    elif cmd in ("last", "l"):
+        async for message in channel.history(limit=3, oldest_first=False):
             await message.delete()
-            deleteCounter += 1
-        else:
-            missedCounter += 1
-            if missedCounter > 25:
-                break  # Stop searching forever
-        if deleteCounter > 50:
-            print("!!! Recent messages have been deleted by [{}].".format(ctx.message.author))
-            break  # stop looking through messages
-    # await ctx.send("{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
-    # print("!!! User [{}] was not authorized to use $purge".format(ctx.message.author))
 
 
 @client.command(hidden=True)

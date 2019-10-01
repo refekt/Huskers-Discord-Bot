@@ -23,6 +23,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
         """ Isms hates stocks. """
         await ctx.send("Stonk!")
 
+    @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def newmarkov(self, ctx, *input):
+        pass
+
     @commands.command(aliases=["cmkv",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def channelmarkov(self, ctx, *chan: discord.TextChannel):
