@@ -27,8 +27,49 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def newmarkov(self, ctx, *what: typing.Union[discord.Member, discord.TextChannel]):
-        await ctx.send(what)
-        pass
+        edit_msg = await ctx.send("Thinking...")
+
+        if not what:
+            embed = discord.Embed(title="You can't do that!", color=0xFF0000)
+            embed.set_image(url="http://m.quickmeme.com/img/96/9651e121dac222fdac699ca6d962b84f288c75e6ec120f4a06e3c04f139ee8ec.jpg")
+            await edit_msg.edit(content="", embed=embed)
+            return
+
+        source_data = ""
+        bannedchannels = ["test-banned", "news-politics", "huskerchat"]
+
+        for source in what:
+            if type(source) == discord.Member:
+                f = open("scofro.txt", "r")
+                scottFrost = ""
+
+                if source.bot:
+                    if f.mode == "r":
+                        scottFrost += f.read()
+                    source_data = re.sub(r'[^\x00-\x7f]', r'', scottFrost)
+                else:
+                    async for msg in ctx.channel.history(limit=5000):
+                        if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
+                            source_data += "\r\n" + str(msg.content).capitalize()
+
+                f.close()
+            elif type(source) == discord.TextChannel:
+                if source.name not in bannedchannels:
+                    async for msg in source.history(limit=5000):
+                        if msg.content != "" and not msg.author.bot:
+                            source_data += "\r\n" + msg.content
+
+            if not source_data:
+                await edit_msg.edit(content="You broke me!")
+                return
+
+            chain = markovify.NewlineText(source_data, well_formed=True)
+            sentence = chain.make_short_sentence(max_chars=300)
+
+            if sentence is None:
+                await edit_msg.edit(content="You broke me!")
+            else:
+                await edit_msg.edit(content=sentence)
 
     @commands.command(aliases=["cmkv",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
@@ -90,7 +131,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     async for msg in ctx.channel.history(limit=5000):
                         if msg.content != "" and str(msg.author) == str(u) and not msg.author.bot:
                             source_data += "\r\n" + str(msg.content).capitalize()
-                print(source_data)
             f.close()
 
         if not source_data:
