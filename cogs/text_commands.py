@@ -40,11 +40,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
             if len(what) > 5:
                 await edit_msg.edit(content="...this might take awhile...be patient...")
 
+            f = open("scofro.txt", "r")
+            scottFrost = ""
+
             for source in what:
                 if type(source) == discord.Member:
-                    f = open("scofro.txt", "r")
-                    scottFrost = ""
-
                     if source.bot:
                         if f.mode == "r":
                             scottFrost += f.read()
@@ -53,13 +53,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
                         async for msg in ctx.channel.history(limit=5000):
                             if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
                                 source_data += "\r\n" + str(msg.content).capitalize()
-
-                    f.close()
                 elif type(source) == discord.TextChannel:
                     if source.name not in bannedchannels:
                         async for msg in source.history(limit=5000):
                             if msg.content != "" and not msg.author.bot:
                                 source_data += "\r\n" + msg.content
+
+            f.close()
 
         if not source_data:
             await edit_msg.edit(content="You broke me!")
