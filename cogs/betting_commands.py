@@ -418,7 +418,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         await ctx.send("Update complete!")
 
     @bet.command(hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.has_any_role(606301197426753536, 440639061191950336) # 443805741111836693
     async def tally(self, ctx, *, team):
         gameNumber = game_number(team.lower())
 
