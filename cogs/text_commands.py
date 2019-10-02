@@ -28,36 +28,35 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def markov(self, ctx, *what: typing.Union[discord.Member, discord.TextChannel]):
         edit_msg = await ctx.send("Thinking...")
+        source_data = ""
 
         if not what:
-            embed = discord.Embed(title="You can't do that!", color=0xFF0000)
-            embed.set_image(url="http://m.quickmeme.com/img/96/9651e121dac222fdac699ca6d962b84f288c75e6ec120f4a06e3c04f139ee8ec.jpg")
-            await edit_msg.edit(content="", embed=embed)
-            return
+            async for msg in ctx.message.channel.history(limit=5000):
+                if msg.content != "" and not msg.author.bot:
+                    source_data += "\r\n" + msg.content
+        else:
+            bannedchannels = ["test-banned", "news-politics", "huskerchat"]
 
-        source_data = ""
-        bannedchannels = ["test-banned", "news-politics", "huskerchat"]
+            for source in what:
+                if type(source) == discord.Member:
+                    f = open("scofro.txt", "r")
+                    scottFrost = ""
 
-        for source in what:
-            if type(source) == discord.Member:
-                f = open("scofro.txt", "r")
-                scottFrost = ""
+                    if source.bot:
+                        if f.mode == "r":
+                            scottFrost += f.read()
+                        source_data = re.sub(r'[^\x00-\x7f]', r'', scottFrost)
+                    else:
+                        async for msg in ctx.channel.history(limit=5000):
+                            if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
+                                source_data += "\r\n" + str(msg.content).capitalize()
 
-                if source.bot:
-                    if f.mode == "r":
-                        scottFrost += f.read()
-                    source_data = re.sub(r'[^\x00-\x7f]', r'', scottFrost)
-                else:
-                    async for msg in ctx.channel.history(limit=5000):
-                        if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
-                            source_data += "\r\n" + str(msg.content).capitalize()
-
-                f.close()
-            elif type(source) == discord.TextChannel:
-                if source.name not in bannedchannels:
-                    async for msg in source.history(limit=5000):
-                        if msg.content != "" and not msg.author.bot:
-                            source_data += "\r\n" + msg.content
+                    f.close()
+                elif type(source) == discord.TextChannel:
+                    if source.name not in bannedchannels:
+                        async for msg in source.history(limit=5000):
+                            if msg.content != "" and not msg.author.bot:
+                                source_data += "\r\n" + msg.content
 
         if not source_data:
             await edit_msg.edit(content="You broke me!")
