@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import datetime
+import config
+import mysql
 
 CB_REFRESH_INTERVAL = 480
 cb_list = []
@@ -84,6 +86,14 @@ def pull_crystal_balls_from_pages(year, page=1):
         prediction_time = t.find(class_='prediction-date')
         prediction_time = prediction_time.get_text().strip()
 
+
+        with mysql.sqlConnection.cursor() as cursor:
+            fname = name.split()[0]
+            lname = name.split()[1]
+            cursor.execute(config.sqlUpdateCrystalBall, (fname, lname, name, main_photo, pick, correct))
+        mysql.sqlConnection.commit()
+        cursor.close()
+
         # Now build the dictionary
         sub_dict = {'Name': name,
                     'Photo': main_photo,
@@ -112,7 +122,7 @@ def load_cb_to_list():
     print("Crystal Balls loaded into cb_list.")
 
 
-def move_cb_to_list_and_json(pages=6, json_dump=False):
+def move_cb_to_list_and_json(pages=15, json_dump=False):
     # Loops through pull_crystal_balls_from_pages() 'pages' times.
     # Dumps to JSON is json_dump == True
     print("*** Starting")

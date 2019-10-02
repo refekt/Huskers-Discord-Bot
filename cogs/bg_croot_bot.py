@@ -13,7 +13,7 @@ class BackgroundRefresh(commands.Cog, name="Background Refresh"):
     def cog_unload(self):
         self.bg_cb_refresh.stop()
 
-    @tasks.loop(hours=4)
+    @tasks.loop(hours=1)
     async def bg_cb_refresh(self):
         print("Starting background task for Crystal Ball refreshing...")
         await check_last_run()

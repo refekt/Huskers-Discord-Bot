@@ -27,7 +27,7 @@ client = commands.Bot(command_prefix=botPrefix)
 client.load_extension('cogs.image_commands')
 client.load_extension('cogs.text_commands')
 client.load_extension('cogs.croot_bot')
-client.load_extension('cogs.bg_croot_bot.py')
+client.load_extension('cogs.bg_croot_bot')
 client.load_extension('cogs.stat_bot')
 client.load_extension('cogs.sched_commands')
 client.load_extension('cogs.betting_commands')
@@ -379,7 +379,7 @@ async def on_reaction_add(reaction, user):
 
             if reaction.emoji in emoji_dict:
                 # cb = cogs.croot_bot.CrootBot
-                await cogs.croot_bot.parse_search(self=reaction, search=config.player_search_list[emoji_dict[reaction.emoji]], channel=channel)
+                await cogs.croot_bot.parse_search(search=config.player_search_list[emoji_dict[reaction.emoji]], channel=channel)
 
         # If a 247 highlight is found for a $CrootBot response and someone reacts to the video camera, call the function to parse through the recruits hudl page and grab a highlight video
         global highlight_url

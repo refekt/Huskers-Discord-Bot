@@ -6,10 +6,11 @@ import datetime
 import pandas
 import crystal_balls
 import os, sys, inspect
-import importlib
+# import importlib
 from bs4 import BeautifulSoup
 import re
 from discord.ext import commands
+import mysql
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parrentdir = os.path.dirname(currentdir)
@@ -55,11 +56,21 @@ except:
     print("Error opening team_ids.json")
 
 
+def last_run():
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlRetrieveCrystalBallLastRun)
+    mysql.sqlConnection.commit()
+    last_run = cursor.fetchone()
+    cursor.close()
+
+    return last_run
+
+
 # TODO Look at and revamp
 async def check_last_run():
     """ Check when the last time the JSON was pulled. """
     now = datetime.datetime.now()
-    temp_check = config.last_run
+    temp_check = last_run()
     check = pandas.to_datetime(temp_check) + datetime.timedelta(minutes=crystal_balls.CB_REFRESH_INTERVAL)
 
     print("***\nNow: {}\nTemp Check: {}\nCheck: {}\nNow > Check: {}\n***".format(now, temp_check, check, now > check))
@@ -67,28 +78,13 @@ async def check_last_run():
     if now > check:
         print("Last time the JSON was pulled exceeded threshold")
 
-        # if ctx: await ctx.send("The crystal ball database is stale. Updating now; standby...")
-
         crystal_balls.move_cb_to_list_and_json(json_dump=True)
 
-        f = open('config.py', 'r')
-        lines = f.readlines()
-        temp = ""
-        for l in lines:
-            if not "last_run" in l:
-                temp = temp + l
-        temp = temp + "last_run = \'{}\'\n".format(datetime.datetime.now())
-        f.close()
-
-        f = open("config.py", "w+")
-        f.write(temp)
-        f.close()
-
-        importlib.reload(config)
-
-        # if ctx: await ctx.send("The crystal ball database is fresh and ready to go! {} entries were collected.".format(len(crystal_balls.cb_list)))
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlUpdateCrystalLastRun, (datetime.datetime.now()))
+        mysql.sqlConnection.commit()
+        cursor.close()
     else:
-        # await ctx.send("The crystal ball database is already fresh.")
         if len(crystal_balls.cb_list) <= 1:
             crystal_balls.load_cb_to_list()
 
@@ -208,12 +204,12 @@ class CrootBot(commands.Cog, name="Croot Bot"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command(hidden=True, aliases=["cbr", ])
-    # @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
-    # @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    # async def cb_refresh(self, ctx):
-    #     """ Did HuskerBot act up? Use this only in emergencies. """
-    #     await self.check_last_run(ctx)
+    @commands.command(hidden=True, aliases=["cbr", ])
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def cb_refresh(self, ctx):
+        """ Did HuskerBot act up? Use this only in emergencies. """
+        await check_last_run()
 
     @commands.command(aliases=["rb", ])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
@@ -381,7 +377,6 @@ class CrootBot(commands.Cog, name="Croot Bot"):
             embed = discord.Embed(title="Search Results", description=embed_text, color=0xff0000)
             embed.set_author(name="HuskerBot CrootBot")
             embed.set_footer(text='Search Results ' + huskerbot_footer)
-            # await ctx.send(players_string)
             await ctx.send(embed=embed)
         else:
             channel = ctx.channel
