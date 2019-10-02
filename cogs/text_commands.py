@@ -66,7 +66,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
-        sentence = chain.make_short_sentence(min_chars=100, max_chars=500)
+        sentence = chain.make_short_sentence(min_chars=45, max_chars=500)
 
         if sentence is None:
             await edit_msg.edit(content="You broke me!")
