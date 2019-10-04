@@ -34,10 +34,12 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
     @commands.group()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def sub(self, ctx):
+        """Interacts with the r/Huskers subreddit"""
         pass
 
     @sub.command()
     async def recent(self, ctx, count=5):
+        """Outputs the most recent submissions on r/Huskers. Default is 5."""
         token_info = reddit_oath()
         headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
         response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
