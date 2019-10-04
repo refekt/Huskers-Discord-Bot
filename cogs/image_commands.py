@@ -55,7 +55,7 @@ flag_dict = {
     'minnesota': 'https://i.imgur.com/54mF0sK.jpg',
     'nebraska': 'https://i.imgur.com/q2em9Qw.jpg',
     'northern_illinois': 'https://i.imgur.com/HpmAoIh.jpg',
-    'northwestern': 'https://i.imgur.com/WG4kFP6.jpg',
+    'northwestern': 'https://i.imgur.com/Vzk3wdG.jpg',
     'notredame': 'https://i.imgur.com/Ofoaz7U.png',
     'ohio_state': 'https://i.imgur.com/8QwoYgm.jpg',
     'penn_state': 'https://i.imgur.com/JkQuMXf.jpg',
