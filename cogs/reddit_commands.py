@@ -1,8 +1,8 @@
-import praw
-import discord
 from discord.ext import commands
 import mysql
 import config
+import requests
+import requests.auth
 
 globalRate = 3
 globalPer = 30
@@ -17,51 +17,24 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
 
     @sub.command()
     async def recent(self, ctx):
-        edit_msg = await ctx.send("Loading...")
-
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlRetrieveRedditInfo)
-            reddit_info = cursor.fetchone()
+            reddit_info = cursor.fetchall()
         mysql.sqlConnection.commit()
         cursor.close()
 
-        reddit = praw.Reddit(
-            client_id=reddit_info["client_id"],
-            client_secret=reddit_info["client_secret"],
-            user_agent=reddit_info["user_agent"],
-            username=reddit_info["username"],
-            password=reddit_info["password"]
-        )
+        client_auth = requests.auth.HTTPBasicAuth(reddit_info[0]["client_id"], reddit_info[0]["client_secret"])
+        post_data = {"grant_type": "password", "username": reddit_info[0]["username"], "password": reddit_info[0]["password"]}
+        user_agent = "Frosty by refekt"
+        headers = {"User-Agent": user_agent}
 
-        subreddit = reddit.subreddit("huskers")
-        posts = []
+        response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
+        token_info = response.json()
 
-        limit = 99
-        for index, submissions in enumerate(subreddit.stream.submissions()):
-            posts.append([submissions.author, submissions.title, submissions.permalink, submissions.ups, submissions.downs, submissions.thumbnail])
-            if index == limit:
-                break
+        headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
+        response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
 
-        posts.reverse()
-
-        await edit_msg.delete()
-
-        limit = 4
-        for index, post in enumerate(posts):
-            url_profile = "https://reddit.com/u/{}".format(post[0])
-            url_permalink = "https://reddit.com{}".format(post[2])
-
-            embed = discord.Embed(title="{}".format(post[1]), color=0xFF0000)
-            if post[5] == "self":
-                embed.set_thumbnail(url="https://i.imgur.com/aaqkw35.png")
-            else:
-                embed.set_thumbnail(url=post[5])
-            embed.add_field(name="{} ⬆ {} ⬇".format(post[3], post[4]), inline=False, value="Permalink: [Click]({})\nAuthor: [/u/{}]({})\n".format(url_permalink, post[0], url_profile))
-
-            await ctx.send(embed=embed)
-
-            if index == limit:
-                break
+        print(response.json())
 
 
 def setup(bot):

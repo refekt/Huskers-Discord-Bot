@@ -87,12 +87,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         load_season_bets()
         create_embed()
 
-        if ctx.subcommand_passed:
-            return
-
         global embed
         global raw_username
         raw_username = "{}".format(ctx.author)
+
+        if ctx.subcommand_passed:
+            return
 
         # Outputs the betting message to allow the user to see the upcoming opponent and voting reactions.
         url = "https://api.collegefootballdata.com/lines?year={}&week={}&seasonType=regular&team=nebraska".format(config.current_game[1].year, config.current_game[2])
@@ -328,7 +328,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             # Retrieve the user's bet
             with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveBet, (raw_username))
+                cursor.execute(config.sqlRetrieveBet, raw_username)
                 userBetsDict = cursor.fetchall()
             mysql.sqlConnection.commit()
 
