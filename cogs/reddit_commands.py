@@ -29,7 +29,7 @@ def reddit_oauth():
     return token_info
 
 
-def recent_posts(count):
+def recent_posts():
     token_info = reddit_oauth()
     headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
     response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
@@ -58,7 +58,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
     @reddit.command()
     async def recent(self, ctx, count=3):
         """Outputs the most recent submissions on r/Huskers. Default is 5."""
-        posts = recent_posts(count)
+        posts = recent_posts()
 
         for index, post in enumerate(posts["data"]["children"]):
             if index == count:
@@ -79,7 +79,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts(100)
+        posts = recent_posts()
 
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
@@ -100,7 +100,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts(100)
+        posts = recent_posts()
 
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
