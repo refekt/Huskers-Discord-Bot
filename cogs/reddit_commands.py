@@ -12,7 +12,7 @@ max_posts = 5
 user_agent = "Frosty by refekt"
 
 
-def reddit_oath():
+def reddit_oauth():
     with mysql.sqlConnection.cursor() as cursor:
         cursor.execute(config.sqlRetrieveRedditInfo)
         reddit_info = cursor.fetchall()
@@ -30,7 +30,7 @@ def reddit_oath():
 
 
 def recent_posts(count):
-    token_info = reddit_oath()
+    token_info = reddit_oauth()
     headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
     response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
     posts = response.json()
