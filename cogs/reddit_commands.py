@@ -10,6 +10,7 @@ globalPer = 30
 max_posts = 5
 
 user_agent = "Frosty by refekt"
+reddit_error_message = "An error occurred retrieving posts from reddit!"
 
 
 def reddit_oauth():
@@ -29,10 +30,18 @@ def reddit_oauth():
     return token_info
 
 
-def recent_posts():
+def check_if_error(arg):
+    try:
+        if arg["error"] == 400:
+            return True
+    except:
+        return False
+
+
+def recent_posts(count=25):
     token_info = reddit_oauth()
     headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
-    response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
+    response = requests.get("https://oauth.reddit.com/r/huskers/new?limit={}".format(count), headers=headers)
     posts = response.json()
 
     return posts
@@ -57,8 +66,11 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
 
     @reddit.command()
     async def recent(self, ctx, count=3):
-        """Outputs the most recent submissions on r/Huskers. Default is 5."""
-        posts = recent_posts()
+        """Outputs the most recent submissions on r/Huskers. Default is 3."""
+        posts = recent_posts(count)
+        if check_if_error(posts):
+            await ctx.send(reddit_error_message)
+            return
 
         for index, post in enumerate(posts["data"]["children"]):
             if index == count:
@@ -75,11 +87,15 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
 
     @reddit.command()
     async def gameday(self, ctx):
+        """Outputs the most recent game day thread on r/Huskers."""
         thread_titles = ("pregame thread -", "game thread -")
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts()
+        posts = recent_posts(100)
+        if check_if_error(posts):
+            await ctx.send(reddit_error_message)
+            return
 
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
@@ -96,11 +112,15 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
 
     @reddit.command()
     async def postgame(self, ctx):
+        """Outputs the most recent postt game day thread on r/Huskers."""
         thread_titles = "post game thread -"
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts()
+        posts = recent_posts(100)
+        if check_if_error(posts):
+            await ctx.send(reddit_error_message)
+            return
 
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
