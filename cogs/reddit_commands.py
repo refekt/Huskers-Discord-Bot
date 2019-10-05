@@ -4,7 +4,6 @@ import mysql
 import config
 import requests
 import requests.auth
-import json
 
 globalRate = 3
 globalPer = 30
@@ -30,47 +29,91 @@ def reddit_oath():
     return token_info
 
 
+def recent_posts(count):
+    token_info = reddit_oath()
+    headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
+    response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
+    posts = response.json()
+
+    return posts
+
+
+def build_post_info(arg):
+    if arg["data"]["thumbnail"] == "self":
+        post_thumbnail = "https://i.imgur.com/Ah3x5NA.png"
+    else:
+        post_thumbnail = arg["data"]["thumbnail"]
+    post_info = dict(title=arg["data"]["title"], author=arg["data"]["author"], ups=arg["data"]["ups"], downs=arg["data"]["downs"], permalink=arg["data"]["permalink"], thumbnail=post_thumbnail)
+
+    return post_info
+
+
 class RedditCommands(commands.Cog, name="Reddit Commands"):
     @commands.group()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def sub(self, ctx):
+    async def reddit(self, ctx):
         """Interacts with the r/Huskers subreddit"""
         pass
 
-    @sub.command()
-    async def recent(self, ctx, count=5):
+    @reddit.command()
+    async def recent(self, ctx, count=3):
         """Outputs the most recent submissions on r/Huskers. Default is 5."""
-        token_info = reddit_oath()
-        headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
-        response = requests.get("https://oauth.reddit.com/r/huskers/new", headers=headers)
-        posts = response.json()
-
-        dump = False
-        if dump:
-            with open("huskers_sub.json", "w") as fp:
-                json.dump(posts, fp, sort_keys=True, indent=4)
-            fp.close()
+        posts = recent_posts(count)
 
         for index, post in enumerate(posts["data"]["children"]):
             if index == count:
                 break
 
-            post_title = post["data"]["title"]
-            post_author = post["data"]["author"]
-            post_ups = post["data"]["ups"]
-            post_downs = post["data"]["downs"]
-            post_permalink = "https://reddit.com{}".format(post["data"]["permalink"])
-            if post["data"]["thumbnail"] == "self":
-                post_thumbnail = "https://i.imgur.com/Ah3x5NA.png"
-            else:
-                post_thumbnail = post["data"]["thumbnail"]
+            post_info = build_post_info(post)
 
-            embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_ups, post_downs, post_title), color=0xFF0000)
-            embed.set_thumbnail(url=post_thumbnail)
-            embed.add_field(name="Author", value="[/u/{}]({})".format(post_author, "https://reddit.com/u/{}".format(post_author)))
-            embed.add_field(name="Permalink", value="{}".format(post_permalink))
+            embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
+            embed.set_thumbnail(url=post_info["thumbnail"])
+            embed.add_field(name="Author", value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
+            embed.add_field(name="Permalink", value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
 
             await ctx.send(embed=embed)
+
+    @reddit.command()
+    async def gameday(self, ctx):
+        thread_titles = ("pregame thread -", "game thread -")
+
+        edit_msg = await ctx.send("Loading...")
+
+        posts = recent_posts(100)
+
+        for index, post in enumerate(posts["data"]["children"]):
+            post_info = build_post_info(post)
+            if post_info["title"].lower().startswith(thread_titles[0]) or post_info["title"].lower().startswith(thread_titles[1]):
+                embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
+                embed.set_thumbnail(url=post_info["thumbnail"])
+                embed.add_field(name="Author", value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
+                embed.add_field(name="Permalink", value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
+
+                await edit_msg.edit(content="", embed=embed)
+                return
+
+        await edit_msg.edit(content="No game day threads found!")
+
+    @reddit.command()
+    async def postgame(self, ctx):
+        thread_titles = "post game thread -"
+
+        edit_msg = await ctx.send("Loading...")
+
+        posts = recent_posts(100)
+
+        for index, post in enumerate(posts["data"]["children"]):
+            post_info = build_post_info(post)
+            if post_info["title"].lower().startswith(thread_titles):
+                embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
+                embed.set_thumbnail(url=post_info["thumbnail"])
+                embed.add_field(name="Author", value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
+                embed.add_field(name="Permalink", value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
+
+                await edit_msg.edit(content="", embed=embed)
+                return
+
+        await edit_msg.edit(content="No post game threads found!")
 
 
 def setup(bot):
