@@ -8,6 +8,8 @@ import requests.auth
 globalRate = 3
 globalPer = 30
 max_posts = 5
+reddit_footer = "/r/Huskers Post created by Bot Frost"
+reddit_reactions = ("⬆", "⬇", "⭐")
 
 user_agent = "Frosty by refekt"
 reddit_error_message = "An error occurred retrieving posts from reddit!"
@@ -52,9 +54,32 @@ def build_post_info(arg):
         post_thumbnail = "https://i.imgur.com/Ah3x5NA.png"
     else:
         post_thumbnail = arg["data"]["thumbnail"]
-    post_info = dict(title=arg["data"]["title"], author=arg["data"]["author"], ups=arg["data"]["ups"], downs=arg["data"]["downs"], permalink=arg["data"]["permalink"], thumbnail=post_thumbnail)
+    post_info = dict(
+        title=arg["data"]["title"],
+        author=arg["data"]["author"],
+        ups=arg["data"]["ups"],
+        downs=arg["data"]["downs"],
+        permalink=arg["data"]["permalink"],
+        thumbnail=post_thumbnail,
+        num_comments=arg["data"]["num_comments"]
+    )
 
     return post_info
+
+
+async def add_reactions(message: discord.Message, reactions):
+    for reaction in reactions:
+        await message.add_reaction(reaction)
+
+
+def build_embed(post_info):
+    embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
+    embed.set_thumbnail(url=post_info["thumbnail"])
+    embed.set_footer(text=reddit_footer)
+    embed.add_field(name="Author", inline=True, value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
+    embed.add_field(name="Permalink", inline=True, value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
+    embed.add_field(name="Comments", inline=True, value=post_info["num_comments"])
+    return embed
 
 
 class RedditCommands(commands.Cog, name="Reddit Commands"):
@@ -77,13 +102,10 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
                 break
 
             post_info = build_post_info(post)
+            embed = build_embed(post_info)
 
-            embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
-            embed.set_thumbnail(url=post_info["thumbnail"])
-            embed.add_field(name="Author", value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
-            embed.add_field(name="Permalink", value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
-
-            await ctx.send(embed=embed)
+            msg = await ctx.send(embed=embed)
+            await add_reactions(message=msg, reactions=reddit_reactions)
 
     @reddit.command()
     async def gameday(self, ctx):
@@ -100,15 +122,12 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
             if post_info["title"].lower().startswith(thread_titles[0]) or post_info["title"].lower().startswith(thread_titles[1]):
-                embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
-                embed.set_thumbnail(url=post_info["thumbnail"])
-                embed.add_field(name="Author", value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
-                embed.add_field(name="Permalink", value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
-
+                embed = build_embed(post_info)
                 await edit_msg.edit(content="", embed=embed)
                 return
 
         await edit_msg.edit(content="No game day threads found!")
+        await add_reactions(message=edit_msg, reactions=reddit_reactions)
 
     @reddit.command()
     async def postgame(self, ctx):
@@ -125,15 +144,12 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
             if post_info["title"].lower().startswith(thread_titles):
-                embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
-                embed.set_thumbnail(url=post_info["thumbnail"])
-                embed.add_field(name="Author", value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
-                embed.add_field(name="Permalink", value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
-
+                embed = build_embed(post_info)
                 await edit_msg.edit(content="", embed=embed)
                 return
 
         await edit_msg.edit(content="No post game threads found!")
+        await add_reactions(message=edit_msg, reactions=reddit_reactions)
 
 
 def setup(bot):
