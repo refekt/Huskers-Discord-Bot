@@ -8,8 +8,8 @@ import requests.auth
 globalRate = 3
 globalPer = 30
 max_posts = 5
-reddit_footer = "/r/Huskers Post created by Bot Frost"
-reddit_reactions = ("⬆", "⬇", "⭐")
+reddit_footer = "/r/Huskers Post created by Bot Frost | ID: "
+reddit_reactions = ("⬆", "⬇")
 
 user_agent = "Frosty by refekt"
 reddit_error_message = "An error occurred retrieving posts from reddit!"
@@ -26,8 +26,16 @@ def reddit_oauth():
     post_data = {"grant_type": "password", "username": reddit_info[0]["username"], "password": reddit_info[0]["password"]}
     headers = {"User-Agent": user_agent}
 
-    response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
-    token_info = response.json()
+    access_token_response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
+    token_info = access_token_response.json()
+
+    me_response = requests.get(url="https://www.reddit.com/api/v1/me.json", auth=client_auth, headers=headers)
+    me_info = me_response.json()
+
+    try:
+        print(me_info["modhash"])
+    except:
+        pass
 
     return token_info
 
@@ -49,6 +57,13 @@ def recent_posts(count=25):
     return posts
 
 
+def vote_post(vote: str, id: str):
+    token_info = reddit_oauth()
+    headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
+    url = "https://oauth.reddit.com/api/vote?dir={}&id={}&rank=2".format(vote, id)
+    response = requests.post(url=url, headers=headers)
+
+
 def build_post_info(arg):
     if arg["data"]["thumbnail"] == "self":
         post_thumbnail = "https://i.imgur.com/Ah3x5NA.png"
@@ -61,7 +76,8 @@ def build_post_info(arg):
         downs=arg["data"]["downs"],
         permalink=arg["data"]["permalink"],
         thumbnail=post_thumbnail,
-        num_comments=arg["data"]["num_comments"]
+        num_comments=arg["data"]["num_comments"],
+        name=arg["data"]["name"]
     )
 
     return post_info
@@ -75,7 +91,7 @@ async def add_reactions(message: discord.Message, reactions):
 def build_embed(post_info):
     embed = discord.Embed(title="⬆ {} ⬇ {} - {}".format(post_info["ups"], post_info["downs"], post_info["title"]), color=0xFF0000)
     embed.set_thumbnail(url=post_info["thumbnail"])
-    embed.set_footer(text=reddit_footer)
+    embed.set_footer(text="{}{}".format(reddit_footer, post_info["name"]))
     embed.add_field(name="Author", inline=True, value="[/u/{}]({})".format(post_info["author"], "https://reddit.com/u/{}".format(post_info["author"])))
     embed.add_field(name="Permalink", inline=True, value="[{}](https://reddit.com{})".format(post_info["permalink"], post_info["permalink"]))
     embed.add_field(name="Comments", inline=True, value=post_info["num_comments"])

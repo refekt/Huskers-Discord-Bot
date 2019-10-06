@@ -1,17 +1,16 @@
 #!/usr/bin/env python3.7
 import discord
+import requests
 from discord.ext import commands
 from discord.utils import get
-import requests
 from bs4 import BeautifulSoup
+from cogs.betting_commands import store_next_opponent
+from cogs.reddit_commands import reddit_footer, reddit_reactions, vote_post
 import sys
-import random
 import config
-# import function_helper
+import random
 import re
 import cogs.croot_bot
-from cogs.betting_commands import store_next_opponent
-# from cogs.betting_commands import *
 import datetime
 import json
 import hashlib
@@ -27,7 +26,7 @@ client = commands.Bot(command_prefix=botPrefix)
 client.load_extension('cogs.image_commands')
 client.load_extension('cogs.text_commands')
 client.load_extension('cogs.croot_bot')
-client.load_extension('cogs.bg_croot_bot')
+# client.load_extension('cogs.bg_croot_bot')
 client.load_extension('cogs.stat_bot')
 client.load_extension('cogs.sched_commands')
 client.load_extension('cogs.betting_commands')
@@ -345,17 +344,24 @@ async def on_raw_reaction_add(payload):
 
                     await user.send(embed=embed)
                     break
+        # reddit_commands
+        elif emoji in reddit_reactions and user != client.user and message.embeds[0].footer.text.startswith(reddit_footer):
+            if emoji == "⬆":
+                vote_post("1", message.embeds[0].footer.text.split("ID: ")[1].strip())
 
-            try:
-                for reaction in message.reactions:
-                    if emoji == reaction.emoji:
-                        await reaction.remove(user)
-            except discord.Forbidden as forb:
-                print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
-            except discord.HTTPException as err:
-                print("Error removing reaction from {}: {}".format(user, err))
-            except:
-                print("I don't know why we can't remove {}'s reaction.".format(user))
+            elif emoji == "⬇":
+                vote_post("-1", message.embeds[0].footer.text.split("ID: ")[1].strip())
+
+        try:
+            for reaction in message.reactions:
+                if emoji == reaction.emoji:
+                    await reaction.remove(user)
+        except discord.Forbidden as forb:
+            print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
+        except discord.HTTPException as err:
+            print("Error removing reaction from {}: {}".format(user, err))
+        except:
+            print("I don't know why we can't remove {}'s reaction.".format(user))
 
 
 @client.event
