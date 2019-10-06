@@ -15,7 +15,6 @@ globalPer = 60
 embed = None
 
 
-# Load season bets
 def load_season_bets():
     f = open('season_bets.json', 'r')
     temp_json = f.read()
@@ -23,7 +22,6 @@ def load_season_bets():
     f.close()
 
 
-# Allows the ability to load next opponent for sub commands.
 def store_next_opponent():
     # Open previously generated JSON from $schedule.
     # To refresh change dump = True manually
@@ -65,7 +63,6 @@ def game_number(team):
 
 
 def create_embed():
-    # Creates the embed object for all messages within method
     global embed
     embed = discord.Embed(title="Husker Game Betting", description="How do you think the Huskers will do in their next game? Place your bets below!", color=0xff0000)
     embed.set_thumbnail(url="https://i.imgur.com/THeNvJm.jpg")
@@ -124,6 +121,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if lines:
             embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
             embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
+
+            # TODO Verify that this works when Nebraska is not favored. Spread is stored as a negative value when favored and a positive value when favored
+            with mysql.sqlConnection.cursor() as cursor:
+                cursor.execute(config.sqlUpdateLineInfo, (config.current_game[2], lines[0]["spread"], lines[0]["overUnder"], lines[0]["spread"], lines[0]["overUnder"]))
+            mysql.sqlConnection.commit()
+            cursor.close()
         else:
             embed.add_field(name="Spread (TBD)", value="TBD")
             embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
@@ -253,9 +256,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         winners_spread = flattenList(winners_spread)
         winners_moneyline = flattenList(winners_moneyline)
 
-        embed.add_field(name="Win or Lose Winners", value=winners_winorlose)
-        embed.add_field(name="Spread Winners", value=winners_spread)
-        embed.add_field(name="Total Points Winners", value=winners_moneyline)
+        embed.add_field(name="Win or Lose Winners", inline=True, value=winners_winorlose)
+        embed.add_field(name="Spread Winners", inline=True, value=winners_spread)
+        embed.add_field(name="Total Points Winners", inline=True, value=winners_moneyline)
 
         await ctx.send(embed=embed)
 
@@ -397,8 +400,15 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if lines:
             for line in lines:
                 if line["provider"] == "Bovada":
+
                     embed.add_field(name="Spread ({})".format(line["provider"]), value="{}".format(line["formattedSpread"]), inline=False)
                     embed.add_field(name="Total Points/Over Under ({})".format(line["provider"]), value="{}".format(line["overUnder"]), inline=False)
+                    # TODO Verify that this works when Nebraska is not favored. Spread is stored as a negative value when favored and a positive value when favored
+                    with mysql.sqlConnection.cursor() as cursor:
+                        cursor.execute(config.sqlUpdateLineInfo, (gameNumber, line["spread"], line["overUnder"], line["spread"], line["overUnder"]))
+                    mysql.sqlConnection.commit()
+                    cursor.close()
+
                     break
         else:
             embed.add_field(name="Spread", value="TBD")
@@ -414,18 +424,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlUpdateScores, (gameNumber, score, oppo_score, score, oppo_score))
         mysql.sqlConnection.commit()
-
-        await ctx.send("Update complete!")
-
-    @bet.command(hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336) # 443805741111836693
-    async def tally(self, ctx, *, team):
-        gameNumber = game_number(team.lower())
+        cursor.close()
 
         with mysql.sqlConnection.cursor() as cursor:
-            cursor.execute(config.sqlRetrieveGameInfo, (gameNumber))
+            cursor.execute(config.sqlRetrieveGameInfo, gameNumber)
             game_info = cursor.fetchone()
         mysql.sqlConnection.commit()
+        cursor.close()
 
         result_winorlose = bool(
             int(game_info["score"]) > int(game_info["opponent_score"])
@@ -452,11 +457,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         )
 
         with mysql.sqlConnection.cursor() as cursor:
-            cursor.execute(config.sqlUpdateAllBetCategories, (gameNumber, result_winorlose, result_spread, result_moneyline, result_winorlose, result_spread, result_moneyline))
+            cursor.execute(config.sqlUpdateAllBetCategories, (gameNumber, True, result_winorlose, result_spread, result_moneyline, True, result_winorlose, result_spread, result_moneyline))
             game_info = cursor.fetchone()
         mysql.sqlConnection.commit()
 
-        await ctx.send("Updated! The results are:\nWin: {}\nSpread: {}\nTotal Points:{}".format(result_winorlose, result_spread, result_moneyline))
+        await ctx.send("Updated! The results are:\nNebraska: {}\nOpponent: {}\nWin: {}\nSpread: {}\nTotal Points:{}".format(score, oppo_score, result_winorlose, result_spread, result_moneyline))
 
 
 def setup(bot):

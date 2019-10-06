@@ -321,9 +321,9 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
         # This keeps bot spam down to a minimal.
         # await function_helper.check_command_channel(ctx.command, ctx.channel)
-        # if not function_helper.correct_channel:
-        #     await ctx.send(wrong_channel_text)
-        #     return
+        #         # if not function_helper.correct_channel:
+        #         #     await ctx.send(wrong_channel_text)
+        #         #     return
 
         if len(name) == 2:
             url = 'https://247sports.com/Season/{}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={}&Player.LastName={}'.format(year, name[0], name[1])
