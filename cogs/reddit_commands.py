@@ -61,7 +61,7 @@ def vote_post(vote: str, id: str):
     token_info = reddit_oauth()
     headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
     url = "https://oauth.reddit.com/api/vote?dir={}&id={}&rank=2".format(vote, id)
-    response = requests.post(url=url, headers=headers)
+    requests.post(url=url, headers=headers)
 
 
 def build_post_info(arg):
@@ -121,7 +121,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
             embed = build_embed(post_info)
 
             msg = await ctx.send(embed=embed)
-            await add_reactions(message=msg, reactions=reddit_reactions)
+            # await add_reactions(message=msg, reactions=reddit_reactions)
 
     @reddit.command()
     async def gameday(self, ctx):
@@ -143,7 +143,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
                 return
 
         await edit_msg.edit(content="No game day threads found!")
-        await add_reactions(message=edit_msg, reactions=reddit_reactions)
+        # await add_reactions(message=edit_msg, reactions=reddit_reactions)
 
     @reddit.command()
     async def postgame(self, ctx):
@@ -165,7 +165,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
                 return
 
         await edit_msg.edit(content="No post game threads found!")
-        await add_reactions(message=edit_msg, reactions=reddit_reactions)
+        # await add_reactions(message=edit_msg, reactions=reddit_reactions)
 
 
 def setup(bot):
