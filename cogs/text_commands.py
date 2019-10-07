@@ -254,7 +254,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             embed.add_field(name="Temperature", value="{} F".format(weather_dict["data"][0]["temp"]))
             embed.add_field(name="Cloud Coverage", value="{}%".format(weather_dict["data"][0]["clouds"]))
             embed.add_field(name="Wind Speed", value="{} MPH / {}".format(weather_dict["data"][0]["wind_spd"], weather_dict["data"][0]["wind_cdir"]))
-            embed.add_field(name="Snow Chance", value="{:.2f}%".format(weather_dict["data"][0]["snow"]*100))
+            embed.add_field(name="Snow Chance", value="{:.2f}%".format(weather_dict["data"][0]["snow"]))
             embed.add_field(name="Precipitation Chance", value="{:.2f}%".format(weather_dict["data"][0]["precip"]*100))
         elif which == "forecast":
             r = requests.get(url="https://api.weatherbit.io/v2.0/forecast/daily?key={}&lang=en&units=I&lat={}&lon={}&days=7".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
@@ -278,7 +278,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
                     embed.add_field(name="Temperature", value="{} F".format(days["temp"]))
                     embed.add_field(name="Cloud Coverage", value="{}%".format(days["clouds"]))
                     embed.add_field(name="Wind Speed", value="{} MPH / {}".format(days["wind_spd"], days["wind_cdir"]))
-                    embed.add_field(name="Snow Chance", value="{:.2f}%".format(days["snow"] * 100))
+                    embed.add_field(name="Snow Chance", value="{:.2f}%".format(days["snow"]))
                     embed.add_field(name="Precipitation Chance", value="{:.2f}%".format(days["precip"] * 100))
         else:
             await ctx.send("`Current` and `forecast` are the only options for `$weather`. Please try again.")
