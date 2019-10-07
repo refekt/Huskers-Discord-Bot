@@ -167,6 +167,28 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
         await edit_msg.edit(content="No post game threads found!")
         # await add_reactions(message=edit_msg, reactions=reddit_reactions)
 
+    @reddit.command()
+    async def weekly(self, ctx):
+        """Outputs the current weekly game discussion on r/Huskers."""
+        thread_titles = "weekly discussion thread -"
+
+        edit_msg = await ctx.send("Loading...")
+
+        posts = recent_posts(100)
+        if check_if_error(posts):
+            await ctx.send(reddit_error_message)
+            return
+
+        for index, post in enumerate(posts["data"]["children"]):
+            post_info = build_post_info(post)
+            if post_info["title"].lower().startswith(thread_titles):
+                embed = build_embed(post_info)
+                await edit_msg.edit(content="", embed=embed)
+                return
+
+        await edit_msg.edit(content="No post game threads found!")
+        # await add_reactions(message=edit_msg, reactions=reddit_reactions)
+
 
 def setup(bot):
     bot.add_cog(RedditCommands(bot))
