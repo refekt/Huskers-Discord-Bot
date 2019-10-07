@@ -220,7 +220,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def strut(self, ctx):
         """ Martinez struttin his stuff """
-        await ctx.send(embed= await sendImage("Dat Strut", "https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif"))
+        await ctx.send(embed=await sendImage("Dat Strut", "https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif"))
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
@@ -238,13 +238,19 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def guzzle(self, ctx):
         """ Let the cup runeth over """
-        await ctx.send(embed= await sendImage("Give it to me bb", "https://i.imgur.com/OW7rChr.gif"))
+        await ctx.send(embed=await sendImage("Give it to me bb", "https://i.imgur.com/OW7rChr.gif"))
 
     @commands.command(aliases=["td",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def touchdown(self, ctx):
         """ Let the cup runeth over """
-        await ctx.send(embed= await sendImage("🏈🎈🏈🎈", "https://i.imgur.com/Wh4aLYo.gif"))
+        await ctx.send(embed=await sendImage("🏈🎈🏈🎈", "https://i.imgur.com/Wh4aLYo.gif"))
+        
+    @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def yeet(self, ctx):
+        """BIG BOY PARTY"""
+        await ctx.send(embed=await sendImage("BIG BOY PARTY", "https://i.imgur.com/3sshtBD.gif"))
 
     @commands.command(aliases=["ref",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
