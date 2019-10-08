@@ -120,7 +120,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         tz_target = pytz.timezone("CST6CDT")
         game_dt_cst = game_dt_utc.astimezone(tz_target)
 
-        embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0],game_dt_cst.strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
+        embed.add_field(name="Opponent", value="{}\n{}".format(config.current_game[0], game_dt_cst.strftime("%B %d, %Y at %H:%M %p CST")), inline=False)
         embed.add_field(name="Rules", value="1. All bets must be placed prior to kick off.\n2. The final odds are used for scoring purposes.\n3. Only one bet per user per game.\n4. Bets are stored by __Discord__ username.")
         embed.add_field(name="Scoring", value="1 Point : winning or losing the game.\n2 Points: covering or not covering the spread and total points.", inline=False)
         embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
@@ -140,7 +140,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.add_field(name="Spread (TBD)", value="TBD")
             embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
 
-        embed.add_field(name="Vote Instructions", value="Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\nBets over (⏫) or under (⏬) on the spread. Clear bet (❌).\nBets over (🔼) or under (🔽) on total points. Clear bet (✖).\n", inline=False)
+        embed.add_field(name="Vote Instructions", value=
+        "Bets winning (⬆) or losing (⬇) the game. Clear bet (❎).\n"
+        "Bets Nebraska covers (⏫) or doesn't cover (⏬) the spread. Clear bet (❌).\n"
+        "Bets over (🔼) or under (🔽) on total points. Clear bet (✖).\n", inline=False)
 
         # Store message sent in an object to allow for reactions afterwards
         check_now_raw = datetime.datetime.now()
@@ -154,7 +157,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             print("Reactions not applied because datetime is after kickoff.")
 
-    @bet.command(aliases=["a",])
+    @bet.command(aliases=["a", ])
     async def all(self, ctx, *, team=None):
         """Show all the bets for the current or provided opponent."""
         global embed
@@ -230,7 +233,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         await ctx.send(embed=embed)
 
-    @bet.command(aliases=["win", "w",])
+    @bet.command(aliases=["win", "w", ])
     async def winners(self, ctx, *, team):
         """Show the winners for the current or provided opponent."""
         if not team:
@@ -271,7 +274,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         await ctx.send(embed=embed)
 
-    @bet.command(aliases=["lb",])
+    @bet.command(aliases=["lb", ])
     async def leaderboard(self, ctx):
         """Shows the leaderboard for the season."""
         global embed
@@ -298,7 +301,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         embed.add_field(name="Top 10 Average Points Ranking", value=strAdjustedLeader)
         await ctx.send(embed=embed)
 
-    @bet.command(aliases=["s",])
+    @bet.command(aliases=["s", ])
     async def show(self, ctx, *, team=None):
         """Shows the current or provided opponent placed bet(s)."""
         userBetWin = "N/A"
@@ -380,7 +383,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         embed.add_field(name="Time Placed", value=lastUpdate)
         await ctx.send(embed=embed)
 
-    @bet.command(aliases=["line", "l",])
+    @bet.command(aliases=["line", "l", ])
     async def lines(self, ctx, *, team=None):
         """Shows the current or provided opponent lines."""
         global embed
