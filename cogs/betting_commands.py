@@ -69,6 +69,13 @@ def create_embed():
     embed.set_footer(text=config.bet_footer)
 
 
+def update_db_lines(line, gameNumber, spread):
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlUpdateLineInfo, (gameNumber, line["spread"], line["overUnder"], spread, line["overUnder"]))
+    mysql.sqlConnection.commit()
+    cursor.close()
+
+
 class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.group()
     # @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
@@ -122,11 +129,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
             embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
 
-            # TODO Verify that this works when Nebraska is not favored. Spread is stored as a negative value when favored and a positive value when favored
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlUpdateLineInfo, (config.current_game[2], lines[0]["spread"], lines[0]["overUnder"], lines[0]["spread"], lines[0]["overUnder"]))
-            mysql.sqlConnection.commit()
-            cursor.close()
+            if lines[0]["formattedSpread"].startswith("Nebraska"):
+                update_db_lines(lines[0], config.current_game[2], lines[0]["spread"])
+            else:
+                update_db_lines(lines[0], config.current_game[2], abs(lines[0]["spread"]))
         else:
             embed.add_field(name="Spread (TBD)", value="TBD")
             embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
@@ -403,12 +409,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                     embed.add_field(name="Spread ({})".format(line["provider"]), value="{}".format(line["formattedSpread"]), inline=False)
                     embed.add_field(name="Total Points/Over Under ({})".format(line["provider"]), value="{}".format(line["overUnder"]), inline=False)
-                    # TODO Verify that this works when Nebraska is not favored. Spread is stored as a negative value when favored and a positive value when favored
-                    with mysql.sqlConnection.cursor() as cursor:
-                        cursor.execute(config.sqlUpdateLineInfo, (gameNumber, line["spread"], line["overUnder"], line["spread"], line["overUnder"]))
-                    mysql.sqlConnection.commit()
-                    cursor.close()
 
+                    if line["formattedSpread"].startswith("Nebraska"):
+                        update_db_lines(line, gameNumber, line["spread"])
+                    else:
+                        update_db_lines(line, gameNumber, abs(line["spread"]))
                     break
         else:
             embed.add_field(name="Spread", value="TBD")

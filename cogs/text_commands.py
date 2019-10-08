@@ -238,12 +238,6 @@ class TextCommands(commands.Cog, name="Text Commands"):
         r = requests.get(url="https://api.weatherbit.io/v2.0/current?key={}&lang=en&units=I&lat={}&lon={}".format("39b7915267f04d5f88fa5fe6be6290e6", coords["x"], coords["y"]))
         weather_dict = r.json()
 
-        # dump = True
-        # if dump:
-        #     with open("weather_json.json", "w") as fp:
-        #         json.dump(weather_dict, fp, sort_keys=True, indent=4)
-        #     fp.close()
-
         embed = discord.Embed(
             title="Weather Forecast for __[{}]__ in __[{}, {}]__".format(venueName, weather_dict["data"][0]["city_name"], weather_dict["data"][0]["state_code"]),
             color=0xFF0000,
