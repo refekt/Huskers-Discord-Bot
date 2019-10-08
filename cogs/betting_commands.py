@@ -325,9 +325,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 userBetWin = "Lose"
 
             if checkUserBet["spread"] == 1:
-                userBetSpread = "Over"
+                userBetSpread = "Nebraska covers the spread"
             elif checkUserBet["spread"] == 0:
-                userBetSpread = "Under"
+                userBetSpread = "Nebraska doesn't cover the spread"
 
             if checkUserBet["moneyline"] == 1:
                 userBetMoneyline = "Over"
