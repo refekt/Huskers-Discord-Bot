@@ -310,6 +310,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         global raw_username
         global embed
 
+        messages = ("Win the game", "Lose the game", "Nebraska covers the spread", "Nebraska does not cover the spread", "The total points go over", "The total points go under")
+
         if team:
             gameNumber = game_number(team.lower())
 
@@ -320,19 +322,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             mysql.sqlConnection.commit()
 
             if checkUserBet["win"] == 1:
-                userBetWin = "Win"
+                userBetWin = messages[0]
             elif checkUserBet["win"] == 0:
-                userBetWin = "Lose"
+                userBetWin = messages[1]
 
             if checkUserBet["spread"] == 1:
-                userBetSpread = "Nebraska covers the spread"
+                userBetSpread = messages[2]
             elif checkUserBet["spread"] == 0:
-                userBetSpread = "Nebraska doesn't cover the spread"
+                userBetSpread = messages[3]
 
             if checkUserBet["moneyline"] == 1:
-                userBetMoneyline = "Over"
+                userBetMoneyline = messages[4]
             elif checkUserBet["moneyline"] == 0:
-                userBetMoneyline = "Under"
+                userBetMoneyline = messages[5]
 
             try:
                 lastUpdate = checkUserBet["date_updated"]
@@ -351,19 +353,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
             if checkUserBet["game_number"] == config.current_game[2]:
                 if checkUserBet["win"] == 1:
-                    userBetWin = "Win"
+                    userBetWin = messages[0]
                 elif checkUserBet["win"] == 0:
-                    userBetWin = "Lose"
+                    userBetWin = messages[1]
 
                 if checkUserBet["spread"] == 1:
-                    userBetSpread = "Over"
+                    userBetSpread = messages[2]
                 elif checkUserBet["spread"] == 0:
-                    userBetSpread = "Under"
+                    userBetSpread = messages[3]
 
                 if checkUserBet["moneyline"] == 1:
-                    userBetMoneyline = "Over"
+                    userBetMoneyline = messages[4]
                 elif checkUserBet["moneyline"] == 0:
-                    userBetMoneyline = "Under"
+                    userBetMoneyline = messages[5]
 
                 try:
                     lastUpdate = checkUserBet["date_updated"]
