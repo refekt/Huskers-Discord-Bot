@@ -307,6 +307,7 @@ async def on_raw_reaction_add(payload):
                 cursor.execute(config.sqlRetrieveBet, (raw_username))
                 userBetsDict = cursor.fetchall()
             mysql.sqlConnection.commit()
+            cursor.close()
 
             for userBet in userBetsDict:
                 if userBet["user"] == raw_username and userBet["game_number"] == config.current_game[2]:
@@ -344,6 +345,18 @@ async def on_raw_reaction_add(payload):
 
                     await user.send(embed=embed)
                     break
+
+            try:
+                for reaction in message.reactions:
+                    if emoji == reaction.emoji:
+                        await reaction.remove(user)
+            except discord.Forbidden as forb:
+                print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
+            except discord.HTTPException as err:
+                print("Error removing reaction from {}: {}".format(user, err))
+            except:
+                print("I don't know why we can't remove {}'s reaction.".format(user))
+
         # reddit_commands
         elif emoji in reddit_reactions and user != client.user and message.embeds[0].footer.text.startswith(reddit_footer):
             if emoji == "⬆":
@@ -351,17 +364,6 @@ async def on_raw_reaction_add(payload):
 
             elif emoji == "⬇":
                 vote_post("-1", message.embeds[0].footer.text.split("ID: ")[1].strip())
-
-        try:
-            for reaction in message.reactions:
-                if emoji == reaction.emoji:
-                    await reaction.remove(user)
-        except discord.Forbidden as forb:
-            print("Unable to remove {}'s reaction due to Forbiddin: \n{}".format(user, forb))
-        except discord.HTTPException as err:
-            print("Error removing reaction from {}: {}".format(user, err))
-        except:
-            print("I don't know why we can't remove {}'s reaction.".format(user))
 
 
 @client.event
