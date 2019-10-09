@@ -357,9 +357,10 @@ async def on_raw_reaction_add(payload):
                     embed.add_field(name="Over/Under Total Points", value=userBetMoneyline, inline=True)
                     embed.add_field(name="Time Placed", value=userBetTime)
 
-                    await user.send(embed=embed)
                     if underdog:
-                        await user.send("WARNING: As an underdog, Nebraska will always cover the spread if they win the game. Conversley, if Nebraska is favored and loses, they will always be unable to cover the spread.")
+                        embed.add_field(name="⚠ Warning! ⚠", value="As an underdog, Nebraska will always cover the spread if they win the game. Conversley, if Nebraska is favored and loses, they will always be unable to cover the spread.")
+
+                    await user.send(embed=embed)
                     break
 
             try:
