@@ -521,91 +521,114 @@ async def huskerbotquit(ctx):
     await client.logout()
 
 
-@client.command(hidden=True)
+@client.group(hidden=True)
 @commands.has_any_role(606301197426753536, 440639061191950336)
-async def purge(ctx, cmd=None):
+async def purge(ctx):
     """ Delete Husker Bot's previous messages. """
     if ctx.message.channel.id == 458474143403212801:  # prevent from deleting #botlogs
+        return
+
+    if ctx.subcommand_passed:
         return
 
     channel = client.get_channel(ctx.message.channel.id)
     deleteCounter = 0
     missedCounter = 0
 
-    cmd = str(cmd).lower()
-
-    if cmd == "none":
-        async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
-            if message.author == client.user:
-                await message.delete()
-                deleteCounter += 1
-            else:
-                missedCounter += 1
-                if missedCounter > 25:
-                    break  # Stop searching forever
-            if deleteCounter > 50:
-                break  # stop looking through messages
-    elif cmd in ("all", "a"):
-        authedChanIDs = (622581511488667699, 595705205069185047)
-        if channel.id in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
-            async for message in channel.history(limit=100):
-                await message.delete()
-    elif cmd in ("last", "l"):
-        async for message in channel.history(limit=3, oldest_first=False):
+    async for message in channel.history(limit=1000, before=None, after=None, around=None, oldest_first=False):  # For whatever reason, the limit=N doesn't actually go back to what I put it
+        if message.author == client.user:
             await message.delete()
+            deleteCounter += 1
+        else:
+            missedCounter += 1
+            if missedCounter > 25:
+                break  # Stop searching forever
+        if deleteCounter > 50:
+            break  # stop looking through messages
+
+
+@purge.command(aliases=["a",])
+async def all(ctx):
+    authedChanIDs = (622581511488667699, 595705205069185047)
+    channel = client.get_channel(ctx.message.channel.id)
+
+    if channel.id in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
+        msgs = []
+        try:
+            async for message in channel.history(limit=100):
+                msgs.append(message)
+            await channel.delete_messages(msgs)
+        except discord.ClientException:
+            print("Cannot delete more than 100 messages at a time.")
+            pass
+        except discord.Forbidden:
+            print("Missing permissions.")
+            pass
+        except discord.HTTPException:
+            print("Deleting messages failed.")
+            pass
+
+
+@purge.command(aliases=["l",])
+async def last(ctx):
+    channel = client.get_channel(ctx.message.channel.id)
+
+    async for message in channel.history(limit=3, oldest_first=False):
+        await message.delete()
+
+
+async def updateChan(chan: discord.TextChannel, name: str, gameday: bool, reason="Game day mode activation/deactivation"):
+    try:
+        await chan.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=True)
+        await chan.edit(name=name, reason=reason)
+        print("Renamed channel to [{}]. Set {} permissions to {}.".format(name, client.user, gameday))
+        print("Sleeping 1 second...")
+        time.sleep(1)
+    except discord.Forbidden as e:
+        print("Forbidden! Channel: {}\n{}".format(chan, e))
+    except discord.HTTPException as e:
+        print("Editing failed\n{}".format(e))
+    except Exception as e:
+        print("Unknown error!\n{}".format(e))
 
 
 @client.group(hidden=True)
 @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
-async def gameday(ctx, command=None):
+async def gameday(ctx):
     """ Turn on or off game day mode for the bot. """
-    async def updateChan(chan: discord.TextChannel, name: str, gameday: bool, reason="Game day mode activation/deactivation"):
-        try:
-            await chan.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=True)
-            await chan.edit(name=name, reason=reason)
-            print("Renamed channel to [{}]. Set {} permissions to {}.".format(name, client.user, gameday))
-            print("Sleeping 1 second...")
-            time.sleep(1)
-        except discord.Forbidden as e:
-            print("Forbidden! Channel: {}\n{}".format(chan, e))
-        except discord.HTTPException as e:
-            print("Editing failed\n{}".format(e))
-        except Exception as e:
-            print("Unknown error!\n{}".format(e))
+    pass
 
+
+@gameday.command()
+async def on(ctx):
     edit_msg = await ctx.send("Setting up...")
+    for channel in ctx.guild.channels:
+        if channel.id == 440868279150444544:
+            await updateChan(chan=channel, name="game-chat", gameday=True)
+        elif channel.id == 507520543096832001:
+            await updateChan(chan=channel, name="delayed-game-chat", gameday=True)
 
-    @gameday.command()
-    async def on():
-        global edit_msg
+        if channel.id == 440868279150444544:
+            await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
+        elif channel.id == 507520543096832001:
+            await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
+    await edit_msg.edit(content="Game day mode on!")
 
-        for channel in ctx.guild.channels:
-            if channel.id == 440868279150444544:
-                await updateChan(chan=channel, name="game-chat", gameday=True)
-            elif channel.id == 507520543096832001:
-                await updateChan(chan=channel, name="delayed-game-chat", gameday=True)
 
-            if channel.id == 440868279150444544:
-                await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
-            elif channel.id == 507520543096832001:
-                await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
-        await edit_msg.edit(content="Game day mode on!")
+@gameday.command()
+async def off(ctx):
+    edit_msg = await ctx.send("Setting up...")
+    for channel in ctx.guild.channels:
+        if channel.id == 440868279150444544:
+            await updateChan(chan=channel, name="huskerchat", gameday=False)
+        elif channel.id == 507520543096832001:
+            await updateChan(chan=channel, name="💯🌽👊scotts-tots", gameday=False)
 
-    @gameday.command()
-    async def off():
-        global edit_msg
-
-        for channel in ctx.guild.channels:
-            if channel.id == 440868279150444544:
-                await updateChan(chan=channel, name="huskerchat", gameday=False)
-            elif channel.id == 507520543096832001:
-                await updateChan(chan=channel, name="💯🌽👊scotts-tots", gameday=False)
-
-            if channel.id == 440868279150444544:
-                await channel.set_permissions(client.user, send_messages=False, read_messages=False, manage_channels=False)
-            elif channel.id == 507520543096832001:
-                await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
-        await edit_msg.edit(content="Game day mode off!")
+        if channel.id == 440868279150444544:
+            await channel.set_permissions(client.user, send_messages=False, read_messages=False, manage_channels=False)
+        elif channel.id == 507520543096832001:
+            await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
+    await edit_msg.edit(content="Game day mode off!")
 
 
 @client.command()
