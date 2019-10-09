@@ -124,6 +124,15 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         """Oh yeah. It's all coming together."""
         await ctx.send(embed=await sendImage("If we have Frost, we have national championships.", "https://i.imgur.com/tdN5IEG.png"))
 
+
+    @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def possum(self, ctx):
+        """Possum!"""
+        possum = ("https://i.imgur.com/UI3l2Xu.jpg", "https://cdn.discordapp.com/attachments/442047437561921548/631580916342325258/image0.gif", "https://thumbs.gfycat.com/WideEcstaticImperialeagle-size_restricted.gif", "https://thumbs.gfycat.com/AlienatedNaturalChuckwalla-size_restricted.gif")
+        await ctx.send(embed=await sendImage("Possum Paradise 🌴✈", random.choice(possum)))
+
+
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def crabfrost(self, ctx):
@@ -142,11 +151,6 @@ class ImageCommands(commands.Cog, name="Image Commands"):
         """Get on the floooooor!"""
         await ctx.send(embed=await sendImage("FUCK IOWA", "https://thumbs.gfycat.com/CanineEssentialGelding-size_restricted.gif"))
 
-    @commands.command(aliases=["possum",])
-    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def possums(self, ctx):
-        """Possum Palace"""
-        await ctx.send(embed=await sendImage("Possum", "https://i.imgur.com/UI3l2Xu.jpg"))
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
