@@ -17,10 +17,11 @@ import hashlib
 import time
 import mysql
 import asyncio
+from config import client
 
 # Bot specific stuff
-botPrefix='$'
-client = commands.Bot(command_prefix=botPrefix)
+# botPrefix='$'
+# client = commands.Bot(command_prefix=botPrefix)
 
 # Cogs
 client.load_extension('cogs.image_commands')
@@ -434,81 +435,81 @@ async def on_reaction_add(reaction, user):
                 await member.add_roles(role)
 
 
-@client.event
-async def on_command_error(ctx, error):
-    if ctx.message.content.startswith("$secret"):
-        try:
-            context = ctx.message.content.split(" ")
-            # $secret
-            if context[0].lower() != "$secret":
-                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-            # mammal | channel
-            if not context[1].isalpha() and not context[2].isalpha():
-                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-            # channel must be "war" or "scott"
-            if context[2].lower() != "war" and context[2].lower() != "scott":
-                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-
-            f = open('mammals.json', 'r')
-            temp_json = f.read()
-            mammals = json.loads(temp_json)
-            f.close()
-
-            checkID = hashlib.md5(str(ctx.message.author.id).encode())
-            channel = int()
-
-            if context[2].lower() == "war":
-                channel = client.get_channel(525519594417291284)
-            elif context[2].lower() == "scott":
-                channel = client.get_channel(507520543096832001)
-            elif context[2].lower() == "spam":
-                channel = client.get_channel(595705205069185047)
-            else:
-                await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
-
-            if checkID.hexdigest() == mammals[context[1]]:
-                context_commands = "{} {} {}".format(context[0], context[1], context[2])
-                message = ctx.message.content[len(context_commands):]
-
-                embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xFF0000)
-                embed.add_field(name="Message", value=message)
-                embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
-
-                await channel.send(embed=embed)
-            else:
-                await ctx.message.author.send("Shit didn't add up")
-        except:
-            print("An error occured: {}".format(error))
-            output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-                         "```Message ID: {}\n" \
-                         "Channel: {} / {}\n" \
-                         "Author: {}\n" \
-                         "Content: {}\n" \
-                         "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-            await ctx.send(output_msg)
-    else:
-        err = getattr(error, "original", error)
-        print("!!! Error occurred\n!!!! {}\n!!! ".format(error))
-
-        if isinstance(err, commands.CommandNotFound):
-            return
-        elif isinstance(err, commands.BadArgument):
-            return await ctx.send("Command `${}` received a bad argument. Review `$help {}` for more information.".format(ctx.command.qualified_name, ctx.command.qualified_name))
-        elif isinstance(err, discord.ext.commands.CommandOnCooldown):
-            err = str(error).split(".")
-            return await ctx.send("HOLD UP {}!  ${} is on cooldown. {} seconds.".format(ctx.message.author.mention, ctx.command.qualified_name, err[1]))
-        elif isinstance(err, discord.ext.commands.MissingAnyRole):
-            return await ctx.send("{}! You are not authorized to use this command!".format(ctx.message.author.mention))
-        elif isinstance(err, discord.ext.commands.MissingRole):
-            return await ctx.send("{}! You are not authorized to use this command!".format(ctx.message.author.mention))
-        else:
-            output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-                         "```Message ID: {}\n" \
-                         "Channel: {} / {}\n" \
-                         "Author: {}\n" \
-                         "Content: {}\n" \
-                         "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
-            await ctx.send(output_msg)
+# @client.event
+# async def on_command_error(ctx, error):
+#     if ctx.message.content.startswith("$secret"):
+#         try:
+#             context = ctx.message.content.split(" ")
+#             # $secret
+#             if context[0].lower() != "$secret":
+#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+#             # mammal | channel
+#             if not context[1].isalpha() and not context[2].isalpha():
+#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+#             # channel must be "war" or "scott"
+#             if context[2].lower() != "war" and context[2].lower() != "scott":
+#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+#
+#             f = open('mammals.json', 'r')
+#             temp_json = f.read()
+#             mammals = json.loads(temp_json)
+#             f.close()
+#
+#             checkID = hashlib.md5(str(ctx.message.author.id).encode())
+#             channel = int()
+#
+#             if context[2].lower() == "war":
+#                 channel = client.get_channel(525519594417291284)
+#             elif context[2].lower() == "scott":
+#                 channel = client.get_channel(507520543096832001)
+#             elif context[2].lower() == "spam":
+#                 channel = client.get_channel(595705205069185047)
+#             else:
+#                 await ctx.message.author.send("Incorrect message format. Use: $secret <mammal> <channel> <message>")
+#
+#             if checkID.hexdigest() == mammals[context[1]]:
+#                 context_commands = "{} {} {}".format(context[0], context[1], context[2])
+#                 message = ctx.message.content[len(context_commands):]
+#
+#                 embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xFF0000)
+#                 embed.add_field(name="Message", value=message)
+#                 embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
+#
+#                 await channel.send(embed=embed)
+#             else:
+#                 await ctx.message.author.send("Shit didn't add up")
+#         except:
+#             print("An error occured: {}".format(error))
+#             output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+#                          "```Message ID: {}\n" \
+#                          "Channel: {} / {}\n" \
+#                          "Author: {}\n" \
+#                          "Content: {}\n" \
+#                          "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+#             await ctx.send(output_msg)
+#     else:
+#         err = getattr(error, "original", error)
+#         print("!!! Error occurred\n!!!! {}\n!!! ".format(error))
+#
+#         if isinstance(err, commands.CommandNotFound):
+#             return
+#         elif isinstance(err, commands.BadArgument):
+#             return await ctx.send("Command `${}` received a bad argument. Review `$help {}` for more information.".format(ctx.command.qualified_name, ctx.command.qualified_name))
+#         elif isinstance(err, discord.ext.commands.CommandOnCooldown):
+#             err = str(error).split(".")
+#             return await ctx.send("HOLD UP {}!  ${} is on cooldown. {} seconds.".format(ctx.message.author.mention, ctx.command.qualified_name, err[1]))
+#         elif isinstance(err, discord.ext.commands.MissingAnyRole):
+#             return await ctx.send("{}! You are not authorized to use this command!".format(ctx.message.author.mention))
+#         elif isinstance(err, discord.ext.commands.MissingRole):
+#             return await ctx.send("{}! You are not authorized to use this command!".format(ctx.message.author.mention))
+#         else:
+#             output_msg = "Whoa there, {}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
+#                          "```Message ID: {}\n" \
+#                          "Channel: {} / {}\n" \
+#                          "Author: {}\n" \
+#                          "Content: {}\n" \
+#                          "Error: {}```".format(ctx.message.author.mention, ctx.message.id, ctx.message.channel.name, ctx.message.channel.id, ctx.message.author, ctx.message.content, error)
+#             await ctx.send(output_msg)
 
 
 @client.command(aliases=["quit", "q"])
@@ -554,13 +555,13 @@ async def purge(ctx, cmd=None):
             await message.delete()
 
 
-@client.command(hidden=True)
+@client.group(hidden=True)
 @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
 async def gameday(ctx, command=None):
     """ Turn on or off game day mode for the bot. """
     async def updateChan(chan: discord.TextChannel, name: str, gameday: bool, reason="Game day mode activation/deactivation"):
         try:
-            await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=True)
+            await chan.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=True)
             await chan.edit(name=name, reason=reason)
             print("Renamed channel to [{}]. Set {} permissions to {}.".format(name, client.user, gameday))
             print("Sleeping 1 second...")
@@ -573,7 +574,11 @@ async def gameday(ctx, command=None):
             print("Unknown error!\n{}".format(e))
 
     edit_msg = await ctx.send("Setting up...")
-    if command == "on":
+
+    @gameday.command()
+    async def on():
+        global edit_msg
+
         for channel in ctx.guild.channels:
             if channel.id == 440868279150444544:
                 await updateChan(chan=channel, name="game-chat", gameday=True)
@@ -585,7 +590,11 @@ async def gameday(ctx, command=None):
             elif channel.id == 507520543096832001:
                 await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
         await edit_msg.edit(content="Game day mode on!")
-    elif command == "off":
+
+    @gameday.command()
+    async def off():
+        global edit_msg
+
         for channel in ctx.guild.channels:
             if channel.id == 440868279150444544:
                 await updateChan(chan=channel, name="huskerchat", gameday=False)
@@ -597,8 +606,6 @@ async def gameday(ctx, command=None):
             elif channel.id == 507520543096832001:
                 await channel.set_permissions(client.user, send_messages=True, read_messages=True, manage_channels=False)
         await edit_msg.edit(content="Game day mode off!")
-    else:
-        await edit_msg.edit(content="{} is creating more spam because they are not authorized to use this command!".format(ctx.message.author.mention))
 
 
 @client.command()
