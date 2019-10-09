@@ -288,9 +288,8 @@ async def on_raw_reaction_add(payload):
             raw_username = "{}#{}".format(user.name, user.discriminator)
 
             formattedSpread = ""
-            for index, field in enumerate(message.embeds[0].fields):
+            for field in message.embeds[0].fields:
                 if str(field.name).startswith("Spread"):
-                    print("Value:", field.value)
                     formattedSpread = field.value
                     break
 
@@ -300,17 +299,9 @@ async def on_raw_reaction_add(payload):
                 underdog = False
 
             if emoji == "⬆":
-                if underdog:
-                    try_adding_new_dict(raw_username, "winorlose", True)
-                    try_adding_new_dict(raw_username, "spread", True)
-                else:
-                    try_adding_new_dict(raw_username, "winorlose", True)
+                try_adding_new_dict(raw_username, "winorlose", True)
             elif emoji == "⬇":
-                if underdog:
-                    try_adding_new_dict(raw_username, "winorlose", False)
-                    try_adding_new_dict(raw_username, "spread", False)
-                else:
-                    try_adding_new_dict(raw_username, "winorlose", False)
+                try_adding_new_dict(raw_username, "winorlose", False)
             elif emoji == "❎":
                 try_adding_new_dict(raw_username, "canx_winorlose", "")
             elif emoji == "⏫":
@@ -367,6 +358,8 @@ async def on_raw_reaction_add(payload):
                     embed.add_field(name="Time Placed", value=userBetTime)
 
                     await user.send(embed=embed)
+                    if underdog:
+                        await user.send("WARNING: As an underdog, Nebraska will always cover the spread if they win the game. Conversley, if Nebraska is favored and loses, they will always be unable to cover the spread.")
                     break
 
             try:
