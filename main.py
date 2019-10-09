@@ -47,9 +47,11 @@ highlight_url = None
 
 def try_adding_new_dict(bet_username: str, which: str, placed_bet):
     if which == "winorlose":
+
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlInsertWinorlose, (config.current_game[2], bet_username, int(placed_bet), int(placed_bet)))
         mysql.sqlConnection.commit()
+
     elif which == "canx_winorlose":
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlInsertWinorlose, (config.current_game[2], bet_username, -1, -1))
@@ -285,10 +287,30 @@ async def on_raw_reaction_add(payload):
 
             raw_username = "{}#{}".format(user.name, user.discriminator)
 
+            formattedSpread = ""
+            for index, field in enumerate(message.embeds[0].fields):
+                if str(field.name).startswith("Spread"):
+                    print("Value:", field.value)
+                    formattedSpread = field.value
+                    break
+
+            if "Nebraska" in formattedSpread:
+                underdog = True
+            else:
+                underdog = False
+
             if emoji == "⬆":
-                try_adding_new_dict(raw_username, "winorlose", True)
+                if underdog:
+                    try_adding_new_dict(raw_username, "winorlose", True)
+                    try_adding_new_dict(raw_username, "spread", True)
+                else:
+                    try_adding_new_dict(raw_username, "winorlose", True)
             elif emoji == "⬇":
-                try_adding_new_dict(raw_username, "winorlose", False)
+                if underdog:
+                    try_adding_new_dict(raw_username, "winorlose", False)
+                    try_adding_new_dict(raw_username, "spread", False)
+                else:
+                    try_adding_new_dict(raw_username, "winorlose", False)
             elif emoji == "❎":
                 try_adding_new_dict(raw_username, "canx_winorlose", "")
             elif emoji == "⏫":

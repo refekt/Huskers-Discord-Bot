@@ -1,24 +1,22 @@
 dm_str = 'Direct Message'
 correct_channel = False
+from discord.ext import commands
+import discord
 
 
-async def check_command_channel(command: str, channel):
+# def is_authorized_channel():
+async def check_command_channel(command: discord.ext.commands.Command, channel):
     global correct_channel
 
-    croot_commands = ["crootbot", "referee", "cb_search", "recentballs", "cb_refresh"]
+    croot_commands = ["crootbot", "cb_search", "recentballs", "cb_refresh"]
     flag_commands = ["crappyflag", "randomflag"]
-    all_commands = croot_commands + flag_commands #+ mkv_commands
-
-    # print("Checking command [${}]".format(command))
+    all_commands = croot_commands + flag_commands
 
     if str(command) not in all_commands:
-        # print("Command [${}] doesn't need to be regulated".format(command))
         correct_channel = True
         return
 
-    # print("Regulated command found. Checking channel [#{}]".format(channel))
-
-    #   Production Server:...
+    #   Production Server:
     #   the-war-room = 525519594417291284
     #   💯🌽👊 scotts-tots = 507520543096832001
     #   bot-spam = 593984711706279937
@@ -41,5 +39,4 @@ async def check_command_channel(command: str, channel):
     else:
         flag = False
 
-    # print("Regulation of [${}] == [{}]".format(command, flag))
     correct_channel = flag
