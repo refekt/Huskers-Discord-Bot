@@ -143,13 +143,21 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def danceparty(self, ctx):
         """Get on the floooooor!"""
-        await ctx.send(embed=await sendImage("🕺💃👯‍♂️👯‍♀️", "https://thumbs.gfycat.com/GiddyOldfashionedBluebreastedkookaburra-size_restricted.gif"))
+        dances = ("https://thumbs.gfycat.com/FriendlyUnrulyCottonmouth-size_restricted.gif", "https://thumbs.gfycat.com/GiddyOldfashionedBluebreastedkookaburra-size_restricted.gif")
+        await ctx.send(embed=await sendImage("🕺💃👯‍♂️👯‍♀️", random.choice(dances)))
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def fuckiowa(self, ctx):
-        """Get on the floooooor!"""
+        """Fuck Iowa"""
         await ctx.send(embed=await sendImage("FUCK IOWA", "https://thumbs.gfycat.com/CanineEssentialGelding-size_restricted.gif"))
+
+
+    @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def fuckminn(self, ctx):
+        """Fuck Minnesota"""
+        await ctx.send(embed=await sendImage("SINK THE BOAT", "https://thumbs.gfycat.com/SadClearcutGalapagosalbatross-size_restricted.gif"))
 
 
     @commands.command()
