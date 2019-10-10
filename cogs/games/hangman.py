@@ -250,6 +250,11 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("Guesses must be alpha characters only!")
             return
 
+        global keep_playing
+        if not keep_playing:
+            await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
+            return
+
         global players
         if ctx.message.author not in players:
             await ctx.send("You are not a registered participant in this game!")
@@ -276,8 +281,6 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         # await ctx.send(build_word_bar())
         await ctx.send(build_message())
 
-        global keep_playing
-
         if check_win_or_lose() == GameCondition.win:
             await ctx.send("You win!")
             keep_playing = False
@@ -285,14 +288,33 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("You lose!")
             keep_playing = False
 
-    @hangman.command()
+    @hangman.command(aliases=["fg",])
+    async def fullguess(self, ctx, *, word: str):
+        global current_word
+        global players
+
+        if ctx.message.author not in players:
+            await ctx.send("You are not a registered participant in this game!")
+            return
+
+        if word.lower().replace(" ", "") == current_word:
+            await ctx.send("Correct! {} win the game!".format(ctx.author))
+
+        global keep_playing
+        keep_playing = False
+
+    @hangman.command(aliases=["q",])
     async def quit(self, ctx):
+        global keep_playing
+        if not keep_playing:
+            await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
+            return
+
         global players
         global moves_left
         global current_word
         global built_word
         global guesses
-        global keep_playing
 
         keep_playing = False
         moves_left = max_moves
@@ -331,5 +353,5 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         # await ctx.send(build_word_bar())
         await ctx.send(build_message())
 
-        # print("New game started with word [{}]".format(current_word))
+        print("New game started with word [{}]".format(current_word))
         # await ctx.send("BETA: New game started with word [{}]".format(current_word))
