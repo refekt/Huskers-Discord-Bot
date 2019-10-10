@@ -257,6 +257,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             return
 
         global players
+        print(ctx.message.author.name, players)
         if ctx.message.author.name not in players:
             await ctx.send("You are not a registered participant in this game!")
             return
@@ -345,9 +346,8 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             guesses = []
 
             for p in new_players:
-                print(type(p))
                 if type(p) == discord.member.Member:
-                    players.append(p)
+                    players.append(p.name)
                     flattened.append(p.name)
                 elif type(p) == discord.role.Role:
                     for member in p.members:
