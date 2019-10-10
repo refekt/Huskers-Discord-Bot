@@ -198,6 +198,10 @@ def build_word_bar():
     return word_bar
 
 
+def build_message():
+    return "```\nHusker Hangman!\n```" + build_board(moves_left) + build_word_bar()
+
+
 def try_guess(letter: str):
     global current_word
     global guesses
@@ -246,6 +250,11 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("Guesses must be alpha characters only!")
             return
 
+        global players
+        if ctx.message.author not in players:
+            await ctx.send("You are not a registered participant in this game!")
+            return
+
         edit_msg = await ctx.send("Thinking...")
 
         letter = letter[0].lower()
@@ -256,8 +265,16 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             moves_left -= 1
 
         await edit_msg.delete()
-        await ctx.send(build_board(moves_left))
-        await ctx.send(build_word_bar())
+
+        async for message in ctx.channel.history(limit=100):
+            if message.author.bot:
+                if "Husker Hangman!" in message.content:
+                    await message.delete()
+                    break
+
+        # await ctx.send(build_board(moves_left))
+        # await ctx.send(build_word_bar())
+        await ctx.send(build_message())
 
         global keep_playing
 
@@ -270,9 +287,20 @@ class Hangman(commands.Cog, name="Husker Hangman"):
 
     @hangman.command()
     async def quit(self, ctx):
+        global players
+        global moves_left
+        global current_word
+        global built_word
+        global guesses
         global keep_playing
+
         keep_playing = False
-        pass
+        moves_left = max_moves
+        current_word = ""
+        built_word = ""
+        guesses = []
+
+        await ctx.send("The current game has been ended!")
 
     @hangman.command(aliases=["n",])
     async def new(self, ctx, *new_players: discord.Member):
@@ -297,10 +325,11 @@ class Hangman(commands.Cog, name="Husker Hangman"):
                 players.append(p)
                 flattened.append(p.name)
 
-            await ctx.send("```\nNew game started with {}!\n```".format(flattened))
+            await ctx.send("```\nHusker Hangman!: New game started with {}!\n```".format(flattened))
 
-        await ctx.send(build_board(stages["new"]))
-        await ctx.send(build_word_bar())
+        # await ctx.send(build_board(stages["new"]))
+        # await ctx.send(build_word_bar())
+        await ctx.send(build_message())
 
         # print("New game started with word [{}]".format(current_word))
-        await ctx.send("BETA: New game started with word [{}]".format(current_word))
+        # await ctx.send("BETA: New game started with word [{}]".format(current_word))
