@@ -129,7 +129,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def possum(self, ctx):
         """Possum!"""
-        possum = ("https://i.imgur.com/UI3l2Xu.jpg", "https://cdn.discordapp.com/attachments/442047437561921548/631580916342325258/image0.gif", "https://thumbs.gfycat.com/WideEcstaticImperialeagle-size_restricted.gif", "https://thumbs.gfycat.com/AlienatedNaturalChuckwalla-size_restricted.gif")
+        possum = ("https://cdn.discordapp.com/attachments/442047437561921548/631876712841347117/e3l21wsflor31.jpg", "https://i.imgur.com/UI3l2Xu.jpg", "https://cdn.discordapp.com/attachments/442047437561921548/631580916342325258/image0.gif", "https://thumbs.gfycat.com/WideEcstaticImperialeagle-size_restricted.gif", "https://thumbs.gfycat.com/AlienatedNaturalChuckwalla-size_restricted.gif")
         await ctx.send(embed=await sendImage("Possum Paradise 🌴✈", random.choice(possum)))
 
 
