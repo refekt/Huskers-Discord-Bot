@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import random
 from enum import Enum
+import typing
 
 gaming_channels = (593984711706279937, 595705205069185047)
 stages = {"new": 6, "finished": 0}
@@ -256,7 +257,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             return
 
         global players
-        if ctx.message.author not in players:
+        if ctx.message.author.name not in players:
             await ctx.send("You are not a registered participant in this game!")
             return
 
@@ -325,7 +326,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         await ctx.send("The current game has been ended!")
 
     @hangman.command(aliases=["n",])
-    async def new(self, ctx, *new_players: discord.Member):
+    async def new(self, ctx, *new_players: typing.Union[discord.Member, discord.Role]):
         if not new_players:
             await ctx.send("There must be at least one player!")
             return
@@ -344,8 +345,14 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             guesses = []
 
             for p in new_players:
-                players.append(p)
-                flattened.append(p.name)
+                print(type(p))
+                if type(p) == discord.member.Member:
+                    players.append(p)
+                    flattened.append(p.name)
+                elif type(p) == discord.role.Role:
+                    for member in p.members:
+                        players.append(member.name)
+                        flattened.append(member.name)
 
             await ctx.send("```\nHusker Hangman!: New game started with {}!\n```".format(flattened))
 
