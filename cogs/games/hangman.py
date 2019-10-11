@@ -59,8 +59,7 @@ word_choices = (
     "gator bowl"
 )
 hangman_stages = (
-    """"
-    ```
+    """
     ___________
     |       |
     |       0
@@ -69,10 +68,8 @@ hangman_stages = (
     |
     |
     -----------
-```
     """,
     """
-    ```
     ___________
     |       |
     |       0
@@ -81,10 +78,8 @@ hangman_stages = (
     |
     |
     -----------
-```
     """,
     """
-    ```
     ___________
     |       |
     |       0
@@ -93,10 +88,8 @@ hangman_stages = (
     |
     |
     -----------
-```
     """,
     """
-    ```
     ___________
     |       |
     |       0
@@ -105,10 +98,8 @@ hangman_stages = (
     |
     |
     -----------
-```
     """,
     """
-    ```
     ___________
     |       |
     |       0
@@ -117,10 +108,8 @@ hangman_stages = (
     |
     |
     -----------
-```
     """,
     """
-    ```
     ___________
     |       |
     |       0
@@ -129,10 +118,8 @@ hangman_stages = (
     |
     |
     -----------
-```
     """,
     """
-    ```
     ___________
     |       |
     |       
@@ -141,7 +128,6 @@ hangman_stages = (
     |
     |
     -----------
-```
     """
 )
 current_word = ""
@@ -194,13 +180,13 @@ def build_word_bar():
     global built_word
     built_word = word_bar
 
-    word_bar = "```\nWord: " + word_bar + " Guesses: {}\n```".format(guesses)
+    word_bar = "\nWord: " + word_bar + " Guesses: {}".format(guesses)
 
     return word_bar
 
 
 def build_message():
-    return "```\nHusker Hangman!\n```" + build_board(moves_left) + build_word_bar()
+    return "```\nHusker Hangman!\n" + build_board(moves_left) + build_word_bar() + "\n```"
 
 
 def try_guess(letter: str):
@@ -261,10 +247,6 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
             return
 
-        # global players
-        # if ctx.message.author.name not in players:
-        #     await ctx.send("You are not a registered participant in this game!")
-        #     return
         if not is_in_players(ctx.message.author.name):
             await ctx.send("You are not a registered participant in this game!")
             return
@@ -303,11 +285,16 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("You are not a registered participant in this game!")
             return
 
-        if word.lower().replace(" ", "") == current_word:
-            await ctx.send("Correct! {} win the game!".format(ctx.author))
-
-        global keep_playing
-        keep_playing = False
+        if word.lower().replace(" ", "") == current_word.replace(" ", ""):
+            await ctx.send("Correct! {} wins the game!".format(ctx.author))
+            global keep_playing
+            keep_playing = False
+        else:
+            global moves_left
+            global guesses
+            guesses.append(word)
+            moves_left -= 1
+            await ctx.send(build_message())
 
     @hangman.command(aliases=["q",])
     async def quit(self, ctx):
@@ -318,6 +305,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
 
         if not is_in_players(ctx.message.author.name):
             await ctx.send("You are not a registered participant in this game!")
+
             return
 
         global players
@@ -333,6 +321,11 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         guesses = []
 
         await ctx.send("The current game has been ended!")
+
+        async for message in ctx.channel.history(limit=100):
+            if "Husker Hangman!" in message.content and message.author.bot:
+                await message.delete()
+                break
 
     @hangman.command(aliases=["n",])
     async def new(self, ctx, *new_players: typing.Union[discord.Member, discord.Role]):
