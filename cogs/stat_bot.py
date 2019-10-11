@@ -5,7 +5,6 @@ import json
 import datetime
 import pytz
 import math
-import typing
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -93,14 +92,74 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
     @commands.command(aliases=["ps",])
     # @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def playerstats(self, ctx, name, team: typing.Optional[str] = "Nebraska", position: typing.Optional[str] = "QB"):
+    async def playerstats(self, ctx, *, name):
         # Make an image of a jersey with their name and number drawn on
-        # Embed the player bio and season stats
-        player_search_url = "https://api.collegefootballdata.com/player/search?searchTerm={}&school=nebraska".format(name)
-        player_id = 0
-        player_usage_url = "https://api.collegefootballdata.com/player/usage?year=2019&team=nebraska&playerId={}".format(player_id)
+        edit_msg = await ctx.send("Loading...")
 
-        await ctx.send("Team: {}\nPosition: {}\nName: {}\n".format(team, position, name))
+        player_search_url = "https://api.collegefootballdata.com/player/search?searchTerm={}&team=nebraska".format(name)
+        try:
+            r = requests.get(player_search_url)
+            player_data = r.json()
+        except:
+            await edit_msg.edit(content="An error occurred retrieving poll data.")
+            return
+
+        if not player_data:
+            await edit_msg.edit(content="No player found!")
+            return
+
+        player_usage_url = "https://api.collegefootballdata.com/player/usage?year={}&playerId={}&excludeGarbageTime=false".format(datetime.datetime.now().year, player_data[0]["id"])
+        try:
+            r = requests.get(player_usage_url)
+            player_usage_data = r.json()
+        except:
+            await ctx.send("An error occurred retrieving poll data.")
+            return
+
+        player_ppa_url = "https://api.collegefootballdata.com/ppa/players/season?year={}&team=nebraska&playerId={}".format(datetime.datetime.now().year, player_data[0]["id"])
+        try:
+            r = requests.get(player_ppa_url)
+            player_ppa_data = r.json()
+        except:
+            await ctx.send("An error occurred retrieving poll data.")
+            return
+
+        url = "https://api.collegefootballdata.com/ppa/players/games?year=2019&team=nebraska&playerId=4361182"
+
+        embed = discord.Embed(title="{}'s {} Stats".format(player_data[0]["name"], datetime.datetime.now().year), color=0xFF0000)
+        embed.set_thumbnail(url="https://i.imgur.com/vxCX5En.png")
+        embed.set_footer(text="Frost Bot: Player Season Stats")
+        embed.add_field(name="Biography", value="Height: {}\"\nWeight: {} lbs.\nJersey: #{}\nPosition: {}\nHometown: {}".format(
+            player_data[0]["height"],
+            player_data[0]["weight"],
+            player_data[0]["jersey"],
+            player_data[0]["position"],
+            player_data[0]["hometown"]
+        ))
+
+        if player_ppa_data:
+            embed.add_field(name="Season Predicted Points Added",
+                            value="Total Plays: {}\nOverall: {}\nPassing: {}\nRushing: {}".format(
+                                player_ppa_data[0]["countablePlays"],
+                                player_ppa_data[0]["averagePPA"]["all"],
+                                player_ppa_data[0]["averagePPA"]["pass"],
+                                player_ppa_data[0]["averagePPA"]["rush"]
+                            ))
+
+        if player_usage_data:
+            embed.add_field(name="Usage",
+                            value="Overall: {:.2f}%\nPassing: {:.2f}%\nRushing: {:.2f}%\n1st Down: {:.2f}%\n2nd Down: {:.2f}%\n3rd Down: {:.2f}%\nStandard Downs: {:.2f}%\nPassing Downs: {:.2f}%".format(
+                player_usage_data[0]["usage"]["overall"] * 100,
+                player_usage_data[0]["usage"]["pass"] * 100,
+                player_usage_data[0]["usage"]["rush"] * 100,
+                player_usage_data[0]["usage"]["firstDown"] * 100,
+                player_usage_data[0]["usage"]["secondDown"] * 100,
+                player_usage_data[0]["usage"]["thirdDown"] * 100,
+                player_usage_data[0]["usage"]["standardDowns"] * 100,
+                player_usage_data[0]["usage"]["passingDowns"] * 100
+            ))
+
+        await edit_msg.edit(content="", embed=embed)
 
     @commands.command(aliases=["mu",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)

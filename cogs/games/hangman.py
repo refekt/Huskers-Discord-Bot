@@ -180,7 +180,7 @@ def build_word_bar():
     global built_word
     built_word = word_bar
 
-    word_bar = "\nWord: " + word_bar + " Guesses: {}".format(guesses)
+    word_bar = "\nWord: " + word_bar + "\nGuesses: {}".format(guesses)
 
     return word_bar
 
