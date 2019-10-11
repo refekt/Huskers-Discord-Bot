@@ -223,16 +223,21 @@ def check_win_or_lose():
     check_current_word = current_word.replace(" ", "")
     check_word_bar = built_word.replace(" ", "")
 
-    # print("Current word:", check_current_word, "Word bar:", check_word_bar, "Bool:", check_current_word == check_word_bar, "Moves left:", moves_left)
-
     if moves_left <= 0:
         return GameCondition.lose
 
     if check_current_word == check_word_bar:
-        # print("Word bar matches current word.")
         return GameCondition.win
 
     return GameCondition.playing
+
+
+def is_in_players(checkme):
+    global players
+    if checkme in players:
+        return True
+    else:
+        return False
 
 
 def setup(bot):
@@ -256,9 +261,11 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
             return
 
-        global players
-        print(ctx.message.author.name, players)
-        if ctx.message.author.name not in players:
+        # global players
+        # if ctx.message.author.name not in players:
+        #     await ctx.send("You are not a registered participant in this game!")
+        #     return
+        if not is_in_players(ctx.message.author.name):
             await ctx.send("You are not a registered participant in this game!")
             return
 
@@ -274,13 +281,10 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         await edit_msg.delete()
 
         async for message in ctx.channel.history(limit=100):
-            if message.author.bot:
-                if "Husker Hangman!" in message.content:
-                    await message.delete()
-                    break
+            if "Husker Hangman!" in message.content and message.author.bot:
+                await message.delete()
+                break
 
-        # await ctx.send(build_board(moves_left))
-        # await ctx.send(build_word_bar())
         await ctx.send(build_message())
 
         if check_win_or_lose() == GameCondition.win:
@@ -295,7 +299,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         global current_word
         global players
 
-        if ctx.message.author not in players:
+        if not is_in_players(ctx.message.author.name):
             await ctx.send("You are not a registered participant in this game!")
             return
 
@@ -310,6 +314,10 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         global keep_playing
         if not keep_playing:
             await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
+            return
+
+        if not is_in_players(ctx.message.author.name):
+            await ctx.send("You are not a registered participant in this game!")
             return
 
         global players
@@ -356,8 +364,6 @@ class Hangman(commands.Cog, name="Husker Hangman"):
 
             await ctx.send("```\nHusker Hangman!: New game started with {}!\n```".format(flattened))
 
-        # await ctx.send(build_board(stages["new"]))
-        # await ctx.send(build_word_bar())
         await ctx.send(build_message())
 
         print("New game started with word [{}]".format(current_word))
