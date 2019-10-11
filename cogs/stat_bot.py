@@ -126,7 +126,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         url = "https://api.collegefootballdata.com/ppa/players/games?year=2019&team=nebraska&playerId=4361182"
 
-        embed = discord.Embed(title="{}'s {} Stats".format(player_data[0]["name"], datetime.datetime.now().year), color=0xFF0000)
+        embed = discord.Embed(title="{}'s {} Season Stats".format(player_data[0]["name"], datetime.datetime.now().year), color=0xFF0000)
         embed.set_thumbnail(url="https://i.imgur.com/vxCX5En.png")
         embed.set_footer(text="Frost Bot: Player Season Stats")
         embed.add_field(name="Biography", value="Height: {}\"\nWeight: {} lbs.\nJersey: #{}\nPosition: {}\nHometown: {}".format(
@@ -138,7 +138,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
         ))
 
         if player_ppa_data:
-            embed.add_field(name="Season Predicted Points Added",
+            embed.add_field(name="Predicted Points Added",
                             value="Total Plays: {}\nOverall: {}\nPassing: {}\nRushing: {}".format(
                                 player_ppa_data[0]["countablePlays"],
                                 player_ppa_data[0]["averagePPA"]["all"],
