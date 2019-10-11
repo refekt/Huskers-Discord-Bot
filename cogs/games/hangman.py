@@ -291,7 +291,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("You win!")
             keep_playing = False
         elif check_win_or_lose() == GameCondition.lose:
-            await ctx.send("You lose!")
+            await ctx.send("You lose! The word was [{}].".format(current_word))
             keep_playing = False
 
     @hangman.command(aliases=["fg",])

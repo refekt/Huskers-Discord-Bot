@@ -5,6 +5,7 @@ import json
 import datetime
 import pytz
 import math
+import typing
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
 husker_schedule = []
@@ -89,6 +90,17 @@ class StatBot(commands.Cog, name="CFB Stats"):
 
         message_string += "\n```"
         await msg.edit(content=message_string)
+
+    @commands.command(aliases=["ps",])
+    # @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def playerstats(self, ctx, name, team: typing.Optional[str] = "Nebraska", position: typing.Optional[str] = "QB"):
+        # Make an image of a jersey with their name and number drawn on
+        # Embed the player bio and season stats
+        player_search_url = "https://api.collegefootballdata.com/player/search?searchTerm={}&school=nebraska".format(name)
+        player_id = 0
+        player_usage_url = "https://api.collegefootballdata.com/player/usage?year=2019&team=nebraska&playerId={}".format(player_id)
+
+        await ctx.send("Team: {}\nPosition: {}\nName: {}\n".format(team, position, name))
 
     @commands.command(aliases=["mu",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
