@@ -5,6 +5,7 @@ import mysql
 import config
 import requests
 import requests.auth
+import re
 
 globalRate = 3
 globalPer = 30
@@ -49,10 +50,10 @@ def check_if_error(arg):
         return False
 
 
-def recent_posts(count=25):
+def recent_posts(sub: str, count=25):
     token_info = reddit_oauth()
     headers = {"Authorization": "bearer {}".format(token_info["access_token"]), "User-Agent": user_agent}
-    response = requests.get("https://oauth.reddit.com/r/huskers/new?limit={}".format(count), headers=headers)
+    response = requests.get("https://oauth.reddit.com/r/{}/new?limit={}".format(sub, count), headers=headers)
     posts = response.json()
 
     return posts
@@ -100,46 +101,6 @@ def build_embed(post_info):
 
 
 class RedditCommands(commands.Cog, name="Reddit Commands"):
-    # def __init__(self, bot):
-    #     self.bot = bot
-    #     self.bg_recent.start()
-    #
-    # def cog_unload(self):
-    #     self.bg_recent.stop()
-    #
-    # @tasks.loop(seconds=10)
-    # async def bg_recent(self, ctx: discord.Message, count=3):
-    #     """Outputs the most recent submissions on r/Huskers. Default is 3."""
-    #     print("CTX: {}".format(ctx))
-    #
-    #     # if ctx is None:
-    #     #     ctx = client.get_channel(595705205069185047)  #593984711706279937)  # Bot channel
-    #
-    #     posts = recent_posts(count)
-    #     if check_if_error(posts):
-    #         await ctx.send(reddit_error_message)
-    #         return
-    #
-    #     for index, post in enumerate(posts["data"]["children"]):
-    #         if index == count:
-    #             break
-    #
-    #         post_info = build_post_info(post)
-    #         embed = build_embed(post_info)
-    #
-    #         msg = await ctx.send(embed=embed)
-    #         # await add_reactions(message=msg, reactions=reddit_reactions)
-    #
-    # @bg_recent.before_loop
-    # async def before_bg_recent(self):
-    #     print("Starting `recent` loop")
-    #     pass
-    #
-    # @bg_recent.after_loop
-    # async def after_bg_recent(self):
-    #     print("Stopping `recent` loop")
-    #     pass
-
     @commands.group()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def reddit(self, ctx):
@@ -149,7 +110,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
     @reddit.command()
     async def recent(self, ctx, count=3):
         """Outputs the most recent submissions on r/Huskers. Default is 3."""
-        posts = recent_posts(count)
+        posts = recent_posts("huskers", count)
         if check_if_error(posts):
             await ctx.send(reddit_error_message)
             return
@@ -164,58 +125,94 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
             msg = await ctx.send(embed=embed)
             # await add_reactions(message=msg, reactions=reddit_reactions)
 
-    @reddit.command(aliases=["g",])
+    @reddit.command(aliases=["g", ])
     async def gameday(self, ctx):
         """Outputs the most recent game day thread on r/Huskers."""
         thread_titles = ("pregame thread -", "pre game thread -", "game thread -")
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts(100)
+        posts = recent_posts("huskers", 100)
         if check_if_error(posts):
             await ctx.send(reddit_error_message)
             return
 
+        embed = None
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
             if post_info["title"].lower().startswith(thread_titles[0]) or post_info["title"].lower().startswith(thread_titles[1]):
                 embed = build_embed(post_info)
                 await edit_msg.edit(content="", embed=embed)
-                return
+                break
 
-        await edit_msg.edit(content="No game day threads found!")
-        # await add_reactions(message=edit_msg, reactions=reddit_reactions)
+        if not embed:
+            await edit_msg.edit(content="No r/Huskers game day threads found!")
 
-    @reddit.command(aliases=["p",])
+        cfb_regex = "\[Game Thread\]\s(.{1,}\s@\sNebraska\s\([0-9]{1,2}\:[0-9]{1}[0-0]{1}(AM|PM)\s.{1,}\)|Nebraska\s@\s.{1,}\s\([0-9]{1,2}:[0-9]{1}[0-9]{1}(AM|PM)\s.{1,}\))"
+        posts = recent_posts("cfb", 100)
+        if check_if_error(posts):
+            await ctx.send(reddit_error_message)
+            return
+
+        match = None
+        for index, post in enumerate(posts["data"]["children"]):
+            post_info = build_post_info(post)
+            match = re.match(cfb_regex, post_info["title"])
+            if match:
+                embed = build_embed(post_info)
+                await ctx.send(embed=embed)
+
+        if not match:
+            await ctx.send("No r/cfb game day threads found!")
+
+    @reddit.command(aliases=["p", ])
     async def postgame(self, ctx):
         """Outputs the most recent postt game day thread on r/Huskers."""
         thread_titles = "post game thread -"
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts(100)
+        posts = recent_posts("huskers", 100)
         if check_if_error(posts):
             await ctx.send(reddit_error_message)
             return
 
+        embed = None
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
             if post_info["title"].lower().startswith(thread_titles):
                 embed = build_embed(post_info)
                 await edit_msg.edit(content="", embed=embed)
-                return
+                break
 
-        await edit_msg.edit(content="No post game threads found!")
-        # await add_reactions(message=edit_msg, reactions=reddit_reactions)
+        if not embed:
+            await edit_msg.edit(content="No r/Huskers post game day threads found!")
 
-    @reddit.command(aliases=["w",])
+        cfb_regex = "\[Postgame Thread\]\s(.{1,}\sDefeats\sNebraska\s|Nebraska\sDefeats\s.{1,}\s)"
+        posts = recent_posts("cfb", 100)
+        if check_if_error(posts):
+            await ctx.send(reddit_error_message)
+            return
+
+        match = None
+        for index, post in enumerate(posts["data"]["children"]):
+            post_info = build_post_info(post)
+            match = re.match(cfb_regex, post_info["title"])
+            if match:
+                embed = build_embed(post_info)
+                await ctx.send(embed=embed)
+
+        if not match:
+            await ctx.send("No r/cfb post game day threads found!")
+
+    @reddit.command(aliases=["w", ])
     async def weekly(self, ctx):
         """Outputs the current weekly game discussion on r/Huskers."""
         thread_titles = "weekly discussion thread -"
 
         edit_msg = await ctx.send("Loading...")
 
-        posts = recent_posts(100)
+        posts = recent_posts("huskers", 100)
         if check_if_error(posts):
             await ctx.send(reddit_error_message)
             return
