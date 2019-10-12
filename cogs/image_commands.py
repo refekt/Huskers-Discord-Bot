@@ -203,7 +203,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def ohno(self, ctx):
         """ This is not ideal. """
-        await ctx.send(embed=await sendImage("Big OOOOOOF", "https://i.imgur.com/f4P6jBO.png"))
+        await ctx.send(embed=await sendImage("Big OOOOOOF", random.choice(["https://i.imgur.com/f4P6jBO.png", "https://i.imgur.com/g63wKDl.png"])))
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
