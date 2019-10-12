@@ -151,6 +151,24 @@ class GameCondition(Enum):
     playing = 2
 
 
+class ConvertExceptions(object):
+
+    func = None
+
+    def __init__(self, exceptions, replacement=None):
+        self.exceptions = exceptions
+        self.replacement = replacement
+
+    def __call__(self, *args, **kwargs):
+        if self.func is None:
+            self.func = args[0]
+            return self
+        try:
+            return self.func(*args, **kwargs)
+        except self.exceptions:
+            return self.replacement
+
+
 def pick_new_word():
     return random.choice(word_choices)
 
@@ -226,6 +244,14 @@ def is_in_players(checkme):
         return False
 
 
+def game_playing():
+    global keep_playing
+    if not keep_playing:
+        return False
+    else:
+        return True
+
+
 def setup(bot):
     bot.add_cog(Hangman(bot))
 
@@ -234,7 +260,10 @@ class Hangman(commands.Cog, name="Husker Hangman"):
     """Husker Hangman!"""
     @commands.group(aliases=["hm",])
     async def hangman(self, ctx):
-        pass
+        if not ctx.subcommand_passed:
+            await ctx.send("A subcommand must be entered. Please review `$help hangman` for more information.")
+        elif not ctx.invoked_subcommand:
+            await ctx.send("A correct subcommand must be entered. Please review `$help hangman` for more information.")
 
     @hangman.command(aliases=["g",])
     async def guess(self, ctx, letter: str):
@@ -242,8 +271,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
             await ctx.send("Guesses must be alpha characters only!")
             return
 
-        global keep_playing
-        if not keep_playing:
+        if not game_playing():
             await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
             return
 
@@ -281,6 +309,10 @@ class Hangman(commands.Cog, name="Husker Hangman"):
         global current_word
         global players
 
+        if not game_playing():
+            await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
+            return
+
         if not is_in_players(ctx.message.author.name):
             await ctx.send("You are not a registered participant in this game!")
             return
@@ -298,8 +330,7 @@ class Hangman(commands.Cog, name="Husker Hangman"):
 
     @hangman.command(aliases=["q",])
     async def quit(self, ctx):
-        global keep_playing
-        if not keep_playing:
+        if not game_playing():
             await ctx.send("There is no game currently being played. To start a new game use `$hangman new [discord.Member,...]`.")
             return
 

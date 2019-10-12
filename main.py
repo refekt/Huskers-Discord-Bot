@@ -29,6 +29,7 @@ client.load_extension('cogs.sched_commands')
 client.load_extension('cogs.betting_commands')
 client.load_extension('cogs.reddit_commands')
 client.load_extension('cogs.games.hangman')
+client.load_extension('cogs.games.trivia')
 
 # initialize a global list for CrootBot to put search results in
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']

@@ -167,7 +167,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
     @reddit.command(aliases=["g",])
     async def gameday(self, ctx):
         """Outputs the most recent game day thread on r/Huskers."""
-        thread_titles = ("pregame thread -", "game thread -")
+        thread_titles = ("pregame thread -", "pre game thread -", "game thread -")
 
         edit_msg = await ctx.send("Loading...")
 
