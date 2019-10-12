@@ -37,7 +37,8 @@ ref_dict = {"backblock": ["Block in the back", "OFF: 10 yards\nDEF: 10 yards", "
             "sub": ["Substitution Infraction", "OFF: 5 yards\nDEF: 5 yards", ""],
             'targeting': ['Targeting', 'OFF/DEF: 15 yard penalty, ejection ', 'https://i.imgur.com/qOsjBCB.gif'],
             'td': ['Touchdown', 'OFF: 6 points', 'https://i.imgur.com/UJ0AC5k.mp4'],
-            'unsport': ['Unsportsmanlike', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/6Cy9UE4.gif']
+            'unsport': ['Unsportsmanlike', 'OFF: 15 yards\nDEF: 15 yards', 'https://i.imgur.com/6Cy9UE4.gif'],
+            'sexy': ["Big SEXY", "", "https://i.imgur.com/4A3ADAa.jpg"]
             }
 flag_dict = {
     'alabama': 'https://i.imgur.com/uHXPo4n.png',
