@@ -40,6 +40,7 @@ def store_next_opponent():
         check_now = datetime.datetime.now()
 
         if check_now < check_date:
+            config.current_game = []
             if events["home_team"] != "Nebraska":
                 config.current_game.append(events["home_team"])
             else:
@@ -49,6 +50,8 @@ def store_next_opponent():
             break
         # Used for navigating season_bets JSON
         counter += 1
+
+    print(config.current_game)
 
 
 def game_number(team):
