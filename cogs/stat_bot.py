@@ -302,7 +302,7 @@ class StatBot(commands.Cog, name="CFB Stats"):
             return
 
         if not boxscore_json:
-            await edit_msg.edit(content="This was a bye week. Try again.")
+            await edit_msg.edit(content="This is either a bye week or a game in progress. Try again.")
             return
 
         dump = True
