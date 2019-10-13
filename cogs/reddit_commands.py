@@ -168,7 +168,8 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
     @reddit.command(aliases=["p", ])
     async def postgame(self, ctx):
         """Outputs the most recent postt game day thread on r/Huskers."""
-        thread_titles = "post game thread -"
+        # thread_titles = ("post game thread -", "- post game thread")
+        thread_titles = "post game thread"
 
         edit_msg = await ctx.send("Loading...")
 
@@ -180,7 +181,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
         embed = None
         for index, post in enumerate(posts["data"]["children"]):
             post_info = build_post_info(post)
-            if post_info["title"].lower().startswith(thread_titles):
+            if thread_titles in post_info["title"].lower():
                 embed = build_embed(post_info)
                 await edit_msg.edit(content="", embed=embed)
                 break
@@ -203,7 +204,7 @@ class RedditCommands(commands.Cog, name="Reddit Commands"):
                 await ctx.send(embed=embed)
                 return
 
-            await ctx.send("No r/cfb game day threads found!")
+        await ctx.send("No r/cfb game day threads found!")
 
     @reddit.command(aliases=["w", ])
     async def weekly(self, ctx):
