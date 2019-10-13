@@ -111,8 +111,11 @@ async def on_message(message):
         if ".addvotes" in message.content.lower():
             emojiUpvote = "\N{UPWARDS BLACK ARROW}"
             emojiDownvote = "\N{DOWNWARDS BLACK ARROW}"
-            await message.add_reaction(emojiUpvote)
-            await message.add_reaction(emojiDownvote)
+            # await message.add_reaction(emojiUpvote)
+            # await message.add_reaction(emojiDownvote)
+            await message.add_reaction("⬆")
+            await message.add_reaction("⬇")
+            await message.add_reaction("↔")
 
         # Link a subreddit
         #get a list of subreddits mentioned
