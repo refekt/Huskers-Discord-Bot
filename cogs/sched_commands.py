@@ -82,7 +82,7 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
             r = requests.get(url)
             schedule_list = r.json() # Actually imports a list
         except:
-            await ctx.send("An error occurred retrieving poll data.")
+            await ctx.send("An error occurred retrieving schedule data.")
             return
 
         dump = True

@@ -22,13 +22,22 @@ def load_season_bets():
     f.close()
 
 
-def store_next_opponent():
+def store_next_opponent(year):
     # Open previously generated JSON from $schedule.
     # To refresh change dump = True manually
-    f = open('husker_schedule.json', 'r')
-    temp_json = f.read()
-    husker_schedule = json.loads(temp_json)
-    f.close()
+    url = "https://api.collegefootballdata.com/games?year={}&seasonType=regular&team=nebraska".format(year)
+    husker_schedule = None
+    try:
+        r = requests.get(url)
+        husker_schedule = r.json()  # Actually imports a list
+    except:
+        print("Unable to pull data")
+
+    dump = True
+    if dump:
+        with open("husker_schedule.json", "w") as fp:
+            json.dump(husker_schedule, fp, sort_keys=True, indent=4)
+        fp.close()
 
     # Find first game that is scheduled after now()
     counter = 1
@@ -38,8 +47,7 @@ def store_next_opponent():
         check_date = datetime.datetime(day=check_date_raw.day, month=check_date_raw.month, year=check_date_raw.year, hour=check_date_raw.hour, minute=check_date_raw.minute)
 
         check_now = datetime.datetime.now()
-
-        if check_now < check_date:
+        if check_now <= check_date:
             config.current_game = []
             if events["home_team"] != "Nebraska":
                 config.current_game.append(events["home_team"])
@@ -50,8 +58,6 @@ def store_next_opponent():
             break
         # Used for navigating season_bets JSON
         counter += 1
-
-    print(config.current_game)
 
 
 def game_number(team):
@@ -90,7 +96,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return
 
         # Load next opponent and bets
-        store_next_opponent()
+        store_next_opponent(datetime.datetime.now().year)
         load_season_bets()
         create_embed()
 
@@ -154,7 +160,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         msg_sent = await ctx.send(embed=embed)
         check_game_datetime = config.current_game[1]
-        if check_now < check_game_datetime:
+        if check_now + + datetime.timedelta(hours=5) < check_game_datetime:
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
         else:
