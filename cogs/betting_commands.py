@@ -463,16 +463,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         result_spread = None
         if game_info["spread_value"] > 0:
-            result_spread = bool(
-                int(
-                    abs(int(game_info["score"]) - int(game_info["opponent_score"])) > game_info["spread_value"]
-                )
+            print("Comparing: ", game_info["opponent_score"], "-", game_info["score"], "=", game_info["opponent_score"] - game_info["score"], ">", game_info["spread_value"])
+
+            result_spread = not bool(
+                (game_info["opponent_score"] - game_info["score"]) > game_info["spread_value"]
             )
         elif game_info["spread_value"] < 0:
+            print("Comparing: ", game_info["score"], "-", game_info["opponent_score"], "=", game_info["score"] - game_info["opponent_score"], ">", game_info["spread_value"])
+
             result_spread = bool(
-                int(
-                    abs(int(game_info["score"]) - int(game_info["opponent_score"])) > abs(game_info["spread_value"])
-                )
+                (game_info["score"] - game_info["opponent_score"]) > abs(game_info["spread_value"])
             )
 
         result_moneyline = bool(
@@ -486,7 +486,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             game_info = cursor.fetchone()
         mysql.sqlConnection.commit()
 
-        await ctx.send("Updated! The results are:\nNebraska: {}\nOpponent: {}\nWin: {}\nSpread: {}\nTotal Points:{}".format(score, oppo_score, result_winorlose, result_spread, result_moneyline))
+        await ctx.send("Updated! The results are:\nNebraska: {}\nOpponent: {}\nWin (Yes==True, No==False): {}\nSpread (): {}\nTotal Points: {}".format(
+            score,
+            oppo_score,
+            result_winorlose,
+            result_spread,
+            result_moneyline
+        ))
 
 
 def setup(bot):
