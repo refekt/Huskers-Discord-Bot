@@ -1,5 +1,6 @@
 from discord.ext import commands
 import mysql, config, random, discord, time
+from datetime import datetime
 
 errors = {
     "wrong_channel": "You used the command in the wrong channel!",
@@ -27,6 +28,9 @@ def trivia_embed(*fields):
 
 async def loop_questions(chan: discord.TextChannel):
     if game.started:
+        msg = await chan.send(
+            embed=trivia_embed(["Question Loading...", "Answers Loading..."])
+        )
         question_list = [
             game.questions[game.current_question]["correct"],
             game.questions[game.current_question]["wrong_1"],
@@ -43,14 +47,12 @@ async def loop_questions(chan: discord.TextChannel):
             question_list[2],
             question_list[3]
         )
-
         question_embed = trivia_embed(
                 [game.questions[game.current_question]["question"], question_msg]
             )
-        msg = await chan.send(
-            embed=question_embed
-        )
         await add_reactions(msg)
+        game.current_question_dt = datetime.now()
+        await msg.edit(embed=question_embed)
         time.sleep(game.timer)
         question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
         await msg.edit(embed=question_embed)
@@ -63,6 +65,7 @@ class TriviaGame():
     def __init__(self, channel, question=None):
         self.channel = None
         self.current_question = 0
+        self.current_question_dt = None
         self.questions = list()
         self.timer = int()
         self.setup_complete = False
@@ -146,21 +149,10 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
             msg = await game.channel.send(embed=embed)
             for index in range(game.timer, -1, -1):
-                embed = trivia_embed(
-                    ["Rules", "You have {} seconds to answer by reacting to questions. Each question is worth 1,000 points per second and will count down to 0 after {} seconds.".format(game.timer, game.timer)],
-                    ["Game Status", "The game is starting soon! Get ready for the first question!"],
-                    ["Countdown...", index]
-                )
+                embed.remove_field(2)
+                embed.add_field(name="Countdown..", value=str(index))
                 await msg.edit(embed=embed)
                 time.sleep(1)
-
-            # countdown_message = await game.channel.send("```\nGet ready!\n```")
-            # for index in range(game.timer, -1, -1):
-            #     time.sleep(1)
-            #     await countdown_message.edit(content="```\n{}...\n```".format(index))
-            # await countdown_message.edit(content="```\nStarting!\n```")
-            # time.sleep(1)
-            # await countdown_message.delete()
         else:
             await ctx.send(
                 embed=trivia_embed(
@@ -170,7 +162,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
         await loop_questions(game.channel)
 
-    @trivia.command(aliases=["n",])
+    @trivia.command(aliases=["n",], hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336)
     async def next(self, ctx):
         """Admin/Trivia Boss Command: Send the next question"""
@@ -180,14 +172,15 @@ class Trivia(commands.Cog, name="Husker Trivia"):
     @commands.has_any_role(606301197426753536, 440639061191950336)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
-        game.started = False
+        global game
+        game = TriviaGame(channel=None)
         await ctx.send(
             embed=trivia_embed(
                 ["Quitting", "The current trivia game has ended!"]
             )
         )
 
-    @trivia.command(aliases=["score",])
+    @trivia.command(aliases=["score",], hidden=True)
     async def scores(self, ctx):
         """Shows the score for the current trivia game"""
         pass
