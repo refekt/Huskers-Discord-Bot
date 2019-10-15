@@ -255,7 +255,7 @@ async def on_raw_reaction_add(payload):
         # Updating season_bets JSON for reacting to a $bet message
         if emoji in bet_emojis and user != client.user and message.embeds[0].footer.text == config.bet_footer:
             if not bool(config.current_game):
-                store_next_opponent()
+                store_next_opponent(datetime.datetime.now().year)
 
             check_now = datetime.datetime.now()
             check_game_datetime_raw = config.current_game[1]
@@ -361,6 +361,12 @@ async def on_raw_reaction_add(payload):
 
             elif emoji == "⬇":
                 vote_post("-1", message.embeds[0].footer.text.split("ID: ")[1].strip())
+
+        # Trivia commands
+        elif user != client.user and message.embeds[0].title == "Husker Discord Trivia" and len(message.embeds[0].fields) == 1:
+            import cogs.games.trivia as trivia
+            trivia.tally_score(message, user, datetime.datetime.now())
+
     else:
         if not message.author.bot and ".addvotes" in message.content and emoji not in arrows:
             for reaction in message.reactions:
@@ -557,9 +563,12 @@ async def all(ctx):
     if channel.id in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
         msgs = []
         try:
-            async for message in channel.history(limit=100):
+            maxage = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)
+            async for message in channel.history(limit=100, oldest_first=True, before=(datetime.datetime.now() + datetime.timedelta(days=-13))):
+                # if message.created_at >= maxage:
                 msgs.append(message)
             await channel.delete_messages(msgs)
+            print("Bulk delete successful.")
         except discord.ClientException:
             print("Cannot delete more than 100 messages at a time.")
             pass
@@ -567,7 +576,7 @@ async def all(ctx):
             print("Missing permissions.")
             pass
         except discord.HTTPException:
-            print("Deleting messages failed.")
+            print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
             pass
 
 

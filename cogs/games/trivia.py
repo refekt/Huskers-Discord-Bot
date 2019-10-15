@@ -6,7 +6,9 @@ errors = {
     "wrong_channel": "You used the command in the wrong channel!",
     "already_setup": "There is already a game setup. To start a new game you must perform `$trivia quit` first.",
     "not_setup": "The game is not setup. To setup a game you must perform `$trivia setup` first.",
-    "already_started": "The game is already started!"
+    "already_started": "The game is already started!",
+    "trivia_master": "You are not the Trivia Master! Denied.",
+    "unknown": "Unknown error!"
 }
 
 
@@ -22,15 +24,14 @@ def trivia_embed(*fields):
     embed.set_thumbnail(url="https://i.imgur.com/0Co9fOy.jpg")
     embed.set_author(name="Bot Frost", url="https://reddit.com/u/Bot_Frost", icon_url="https://i.imgur.com/Ah3x5NA.png")
     for field in fields:
-        embed.add_field(name=field[0], value=field[1])
+        embed.add_field(name=field[0], value=field[1], inline=False)
     return embed
 
 
 async def loop_questions(chan: discord.TextChannel):
     if game.started:
-        msg = await chan.send(
-            embed=trivia_embed(["Question Loading...", "Answers Loading..."])
-        )
+        game.processing = True
+
         question_list = [
             game.questions[game.current_question]["correct"],
             game.questions[game.current_question]["wrong_1"],
@@ -38,10 +39,8 @@ async def loop_questions(chan: discord.TextChannel):
             game.questions[game.current_question]["wrong_3"]
         ]
         random.shuffle(question_list)
-        question_msg = "1️⃣: {}\n" \
-                       "2️⃣: {}\n" \
-                       "3️⃣: {}\n" \
-                       "4️⃣: {}".format(
+
+        question_msg = "1️⃣: {}\n2️⃣: {}\n3️⃣: {}\n4️⃣: {}".format(
             question_list[0],
             question_list[1],
             question_list[2],
@@ -50,15 +49,50 @@ async def loop_questions(chan: discord.TextChannel):
         question_embed = trivia_embed(
                 [game.questions[game.current_question]["question"], question_msg]
             )
+
+        msg = await chan.send(
+            embed=trivia_embed(["Question Loading...", "Answers Loading..."])
+        )
         await add_reactions(msg)
+        time.sleep(1)
+
         game.current_question_dt = datetime.now()
-        await msg.edit(embed=question_embed)
-        time.sleep(game.timer)
-        question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
+        question_embed.set_footer(text=str(game.current_question_dt))
         await msg.edit(embed=question_embed)
 
-        game.questions[game.current_question]["answered"] = True
+        time.sleep(game.timer)
+        question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
+
+        now = datetime.now()
+        old = datetime.strptime(question_embed.footer.text, "%Y-%m-%d %H:%M:%S.%f")
+        question_embed.set_footer(text="{}|{}".format(question_embed.footer.text,now,now-old))
+        await msg.edit(embed=question_embed)
+
         game.current_question += 1
+        game.add_to_collection(msg)
+        game.processing = False
+
+        if game.current_question > len(game.questions):
+            await chan.send("The game is over!")
+
+
+async def delete_collection():
+    await game.channel.delete_messages(game.message_collection)
+
+
+def tally_score(message: discord.Message, author: discord.Member, end):
+    """1000 points per second"""
+    footer_text = message.embeds[0].footer.text
+    start = datetime.strptime(footer_text.split("|")[0].strip(), "%Y-%m-%d %H:%M:%S.%f")
+    # end = datetime.strptime(footer_text.split("|")[1].strip(), "%Y-%m-%d %H:%M:%S.%f")
+    diff = end - start
+    score = (diff.total_seconds() - game.timer) * 1000
+    print("score", score)
+
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlInsertTriviaScore, (author.display_name, score, score))
+    mysql.sqlConnection.commit()
+    cursor.close()
 
 
 class TriviaGame():
@@ -70,8 +104,12 @@ class TriviaGame():
         self.timer = int()
         self.setup_complete = False
         self.started = False
+        self.processing = False
+        self.trivia_master = None
+        self.message_collection = list()
 
-    def setup(self, chan: discord.TextChannel, timer=None):
+    def setup(self, user: discord.Member, chan: discord.TextChannel, timer=None):
+        self.trivia_master = user
         self.channel = chan
         if timer:
             self.timer = timer
@@ -81,8 +119,7 @@ class TriviaGame():
             cursor.execute(config.sqlRetrieveTriviaQuestions)
             trivia_questions = cursor.fetchall()
         mysql.sqlConnection.commit()
-        for question in trivia_questions:
-            question["answered"] = False
+        cursor.close()
         random.shuffle(trivia_questions)
         self.questions = trivia_questions
         self.setup_complete = True
@@ -92,6 +129,9 @@ class TriviaGame():
             return True
         else:
             return False
+
+    def add_to_collection(self, message: discord.Message):
+        self.message_collection.append(message)
 
 
 game = TriviaGame(channel=None)
@@ -116,29 +156,33 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 )
                 return
         except:
-            pass
+            pass  # I don't know if the try/excpet is needed
 
         timer = abs(timer)
-        game.setup(chan, timer)
-        await ctx.send(
+        game.setup(ctx.message.author, chan, timer)
+        msg = await ctx.send(
             embed=trivia_embed(
                 ["Channel", chan],
                 ["Question Timer", timer],
                 ["Number of Questions", len(game.questions)]
             )
         )
+        game.add_to_collection(msg)
+
+    @setup.error
+    async def setup_handler(self, ctx, error):
+        await ctx.send(errors["unknown"])
 
     @trivia.command()
     @commands.has_any_role(606301197426753536, 440639061191950336)
     async def start(self, ctx):
         """Admin/Trivia Boss Command: Starts the trivia game"""
-        if not game.correct_channel(ctx.channel):
+        if not ctx.message.author == game.trivia_master:
             await ctx.send(
                 embed=trivia_embed(
-                    ["Error!", errors["wrong_channel"]]
+                    ["Error!", errors["trivia_master"]]
                 )
             )
-            return
 
         if game.setup_complete:
             game.started = True
@@ -153,6 +197,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 embed.add_field(name="Countdown..", value=str(index))
                 await msg.edit(embed=embed)
                 time.sleep(1)
+            await msg.delete()
         else:
             await ctx.send(
                 embed=trivia_embed(
@@ -162,23 +207,51 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
         await loop_questions(game.channel)
 
+    @start.error
+    async def start_handler(self, ctx, error):
+        await ctx.send(errors["unknown"])
+
     @trivia.command(aliases=["n",], hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336)
     async def next(self, ctx):
         """Admin/Trivia Boss Command: Send the next question"""
-        pass
+        global game
+        if not ctx.message.author == game.trivia_master:
+            await ctx.send(
+                embed=trivia_embed(
+                    ["Error!", errors["trivia_master"]]
+                )
+            )
+
+        if not game.processing:
+            await loop_questions(game.channel)
+
+    @next.error
+    async def next_handler(self, ctx, error):
+        await ctx.send(errors["unknown"])
 
     @trivia.command(aliases=["q",])
     @commands.has_any_role(606301197426753536, 440639061191950336)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
         global game
+        if not ctx.message.author == game.trivia_master:
+            await ctx.send(
+                embed=trivia_embed(
+                    ["Error!", errors["trivia_master"]]
+                )
+            )
+        await delete_collection()
         game = TriviaGame(channel=None)
         await ctx.send(
             embed=trivia_embed(
                 ["Quitting", "The current trivia game has ended!"]
             )
         )
+
+    @quit.error
+    async def quit_handler(self, ctx, error):
+        await ctx.send(errors["unknown"])
 
     @trivia.command(aliases=["score",], hidden=True)
     async def scores(self, ctx):
