@@ -29,7 +29,7 @@ client.load_extension('cogs.sched_commands')
 client.load_extension('cogs.betting_commands')
 client.load_extension('cogs.reddit_commands')
 client.load_extension('cogs.games.hangman')
-client.load_extension('cogs.games.trivia')
+# client.load_extension('cogs.games.trivia')
 
 # initialize a global list for CrootBot to put search results in
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']
@@ -366,6 +366,7 @@ async def on_raw_reaction_add(payload):
         elif user != client.user and message.embeds[0].title == "Husker Discord Trivia" and len(message.embeds[0].fields) == 1:
             import cogs.games.trivia as trivia
             trivia.tally_score(message, user, datetime.datetime.now())
+            await channelID.send("Sent score")
 
     else:
         if not message.author.bot and ".addvotes" in message.content and emoji not in arrows:
@@ -652,7 +653,7 @@ async def about(ctx):
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
     embed.add_field(name="Hosting Location", value="Jeyrad's VPS Server. Thank you!")
     embed.add_field(name="Ready Status", value=client.is_ready())
-    embed.add_field(name="Current Latency", value="{:.2f} ms".format(client.latency*1000))
+    embed.add_field(name="Current Latency", value="{:.2f} ms".format(config.bot_latency()))
     embed.add_field(name="Client User", value=client.user)
     embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)

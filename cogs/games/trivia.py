@@ -1,5 +1,5 @@
 from discord.ext import commands
-import mysql, config, random, discord, time
+import mysql, config, random, discord, time #, threading, _thread
 from datetime import datetime
 
 errors = {
@@ -28,7 +28,7 @@ def trivia_embed(*fields):
     return embed
 
 
-async def loop_questions(chan: discord.TextChannel):
+async def loop_questions():  # chan: discord.TextChannel):
     if game.started:
         game.processing = True
 
@@ -50,7 +50,7 @@ async def loop_questions(chan: discord.TextChannel):
                 [game.questions[game.current_question]["question"], question_msg]
             )
 
-        msg = await chan.send(
+        msg = await game.channel.send(
             embed=trivia_embed(["Question Loading...", "Answers Loading..."])
         )
         await add_reactions(msg)
@@ -60,7 +60,10 @@ async def loop_questions(chan: discord.TextChannel):
         question_embed.set_footer(text=str(game.current_question_dt))
         await msg.edit(embed=question_embed)
 
-        time.sleep(game.timer)
+        print("Bot latency", config.bot_latency() / 1000)
+
+        # time.sleep(game.timer + (config.bot_latency() / 1000))
+
         question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
 
         now = datetime.now()
@@ -73,7 +76,7 @@ async def loop_questions(chan: discord.TextChannel):
         game.processing = False
 
         if game.current_question > len(game.questions):
-            await chan.send("The game is over!")
+            await game.channel.send("The game is over!")
 
 
 async def delete_collection():
@@ -86,7 +89,9 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     start = datetime.strptime(footer_text.split("|")[0].strip(), "%Y-%m-%d %H:%M:%S.%f")
     # end = datetime.strptime(footer_text.split("|")[1].strip(), "%Y-%m-%d %H:%M:%S.%f")
     diff = end - start
-    score = (diff.total_seconds() - game.timer) * 1000
+    score = diff.total_seconds()
+    print("score", score)
+    score *= 1000
     print("score", score)
 
     with mysql.sqlConnection.cursor() as cursor:
@@ -135,6 +140,10 @@ class TriviaGame():
 
 
 game = TriviaGame(channel=None)
+
+
+def thread_waiting(game: TriviaGame):
+    pass
 
 
 class Trivia(commands.Cog, name="Husker Trivia"):
@@ -205,7 +214,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 )
             )
 
-        await loop_questions(game.channel)
+        await loop_questions()
 
     @start.error
     async def start_handler(self, ctx, error):
@@ -224,7 +233,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
 
         if not game.processing:
-            await loop_questions(game.channel)
+            await loop_questions()
 
     @next.error
     async def next_handler(self, ctx, error):
