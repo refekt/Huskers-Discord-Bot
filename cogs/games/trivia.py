@@ -151,7 +151,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         pass
 
     @trivia.command(aliases=["s",])
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
     async def setup(self, ctx, chan: discord.TextChannel, timer=10, questions=15):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
         try:
@@ -183,7 +183,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         await ctx.send(errors["unknown"])
 
     @trivia.command()
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
     async def start(self, ctx):
         """Admin/Trivia Boss Command: Starts the trivia game"""
         if not ctx.message.author == game.trivia_master:
@@ -221,7 +221,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         await ctx.send(errors["unknown"])
 
     @trivia.command(aliases=["n",], hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
     async def next(self, ctx):
         """Admin/Trivia Boss Command: Send the next question"""
         global game
@@ -240,7 +240,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         await ctx.send(errors["unknown"])
 
     @trivia.command(aliases=["q",])
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
         global game
