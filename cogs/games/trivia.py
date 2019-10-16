@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.ext.commands import TextChannelConverter
 import mysql, config, random, discord, time, asyncio
 from datetime import datetime
 
@@ -8,12 +9,13 @@ errors = {
     "not_setup": "The game is not setup. To setup a game you must perform `$trivia setup` first.",
     "already_started": "The game is already started!",
     "trivia_master": "You are not the Trivia Master! Denied.",
-    "unknown": "Unknown error!"
+    "unknown": "Unknown error!",
+    "setup_error": "One or more inputs was incorrect. Try again!"
 }
 
 
 async def add_reactions(message: discord.Message):
-    reactions = ("💓", "💛", "💚", "💙")
+    reactions = ("💓", "💛", "💚", "💙", "⏭")
     for reaction in reactions:
         await message.add_reaction(reaction)
 
@@ -26,6 +28,32 @@ def trivia_embed(*fields):
     for field in fields:
         embed.add_field(name=field[0], value=field[1], inline=False)
     return embed
+
+
+async def start_messagse():
+    if game.setup_complete:
+        game.started = True
+        embed = trivia_embed(
+            ["Rules", "You have {} seconds to answer by reacting to questions. Each question is worth 1,000 points per second and will count down to 0 after {} seconds.".format(game.timer, game.timer)],
+            ["Game Status", "The game is starting soon! Get ready for the first question!"],
+            ["Countdown...", game.timer]
+        )
+        msg = await game.channel.send(embed=embed)
+
+        for index in range(game.timer, -1, -1):
+            embed.remove_field(2)
+            embed.add_field(name="Countdown..", value=str(index))
+            await msg.edit(embed=embed)
+            time.sleep(1)
+    else:
+        await game.channel.send(
+            embed=trivia_embed(
+                ["Error!", errors["already_started"]]
+            )
+        )
+        return
+
+    await loop_questions()
 
 
 async def loop_questions():  # chan: discord.TextChannel):
@@ -75,8 +103,51 @@ async def loop_questions():  # chan: discord.TextChannel):
         game.add_to_collection(msg)
         game.processing = False
 
-        if game.current_question > len(game.questions):
-            await game.channel.send("The game is over!")
+        def check_reaction(r, u):
+            return u == game.trivia_master and str(r.emoji) == "⏭"
+
+        if game.current_question >= len(game.questions):
+            await quit_game()
+
+        try:
+            reaction, user = await config.client.wait_for("reaction_add", check=check_reaction)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            if not game.processing and game.started:
+                await loop_questions()
+
+
+def scoreboard():
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlRetrieveTriviaScores)
+    mysql.sqlConnection.commit()
+    scores = cursor.fetchall()
+    cursor.close()
+
+    if scores:
+        scores_edited = ""
+        for score in scores:
+            scores_edited += "{}: {}\n".format(score["user"], score["score"])
+        return scores_edited
+    else:
+        return "N/A"
+
+
+async def quit_game():
+    global game
+    await delete_collection()
+
+    scores = scoreboard()
+
+    await game.channel.send(
+        embed=trivia_embed(
+            ["Quitting", "The current trivia game has ended!"],
+            ["Scores", scores]
+        )
+    )
+
+    game = TriviaGame(channel=None)
 
 
 async def delete_collection():
@@ -91,6 +162,8 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     score = diff.total_seconds()
     score *= 1000
     score = (game.timer * 1000) - score
+
+    print("===\n= User: {}\n= Score: {}\n===\n".format(author.display_name, score))
 
     with mysql.sqlConnection.cursor() as cursor:
         cursor.execute(config.sqlInsertTriviaScore, (author.display_name, score, score))
@@ -111,20 +184,19 @@ class TriviaGame():
         self.trivia_master = None
         self.message_collection = list()
 
-    def setup(self, user: discord.Member, chan: discord.TextChannel, timer, questions):
+    def setup(self, user: discord.Member, chan, timer, questions):
         self.trivia_master = user
         self.channel = chan
-        if timer:
-            self.timer = timer
-        else:
-            self.timer = 10
+        self.timer = int(timer)
+
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlRetrieveTriviaQuestions)
             trivia_questions = cursor.fetchall()
         mysql.sqlConnection.commit()
         cursor.close()
         random.shuffle(trivia_questions)
-        self.questions = trivia_questions[0:questions]
+
+        self.questions = trivia_questions[0:int(questions)]
         self.setup_complete = True
 
     def correct_channel(self, chan):
@@ -148,7 +220,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
     @trivia.command(aliases=["s",])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
-    async def setup(self, ctx, chan: discord.TextChannel, timer=10, questions=15):
+    async def setup(self, ctx): #, chan: discord.TextChannel, timer=10, questions=15, category=None):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
         try:
             if game.setup_complete:
@@ -161,21 +233,81 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         except:
             pass  # I don't know if the try/excpet is needed
 
-        timer = abs(timer)
-        game.setup(ctx.message.author, chan, timer, questions)
+        setup_questions = [
+            ["Channel", "What channel do you want to use?"],
+            ["Timer", "How long of a question timer do you want to use?"],
+            ["Questions", "How many question do you want to use?"]#,
+            #["Category", "What category do you want to use? (all, huskers, ...)"]
+        ]
+
+        def check_channel(m):
+            return m
+
+        def check_timer_and_questions(m):
+            return abs(int(m.content))
+
+        def check_category(m):
+            return m.content
+
+        setup_chan = setup_timer = setup_question_length = setup_category = None
+
+        for question in setup_questions:
+            await ctx.send(
+                embed=trivia_embed(
+                    [question[0], question[1]]
+                )
+            )
+
+            if question[0] == "Channel":
+                msg = await config.client.wait_for("message", check=check_channel)
+                setup_chan = await TextChannelConverter().convert(ctx, msg.content)
+                game.message_collection.append(msg)
+            elif question[0] == "Timer":
+                msg = await config.client.wait_for("message", check=check_timer_and_questions)
+                setup_timer = msg.content
+                game.message_collection.append(msg)
+            elif question[0] == "Questions":
+                msg = await config.client.wait_for("message", check=check_timer_and_questions)
+                setup_question_length = msg.content
+                game.message_collection.append(msg)
+            elif question[0] == "Category":
+                msg = await config.client.wait_for("message", check=check_category)
+                setup_category = msg.content
+                game.message_collection.append(msg)
+
+        game.setup(ctx.message.author, setup_chan, setup_timer, setup_question_length)
 
         msg = await ctx.send(
             embed=trivia_embed(
-                ["Channel", chan.mention],
-                ["Question Timer", timer],
-                ["Number of Questions", len(game.questions)]
+                ["Status", "Setup Completed! React 🆗 to start the game or use `$trivia start`."],
+                ["Channel", game.channel.mention],
+                ["Timer", game.timer],
+                ["Number of Questions", len(game.questions)],
+                ["Category", "TBD"]
             )
         )
-        game.add_to_collection(msg)
+        game.message_collection.append(msg)
+        await msg.add_reaction("🆗")
+
+        def check_reaction(r, u):
+            return u == game.trivia_master and str(r.emoji) == "🆗"
+
+        try:
+            reaction, user = await config.client.wait_for("reaction_add", check=check_reaction)
+        except asyncio.TimeoutError:
+            await ctx.send("ur dumb lol")
+        else:
+            await start_messagse()
 
     @setup.error
     async def setup_handler(self, ctx, error):
-        await ctx.send(errors["unknown"])
+        await ctx.send(
+            embed=trivia_embed(
+                ["Setup Error!", errors["setup_error"]]
+            )
+        )
+        global game
+        game = TriviaGame(channel=None)
 
     @trivia.command()
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
@@ -189,33 +321,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
             return
 
-        if game.setup_complete:
-            game.started = True
-            embed = trivia_embed(
-                ["Rules", "You have {} seconds to answer by reacting to questions. Each question is worth 1,000 points per second and will count down to 0 after {} seconds.".format(game.timer, game.timer)],
-                ["Game Status", "The game is starting soon! Get ready for the first question!"],
-                ["Countdown...", game.timer]
-            )
-            msg = await game.channel.send(embed=embed)
-            for index in range(game.timer, -1, -1):
-                embed.remove_field(2)
-                embed.add_field(name="Countdown..", value=str(index))
-                await msg.edit(embed=embed)
-                time.sleep(1)
-            await msg.delete()
-        else:
-            await ctx.send(
-                embed=trivia_embed(
-                    ["Error!", errors["already_started"]]
-                )
-            )
-            return
-
-        await loop_questions()
-
-    @start.error
-    async def start_handler(self, ctx, error):
-        await ctx.send(errors["unknown"])
+        await start_messagse()
 
     @trivia.command(aliases=["n",], hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
@@ -233,41 +339,11 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         if not game.processing and game.started:
             await loop_questions()
 
-    @next.error
-    async def next_handler(self, ctx, error):
-        await ctx.send(errors["unknown"])
-
     @trivia.command(aliases=["q",])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
-        global game
-        if not ctx.message.author == game.trivia_master and game.started:
-            await ctx.send(
-                embed=trivia_embed(
-                    ["Error!", errors["trivia_master"]]
-                )
-            )
-            return
-
-        await delete_collection()
-
-        with mysql.sqlConnection.cursor() as cursor:
-            cursor.execute(config.sqlClearTriviaScore)
-        mysql.sqlConnection.commit()
-        cursor.close()
-
-        game = TriviaGame(channel=None)
-
-        await ctx.send(
-            embed=trivia_embed(
-                ["Quitting", "The current trivia game has ended!"]
-            )
-        )
-
-    @quit.error
-    async def quit_handler(self, ctx, error):
-        await ctx.send(errors["unknown"])
+        await quit_game()
 
     @trivia.command(aliases=["score",], hidden=True)
     async def scores(self, ctx):
@@ -280,17 +356,12 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
             return
 
-        with mysql.sqlConnection.cursor() as cursor:
-            cursor.execute(config.sqlRetrieveTriviaScores)
-            scores = cursor.fetchall()
-        mysql.sqlConnection.commit()
-        cursor.close()
-
-        embed = trivia_embed(
-            ["Scoreboard", scores]
+        scores = scoreboard()
+        await game.channel.send(
+            embed=trivia_embed(
+                ["Scoreboard", scores]
+            )
         )
-
-        await game.channel.send(embed=embed)
 
 
 def setup(bot):
