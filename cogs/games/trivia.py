@@ -250,6 +250,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                     ["Error!", errors["trivia_master"]]
                 )
             )
+            return
 
         await delete_collection()
 
