@@ -1,5 +1,5 @@
 from discord.ext import commands
-import mysql, config, random, discord, time #, threading, _thread
+import mysql, config, random, discord, time, asyncio
 from datetime import datetime
 
 errors = {
@@ -13,7 +13,7 @@ errors = {
 
 
 async def add_reactions(message: discord.Message):
-    reactions = ('1⃣', '2⃣', '3⃣', '4⃣')
+    reactions = ("💓", "💛", "💚", "💙")
     for reaction in reactions:
         await message.add_reaction(reaction)
 
@@ -38,9 +38,11 @@ async def loop_questions():  # chan: discord.TextChannel):
             game.questions[game.current_question]["wrong_2"],
             game.questions[game.current_question]["wrong_3"]
         ]
+
         random.shuffle(question_list)
 
-        question_msg = "1️⃣: {}\n2️⃣: {}\n3️⃣: {}\n4️⃣: {}".format(
+        # reactions = ("💓", "💛", "💚", "💙")
+        question_msg = "💓: {}\n💛: {}\n💚: {}\n💙: {}".format(
             question_list[0],
             question_list[1],
             question_list[2],
@@ -60,9 +62,7 @@ async def loop_questions():  # chan: discord.TextChannel):
         question_embed.set_footer(text=str(game.current_question_dt))
         await msg.edit(embed=question_embed)
 
-        print("Bot latency", config.bot_latency() / 1000)
-
-        # time.sleep(game.timer + (config.bot_latency() / 1000))
+        await asyncio.sleep(game.timer + (config.bot_latency()/100))
 
         question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
 
@@ -87,12 +87,10 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     """1000 points per second"""
     footer_text = message.embeds[0].footer.text
     start = datetime.strptime(footer_text.split("|")[0].strip(), "%Y-%m-%d %H:%M:%S.%f")
-    # end = datetime.strptime(footer_text.split("|")[1].strip(), "%Y-%m-%d %H:%M:%S.%f")
     diff = end - start
     score = diff.total_seconds()
-    print("score", score)
     score *= 1000
-    print("score", score)
+    score = (game.timer * 1000) - score
 
     with mysql.sqlConnection.cursor() as cursor:
         cursor.execute(config.sqlInsertTriviaScore, (author.display_name, score, score))
@@ -113,7 +111,7 @@ class TriviaGame():
         self.trivia_master = None
         self.message_collection = list()
 
-    def setup(self, user: discord.Member, chan: discord.TextChannel, timer=None):
+    def setup(self, user: discord.Member, chan: discord.TextChannel, timer, questions):
         self.trivia_master = user
         self.channel = chan
         if timer:
@@ -126,7 +124,7 @@ class TriviaGame():
         mysql.sqlConnection.commit()
         cursor.close()
         random.shuffle(trivia_questions)
-        self.questions = trivia_questions
+        self.questions = trivia_questions[0:questions]
         self.setup_complete = True
 
     def correct_channel(self, chan):
@@ -154,7 +152,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
     @trivia.command(aliases=["s",])
     @commands.has_any_role(606301197426753536, 440639061191950336)
-    async def setup(self, ctx, chan: discord.TextChannel, timer=10):
+    async def setup(self, ctx, chan: discord.TextChannel, timer=10, questions=15):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
         try:
             if game.setup_complete:
@@ -168,7 +166,9 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             pass  # I don't know if the try/excpet is needed
 
         timer = abs(timer)
-        game.setup(ctx.message.author, chan, timer)
+        game.setup(ctx.message.author, chan, timer, questions)
+        print(len(game.questions))
+
         msg = await ctx.send(
             embed=trivia_embed(
                 ["Channel", chan],
@@ -250,8 +250,16 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                     ["Error!", errors["trivia_master"]]
                 )
             )
+
         await delete_collection()
+
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlClearTriviaScore)
+        mysql.sqlConnection.commit()
+        cursor.close()
+
         game = TriviaGame(channel=None)
+
         await ctx.send(
             embed=trivia_embed(
                 ["Quitting", "The current trivia game has ended!"]
@@ -265,7 +273,17 @@ class Trivia(commands.Cog, name="Husker Trivia"):
     @trivia.command(aliases=["score",], hidden=True)
     async def scores(self, ctx):
         """Shows the score for the current trivia game"""
-        pass
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlRetrieveTriviaScores)
+            scores = cursor.fetchall()
+        mysql.sqlConnection.commit()
+        cursor.close()
+
+        embed = trivia_embed(
+            ["Scoreboard", scores]
+        )
+
+        await game.channel.send(embed=embed)
 
 
 def setup(bot):

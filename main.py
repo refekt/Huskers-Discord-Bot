@@ -29,7 +29,7 @@ client.load_extension('cogs.sched_commands')
 client.load_extension('cogs.betting_commands')
 client.load_extension('cogs.reddit_commands')
 client.load_extension('cogs.games.hangman')
-# client.load_extension('cogs.games.trivia')
+client.load_extension('cogs.games.trivia')
 
 # initialize a global list for CrootBot to put search results in
 welcome_emoji_list = ['🔴', '🍞', '🥔', '🥒', '😂']
@@ -365,9 +365,19 @@ async def on_raw_reaction_add(payload):
         # Trivia commands
         elif user != client.user and message.embeds[0].title == "Husker Discord Trivia" and len(message.embeds[0].fields) == 1:
             import cogs.games.trivia as trivia
-            trivia.tally_score(message, user, datetime.datetime.now())
-            await channelID.send("Sent score")
+            from cogs.games.trivia import game
+            import re
 
+            q_search = "{}: {}".format(emoji, game.questions[game.current_question]["correct"])
+            # print("Searching for: [{}]".format(q_search))
+            print("[\n{}\n]".format(message.embeds[0].fields[0].value))
+            # print()
+
+            result = re.search(q_search, message.embeds[0].fields[0].value)
+            if result:
+                trivia.tally_score(message, user, datetime.datetime.now())
+
+    # Errything else
     else:
         if not message.author.bot and ".addvotes" in message.content and emoji not in arrows:
             for reaction in message.reactions:
