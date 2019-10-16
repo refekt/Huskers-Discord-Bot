@@ -166,7 +166,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
         msg = await ctx.send(
             embed=trivia_embed(
-                ["Channel", chan],
+                ["Channel", chan.mention],
                 ["Question Timer", timer],
                 ["Number of Questions", len(game.questions)]
             )
