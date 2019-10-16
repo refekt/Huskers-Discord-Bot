@@ -140,10 +140,6 @@ class TriviaGame():
 game = TriviaGame(channel=None)
 
 
-def thread_waiting(game: TriviaGame):
-    pass
-
-
 class Trivia(commands.Cog, name="Husker Trivia"):
     @commands.group()
     async def trivia(self, ctx):
@@ -167,7 +163,6 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
         timer = abs(timer)
         game.setup(ctx.message.author, chan, timer, questions)
-        print(len(game.questions))
 
         msg = await ctx.send(
             embed=trivia_embed(
@@ -192,6 +187,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                     ["Error!", errors["trivia_master"]]
                 )
             )
+            return
 
         if game.setup_complete:
             game.started = True
@@ -213,6 +209,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                     ["Error!", errors["already_started"]]
                 )
             )
+            return
 
         await loop_questions()
 
@@ -231,8 +228,9 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                     ["Error!", errors["trivia_master"]]
                 )
             )
+            return
 
-        if not game.processing:
+        if not game.processing and game.started:
             await loop_questions()
 
     @next.error
@@ -244,7 +242,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
         global game
-        if not ctx.message.author == game.trivia_master:
+        if not ctx.message.author == game.trivia_master and game.started:
             await ctx.send(
                 embed=trivia_embed(
                     ["Error!", errors["trivia_master"]]
@@ -274,6 +272,14 @@ class Trivia(commands.Cog, name="Husker Trivia"):
     @trivia.command(aliases=["score",], hidden=True)
     async def scores(self, ctx):
         """Shows the score for the current trivia game"""
+        if not game.started:
+            await ctx.send(
+                embed=trivia_embed(
+                    ["Error!", errors["not_setup"]]
+                )
+            )
+            return
+
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlRetrieveTriviaScores)
             scores = cursor.fetchall()
