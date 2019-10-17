@@ -230,7 +230,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
     @trivia.command(aliases=["s",])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
-    async def setup(self, ctx): #, chan: discord.TextChannel, timer=10, questions=15, category=None):
+    async def setup(self, ctx):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
         try:
             if game.setup_complete:
@@ -284,20 +284,15 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                print("Trying channel...")
                 msg = await config.client.wait_for("message", check=check_channel)
-                print("msg", msg.content)
                 if msg:
-                    print("setting up channel")
                     setup_chan = await TextChannelConverter().convert(ctx, msg.content)
-                    print("chan", setup_chan.name)
             except TimeoutError:
                 print("A Timeout Error occurred.")
             except discord.ext.commands.BadArgument:
                 sent_msg = await ctx.send("Not a valid Text Channel. Try again!")
                 game.message_collection.append(sent_msg)
             else:
-                print("chan_setup=false")
                 chan_setup = False
 
         timer_setup = True
@@ -404,7 +399,14 @@ class Trivia(commands.Cog, name="Husker Trivia"):
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
-        await quit_game()
+        if game.setup_complete:
+            await quit_game()
+        else:
+            await ctx.send(
+                embed=trivia_embed(
+                    ["Error!", errors["not_setup"]]
+                )
+            )
 
     @trivia.command(aliases=["score",], hidden=True)
     async def scores(self, ctx):

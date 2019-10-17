@@ -376,6 +376,11 @@ async def on_raw_reaction_add(payload):
             result = re.search(q_search, message.embeds[0].fields[0].value)
             if result:
                 trivia.tally_score(message, user, datetime.datetime.now())
+            else:
+                with mysql.sqlConnection.cursor() as cursor:
+                    cursor.execute(config.sqlZeroTriviaScore, (user.display_name, 0, 0))
+                mysql.sqlConnection.commit()
+                cursor.close()
 
             for reaction in message.reactions:
                 if reaction not in arrows:
