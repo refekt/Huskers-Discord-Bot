@@ -46,7 +46,7 @@ async def start_messages():
         clear_scoreboard()
 
         embed = trivia_embed(
-            ["Rules", "You have __[{}]__ seconds to answer by reacting to questions. Each question is worth 1,000 points per second and will count down to 0 after __[{}]__ seconds.".format(game.timer, game.timer)],
+            ["Rules", f'You have __[{game.timer}]__ seconds to answer the question by reacting to the message. Each question is worth 1,000 points per second and will countdown to 0 points after __[{game.timer}]__ seconds.'],
             ["Game Status", "The game is starting soon! Get ready for the first question!"],
             ["Countdown...", game.timer]
         )
@@ -88,16 +88,12 @@ async def loop_questions():
         ]
         random.shuffle(question_list)
 
-        question_msg = "💓: {}\n💛: {}\n💚: {}\n💙: {}".format(
-            question_list[0],
-            question_list[1],
-            question_list[2],
-            question_list[3]
-        )
+        question_msg = f'💓: {question_list[0]}\n💛: {question_list[1]}\n💚: {question_list[2]}\n💙: {question_list[3]}'
 
         question_embed = trivia_embed(
-                [game.questions[game.current_question]["question"], question_msg]
-            )
+            ["Question Number", f'{game.current_question + 1} out of {len(game.questions)}'],
+            [game.questions[game.current_question]["question"], question_msg]
+        )
 
         game.current_question_dt = datetime.now()
         question_embed.set_footer(text=str(game.current_question_dt))
@@ -111,7 +107,7 @@ async def loop_questions():
 
         now = datetime.now()
         old = datetime.strptime(question_embed.footer.text, "%Y-%m-%d %H:%M:%S.%f")
-        question_embed.set_footer(text="{}|{}".format(question_embed.footer.text,now,now-old))
+        question_embed.set_footer(text=f'{question_embed.footer.text}|{now} == {now-old}')
         await msg.edit(embed=question_embed)
 
         game.current_question += 1
@@ -143,7 +139,7 @@ def scoreboard():
     if scores:
         scores_edited = ""
         for index, score in enumerate(scores):
-            scores_edited += "#{}. {}: {}\n".format(index + 1, score["user"], score["score"])
+            scores_edited += f'#{index + 1}. {score["user"]}: {score["score"]}'
         return scores_edited
     else:
         return "N/A"
@@ -357,16 +353,6 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             await ctx.send("ur dumb lol")
         else:
             await start_messages()
-
-    # @setup.error
-    # async def setup_handler(self, ctx, error):
-    #     await ctx.send(
-    #         embed=trivia_embed(
-    #             ["Setup Error!", errors["setup_error"]]
-    #         )
-    #     )
-    #     global game
-    #     game = TriviaGame(channel=None)
 
     @trivia.command()
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
