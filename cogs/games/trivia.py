@@ -95,8 +95,8 @@ async def loop_questions():  # chan: discord.TextChannel):
 
         await asyncio.sleep(game.timer + (config.bot_latency()/100))
 
-        question_embed.add_field(name="Correct Answer", value=game.questions[game.current_question]["correct"])
-        question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
+        question_embed.add_field(name="Correct Answer", inline=False, value=game.questions[game.current_question]["correct"])
+        question_embed.add_field(name="Status", inline=False, value="🛑 Timed out! 🛑")
 
         now = datetime.now()
         old = datetime.strptime(question_embed.footer.text, "%Y-%m-%d %H:%M:%S.%f")
