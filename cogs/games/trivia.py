@@ -13,6 +13,8 @@ errors = {
     "setup_error": "One or more inputs was incorrect. Try again!"
 }
 
+trivia_categories = ("all", "huskers")
+
 
 async def add_reactions(message: discord.Message):
     reactions = ("💓", "💛", "💚", "💙", "⏭")
@@ -240,40 +242,80 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             #["Category", "What category do you want to use? (all, huskers, ...)"]
         ]
 
+        game.trivia_master = ctx.message.author
+
         def check_channel(m):
-            return m
+            if m.author == game.trivia_master and m.content in [c.name for c in ctx.message.guild.channels]:
+                return True
+            else:
+                return False
 
         def check_timer_and_questions(m):
-            return abs(int(m.content))
+            if m.author == game.trivia_master and m.content.isnumeric():
+                return True
+            else:
+                return False
 
         def check_category(m):
-            return m.content
+            if m.author == game.trivia_master and m.content in trivia_categories:
+                return True
+            else:
+                return False
 
         setup_chan = setup_timer = setup_question_length = setup_category = None
 
-        for question in setup_questions:
-            await ctx.send(
-                embed=trivia_embed(
-                    [question[0], question[1]]
-                )
-            )
+        chan_setup = True
+        while chan_setup:
+            sent_msg = await ctx.send(setup_questions[0][1])
+            game.message_collection.append(sent_msg)
 
-            if question[0] == "Channel":
+            try:
                 msg = await config.client.wait_for("message", check=check_channel)
-                setup_chan = await TextChannelConverter().convert(ctx, msg.content)
-                game.message_collection.append(msg)
-            elif question[0] == "Timer":
+                if msg:
+                    setup_chan = await TextChannelConverter().convert(ctx, msg.content)
+            except TimeoutError:
+                print("A Timeout Error occurred.")
+            except discord.ext.commands.BadArgument:
+                sent_msg = await ctx.send("Not a valid Text Channel. Try again!")
+                game.message_collection.append(sent_msg)
+            else:
+                chan_setup = False
+
+        timer_setup = True
+        while timer_setup:
+            sent_msg = await ctx.send(setup_questions[1][1])
+            game.message_collection.append(sent_msg)
+
+            try:
                 msg = await config.client.wait_for("message", check=check_timer_and_questions)
-                setup_timer = msg.content
-                game.message_collection.append(msg)
-            elif question[0] == "Questions":
+                if msg:
+                    setup_timer = abs(int(msg.content))
+            except TimeoutError:
+                print("A Timeout Error occurred.")
+            except discord.ext.commands.BadArgument:
+                sent_msg = await ctx.send("Not a valid question timer. Try again!")
+                game.message_collection.append(sent_msg)
+            else:
+                timer_setup = False
+
+        question_length_setup = True
+        while question_length_setup:
+            sent_msg = await ctx.send(setup_questions[2][1])
+            game.message_collection.append(sent_msg)
+
+            try:
                 msg = await config.client.wait_for("message", check=check_timer_and_questions)
-                setup_question_length = msg.content
-                game.message_collection.append(msg)
-            elif question[0] == "Category":
-                msg = await config.client.wait_for("message", check=check_category)
-                setup_category = msg.content
-                game.message_collection.append(msg)
+                if not msg == "N/A":
+                    setup_question_length = abs(int(msg.content))
+            except TimeoutError:
+                print("A Timeout Error occurred.")
+            except discord.ext.commands.BadArgument:
+                sent_msg = await ctx.send("Not a valid number of questions. Try again!")
+                game.message_collection.append(sent_msg)
+            else:
+                question_length_setup = False
+
+        #TODO Categories will goo here...
 
         game.setup(ctx.message.author, setup_chan, setup_timer, setup_question_length)
 
@@ -299,15 +341,15 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         else:
             await start_messagse()
 
-    @setup.error
-    async def setup_handler(self, ctx, error):
-        await ctx.send(
-            embed=trivia_embed(
-                ["Setup Error!", errors["setup_error"]]
-            )
-        )
-        global game
-        game = TriviaGame(channel=None)
+    # @setup.error
+    # async def setup_handler(self, ctx, error):
+    #     await ctx.send(
+    #         embed=trivia_embed(
+    #             ["Setup Error!", errors["setup_error"]]
+    #         )
+    #     )
+    #     global game
+    #     game = TriviaGame(channel=None)
 
     @trivia.command()
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)

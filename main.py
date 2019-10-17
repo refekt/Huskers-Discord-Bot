@@ -579,20 +579,17 @@ async def all(ctx):
         msgs = []
         try:
             maxage = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)
-            async for message in channel.history(limit=100, oldest_first=True, before=(datetime.datetime.now() + datetime.timedelta(days=-13))):
-                # if message.created_at >= maxage:
-                msgs.append(message)
+            async for message in channel.history(limit=100):
+                if message.created_at >= maxage:
+                    msgs.append(message)
             await channel.delete_messages(msgs)
-            print("Bulk delete successful.")
+            print("Bulk delete of {} messages successful.".format(len(msgs)))
         except discord.ClientException:
             print("Cannot delete more than 100 messages at a time.")
-            pass
         except discord.Forbidden:
             print("Missing permissions.")
-            pass
         except discord.HTTPException:
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
-            pass
 
 
 @purge.command(aliases=["l",])
