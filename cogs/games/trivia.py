@@ -32,7 +32,7 @@ def trivia_embed(*fields):
     return embed
 
 
-async def start_messagse():
+async def start_messages():
     if game.setup_complete:
         game.started = True
         embed = trivia_embed(
@@ -353,7 +353,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         except asyncio.TimeoutError:
             await ctx.send("ur dumb lol")
         else:
-            await start_messagse()
+            await start_messages()
 
     # @setup.error
     # async def setup_handler(self, ctx, error):
@@ -377,7 +377,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
             return
 
-        await start_messagse()
+        await start_messages()
 
     @trivia.command(aliases=["n",], hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
