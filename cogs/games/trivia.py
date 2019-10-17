@@ -149,6 +149,12 @@ async def quit_game():
         )
     )
 
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlClearTriviaScore)
+    mysql.sqlConnection.commit()
+    cursor.close()
+
+
     game = TriviaGame(channel=None)
 
 
