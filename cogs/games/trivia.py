@@ -41,6 +41,7 @@ async def start_messagse():
             ["Countdown...", game.timer]
         )
         msg = await game.channel.send(embed=embed)
+        game.message_collection.append(msg)
 
         for index in range(game.timer, -1, -1):
             embed.remove_field(2)
@@ -94,6 +95,7 @@ async def loop_questions():  # chan: discord.TextChannel):
 
         await asyncio.sleep(game.timer + (config.bot_latency()/100))
 
+        question_embed.add_field(name="Correct Answer", value=game.questions[game.current_question]["correct"])
         question_embed.add_field(name="Status", value="🛑 Timed out! 🛑")
 
         now = datetime.now()
@@ -138,7 +140,8 @@ def scoreboard():
 
 async def quit_game():
     global game
-    await delete_collection()
+
+    # await delete_collection()
 
     scores = scoreboard()
 
@@ -153,7 +156,6 @@ async def quit_game():
         cursor.execute(config.sqlClearTriviaScore)
     mysql.sqlConnection.commit()
     cursor.close()
-
 
     game = TriviaGame(channel=None)
 
@@ -251,10 +253,16 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         ]
 
         def check_channel(m):
-            if m.author == game.trivia_master and m.clean_content.split("#")[1] in [c.name for c in m.guild.channels]:
-                return True
+            if "#" in m.clean_content:
+                if m.author == game.trivia_master and m.clean_content.split("#")[1] in [c.name for c in m.guild.channels]:
+                    return True
+                else:
+                    return False
             else:
-                return False
+                if m.author == game.trivia_master and m.clean_content in [c.name for c in m.guild.channels]:
+                    return True
+                else:
+                    return False
 
         def check_timer_and_questions(m):
             if m.author == game.trivia_master and m.content.isnumeric():

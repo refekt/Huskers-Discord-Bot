@@ -379,7 +379,10 @@ async def on_raw_reaction_add(payload):
 
             for reaction in message.reactions:
                 if reaction not in arrows:
-                    await reaction.remove(user)
+                    try:
+                        await reaction.remove(user)
+                    except:
+                        pass
 
     # Errything else
     else:
