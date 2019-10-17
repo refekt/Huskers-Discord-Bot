@@ -235,17 +235,17 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         except:
             pass  # I don't know if the try/excpet is needed
 
+        game.trivia_master = ctx.message.author
+
         setup_questions = [
             ["Channel", "What channel do you want to use?"],
             ["Timer", "How long of a question timer do you want to use?"],
-            ["Questions", "How many question do you want to use?"]#,
-            #["Category", "What category do you want to use? (all, huskers, ...)"]
+            ["Questions", "How many question do you want to use?"],
+            ["Category", "What category do you want to use? (all, huskers, ...)"]
         ]
 
-        game.trivia_master = ctx.message.author
-
         def check_channel(m):
-            if m.author == game.trivia_master and m.content in [c.name for c in ctx.message.guild.channels]:
+            if m.author == game.trivia_master and m.clean_content.split("#")[1] in [c.name for c in m.guild.channels]:
                 return True
             else:
                 return False
@@ -270,15 +270,20 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
+                print("Trying channel...")
                 msg = await config.client.wait_for("message", check=check_channel)
+                print("msg", msg.content)
                 if msg:
+                    print("setting up channel")
                     setup_chan = await TextChannelConverter().convert(ctx, msg.content)
+                    print("chan", setup_chan.name)
             except TimeoutError:
                 print("A Timeout Error occurred.")
             except discord.ext.commands.BadArgument:
                 sent_msg = await ctx.send("Not a valid Text Channel. Try again!")
                 game.message_collection.append(sent_msg)
             else:
+                print("chan_setup=false")
                 chan_setup = False
 
         timer_setup = True
