@@ -32,18 +32,29 @@ def trivia_embed(*fields):
     return embed
 
 
+def clear_scoreboard():
+    with mysql.sqlConnection.cursor() as cursor:
+        cursor.execute(config.sqlClearTriviaScore)
+    mysql.sqlConnection.commit()
+    cursor.close()
+
+
 async def start_messages():
     if game.setup_complete:
         game.started = True
+
+        clear_scoreboard()
+
         embed = trivia_embed(
-            ["Rules", "You have {} seconds to answer by reacting to questions. Each question is worth 1,000 points per second and will count down to 0 after {} seconds.".format(game.timer, game.timer)],
+            ["Rules", "You have __[{}]__ seconds to answer by reacting to questions. Each question is worth 1,000 points per second and will count down to 0 after __[{}]__ seconds.".format(game.timer, game.timer)],
             ["Game Status", "The game is starting soon! Get ready for the first question!"],
             ["Countdown...", game.timer]
         )
+
         msg = await game.channel.send(embed=embed)
         game.message_collection.append(msg)
 
-        for index in range(game.timer, -1, -1):
+        for index in range(10, -1, -1):
             embed.remove_field(2)
             embed.add_field(name="Countdown..", value=str(index))
             await msg.edit(embed=embed)
@@ -59,29 +70,9 @@ async def start_messages():
     await loop_questions()
 
 
-async def loop_questions():  # chan: discord.TextChannel):
+async def loop_questions():
     if game.started:
         game.processing = True
-
-        question_list = [
-            game.questions[game.current_question]["correct"],
-            game.questions[game.current_question]["wrong_1"],
-            game.questions[game.current_question]["wrong_2"],
-            game.questions[game.current_question]["wrong_3"]
-        ]
-
-        random.shuffle(question_list)
-
-        # reactions = ("💓", "💛", "💚", "💙")
-        question_msg = "💓: {}\n💛: {}\n💚: {}\n💙: {}".format(
-            question_list[0],
-            question_list[1],
-            question_list[2],
-            question_list[3]
-        )
-        question_embed = trivia_embed(
-                [game.questions[game.current_question]["question"], question_msg]
-            )
 
         msg = await game.channel.send(
             embed=trivia_embed(["Question Loading...", "Answers Loading..."])
@@ -89,8 +80,28 @@ async def loop_questions():  # chan: discord.TextChannel):
         await add_reactions(msg)
         time.sleep(1)
 
+        question_list = [
+            game.questions[game.current_question]["correct"],
+            game.questions[game.current_question]["wrong_1"],
+            game.questions[game.current_question]["wrong_2"],
+            game.questions[game.current_question]["wrong_3"]
+        ]
+        random.shuffle(question_list)
+
+        question_msg = "💓: {}\n💛: {}\n💚: {}\n💙: {}".format(
+            question_list[0],
+            question_list[1],
+            question_list[2],
+            question_list[3]
+        )
+
+        question_embed = trivia_embed(
+                [game.questions[game.current_question]["question"], question_msg]
+            )
+
         game.current_question_dt = datetime.now()
         question_embed.set_footer(text=str(game.current_question_dt))
+
         await msg.edit(embed=question_embed)
 
         await asyncio.sleep(game.timer + (config.bot_latency()/100))
@@ -131,8 +142,8 @@ def scoreboard():
 
     if scores:
         scores_edited = ""
-        for score in scores:
-            scores_edited += "{}: {}\n".format(score["user"], score["score"])
+        for index, score in enumerate(scores):
+            scores_edited += "#{}. {}: {}\n".format(index + 1, score["user"], score["score"])
         return scores_edited
     else:
         return "N/A"
@@ -140,8 +151,6 @@ def scoreboard():
 
 async def quit_game():
     global game
-
-    # await delete_collection()
 
     scores = scoreboard()
 
@@ -151,11 +160,6 @@ async def quit_game():
             ["Scores", scores]
         )
     )
-
-    with mysql.sqlConnection.cursor() as cursor:
-        cursor.execute(config.sqlClearTriviaScore)
-    mysql.sqlConnection.commit()
-    cursor.close()
 
     game = TriviaGame(channel=None)
 
@@ -172,8 +176,6 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     score = diff.total_seconds()
     score *= 1000
     score = (game.timer * 1000) - score
-
-    print("===\n= User: {}\n= Score: {}\n===\n".format(author.display_name, score))
 
     with mysql.sqlConnection.cursor() as cursor:
         cursor.execute(config.sqlInsertTriviaScore, (author.display_name, score, score))
@@ -343,6 +345,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
         )
         game.message_collection.append(msg)
+
         await msg.add_reaction("🆗")
 
         def check_reaction(r, u):
