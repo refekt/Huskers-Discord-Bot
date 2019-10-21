@@ -54,7 +54,7 @@ def store_next_opponent(year):
             else:
                 config.current_game.append(events["away_team"])
             config.current_game.append(check_date)
-            config.current_game.append(counter)
+            config.current_game.append(events["week"])
             break
         # Used for navigating season_bets JSON
         counter += 1
@@ -68,8 +68,8 @@ def game_number(team):
     mysql.sqlConnection.commit()
     gameNumber = int(gameNumber["game_number"])
 
-    return int(gameNumber)
-
+    # return int(gameNumber)
+    return config.current_game[2]
 
 def create_embed():
     global embed

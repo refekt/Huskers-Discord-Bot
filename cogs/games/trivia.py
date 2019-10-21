@@ -3,6 +3,9 @@ from discord.ext.commands import TextChannelConverter
 import mysql, config, random, discord, time, asyncio
 from datetime import datetime
 
+# TODO Add more questions...https://opentdb.com/api_config.php
+# https://opentdb.com/api.php?amount=10&category=29&difficulty=medium&type=multiple
+
 errors = {
     "wrong_channel": "You used the command in the wrong channel!",
     "already_setup": "There is already a game setup. To start a new game you must perform `$trivia quit` first.",
