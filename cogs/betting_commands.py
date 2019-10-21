@@ -68,8 +68,9 @@ def game_number(team):
     mysql.sqlConnection.commit()
     gameNumber = int(gameNumber["game_number"])
 
-    # return int(gameNumber)
-    return config.current_game[2]
+    return int(gameNumber)
+    # return config.curren
+    # t_game[2]
 
 def create_embed():
     global embed
