@@ -1,10 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import TextChannelConverter
-import mysql, config, random, discord, time, asyncio
+import mysql, config, random, discord, time, asyncio, requests, html
 from datetime import datetime
-
-# TODO Add more questions...https://opentdb.com/api_config.php
-# https://opentdb.com/api.php?amount=10&category=29&difficulty=medium&type=multiple
 
 errors = {
     "wrong_channel": "You used the command in the wrong channel!",
@@ -16,7 +13,30 @@ errors = {
     "setup_error": "One or more inputs was incorrect. Try again!"
 }
 
-trivia_categories = ("all", "huskers")
+trivia_cats = {
+    "huskers": [0, "huskers"],
+    "animals": [9, "Animals"],
+    "anime": [10, "Anime"],
+    "art": [11, "Art"],
+    "books": [12, "Books"],
+    "cartoons": [14, "Cartoons"],
+    "celebs": [15, "Celebs"],
+    "computers": [17, "Computers"],
+    "film": [18, "Film"],
+    "gadgets": [19, "Gadgets"],
+    "games": [20, "Games"],
+    "general": [21, "General"],
+    "geography": [22, "Geography"],
+    "history": [23, "History"],
+    "math": [24, "Math"],
+    "music": [25, "Music"],
+    "mythology": [26, "Mythology"],
+    "politics": [27, "Politics"],
+    "science": [28, "Science"],
+    "sports": [30, "Sports"],
+    "tv": [31, "Television"],
+    "vehicles": [32, "Vehicles"]
+}
 
 
 async def add_reactions(message: discord.Message):
@@ -169,12 +189,21 @@ async def delete_collection():
 
 def tally_score(message: discord.Message, author: discord.Member, end):
     """1000 points per second"""
+    print(message, author, end)
+    if end == 0:
+        with mysql.sqlConnection.cursor() as cursor:
+            cursor.execute(config.sqlInsertTriviaScore, (author.display_name, 0, 0))
+        mysql.sqlConnection.commit()
+        cursor.close()
+        print(f">>> {author} got a score of 0.")
+        return
     footer_text = message.embeds[0].footer.text
     start = datetime.strptime(footer_text.split("|")[0].strip(), "%Y-%m-%d %H:%M:%S.%f")
     diff = end - start
     score = diff.total_seconds()
     score *= 1000
     score = (game.timer * 1000) - score
+    print(f">>> {author} got a score of {score}.")
 
     with mysql.sqlConnection.cursor() as cursor:
         cursor.execute(config.sqlInsertTriviaScore, (author.display_name, score, score))
@@ -184,6 +213,8 @@ def tally_score(message: discord.Message, author: discord.Member, end):
 
 class TriviaGame():
     def __init__(self, channel, question=None):
+        self.category_index = None
+        self.category = None
         self.channel = None
         self.current_question = 0
         self.current_question_dt = None
@@ -195,19 +226,45 @@ class TriviaGame():
         self.trivia_master = None
         self.message_collection = list()
 
-    def setup(self, user: discord.Member, chan, timer, questions):
+    def setup(self, user: discord.Member, chan, timer, questions, category):
         self.trivia_master = user
         self.channel = chan
         self.timer = int(timer)
 
-        with mysql.sqlConnection.cursor() as cursor:
-            cursor.execute(config.sqlRetrieveTriviaQuestions)
-            trivia_questions = cursor.fetchall()
-        mysql.sqlConnection.commit()
-        cursor.close()
-        random.shuffle(trivia_questions)
+        if category[0] == 0:
+            with mysql.sqlConnection.cursor() as cursor:
+                cursor.execute(config.sqlRetrieveTriviaQuestions)
+                trivia_questions = cursor.fetchall()
+            mysql.sqlConnection.commit()
+            cursor.close()
+            random.shuffle(trivia_questions)
+            self.questions = trivia_questions[0:int(questions)]
+            self.category_index = category[0]
+            self.category = category[1].title()
+        else:
+            self.category_index = category[0]
+            self.category = category[1].title()
 
-        self.questions = trivia_questions[0:int(questions)]
+            url = f"https://opentdb.com/api.php?amount={questions}&category={self.category_index}&&type=multiple"
+            q = []
+
+            try:
+                r = requests.get(url)
+                for index, question in enumerate(r.json()["results"]):
+                    q.append(
+                        {
+                            "question": html.unescape(question["question"]).strip("\r").strip("\n"),
+                            "correct": html.unescape(question["correct_answer"]).strip("\r").strip("\n"),
+                            "wrong_1": html.unescape(question["incorrect_answers"][0]).strip("\r").strip("\n"),
+                            "wrong_2": html.unescape(question["incorrect_answers"][1]).strip("\r").strip("\n"),
+                            "wrong_3": html.unescape(question["incorrect_answers"][2]).strip("\r").strip("\n")
+                        }
+                    )
+            except:
+                print("Error in questions....")
+                return
+            self.questions = q[0:int(questions)]
+
         self.setup_complete = True
 
     def correct_channel(self, chan):
@@ -246,11 +303,16 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
         game.trivia_master = ctx.message.author
 
+        cat_list = ""
+        for index, cat in enumerate(trivia_cats):
+            pass
+            cat_list += f"#{index + 1:2}: {cat}\n"
+
         setup_questions = [
             ["Channel", "What channel do you want to use?"],
             ["Timer", "How long of a question timer do you want to use?"],
             ["Questions", "How many question do you want to use?"],
-            ["Category", "What category do you want to use? (all, huskers, ...)"]
+            ["Category", f"What category do you want to use? Must match __exactly__ as:\n{cat_list}"]
         ]
 
         def check_channel(m):
@@ -272,7 +334,8 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 return False
 
         def check_category(m):
-            if m.author == game.trivia_master and m.content in trivia_categories:
+            # print(m.clean_content in [c for c in trivia_cats])
+            if m.author == game.trivia_master and m.clean_content in [c for c in trivia_cats]:
                 return True
             else:
                 return False
@@ -330,9 +393,24 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             else:
                 question_length_setup = False
 
-        #TODO Categories will goo here...
+        category_setup = True
+        while category_setup:
+            sent_msg = await ctx.send(setup_questions[3][1])
+            game.message_collection.append(sent_msg)
 
-        game.setup(ctx.message.author, setup_chan, setup_timer, setup_question_length)
+            try:
+                msg = await config.client.wait_for("message", check=check_category)
+                if msg:
+                    setup_category = trivia_cats[msg.clean_content]
+            except TimeoutError:
+                print("A Timeout Error occurred.")
+            except discord.ext.commands.BadArgument:
+                sent_msg = await ctx.send("Not a valid category. Try again!")
+                game.message_collection.append(sent_msg)
+            else:
+                category_setup = False
+
+        game.setup(ctx.message.author, setup_chan, setup_timer, setup_question_length, setup_category)
 
         msg = await ctx.send(
             embed=trivia_embed(
@@ -340,7 +418,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 ["Channel", game.channel.mention],
                 ["Timer", game.timer],
                 ["Number of Questions", len(game.questions)],
-                ["Category", "TBD"]
+                ["Category", game.category]
             )
         )
         game.message_collection.append(msg)

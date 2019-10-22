@@ -363,24 +363,17 @@ async def on_raw_reaction_add(payload):
                 vote_post("-1", message.embeds[0].footer.text.split("ID: ")[1].strip())
 
         # Trivia commands
-        elif user != client.user and message.embeds[0].title == "Husker Discord Trivia" and len(message.embeds[0].fields) == 1:
+        elif user != client.user and message.embeds[0].title == "Husker Discord Trivia" and len(message.embeds[0].fields) == 2:
             import cogs.games.trivia as trivia
             from cogs.games.trivia import game
             import re
 
             q_search = "{}: {}".format(emoji, game.questions[game.current_question]["correct"])
-            # print("Searching for: [{}]".format(q_search))
-            # print("[\n{}\n]".format(message.embeds[0].fields[0].value))
-            # print()
-
             result = re.search(q_search, message.embeds[0].fields[0].value)
             if result:
                 trivia.tally_score(message, user, datetime.datetime.now())
             else:
-                with mysql.sqlConnection.cursor() as cursor:
-                    cursor.execute(config.sqlZeroTriviaScore, (user.display_name, 0, 0))
-                mysql.sqlConnection.commit()
-                cursor.close()
+                trivia.tally_score(message, user, 0)
 
             for reaction in message.reactions:
                 if reaction not in arrows:
