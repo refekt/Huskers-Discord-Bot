@@ -158,12 +158,13 @@ def scoreboard():
         cursor.execute(config.sqlRetrieveTriviaScores)
     mysql.sqlConnection.commit()
     scores = cursor.fetchall()
+
     cursor.close()
 
     if scores:
         scores_edited = ""
         for index, score in enumerate(scores):
-            scores_edited += f'#{index + 1}. {score["user"]}: {score["score"]}'
+            scores_edited += f'#{index + 1}. {score["user"]}: {score["score"]}\n'
         return scores_edited
     else:
         return "N/A"
@@ -334,7 +335,6 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 return False
 
         def check_category(m):
-            # print(m.clean_content in [c for c in trivia_cats])
             if m.author == game.trivia_master and m.clean_content in [c for c in trivia_cats]:
                 return True
             else:
