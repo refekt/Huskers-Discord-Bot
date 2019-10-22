@@ -189,7 +189,7 @@ async def delete_collection():
 
 def tally_score(message: discord.Message, author: discord.Member, end):
     """1000 points per second"""
-    print(message, author, end)
+    print(f"End: {end}")
     if end == 0:
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlInsertTriviaScore, (author.display_name, 0, 0))
@@ -206,7 +206,7 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     print(f">>> {author} got a score of {score}.")
 
     with mysql.sqlConnection.cursor() as cursor:
-        cursor.execute(config.sqlInsertTriviaScore, (author.display_name, score, score))
+        cursor.execute(config.sqlInsertTriviaScore, (author.display_name, abs(score), abs(score)))
     mysql.sqlConnection.commit()
     cursor.close()
 

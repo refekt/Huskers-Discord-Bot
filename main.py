@@ -369,7 +369,8 @@ async def on_raw_reaction_add(payload):
             import re
 
             q_search = "{}: {}".format(emoji, game.questions[game.current_question]["correct"])
-            result = re.search(q_search, message.embeds[0].fields[0].value)
+            result = re.search(q_search, message.embeds[0].fields[1].value)
+
             if result:
                 trivia.tally_score(message, user, datetime.datetime.now())
             else:
