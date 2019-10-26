@@ -247,13 +247,48 @@ class CrootBot(commands.Cog, name="Croot Bot"):
 
             await ctx.send(
                 embed=sports_embed(
+                    ["Home Page", "https://247sports.com/college/nebraska/"],
                     ["Recent News", articles[0:1023]]
                 )
             )
 
     @_247.command()
-    async def recruiting(self, ctx):
-        pass
+    async def commits(self, ctx):
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        page = None
+        try:
+            page = requests.get(url="https://247sports.com/college/nebraska/Season/2020-Football/Commits/", headers=headers)
+        except:
+            print("Error getting 247sports homepage")
+            return
+
+        soup = BeautifulSoup(page.text, "html.parser")
+
+        ranks_rating = soup.find_all(class_="ir-bar__number")
+        r_r = []
+        for r in ranks_rating:
+            r_r.append(r.contents[0])
+
+        commits_list = soup.find_all(class_="ri-page__list-item")
+        commits_string = ""
+        for index, commit in enumerate(commits_list):
+            if index > 0:
+                for child in commit.children:
+                    if len(child) > 1:
+                        recruit = child.contents[3].contents[1].contents[0]
+                        href = child.contents[3].contents[1].attrs["href"].split("//")[1]
+                        commits_string += f"[{recruit}]({'https://' + href})\n"
+
+        ranks_rating_string = f"National Rank: {r_r[0]}\n" \
+                              f"Big-Ten Rank: {r_r[1]}\n" \
+                              f"Avg. Rating: {r_r[2]}"
+        print(commits_string)
+        await ctx.send(
+            embed=sports_embed(
+                ["Recruiting Rankings", ranks_rating_string],
+                ["Commits", commits_string]
+            )
+        )
 
     @commands.command(hidden=True, aliases=["cbr", ])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
