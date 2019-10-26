@@ -277,18 +277,29 @@ class CrootBot(commands.Cog, name="Croot Bot"):
                     if len(child) > 1:
                         recruit = child.contents[3].contents[1].contents[0]
                         href = child.contents[3].contents[1].attrs["href"].split("//")[1]
-                        commits_string += f"[{recruit}]({'https://' + href})\n"
+                        metrics = child.contents[5].contents[0]
+                        stars = child.contents[7].contents[1].contents[7].contents[0]
+                        commit_date = child.contents[9].contents[1].contents[0]
+                        commits_string += f"[{recruit}]({'https://' + href}) * {metrics} * {stars} * {commit_date}\n"
+
+        commits_list = commits_string.split("\n")
 
         ranks_rating_string = f"National Rank: {r_r[0]}\n" \
                               f"Big-Ten Rank: {r_r[1]}\n" \
                               f"Avg. Rating: {r_r[2]}"
-        print(commits_string)
+
         await ctx.send(
             embed=sports_embed(
-                ["Recruiting Rankings", ranks_rating_string],
-                ["Commits", commits_string]
+                ["Recruiting Rankings", ranks_rating_string]
             )
         )
+
+        for commit in commits_list:
+            await ctx.send(
+                embed=sports_embed(
+                    ["Recruit", commit]
+                )
+            )
 
     @commands.command(hidden=True, aliases=["cbr", ])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)

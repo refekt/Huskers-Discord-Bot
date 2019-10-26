@@ -285,7 +285,13 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def balloons(self, ctx):
         balloons = [
-            "```\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈🎈🎈🎈\n🎈        🎈    🎈  🎈    🎈\n🎈  🎈🎈  🎈🎈🎈    🎈🎈🎈\n🎈    🎈  🎈    🎈  🎈    🎈\n🎈🎈🎈🎈  🎈🎈🎈🎈  🎈    🎈\n```"
+            "```\n"
+            "🎈🎈🎈🎈  🎈🎈🎈🎈  🎈🎈🎈🎈\n"
+            "🎈        🎈   🎈   🎈   🎈\n"
+            "🎈  🎈🎈  🎈🎈🎈    🎈🎈🎈\n"
+            "🎈    🎈  🎈   🎈   🎈   🎈\n"
+            "🎈🎈🎈🎈  🎈🎈🎈🎈  🎈    🎈\n"
+            "```"
         ]
 
         loops = len(balloons)
