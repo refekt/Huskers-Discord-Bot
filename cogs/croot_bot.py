@@ -66,6 +66,16 @@ def last_run():
     return last_run
 
 
+def sports_embed(*fields):
+    embed = discord.Embed(title="Huskers 247Sports", description="Nebraska Huskers Football and Recruiting", color=0xFF0000)
+    embed.set_footer(text="Frost Bot")
+    embed.set_thumbnail(url="https://s3media.247sports.com/Uploads/Assets/247/264/8264247.png")
+    embed.set_author(name="Bot Frost", url="https://reddit.com/u/Bot_Frost", icon_url="https://i.imgur.com/Ah3x5NA.png")
+    for field in fields:
+        embed.add_field(name=field[0], value=field[1], inline=False)
+    return embed
+
+
 # TODO Look at and revamp
 async def check_last_run():
     """ Check when the last time the JSON was pulled. """
@@ -203,6 +213,47 @@ async def parse_search(search, channel):
 class CrootBot(commands.Cog, name="Croot Bot"):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.group(name="247")
+    async def _247(self, ctx):
+        if not ctx.subcommand_passed:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+            page = None
+            try:
+                page = requests.get(url="https://247sports.com/college/nebraska/", headers=headers)
+            except:
+                print("Error getting 247sports homepage")
+                return
+
+            soup = BeautifulSoup(page.text, "html.parser")
+            temp_articles = soup.find_all(class_="news-article__img")
+            articles = ""
+
+            for index, art in enumerate(temp_articles):
+                href = art.attrs["href"]
+                for child in art.children:
+                    try:
+                        title = child.contents[0].attrs["title"]
+                    except IndexError:
+                        continue
+                    except:
+                        continue
+
+                    url = f"[{title}]({href})"
+                    articles += f"{url}\n"
+
+                if index >= 4:
+                    break
+
+            await ctx.send(
+                embed=sports_embed(
+                    ["Recent News", articles[0:1023]]
+                )
+            )
+
+    @_247.command()
+    async def recruiting(self, ctx):
+        pass
 
     @commands.command(hidden=True, aliases=["cbr", ])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
