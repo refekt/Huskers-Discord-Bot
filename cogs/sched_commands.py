@@ -78,6 +78,7 @@ class StatBot(commands.Cog, name="Football Schedules and Scores"):
         edit_msg = await ctx.send("Loading...")
 
         url = "https://api.collegefootballdata.com/games?year={}&seasonType=regular&team=nebraska".format(year)
+        print(url)
         try:
             r = requests.get(url)
             schedule_list = r.json() # Actually imports a list

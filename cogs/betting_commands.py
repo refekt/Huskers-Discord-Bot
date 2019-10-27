@@ -69,8 +69,7 @@ def game_number(team):
     gameNumber = int(gameNumber["game_number"])
 
     return int(gameNumber)
-    # return config.curren
-    # t_game[2]
+
 
 def create_embed():
     global embed
@@ -94,6 +93,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         dbAvailable = config.pingMySQL()
         if not dbAvailable:
             await ctx.send("The MySQL database is currently unavailable. Please try again later.")
+            return
+
+        apiAvailable = requests.get("https://api.collegefootballdata.com/lines?year=2019&week=9&seasonType=regular&team=nebraska")
+        if apiAvailable.status_code == 502:  # TODO Add other status codes, idk what they are yet
+            await ctx.send("The API services (https://api.collegefootballdata.com) is currently unavailable. Please try again later.")
             return
 
         # Load next opponent and bets
