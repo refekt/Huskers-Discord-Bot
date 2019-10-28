@@ -49,6 +49,51 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
 globalRate = 3
 globalPer = 30
 
+
+class Recruit():
+    def __init__(self, name, metrics, position, hometown, image, rating, commit_dt, profile, school="", stars=None, transfer=False, transfer_eligibility="", transfer_location="N/A"):
+        self.name = name
+        self.metrics = metrics
+        self.position = position
+        self.hometown = hometown
+        self.image = image
+        self.school = school
+        self.stars = stars
+        self.rating = rating
+        self.commit_dt = commit_dt
+        self.profile = profile
+        self.transfer = transfer
+        self.transfer_eligibility = transfer_eligibility
+        self.transfer_location = transfer_location
+        if not transfer:
+            # self.recruit_string = \
+            #     f"Name: [{name}]\n" \
+            #     f"Metrics: [{metrics}]\n" \
+            #     f"Position: [{position}]\n" \
+            #     f"Hometown: [{hometown}]\n" \
+            #     f"Image: [{image}]\n" \
+            #     f"School: [{school}]\n" \
+            #     f"Stars: [{stars}]\n" \
+            #     f"Rating: [{rating}]\n" \
+            #     f"Commit Date: [{commit_dt}]\n" \
+            #     f"Profile URL: [{profile}]\n"
+            self.recruit_string = \
+                f"{stars} ⭐ {name} ({hometown}) | {position} | {metrics} lbs"
+        else:
+            # self.recruit_string = \
+            #     f"Name: [{name}]\n" \
+            #     f"Metrics: [{metrics}]\n" \
+            #     f"Position: [{position}]\n" \
+            #     f"Image: [{image}]\n" \
+            #     f"Stars: [{stars}]\n" \
+            #     f"Rating: [{rating}]\n" \
+            #     f"Profile URL: [{profile}]\n" \
+            #     f"Transfer Eligibility: {transfer_eligibility}" \
+            #     f"Transfer Location: [{transfer_location}]\n"
+            self.recruit_string = \
+                f"{stars} ⭐ {name} ({transfer_location}) | {position} | {metrics} lbs"
+
+
 try:
     with open('team_ids.json', 'r') as fp:
         team_ids = json.load(fp)
@@ -268,38 +313,103 @@ class CrootBot(commands.Cog, name="Croot Bot"):
         r_r = []
         for r in ranks_rating:
             r_r.append(r.contents[0])
-
-        commits_list = soup.find_all(class_="ri-page__list-item")
-        commits_string = ""
-        for index, commit in enumerate(commits_list):
-            if index > 0:
-                for child in commit.children:
-                    if len(child) > 1:
-                        recruit = child.contents[3].contents[1].contents[0]
-                        href = child.contents[3].contents[1].attrs["href"].split("//")[1]
-                        metrics = child.contents[5].contents[0]
-                        stars = child.contents[7].contents[1].contents[7].contents[0]
-                        commit_date = child.contents[9].contents[1].contents[0]
-                        commits_string += f"[{recruit}]({'https://' + href}) * {metrics} * {stars} * {commit_date}\n"
-
-        commits_list = commits_string.split("\n")
-
         ranks_rating_string = f"National Rank: {r_r[0]}\n" \
                               f"Big-Ten Rank: {r_r[1]}\n" \
                               f"Avg. Rating: {r_r[2]}"
 
+        recruits = []
+
+        commits_list = soup.find_all(class_="ri-page__list-item")
+        for index, commit in enumerate(commits_list):
+            if index > 0:
+                for child in commit.children:
+                    if len(child) > 1:
+                        image = child.contents[1].contents[1].attrs["data-src"]
+                        name = child.contents[3].contents[1].contents[0]
+                        href = child.contents[3].contents[1].attrs["href"].split("//")[1]
+                        metrics = child.contents[5].contents[0]
+                        stars = 0
+                        for star_check in child.contents[7].contents[1].contents:
+                            if str(star_check) == "<span class=\"icon-starsolid yellow\"></span>":
+                                stars += 1
+                        rating = child.contents[7].contents[1].contents[7].contents[0]
+                        commit_date = child.contents[9].contents[1].contents[0].split(" ")[2]
+                        position = child.contents[11].contents[0]
+                        school_hometown = child.contents[1].parent.contents[3].contents[3].contents[0]
+                        school = school_hometown.split("(")[0].strip()
+                        hometown = school_hometown.split("(")[1].split(")")[0]
+
+                        recruits.append(
+                            Recruit(
+                                name=name,
+                                metrics=metrics,
+                                position=position,
+                                hometown=hometown,
+                                school=school,
+                                image=image,
+                                stars=stars,
+                                rating=rating,
+                                commit_dt=commit_date,
+                                profile=f"https://{href}",
+                                transfer=False,
+                                transfer_eligibility="",
+                                transfer_location=""
+                            )
+                        )
+
+        transfers_list = soup.find_all(class_="portal-list_itm")
+        for index, transfer in enumerate(transfers_list):
+            if index > 0:
+                image = transfer.contents[1].contents[1].attrs["data-src"].split("?")[0]
+                name = transfer.contents[3].contents[1].contents[0]
+                href = transfer.contents[3].contents[1].attrs["href"]
+                metrics = transfer.contents[5].contents[0]
+                stars = 0
+                for star_check in transfer.contents[7].contents[1].contents:
+                    if str(star_check) == "<span class=\"icon-starsolid yellow\"></span>":
+                        stars += 1
+                rating = transfer.contents[7].contents[1].contents[7].contents[0]
+                eligibility = transfer.contents[9].contents[0]
+                position = transfer.contents[11].contents[0]
+                xfer_loc = \
+                    f"{transfer.contents[13].contents[1].contents[0].attrs['alt']}" \
+                    f"»" \
+                    f"{transfer.contents[13].contents[5].contents[0].attrs['alt']}"
+
+                print(f"[{xfer_loc}]")
+                if xfer_loc == "":
+                    xfer_loc = "N/A"
+
+                recruits.append(
+                    Recruit(
+                        name=name,
+                        metrics=metrics,
+                        position=position,
+                        hometown="",
+                        school="",
+                        image=image,
+                        stars=stars,
+                        rating=rating,
+                        commit_dt="",
+                        profile=f"https://{href}",
+                        transfer=True,
+                        transfer_eligibility=eligibility,
+                        transfer_location=xfer_loc
+                    )
+                )
+
+        recruit_string = ""
+        for recruit in recruits:
+            recruit_string += f"{recruit.recruit_string}\n"
+
         await ctx.send(
             embed=sports_embed(
-                ["Recruiting Rankings", ranks_rating_string]
+                ["Recruiting Home Page", "[https://247sports.com/college/nebraska/Season/2020-Football/Commits/](Click)"],
+                ["Recruiting Rankings", ranks_rating_string],
+                ["Total Number of Recruits", len(recruits)],
+                ["Recruits", recruit_string[0:1023]]
             )
         )
-
-        for commit in commits_list:
-            await ctx.send(
-                embed=sports_embed(
-                    ["Recruit", commit]
-                )
-            )
 
     @commands.command(hidden=True, aliases=["cbr", ])
     @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)

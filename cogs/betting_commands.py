@@ -468,14 +468,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         result_spread = None
         if game_info["spread_value"] > 0:
-            print("Comparing: ", game_info["opponent_score"], "-", game_info["score"], "=", game_info["opponent_score"] - game_info["score"], ">", game_info["spread_value"])
-
             result_spread = not bool(
                 (game_info["opponent_score"] - game_info["score"]) > game_info["spread_value"]
             )
         elif game_info["spread_value"] < 0:
-            print("Comparing: ", game_info["score"], "-", game_info["opponent_score"], "=", game_info["score"] - game_info["opponent_score"], ">", game_info["spread_value"])
-
             result_spread = bool(
                 (game_info["score"] - game_info["opponent_score"]) > abs(game_info["spread_value"])
             )
