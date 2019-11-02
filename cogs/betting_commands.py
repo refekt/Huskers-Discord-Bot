@@ -55,6 +55,8 @@ def store_next_opponent(year):
                 config.current_game.append(events["away_team"])
             config.current_game.append(check_date)
             config.current_game.append(events["week"])
+
+            print(config.current_game)
             break
         # Used for navigating season_bets JSON
         counter += 1
@@ -165,7 +167,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         msg_sent = await ctx.send(embed=embed)
         check_game_datetime = config.current_game[1]
-        if check_now + + datetime.timedelta(hours=5) < check_game_datetime:
+
+        print(check_now)
+
+        # if check_now + datetime.timedelta(hours=5) < check_game_datetime:
+        if check_now < check_game_datetime:
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
         else:

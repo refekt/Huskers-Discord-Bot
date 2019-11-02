@@ -49,6 +49,13 @@ long_positions = {'PRO' : 'Pro-Style Quarterback',
 globalRate = 3
 globalPer = 30
 
+try:
+    with open('team_ids.json', 'r') as fp:
+        team_ids = json.load(fp)
+except:
+    print("Error opening team_ids.json")
+
+
 
 class Recruit():
     def __init__(self, name, metrics, position, hometown, image, rating, commit_dt, profile, school="", stars=None, transfer=False, transfer_eligibility="", transfer_location="N/A"):
@@ -66,39 +73,11 @@ class Recruit():
         self.transfer_eligibility = transfer_eligibility
         self.transfer_location = transfer_location
         if not transfer:
-            # self.recruit_string = \
-            #     f"Name: [{name}]\n" \
-            #     f"Metrics: [{metrics}]\n" \
-            #     f"Position: [{position}]\n" \
-            #     f"Hometown: [{hometown}]\n" \
-            #     f"Image: [{image}]\n" \
-            #     f"School: [{school}]\n" \
-            #     f"Stars: [{stars}]\n" \
-            #     f"Rating: [{rating}]\n" \
-            #     f"Commit Date: [{commit_dt}]\n" \
-            #     f"Profile URL: [{profile}]\n"
             self.recruit_string = \
                 f"{stars} ⭐ {name} ({hometown}) | {position} | {metrics} lbs"
         else:
-            # self.recruit_string = \
-            #     f"Name: [{name}]\n" \
-            #     f"Metrics: [{metrics}]\n" \
-            #     f"Position: [{position}]\n" \
-            #     f"Image: [{image}]\n" \
-            #     f"Stars: [{stars}]\n" \
-            #     f"Rating: [{rating}]\n" \
-            #     f"Profile URL: [{profile}]\n" \
-            #     f"Transfer Eligibility: {transfer_eligibility}" \
-            #     f"Transfer Location: [{transfer_location}]\n"
             self.recruit_string = \
                 f"{stars} ⭐ {name} ({transfer_location}) | {position} | {metrics} lbs"
-
-
-try:
-    with open('team_ids.json', 'r') as fp:
-        team_ids = json.load(fp)
-except:
-    print("Error opening team_ids.json")
 
 
 def last_run():
