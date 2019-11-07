@@ -322,12 +322,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
             return val[1]
 
         users_sorted.sort(key=sort_second)
-        users_sorted.reverse()
 
         earliest = "```\n"
         for index, user in enumerate(users_sorted):
             if index < count:
-                earliest += f"#{index}: {user[1]}: {user[0]}\n"
+                earliest += f"#{index + 1}: {user[1]}: {user[0]}\n"
         earliest += "```"
         await ctx.send(earliest)
 
