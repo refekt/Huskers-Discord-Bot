@@ -1,4 +1,5 @@
 from discord.ext import commands
+from config import client
 import markovify
 import random
 import json
@@ -303,6 +304,32 @@ class TextCommands(commands.Cog, name="Text Commands"):
             i += 1
             time.sleep(0.5)
 
+    @commands.command(aliases=["24",])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def _24hours(self, ctx):
+        await ctx.send(f"We have 24 hours to celebrate a win or mourn a loss. That time ends in [].")
+        pass
+
+    @commands.command()
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def userorder(self, ctx):
+        users = client.get_all_members()
+        users_sorted = []
+        for user in users:
+            users_sorted.append([user.name, user.joined_at])
+
+        def sort_second(val):
+            return val[1]
+
+        users_sorted.sort(key=sort_second)
+        print(users_sorted)
+
+        earliest = ""
+        for index, user in enumerate(users_sorted):
+            if index < 11:
+                earliest += f"{user[1]}: {user[0]}\n"
+
+        await ctx.send(earliest)
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))

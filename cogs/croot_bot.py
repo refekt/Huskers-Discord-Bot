@@ -56,7 +56,6 @@ except:
     print("Error opening team_ids.json")
 
 
-
 class Recruit():
     def __init__(self, name, metrics, position, hometown, image, rating, commit_dt, profile, school="", stars=None, transfer=False, transfer_eligibility="", transfer_location="N/A"):
         self.name = name

@@ -659,6 +659,7 @@ async def off(ctx):
 @client.command()
 async def about(ctx):
     embed = discord.Embed(title="HuskerBot's CV", author=client.user, color=0xFF0000)
+    discord.Embed()
     embed.set_thumbnail(url="https://i.imgur.com/Ah3x5NA.png")
     embed.add_field(name="About HuskerBot", value="HuskerBot was created by [/u/refekt](https://reddit.com/u/refekt) and "
                                                   "[/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assist greatly with coding. "
