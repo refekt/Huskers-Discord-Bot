@@ -312,7 +312,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def userorder(self, ctx, count=11):
+    async def userorder(self, ctx, count=10):
         users = client.get_all_members()
 
         users_sorted = []
