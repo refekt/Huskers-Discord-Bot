@@ -314,6 +314,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def userorder(self, ctx, count=11):
         users = client.get_all_members()
+
         users_sorted = []
         for user in users:
             users_sorted.append([user.name, user.joined_at])
@@ -326,9 +327,10 @@ class TextCommands(commands.Cog, name="Text Commands"):
         earliest = "```\n"
         for index, user in enumerate(users_sorted):
             if index < count:
-                earliest += f"#{index + 1}: {user[1]}: {user[0]}\n"
+                earliest += f"#{index + 1:2}: {user[1]}: {user[0]}\n"
         earliest += "```"
         await ctx.send(earliest)
+
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))
