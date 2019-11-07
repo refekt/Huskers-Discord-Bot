@@ -312,7 +312,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
-    async def userorder(self, ctx):
+    async def userorder(self, ctx, count=11):
         users = client.get_all_members()
         users_sorted = []
         for user in users:
@@ -326,7 +326,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
 
         earliest = "```\n"
         for index, user in enumerate(users_sorted):
-            if index < 11:
+            if index < count:
                 earliest += f"#{index}: {user[1]}: {user[0]}\n"
         earliest += "```"
         await ctx.send(earliest)
