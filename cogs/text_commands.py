@@ -324,11 +324,11 @@ class TextCommands(commands.Cog, name="Text Commands"):
         users_sorted.sort(key=sort_second)
         users_sorted.reverse()
 
-        earliest = ""
+        earliest = "```\n"
         for index, user in enumerate(users_sorted):
             if index < 11:
-                earliest += f"{user[1]}: {user[0]}\n"
-
+                earliest += f"#{index}: {user[1]}: {user[0]}\n"
+        earliest += "```"
         await ctx.send(earliest)
 
 def setup(bot):
