@@ -322,7 +322,7 @@ class TextCommands(commands.Cog, name="Text Commands"):
             return val[1]
 
         users_sorted.sort(key=sort_second)
-        print(users_sorted)
+        users_sorted.reverse()
 
         earliest = ""
         for index, user in enumerate(users_sorted):
