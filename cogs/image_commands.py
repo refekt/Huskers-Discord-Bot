@@ -269,7 +269,7 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def biglol(self, ctx):
         """ LOL """
-        await ctx.send(embed=await sendImage("BIG LOLLLLLLLLLLLLL", "https://i.imgur.com/zqOs8yr.gif"))
+        await ctx.send(text="https://i.imgur.com/zqOs8yr.gif", embed=await sendImage("BIG LOLLLLLLLLLLLLL", "https://i.imgur.com/zqOs8yr.gif"))
 
     @commands.command(aliases=["ref",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
