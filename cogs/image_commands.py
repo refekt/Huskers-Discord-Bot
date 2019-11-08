@@ -258,12 +258,18 @@ class ImageCommands(commands.Cog, name="Image Commands"):
     async def touchdown(self, ctx):
         """ Let the cup runeth over """
         await ctx.send(embed=await sendImage("🏈🎈🏈🎈", "https://i.imgur.com/Wh4aLYo.gif"))
-        
+
     @commands.command()
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
     async def yeet(self, ctx):
         """BIG BOY PARTY"""
         await ctx.send(embed=await sendImage("BIG BOY PARTY", "https://i.imgur.com/3sshtBD.gif"))
+
+    @commands.command(aliases=["lol",])
+    @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
+    async def biglol(self, ctx):
+        """ LOL """
+        await ctx.send(embed=await sendImage("BIG LOLLLLLLLLLLLLL", "https://i.imgur.com/zqOs8yr.gif"))
 
     @commands.command(aliases=["ref",])
     @commands.cooldown(rate=globalRate, per=globalPer, type=commands.BucketType.user)
