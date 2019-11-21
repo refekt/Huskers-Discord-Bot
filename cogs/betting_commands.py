@@ -55,8 +55,6 @@ def store_next_opponent(year):
                 config.current_game.append(events["away_team"])
             config.current_game.append(check_date)
             config.current_game.append(events["week"])
-
-            print(config.current_game)
             break
         # Used for navigating season_bets JSON
         counter += 1
@@ -71,7 +69,8 @@ def game_number(team):
     gameNumber = int(gameNumber["game_number"])
 
     return int(gameNumber)
-
+    # return config.curren
+    # t_game[2]
 
 def create_embed():
     global embed
@@ -95,11 +94,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         dbAvailable = config.pingMySQL()
         if not dbAvailable:
             await ctx.send("The MySQL database is currently unavailable. Please try again later.")
-            return
-
-        apiAvailable = requests.get("https://api.collegefootballdata.com/lines?year=2019&week=9&seasonType=regular&team=nebraska")
-        if apiAvailable.status_code == 502:  # TODO Add other status codes, idk what they are yet
-            await ctx.send("The API services (https://api.collegefootballdata.com) is currently unavailable. Please try again later.")
             return
 
         # Load next opponent and bets
@@ -142,24 +136,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         embed.add_field(name="Usage", value="$bet - Show this command\n$bet show - Shows your currently placed bets\n$bet all - Shows the current breakout of all bets placed\n$bet winners [opponent] - Shows the winners for the selected opponent.")
 
         if lines:
-            formatted_spread = lines[0]["formattedSpread"]
-            provider = lines[0]["provider"]
-            spread = float(lines[0]["spread"])
-            over_under = lines[0]["overUnder"]
-            if over_under is None:
-                over_under = "N/A"
+            if lines[0]["formattedSpread"].startswith("Nebraska"):
+                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
+            else:
+                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="+{} Nebraska".format(abs(lines[0]["spread"])), inline=False)
+            embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
 
             if lines[0]["formattedSpread"].startswith("Nebraska"):
-                embed.add_field(name=f"Spread ({provider})", value=f"{formatted_spread}", inline=False)
+                update_db_lines(lines[0], config.current_game[2], lines[0]["spread"])
             else:
-                embed.add_field(name=f"Spread ({provider})", value=f"+{abs(spread)} Nebraska", inline=False)
-
-            embed.add_field(name=f"Total Points/Over Under ({provider})", value=f"{over_under}", inline=False)
-
-            if lines[0]["formattedSpread"].startswith("Nebraska"):
-                update_db_lines(lines[0], config.current_game[2], spread)
-            else:
-                update_db_lines(lines[0], config.current_game[2], abs(spread))
+                update_db_lines(lines[0], config.current_game[2], abs(lines[0]["spread"]))
         else:
             embed.add_field(name="Spread (TBD)", value="TBD")
             embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
@@ -175,11 +161,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         msg_sent = await ctx.send(embed=embed)
         check_game_datetime = config.current_game[1]
-
-        print(check_now)
-
-        # if check_now + datetime.timedelta(hours=5) < check_game_datetime:
-        if check_now < check_game_datetime:
+        if check_now + + datetime.timedelta(hours=5) < check_game_datetime:
             for e in bet_emojis:
                 await msg_sent.add_reaction(e)
         else:
@@ -319,11 +301,15 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         strLeader = ""
         for user in sqlLeaderboard:
-            strLeader += "[{} pts] {}\n".format(int(user["total_points"]), user["user"])
+            strLeader += f"[{int(user['total_points'])} pts] {user['user']}\n"
 
         strAdjustedLeader = ""
+
+        sqlAverageLeaderboard = sorted(sqlAverageLeaderboard, key = lambda i: i["points_per_game_bet_on"])
+        sqlAverageLeaderboard.reverse()
+
         for user in sqlAverageLeaderboard:
-            strAdjustedLeader += "[{} pts] {}\n".format(int(user["avg_pts_per_game"]), user["user"])
+            strAdjustedLeader += f"[{user['points_per_game_bet_on']:.3} pts] {user['user']}\n"
 
         embed.add_field(name="Top 10 Ranking", value=strLeader)
         embed.add_field(name="Top 10 Average Points Ranking", value=strAdjustedLeader)
@@ -440,30 +426,24 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             print("No lines available")
 
         if lines:
-            for line in lines:
-                if line["provider"] == "Bovada":
-                    formatted_spread = line["formattedSpread"]
-                    provider = line["provider"]
-                    spread = float(line["spread"])
-                    over_under = line["overUnder"]
-                    if over_under is None:
-                        over_under = "N/A"
+            if len(lines) == 1:
+                if lines[0]["formattedSpread"].startswith("Nebraska"):
+                    embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
+                else:
+                    embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="+{} Nebraska".format(abs(lines[0]["spread"])), inline=False)
+                embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
 
-                    if line["formattedSpread"].startswith("Nebraska"):
-                        embed.add_field(name=f"Spread ({provider})", value=f"{formatted_spread}", inline=False)
-                    else:
-                        embed.add_field(name=f"Spread ({provider})", value=f"+{abs(spread)} Nebraska", inline=False)
-
-                    embed.add_field(name=f"Total Points/Over Under ({provider})", value=f"{over_under}", inline=False)
-
-                    if line["formattedSpread"].startswith("Nebraska"):
-                        update_db_lines(line, config.current_game[2], spread)
-                    else:
-                        update_db_lines(line, config.current_game[2], abs(spread))
-                    break
+                if lines[0]["formattedSpread"].startswith("Nebraska"):
+                    update_db_lines(lines[0], gameNumber, lines[0]["spread"])
+                else:
+                    update_db_lines(lines[0], gameNumber, abs(lines[0]["spread"]))
+            else:
+                for line in lines:
+                    embed.add_field(name=f"{line['provider']}'s Spread", value=line['formattedSpread'])
+                    embed.add_field(name=f"{line['provider']}'s Total Points/Over Under", value=line['overUnder'])
         else:
             embed.add_field(name="Spread", value="TBD")
-            embed.add_field(name="Total Points/Over Under", value="TBD") ### sdfasfsa
+            embed.add_field(name="Total Points/Over Under", value="TBD")
 
         await ctx.send(embed=embed)
 
@@ -483,38 +463,34 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         mysql.sqlConnection.commit()
         cursor.close()
 
+        print(game_info)
+
         result_winorlose = bool(
-            int(game_info["score"]) > int(game_info["opponent_score"])
+            game_info["score"] > game_info["opponent_score"]
         )
 
-        result_spread = None
-        if game_info["spread_value"] > 0:
-            result_spread = not bool(
-                (game_info["opponent_score"] - game_info["score"]) > game_info["spread_value"]
-            )
-        elif game_info["spread_value"] < 0:
-            result_spread = bool(
-                (game_info["score"] - game_info["opponent_score"]) > abs(game_info["spread_value"])
-            )
+        result_spread = bool(
+            (game_info["opponent_score"] - game_info["score"]) < game_info["spread_value"]
+        )
 
         result_moneyline = bool(
-            int(
-                (game_info["score"] + game_info["opponent_score"]) > game_info["moneyline_value"]
-            )
+            (game_info["score"] + game_info["opponent_score"]) > game_info["moneyline_value"]
         )
 
         with mysql.sqlConnection.cursor() as cursor:
             cursor.execute(config.sqlUpdateAllBetCategories, (gameNumber, True, result_winorlose, result_spread, result_moneyline, True, result_winorlose, result_spread, result_moneyline))
-            game_info = cursor.fetchone()
         mysql.sqlConnection.commit()
 
-        await ctx.send("Updated! The results are:\nNebraska: {}\nOpponent: {}\nWin (Yes==True, No==False): {}\nSpread (): {}\nTotal Points: {}".format(
-            score,
-            oppo_score,
-            result_winorlose,
-            result_spread,
-            result_moneyline
-        ))
+        print(result_moneyline, result_spread, result_winorlose)
+
+        await ctx.send(f"```\n"
+                       f"Scores:\n"
+                       f"{'Nebraska:':<25} {int(game_info['score'])}\n"
+                       f"{game_info['opponent']:<25}: {int(game_info['opponent_score'])}\n"
+                       f"Win Result: {result_winorlose}\n"
+                       f"Spread Result ({'Nebraska ' + str(game_info['spread_value']) if game_info['spread_value'] < 0 else game_info['opponent'] + ' -' + str(game_info['spread_value'])}): {result_spread}\n"
+                       f"Total Points Result ({int(game_info['moneyline_value'])}): {result_moneyline}\n"
+                       f"```\n")
 
 
 def setup(bot):
