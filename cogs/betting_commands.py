@@ -439,8 +439,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     update_db_lines(lines[0], gameNumber, abs(lines[0]["spread"]))
             else:
                 for line in lines:
-                    embed.add_field(name=f"{line['provider']}'s Spread", value=line['formattedSpread'])
-                    embed.add_field(name=f"{line['provider']}'s Total Points/Over Under", value=line['overUnder'])
+                    embed.add_field(name=f"{line['provider']}'s Bet Info", value=f"Spread: {line['formattedSpread']}\nTotal Points: {line['overUnder']}\n")
         else:
             embed.add_field(name="Spread", value="TBD")
             embed.add_field(name="Total Points/Over Under", value="TBD")
