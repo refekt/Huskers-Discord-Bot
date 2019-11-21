@@ -463,7 +463,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     break
         else:
             embed.add_field(name="Spread", value="TBD")
-            embed.add_field(name="Total Points/Over Under", value="TBD")
+            embed.add_field(name="Total Points/Over Under", value="TBD") ### sdfasfsa
 
         await ctx.send(embed=embed)
 
