@@ -139,13 +139,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             if lines[0]["formattedSpread"].startswith("Nebraska"):
                 embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
             else:
-                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="+{} Nebraska".format(abs(lines[0]["spread"])), inline=False)
+                embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="+{} Nebraska".format(lines[0]["spread"]), inline=False)
             embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
 
             if lines[0]["formattedSpread"].startswith("Nebraska"):
                 update_db_lines(lines[0], config.current_game[2], lines[0]["spread"])
             else:
-                update_db_lines(lines[0], config.current_game[2], abs(lines[0]["spread"]))
+                update_db_lines(lines[0], config.current_game[2], lines[0]["spread"])
         else:
             embed.add_field(name="Spread (TBD)", value="TBD")
             embed.add_field(name="Total Points/Over Under (TBD)", value="TBD")
@@ -430,13 +430,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 if lines[0]["formattedSpread"].startswith("Nebraska"):
                     embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["formattedSpread"]), inline=False)
                 else:
-                    embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="+{} Nebraska".format(abs(lines[0]["spread"])), inline=False)
+                    embed.add_field(name="Spread ({})".format(lines[0]["provider"]), value="+{} Nebraska".format(lines[0]["spread"]), inline=False)
                 embed.add_field(name="Total Points/Over Under ({})".format(lines[0]["provider"]), value="{}".format(lines[0]["overUnder"]), inline=False)
 
                 if lines[0]["formattedSpread"].startswith("Nebraska"):
                     update_db_lines(lines[0], gameNumber, lines[0]["spread"])
                 else:
-                    update_db_lines(lines[0], gameNumber, abs(lines[0]["spread"]))
+                    update_db_lines(lines[0], gameNumber, lines[0]["spread"])
             else:
                 for line in lines:
                     embed.add_field(name=f"{line['provider']}'s Bet Info", value=f"Spread: {line['formattedSpread']}\nTotal Points: {line['overUnder']}\n")
