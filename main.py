@@ -90,7 +90,7 @@ async def pinned_board(reactions: list):
     duplicate = False
 
     for reaction in reactions:
-        if reaction.count >= 5 and not reaction.message.channel.name == chan.name:
+        if reaction.count >= 5 and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
             if not reaction.message.author.bot:
                 message_history_raw = await chan.history(limit=5000).flatten()
 
