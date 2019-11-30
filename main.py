@@ -80,20 +80,32 @@ async def pinned_board(reactions: list):
     if chan is None:
         chan = client.get_channel(id=616824929383612427)
 
+    pinned_messages = []
+    message_history_raw = []
+    duplicate = False
+
     for reaction in reactions:
-        if reaction.count >= 5:
+        if reaction.count >= 5 and not reaction.message.channel.name == chan.name:
             if not reaction.message.author.bot:
                 message_history_raw = await chan.history(limit=5000).flatten()
-                pinned_messages = []
 
                 for message_raw in message_history_raw:
-                    if str(message_raw.content).find("```") > 0:
-                        msg = str(message_raw.content).split("```")[1].replace("\n", "")
-                        pinned_messages.append(msg)
+                    if len(message_raw.embeds) > 0:
+                        if message_raw.embeds[0].footer.text == str(reaction.message.id):
+                            duplicate = True
+                            break
 
-                if len(pinned_messages) == 0 or str(reaction.message.content) not in pinned_messages:
-                    msg = await chan.send(f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author} 🏆\n```{reaction.message.content}\n```")
-                    await msg.add_reaction(reaction)
+                if not duplicate:
+                    embed = discord.Embed(title=f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author} with the {reaction} reaction 🏆", color=0xFF0000)
+                    embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}")
+                    embed.set_footer(text=reaction.message.id)
+                    await chan.send(embed=embed)
+                # else:
+                #     print(f"Duplicate found, message ID: {reaction.message.id}")
+
+    del message_history_raw
+    del pinned_messages
+    del duplicate
 
 
 @client.event
@@ -268,7 +280,7 @@ async def on_raw_reaction_add(payload):
     guildID = client.get_guild(payload.guild_id)
     emoji = payload.emoji.name
 
-    # await pinned_board(message.reactions)
+    await pinned_board(message.reactions)
 
     dbAvailable = config.pingMySQL()
     if not dbAvailable:
