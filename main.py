@@ -81,7 +81,7 @@ async def pinned_board(reactions: list):
         chan = client.get_channel(id=616824929383612427)
 
     for reaction in reactions:
-        if reaction.count >= 1:
+        if reaction.count >= 5:
             if not reaction.message.author.bot:
                 message_history_raw = await chan.history(limit=5000).flatten()
                 pinned_messages = []
