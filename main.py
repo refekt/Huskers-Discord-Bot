@@ -80,6 +80,11 @@ async def pinned_board(reactions: list):
     if chan is None:
         chan = client.get_channel(id=616824929383612427)
 
+    banned_channels = (525519594417291284, 538419127535271946, 458474143403212801)
+
+    if chan.id in banned_channels:
+        return
+
     pinned_messages = []
     message_history_raw = []
     duplicate = False
