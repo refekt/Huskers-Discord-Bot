@@ -268,7 +268,7 @@ async def on_raw_reaction_add(payload):
     guildID = client.get_guild(payload.guild_id)
     emoji = payload.emoji.name
 
-    await pinned_board(message.reactions)
+    # await pinned_board(message.reactions)
 
     dbAvailable = config.pingMySQL()
     if not dbAvailable:
@@ -596,6 +596,28 @@ async def purge(ctx):
                 break  # Stop searching forever
         if deleteCounter > 50:
             break  # stop looking through messages
+
+
+@purge.command(aliases=["b",])
+async def bot(ctx):
+    authedChanIDs = (622581511488667699, 595705205069185047, 487431877792104470)
+    channel = client.get_channel(ctx.message.channel.id)
+
+    if channel.id in authedChanIDs:  # Only authorized use within betting channel or spam testing chan
+        msgs = []
+        try:
+            maxage = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)
+            async for message in channel.history(limit=100):
+                if message.created_at >= maxage and message.author.bot:
+                    msgs.append(message)
+            await channel.delete_messages(msgs)
+            print("Bulk delete of {} messages successful.".format(len(msgs)))
+        except discord.ClientException:
+            print("Cannot delete more than 100 messages at a time.")
+        except discord.Forbidden:
+            print("Missing permissions.")
+        except discord.HTTPException:
+            print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
 
 @purge.command(aliases=["a",])
