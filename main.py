@@ -74,6 +74,28 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet):
         mysql.sqlConnection.commit()
 
 
+async def pinned_board(reactions: list):
+    chan = client.get_channel(id=487431877792104470)
+
+    if chan is None:
+        chan = client.get_channel(id=616824929383612427)
+
+    for reaction in reactions:
+        if reaction.count >= 1:
+            if not reaction.message.author.bot:
+                message_history_raw = await chan.history(limit=5000).flatten()
+                pinned_messages = []
+
+                for message_raw in message_history_raw:
+                    if str(message_raw.content).find("```") > 0:
+                        msg = str(message_raw.content).split("```")[1].replace("\n", "")
+                        pinned_messages.append(msg)
+
+                if len(pinned_messages) == 0 or str(reaction.message.content) not in pinned_messages:
+                    msg = await chan.send(f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author} 🏆\n```{reaction.message.content}\n```")
+                    await msg.add_reaction(reaction)
+
+
 @client.event
 async def on_ready():
     nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos")
@@ -246,6 +268,8 @@ async def on_raw_reaction_add(payload):
     guildID = client.get_guild(payload.guild_id)
     emoji = payload.emoji.name
 
+    await pinned_board(message.reactions)
+
     dbAvailable = config.pingMySQL()
     if not dbAvailable:
         await channelID.send("The MySQL database is currently unavailable. Please try again later.")
@@ -394,6 +418,8 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_reaction_add(reaction, user):
+    # await pinned_board(reaction.message.reactions)
+
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
         # Checking for $CrootBot search results embedded message. Responds to added reactions by searching for and outputting a 247Sports profile for that player.
