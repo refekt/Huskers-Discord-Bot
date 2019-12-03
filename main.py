@@ -84,7 +84,9 @@ async def pinned_board(reactions: list):
     if chan is None:
         chan = client.get_channel(id=616824929383612427)
 
-    banned_channels = (525519594417291284, 538419127535271946, 458474143403212801)
+    banned_channels = (525519594417291284, 538419127535271946, 458474143403212801, 525519594417291284, 458474143403212801, 651523695214329887, 487431877792104470, 504777800100741120)
+
+    # print(f'{chan.id} - {banned_channels} - {chan.id in banned_channels}')
 
     if chan.id in banned_channels:
         return
