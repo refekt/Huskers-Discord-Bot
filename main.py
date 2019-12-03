@@ -74,6 +74,10 @@ def try_adding_new_dict(bet_username: str, which: str, placed_bet):
         mysql.sqlConnection.commit()
 
 
+def server_member_count():
+    return len(client.users)
+
+
 async def pinned_board(reactions: list):
     chan = client.get_channel(id=487431877792104470)
 
@@ -89,8 +93,10 @@ async def pinned_board(reactions: list):
     message_history_raw = []
     duplicate = False
 
+    threshold = int(0.0075 * server_member_count())
+
     for reaction in reactions:
-        if reaction.count >= 5 and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
+        if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
             if not reaction.message.author.bot:
                 message_history_raw = await chan.history(limit=5000).flatten()
 
