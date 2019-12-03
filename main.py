@@ -2,10 +2,10 @@
 import discord
 import requests
 from discord.ext import commands
-from discord.utils import get
+# from discord.utils import get
 from bs4 import BeautifulSoup
 from cogs.betting_commands import store_next_opponent
-from cogs.reddit_commands import reddit_footer, reddit_reactions, vote_post
+# from cogs.reddit_commands import reddit_footer, reddit_reactions, vote_post
 import sys
 import config
 import random
@@ -273,7 +273,8 @@ async def on_message(message):
 async def on_member_join(member):
     print("New member: {}".format(member.name))
     embed = discord.Embed(title="HuskerBot's Welcome Message", color=0xff0000)
-    embed.add_field(name="Welcome __`{}`__ to the Huskers Discord!".format(member.name), value="The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
+    embed.add_field(name="Welcome __`{}`__ to the Huskers Discord!".format(member.name),
+                    value="The Admin team and Frost Approved members hope you have a good time while here. I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands by sending `$help`.\n\n"
                    "We also have some fun roles that may interest you and you're welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans of Lil Red. Next up we have the 🍞 `@/r/unza` team. They are our resident Runza experts. Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. Which is better?\n\n"
                    "React to this message with the emojis below to automatically join the roles!", inline=False)
     embed.set_footer(text=welcome_footer)
@@ -300,6 +301,34 @@ async def on_raw_reaction_add(payload):
         return
 
     if len(message.embeds) > 0:
+
+        # # Checking for on_member_join() embedded message. Adds "fun role" to member based on which reaction is sent.
+        # if emoji in welcome_emoji_list and user != client.user and message.embeds[0].footer.text == welcome_footer:
+        #     print(f'{user} welcome emojis')
+        #     server_id = 440632686185414677
+        #     server = client.get_guild(server_id)
+        #     member = server.get_member(user.id)
+        #
+        #     try:
+        #         if emoji == '🍞':
+        #             role = get(server.roles, id=485086088017215500)
+        #             await member.add_roles(role)
+        #         elif emoji == '😂':
+        #             role = get(server.roles, id=448690298760200195)
+        #             await member.add_roles(role)
+        #         elif emoji == '🥒':
+        #             role = get(server.roles, id=583842403341828115)
+        #             await member.add_roles(role)
+        #         elif emoji == '🥔':
+        #             role = get(server.roles, id=583842320575889423)
+        #             await member.add_roles(role)
+        #         elif emoji == '🔴':
+        #             role = get(server.roles, id=464903715854483487)
+        #             await member.add_roles(role)
+        #     except:
+        #         print('error?')
+
+
         # Updating season_bets JSON for reacting to a $bet message
         if emoji in bet_emojis and user != client.user and message.embeds[0].footer.text == config.bet_footer:
             if not bool(config.current_game):
@@ -403,12 +432,12 @@ async def on_raw_reaction_add(payload):
                 print("I don't know why we can't remove {}'s reaction.".format(user))
 
         # reddit_commands
-        elif emoji in reddit_reactions and user != client.user and message.embeds[0].footer.text.startswith(reddit_footer):
-            if emoji == "⬆":
-                vote_post("1", message.embeds[0].footer.text.split("ID: ")[1].strip())
-
-            elif emoji == "⬇":
-                vote_post("-1", message.embeds[0].footer.text.split("ID: ")[1].strip())
+        # elif emoji in reddit_reactions and user != client.user and message.embeds[0].footer.text.startswith(reddit_footer):
+        #     if emoji == "⬆":
+        #         vote_post("1", message.embeds[0].footer.text.split("ID: ")[1].strip())
+        #
+        #     elif emoji == "⬇":
+        #         vote_post("-1", message.embeds[0].footer.text.split("ID: ")[1].strip())
 
         # Trivia commands
         elif user != client.user and message.embeds[0].title == "Husker Discord Trivia" and len(message.embeds[0].fields) == 2:
@@ -486,29 +515,6 @@ async def on_reaction_add(reaction, user):
                 embed = discord.Embed(title = title, url = video_url, color=0xff0000)
                 await channel.send(embed = embed)
                 highlight_url = None
-
-        # Checking for on_member_join() embedded message. Adds "fun role" to member based on which reaction is sent.
-        if reaction.emoji in welcome_emoji_list and user != client.user and reaction.message.embeds[0].footer.text == welcome_footer:
-            server_id = 440632686185414677
-            server = client.get_guild(server_id)
-            member = server.get_member(user.id)
-
-            if reaction.emoji == '🍞':
-                role = get(server.roles, id=485086088017215500)
-                await member.add_roles(role)
-            elif reaction.emoji == '😂':
-                role = get(server.roles, id=448690298760200195)
-                await member.add_roles(role)
-            elif reaction.emoji == '🥒':
-                role = get(server.roles, id=583842403341828115)
-                await member.add_roles(role)
-            elif reaction.emoji == '🥔':
-                role = get(server.roles, id=583842320575889423)
-                await member.add_roles(role)
-            elif reaction.emoji == '🔴':
-                role = get(server.roles, id=464903715854483487)
-                await member.add_roles(role)
-
 
 @client.event
 async def on_command_error(ctx, error):
@@ -743,6 +749,50 @@ async def about(ctx):
     embed.add_field(name="Client User", value=client.user)
     embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)
+
+
+@client.command()
+async def setuprules(ctx):
+    channel = client.get_channel(id=651523695214329887)
+#     moaming = client.get_channel(id=620043869504929832)
+#     rules = f"""
+# 1️⃣ Be respectful
+#
+# 2️⃣ Sending or linking any harmful material such as viruses, IP grabbers, etc. results in an immediate and permanent ban.
+#
+# 3️⃣ Abusing mentions to @everyone, the admins, the moderators (Frost Approved) or a specific person without proper reason is prohibited.
+#
+# 4️⃣ Act civil in all chats. {moaming.mention} is the only authorized channel for overt negative comments.
+#
+# 5️⃣ Post content in the correct channels.
+#
+# 6️⃣ Absolutely no posting of personal information of others (doxxing).
+#
+# 7️⃣ Do not post graphic text or pictures of minors (<18yo)
+#
+# 8️⃣ Fuck Iowa, Colorado, Texas, Florida
+#     """
+#
+#     embed = discord.Embed(title="Huskers' Discord Rules", color=0xFF0000)
+#     embed.set_footer(text="Created by Bot Frost")
+#     embed.set_thumbnail(url="https://i.imgur.com/Ah3x5NA.png")
+#     embed.add_field(name="Rules", value=rules)
+#     await channel.send(embed=embed)
+
+    embed = discord.Embed(title="Welcome!", color=0xff0000)
+    embed.add_field(name="Welcome to the Huskers Discord!",
+                    value=
+                    "The Admin team and Frost Approved members hope you have a good time while here. "
+                    "I am your full-serviced Discord bot, HuskerBot! You can find a list of my commands "
+                    "by sending `$help`.\n\nWe also have some fun roles that may interest you and you're "
+                    "welcome to join! The first, we have the 🔴 `@Lil' Huskers Squad`--those who are fans "
+                    "of Lil Red. Next up we have the 🍞 `@/r/unza` team. They are our resident Runza experts. "
+                    "Right behind the sandwich lovers are the 😂 `@Meme Team`! Their meme creation is second "
+                    "to none. Finally, we have our two food gangs: 🥔 `@POTATO GANG` and 🥒 `@Asparagang`. "
+                    "Which is better?\n\nReact to this message with the emojis below to automatically join the roles!",
+                    inline=False)
+    embed.set_footer(text=welcome_footer)
+    await channel.send(embed=embed)
 
 
 if len(sys.argv) > 0:
