@@ -107,6 +107,7 @@ async def pinned_board(reactions: list):
                             break
 
                 if not duplicate:
+                    print(f'Adding a message because it is not a duplicate and exceeds {threshold} reactions')
                     embed = discord.Embed(title=f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author} with the {reaction} reaction 🏆", color=0xFF0000)
                     embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}")
                     embed.set_footer(text=reaction.message.id)
