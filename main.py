@@ -96,6 +96,7 @@ async def pinned_board(reactions: list):
     duplicate = False
 
     threshold = int(0.0075 * server_member_count())
+    # sdfasfas
 
     for reaction in reactions:
         if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
