@@ -78,17 +78,16 @@ def server_member_count():
     return len(client.users)
 
 
-async def pinned_board(reactions: list):
-    chan = client.get_channel(id=487431877792104470)
+async def pinned_board(channel, reactions: list):
+    output_channel = client.get_channel(id=487431877792104470)
 
-    if chan is None:
-        chan = client.get_channel(id=616824929383612427)
+    if output_channel is None:
+        output_channel = client.get_channel(id=616824929383612427)
 
-    banned_channels = (525519594417291284, 538419127535271946, 458474143403212801, 525519594417291284, 458474143403212801, 651523695214329887, 487431877792104470, 504777800100741120)
+    banned_channels = (538419127535271946, 525519594417291284, 458474143403212801, 651523695214329887, 487431877792104470, 504777800100741120)
 
-    # print(f'{chan.id} - {banned_channels} - {chan.id in banned_channels}')
-
-    if chan.id in banned_channels:
+    if channel in banned_channels:
+        print("Reaction was in a banned channel")
         return
 
     pinned_messages = []
@@ -96,12 +95,12 @@ async def pinned_board(reactions: list):
     duplicate = False
 
     threshold = int(0.0075 * server_member_count())
-    # sdfasfas
+    print(f"Threshold is [{threshold}]")
 
     for reaction in reactions:
-        if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
+        if reaction.count >= threshold and not reaction.message.channel.name == output_channel.name and not ".addvotes" in reaction.message.content:
             if not reaction.message.author.bot:
-                message_history_raw = await chan.history(limit=5000).flatten()
+                message_history_raw = await output_channel.history(limit=5000).flatten()
 
                 for message_raw in message_history_raw:
                     if len(message_raw.embeds) > 0:
@@ -114,7 +113,7 @@ async def pinned_board(reactions: list):
                     embed = discord.Embed(title=f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author} with the {reaction} reaction 🏆", color=0xFF0000)
                     embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}")
                     embed.set_footer(text=reaction.message.id)
-                    await chan.send(embed=embed)
+                    await output_channel.send(embed=embed)
                 # else:
                 #     print(f"Duplicate found, message ID: {reaction.message.id}")
 
@@ -296,7 +295,7 @@ async def on_raw_reaction_add(payload):
     guildID = client.get_guild(payload.guild_id)
     emoji = payload.emoji.name
 
-    await pinned_board(message.reactions)
+    await pinned_board(channelID, message.reactions)
 
     dbAvailable = config.pingMySQL()
     if not dbAvailable:
@@ -474,8 +473,6 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_reaction_add(reaction, user):
-    # await pinned_board(reaction.message.reactions)
-
     # Checking for an embedded message
     if len(reaction.message.embeds) > 0:
         # Checking for $CrootBot search results embedded message. Responds to added reactions by searching for and outputting a 247Sports profile for that player.
