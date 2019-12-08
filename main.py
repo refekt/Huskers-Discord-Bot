@@ -743,11 +743,10 @@ async def about(ctx):
                                                   "[/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assist greatly with coding. "
                                                   "Source code is located on "
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
-    embed.add_field(name="Hosting Location", value="Jeyrad's VPS Server. Thank you!")
+    embed.add_field(name="Hosting Location", value="refekt's host")
     embed.add_field(name="Ready Status", value=client.is_ready())
     embed.add_field(name="Current Latency", value="{:.2f} ms".format(config.bot_latency()))
     embed.add_field(name="Client User", value=client.user)
-    embed.add_field(name="Ready Status", value=client.is_ready())
     await ctx.send(embed=embed)
 
 
