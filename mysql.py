@@ -6,4 +6,4 @@ print(f"%%% Connected to the MySQL Database! %%%\n"
       f"%%% User: {sqlConnection.user.decode('utf-8')}\n"
       f"%%% Database: {sqlConnection.db.decode('utf-8')}\n"
       f"%%% Connection Check: {sqlConnection.ping}\n"
-      f"%%%Work")
+      f"%%%W")
