@@ -1,22 +1,24 @@
 #!/usr/bin/env python3.7
-import discord
-import requests
-from discord.ext import commands
-# from discord.utils import get
-from bs4 import BeautifulSoup
-from cogs.betting_commands import store_next_opponent
-# from cogs.reddit_commands import reddit_footer, reddit_reactions, vote_post
-import sys
-import config
+import asyncio
+import datetime
+import hashlib
+import json
 import random
 import re
-import cogs.croot_bot
-import datetime
-import json
-import hashlib
+# from cogs.reddit_commands import reddit_footer, reddit_reactions, vote_post
+import sys
 import time
+
+import discord
+import requests
+# from discord.utils import get
+from bs4 import BeautifulSoup
+from discord.ext import commands
+
+import cogs.croot_bot
+import config
 import mysql
-import asyncio
+from cogs.betting_commands import store_next_opponent
 from config import client
 
 # Cogs
@@ -746,7 +748,6 @@ async def about(ctx):
     embed.add_field(name="Hosting Location", value="refekt's host")
     embed.add_field(name="Ready Status", value=client.is_ready())
     embed.add_field(name="Current Latency", value="{:.2f} ms".format(config.bot_latency()))
-    embed.add_field(name="Client User", value=client.user)
     await ctx.send(embed=embed)
 
 
