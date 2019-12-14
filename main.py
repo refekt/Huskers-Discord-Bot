@@ -747,7 +747,7 @@ async def about(ctx):
                                                   "[GitHub](https://www.github.com/refekt/Husker-Bot).")
     embed.add_field(name="Hosting Location", value="refekt's host")
     embed.add_field(name="Ready Status", value=client.is_ready())
-    embed.add_field(name="Current Latency", value="{:.2f} ms".format(config.bot_latency()))
+    embed.add_field(name="Current Latency!", value="{:.2f} ms".format(config.bot_latency()))
     await ctx.send(embed=embed)
 
 
