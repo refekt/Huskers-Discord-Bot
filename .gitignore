@@ -3,3 +3,4 @@
 /bot.log
 .idea
 mammals.json
+*.pyc
