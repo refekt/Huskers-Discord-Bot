@@ -1,5 +1,6 @@
 from discord.ext import commands
 from paramiko import client as client
+from utils.embed import build_embed
 
 from utils.consts import ssh_pw, ssh_user, ssh_host
 
@@ -55,33 +56,14 @@ def connect_SSH():
 class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
     @commands.has_any_role(606301197426753536, 440639061191950336)
     @commands.command()
-    async def status(self, ctx):
-        msg = await ctx.send("Checking status...")
-        connection = connect_SSH()
-        output = str(connection.sendCommand("sudo systemctl status minecraft@linuxconfig"))[0:1999]
-        print(len(output))
-        await msg.edit(content=output)
+    async def server(self, ctx):
+        await ctx.send(
+            embed=build_embed(
+                title="Husker Discord Minecraft Server",
+                fields=[["Server", "202.5.24.139"], ["Port", "25565"]]
+            )
+        )
 
-    @commands.has_any_role(606301197426753536, 440639061191950336)
-    @commands.command()
-    async def start(self, ctx):
-        msg = await ctx.send("Starting server...")
-        connection = connect_SSH()
-        await msg.edit(content=connection.sendCommand("sudo systemctl start minecraft@linuxconfig"))
-
-    @commands.has_any_role(606301197426753536, 440639061191950336)
-    @commands.command()
-    async def start(self, ctx):
-        msg = await ctx.send("Restarting server...")
-        connection = connect_SSH()
-        await msg.edit(content=connection.sendCommand("sudo systemctl restart minecraft@linuxconfig"))
-
-    @commands.has_any_role(606301197426753536, 440639061191950336)
-    @commands.command()
-    async def x(self, ctx, command: str):
-        msg = await ctx.send("Sending command...")
-        connection = connect_SSH()
-        await msg.edit(content=connection.sendCommand(command))
 
 
 def setup(bot):
