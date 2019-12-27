@@ -1,3 +1,4 @@
 
 *.env
 /bot.log
+.idea
