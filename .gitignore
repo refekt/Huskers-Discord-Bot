@@ -4,3 +4,7 @@
 .idea
 mammals.json
 *.pyc
+*.pyo
+cogs/__pycache__/
+cogs/games/__psycache__/
+utils/__pycache__/
