@@ -1,7 +1,18 @@
+import asyncio
+import html
+import random
+import time
+from datetime import datetime
+
+import discord
+import requests
 from discord.ext import commands
 from discord.ext.commands import TextChannelConverter
-import mysql, config, random, discord, time, asyncio, requests, html
-from datetime import datetime
+
+from utils.client import client
+from utils.embed import build_embed
+from utils.misc import bot_latency
+from utils.mysql import process_MySQL, sqlClearTriviaScore, sqlRetrieveTriviaScores, sqlInsertTriviaScore, sqlRetrieveTriviaQuestions
 
 errors = {
     "wrong_channel": "You used the command in the wrong channel!",
@@ -39,28 +50,28 @@ trivia_cats = {
     "vehicles": [28, "Vehicles"]
 }
 
+# reactions = ("💓", "💛", "💚", "💙", "⏭")
+reactions = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "⏭")
+
 
 async def add_reactions(message: discord.Message):
-    reactions = ("💓", "💛", "💚", "💙", "⏭")
+    global reactions
     for reaction in reactions:
         await message.add_reaction(reaction)
 
 
 def trivia_embed(*fields):
-    embed = discord.Embed(title="Husker Discord Trivia", description="The Huskers Discord weekly trivia game!", color=0xFF0000)
-    embed.set_footer(text="Frost Bot")
-    embed.set_thumbnail(url="https://i.imgur.com/0Co9fOy.jpg")
-    embed.set_author(name="Bot Frost", url="https://reddit.com/u/Bot_Frost", icon_url="https://i.imgur.com/Ah3x5NA.png")
-    for field in fields:
-        embed.add_field(name=field[0], value=field[1], inline=False)
-    return embed
+    return build_embed(
+        title="Husker Discord Trivia",
+        description="The Husker Discord trivia game!",
+        thumbnail="https://i.imgur.com/0Co9fOy.jpg",
+        fields=fields,
+        inline=False
+    )
 
 
 def clear_scoreboard():
-    with mysql.sqlConnection.cursor() as cursor:
-        cursor.execute(config.sqlClearTriviaScore)
-    mysql.sqlConnection.commit()
-    cursor.close()
+    process_MySQL(sqlClearTriviaScore)
 
 
 async def start_messages():
@@ -70,7 +81,8 @@ async def start_messages():
         clear_scoreboard()
 
         embed = trivia_embed(
-            ["Rules", f'You have __[{game.timer}]__ seconds to answer the question by reacting to the message. Each question is worth 1,000 points per second and will countdown to 0 points after __[{game.timer}]__ seconds.'],
+            ["Rules", f'You have __[{game.timer}]__ seconds to answer the question by reacting to the message. Each question is worth 1,000 points per second and will countdown to 0 points after '
+                      f'__[{game.timer}]__ seconds.'],
             ["Game Status", "The game is starting soon! Get ready for the first question!"],
             ["Countdown...", game.timer]
         )
@@ -112,7 +124,10 @@ async def loop_questions():
         ]
         random.shuffle(question_list)
 
-        question_msg = f'💓: {question_list[0]}\n💛: {question_list[1]}\n💚: {question_list[2]}\n💙: {question_list[3]}'
+        question_msg = f"{reactions[0]}: {question_list[0]}\n" \
+                       f"{reactions[1]}: {question_list[1]}\n" \
+                       f"{reactions[2]}: {question_list[2]}\n" \
+                       f"{reactions[3]}: {question_list[3]}"
 
         question_embed = trivia_embed(
             ["Question Number", f'{game.current_question + 1} out of {len(game.questions)}'],
@@ -124,7 +139,7 @@ async def loop_questions():
 
         await msg.edit(embed=question_embed)
 
-        await asyncio.sleep(game.timer + (config.bot_latency()/100))
+        await asyncio.sleep(game.timer + bot_latency())
 
         question_embed.add_field(name="Correct Answer", inline=False, value=game.questions[game.current_question]["correct"])
         question_embed.add_field(name="Status", inline=False, value="🛑 Timed out! 🛑")
@@ -145,7 +160,7 @@ async def loop_questions():
             await quit_game()
 
         try:
-            reaction, user = await config.client.wait_for("reaction_add", check=check_reaction)
+            reaction, user = await client.wait_for("reaction_add", check=check_reaction)
         except asyncio.TimeoutError:
             pass
         else:
@@ -154,12 +169,7 @@ async def loop_questions():
 
 
 def scoreboard():
-    with mysql.sqlConnection.cursor() as cursor:
-        cursor.execute(config.sqlRetrieveTriviaScores)
-    mysql.sqlConnection.commit()
-    scores = cursor.fetchall()
-
-    cursor.close()
+    scores = process_MySQL(fetch="all", query=sqlRetrieveTriviaScores)
 
     if scores:
         scores_edited = ""
@@ -192,12 +202,10 @@ async def delete_collection():
 def tally_score(message: discord.Message, author: discord.Member, end):
     """1000 points per second"""
     if end == 0:
-        with mysql.sqlConnection.cursor() as cursor:
-            cursor.execute(config.sqlInsertTriviaScore, (author.display_name, 0, 0))
-        mysql.sqlConnection.commit()
-        cursor.close()
+        process_MySQL(query=sqlInsertTriviaScore, value=(author.display_name, 0, 0))
         print(f">>> {author} got a score of 0.")
         return
+
     footer_text = message.embeds[0].footer.text
     start = datetime.strptime(footer_text.split("|")[0].strip(), "%Y-%m-%d %H:%M:%S.%f")
     diff = end - start
@@ -206,10 +214,7 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     score = (game.timer * 1000) - score
     print(f">>> {author} got a score of {score}.")
 
-    with mysql.sqlConnection.cursor() as cursor:
-        cursor.execute(config.sqlInsertTriviaScore, (author.display_name, abs(score), abs(score)))
-    mysql.sqlConnection.commit()
-    cursor.close()
+    process_MySQL(query=sqlInsertTriviaScore, values=(author.display_name, abs(score), abs(score)))
 
 
 class TriviaGame():
@@ -233,11 +238,7 @@ class TriviaGame():
         self.timer = int(timer)
 
         if category[0] == 0:
-            with mysql.sqlConnection.cursor() as cursor:
-                cursor.execute(config.sqlRetrieveTriviaQuestions)
-                trivia_questions = cursor.fetchall()
-            mysql.sqlConnection.commit()
-            cursor.close()
+            trivia_questions = process_MySQL(fetch="all", query=sqlRetrieveTriviaQuestions)
             random.shuffle(trivia_questions)
             self.questions = trivia_questions[0:int(questions)]
             self.category_index = category[0]
@@ -348,7 +349,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await config.client.wait_for("message", check=check_channel)
+                msg = await client.wait_for("message", check=check_channel)
                 if msg:
                     setup_chan = await TextChannelConverter().convert(ctx, msg.content)
             except TimeoutError:
@@ -365,7 +366,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await config.client.wait_for("message", check=check_timer_and_questions)
+                msg = await client.wait_for("message", check=check_timer_and_questions)
                 if msg:
                     setup_timer = abs(int(msg.content))
             except TimeoutError:
@@ -382,7 +383,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await config.client.wait_for("message", check=check_timer_and_questions)
+                msg = await client.wait_for("message", check=check_timer_and_questions)
                 if not msg == "N/A":
                     setup_question_length = abs(int(msg.content))
             except TimeoutError:
@@ -399,7 +400,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await config.client.wait_for("message", check=check_category)
+                msg = await client.wait_for("message", check=check_category)
                 if msg:
                     setup_category = trivia_cats[msg.clean_content]
             except TimeoutError:
@@ -429,7 +430,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             return u == game.trivia_master and str(r.emoji) == "🆗"
 
         try:
-            reaction, user = await config.client.wait_for("reaction_add", check=check_reaction)
+            reaction, user = await client.wait_for("reaction_add", check=check_reaction)
         except asyncio.TimeoutError:
             await ctx.send("ur dumb lol")
         else:
