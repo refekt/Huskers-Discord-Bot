@@ -56,7 +56,7 @@ def connect_SSH():
 class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
     @commands.has_any_role(606301197426753536, 440639061191950336)
     @commands.command()
-    async def server(self, ctx):
+    async def mcserver(self, ctx):
         await ctx.send(
             embed=build_embed(
                 title="Husker Discord Minecraft Server",
