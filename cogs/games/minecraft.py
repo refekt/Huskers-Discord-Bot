@@ -60,7 +60,7 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
         await ctx.send(
             embed=build_embed(
                 title="Husker Discord Minecraft Server",
-                fields=[["Version", "Java"], ["Server", "202.5.24.139"], ["Port", "25565"]]
+                fields=[["Version", "Java"], ["Server", "202.5.24.139"], ["Port", "25565"], ["Dynamic Map", "http://202.5.24.139:8123/"]]
             )
         )
 

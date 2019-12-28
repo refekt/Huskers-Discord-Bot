@@ -20,6 +20,7 @@ class TextCommands(commands.Cog):
     @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
     async def countdown(self, ctx, *, team=None):
         """ Countdown to the most current or specific Husker game """
+        edit_msg = await ctx.send("Loading...")
         now_cst = datetime.now().astimezone(tz=tz)
 
         def convert_seconds(n):
@@ -39,7 +40,7 @@ class TextCommands(commands.Cog):
                     return
 
         async def send_countdown(days: int, hours: int, minutes: int, opponent: str, datetime: datetime):
-            await ctx.send(f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent} ]__ game at __[ {datetime.strftime('%B %d, %Y %I:%M %p')} ]__")
+            await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent} ]__ game at __[ {datetime.strftime('%B %d, %Y %I:%M %p')} ]__")
 
         if team is None:
             for game in ScheduleBackup(year=datetime.now().year):
