@@ -1,14 +1,16 @@
 import datetime
+from utils.consts import chan_rules, chan_botlogs
 
 import discord
 from discord.ext import commands
 
 from utils.client import client
+from utils.consts import admin_prod, admin_test
 from utils.embed import build_embed as build_embed
 
 
 def not_botlogs(chan: discord.TextChannel):
-    return chan.id == 458474143403212801
+    return chan.id == chan_botlogs
 
 
 class AdminCommands(commands.Cog, name="Admin Commands"):
@@ -49,7 +51,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
     @commands.group(hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(admin_prod, admin_test)
     async def purge(self, ctx):
         """ Deletes up to 100 bot messages """
         if ctx.subcommand_passed:
@@ -104,14 +106,14 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
     @commands.command(aliases=["q",], hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(admin_prod, admin_test)
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
         await client.logout()
 
     @commands.command(hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(admin_prod, admin_test)
     async def rules(self, ctx):
         text = """
         1️⃣ Be respectful\n
@@ -125,7 +127,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         9️⃣ All NSFW Images must be spoiler tagged
         """
 
-        rules_channel = client.get_channel(651523695214329887)
+        rules_channel = client.get_channel(chan_rules)
         rules_title = "Huskers' Discord Rules"
         messages = await rules_channel.history().flatten()
 
@@ -148,7 +150,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
     @commands.command(hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(admin_prod, admin_test)
     async def roles(self, ctx):
         roles = """
         Below are a list of vanity roles you can add or remove whenever you like by reacting to this message:\n
@@ -163,8 +165,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         """
         roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧")
 
-        rules_channel = client.get_channel(651523695214329887)
-        messages = await rules_channel.history().flatten()
+        messages = await chan_rules.history().flatten()
         roles_title = "Huskers' Discord Roles"
 
         for message in messages:
@@ -181,7 +182,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         del messages
 
-        rules_message = await rules_channel.send(
+        rules_message = await chan_rules.send(
             embed=build_embed(
                 title=roles_title,
                 fields=[["Roles", roles]]

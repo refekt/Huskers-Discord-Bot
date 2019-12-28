@@ -9,6 +9,8 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
+from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
+from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_lilred, role_meme, role_packer, role_pixel, role_runza
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 
@@ -135,7 +137,7 @@ async def monitor_messages(message: discord.Message):
             if random.random() >= .90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
 
-        if not type(channel) == discord.DMChannel and 459569717430976513 in [roleid.id for roleid in message.author.roles]:
+        if not type(channel) == discord.DMChannel and role_gumby in [roleid.id for roleid in message.author.roles]:
             await message.add_reaction("🦐")
             if random.random() >= .97:
                 await message.channel.send("https://i.imgur.com/1tVJ2tW.gif")
@@ -171,12 +173,12 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction(arrow)
 
     async def hall_of_fame_messages(reactions: list):
-        chan = client.get_channel(id=487431877792104470)
+        chan = client.get_channel(id=chan_HOF_prod)
 
         if chan is None:
-            chan = client.get_channel(id=616824929383612427)
+            chan = client.get_channel(id=chan_HOF_test)
 
-        banned_channels = (525519594417291284, 538419127535271946, 458474143403212801)
+        banned_channels = (chan_dbl_war_room, chan_war_room, chan_botlogs)
 
         if chan.id in banned_channels:
             return
@@ -250,14 +252,14 @@ async def roles_message(action, message:discord.Message, member: discord.User, e
             guild = client.get_guild(440632686185414677)
             member = guild.get_member(member.id)
             roles = {
-                "🥔": guild.get_role(583842320575889423),
-                "💚": guild.get_role(583842403341828115),
-                "🥪": guild.get_role(485086088017215500),
-                "😹": guild.get_role(448690298760200195),
-                "♣": guild.get_role(592425861534449674),
-                "🧀": guild.get_role(609409451836964878),
-                "☎": guild.get_role(633698252809699369),
-                "🎧": guild.get_role(633702209703378978)
+                "🥔": guild.get_role(role_potato),
+                "💚": guild.get_role(role_asparagus),
+                "🥪": guild.get_role(role_runza),
+                "😹": guild.get_role(role_meme),
+                "♣": guild.get_role(role_isms),
+                "🧀": guild.get_role(role_packer),
+                "☎": guild.get_role(role_pixel),
+                "🎧": guild.get_role(role_airpod)
             }
 
             if not emoji.name in [emoji for emoji in roles.keys()]:
@@ -301,9 +303,9 @@ class MyClient(commands.Bot):
                 checkID = hashlib.md5(str(ctx.message.author.id).encode())
 
                 if context[2].lower() == "war":
-                    channel = client.get_channel(525519594417291284)
+                    channel = client.get_channel(chan_war_room)
                 elif context[2].lower() == "scott":
-                    channel = client.get_channel(507520543096832001)
+                    channel = client.get_channel(chan_scott)
                 else:
                     await ctx.message.author.send(error_message)
                     return

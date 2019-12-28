@@ -1,3 +1,4 @@
+from utils.consts import admin_test, admin_prod, mod_prod
 import asyncio
 import html
 import random
@@ -289,7 +290,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         pass
 
     @trivia.command(aliases=["s",])
-    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.has_any_role(admin_test, admin_prod, mod_prod)
     async def setup(self, ctx):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
         try:
@@ -437,7 +438,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             await start_messages()
 
     @trivia.command()
-    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.has_any_role(admin_test, admin_prod, mod_prod)
     async def start(self, ctx):
         """Admin/Trivia Boss Command: Starts the trivia game"""
         if not ctx.message.author == game.trivia_master:
@@ -451,7 +452,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         await start_messages()
 
     @trivia.command(aliases=["n",], hidden=True)
-    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.has_any_role(admin_test, admin_prod, mod_prod)
     async def next(self, ctx):
         """Admin/Trivia Boss Command: Send the next question"""
         global game
@@ -467,7 +468,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             await loop_questions()
 
     @trivia.command(aliases=["q",])
-    @commands.has_any_role(606301197426753536, 440639061191950336, 443805741111836693)
+    @commands.has_any_role(admin_test, admin_prod, mod_prod)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
         if game.setup_complete:

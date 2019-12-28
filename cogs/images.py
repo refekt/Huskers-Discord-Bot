@@ -4,6 +4,7 @@ from discord.ext import commands
 
 from utils.consts import _global_per as _global_per
 from utils.consts import _global_rate as _global_rate
+from utils.consts import role_asparagus, role_potato
 from utils.embed import build_image_embed
 
 
@@ -71,14 +72,14 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
 
     @commands.command()
     @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
-    @commands.has_role(583842320575889423)
+    @commands.has_role(role_potato)
     async def potatoes(self, ctx):
         """ Po-tay-toes! """
         await ctx.send(embed=build_image_embed(title="Po-Tay-Toes", image="https://i.imgur.com/Fzw6Gbh.gif"))
 
     @commands.command()
     @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
-    @commands.has_role(583842403341828115)
+    @commands.has_role(role_asparagus)
     async def asparagus(self, ctx):
         """ Uh-spare-uh-gus """
         await ctx.send(embed=build_image_embed(title="Asparagang", image="https://i.imgur.com/QskqFO0.gif"))

@@ -1,6 +1,7 @@
 from discord.ext import commands
 from paramiko import client as client
 
+from utils.consts import admin_prod, admin_test
 from utils.consts import ssh_pw, ssh_user, ssh_host
 from utils.embed import build_embed
 
@@ -60,7 +61,7 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
     async def minecraft(self, ctx):
         pass
 
-    @commands.has_any_role(606301197426753536, 440639061191950336)
+    @commands.has_any_role(admin_prod, admin_test)
     @minecraft.command()
     async def status(self, ctx):
         ssh = connect_SSH()
