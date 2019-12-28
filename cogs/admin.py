@@ -31,6 +31,22 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             )
         )
 
+    @commands.command()
+    async def donate(self, ctx):
+        """ All about Bot Frost """
+        import platform
+
+        await ctx.send(
+            embed=build_embed(
+                title="Donate",
+                inline=False,
+                fields=[
+                    ["About", "Donations will go toward the payment of server cost. Right now total costs are $3.50 a month."],
+                    ["Donation Link", "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
+                ]
+            )
+        )
+
     @commands.group(hidden=True)
     @commands.has_any_role(606301197426753536, 440639061191950336)
     async def purge(self, ctx):
