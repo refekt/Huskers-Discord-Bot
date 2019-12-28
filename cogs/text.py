@@ -252,7 +252,7 @@ class TextCommands(commands.Cog):
 
     @commands.command()
     @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
-    async def orderjoined(self, ctx, who: discord.Member):
+    async def whenjoined(self, ctx, who: discord.Member):
         """ When did you join the server? """
         from utils.client import client
 
@@ -291,9 +291,8 @@ class TextCommands(commands.Cog):
                       'Reply hazy', 'Scott Frost approves', 'These are the affirmative answers.', 'Try again', 'Try again', 'Without a doubt', 'Yes – definitely', 'You may rely on it']
 
         random.shuffle(eight_ball)
-        dice_roll = random.randint(0, len(eight_ball) - 1)
 
-        embed = discord.Embed(title="The HuskerBot 8-Ball :8ball: says...", description=eight_ball[dice_roll], color=0xFF0000)
+        embed = discord.Embed(title="The HuskerBot 8-Ball :8ball: says...", description=random.choice(eight_ball), color=0xFF0000)
         embed.set_thumbnail(url="https://i.imgur.com/L5Gpu0z.png")
         await ctx.send(embed=embed)
 
