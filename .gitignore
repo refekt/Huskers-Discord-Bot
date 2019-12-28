@@ -8,3 +8,5 @@ mammals.json
 cogs/__pycache__/
 cogs/games/__psycache__/
 utils/__pycache__/
+.gitignore
+.gitattributes
