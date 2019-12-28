@@ -1,8 +1,12 @@
 from discord.ext import commands
 from paramiko import client as client
-from utils.embed import build_embed
 
 from utils.consts import ssh_pw, ssh_user, ssh_host
+from utils.embed import build_embed
+
+ssh_commands = {
+    "status": "ps aux | grep spigot"
+}
 
 
 class ssh:
@@ -10,34 +14,32 @@ class ssh:
 
     def __init__(self, address, username, password):
         print("^^^ Connecting to server... ^^^")
+
         self.client = client.SSHClient()
         self.client.set_missing_host_key_policy(client.AutoAddPolicy())
         self.client.connect(address, username=username, password=password, look_for_keys=False)
 
     def sendCommand(self, command):
-        alldata = None
+        print(f"^^^ Sending command [{command}] ^^^")
 
-        if (self.client):
+        import select
+
+        alldata = "```\n"
+
+        if self.client:
             stdin, stdout, stderr = self.client.exec_command(command)
+
             while not stdout.channel.exit_status_ready():
-                # Print data when available
-                if stdout.channel.recv_ready():
-                    alldata = stdout.channel.recv(1024)
-                    prevdata = b"1"
-                    while prevdata:
-                        prevdata = stdout.channel.recv(1024)
-                        alldata += prevdata
-                try:
-                    print(str(alldata, "utf-8"))
-                except:
-                    pass
+                rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+
+                if len(rl) > 0:
+                    alldata += str(stdout.channel.recv(1024), "utf-8")
+                    break
+
+            alldata += "\n```"
 
             return f"All Data: " \
-                   f"```\n" \
-                   f"{str(alldata, 'utf8') if alldata else '*'}" \
-                   f"\n```" \
-                   f"\n" \
-                   f"STD Out: ```\n{' '.join([str(elem, 'utf-8') for elem in stdout.readlines()]) if stdout.readlines() else '*'}```\n"
+                   f"{alldata if alldata else '*'}"
         else:
             print("^^^ Connection not opened! ^^^")
 
@@ -54,16 +56,25 @@ def connect_SSH():
 
 
 class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
+    @commands.group(aliases=["mc",])
+    async def minecraft(self, ctx):
+        pass
+
     @commands.has_any_role(606301197426753536, 440639061191950336)
-    @commands.command()
-    async def mcserver(self, ctx):
+    @minecraft.command()
+    async def status(self, ctx):
+        ssh = connect_SSH()
+        await ctx.send(ssh.sendCommand(ssh_commands["status"]))
+        del ssh
+
+    @minecraft.command()
+    async def server(self, ctx):
         await ctx.send(
             embed=build_embed(
                 title="Husker Discord Minecraft Server",
                 fields=[["Version", "Java"], ["Server", "202.5.24.139"], ["Port", "25565"], ["Dynamic Map", "http://202.5.24.139:8123/"]]
             )
         )
-
 
 
 def setup(bot):
