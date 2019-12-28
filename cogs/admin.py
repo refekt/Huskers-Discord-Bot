@@ -34,7 +34,6 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command()
     async def donate(self, ctx):
         """ Donate to the cause """
-        import platform
 
         await ctx.send(
             embed=build_embed(
