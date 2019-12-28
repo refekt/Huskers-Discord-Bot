@@ -38,11 +38,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         await ctx.send(
             embed=build_embed(
-                title="Donate",
+                title="Donation Information",
                 inline=False,
-                image="resources/donate.png",
+                thumbnail="https://i.imgur.com/53GeCvm.png",
                 fields=[
-                    ["About", "Donations will go toward the payment of server cost. Right now total costs are $3.50 a month."],
+                    ["About", "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware "
+                              "performance I cannot provide with my own machiens. Donations will go toward the payment of server cost. A top end server will be about $15 a month."],
                     ["Donation Link", "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
                 ]
             )
