@@ -115,7 +115,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command(hidden=True)
     @commands.has_any_role(admin_prod, admin_test)
     async def rules(self, ctx):
-        text = """
+        text = \
+        """
         1️⃣ Be respectful\n
         2️⃣ Sending or linking any harmful material such as viruses, IP grabbers, etc. results in an immediate and permanent ban.\n
         3️⃣ Abusing mentions to @everyone, the admins, the moderators (Frost Approved) or a specific person without proper reason is prohibited.\n
