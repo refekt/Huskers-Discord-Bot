@@ -156,6 +156,13 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ 🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈 """
         await ctx.send(embed=build_image_embed(title="🏈🎈🏈🎈", image="https://i.imgur.com/Wh4aLYo.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    async def nicoleistall(self, ctx):
+        """ I AM A TALL BOY """
+        await ctx.send(embed=build_image_embed(title="Big Boye", image="https://media1.tenor.com/images/99972fba7f9f38377b56d5d56e4b6052/tenor.gif"))
+
+
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
 
