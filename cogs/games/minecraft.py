@@ -6,9 +6,9 @@ from utils.embed import build_embed
 
 # from paramiko import client as client
 
-ssh_commands = {
-    "status": "ps aux | grep spigot"
-}
+# ssh_commands = {
+#     "status": "ps aux | grep spigot"
+# }
 
 
 # class ssh:
