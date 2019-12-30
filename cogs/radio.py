@@ -28,4 +28,4 @@ def setup(bot):
     bot.add_cog(RadioCommands(bot))
 
 
-print("### Radio Commands loaded! ###")
+print("### Radio Commands loaded!! ###")
