@@ -2,8 +2,8 @@ import random
 
 from discord.ext import commands
 
-from utils.consts import _global_per as _global_per
-from utils.consts import _global_rate as _global_rate
+from utils.consts import _global_per
+from utils.consts import _global_rate
 from utils.consts import role_asparagus, role_potato
 from utils.embed import build_image_embed
 

@@ -118,6 +118,9 @@ chan_botlogs = 458474143403212801
 chan_scott = 507520543096832001
 chan_rules = 651523695214329887
 
+
+bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
+
 # def CurrentWeek():
 #     now = datetime.datetime(year=datetime.datetime.utcnow().year, month=datetime.datetime.utcnow().month, day=datetime.datetime.utcnow().day, hour=0, minute=0, second=0, microsecond=0, tzinfo=tz)
 #     index = len(SeasonWeeks) - 1

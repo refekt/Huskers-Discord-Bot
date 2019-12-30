@@ -57,22 +57,19 @@ recruits = {
 eNSD = datetime(year=2019, day=18, month=12)
 
 
-def is_me():
-    def predicate(ctx):
-        return ctx.message.author.id == 189554873778307073
-    return commands.check(predicate)
+def is_me(ctx):
+    return ctx.message.author.id == 189554873778307073
 
 
 class RedditCommands(commands.Cog):
     @commands.command(hidden=True)
-    @is_me()
+    @commands.check(is_me)
     async def nsd(self, ctx, recruit: str, source: str):
-        # right_now = datetime.now().date()
-        # if not right_now == eNSD.date():
-        #     print("It is not early signing day!")
-        #     return
+        right_now = datetime.now()
+        if not right_now.date() == eNSD.date():
+            print("It is not early signing day!")
+            return
 
-        # 0 == name, 1 == stars, 2 == position, 3 == url, 4 == /r/huskers, 5 == /r/cfb
         me = client.get_user(189554873778307073)
 
         try:
@@ -95,6 +92,7 @@ class RedditCommands(commands.Cog):
             password=reddit_pw
         )
 
+        # 0 == name, 1 == stars, 2 == position, 3 == url, 4 == /r/huskers, 5 == /r/cfb
         text = f"247Sports Profile: {recruits[recruit][3]}\n" \
                f"\n" \
                f"Source: {source}"

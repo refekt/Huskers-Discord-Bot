@@ -6,8 +6,8 @@ from discord.ext import commands
 
 from utils.client import client
 from utils.consts import FootballRecruit
-from utils.consts import _global_per as _global_per
-from utils.consts import _global_rate as _global_rate
+from utils.consts import _global_per
+from utils.consts import _global_rate
 from utils.embed import build_embed, build_recruit_embed
 
 
