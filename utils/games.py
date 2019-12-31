@@ -219,7 +219,7 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
             if ele == "Husker Sports Network":
                 _radio_station = "Huskers Sports Network"
 
-         _game_date_time = datetime.datetime.strptime(f"{raw_date} {raw_time}", "%b %d %Y %I:%M %p").astimezone(tz=tz)
+        _game_date_time = datetime.datetime.strptime(f"{raw_date} {raw_time}", "%b %d %Y %I:%M %p").astimezone(tz=tz)
 
         _game_links_raw = game.contents[5].contents[3].contents[1].contents
 
