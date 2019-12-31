@@ -165,6 +165,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         Minecraft (🪓)
         """
         roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧", "🪓")
+
         rules_channel = client.get_channel(chan_rules)
         messages = await rules_channel.history().flatten()
         roles_title = "Huskers' Discord Roles"
