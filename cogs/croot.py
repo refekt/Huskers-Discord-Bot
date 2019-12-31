@@ -26,7 +26,6 @@ class RecruitCommands(commands.Cog):
 
         edit_msg = await ctx.send("Loading...")
 
-        search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4, "6️⃣": 5, "7️⃣": 6, "8️⃣": 7, "9️⃣": 8, "🔟": 9}
         search = FootballRecruit(year, name)
 
         if len(search) == 1:
@@ -35,6 +34,7 @@ class RecruitCommands(commands.Cog):
             return
 
         result_info = ""
+        search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4, "6️⃣": 5, "7️⃣": 6, "8️⃣": 7, "9️⃣": 8, "🔟": 9}
 
         index = 0
 

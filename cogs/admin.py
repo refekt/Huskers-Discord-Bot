@@ -163,8 +163,9 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         Packer Backer (🧀)\n
         Pixel Gang (☎)\n
         Airpod Gang (🎧)\n
+        Minecraft (🪓)
         """
-        roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧")
+        roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧", "🪓")
 
         messages = await chan_rules.history().flatten()
         roles_title = "Huskers' Discord Roles"

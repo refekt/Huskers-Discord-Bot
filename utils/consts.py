@@ -110,6 +110,7 @@ role_packer = 609409451836964878
 role_pixel = 633698252809699369
 role_airpod = 633702209703378978
 role_gumby = 459569717430976513
+role_minecraft = 661409899481268238
 
 chan_HOF_prod = 487431877792104470
 chan_HOF_test = 616824929383612427
@@ -428,6 +429,7 @@ def FootballRecruit(year, name):
     search_results = x247_search = None
     team_ids_raw = process_MySQL(fetch="all", query=TeamIDs)
     team_ids = dict()
+
     for id in team_ids_raw:
         team_ids.update({id['id']: id['name']})
 

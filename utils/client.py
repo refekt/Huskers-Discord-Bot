@@ -10,7 +10,7 @@ from discord.ext import commands
 
 import utils.consts as consts
 from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
-from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_lilred, role_meme, role_packer, role_pixel, role_runza
+from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 
@@ -259,7 +259,8 @@ async def roles_message(action, message:discord.Message, member: discord.User, e
                 "♣": guild.get_role(role_isms),
                 "🧀": guild.get_role(role_packer),
                 "☎": guild.get_role(role_pixel),
-                "🎧": guild.get_role(role_airpod)
+                "🎧": guild.get_role(role_airpod),
+                "🪓": guild.get_role(role_minecraft)
             }
 
             if not emoji.name in [emoji for emoji in roles.keys()]:
@@ -431,7 +432,7 @@ client.load_extension('cogs.referee')
 client.load_extension('cogs.schedule')
 client.load_extension('cogs.text')
 client.load_extension('cogs.croot')
-client.load_extension('cogs.betting')
+# client.load_extension('cogs.betting')
 # client.load_extension('cogs.reddit')
 client.load_extension('cogs.radio')
 client.load_extension('cogs.games.trivia')
