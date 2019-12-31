@@ -198,11 +198,19 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
 
             if ("PM" in ele) or ("AM" in ele) or ("A.M." in ele.upper()) or ("P.M." in ele.upper()):
                 raw_time = ele.rstrip()
-                if "." in raw_time:
-                    raw_time = raw_time.replace(".", "").upper()
-                    raw_time = raw_time[0:2] + ":00 " + raw_time[-2:]
 
+            # Fixing dirty data
+            if "::" in raw_time:
+                raw_time = raw_time.replace("::", ":")
+            if " :" in raw_time:
+                raw_time = raw_time.replace(" :", ":")
+            if "." in raw_time:
+                raw_time = raw_time.replace(".", "").upper()
+                raw_time = raw_time[0:2] + ":00 " + raw_time[-2:]
             if ele == "TBA ":
+                raw_time = "11:00 PM"
+
+            if not raw_time:
                 raw_time = "11:00 PM"
 
             if ele in tv_stations:
@@ -211,14 +219,7 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
             if ele == "Husker Sports Network":
                 _radio_station = "Huskers Sports Network"
 
-        # Fixing dirty data
-        if "::" in raw_time:
-            raw_time = raw_time.replace("::", ":")
-
-        if " :" in raw_time:
-            raw_time = raw_time.replace(" :", ":")
-
-        _game_date_time = datetime.datetime.strptime(f"{raw_date} {raw_time}", "%b %d %Y %I:%M %p").astimezone(tz=tz)
+         _game_date_time = datetime.datetime.strptime(f"{raw_date} {raw_time}", "%b %d %Y %I:%M %p").astimezone(tz=tz)
 
         _game_links_raw = game.contents[5].contents[3].contents[1].contents
 
@@ -256,15 +257,16 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
                 city_state = loc[index].text.strip().split(", ")
 
                 city = city_state[0]
+                state = ""
 
                 if len(city_state) == 2:
-                    state = states_old[city_state[1]]
+                    try:
+                        state = states_old[city_state[1]]
+                    except KeyError:
+                        state = "N/A"
                 elif len(city_state) == 1:
                     state = "NE"
                 return [city, state]
-
-        home_team = "Nebraska" if game_location(index)[0] == "Lincoln" else o
-        away_team = "Nebraska" if not game_location(index)[0] == "Lincoln" else o
 
         games.append(
             HuskerDotComSchedule(
@@ -306,14 +308,12 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
     del _game_history_url
     del _game_gallery_url
     del _game_links_raw
-    del away_team
     del big_ten_members
     del bitly_oauth_token
     del ele
     del g
     del game
     del games_raw
-    del home_team
     del husker_url
     del index
     del loc

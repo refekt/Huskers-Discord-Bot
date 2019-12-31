@@ -1,9 +1,13 @@
+import logging
 import os
 import platform
 import sys
 
 import pytz
 from dotenv import load_dotenv
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 print(f"### Platform == {platform.platform()} ###")
 
@@ -43,7 +47,6 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gec
 
 # Consistent timezone
 tz = pytz.timezone("US/Central")
-
 
 # Discord Roles
 role_admin_prod = 440639061191950336
