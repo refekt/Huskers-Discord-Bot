@@ -27,7 +27,7 @@ def position_abbr(position):
     return long_positions[position]
 
 
-class RecruitInterest():
+class RecruitInterest:
     school = None
     offered = None
     status = None
@@ -38,7 +38,7 @@ class RecruitInterest():
         self.status = status
 
 
-class Recruit():
+class Recruit:
     x247_highlights = None
     x247_profile = None
     all_time_ranking = None

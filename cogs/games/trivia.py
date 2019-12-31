@@ -218,7 +218,7 @@ def tally_score(message: discord.Message, author: discord.Member, end):
     process_MySQL(query=sqlInsertTriviaScore, values=(author.display_name, abs(score), abs(score)))
 
 
-class TriviaGame():
+class TriviaGame:
     def __init__(self, channel, question=None):
         self.category_index = None
         self.category = None

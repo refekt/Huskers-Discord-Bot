@@ -9,7 +9,7 @@ from utils.consts import headers
 from utils.consts import tz
 
 
-class SeasonStats():
+class SeasonStats:
     wins = None
     losses = None
 
@@ -18,7 +18,7 @@ class SeasonStats():
         self.losses = losses
 
 
-class GameBets():
+class GameBets:
     game_number = None
     over_under = None
     spread = None
@@ -31,7 +31,7 @@ class GameBets():
         self.win = win
 
 
-class GameBetLine():
+class GameBetLine:
     provider = None
     spread = None
     formatted_spread = None
@@ -44,7 +44,7 @@ class GameBetLine():
         self.over_under = over_under
 
 
-class GameBetInfo():
+class GameBetInfo:
     home_team = None
     home_score = None
     away_team = None
@@ -87,7 +87,7 @@ class GameBetInfo():
             pass
 
 
-class HuskerDotComSchedule():
+class HuskerDotComSchedule:
     opponent = None
     game_date_time = None
     tv_station = None
