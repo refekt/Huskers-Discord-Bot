@@ -7,10 +7,10 @@ import pytz
 import requests
 from discord.ext import commands
 
-from utils.consts import ScheduleBackup
 from utils.consts import _global_per
 from utils.consts import _global_rate
 from utils.embed import build_embed
+from utils.games import ScheduleBackup
 
 leagueDict = {
     'top25': 0,
@@ -82,18 +82,21 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         """ Nebraska's football schedule """
         edit_msg = await ctx.send("Loading...")
 
-        scheduled_games = ScheduleBackup(year=year)
+        scheduled_games, season_stats = ScheduleBackup(year=year)
+
         game_data = []
         nl = "\n"
+        arr = "» "
         title = value = ""
         total_len = 0
         for index, game in enumerate(scheduled_games):
             title = f"Game {index + 1}"
             value = \
                 f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}" \
-                f"{game.game_date_time.strftime('%b %d %Y @ %I:%M %p') + nl}" \
-                f"{game.location[0] + ', ' + game.location[1] + nl}" \
-                f"{game.tv_station + nl if game.tv_station else ''}" \
+                f"{arr + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}" \
+                f"{arr + game.bets.lines[0].formatted_spread + nl if len(game.bets.lines) else ''}" \
+                f"{arr + game.location[0] + ', ' + game.location[1] + nl}" \
+                f"{arr + game.tv_station + nl if game.tv_station else ''}" \
                 f"{'[Boxscore](' + game.boxscore_url + ')' + nl if game.boxscore_url else ''}" \
                 f"{'[Recap](' + game.recap_url + ')' + nl if game.recap_url else ''}" \
                 f"{'[Notes](' + game.notes_url + ')' + nl if game.notes_url else ''}" \
@@ -110,8 +113,10 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
                 ]
             )
 
+        title_str = f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})"
+
         embed = build_embed(
-                f"Nebraska's {year} Schedule",
+                title_str,
             )
 
         embed_extended = None
@@ -121,7 +126,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
                 embed.add_field(name=game[0], value=game[1])
             else:
                 if embed_extended is None:
-                    embed_extended = build_embed(f"Nebraska's {year} Schedule")
+                    embed_extended = build_embed(title_str)
 
                 embed_extended.add_field(name=game[0], value=game[1])
 
@@ -185,6 +190,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
     #             )
     #             break
 
+    ### Jeyrad's code ###
     @commands.command()
     @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
     async def cfb(self, ctx, league='top25', week=-1, year=2019):
@@ -315,6 +321,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
             cur_week = cur_week - 1
 
         return len(weeks)
+    ### Jeyrad's code ###
 
 
 def setup(bot):

@@ -8,8 +8,8 @@ import markovify
 import requests
 from discord.ext import commands
 
-from utils.consts import ScheduleBackup
-from utils.consts import Venue
+from utils.games import ScheduleBackup
+from utils.games import Venue
 from utils.consts import _global_per
 from utils.consts import _global_rate
 from utils.consts import tz

@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import admin_prod, admin_test
+from utils.consts import role_admin_prod, role_admin_test
 from utils.embed import build_embed as build_embed
 
 
@@ -51,7 +51,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
     @commands.group(hidden=True)
-    @commands.has_any_role(admin_prod, admin_test)
+    @commands.has_any_role(role_admin_prod, role_admin_test)
     async def purge(self, ctx):
         """ Deletes up to 100 bot messages """
         if ctx.subcommand_passed:
@@ -106,14 +106,14 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
     @commands.command(aliases=["q",], hidden=True)
-    @commands.has_any_role(admin_prod, admin_test)
+    @commands.has_any_role(role_admin_prod, role_admin_test)
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
         await client.logout()
 
     @commands.command(hidden=True)
-    @commands.has_any_role(admin_prod, admin_test)
+    @commands.has_any_role(role_admin_prod, role_admin_test)
     async def rules(self, ctx):
         text = \
         """
@@ -150,7 +150,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
     @commands.command(hidden=True)
-    @commands.has_any_role(admin_prod, admin_test)
+    @commands.has_any_role(role_admin_prod, role_admin_test)
     async def roles(self, ctx):
         roles = """
         Below are a list of vanity roles you can add or remove whenever you like by reacting to this message:\n
@@ -193,6 +193,11 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         for emoji in roles_emojis:
             await rules_message.add_reaction(emoji)
+
+    @commands.command(hidden=True)
+    async def repeat(self, ctx, *, message):
+        if ctx.channel.type == discord.ChannelType.private:
+            await ctx.send(message)
 
 
 def setup(bot):
