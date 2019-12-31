@@ -1,13 +1,9 @@
-import logging
 import os
 import platform
 import sys
 
 import pytz
 from dotenv import load_dotenv
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
 print(f"### Platform == {platform.platform()} ###")
 
@@ -72,5 +68,6 @@ chan_war_room = 525519594417291284
 chan_botlogs = 458474143403212801
 chan_scott = 507520543096832001
 chan_rules = 651523695214329887
-
+chan_radio_prod = 660610967733796902
+chan_radio_test = 595705205069185050
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]

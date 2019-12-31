@@ -1,13 +1,17 @@
-import discord
 from discord.ext import commands
+import youtube_dl
+import sys
+from utils.consts import chan_radio_prod, chan_radio_test
 
-# import youtube_dl
 
-# Game == pressence
-#
-# if not discord.opus.is_loaded():
-#     # the 'opus' library here is opus.dll on windows or libopus.so on linux in the current directory you should replace this with the location the opus library is located in.
-#     discord.opus.load_opus("libopus-0")
+class RadioBot():
+    channel = None
+
+    def __init__(self):
+        if sys.argv[0] == "prod":
+            self.channel = chan_radio_prod
+        elif sys.argv[0] == "test":
+            self.channel = chan_radio_test
 
 
 class RadioCommands(commands.Cog, name="Radio Commands"):

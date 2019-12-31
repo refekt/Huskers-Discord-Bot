@@ -1,5 +1,4 @@
 import hashlib
-from utils.consts import logger
 import json
 import random
 import re
@@ -279,17 +278,11 @@ async def roles_message(action, message:discord.Message, member: discord.User, e
 
 
 class MyClient(commands.Bot):
+
     def __init__(self, command_prefix, **options):
         super().__init__(command_prefix, **options)
 
     # async def on_command_error(self, ctx, error):
-    #
-    #     gettrace = getattr(sys, "gettrace", None)
-    #
-    #     if gettrace():
-    #         logger.debug("Debugging?!")
-    #         return
-    #
     #     if ctx.message.content.startswith(f"{client.command_prefix}secret"):
     #         try:
     #             error_message = f"Incorrect message format. Use: {client.command_prefix}secret <mammal> <channel> <message>"
