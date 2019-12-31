@@ -127,10 +127,10 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         8️⃣ Fuck Iowa, Colorado, Texas, Florida\n
         9️⃣ All NSFW Images must be spoiler tagged
         """
-
+        chan = client.get_channel(chan_rules)
         rules_channel = client.get_channel(chan_rules)
         rules_title = "Huskers' Discord Rules"
-        messages = await rules_channel.history().flatten()
+        messages = await chan.history().flatten()
 
         for message in messages:
             if message.author == client.user and message.embeds[0].title == rules_title:
