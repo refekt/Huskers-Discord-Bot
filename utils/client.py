@@ -1,5 +1,3 @@
-import hashlib
-import json
 import random
 import re
 import sys
@@ -9,11 +7,11 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
-from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
+from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room
 from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
 from utils.embed import build_embed
-from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 from utils.misc import on_prod_server
+from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 
 
 async def split_payload(payload):

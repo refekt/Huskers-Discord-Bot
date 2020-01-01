@@ -4,6 +4,7 @@ from discord.ext import commands
 from utils.consts import ssh_pw, ssh_user, ssh_host
 from utils.embed import build_embed
 
+
 # from paramiko import client as client
 
 # ssh_commands = {

@@ -1,10 +1,10 @@
 import datetime
-from utils.consts import chan_rules, chan_botlogs
 
 import discord
 from discord.ext import commands
 
 from utils.client import client
+from utils.consts import chan_rules, chan_botlogs
 from utils.consts import role_admin_prod, role_admin_test
 from utils.embed import build_embed as build_embed
 

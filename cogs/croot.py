@@ -5,9 +5,9 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.recruit import FootballRecruit
 from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_embed, build_recruit_embed
+from utils.recruit import FootballRecruit
 
 
 class RecruitCommands(commands.Cog):
