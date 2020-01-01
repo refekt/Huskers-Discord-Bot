@@ -13,6 +13,7 @@ from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_wa
 from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
+from utils.misc import on_prod_server
 
 
 async def split_payload(payload):
@@ -444,13 +445,11 @@ client.load_extension('cogs.games.trivia')
 client.load_extension('cogs.games.minecraft')
 
 if len(sys.argv) > 0:
-    if sys.argv[1] == "test":
-        token = consts.test_token
-        client.run(token)
-    elif sys.argv[1] == "prod":
+    if on_prod_server():
         token = consts.prod_token
         client.run(token)
     else:
-        print("Incorrect argument provided")
+        token = consts.test_token
+        client.run(token)
 else:
     print("No arguments provided")
