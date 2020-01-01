@@ -3,14 +3,15 @@ from discord.ext import commands
 from utils.client import client
 from utils.consts import _global_rate, _global_per, _global_type
 from utils.consts import role_admin_prod, role_admin_test, role_mod_prod
+import sys
+from utils.consts import chan_radio_test, chan_radio_prod
 
+if sys.argv[1] == "prod":
+    channel = client.get_channel(id=chan_radio_prod)
+elif sys.argv[1] == "test":
+    channel = client.get_channel(id=chan_radio_test)
 
-class RadioHelper():
-    def __init__(self, channel: VoiceChannel):
-        self.bot = client
-        self.channel = channel
-        self.started = False
-    pass
+channel_connection = None
 
 
 class RadioCommands(commands.Cog):
@@ -22,12 +23,14 @@ class RadioCommands(commands.Cog):
         return
 
     @radio.command()
-    async def join(self, ctx):
-        return
+    async def start(self, ctx):
+        global channel_connection
+        channel_connection = await channel.connect()
 
     @radio.command()
-    async def leaev(self, ctx):
-        return
+    async def stop(self, ctx):
+        if channel_connection.is_connect():
+            await channel_connection.disconnect()
 
 
 def setup(bot):
