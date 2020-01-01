@@ -7,8 +7,7 @@ import pytz
 import requests
 from discord.ext import commands
 
-from utils.consts import _global_per
-from utils.consts import _global_rate
+from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 
@@ -77,7 +76,7 @@ def hex_to_rgb(hex):
 
 class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
     @commands.group(aliases=["sched"])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def schedule(self, ctx, year=datetime.now().year):
         """ Nebraska's football schedule """
         edit_msg = await ctx.send("Loading...")
@@ -192,7 +191,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
 
     ### Jeyrad's code ###
     @commands.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def cfb(self, ctx, league='top25', week=-1, year=2019):
         """Returns a schedule w/ scores (if in past or in progress) from ESPN for a given league, week and year.
         Usage is: `cfbsched <league> <week> <year>"""
@@ -221,7 +220,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
             return
 
     @commands.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def nfl(self, ctx, week=-1, year=datetime.now().year):
         """ Returns a schedule w/ scores (if in past or in progress) from ESPN for a given week and year.
         Usage is: `nflsched <week> <year>"""

@@ -2,8 +2,7 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import _global_per
-from utils.consts import _global_rate
+from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_embed
 
 signals = {
@@ -31,7 +30,7 @@ signals = {
 
 class Referee(commands.Cog):
     @commands.group(aliases=["ref", ])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def referee(self, ctx):
         """ A list of referee signals """
         if not ctx.invoked_subcommand:

@@ -1,12 +1,11 @@
 from discord.ext import commands
 
-from utils.consts import _global_per
-from utils.consts import _global_rate
+from utils.consts import _global_rate, _global_per, _global_type
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.group()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def bet(self, ctx):
         """ Allows users to place bets for Husker games."""
 

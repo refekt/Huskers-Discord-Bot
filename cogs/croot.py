@@ -6,14 +6,13 @@ from discord.ext import commands
 
 from utils.client import client
 from utils.recruit import FootballRecruit
-from utils.consts import _global_per
-from utils.consts import _global_rate
+from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_embed, build_recruit_embed
 
 
 class RecruitCommands(commands.Cog):
     @commands.command(aliases=["cb",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def crootboot(self, ctx, year: int, *name):
         if len(name) == 0:
             raise discord.ext.commands.UserInputError("A player's first and/or last name is required.")

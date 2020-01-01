@@ -2,8 +2,7 @@ import random
 
 from discord.ext import commands
 
-from utils.consts import _global_per
-from utils.consts import _global_rate
+from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_image_embed
 
 flag_dict = {
@@ -41,7 +40,7 @@ flag_dict = {
 
 class CrappyFlags(commands.Cog, name="Flag Commands"):
     @commands.command(aliases=["rf",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def randomflag(self, ctx):
         """ Random Nebraskan flags """
         flags = []
@@ -55,7 +54,7 @@ class CrappyFlags(commands.Cog, name="Flag Commands"):
         await ctx.send(embed=build_image_embed(title="Random Ass Nebraska Flag", image=random.choice(flags)))
 
     @commands.group(aliases=["cf", ])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def crappyflag(self, ctx):
         """ Display some crappy flags """
         subcmds = []

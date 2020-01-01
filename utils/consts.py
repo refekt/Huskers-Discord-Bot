@@ -3,6 +3,7 @@ import platform
 import sys
 
 import pytz
+from discord.ext.commands import BucketType
 from dotenv import load_dotenv
 
 print(f"### Platform == {platform.platform()} ###")
@@ -23,6 +24,7 @@ else:
 # Cooldown rates for commands
 _global_rate = os.getenv("global_rate")
 _global_per = os.getenv("global_per")
+_global_type = BucketType.user
 
 # Custom variables hosted in `variables.env` to prevent showing on Git
 host = os.getenv("sqlHost")

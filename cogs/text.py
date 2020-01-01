@@ -8,16 +8,15 @@ import markovify
 import requests
 from discord.ext import commands
 
+from utils.consts import _global_rate, _global_per, _global_type
+from utils.consts import tz
 from utils.games import ScheduleBackup
 from utils.games import Venue
-from utils.consts import _global_per
-from utils.consts import _global_rate
-from utils.consts import tz
 
 
 class TextCommands(commands.Cog):
     @commands.command(aliases=["cd",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def countdown(self, ctx, *, team=None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
@@ -62,7 +61,7 @@ class TextCommands(commands.Cog):
         await cd_next_season()
 
     @commands.command(aliases=["mkv"])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def markov(self, ctx, *what: typing.Union[discord.Member, discord.TextChannel]):
         """ Creates a Markov chain based off a user and/or text-channel """
         edit_msg = await ctx.send("Thinking...")
@@ -112,7 +111,7 @@ class TextCommands(commands.Cog):
             await edit_msg.edit(content=sentence)
 
     @commands.group()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def weather(self, ctx):
         """ Current weather for the next game day location """
 
@@ -226,7 +225,7 @@ class TextCommands(commands.Cog):
     #             break
 
     @commands.command(name="24hours", aliases=["24", "24hrs",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def _24hours(self, ctx):
         """ You have 24 hours to cheer or moam about the game """
         games = ScheduleBackup(year=datetime.now().year)
@@ -252,7 +251,7 @@ class TextCommands(commands.Cog):
                     return
 
     @commands.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def whenjoined(self, ctx, who: discord.Member):
         """ When did you join the server? """
         from utils.client import client
@@ -284,7 +283,7 @@ class TextCommands(commands.Cog):
                     return
 
     @commands.command(aliases=["8b",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=commands.BucketType.user)
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
         eight_ball = ['As I see it, yes', 'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Coach V\'s cigar would like this', 'Concentrate and ask again', 'Definitely yes',
