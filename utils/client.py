@@ -438,7 +438,8 @@ client.load_extension('cogs.text')
 client.load_extension('cogs.croot')
 # client.load_extension('cogs.betting')
 # client.load_extension('cogs.reddit')
-# client.load_extension('cogs.audio')
+if sys.argv[1] == "test":
+    client.load_extension('cogs.audio')
 client.load_extension('cogs.games.trivia')
 client.load_extension('cogs.games.minecraft')
 
