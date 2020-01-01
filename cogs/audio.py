@@ -1,17 +1,17 @@
-from discord import VoiceChannel
 from discord.ext import commands
+
 from utils.client import client
 from utils.consts import _global_rate, _global_per, _global_type
-from utils.consts import role_admin_prod, role_admin_test, role_mod_prod
-import sys
 from utils.consts import chan_radio_test, chan_radio_prod
+from utils.consts import role_admin_prod, role_admin_test, role_mod_prod
+from utils.misc import on_prod_server
 
-if sys.argv[1] == "prod":
-    channel = client.get_channel(id=chan_radio_prod)
-elif sys.argv[1] == "test":
-    channel = client.get_channel(id=chan_radio_test)
 
-channel_connection = None
+def radio_channel():
+    return client.get_channel(id=chan_radio_prod if on_prod_server() else chan_radio_test)
+
+
+voice_client = None
 
 
 class RadioCommands(commands.Cog):
@@ -24,13 +24,14 @@ class RadioCommands(commands.Cog):
 
     @radio.command()
     async def start(self, ctx):
-        global channel_connection
-        channel_connection = await channel.connect()
+        channel = radio_channel()
+        global voice_client
+        voice_client = await channel.connect()
 
     @radio.command()
     async def stop(self, ctx):
-        if channel_connection.is_connect():
-            await channel_connection.disconnect()
+        global voice_client
+        await voice_client.disconnect()
 
 
 def setup(bot):
