@@ -1,34 +1,24 @@
 import sys
 
-# import youtube_dl
-from discord.channel import VoiceChannel
 from discord.ext import commands
-
+from discord.channel import VoiceChannel
 from utils.client import client
+import discord
 from utils.consts import chan_radio_prod, chan_radio_test
+from utils.consts import guild_test, guild_prod
 
 
-def voice_channel():
-    if sys.argv[1] == "prod":
-        return chan_radio_prod
-    elif sys.argv[1] == "test":
-        return chan_radio_test
-
-
-class RadioBot:
-    channel_id = None
+class DiscordRadio:
     channel = VoiceChannel
-    voice_client = None
 
     def __init__(self, channel):
-        self.channel_id = channel
-        self.channel = client.get_channel(id=self.channel_id)
+        self.channel = channel
 
-    async def connect(self):
-        self.voice_client = await self.channel.connect()
 
-    async def disconnect(self):
-        await self.voice_client.disconnect()
+r = DiscordRadio(chan_radio_test)
+guild = discord.get_guild(id=guild_test)
+
+print(r)
 
 
 class RadioCommands(commands.Cog, name="Radio Commands"):
@@ -38,13 +28,11 @@ class RadioCommands(commands.Cog, name="Radio Commands"):
 
     @radio.command()
     async def join(self, ctx):
-        r = RadioBot(channel=voice_channel())
-        await r.connect()
+        pass
 
     @radio.command()
     async def leave(self, ctx):
-        r = RadioBot(channel=voice_channel())
-        await r.disconnect()
+        pass
 
 
 def setup(bot):
