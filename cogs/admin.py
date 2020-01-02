@@ -237,6 +237,13 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             await ctx.send(message)
             await ctx.message.delete()
 
+    @commands.command(hidden=True)
+    async def cperms(self, ctx):
+        channel_lists = client.get_all_channels()
+
+        for c in channel_lists:
+            print(c)
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
