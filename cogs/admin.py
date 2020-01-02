@@ -241,8 +241,24 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     async def cperms(self, ctx):
         channel_lists = client.get_all_channels()
 
+        add_role = None
+
+        for role in ctx.guild.roles:
+            if role.id == role_admin_test or role.id == role_admin_prod:
+                add_role = role
+                print(f"Found role: {add_role}")
+                break
+
         for c in channel_lists:
-            print(c)
+            if c.type == discord.ChannelType.text or c.type == discord.ChannelType.voice:
+                if c.id == 538419127535271946 or c.id == 525519594417291284 or c.id == 458474143403212801:
+                    pass
+                else:
+                    try:
+                        await c.set_permissions(add_role, read_messages=True)
+                        print(f"Added {add_role} to {c.name}!")
+                    except discord.Forbidden:
+                        print(f"Unable to modify: {c.name}")
 
 
 def setup(bot):
