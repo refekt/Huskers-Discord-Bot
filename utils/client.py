@@ -142,7 +142,28 @@ async def monitor_messages(message: discord.Message):
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
 
         if not type(channel) == discord.DMChannel and role_gumby in [roleid.id for roleid in message.author.roles]:
-            await message.add_reaction("🦐")
+            # blocked = False
+            try:
+                await message.add_reaction("🦐")
+            except discord.Forbidden:
+                # blocked = True
+            # except:
+                print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
+
+            # if blocked:
+            ## This turned out requiring a lot more work; specifically with asyncio and loops. Not worth the meme'fort
+            #     from utils.consts import backup_token
+            #     backup = discord.Client()
+            #     await backup.login(backup_token)
+            #
+            #     try:
+            #         # await message.add_reaction("🍤")
+            #         await message.channel.send("You done messed up!")
+            #     except discord.Forbidden:
+            #         print("Backup reaction failed :(")
+            #
+            #     await backup.logout()
+
             if random.random() >= .97:
                 await message.channel.send("https://i.imgur.com/1tVJ2tW.gif")
 

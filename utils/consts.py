@@ -26,16 +26,23 @@ _global_rate = os.getenv("global_rate")
 _global_per = os.getenv("global_per")
 _global_type = BucketType.user
 
-# Custom variables hosted in `variables.env` to prevent showing on Git
+# Discord Bot Tokens
+test_token = os.getenv("TEST_TOKEN")
+prod_token = os.getenv("DISCORD_TOKEN")
+backup_token = os.getenv("BACKUP_TOKEN")
+
+# SQL information
 host = os.getenv("sqlHost")
 user = os.getenv("sqlUser")
 passwd = os.getenv("sqlPass")
 db = os.getenv("sqlDb")
-test_token = os.getenv("TEST_TOKEN")
-prod_token = os.getenv("DISCORD_TOKEN")
+
+# Reddit Bot Info
 reddit_client_id = os.getenv("reddit_client_id")
 reddit_secret = os.getenv("reddit_secret")
 reddit_pw = os.getenv("reddit_pw")
+
+# SSH Information
 ssh_host = os.getenv("ssh_host")
 ssh_user = os.getenv("ssh_user")
 ssh_pw = os.getenv("ssh_pw")
