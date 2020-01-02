@@ -228,7 +228,13 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                         break
 
                 if repeat_channel:
-                    await repeat_channel.send("Testing")
+                    await ctx.message.author.send("What should I say?")
+
+                    def check_message(m):
+                        return m.content
+
+                    output = await client.wait_for("message", check=check_message)
+                    await repeat_channel.send(output.content)
                 else:
                     print("wat")
             else:
