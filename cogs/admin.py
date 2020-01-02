@@ -205,7 +205,9 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         if ctx.channel.type == discord.ChannelType.private:
             channels_list = [channel for channel in client.get_all_channels() if channel.type == discord.ChannelType.text]
 
-            await ctx.message.author.send(f"Which channel:\n{[c.name.lower() for c in channels_list]}")
+            nl = "\n"
+
+            await ctx.message.author.send(f"Which channel:\n{nl.join([c.name.lower() for c in channels_list])}")
 
             def check_chan(m):
                 print(f"Checking {m.content.lower()}")
