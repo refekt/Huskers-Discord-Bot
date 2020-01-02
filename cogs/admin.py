@@ -230,7 +230,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 else:
                     print("wat")
             else:
-                await ctx.message.author.send("Not a valid channel. Start over!")
+                await ctx.message.author.send("Not a valid channel.  Start over!")
         else:
             await ctx.send(message)
             await ctx.message.delete()
