@@ -27,6 +27,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     ["History", "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!"],
                     ["Source Code", "[GitHub](https://www.github.com/refekt/Husker-Bot)"],
                     ["Hosting Location", f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
+                    ["Hosting Status", "https://status.hyperexpert.com/"],
                     ["Latency", f"{client.latency * 1000:.2f} ms"],
                     ["Username", client.user.mention]
                 ]
