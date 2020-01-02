@@ -19,3 +19,4 @@ requests
 urllib3
 websockets
 yarl
+python-dateutil
