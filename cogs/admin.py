@@ -201,9 +201,39 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             await rules_message.add_reaction(emoji)
 
     @commands.command(hidden=True)
-    async def repeat(self, ctx, *, message):
+    async def repeat(self, ctx, *, message=""):
         if ctx.channel.type == discord.ChannelType.private:
+            channels_list = [channel for channel in client.get_all_channels() if channel.type == discord.ChannelType.text]
+
+            await ctx.message.author.send(f"Which channel:\n{[c.name.lower() for c in channels_list]}")
+
+            def check_chan(m):
+                print(f"Checking {m.content.lower()}")
+                for c in channels_list:
+                    if c.name.lower() == m.content.lower():
+                        return c.id
+
+                return False
+
+            msg = await client.wait_for("message", check=check_chan)
+
+            if msg:
+                repeat_channel = None
+
+                for c in channels_list:
+                    if c.name.lower() == msg.content.lower():
+                        repeat_channel = c
+                        break
+
+                if repeat_channel:
+                    await repeat_channel.send("Testing")
+                else:
+                    print("wat")
+            else:
+                await ctx.message.author.send("Not a valid channel. Start over!")
+        else:
             await ctx.send(message)
+            await ctx.message.delete()
 
 
 def setup(bot):

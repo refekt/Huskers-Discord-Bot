@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
-from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room
+from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
 from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -304,55 +304,55 @@ class MyClient(commands.Bot):
     def __init__(self, command_prefix, **options):
         super().__init__(command_prefix, **options)
 
-    async def on_command_error(self, ctx, error):
-        if ctx.message.content.startswith(f"{client.command_prefix}secret"):
-            try:
-                error_message = f"Incorrect message format. Use: {client.command_prefix}secret <mammal> <channel> <message>"
-                context = ctx.message.content.split(" ")
-
-                if context[0].lower() != f"{client.command_prefix}secret":
-                    await ctx.message.author.send(error_message)
-                    return
-
-                if not context[1].isalpha() and not context[2].isalpha():
-                    await ctx.message.author.send(error_message)
-                    return
-
-                if context[2].lower() != "war" and context[2].lower() != "scott":
-                    await ctx.message.author.send(error_message)
-                    return
-
-                f = open('mammals.json', 'r')
-                temp_json = f.read()
-                mammals = json.loads(temp_json)
-                f.close()
-
-                checkID = hashlib.md5(str(ctx.message.author.id).encode())
-
-                if context[2].lower() == "war":
-                    channel = client.get_channel(chan_war_room)
-                elif context[2].lower() == "scott":
-                    channel = client.get_channel(chan_scott)
-                else:
-                    await ctx.message.author.send(error_message)
-                    return
-
-                if checkID.hexdigest() == mammals[context[1]]:
-                    context_commands = f"{context[0]} {context[1]} {context[2]}"
-                    message = ctx.message.content[len(context_commands):]
-
-                    embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xD00000)
-                    embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
-                    embed.add_field(name="Back Channel Communications", value=message)
-
-                    await channel.send(embed=embed)
-                else:
-                    await ctx.message.author.send("Shit didn't add up")
-                    return
-            except:
-                await process_error(ctx, error)
-        else:
-            await process_error(ctx, error)
+    # async def on_command_error(self, ctx, error):
+    #     if ctx.message.content.startswith(f"{client.command_prefix}secret"):
+    #         try:
+    #             error_message = f"Incorrect message format. Use: {client.command_prefix}secret <mammal> <channel> <message>"
+    #             context = ctx.message.content.split(" ")
+    #
+    #             if context[0].lower() != f"{client.command_prefix}secret":
+    #                 await ctx.message.author.send(error_message)
+    #                 return
+    #
+    #             if not context[1].isalpha() and not context[2].isalpha():
+    #                 await ctx.message.author.send(error_message)
+    #                 return
+    #
+    #             if context[2].lower() != "war" and context[2].lower() != "scott":
+    #                 await ctx.message.author.send(error_message)
+    #                 return
+    #
+    #             f = open('mammals.json', 'r')
+    #             temp_json = f.read()
+    #             mammals = json.loads(temp_json)
+    #             f.close()
+    #
+    #             checkID = hashlib.md5(str(ctx.message.author.id).encode())
+    #
+    #             if context[2].lower() == "war":
+    #                 channel = client.get_channel(chan_war_room)
+    #             elif context[2].lower() == "scott":
+    #                 channel = client.get_channel(chan_scott)
+    #             else:
+    #                 await ctx.message.author.send(error_message)
+    #                 return
+    #
+    #             if checkID.hexdigest() == mammals[context[1]]:
+    #                 context_commands = f"{context[0]} {context[1]} {context[2]}"
+    #                 message = ctx.message.content[len(context_commands):]
+    #
+    #                 embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xD00000)
+    #                 embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
+    #                 embed.add_field(name="Back Channel Communications", value=message)
+    #
+    #                 await channel.send(embed=embed)
+    #             else:
+    #                 await ctx.message.author.send("Shit didn't add up")
+    #                 return
+    #         except:
+    #             await process_error(ctx, error)
+    #     else:
+    #         await process_error(ctx, error)
 
     async def on_connect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(client.user.display_name, True, str(datetime.utcnow()).split(".")[0]))
