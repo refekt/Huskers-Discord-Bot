@@ -1,3 +1,5 @@
+import json
+import hashlib
 import random
 import re
 import sys
