@@ -215,10 +215,10 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             await ctx.message.author.send(f"Which channel:\n{nl.join([c.name.lower() for c in channels_list])}")
 
             def check_chan(m):
-                print(f"Checking {m.content.lower()}")
-                for c in channels_list:
-                    if c.name.lower() == m.content.lower():
-                        return c.id
+                if m.channel.type == discord.ChannelType.private:
+                    for c in channels_list:
+                        if c.name.lower() == m.content.lower():
+                            return c.id
 
                 return False
 
@@ -236,7 +236,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     await ctx.message.author.send("What should I say?")
 
                     def check_message(m):
-                        return m.content
+                        if m.channel.type == discord.ChannelType.private:
+                            return m.content
 
                     output = await client.wait_for("message", check=check_message)
                     await repeat_channel.send(output.content)
