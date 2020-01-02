@@ -427,7 +427,7 @@ class MyClient(commands.Bot):
         pass
 
     async def on_member_join(self, member):
-        process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))
+        process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
 
     async def on_member_remove(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))

@@ -56,6 +56,11 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             )
         )
 
+    @donate.after_invoke
+    async def after_donate(self, ctx):
+        from utils.mysql import process_MySQL, sqlLogUser
+        process_MySQL(query=sqlLogUser, values=(ctx.message.author, "member_join", "N/A"))
+
     @commands.group(hidden=True)
     @commands.has_any_role(role_admin_prod, role_admin_test)
     async def purge(self, ctx):
