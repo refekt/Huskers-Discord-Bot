@@ -1,10 +1,9 @@
 from discord.ext import commands
+from paramiko import client as p_client
 
 from utils.consts import role_admin_prod, role_admin_test
 from utils.consts import ssh_pw, ssh_user, ssh_host
 from utils.embed import build_embed
-
-from paramiko import client as p_client
 
 ssh_commands = {
     "status": "ps aux | grep spigot",
