@@ -94,7 +94,6 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
         await edit_msg.edit(content=data)
         del ssh
 
-
     @commands.has_any_role(role_admin_prod, role_admin_test)
     @minecraft.command()
     async def memory(self, ctx):
