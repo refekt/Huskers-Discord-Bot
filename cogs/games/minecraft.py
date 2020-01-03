@@ -111,7 +111,6 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
         await edit_msg.edit(content=data)
         del ssh
 
-
     @minecraft.command()
     async def server(self, ctx):
         await ctx.send(
