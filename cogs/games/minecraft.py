@@ -8,7 +8,8 @@ from paramiko import client as p_client
 
 ssh_commands = {
     "status": "ps aux | grep spigot",
-    "free": "free"
+    "free": "free",
+    "cpu": "ps -eo pcpu,pid,user,args | sort -r -k1 | less "
 }
 
 
@@ -51,9 +52,13 @@ class ssh:
         self.cleanup()
 
 
-def format_data(data: str, filter: str=""):
+def format_data(data: str, filter=None, option: str=None):
     split = data.split("\n")
     output = ""
+
+    if option:
+        if option == "ps aux":
+            output += "`USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND`\n"
 
     for s in split:
         if filter:
@@ -76,7 +81,7 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
 
     @commands.has_any_role(role_admin_prod, role_admin_test)
     @minecraft.command()
-    async def status(self, ctx):
+    async def uptime(self, ctx):
         edit_msg = await ctx.send("Loading...")
         ssh = connect_SSH()
         check = True
@@ -86,7 +91,23 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
             if "minecra" in data:
                 check = False
 
-        data = format_data(data, "java")
+        data = format_data(data, "java", "ps aux")
+        await edit_msg.edit(content=data)
+        del ssh
+
+    @commands.has_any_role(role_admin_prod, role_admin_test)
+    @minecraft.command()
+    async def memory(self, ctx):
+        edit_msg = await ctx.send("Loading...")
+        ssh = connect_SSH()
+        check = True
+        data = ""
+        while check:
+            data = ssh.sendCommand(ssh_commands["free"])
+            if "available" in data:
+                check = False
+
+        data = format_data(data)
         await edit_msg.edit(content=data)
         del ssh
 
