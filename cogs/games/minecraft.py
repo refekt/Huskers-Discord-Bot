@@ -23,7 +23,7 @@ class ssh:
         self.client.connect(address, username=username, password=password, look_for_keys=False)
 
     def sendCommand(self, command):
-        print(f"^^^ Sending command [{command}] ^^^")
+        print(f"^^^ Sending SSH command [{command}] ^^^")
 
         import select
 
