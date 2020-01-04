@@ -17,7 +17,7 @@ elif "Linux" in platform.platform():
         load_dotenv(dotenv_path="/home/botfrost/bot/variables.env")
     elif sys.argv[1] == "test":
         print("### Test environment set ###")
-        load_dotenv(dotenv_path="/home/botfrost_test/variables.env")
+        load_dotenv(dotenv_path="/home/botfrost/bot/variables.env")
 else:
     print(f"Unknown Platform: {platform.platform()}")
 
