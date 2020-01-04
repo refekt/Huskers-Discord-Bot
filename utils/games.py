@@ -2,7 +2,7 @@ import datetime
 import os
 
 import requests
-# from bitlyshortener import Shortener
+from bitlyshortener import Shortener
 from bs4 import BeautifulSoup
 
 from utils.consts import headers

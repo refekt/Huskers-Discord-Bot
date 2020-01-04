@@ -1,3 +1,4 @@
+bitlyshortener
 dateutil
 praw
 python-dotenv
