@@ -30,19 +30,13 @@ class TextCommands(commands.Cog):
 
             return hour, mins
 
-        async def cd_next_season():
-            for game in ScheduleBackup(year=datetime.now().year+1):
-                if not "spring" in game.opponent.lower():
-                    diff = game.game_date_time - now_cst
-                    diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
-                    return
-
         async def send_countdown(days: int, hours: int, minutes: int, opponent: str, datetime: datetime):
             await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent} ]__ game at __[ {datetime.strftime('%B %d, %Y %I:%M %p')} ]__")
 
+        games, stats = ScheduleBackup(year=now_cst.year)
+
         if team is None:
-            for game in ScheduleBackup(year=datetime.now().year):
+            for game in games:
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
@@ -51,14 +45,12 @@ class TextCommands(commands.Cog):
         else:
             team = str(team)
 
-            for game in ScheduleBackup(year=datetime.now().year):
+            for game in games:
                 if team.lower() == game.opponent.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
                     break
-
-        await cd_next_season()
 
     @commands.command(aliases=["mkv"])
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
