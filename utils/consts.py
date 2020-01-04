@@ -47,7 +47,7 @@ ssh_host = os.getenv("ssh_host")
 ssh_user = os.getenv("ssh_user")
 ssh_pw = os.getenv("ssh_pw")
 
-print(_global_rate, _global_per, _global_type, test_token, prod_token, backup_token, host, user, passwd, db, reddit_client_id, reddit_secret, reddit_pw, ssh_host, ssh_user, ssh_pw, sep="\n* ",
+print("* ", _global_rate, _global_per, _global_type, test_token, prod_token, backup_token, host, user, passwd, db, reddit_client_id, reddit_secret, reddit_pw, ssh_host, ssh_user, ssh_pw, sep="\n* ",
       end="\n\n")
 
 # Headers for `requests`
