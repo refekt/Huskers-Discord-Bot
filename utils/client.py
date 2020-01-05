@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import random
 import re
 import sys
@@ -11,6 +12,7 @@ from discord.ext import commands
 import utils.consts as consts
 from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
 from utils.consts import change_my_nickname, change_my_status
+from utils.consts import establish_logger, print_log
 from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -148,7 +150,7 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction("🦐")
             except discord.Forbidden:
                 # blocked = True
-            # except:
+                # except:
                 print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
 
             # if blocked:
@@ -176,7 +178,7 @@ async def monitor_messages(message: discord.Message):
 
             for s in subreddits:
                 if "huskers" in s or "cfb" in s:
-                    break
+                    return
 
                 url = 'https://reddit.com/' + s
                 if '.com//r/' in url:
@@ -271,7 +273,7 @@ async def monitor_reactions(channel, emoji, user, message):
     await trivia_message()
 
 
-async def roles_message(action, message:discord.Message, member: discord.User, emoji:discord.Emoji):
+async def roles_message(action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
     roles_title = "Huskers' Discord Roles"
     try:
         if message.embeds[0].title == roles_title:
@@ -365,8 +367,7 @@ class MyClient(commands.Bot):
         appinfo = await self.application_info()
 
         await change_my_status(client)
-
-        await change_my_nickname(client)
+        await change_my_nickname(client, ctx=None)
 
         print(
             f"### Bot Frost version 2.0 ###\n"
@@ -379,6 +380,10 @@ class MyClient(commands.Bot):
             f"### ~~~ Latency: {self.latency * 1000:.2f} MS\n"
             f"### ~~~ Command Prefix: \"{self.command_prefix}\""
         )
+
+        # establish_logger(category=logging.ERROR)
+
+        # print_log(logging.ERROR, "Testing!")
 
     async def on_resume(self, ctx):
         pass
