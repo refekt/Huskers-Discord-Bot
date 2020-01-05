@@ -1,5 +1,5 @@
-import json
 import hashlib
+import json
 import random
 import re
 import sys
@@ -10,6 +10,7 @@ from discord.ext import commands
 
 import utils.consts as consts
 from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
+from utils.consts import change_my_nickname
 from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -363,12 +364,13 @@ class MyClient(commands.Bot):
     async def on_ready(self):
         appinfo = await self.application_info()
 
-        await client.change_presence(activity=discord.Game(name="Husker Football", type=1))
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Husker Football 24/7"))
+        await change_my_nickname(client)
 
         print(
             f"### Bot Frost version 2.0 ###\n"
-            f"### ~~~ Name: {appinfo.name}\n"
-            f"### ~~~ ID: {appinfo.id}\n"
+            f"### ~~~ Name: {client.user}\n"
+            f"### ~~~ ID: {client.user.id}\n"
             f"### ~~~ Description: {appinfo.description}\n"
             f"### ~~~ Onwer Name: {appinfo.owner.name}#{appinfo.owner.discriminator}\n"
             f"### ~~~ Owner ID: {appinfo.owner.id}\n"

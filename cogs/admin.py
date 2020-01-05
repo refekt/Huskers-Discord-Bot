@@ -7,6 +7,7 @@ from utils.client import client
 from utils.consts import chan_rules, chan_botlogs
 from utils.consts import role_admin_prod, role_admin_test
 from utils.embed import build_embed as build_embed
+from utils.consts import change_my_nickname
 
 
 def not_botlogs(chan: discord.TextChannel):
@@ -205,6 +206,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         for emoji in roles_emojis:
             await rules_message.add_reaction(emoji)
+
+    @commands.command()
+    async def updatenick(self, ctx):
+        print("one")
+        await change_my_nickname(client)
+        print("two")
 
     @commands.command(hidden=True)
     async def repeat(self, ctx, *, message=""):

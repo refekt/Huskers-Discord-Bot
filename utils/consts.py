@@ -1,5 +1,7 @@
+import discord
 import os
 import platform
+import random
 import sys
 
 import pytz
@@ -47,8 +49,8 @@ ssh_host = os.getenv("ssh_host")
 ssh_user = os.getenv("ssh_user")
 ssh_pw = os.getenv("ssh_pw")
 
-print("* ", _global_rate, _global_per, _global_type, test_token, prod_token, backup_token, host, user, passwd, db, reddit_client_id, reddit_secret, reddit_pw, ssh_host, ssh_user, ssh_pw, sep="\n* ",
-      end="\n\n")
+# print("* ", _global_rate, _global_per, _global_type, test_token, prod_token, backup_token, host, user, passwd, db, reddit_client_id, reddit_secret, reddit_pw, ssh_host, ssh_user, ssh_pw,
+# sep="\n* ", end="\n\n")
 
 # Headers for `requests`
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
@@ -87,3 +89,25 @@ chan_radio_test = 595705205069185050
 guild_prod = 440632686185414677
 guild_test = 595705205069185045
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
+
+# Bot nicknames
+nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
+         "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
+         "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom")
+
+
+async def change_my_nickname(client, ctx=None):
+    try:
+        print("~~~ Attempting to change nickname...")
+        await client.user.edit(username=random.choice(nicks))
+        print(f"~~~ Changed nickname to {client.user.username}")
+
+        if ctx:
+            await ctx.send(f"My new name is... 🥁🥁🥁 {client.user.username}!")
+    except discord.HTTPException as err:
+        err_msg = "!!! " + str(err).replace("\n", " ")
+        print(err_msg)
+        if ctx:
+            await ctx.send(err_msg)
+    except:
+        print(f"Unknown error!")
