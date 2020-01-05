@@ -94,7 +94,8 @@ guild_test = 595705205069185045
 async def change_my_nickname(client, ctx=None):
     nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
              "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
-             "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto")
+             "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto", "economybot",
+             "NotaBot_Human", "psybot", "2020: the year of the bot")
 
     try:
         print("~~~ Attempting to change nickname...")
