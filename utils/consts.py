@@ -8,6 +8,8 @@ import pytz
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
 
+import logging
+
 print(f"### Platform == {platform.platform()} ###")
 
 if "Windows" in platform.platform():
@@ -91,7 +93,7 @@ guild_test = 595705205069185045
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
 
-async def change_my_nickname(client, ctx=None):
+async def change_my_nickname(client, ctx):
     nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
              "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
              "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto", "economybot",
@@ -103,7 +105,7 @@ async def change_my_nickname(client, ctx=None):
         print(f"~~~ Changed nickname to {client.user.username}")
 
         if ctx:
-            await ctx.send(f"My new name is... 🥁🥁🥁 {client.user.username}!")
+            await ctx.send(f"Myw new name is... 🥁🥁🥁 {client.user.username}!")
     except discord.HTTPException as err:
         err_msg = "~~~ !!! " + str(err).replace("\n", " ")
         print(err_msg)
@@ -129,3 +131,24 @@ async def change_my_status(client, ctx=None):
             await ctx.send(err_msg)
     except:
         print(f"Unknown error!")
+
+
+def establish_logger(category: int):
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="[%(asctime)s] [%(levelname)s]: %(message)s",
+        datefmt="%d-%b-%y %H:%M:%S"
+    )
+
+
+def print_log(category: int, message: str):
+    if category == logging.DEBUG:
+        logging.debug(msg=message)
+    elif category == logging.INFO:
+        logging.info(msg=message)
+    elif category == logging.WARNING:
+        logging.warning(msg=message)
+    elif category == logging.ERROR:
+        logging.error(msg=message)
+    elif category == logging.CRITICAL:
+        logging.critical(msg=message)

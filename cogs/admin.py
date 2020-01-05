@@ -209,9 +209,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
     @commands.command()
     async def updatenick(self, ctx):
-        print("one")
-        await change_my_nickname(client)
-        print("two")
+        """ Update the bot's nickname """
+        await change_my_nickname(client, ctx)
 
     @commands.command(hidden=True)
     async def repeat(self, ctx, *, message=""):

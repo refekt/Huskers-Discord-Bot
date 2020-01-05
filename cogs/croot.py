@@ -14,6 +14,7 @@ class RecruitCommands(commands.Cog):
     @commands.command(aliases=["cb",])
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def crootboot(self, ctx, year: int, *name):
+        """ Retreive information about a recruit """
         if len(name) == 0:
             raise discord.ext.commands.UserInputError("A player's first and/or last name is required.")
 

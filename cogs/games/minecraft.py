@@ -76,6 +76,7 @@ def connect_SSH():
 class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
     @commands.group(aliases=["mc",])
     async def minecraft(self, ctx):
+        """ View Husker Minecraft server information"""
         pass
 
     @commands.has_any_role(role_admin_prod, role_admin_test)
