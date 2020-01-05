@@ -90,13 +90,12 @@ guild_prod = 440632686185414677
 guild_test = 595705205069185045
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
-# Bot nicknames
-nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
-         "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
-         "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom")
-
 
 async def change_my_nickname(client, ctx=None):
+    nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
+             "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
+             "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom")
+
     try:
         print("~~~ Attempting to change nickname...")
         await client.user.edit(username=random.choice(nicks))
@@ -105,7 +104,25 @@ async def change_my_nickname(client, ctx=None):
         if ctx:
             await ctx.send(f"My new name is... 🥁🥁🥁 {client.user.username}!")
     except discord.HTTPException as err:
-        err_msg = "!!! " + str(err).replace("\n", " ")
+        err_msg = "~~~ !!! " + str(err).replace("\n", " ")
+        print(err_msg)
+        if ctx:
+            await ctx.send(err_msg)
+    except:
+        print(f"Unknown error!")
+
+
+async def change_my_status(client, ctx=None):
+    statuses = ("Husker Football 24/7", "Currently beating Florida 62-24", "Currently giving up 400 yards rushing to one guy", "Attempting a swing pass for -1 yards")
+    try:
+        print("~~~ Attempting to change status...")
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=random.choice(statuses)))
+        print(f"~~~ Changed status to {client.user.username}")
+
+        if ctx:
+            await ctx.send(f"My new status is... 🥁🥁🥁 {client.user.username}!")
+    except discord.HTTPException as err:
+        err_msg = "~~~ !!! " + str(err).replace("\n", " ")
         print(err_msg)
         if ctx:
             await ctx.send(err_msg)
