@@ -256,28 +256,36 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             await ctx.send(message)
             await ctx.message.delete()
 
-    @commands.command(hidden=True)
-    async def cperms(self, ctx):
-        channel_lists = client.get_all_channels()
-
-        add_role = None
-
-        for role in ctx.guild.roles:
-            if role.id == role_admin_test or role.id == role_admin_prod:
-                add_role = role
-                print(f"Found role: {add_role}")
-                break
-
-        for c in channel_lists:
-            if c.type == discord.ChannelType.text or c.type == discord.ChannelType.voice:
-                if c.id == 538419127535271946 or c.id == 525519594417291284 or c.id == 458474143403212801:
-                    pass
-                else:
-                    try:
-                        await c.set_permissions(add_role, read_messages=True)
-                        print(f"Added {add_role} to {c.name}!")
-                    except discord.Forbidden:
-                        print(f"Unable to modify: {c.name}")
+    # @commands.command(hidden=True)
+    # async def idk(self, ctx):
+    #     channel_lists = client.get_all_channels()
+    #
+    #     add_role = None
+    #
+    #     from utils.consts import chan_botlogs
+    #     from utils.consts import role_admin_prod
+    #
+    #     for role in ctx.guild.roles:
+    #         if role.id == role_admin_prod:
+    #             add_role = role
+    #             break
+    #
+    #     for c in channel_lists:
+    #         try:
+    #             # await c.set_permissions(add_role, deafen_members=False, kick_members=False, send_tts_messages=False, attach_files=False, manage_messages=False, manage_guild=False,
+    #             #                         send_messages=False, embed_links=False, external_emojis=False, administrator=False, view_audit_log=False, connect=False, mute_members=False,
+    #             #                         manage_channels=False, priority_speaker=False, read_message_history=False, stream=False, speak=False, read_messages=False, manage_roles=False,
+    #             #                         create_instant_invite=False, use_voice_activation=False, move_members=False, mention_everyone=False, add_reactions=False, ban_members=False,
+    #             #                         manage_nicknames=False, manage_webhooks=False, change_nickname=False, manage_emojis=False)
+    #             await c.set_permissions(add_role, send_messages=True, read_messages=True, read_message_history=True, manage_channels=True, manage_roles=True)
+    #             print(f"Added {add_role} to {c.name}!")
+    #         except discord.Forbidden:
+    #             print(f"Unable to modify: {c.name}")
+    #             pass
+    #         except AttributeError as ae:
+    #             print(ae)
+    #         except:
+    #             pass
 
 
 def setup(bot):
