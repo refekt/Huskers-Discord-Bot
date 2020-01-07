@@ -18,8 +18,8 @@ def on_prod_server():
 
 
 def makeMD5():
-    names = ["389886063453405205"]
-    animals = ["lemur"]
+    names = ["0"]
+    animals = ["z"]
     mammals = dict()
     i = 0
     for name in names:
