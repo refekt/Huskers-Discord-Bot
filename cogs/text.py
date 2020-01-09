@@ -291,9 +291,19 @@ class TextCommands(commands.Cog):
     @commands.command()
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def police(self, ctx, baddie: discord.Member):
-        await ctx.send(f"🚨🚨🚨 **NANI** {baddie.mention}❕❔Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. "
+        await ctx.send(f"**"
+                       f"🚨NANI🚨\n"
+                       f"\t🚨THE🚨\n"
+                       f"\t\t🚨FUCK🚨\n"
+                       f"\t\t\t🚨DID🚨\n"
+                       f"\t\t\t\t🚨YOU🚨\n"
+                       f"\t\t\t🚨JUST🚨\n"
+                       f"\t\t🚨SAY🚨\n"
+                       f"\t🚨{baddie.mention}🚨\n"
+                       f"\n"
+                       f"Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. "
                        f"Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! "
-                       f"🚫 ⛔ 👎 🙅‍♀️Thanks for your cooperation. 😍🤩😘")
+                       f"🚫 ⛔ 👎 🙅‍♀️Thanks for your cooperation. 😍🤩😘 **")
 
 
 def setup(bot):
