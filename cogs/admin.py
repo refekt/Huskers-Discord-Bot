@@ -260,13 +260,25 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.has_any_role(role_admin_prod, role_admin_test)
     async def repeathistory(self, ctx, quantity=20):
         history = await ctx.message.channel.history(limit=quantity).flatten()
-        output = "```\n"
+        output = [""]
+        index = len(output) - 1
         for message in history:
-            output += f"Author: {message.author}, Content: {message.clean_content}\n"
+            newmessage = f"Author: {message.author}, Content: {message.clean_content}\n"
+            if len(newmessage) > 2000:
+                continue
 
-        output += "\n```"
+            if len(output[index] + newmessage) > 2000:
+                output.append(newmessage)
+                index += 1
+            output[index] += newmessage
 
-        await ctx.send(output)
+        message = ""
+        for index in output:
+            if len(message + index) < 2000:
+                message += index
+            else:
+                await ctx.send(f"```\n{message}\n```")
+                message = ""
 
     # @commands.command(hidden=True)
     # async def idk(self, ctx):
