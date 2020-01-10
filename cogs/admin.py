@@ -262,23 +262,37 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         history = await ctx.message.channel.history(limit=quantity).flatten()
         output = [""]
         index = len(output) - 1
+        nl = '\n'
         for message in history:
-            newmessage = f"Author: {message.author}, Content: {message.clean_content}\n"
+
+            newmessage = f"Author: {message.author}, Content: {message.clean_content.replace('`', '').replace(nl, '')}\n"
+            # print(len(newmessage))
+
             if len(newmessage) > 2000:
                 continue
 
-            if len(output[index] + newmessage) > 2000:
+            comblen = len(output[index] + newmessage)
+            # print(comblen)
+
+            if comblen > 2000:
                 output.append(newmessage)
                 index += 1
             output[index] += newmessage
 
+        # print(repr(output))
+
         message = ""
         for index in output:
+            comblen = len(message + index)
+            # print(comblen)
+
             if len(message + index) < 2000:
                 message += index
             else:
                 await ctx.send(f"```\n{message}\n```")
                 message = ""
+
+        await ctx.send(f"```\n{message}\n```")
 
     # @commands.command(hidden=True)
     # async def idk(self, ctx):
