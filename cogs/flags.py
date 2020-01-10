@@ -189,4 +189,4 @@ def setup(bot):
     bot.add_cog(CrappyFlags(bot))
 
 
-print("### CrappyFlags Command loaded! ###")
+# print("### CrappyFlags Command loaded! ###")

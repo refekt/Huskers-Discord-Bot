@@ -338,4 +338,4 @@ def setup(bot):
     bot.add_cog(Referee(bot))
 
 
-print("### Referee Command loaded! ###")
+# print("### Referee Command loaded! ###")

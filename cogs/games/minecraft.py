@@ -130,4 +130,4 @@ def setup(bot):
     bot.add_cog(MinecraftCommands(bot))
 
 
-print("### Minecraft Command loaded! ###")
+# print("### Minecraft Command loaded! ###")

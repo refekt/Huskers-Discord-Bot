@@ -327,4 +327,4 @@ def setup(bot):
     bot.add_cog(ScheduleCommands(bot))
 
 
-print("### Schedule Commands loaded! ###")
+# print("### Schedule Commands loaded! ###")

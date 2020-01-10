@@ -80,4 +80,4 @@ def setup(bot):
     bot.add_cog(RecruitCommands(bot))
 
 
-print("### Recruit Commands loaded! ###")
+# print("### Recruit Commands loaded! ###")

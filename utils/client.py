@@ -1,3 +1,4 @@
+import traceback
 import hashlib
 import json
 import logging
@@ -461,17 +462,14 @@ if sys.argv[1] == "test":
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-client.load_extension('cogs.admin')
-client.load_extension('cogs.flags')
-client.load_extension('cogs.images')
-client.load_extension('cogs.referee')
-client.load_extension('cogs.schedule')
-client.load_extension('cogs.text')
-client.load_extension('cogs.croot')
-# client.load_extension('cogs.betting')
-# client.load_extension('cogs.reddit')
-client.load_extension('cogs.games.trivia')
-client.load_extension('cogs.games.minecraft')
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft") # bettings, reddit
+
+for extension in extensions:
+    try:
+        client.load_extension(extension)
+        print(f"### Successfully loaded [{extension}] commands! ###")
+    except:
+        traceback.print_exc()
 
 if len(sys.argv) > 0:
     if on_prod_server():

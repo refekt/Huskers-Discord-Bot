@@ -311,4 +311,4 @@ def setup(bot):
     bot.add_cog(TextCommands(bot))
 
 
-print("### Text Commands loaded! ###")
+# print("### Text Commands loaded! ###")

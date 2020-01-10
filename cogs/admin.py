@@ -292,4 +292,4 @@ def setup(bot):
     bot.add_cog(AdminCommands(bot))
 
 
-print("### Admin Commands loaded! ###")
+# print("### Admin Commands loaded! ###")

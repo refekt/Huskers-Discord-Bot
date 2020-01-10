@@ -166,4 +166,4 @@ def setup(bot):
     bot.add_cog(ImageCommands(bot))
 
 
-print("### Image Commands loaded! ###")
+# print("### Image Commands loaded! ###")
