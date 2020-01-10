@@ -262,7 +262,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         history = await ctx.message.channel.history(limit=quantity).flatten()
         output = "```\n"
         for message in history:
-            output += message.clean_content + "\n"
+            output += f"Author: {message.author}, Content: {message.clean_content}\n"
 
         output += "\n```"
 
