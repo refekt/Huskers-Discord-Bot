@@ -290,7 +290,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         pass
 
     @trivia.command(aliases=["s",])
-    @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
+    # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def setup(self, ctx):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
         try:
@@ -438,7 +438,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             await start_messages()
 
     @trivia.command()
-    @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
+    # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def start(self, ctx):
         """Admin/Trivia Boss Command: Starts the trivia game"""
         if not ctx.message.author == game.trivia_master:
@@ -452,7 +452,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         await start_messages()
 
     @trivia.command(aliases=["n",], hidden=True)
-    @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
+    # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def next(self, ctx):
         """Admin/Trivia Boss Command: Send the next question"""
         global game
