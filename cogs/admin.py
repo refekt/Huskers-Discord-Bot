@@ -256,6 +256,18 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             await ctx.send(message)
             await ctx.message.delete()
 
+    @commands.command(hidden=True)
+    @commands.has_any_role(role_admin_prod, role_admin_test)
+    async def repeathistory(self, ctx, quantity=20):
+        history = await ctx.message.channel.history(limit=quantity).flatten()
+        output = "```\n"
+        for message in history:
+            output += message.clean_content + "\n"
+
+        output += "\n```"
+
+        await ctx.send(output)
+
     # @commands.command(hidden=True)
     # async def idk(self, ctx):
     #     channel_lists = client.get_all_channels()
