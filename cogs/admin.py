@@ -265,7 +265,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         nl = '\n'
         for message in history:
 
-            newmessage = f"Author: {message.author}, Content: {message.clean_content.replace('`', '').replace(nl, '')}\n"
+            newmessage = f"▶ Author: {message.author}, Content: {message.clean_content.replace('`', '').replace(nl, '')}\n"
             # print(len(newmessage))
 
             if len(newmessage) > 2000:
