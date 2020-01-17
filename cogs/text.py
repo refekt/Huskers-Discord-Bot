@@ -79,9 +79,12 @@ class TextCommands(commands.Cog):
                             scottFrost += f.read()
                         source_data = re.sub(r'[^\x00-\x7f]', r'', scottFrost)
                     else:
-                        async for msg in ctx.channel.history(limit=5000):
-                            if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
-                                source_data += "\r\n" + str(msg.content).capitalize()
+                        try:
+                            async for msg in ctx.message.channel.history(limit=5000):
+                                if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
+                                    source_data += "\r\n" + str(msg.content).capitalize()
+                        except discord.errors.Forbidden:
+                            pass
                 elif type(source) == discord.TextChannel:
                     if source.name not in bannedchannels:
                         async for msg in source.history(limit=5000):
@@ -91,6 +94,7 @@ class TextCommands(commands.Cog):
             f.close()
 
         if not source_data:
+            print(f"!!! Markov - The source data is: {source_data}")
             await edit_msg.edit(content="You broke me!")
             return
 
