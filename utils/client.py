@@ -233,8 +233,9 @@ async def monitor_messages(message: discord.Message):
                                 break
 
                     if not duplicate:
-                        embed = discord.Embed(title=f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author.mention} with the {reaction} reaction 🏆", color=0xFF0000)
-                        embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}")
+                        embed = discord.Embed(title=f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author.mention} with the {reaction} reaction | {reaction.message.jump_url} 🏆",
+                                              color=0xFF0000)
+                        embed.add_field(name=f"Author: {reaction.message.author.mention}", value=f"{reaction.message.content}")
                         embed.set_footer(text=reaction.message.id)
                         await chan.send(embed=embed)
 
@@ -462,7 +463,7 @@ if sys.argv[1] == "test":
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft") # bettings, reddit
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft")  # bettings, reddit
 
 for extension in extensions:
     try:
