@@ -78,7 +78,7 @@ role_minecraft = 661409899481268238
 
 # Discord Channels
 chan_HOF_prod = 487431877792104470
-chan_HOF_test = 616824929383612427
+chan_HOF_test = 606655884340232192
 chan_dbl_war_room = 538419127535271946
 chan_war_room = 525519594417291284
 chan_botlogs = 458474143403212801

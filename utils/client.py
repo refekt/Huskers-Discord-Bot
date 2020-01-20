@@ -188,52 +188,9 @@ async def monitor_messages(message: discord.Message):
             for arrow in arrows:
                 await message.add_reaction(arrow)
 
-    async def hall_of_fame_messages(reactions: list):
-        chan = client.get_channel(id=chan_HOF_prod)
-
-        if chan is None:
-            chan = client.get_channel(id=chan_HOF_test)
-
-        banned_channels = (chan_dbl_war_room, chan_war_room, chan_botlogs)
-
-        if chan.id in banned_channels:
-            return
-
-        pinned_messages = []
-        message_history_raw = []
-        duplicate = False
-
-        def server_member_count():
-            return len(client.users)
-
-        threshold = int(0.0075 * server_member_count())
-
-        for reaction in reactions:
-            if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
-                if not reaction.message.author.bot:
-                    message_history_raw = await chan.history(limit=5000).flatten()
-
-                    for message_raw in message_history_raw:
-                        if len(message_raw.embeds) > 0:
-                            if message_raw.embeds[0].footer.text == str(reaction.message.id):
-                                duplicate = True
-                                break
-
-                    if not duplicate:
-                        embed = discord.Embed(title=f"🏆 Husker Discord Hall of Fame Message by {reaction.message.author.mention} with the {reaction} reaction | {reaction.message.jump_url} 🏆",
-                                              color=0xFF0000)
-                        embed.add_field(name=f"Author: {reaction.message.author.mention}", value=f"{reaction.message.content}")
-                        embed.set_footer(text=reaction.message.id)
-                        await chan.send(embed=embed)
-
-        del message_history_raw
-        del pinned_messages
-        del duplicate
-
     await auto_replies()
     await find_subreddits()
     await add_votes()
-    await hall_of_fame_messages(message.reactions)
 
 
 async def monitor_reactions(channel, emoji, user, message):
@@ -260,6 +217,51 @@ async def monitor_reactions(channel, emoji, user, message):
                 pass
 
     await trivia_message()
+
+
+async def hall_of_fame_messages(reactions: list):
+        chan = client.get_channel(id=chan_HOF_prod)
+
+        if chan is None:
+            chan = client.get_channel(id=chan_HOF_test)
+
+        banned_channels = (chan_dbl_war_room, chan_war_room, chan_botlogs)
+
+        if chan.id in banned_channels:
+            return
+
+        pinned_messages = []
+        message_history_raw = []
+        duplicate = False
+
+        def server_member_count():
+            return len(client.users)
+
+        threshold = int(0.0075 * server_member_count())
+        threshold = 1
+
+        for reaction in reactions:
+            if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
+                if not reaction.message.author.bot:
+                    message_history_raw = await chan.history(limit=5000).flatten()
+
+                    for message_raw in message_history_raw:
+                        if len(message_raw.embeds) > 0:
+                            if message_raw.embeds[0].footer.text == str(reaction.message.id):
+                                duplicate = True
+                                break
+
+                    if not duplicate:
+                        embed = discord.Embed(title=f"🏆 » Husker Discord Hall of Fame Message by [ {reaction.message.author} ] with the [ {reaction} ] reaction « 🏆",
+                                              color=0xFF0000)
+                        embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}", inline=False)
+                        embed.add_field(name="View Message", value=f"[View Message]({reaction.message.jump_url})", inline=False)
+                        embed.set_footer(text=reaction.message.id)
+                        await chan.send(embed=embed)
+
+        del message_history_raw
+        del pinned_messages
+        del duplicate
 
 
 async def roles_message(action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
@@ -408,7 +410,7 @@ class MyClient(commands.Bot):
         payload = await split_payload(payload)
 
         await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
-        # await hall_of_fame_messages(payload["message"].reactions)
+        await hall_of_fame_messages(payload["message"].reactions)
         await roles_message(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
     async def on_reaction_remove(reaction, user):
