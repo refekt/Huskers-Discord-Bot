@@ -1,6 +1,7 @@
 from datetime import datetime
-
+import platform
 import discord
+from utils.games import ScheduleBackup
 
 from utils.consts import tz
 
@@ -106,3 +107,72 @@ def build_recruit_embed(rec):  # rec == recruit
     if not rec.thumbnail == "/.":
         embed.set_thumbnail(url=rec.thumbnail)
     return embed
+
+
+def build_schedule_embed(year, **kwargs):
+    scheduled_games, season_stats = ScheduleBackup(year=year)
+
+    title = value = ""
+    arrow_bullet = "» "
+    nl = "\n"
+    total_len = 0
+    game_data = []
+
+    title_str = f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})"
+    embed = build_embed(
+        title_str,
+    )
+
+    for index, game in enumerate(scheduled_games):
+        title = f"Game {game.week}"
+
+        value = \
+            f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}"
+
+        if game.game_date_time.hour >= 16:
+            value += f"{arrow_bullet + game.game_date_time.strftime('%b %d') + '/TBD' + nl}"
+        else:
+            if "linux" in platform.platform():
+                value += f"{arrow_bullet + game.game_date_time.strftime('%b %d/%-I:%M %p') + nl}"
+            else:
+                value += f"{arrow_bullet + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}"
+
+        value += \
+            f"{arrow_bullet + game.bets.lines[0].formatted_spread + nl if len(game.bets.lines) else ''}" \
+            f"{arrow_bullet + game.location[0] + ', ' + game.location[1] + nl}" \
+            f"{arrow_bullet + game.tv_station + nl if game.tv_station else ''}" \
+            f"{'[Boxscore](' + game.boxscore_url + ')' + nl if game.boxscore_url else ''}" \
+            f"{'[Recap](' + game.recap_url + ')' + nl if game.recap_url else ''}" \
+            f"{'[Notes](' + game.notes_url + ')' + nl if game.notes_url else ''}" \
+            f"{'[Quotes](' + game.quotes_url + ')' + nl if game.quotes_url else ''}" \
+            f"{'[History](' + game.history_url + ')' + nl if game.history_url else ''}" \
+            f"{'[Gallery](' + game.gallery_url + ')' + nl if game.gallery_url else ''}"
+
+        total_len += len(title) + len(value)
+
+        if "week" in kwargs.keys():
+            if game.week == int(kwargs["week"]):
+                embed.add_field(name=title, value=value)
+                return embed
+
+        game_data.append(
+            [
+                title,
+                value
+            ]
+        )
+
+
+
+    embed_extended = None
+
+    for game in game_data:
+        if len(embed) + len(game[0]) + len(game[1]) <= 6000:
+            embed.add_field(name=game[0], value=game[1])
+        else:
+            if embed_extended is None:
+                embed_extended = build_embed(title_str)
+
+            embed_extended.add_field(name=game[0], value=game[1])
+
+    return embed, embed_extended

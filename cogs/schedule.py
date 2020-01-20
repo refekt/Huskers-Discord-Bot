@@ -11,6 +11,7 @@ from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 import platform
+from utils.embed import build_schedule_embed
 
 leagueDict = {
     'top25': 0,
@@ -78,129 +79,34 @@ def hex_to_rgb(hex):
 class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
     @commands.group(aliases=["sched"])
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
-    async def schedule(self, ctx, year=datetime.now().year):
+    async def schedule(self, ctx):
         """ Nebraska's football schedule """
+        pass
+
+    @schedule.command()
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    async def year(self, ctx, year=datetime.now().year):
+        """ Specific year of Nebraska's football schedule """
         edit_msg = await ctx.send("Loading...")
 
-        scheduled_games, season_stats = ScheduleBackup(year=year)
+        embeds = build_schedule_embed(year)
 
-        game_data = []
-        nl = "\n"
-        arr = "» "
-        title = value = ""
-        total_len = 0
-        for index, game in enumerate(scheduled_games):
-            title = f"Game {game.week}"  #f"Game {index + 1}"
-            value = \
-                f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}"
+        await edit_msg.edit(content="", embed=embeds[0])
 
-            if game.game_date_time.hour >= 16:
-                value += f"{arr + game.game_date_time.strftime('%b %d') + '/TBD' + nl}"
-            else:
-                if "linux" in platform.platform():
-                    value += f"{arr + game.game_date_time.strftime('%b %d/%-I:%M %p') + nl}"
-                else:
-                    value += f"{arr + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}"
+        try:
+            await ctx.send(embed=embeds[1])
+        except discord.HTTPException:
+            pass
 
-            value += \
-                f"{arr + game.bets.lines[0].formatted_spread + nl if len(game.bets.lines) else ''}" \
-                f"{arr + game.location[0] + ', ' + game.location[1] + nl}" \
-                f"{arr + game.tv_station + nl if game.tv_station else ''}" \
-                f"{'[Boxscore](' + game.boxscore_url + ')' + nl if game.boxscore_url else ''}" \
-                f"{'[Recap](' + game.recap_url + ')' + nl if game.recap_url else ''}" \
-                f"{'[Notes](' + game.notes_url + ')' + nl if game.notes_url else ''}" \
-                f"{'[Quotes](' + game.quotes_url + ')' + nl if game.quotes_url else ''}" \
-                f"{'[History](' + game.history_url + ')' + nl if game.history_url else ''}" \
-                f"{'[Gallery](' + game.gallery_url + ')' + nl if game.gallery_url else ''}"
+    @schedule.command()
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    async def week(self, ctx, which_week, which_year=datetime.now().year):
+        """ Specific week in a specific year of Nebraska's schedule"""
+        edit_msg = await ctx.send("Loading...")
 
-            total_len += len(title) + len(value)
+        await edit_msg.edit(content="", embed=build_schedule_embed(which_year, week=which_week))
 
-            game_data.append(
-                [
-                    title,
-                    value
-                ]
-            )
-
-        title_str = f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})"
-
-        embed = build_embed(
-                title_str,
-            )
-
-        embed_extended = None
-
-        for game in game_data:
-            if len(embed) + len(game[0]) + len(game[1]) <= 6000:
-                embed.add_field(name=game[0], value=game[1])
-            else:
-                if embed_extended is None:
-                    embed_extended = build_embed(title_str)
-
-                embed_extended.add_field(name=game[0], value=game[1])
-
-        await edit_msg.edit(
-            embed=embed,
-            content=""
-        )
-
-        if embed_extended is not None:
-            await ctx.send(embed=embed_extended)
-
-    # @schedule.command()
-    # async def week(self, ctx, week: int, **kwargs):
-    #     if "year" in kwargs.keys():
-    #         year = kwargs["year"]
-    #     else:
-    #         year = datetime.now().year
-    #
-    #     game_fields = []
-    #     teamsapi = teams_api.TeamsApi()
-    #     all_teams_info = teamsapi.get_fbs_teams(year=datetime.now().year)
-    #
-    #     for game in Schedule(year=year):
-    #         if week == game.week:
-    #             tm = ""
-    #             team_info = []
-    #             if game.home_team == "Nebraska":
-    #                 tm = game.away_team
-    #             else:
-    #                 tm = game.home_team
-    #
-    #             for team in all_teams_info:
-    #                 try:
-    #                     if team.school == tm:
-    #                         team_info = team
-    #                         break
-    #                 except KeyError:
-    #                     continue
-    #
-    #             if game.home_points:
-    #                 title = f"Week {game.week}: {game.home_team} ({game.home_points}) vs {game.away_team} ({game.away_points})"
-    #             else:
-    #                 title = f"Week {game.week}: {game.home_team} vs {game.away_team}"
-    #
-    #             game_dt = dateutil.parser.parse(game.start_date)
-    #             game_dt = game_dt.astimezone(tz=pytz.timezone("US/Central"))
-    #
-    #             if game_dt.hour == 23:
-    #                 description = f"{'Conference Game' if game.conference_game else 'Non-Conference'}\n{game_dt.strftime('%x')}\{game.venue}"
-    #             else:
-    #                 description = f"{'Conference Game' if game.conference_game else 'Non-Conference'}\n{game_dt.strftime('%x %I:%M %p')}\n{game.venue}"
-    #             game_fields.append([title, description])
-    #
-    #             await ctx.send(
-    #                 embed=build_embed(
-    #                     title=title,
-    #                     color=hex_to_rgb(team_info.color),
-    #                     thumbnail=team_info.logos[0],
-    #                     fields=[["Game Info", description]]
-    #                 )
-    #             )
-    #             break
-
-    ### Jeyrad's code ###
-    @commands.command()
+    @commands.command()  ## Jeyrad's code ###
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def cfb(self, ctx, league='top25', week=-1, year=2019):
         """Returns a schedule w/ scores (if in past or in progress) from ESPN for a given league, week and year.
