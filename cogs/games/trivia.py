@@ -470,7 +470,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             await loop_questions()
 
     @trivia.command(aliases=["q",])
-    @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
+    # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
         if game.setup_complete:
