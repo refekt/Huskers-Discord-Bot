@@ -104,9 +104,10 @@ class HuskerDotComSchedule:
     location = None
     bets = GameBetInfo
     week = None
+    opponent_url = None
 
     def __init__(self, opponent, game_date_time, tv_station, radio_station, conference_game, ranking, outcome, boxscore_url, recap_url, notes_url, quotes_url, history_url, gallery_url, location,
-                 bets, week):
+                 bets, week, opponent_url):
         self.opponent = opponent
         self.game_date_time = game_date_time
         self.tv_station = tv_station
@@ -123,6 +124,7 @@ class HuskerDotComSchedule:
         self.location = location
         self.bets = bets
         self.week = week
+        self.opponent_url = opponent_url
 
 
 def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
@@ -145,6 +147,24 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
     game_week_raw = 0
 
     season_stats = SeasonStats()
+
+    def opponent_url():
+        all_games = soup.find_all(attrs={"class": "sidearm-schedule-game-opponent-name"})
+        logos_raw = soup.find_all(attrs={"class": "sidearm-schedule-game-opponent-logo noprint"})
+        logos = []
+
+        if len(all_games) > len(logos_raw):
+            logos.append("https://ucomm.unl.edu/images/brand-book/Our-marks/nebraska-n.jpg")
+
+        for logo in logos_raw:
+            logos.append("https://huskers.com/" + logo.contents[1].attrs["data-src"])
+
+        del all_games
+        del logos_raw
+
+        return logos
+
+    logos = opponent_url()
 
     for index, game in enumerate(games_raw):
         opponent = ""
@@ -275,26 +295,31 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
         if "spring" not in opponent.lower():
             game_week_raw += 1
 
-        games.append(
-            HuskerDotComSchedule(
-                opponent=opponent,
-                game_date_time=_game_date_time,
-                tv_station=_tv_station,
-                radio_station=_radio_station,
-                conference_game=_conference_game,
-                ranking=ranking,
-                outcome=outcome,
-                boxscore_url=_game_boxscore_url,
-                recap_url=_game_recap_url,
-                notes_url=_game_notes_url,
-                quotes_url=_game_quotes_url,
-                history_url=_game_history_url,
-                gallery_url=_game_gallery_url,
-                location=game_location(index),
-                bets=GameBetInfo(year=_game_date_time.year, team="Nebraska", week=index + 1, season="regular"),
-                week=game_week_raw
+        try:
+            games.append(
+                HuskerDotComSchedule(
+                    opponent=opponent,
+                    game_date_time=_game_date_time,
+                    tv_station=_tv_station,
+                    radio_station=_radio_station,
+                    conference_game=_conference_game,
+                    ranking=ranking,
+                    outcome=outcome,
+                    boxscore_url=_game_boxscore_url,
+                    recap_url=_game_recap_url,
+                    notes_url=_game_notes_url,
+                    quotes_url=_game_quotes_url,
+                    history_url=_game_history_url,
+                    gallery_url=_game_gallery_url,
+                    location=game_location(index),
+                    bets=GameBetInfo(year=_game_date_time.year, team="Nebraska", week=index + 1, season="regular"),
+                    week=game_week_raw,
+                    opponent_url=logos[game_week_raw]
+                )
             )
-        )
+        except IndexError:
+            print("Hmmmm")
+
         if outcome is not None:
             if "W" in outcome:
                 season_stats.wins += 1

@@ -153,6 +153,7 @@ def build_schedule_embed(year, **kwargs):
         if "week" in kwargs.keys():
             if game.week == int(kwargs["week"]):
                 embed.add_field(name=title, value=value)
+                embed.set_thumbnail(url=game.opponent_url)
                 return embed
 
         game_data.append(
