@@ -94,12 +94,13 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
             value = \
                 f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}"
 
-            if "linux" in platform.platform():
-                value += \
-                    f"{arr + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}"
+            if game.game_date_time.hour >= 16:
+                value += f"{arr + game.game_date_time.strftime('%b %d') + '/TBD' + nl}"
             else:
-                value += \
-                    f"{arr + game.game_date_time.strftime('%b %d/%-I:%M %p') + nl}"
+                if "linux" in platform.platform():
+                    value += f"{arr + game.game_date_time.strftime('%b %d/%-I:%M %p') + nl}"
+                else:
+                    value += f"{arr + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}"
 
             value += \
                 f"{arr + game.bets.lines[0].formatted_spread + nl if len(game.bets.lines) else ''}" \
