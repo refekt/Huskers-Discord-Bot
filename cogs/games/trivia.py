@@ -287,6 +287,8 @@ class Trivia(commands.Cog, name="Husker Trivia"):
     @commands.group()
     async def trivia(self, ctx):
         """Husker trivia"""
+        if not ctx.invoked_subcommand:
+            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help trivia' to view subcommands.")
         pass
 
     @trivia.command(aliases=["s",])

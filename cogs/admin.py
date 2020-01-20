@@ -294,9 +294,6 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         await ctx.send(f"```\n{message}\n```")
 
-    @commands.command()
-    async def orderjoined(self, ctx):
-        pass
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
