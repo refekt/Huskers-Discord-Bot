@@ -126,8 +126,8 @@ async def monitor_messages(message: discord.Message):
         if re.search(r"g{1,}o{1,}o{1,}d{1,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
-                    title="OwO",
-                    image="https://i.imgur.com/CddtdSY.jpg"
+                    title="😝",
+                    image="https://i.imgur.com/52v1upi.png"
                 ),
                 content=message.author.mention
             )

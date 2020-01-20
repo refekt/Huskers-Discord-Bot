@@ -294,37 +294,9 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         await ctx.send(f"```\n{message}\n```")
 
-    # @commands.command(hidden=True)
-    # async def idk(self, ctx):
-    #     channel_lists = client.get_all_channels()
-    #
-    #     add_role = None
-    #
-    #     from utils.consts import chan_botlogs
-    #     from utils.consts import role_admin_prod
-    #
-    #     for role in ctx.guild.roles:
-    #         if role.id == role_admin_prod:
-    #             add_role = role
-    #             break
-    #
-    #     for c in channel_lists:
-    #         try:
-    #             # await c.set_permissions(add_role, deafen_members=False, kick_members=False, send_tts_messages=False, attach_files=False, manage_messages=False, manage_guild=False,
-    #             #                         send_messages=False, embed_links=False, external_emojis=False, administrator=False, view_audit_log=False, connect=False, mute_members=False,
-    #             #                         manage_channels=False, priority_speaker=False, read_message_history=False, stream=False, speak=False, read_messages=False, manage_roles=False,
-    #             #                         create_instant_invite=False, use_voice_activation=False, move_members=False, mention_everyone=False, add_reactions=False, ban_members=False,
-    #             #                         manage_nicknames=False, manage_webhooks=False, change_nickname=False, manage_emojis=False)
-    #             await c.set_permissions(add_role, send_messages=True, read_messages=True, read_message_history=True, manage_channels=True, manage_roles=True)
-    #             print(f"Added {add_role} to {c.name}!")
-    #         except discord.Forbidden:
-    #             print(f"Unable to modify: {c.name}")
-    #             pass
-    #         except AttributeError as ae:
-    #             print(ae)
-    #         except:
-    #             pass
-
+    @commands.command()
+    async def orderjoined(self, ctx):
+        pass
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
