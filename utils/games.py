@@ -103,9 +103,10 @@ class HuskerDotComSchedule:
     gallery_url = None
     location = None
     bets = GameBetInfo
+    week = None
 
     def __init__(self, opponent, game_date_time, tv_station, radio_station, conference_game, ranking, outcome, boxscore_url, recap_url, notes_url, quotes_url, history_url, gallery_url, location,
-                 bets):
+                 bets, week):
         self.opponent = opponent
         self.game_date_time = game_date_time
         self.tv_station = tv_station
@@ -121,6 +122,7 @@ class HuskerDotComSchedule:
         self.gallery_url = gallery_url
         self.location = location
         self.bets = bets
+        self.week = week
 
 
 def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
@@ -143,6 +145,8 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
         return shortener.shorten_urls(long_urls=[url])[0]
 
     season_stats = SeasonStats()
+
+    game_week_raw = 0
 
     for index, game in enumerate(games_raw):
         o = ""
@@ -268,6 +272,9 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
                     state = "NE"
                 return [city, state]
 
+        if not "spring" in o.lower():
+            game_week_raw += 1
+
         games.append(
             HuskerDotComSchedule(
                 opponent=o,
@@ -284,7 +291,8 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
                 history_url=_game_history_url,
                 gallery_url=_game_gallery_url,
                 location=game_location(index),
-                bets=GameBetInfo(year=_game_date_time.year, team="Nebraska", week=index + 1, season="regular")
+                bets=GameBetInfo(year=_game_date_time.year, team="Nebraska", week=index + 1, season="regular"),
+                week=game_week_raw
             )
         )
         if outcome is not None:

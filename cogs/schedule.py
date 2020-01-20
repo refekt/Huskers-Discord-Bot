@@ -90,7 +90,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         title = value = ""
         total_len = 0
         for index, game in enumerate(scheduled_games):
-            title = f"Game {index + 1}"
+            title = f"Game {game.week}"  #f"Game {index + 1}"
             value = \
                 f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}"
 
