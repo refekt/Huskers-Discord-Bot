@@ -10,6 +10,7 @@ from discord.ext import commands
 from utils.consts import _global_rate, _global_per, _global_type
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
+import platform
 
 leagueDict = {
     'top25': 0,
@@ -91,8 +92,16 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         for index, game in enumerate(scheduled_games):
             title = f"Game {index + 1}"
             value = \
-                f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}" \
-                f"{arr + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}" \
+                f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}"
+
+            if "linux" in platform.platform():
+                value += \
+                    f"{arr + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}"
+            else:
+                value += \
+                    f"{arr + game.game_date_time.strftime('%b %d/%-I:%M %p') + nl}"
+
+            value += \
                 f"{arr + game.bets.lines[0].formatted_spread + nl if len(game.bets.lines) else ''}" \
                 f"{arr + game.location[0] + ', ' + game.location[1] + nl}" \
                 f"{arr + game.tv_station + nl if game.tv_station else ''}" \
