@@ -155,7 +155,7 @@ async def monitor_messages(message: discord.Message):
             except discord.Forbidden:
                 print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
 
-            if random.random() >= .97:
+            if random.random() >= .99:
                 await message.channel.send("https://i.imgur.com/1tVJ2tW.gif")
 
     async def find_subreddits():
