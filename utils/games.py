@@ -9,15 +9,6 @@ from utils.consts import headers
 from utils.consts import tz
 
 
-class SeasonStats:
-    wins = None
-    losses = None
-
-    def __init__(self, wins=0, losses=0):
-        self.wins = wins
-        self.losses = losses
-
-
 class GameBets:
     game_number = None
     over_under = None
@@ -87,6 +78,15 @@ class GameBetInfo:
             pass
 
 
+class SeasonStats:
+    wins = None
+    losses = None
+
+    def __init__(self, wins=0, losses=0):
+        self.wins = wins
+        self.losses = losses
+
+
 class HuskerDotComSchedule:
     opponent = None
     game_date_time = None
@@ -131,60 +131,58 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
     if not r.status_code == 200:
         return
 
+    def shorten_url(url):
+        bitly_oauth_token = [os.getenv("bitly_oauth")]
+        shortener = Shortener(tokens=bitly_oauth_token, max_cache_size=128)
+        return shortener.shorten_urls(long_urls=[url])[0]
+
     soup = BeautifulSoup(r.content, "html.parser")
 
     games_raw = soup.find_all("div", class_="sidearm-schedule-game-row flex flex-wrap flex-align-center row")
     games = []
 
-    g = ""
-
-    bitly_oauth_token = [os.getenv("bitly_oauth")]
-    shortener = Shortener(tokens=bitly_oauth_token, max_cache_size=128)
-
-    def shorten_url(url):
-        return shortener.shorten_urls(long_urls=[url])[0]
+    game_datetime_raw = ""
+    game_week_raw = 0
 
     season_stats = SeasonStats()
 
-    game_week_raw = 0
-
     for index, game in enumerate(games_raw):
-        o = ""
+        opponent = ""
         ranking = ""
 
         if index > 0:  # Games after the first week of the season
-            g = game.contents[1].contents[3].contents[1].text  # Current season? 2019?
+            game_datetime_raw = game.contents[1].contents[3].contents[1].text  # Current season? 2019?
 
-            if g == "":  # Seasons prior or after?
-                g = game.contents[1].contents[3].contents[3].contents[3].conents[1].text
+            if game_datetime_raw == "":  # Seasons prior or after?
+                game_datetime_raw = game.contents[1].contents[3].contents[3].contents[3].conents[1].text
 
-            o = game.contents[1].contents[3].contents[3].contents[3].contents[0]
+            opponent = game.contents[1].contents[3].contents[3].contents[3].contents[0]
 
-            if o == "\n":  # After the first week?
-                o = game.contents[1].contents[3].contents[3].contents[3].contents[1].contents[0]
+            if opponent == "\n":  # After the first week?
+                opponent = game.contents[1].contents[3].contents[3].contents[3].contents[1].contents[0]
 
-            if "#" in o:  # Ranked opponents?
-                ranking = o
-                o = game.contents[1].contents[3].contents[3].contents[3].contents[3].contents[0]
+            if "#" in opponent:  # Ranked opponents?
+                ranking = opponent
+                opponent = game.contents[1].contents[3].contents[3].contents[3].contents[3].contents[0]
 
         elif index == 0:  # First game of the season. Usually the Spring game
-            g = game.contents[1].contents[1].contents[1].text  # Current season? 2019?
+            game_datetime_raw = game.contents[1].contents[1].contents[1].text  # Current season? 2019?
 
-            if g == "":  # Seasons prior or after
-                g = game.contents[1].contents[3].contents[1].contents[1].text
+            if game_datetime_raw == "":  # Seasons prior or after
+                game_datetime_raw = game.contents[1].contents[3].contents[1].contents[1].text
 
             try:  # Current season? 2019?
-                o = game.contents[1].contents[1].contents[3].contents[3].contents[0]
+                opponent = game.contents[1].contents[1].contents[3].contents[3].contents[0]
             except IndexError:  # Seasons prior or after
-                o = game.contents[1].contents[3].contents[3].contents[3].contents[1].contents[0]
+                opponent = game.contents[1].contents[3].contents[3].contents[3].contents[1].contents[0]
 
         outcome = str(game.contents[5].contents[1].text).replace("\n", "").replace(",", ", ")
         outcome_found = ("L," in outcome) or ("W," in outcome)
         if not outcome_found:
             outcome = None
 
-        o = str(o).replace("\r", "").replace("\n", "").lstrip().rstrip()
-        g = g.split("\n")
+        opponent = str(opponent).replace("\r", "").replace("\n", "").lstrip().rstrip()
+        game_datetime_raw = game_datetime_raw.split("\n")
 
         tv_stations = ["ESPN", "FOX", "FS1", "ABC", "BTN"]
         months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
@@ -193,10 +191,10 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
         raw_date = raw_time = _tv_station = _radio_station = _conference_game = ""
 
         for team in big_ten_members:
-            if team == o:
+            if team == opponent:
                 _conference_game = True
 
-        for ele in g:
+        for ele in game_datetime_raw:
             if ele[0:3].upper() in months:
                 raw_date = ele.split(" (")[0] + ' ' + str(year)
 
@@ -268,16 +266,18 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
                         state = states_old[city_state[1]]
                     except KeyError:
                         state = "N/A"
+                    except:
+                        state = "N/A"
                 elif len(city_state) == 1:
                     state = "NE"
                 return [city, state]
 
-        if not "spring" in o.lower():
+        if "spring" not in opponent.lower():
             game_week_raw += 1
 
         games.append(
             HuskerDotComSchedule(
-                opponent=o,
+                opponent=opponent,
                 game_date_time=_game_date_time,
                 tv_station=_tv_station,
                 radio_station=_radio_station,
@@ -302,7 +302,7 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
                 season_stats.losses += 1
 
     # Clean up variables
-    del o
+    del opponent
     del _game_date_time
     del _tv_station
     del _radio_station
@@ -317,9 +317,8 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
     del _game_gallery_url
     del _game_links_raw
     del big_ten_members
-    del bitly_oauth_token
     del ele
-    del g
+    del game_datetime_raw
     del game
     del games_raw
     del husker_url
@@ -331,7 +330,6 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
     del raw_date
     del raw_time
     del shorten
-    del shortener
     del soup
     del states_old
     del team
