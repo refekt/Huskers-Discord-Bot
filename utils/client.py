@@ -141,7 +141,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        if re.search(r"(should|could|would|might)\sof", message.content, re.IGNORECASE):
+        if re.search(r"(should|could|would|might)\sof|(shoulda|coulda|woulda|mighta|)", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="Grammar Police",
