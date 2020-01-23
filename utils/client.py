@@ -141,6 +141,17 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
+        if re.search(r"(should|could|would)\sof", message.content, re.IGNORECASE):
+            await channel.send(
+                embed=build_embed(
+                    title="Grammar Police",
+                    fields=[
+                        ["Fix yourself!", "~~of~~ have*"],
+                        ["Not My Idea", "This was <@440885775132000266>'s idea!"]
+                    ]
+                )
+            )
+
         if "isms" in message.content.lower():
             if random.random() >= .90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
