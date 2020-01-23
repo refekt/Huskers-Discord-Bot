@@ -199,9 +199,10 @@ async def monitor_messages(message: discord.Message):
             for arrow in arrows:
                 await message.add_reaction(arrow)
 
-    await auto_replies()
-    await find_subreddits()
-    await add_votes()
+    if not message.author.bot:
+        await auto_replies()
+        await find_subreddits()
+        await add_votes()
 
 
 async def monitor_reactions(channel, emoji, user, message):
