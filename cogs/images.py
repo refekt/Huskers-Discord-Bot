@@ -95,7 +95,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ ;) """
         await ctx.send(embed=build_image_embed(title="🤷‍♀", image="https://i.imgur.com/Yt63gGE.gif"))
 
-    @commands.command()
+    @commands.command(aliases=["oof"])
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def ohno(self, ctx):
         """ Oof fr, fr """
