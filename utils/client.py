@@ -114,7 +114,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        if re.search(r"l{1,}o{1,}v{1,}e{1,}.{0,}[\W](y{1,}o{1,}u{1,}|u{1,}).{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        elif re.search(r"l{1,}o{1,}v{1,}e{1,}.{0,}[\W](y{1,}o{1,}u{1,}|u{1,}).{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="Shut Up Baby, I Know It",
@@ -123,7 +123,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        if re.search(r"g{1,}o{1,}o{1,}d{1,}.{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        elif re.search(r"g{1,}o{1,}o{1,}d{1,}.{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="😝",
@@ -132,7 +132,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        if re.search(r"b{1,}a{1,}d{1,}.{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        elif re.search(r"b{1,}a{1,}d{1,}.{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="╰（‵□′）╯",
@@ -141,7 +141,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        if re.search(r"(should|could|would|might)\sof|(shoulda|coulda|woulda|mighta)", message.content, re.IGNORECASE):
+        elif re.search(r"(should|could|would|might)\sof|(shoulda|coulda|woulda|mighta)", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="Grammar Police",
@@ -152,7 +152,7 @@ async def monitor_messages(message: discord.Message):
                 )
             )
 
-        if "isms" in message.content.lower():
+        elif "isms" in message.content.lower():
             if random.random() >= .90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
 
@@ -352,7 +352,7 @@ class MyClient(commands.Bot):
 
                     await channel.send(embed=embed)
                 else:
-                    await ctx.message.author.send("Shit didn't add up")
+                    await ctx.message.authro.send("Shit didn't add up")
                     return
             except:
                 await process_error(ctx, error)
