@@ -34,7 +34,7 @@ class Referee(commands.Cog):
     async def referee(self, ctx):
         """ A list of referee signals """
         if not ctx.invoked_subcommand:
-            raise discord.ext.commands.CommandError(message=f"A valid subcommand must be called. Review {client.command_prefix}help {ctx.command} for more information.")
+            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
 
         scmd = ctx.invoked_subcommand
 
