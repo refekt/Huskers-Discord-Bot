@@ -80,7 +80,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
     @commands.group(aliases=["sched"])
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def schedule(self, ctx):
-        """ Nebraska's football schedule """
+        """ [year|week] Nebraska's football schedule """
         if not ctx.invoked_subcommand:
             from utils.client import client
             raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
