@@ -480,4 +480,4 @@ if len(sys.argv) > 0:
         token = consts.test_token
         client.run(token)
 else:
-    print("No arguments provided")
+    print("No arguments provided!")

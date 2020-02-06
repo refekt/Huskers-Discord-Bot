@@ -5,3 +5,9 @@ Bot Frost is the official bot for the Husker Discord server.
 ## Usage
 
 `$help` lists all the available commands.
+
+
+## TODO
+1. Redesign betting functionality.
+2. Introduce a currency used for betting.
+3. Create radio capability.
