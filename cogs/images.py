@@ -165,7 +165,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
     async def maxhype(self, ctx):
         """ I AM A TALL BOY """
-        await ctx.send(embed=build_image_embed(title="HYPE", image="https://gfycat.com/impishsevereafricanfisheagle"))
+        await ctx.send(embed=build_image_embed(title="HYPE", image="https://giant.gfycat.com/ImpishSevereAfricanfisheagle.webm"))
 
 
 def setup(bot):
