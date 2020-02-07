@@ -161,6 +161,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ I AM A TALL BOY """
         await ctx.send(embed=build_image_embed(title="Big Boye", image="https://media1.tenor.com/images/99972fba7f9f38377b56d5d56e4b6052/tenor.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    async def maxhype(self, ctx):
+        """ I AM A TALL BOY """
+        await ctx.send(embed=build_image_embed(title="HYPE", image="https://gfycat.com/ImpishSevereAfricanfisheagle-size_restricted.gif"))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
