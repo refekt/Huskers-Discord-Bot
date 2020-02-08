@@ -16,7 +16,7 @@ states = {'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'C
           'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ', 'New Mexico': 'NM',
           'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
           'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
-          'District Of Columbia': "DC", 'American Samoa': 'AS'}
+          'District Of Columbia': "DC", 'American Samoa': 'AS', 'British Columbia': 'BC'}
 
 
 def position_abbr(position):
@@ -242,18 +242,21 @@ def FootballRecruit(year, name):
             return False
 
     def state_ranking(player):
-        rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&State={states[player['Hometown']['State']]}"})
-
-        ranking = 0
         try:
-            ranking = int(rank[0].contents[3].text)
-        except IndexError:
-            pass
+            rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&State={states[player['Hometown']['State']]}"})
 
-        if len(rank) == 1:
-            return ranking
-        else:
-            return False
+            ranking = 0
+            try:
+                ranking = int(rank[0].contents[3].text)
+            except IndexError:
+                pass
+
+            if len(rank) == 1:
+                return ranking
+            else:
+                return False
+        except KeyError:
+            return "Err"
 
     def position_ranking(player):
         rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&Position={player['PrimaryPlayerPosition']['Abbreviation']}"})
@@ -354,13 +357,18 @@ def FootballRecruit(year, name):
         # rivals_prof = rivals_profile(player)
         # rivals_id = rivals_ID(rivals_prof)
 
+        try:
+            recruit_state = states[p['Hometown']['State']]
+        except KeyError:
+            recruit_state = "N/A"
+
         search_result_players.append(
             Recruit(
                 key=p['Key'],
                 name=p['FullName'],
                 city=p['Hometown']['City']if p['Hometown']['City'] else 'N/A' ,
                 state=p['Hometown']['State'] if p['Hometown']['State'] else 'N/A',
-                state_abbr=states[p['Hometown']['State']] if p['Hometown']['State'] else 'N/A',
+                state_abbr=recruit_state,
                 height=p['Height'],
                 weight=p['Weight'],
                 bio=p['Bio'],
