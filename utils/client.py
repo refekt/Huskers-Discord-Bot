@@ -105,7 +105,7 @@ async def monitor_messages(message: discord.Message):
                  "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo2_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo3_250.gif",
                  "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo4_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo6_250.gif")
 
-        if re.search(r"f{1,}u{1,}c{1,}k{1,}.{0,}[\W](y{1,}o{1,}u{1,}|u{1,}).{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        if re.search(r"fuck.{0,}[\W](you{1,}|u).{0,}[\W]bot", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="BITE MY SHINY, METAL ASS",
@@ -114,7 +114,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        elif re.search(r"l{1,}o{1,}v{1,}e{1,}.{0,}[\W](y{1,}o{1,}u{1,}|u{1,}).{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        elif re.search(r"love.{0,}[\W](you|u).{0,}[\W]bot", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="Shut Up Baby, I Know It",
@@ -123,7 +123,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        elif re.search(r"g{1,}o{1,}o{1,}d{1,}.{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        elif re.search(r"good.{0,}[\W]bot", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="😝",
@@ -132,7 +132,7 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        elif re.search(r"b{1,}a{1,}d{1,}.{0,}[\W]b{1,}o{1,}t{1,}", message.content, re.IGNORECASE):
+        elif re.search(r"bad.{0,}[\W]bot", message.content, re.IGNORECASE):
             await channel.send(
                 embed=build_embed(
                     title="╰（‵□′）╯",
