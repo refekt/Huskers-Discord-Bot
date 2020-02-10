@@ -51,6 +51,12 @@ SSH_HOST = os.getenv("ssh_host")
 SSH_USER = os.getenv("ssh_user")
 SSH_PW = os.getenv("ssh_pw")
 
+# Twitter variables
+TWITTER_CONSUMER_KEY = os.getenv("twitter_consumer_key")
+TWITTER_CONSUMER_SECRET = os.getenv("twitter_consumer_secret")
+TWITTER_TOKEN_KEY = os.getenv("twitter_token_key")
+TWITTER_TOKEN_SECRET = os.getenv("twitter_token_secret")
+
 # Headers for `requests`
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
