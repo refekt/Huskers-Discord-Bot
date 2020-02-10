@@ -8,7 +8,7 @@ from bs4 import element
 from discord.ext import commands
 
 # from google import search
-from utils.consts import headers
+from utils.consts import HEADERS
 from utils.mysql import process_MySQL, sqlTeamIDs as TeamIDs
 
 states = {'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
@@ -135,18 +135,18 @@ def FootballRecruit(year, name):
 
     if len(name) == 1:
         x247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}"
-        first_name = requests.get(url=x247_search, headers=headers)
+        first_name = requests.get(url=x247_search, headers=HEADERS)
         first_name = json.loads(first_name.text)
 
         x247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.LastName={name[0]}"
-        last_name = requests.get(url=x247_search, headers=headers)
+        last_name = requests.get(url=x247_search, headers=HEADERS)
         last_name = json.loads(last_name.text)
 
         search_results = first_name + last_name
     elif len(name) == 2:
         x247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}&Player.LastName={name[1]}"
 
-        search_results = requests.get(url=x247_search, headers=headers)
+        search_results = requests.get(url=x247_search, headers=HEADERS)
         search_results = json.loads(search_results.text)
     else:
         print(f"Error occurred attempting to create 247sports search URL. Exiting..\n"
@@ -311,7 +311,7 @@ def FootballRecruit(year, name):
         return f"https://n.rivals.com/content/prospects/{ID}/featured/videos"
 
     def recruit_interests():
-        req = requests.get(url=player["RecruitInterestsUrl"], headers=headers)
+        req = requests.get(url=player["RecruitInterestsUrl"], headers=HEADERS)
         interests_soup = BeautifulSoup(req.content, "html.parser")
 
         interests = interests_soup.find_all(attrs={"class": "first_blk"})
@@ -336,7 +336,7 @@ def FootballRecruit(year, name):
     for index, player in enumerate(search_results):
         p = player['Player']
 
-        r = requests.get(url=player['Player']['Url'], headers=headers)
+        r = requests.get(url=player['Player']['Url'], headers=HEADERS)
         soup = BeautifulSoup(r.content, "html.parser")
 
         # TODO Grab all the other variables; red_shirt, rivals_profile, fix the JUCO issue with "NCAA" not showing up and crystal balls if only one team

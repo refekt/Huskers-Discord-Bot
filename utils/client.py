@@ -11,10 +11,10 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
-from utils.consts import chan_HOF_prod, chan_HOF_test, chan_botlogs, chan_dbl_war_room, chan_war_room, chan_scott
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT
 from utils.consts import change_my_nickname, change_my_status
 from utils.consts import establish_logger, print_log
-from utils.consts import role_gumby, role_potato, role_asparagus, role_airpod, role_isms, role_meme, role_packer, role_pixel, role_runza, role_minecraft
+from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
@@ -156,7 +156,7 @@ async def monitor_messages(message: discord.Message):
             if random.random() >= .90:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
 
-        if not type(channel) == discord.DMChannel and role_gumby in [roleid.id for roleid in message.author.roles]:
+        if not type(channel) == discord.DMChannel and ROLE_GUMBY in [roleid.id for roleid in message.author.roles]:
             # blocked = False
             try:
                 if not message.author.is_blocked():
@@ -232,12 +232,12 @@ async def monitor_reactions(channel, emoji, user, message):
 
 
 async def hall_of_fame_messages(reactions: list):
-        chan = client.get_channel(id=chan_HOF_prod)
+        chan = client.get_channel(id=CHAN_HOF_PROD)
 
         if chan is None:
-            chan = client.get_channel(id=chan_HOF_test)
+            chan = client.get_channel(id=CHAN_HOF_TEST)
 
-        banned_channels = (chan_dbl_war_room, chan_war_room, chan_botlogs)
+        banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
 
         if chan.id in banned_channels:
             return
@@ -282,15 +282,15 @@ async def roles_message(action, message: discord.Message, member: discord.User, 
             guild = client.get_guild(440632686185414677)
             member = guild.get_member(member.id)
             roles = {
-                "🥔": guild.get_role(role_potato),
-                "💚": guild.get_role(role_asparagus),
-                "🥪": guild.get_role(role_runza),
-                "😹": guild.get_role(role_meme),
-                "♣": guild.get_role(role_isms),
-                "🧀": guild.get_role(role_packer),
-                "☎": guild.get_role(role_pixel),
-                "🎧": guild.get_role(role_airpod),
-                "🪓": guild.get_role(role_minecraft)
+                "🥔": guild.get_role(ROLE_POTATO),
+                "💚": guild.get_role(ROLE_ASPARAGUS),
+                "🥪": guild.get_role(ROLE_RUNZA),
+                "😹": guild.get_role(ROLE_MEME),
+                "♣": guild.get_role(ROLE_ISMS),
+                "🧀": guild.get_role(ROLE_PACKER),
+                "☎": guild.get_role(ROLE_PIXEL),
+                "🎧": guild.get_role(ROLE_AIRPOD),
+                "🪓": guild.get_role(ROLE_MINECRAFT)
             }
 
             if not emoji.name in [emoji for emoji in roles.keys()]:
@@ -335,9 +335,9 @@ class MyClient(commands.Bot):
                 checkID = hashlib.md5(str(ctx.message.author.id).encode())
 
                 if context[2].lower() == "war":
-                    channel = client.get_channel(chan_war_room)
+                    channel = client.get_channel(CHAN_WAR_ROOM)
                 elif context[2].lower() == "scott":
-                    channel = client.get_channel(chan_scott)
+                    channel = client.get_channel(CHAN_SCOTT)
                 else:
                     await ctx.message.author.send(error_message)
                     return
@@ -474,10 +474,10 @@ for extension in extensions:
 
 if len(sys.argv) > 0:
     if on_prod_server():
-        token = consts.prod_token
+        token = consts.PROD_TOKEN
         client.run(token)
     else:
-        token = consts.test_token
+        token = consts.TEST_TOKEN
         client.run(token)
 else:
     print("No arguments provided!")

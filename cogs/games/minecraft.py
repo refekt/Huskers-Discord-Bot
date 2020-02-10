@@ -1,8 +1,8 @@
 from discord.ext import commands
 from paramiko import client as p_client
 
-from utils.consts import role_admin_prod, role_admin_test
-from utils.consts import ssh_pw, ssh_user, ssh_host
+from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
+from utils.consts import SSH_PW, SSH_USER, SSH_HOST
 from utils.embed import build_embed
 
 ssh_commands = {
@@ -70,7 +70,7 @@ def format_data(data: str, filter=None, option: str=None):
 
 
 def connect_SSH():
-    return ssh(address=ssh_host, username=ssh_user, password=ssh_pw)
+    return ssh(address=SSH_HOST, username=SSH_USER, password=SSH_PW)
 
 
 class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
@@ -79,7 +79,7 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
         """ View Husker Minecraft server information"""
         pass
 
-    @commands.has_any_role(role_admin_prod, role_admin_test)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     @minecraft.command()
     async def uptime(self, ctx):
         edit_msg = await ctx.send("Loading...")
@@ -95,7 +95,7 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
         await edit_msg.edit(content=data)
         del ssh
 
-    @commands.has_any_role(role_admin_prod, role_admin_test)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     @minecraft.command()
     async def memory(self, ctx):
         edit_msg = await ctx.send("Loading...")

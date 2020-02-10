@@ -10,7 +10,7 @@ from discord.ext import commands
 from discord.ext.commands import TextChannelConverter
 
 from utils.client import client
-from utils.consts import role_admin_test, role_admin_prod, role_mod_prod
+from utils.consts import ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD
 from utils.embed import build_embed
 from utils.misc import bot_latency
 from utils.mysql import process_MySQL, sqlClearTriviaScore, sqlRetrieveTriviaScores, sqlInsertTriviaScore, sqlRetrieveTriviaQuestions

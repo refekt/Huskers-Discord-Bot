@@ -7,7 +7,7 @@ import pytz
 import requests
 from discord.ext import commands
 
-from utils.consts import _global_rate, _global_per, _global_type
+from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 import platform
@@ -78,7 +78,7 @@ def hex_to_rgb(hex):
 
 class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
     @commands.group(aliases=["sched"])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def schedule(self, ctx):
         """ [year|week] Nebraska's football schedule """
         if not ctx.invoked_subcommand:
@@ -87,7 +87,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         pass
 
     @schedule.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def year(self, ctx, year=datetime.now().year):
         """ Specific year of Nebraska's football schedule """
         edit_msg = await ctx.send("Loading...")
@@ -102,7 +102,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
             pass
 
     @schedule.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def week(self, ctx, which_week, which_year=datetime.now().year):
         """ Specific week in a specific year of Nebraska's schedule"""
         edit_msg = await ctx.send("Loading...")
@@ -110,7 +110,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         await edit_msg.edit(content="", embed=build_schedule_embed(which_year, week=which_week))
 
     @commands.command()  ## Jeyrad's code ###
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def cfb(self, ctx, league='top25', week=-1, year=2019):
         """Returns a schedule w/ scores (if in past or in progress) from ESPN for a given league, week and year.
         Usage is: `cfbsched <league> <week> <year>"""
@@ -139,7 +139,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
             return
 
     @commands.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def nfl(self, ctx, week=-1, year=datetime.now().year):
         """ Returns a schedule w/ scores (if in past or in progress) from ESPN for a given week and year.
         Usage is: `nflsched <week> <year>"""

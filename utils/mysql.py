@@ -168,21 +168,21 @@ SELECT id, name FROM team_ids ORDER BY name ASC
 
 
 def process_MySQL(query: str, **kwargs):
-    from utils.consts import host, passwd, db, user
+    from utils.consts import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
 
     try:
         sqlConnection = pymysql.connect(
-            host=host,
-            user=user,
-            password=passwd,
-            db=db,
+            host=SQL_HOST,
+            user=SQL_USER,
+            password=SQL_PASSWD,
+            db=SQL_DB,
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
         print(f"%%% Connected to the MySQL Database! %%%\n"
               f"%%% Preparing to execute `{repr(query)}`{' and `' + repr(kwargs) + '`' if kwargs else ''}")
     except:
-        print(f"Unable to connect to the `{db}` database.")
+        print(f"Unable to connect to the `{SQL_DB}` database.")
         return
 
     result = None

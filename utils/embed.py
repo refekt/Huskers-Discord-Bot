@@ -3,7 +3,7 @@ import platform
 import discord
 from utils.games import ScheduleBackup
 
-from utils.consts import tz
+from utils.consts import TZ
 
 
 def build_image_embed(title, image):
@@ -15,7 +15,7 @@ def build_image_embed(title, image):
 
 
 def build_embed(title, **kwargs):
-    timestamp = datetime.utcnow().astimezone(tz=tz)
+    timestamp = datetime.utcnow().astimezone(tz=TZ)
 
     if "color" in kwargs.keys():
         if "description" in kwargs.keys():

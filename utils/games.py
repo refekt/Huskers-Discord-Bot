@@ -5,8 +5,8 @@ import requests
 from bitlyshortener import Shortener
 from bs4 import BeautifulSoup
 
-from utils.consts import headers
-from utils.consts import tz
+from utils.consts import HEADERS
+from utils.consts import TZ
 
 
 class GameBets:
@@ -55,7 +55,7 @@ class GameBetInfo:
 
     def establish(self, year, week, team, season="regular"):
         url = f"https://api.collegefootballdata.com/lines?year={year}&week={week}&seasonType={season}&team={team}"
-        re = requests.get(url=url, headers=headers)
+        re = requests.get(url=url, headers=HEADERS)
         data = re.json()
 
         try:
@@ -128,7 +128,7 @@ class HuskerDotComSchedule:
 
 
 def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
-    r = requests.get(url=f"https://huskers.com/sports/football/schedule/{year}", headers=headers)
+    r = requests.get(url=f"https://huskers.com/sports/football/schedule/{year}", headers=HEADERS)
 
     if not r.status_code == 200:
         return
@@ -241,7 +241,7 @@ def ScheduleBackup(year=datetime.datetime.now().year, shorten=False):
             if ele == "Husker Sports Network":
                 _radio_station = "Huskers Sports Network"
 
-        _game_date_time = datetime.datetime.strptime(f"{raw_date} {raw_time}", "%b %d %Y %I:%M %p").astimezone(tz=tz)
+        _game_date_time = datetime.datetime.strptime(f"{raw_date} {raw_time}", "%b %d %Y %I:%M %p").astimezone(tz=TZ)
 
         _game_links_raw = game.contents[5].contents[3].contents[1].contents
 

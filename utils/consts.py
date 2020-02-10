@@ -26,70 +26,70 @@ else:
     print(f"Unknown Platform: {platform.platform()}")
 
 # Cooldown rates for commands
-_global_rate = os.getenv("global_rate")
-_global_per = os.getenv("global_per")
-_global_type = BucketType.user
+CD_GLOBAL_RATE = os.getenv("global_rate")
+CD_GLOBAL_PER = os.getenv("global_per")
+CD_GLOBAL_TYPE = BucketType.user
 
 # Discord Bot Tokens
-test_token = os.getenv("TEST_TOKEN")
-prod_token = os.getenv("DISCORD_TOKEN")
-backup_token = os.getenv("BACKUP_TOKEN")
+TEST_TOKEN = os.getenv("TEST_TOKEN")
+PROD_TOKEN = os.getenv("DISCORD_TOKEN")
+BACKUP_TOKEN = os.getenv("BACKUP_TOKEN")
 
 # SQL information
-host = os.getenv("sqlHost")
-user = os.getenv("sqlUser")
-passwd = os.getenv("sqlPass")
-db = os.getenv("sqlDb")
+SQL_HOST = os.getenv("sqlHost")
+SQL_USER = os.getenv("sqlUser")
+SQL_PASSWD = os.getenv("sqlPass")
+SQL_DB = os.getenv("sqlDb")
 
 # Reddit Bot Info
-reddit_client_id = os.getenv("reddit_client_id")
-reddit_secret = os.getenv("reddit_secret")
-reddit_pw = os.getenv("reddit_pw")
+REDDIT_CLIENT_ID = os.getenv("reddit_client_id")
+REDDIT_SECRET = os.getenv("reddit_secret")
+REDDIT_PW = os.getenv("reddit_pw")
 
 # SSH Information
-ssh_host = os.getenv("ssh_host")
-ssh_user = os.getenv("ssh_user")
-ssh_pw = os.getenv("ssh_pw")
+SSH_HOST = os.getenv("ssh_host")
+SSH_USER = os.getenv("ssh_user")
+SSH_PW = os.getenv("ssh_pw")
 
 # print("* ", _global_rate, _global_per, _global_type, test_token, prod_token, backup_token, host, user, passwd, db, reddit_client_id, reddit_secret, reddit_pw, ssh_host, ssh_user, ssh_pw,
 # sep="\n* ", end="\n\n")
 
 # Headers for `requests`
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
 
 # Consistent timezone
-tz = pytz.timezone("US/Central")
+TZ = pytz.timezone("US/Central")
 
 # Discord Roles
-role_admin_prod = 440639061191950336
-role_admin_test = 606301197426753536
-role_mod_prod = 443805741111836693
-role_potato = 583842320575889423
-role_asparagus = 583842403341828115
-role_lilred = 464903715854483487
-role_runza = 485086088017215500
-role_meme = 448690298760200195
-role_isms = 592425861534449674
-role_packer = 609409451836964878
-role_pixel = 633698252809699369
-role_airpod = 633702209703378978
-role_gumby = 459569717430976513
-role_minecraft = 661409899481268238
+ROLE_ADMIN_PROD = 440639061191950336
+ROLE_ADMIN_TEST = 606301197426753536
+ROLE_MOD_PROD = 443805741111836693
+ROLE_POTATO = 583842320575889423
+ROLE_ASPARAGUS = 583842403341828115
+ROLE_LILRED = 464903715854483487
+ROLE_RUNZA = 485086088017215500
+ROLE_MEME = 448690298760200195
+ROLE_ISMS = 592425861534449674
+ROLE_PACKER = 609409451836964878
+ROLE_PIXEL = 633698252809699369
+ROLE_AIRPOD = 633702209703378978
+ROLE_GUMBY = 459569717430976513
+ROLE_MINECRAFT = 661409899481268238
 
 # Discord Channels
-chan_HOF_prod = 487431877792104470
-chan_HOF_test = 606655884340232192
-chan_dbl_war_room = 538419127535271946
-chan_war_room = 525519594417291284
-chan_botlogs = 458474143403212801
-chan_scott = 507520543096832001
-chan_rules = 651523695214329887
-chan_radio_prod = 660610967733796902
-chan_radio_test = 595705205069185050
+CHAN_HOF_PROD = 487431877792104470
+CHAN_HOF_TEST = 606655884340232192
+CHAN_DBL_WAR_ROOM = 538419127535271946
+CHAN_WAR_ROOM = 525519594417291284
+CHAN_BOTLOGS = 458474143403212801
+CHAN_SCOTT = 507520543096832001
+CHAT_RULES = 651523695214329887
+CHAN_RADIO_PROD = 660610967733796902
+CHAN_RADIO_TEST = 595705205069185050
 
 # Servers/guilds
-guild_prod = 440632686185414677
-guild_test = 595705205069185045
+GUILD_PROD = 440632686185414677
+GUILD_TEST = 595705205069185045
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
 

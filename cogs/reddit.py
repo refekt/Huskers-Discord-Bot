@@ -6,7 +6,7 @@ import praw
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import reddit_client_id, reddit_secret, reddit_pw
+from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 
 recruits = {
     "aho": ["Junior Aho", "3*", "SDE", "https://247sports.com/player/junior-aho-46084569", "Junior Aho is officially N! 🖊", "2020 JUCO 3* SDE Junior Aho signs with Nebraska"],
@@ -85,11 +85,11 @@ class RedditCommands(commands.Cog):
             return
 
         reddit = praw.Reddit(
-            client_id=reddit_client_id,
-            client_secret=reddit_secret,
+            client_id=REDDIT_CLIENT_ID,
+            client_secret=REDDIT_SECRET,
             user_agent="Scotty McFrosty",
             username="refekt",
-            password=reddit_pw
+            password=REDDIT_PW
         )
 
         # 0 == name, 1 == stars, 2 == position, 3 == url, 4 == /r/huskers, 5 == /r/cfb

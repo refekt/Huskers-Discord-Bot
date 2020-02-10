@@ -5,14 +5,14 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import _global_rate, _global_per, _global_type
+from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.embed import build_embed, build_recruit_embed
 from utils.recruit import FootballRecruit
 
 
 class RecruitCommands(commands.Cog):
     @commands.command(aliases=["cb",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def crootboot(self, ctx, year: int, *name):
         """ Retreive information about a recruit """
         if len(name) == 0:

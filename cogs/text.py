@@ -8,19 +8,19 @@ import markovify
 import requests
 from discord.ext import commands
 
-from utils.consts import _global_rate, _global_per, _global_type
-from utils.consts import tz
+from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
+from utils.consts import TZ
 from utils.games import ScheduleBackup
 from utils.games import Venue
 
 
 class TextCommands(commands.Cog):
     @commands.command(aliases=["cd",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def countdown(self, ctx, *, team=None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
-        now_cst = datetime.now().astimezone(tz=tz)
+        now_cst = datetime.now().astimezone(tz=TZ)
 
         def convert_seconds(n):
             secs = n % (24 * 3600)
@@ -53,7 +53,7 @@ class TextCommands(commands.Cog):
                     break
 
     @commands.command(aliases=["mkv"])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def markov(self, ctx, *what: typing.Union[discord.Member, discord.TextChannel]):
         """ Creates a Markov chain based off a user and/or text-channel """
         edit_msg = await ctx.send("Thinking...")
@@ -107,7 +107,7 @@ class TextCommands(commands.Cog):
             await edit_msg.edit(content=sentence)
 
     @commands.group()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def weather(self, ctx):
         """ Current weather for the next game day location """
 
@@ -129,9 +129,9 @@ class TextCommands(commands.Cog):
         season = reversed(season)
 
         for game in season:
-            now_cst = datetime.now().astimezone(tz=tz)
-            print(game.opponent, ":", now_cst, game.game_date_time.astimezone(tz=tz), now_cst < game.game_date_time.astimezone(tz=tz))
-            if now_cst < game.game_date_time.astimezone(tz=tz):
+            now_cst = datetime.now().astimezone(tz=TZ)
+            print(game.opponent, ":", now_cst, game.game_date_time.astimezone(tz=TZ), now_cst < game.game_date_time.astimezone(tz=TZ))
+            if now_cst < game.game_date_time.astimezone(tz=TZ):
                 if game.location == "Memorial Stadium":
                     _venue_name = venues[207]["name"]
                     _x = venues[207]["location"]["x"]
@@ -224,16 +224,16 @@ class TextCommands(commands.Cog):
     #             break
 
     @commands.command(name="24hours", aliases=["24", "24hrs",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
         """ You have 24 hours to cheer or moam about the game """
         games = ScheduleBackup(year=datetime.now().year)
 
         for index, game in enumerate(reversed(games)):
-            game_dt_cst = game.game_date_time.astimezone(tz=tz)
-            now_cst = datetime.now().astimezone(tz=tz)
+            game_dt_cst = game.game_date_time.astimezone(tz=TZ)
+            now_cst = datetime.now().astimezone(tz=TZ)
             _24hourspassed = game_dt_cst + timedelta(days=1)
-            _24hourspassed = _24hourspassed.astimezone(tz=tz)
+            _24hourspassed = _24hourspassed.astimezone(tz=TZ)
 
             if now_cst > game_dt_cst:
                 try:
@@ -250,7 +250,7 @@ class TextCommands(commands.Cog):
                     return
 
     @commands.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def whenjoined(self, ctx, who: discord.Member):
         """ When did you join the server? """
         from utils.client import client
@@ -282,7 +282,7 @@ class TextCommands(commands.Cog):
                     return
 
     @commands.command(aliases=["8b",])
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
         eight_ball = ['As I see it, yes', 'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Coach V\'s cigar would like this', 'Concentrate and ask again', 'Definitely yes',
@@ -296,7 +296,7 @@ class TextCommands(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.cooldown(rate=_global_rate, per=_global_per, type=_global_type)
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def police(self, ctx, baddie: discord.Member):
         await ctx.send(f"**"
                        f"🚨 NANI 🚨\n"
