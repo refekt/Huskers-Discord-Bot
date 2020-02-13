@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils.consts import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, TWITTER_TOKEN_KEY, TWITTER_TOKEN_SECRET
 
 
-def setup_twitter():
+def establish_API():
     return twitter.Api(
         consumer_key=TWITTER_CONSUMER_KEY,
         consumer_secret=TWITTER_CONSUMER_SECRET,
