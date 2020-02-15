@@ -126,11 +126,11 @@ class TextCommands(commands.Cog):
         edit_msg = await ctx.send("Loading...")
 
         season, season_stats = ScheduleBackup(year=datetime.now().year)
-        season = reversed(season)
+        # season = reversed(season)
 
         for game in season:
             now_cst = datetime.now().astimezone(tz=TZ)
-            print(game.opponent, ":", now_cst, game.game_date_time.astimezone(tz=TZ), now_cst < game.game_date_time.astimezone(tz=TZ))
+
             if now_cst < game.game_date_time.astimezone(tz=TZ):
                 if game.location == "Memorial Stadium":
                     _venue_name = venues[207]["name"]
@@ -152,6 +152,8 @@ class TextCommands(commands.Cog):
                     title=f"Weather Forecast for the __[ {game.opponent} ]__ in __[ {_venue_name} / {_weather['data'][0]['city_name']}, {_weather['data'][0]['state_code']} ]__",
                     color=0xFF0000)  #,
                     # description=f"Nebraska's next opponent is __[ {game.opponent} ]__")
+
+                break
 
         if embed is None:
             await ctx.send("The season is over! No upcoming games found.")

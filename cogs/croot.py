@@ -42,6 +42,8 @@ class RecruitCommands(commands.Cog):
             if index < 10:
                 result_info += f"{list(search_reactions.keys())[index]}: {result.year} - {'⭐' * result.rating_stars}{' - ' + result.position if result.rating_stars > 0 else result.position} - {result.name}\n"
 
+                await edit_msg.edit(content=edit_msg.content + ".")
+
         embed = build_embed(
             title="Recruit Search Results",
             fields=[["Search Results", result_info]]

@@ -119,7 +119,14 @@ async def change_my_nickname(client, ctx):
 
 
 async def change_my_status(client, ctx=None):
-    statuses = ("Husker Football 24/7", "Currently beating Florida 62-24", "Currently giving up 400 yards rushing to one guy", "Attempting a swing pass for -1 yards")
+    statuses = (
+        "Husker Football 24/7",
+        "Currently beating Florida 62-24",
+        "Currently giving up 400 yards rushing to one guy",
+        "Attempting a swing pass for -1 yards",
+        "Missing a PAT or a missing a 21 yard FG",
+        "Getting wasted in Haymarket"
+    )
     try:
         print("~~~ Attempting to change status...")
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=random.choice(statuses)))

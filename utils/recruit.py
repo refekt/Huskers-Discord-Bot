@@ -362,6 +362,11 @@ def FootballRecruit(year, name):
         except KeyError:
             recruit_state = "N/A"
 
+        try:
+            recruit_committed_school = team_ids[team_id] if team_id > 0 else None
+        except KeyError:
+            recruit_committed_school = None
+
         search_result_players.append(
             Recruit(
                 key=p['Key'],
@@ -385,7 +390,7 @@ def FootballRecruit(year, name):
                 state_ranking=p['StateRank'],
                 position_ranking=p['PositionRank'],
                 committed=correct_commit_string(),
-                committed_school=team_ids[team_id] if team_id > 0 else None,
+                committed_school=recruit_committed_school,
                 commitment_date=player['AnnouncementDate'],
                 recruit_interests=recruit_interests(),
                 recruit_interests_url=player["RecruitInterestsUrl"],
