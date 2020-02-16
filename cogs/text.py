@@ -60,7 +60,7 @@ class TextCommands(commands.Cog):
         edit_msg = await ctx.send("Thinking...")
         source_data = ""
 
-        CHAN_HIST_LIMIT = 1000
+        CHAN_HIST_LIMIT = 1750
 
         def check_message(auth: discord.Member, msg: discord.Message = None, bot_provided: bool = False):
             if bot_provided:
@@ -105,8 +105,6 @@ class TextCommands(commands.Cog):
                         source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
 
         source_data = cleanup_source_data(source_data)
-
-        print(f"!!! Markov - The source data is: {repr(source_data)}")
 
         if not source_data:
             await edit_msg.edit(content="You broke me!")
