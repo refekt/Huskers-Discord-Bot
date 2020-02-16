@@ -171,59 +171,6 @@ class TextCommands(commands.Cog):
         else:
             await ctx.send(embed=embed)
 
-    # @weather.command()
-    # async def forecast(self, ctx):
-    #     edit_msg = await ctx.send("Loading...")
-    #
-    #     venues = Venue()
-    #     _venue_name = None
-    #     _weather = None
-    #     _x = None
-    #     _y = None
-    #     _opponent = None
-    #     game_dt_cst = None
-    #
-    #     for game in Schedule(year=datetime.now().year):
-    #         game_dt_cst = dateutil.parser.parse(game.start_date)
-    #         game_dt_cst = game_dt_cst.astimezone(tz=pytz.timezone("US/Central"))
-    #         now_cst = datetime.now().astimezone(tz=pytz.timezone("US/Central"))
-    #
-    #         if now_cst < game_dt_cst:
-    #             for venue in venues:
-    #                 if game.venue_id == venue['id']:
-    #                     _venue_name = venue['name']
-    #                     _opponent = game.away_team if game.home_team == "Nebraska" else game.home_team
-    #                     _x = venue['location']['x']
-    #                     _y = venue['location']['y']
-    #
-    #                     break
-    #
-    #     if _venue_name is None:
-    #         await edit_msg.edit(content="The season is over! No upcoming games found.")
-    #         return
-    #
-    #     r = requests.get(url=f"https://api.weatherbit.io/v2.0/forecast/daily?key={'39b7915267f04d5f88fa5fe6be6290e6'}&lang=en&units=I&lat={_x}&lon={_y}&days=7")
-    #     _weather = r.json()
-    #
-    #     for days in _weather["data"]:
-    #         datetime_obj = datetime.strptime(days["datetime"], "%Y-%m-%d")
-    #         if datetime_obj.weekday() == 5:
-    #             embed = discord.Embed(
-    #                 title=f"Game day forecast for __[ {_venue_name} ]__  in __[ {_weather['city_name']}, {_weather['state_code']} ]__",
-    #                 color=0xFF0000,
-    #                 description=f"Nebraska plays  __[ {_opponent} ]__ next on __[ {game_dt_cst.strftime('%c')} ]__ and the weather calls for __[ {days['weather']['description']} ]__")
-    #
-    #             embed.set_thumbnail(url="https://www.weatherbit.io/static/img/icons/{}.png".format(days["weather"]["icon"]))
-    #             embed.add_field(name="Temperature", value=f"{_weather['data'][0]['temp']} F", inline=False)
-    #             embed.add_field(name="Cloud Coverage", value=f"{_weather['data'][0]['clouds']}%", inline=False)
-    #             embed.add_field(name="Wind Speed", value=f"{_weather['data'][0]['wind_spd']} MPH / {_weather['data'][0]['wind_cdir']}", inline=False)
-    #             embed.add_field(name="Snow Chance", value=f"{_weather['data'][0]['snow']:.2f}%", inline=False)
-    #             embed.add_field(name="Precipitation Chance", value=f"{_weather['data'][0]['precip'] * 100:.2f}%", inline=False)
-    #
-    #             await edit_msg.edit(content="", embed=embed)
-    #
-    #             break
-
     @commands.command(name="24hours", aliases=["24", "24hrs",])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
