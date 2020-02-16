@@ -18,6 +18,9 @@ class RecruitCommands(commands.Cog):
         if len(name) == 0:
             raise discord.ext.commands.UserInputError("A player's first and/or last name is required.")
 
+        if len(str(year)) == 2:
+            year += 2000
+
         if year > datetime.datetime.now().year + 5:
             raise discord.ext.commands.UserInputError("The search year must be within five years of the current class.")
 
@@ -25,7 +28,6 @@ class RecruitCommands(commands.Cog):
             raise discord.ext.commands.UserInputError("The search year must be after the first season of college football--1869.")
 
         edit_msg = await ctx.send("Loading...")
-
         search = FootballRecruit(year, name)
 
         if len(search) == 1:
@@ -42,10 +44,8 @@ class RecruitCommands(commands.Cog):
             if index < 10:
                 result_info += f"{list(search_reactions.keys())[index]}: {result.year} - {'⭐' * result.rating_stars}{' - ' + result.position if result.rating_stars > 0 else result.position} - {result.name}\n"
 
-                await edit_msg.edit(content=edit_msg.content + ".")
-
         embed = build_embed(
-            title="Recruit Search Results",
+            title=f"Search Results for [{year} {[n for n in name]}]",
             fields=[["Search Results", result_info]]
         )
 

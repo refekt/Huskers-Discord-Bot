@@ -143,7 +143,6 @@ class TextCommands(commands.Cog):
                             _x = venue['location']['x']
                             _y = venue['location']['y']
                             break
-                await edit_msg.edit(content=edit_msg.content + '.')
 
                 r = requests.get(url=f"https://api.weatherbit.io/v2.0/current?key={'39b7915267f04d5f88fa5fe6be6290e6'}&lang=en&units=I&lat={_x}&lon={_y}")
                 _weather = r.json()
