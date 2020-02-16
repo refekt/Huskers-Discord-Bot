@@ -54,47 +54,61 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["mkv"])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def markov(self, ctx, *what: typing.Union[discord.Member, discord.TextChannel]):
-        """ Creates a Markov chain based off a user and/or text-channel """
+    async def markov(self, ctx, *sources: typing.Union[discord.Member, discord.TextChannel]):
+        """ Attempts to create a meaningful sentence from provided sources. If no source is provided, attempt to create a meaningful sentence from current channel. If a bot is provided as a source, a quote from Scott Frost will be used. If a Discord Member (@mention) is provided, member's history in the current channel will be used. """
+
         edit_msg = await ctx.send("Thinking...")
         source_data = ""
 
-        if not what:
-            async for msg in ctx.message.channel.history(limit=5000):
-                if msg.content != "" and not msg.author.bot:
-                    source_data += "\r\n" + msg.content
+        CHAN_HIST_LIMIT = 1000
+
+        def check_message(auth: discord.Member, msg: discord.Message = None, bot_provided: bool = False):
+            if bot_provided:
+                f = open("resources/scofro.txt", "r")
+                return re.sub(r'[^\x00-\x7f]', r'', f.read())
+            else:
+                from utils.client import client
+
+                banned_channels = ["test-banned", "news-politics"]
+
+                if not auth.bot and msg.channel not in banned_channels and not [ele for ele in client.all_commands.keys() if(ele in msg.clean_content)]:
+                    return "\n" + str(msg.clean_content.capitalize())
+
+            return ""
+
+        def cleanup_source_data(source_data: str):
+            new_source_data = source_data.replace("`", "")
+            return new_source_data
+
+        if not sources:
+            messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
+            for msg in messages:
+                source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=False)
         else:
-            bannedchannels = ["test-banned", "news-politics"]
+            if len(sources) > 5:
+                await edit_msg.edit(content=edit_msg.content + "...this might take awhile...be patient...")
 
-            if len(what) > 5:
-                await edit_msg.edit(content="...this might take awhile...be patient...")
-
-            f = open("resources/scofro.txt", "r")
-            scottFrost = ""
-
-            for source in what:
-                if type(source) == discord.Member:
-                    if source.bot:
-                        if f.mode == "r":
-                            scottFrost += f.read()
-                        source_data = re.sub(r'[^\x00-\x7f]', r'', scottFrost)
+            for item in sources:
+                if type(item) == discord.Member:
+                    if item.bot:
+                        source_data += check_message(auth=ctx.message.author, bot_provided=True)
                     else:
                         try:
-                            async for msg in ctx.message.channel.history(limit=5000):
-                                if msg.content != "" and str(msg.author) == str(source) and not msg.author.bot:
-                                    source_data += "\r\n" + str(msg.content).capitalize()
+                            messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
+                            for msg in messages:
+                                source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
                         except discord.errors.Forbidden:
                             pass
-                elif type(source) == discord.TextChannel:
-                    if source.name not in bannedchannels:
-                        async for msg in source.history(limit=5000):
-                            if msg.content != "" and not msg.author.bot:
-                                source_data += "\r\n" + msg.content
+                elif type(item) == discord.TextChannel:
+                    messages = await item.history(limit=CHAN_HIST_LIMIT).flatten()
+                    for msg in messages:
+                        source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
 
-            f.close()
+        source_data = cleanup_source_data(source_data)
+
+        print(f"!!! Markov - The source data is: {repr(source_data)}")
 
         if not source_data:
-            print(f"!!! Markov - The source data is: {source_data}")
             await edit_msg.edit(content="You broke me!")
             return
 
