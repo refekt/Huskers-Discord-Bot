@@ -213,6 +213,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         await change_my_nickname(client, ctx)
 
     @commands.command(hidden=True)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def repeat(self, ctx, *, message=""):
         if ctx.channel.type == discord.ChannelType.private:
             channels_list = [channel for channel in client.get_all_channels() if channel.type == discord.ChannelType.text]
