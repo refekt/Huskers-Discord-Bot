@@ -29,29 +29,19 @@ async def makeMD5():
     from utils.consts import ROLE_MOD_PROD, ROLE_ADMIN_PROD
     from utils.client import client
 
-    guild = await client.fetch_guild(440632686185414677)
-    guild_members = await guild.fetch_members()
+    guild = client.guilds[1]
+    guild_members = guild.members
 
     admin_or_mods = []
+    animals = ["aardvark", "leopard", "baboon", "meerkat", "bobcat", "meerkat", "cheetah", "ocelot", "dingo", "platypus", "skunk", "squirrel", "horse", "koala", "zebra", "wolf", "fox", "giraffe", "leopard", "raccoon", "elephant", "cat", "dog"]
+    mammals = {}
 
     for member in guild_members:
         if ROLE_ADMIN_PROD == member.top_role.id or ROLE_MOD_PROD == member.top_role.id:
             admin_or_mods.append(member)
 
-    return repr(admin_or_mods)
+    for index, who in enumerate(admin_or_mods):
+        hash_object = hashlib.md5(str(who.id).encode())
+        mammals.update({animals[index]: hash_object.hexdigest()})
 
-    # names = ["0"]
-    # animals = ["z"]
-    # mammals = dict()
-    # i = 0
-    # for name in names:
-    #     hash_object = hashlib.md5(name.encode())
-    #     mammals.update({animals[i]: hash_object.hexdigest()})
-    #     i += 1
-    #
-    # print(mammals)
-
-if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(makeMD5())
+    print(mammals)
