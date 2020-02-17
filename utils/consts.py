@@ -1,14 +1,14 @@
-import discord
+import logging
 import os
 import platform
 import random
-import sys
 
+import discord
 import pytz
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
 
-import logging
+from utils.misc import on_prod_server
 
 print(f"### Platform == {platform.platform()} ###")
 
@@ -16,10 +16,10 @@ if "Windows" in platform.platform():
     print("### Windows environment set ###")
     load_dotenv(dotenv_path="variables.env")
 elif "Linux" in platform.platform():
-    if sys.argv[1] == "prod":
+    if on_prod_server():
         print("### Production environment set ###")
         load_dotenv(dotenv_path="/home/botfrost/bot/variables.env")
-    elif sys.argv[1] == "test":
+    elif not on_prod_server():
         print("### Test environment set ###")
         load_dotenv(dotenv_path="/home/botfrost/bot/variables.env")
 else:

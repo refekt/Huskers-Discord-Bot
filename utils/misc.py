@@ -14,7 +14,12 @@ def bot_latency():
 
 
 def on_prod_server():
-    return True if sys.argv[1] == "prod" else False
+    if sys.argv[1] == "prod":
+        return True
+    elif sys.argv[1] == "test":
+        return False
+    else:
+        return 0
 
 
 def makeMD5():

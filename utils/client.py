@@ -309,7 +309,7 @@ class MyClient(commands.Bot):
     def __init__(self, command_prefix, **options):
         super().__init__(command_prefix, **options)
 
-    if sys.argv[1] == "prod":
+    if on_prod_server():
         async def on_command_error(self, ctx, error):
             if ctx.message.content.startswith(f"{client.command_prefix}secret"):
                 try:
