@@ -30,7 +30,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     ["Hosting Location", f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
                     ["Hosting Status", "https://status.hyperexpert.com/"],
                     ["Latency", f"{client.latency * 1000:.2f} ms"],
-                    ["Username", client.user.mention]
+                    ["Username", client.user.mention],
+                    ["Feeling generous?", f"Check out `{client.command_prefix}donate` to help out the production and upkeep of the bot."]
                 ]
             )
         )
