@@ -267,25 +267,20 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         for message in history:
 
             newmessage = f"▶ Author: {message.author}, Content: {message.clean_content.replace('`', '').replace(nl, '')}\n"
-            # print(len(newmessage))
 
             if len(newmessage) > 2000:
                 continue
 
             comblen = len(output[index] + newmessage)
-            # print(comblen)
 
             if comblen > 2000:
                 output.append(newmessage)
                 index += 1
             output[index] += newmessage
 
-        # print(repr(output))
-
         message = ""
         for index in output:
             comblen = len(message + index)
-            # print(comblen)
 
             if len(message + index) < 2000:
                 message += index
@@ -298,6 +293,3 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
-
-
-# print("### Admin Commands loaded! ###")
