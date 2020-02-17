@@ -349,6 +349,7 @@ class MyClient(commands.Bot):
 
                         embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xD00000)
                         embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
+                        embed.set_footer(text="These messages are anonymous and there is no way to verify messages are accurate.")
                         embed.add_field(name="Back Channel Communications", value=message)
 
                         await channel.send(embed=embed)
