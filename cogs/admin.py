@@ -291,6 +291,13 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         await ctx.send(f"```\n{message}\n```")
 
+    @commands.command(hidden=True)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
+    async def smms(self, ctx):
+        from utils.misc import makeMD5
+
+        await makeMD5()
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))

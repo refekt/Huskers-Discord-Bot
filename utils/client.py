@@ -459,9 +459,9 @@ class MyClient(commands.Bot):
         process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "unban", "N/A"))
 
 
-command_prefix = "$"
-
-if sys.argv[1] == "test":
+if on_prod_server():
+    command_prefix = "$"
+else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
