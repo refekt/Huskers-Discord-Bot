@@ -96,7 +96,8 @@ class TextCommands(commands.Cog):
                         try:
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
                             for msg in messages:
-                                source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
+                                if msg.author == item:
+                                    source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
                         except discord.errors.Forbidden:
                             pass
                 elif type(item) == discord.TextChannel:
