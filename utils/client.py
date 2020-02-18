@@ -11,9 +11,8 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST
 from utils.consts import change_my_nickname, change_my_status
-from utils.consts import establish_logger, print_log
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -385,9 +384,11 @@ class MyClient(commands.Bot):
             f"### ~~~ Command Prefix: \"{self.command_prefix}\""
         )
 
-        # establish_logger(category=logging.ERROR)
-
-        # print_log(logging.ERROR, "Testing!")
+        try:
+            hello_channel = client.get_channel(id=CHAN_BOT_FROST)
+            await hello_channel.send("Greetings! I have arrived.")
+        except AttributeError:
+            pass
 
     async def on_resume(self, ctx):
         pass
