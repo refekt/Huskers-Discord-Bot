@@ -78,6 +78,8 @@ class TextCommands(commands.Cog):
 
         def cleanup_source_data(source_data: str):
             new_source_data = source_data.replace("`", "")
+            regex_url_finder = "((http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+            new_source_data = re.sub(regex_url_finder, "", new_source_data, flags=re.IGNORECASE)
             return new_source_data
 
         if not sources:
