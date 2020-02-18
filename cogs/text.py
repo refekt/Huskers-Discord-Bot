@@ -104,9 +104,11 @@ class TextCommands(commands.Cog):
                     for msg in messages:
                         source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
 
+                await ctx.send(f"DEBUG: {str(source_data)[:200]}")
+
         source_data = cleanup_source_data(source_data)
 
-        broken_message = f"You broke me! Most likely because there is no source data for {source_data}."
+        broken_message = f"You broke me! Most likely because there is no source data for {repr(source_data[:150])}."
 
         if not source_data:
             await edit_msg.edit(content="Source data: " + broken_message)

@@ -386,7 +386,7 @@ class MyClient(commands.Bot):
 
         try:
             hello_channel = client.get_channel(id=CHAN_BOT_FROST)
-            await hello_channel.send("Greetings! I have arrived.")
+            await hello_channel.send("*Beep, boop* Greetings! I have arrived.")
         except AttributeError:
             pass
 
