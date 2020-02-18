@@ -97,6 +97,7 @@ class TextCommands(commands.Cog):
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
                             for msg in messages:
                                 if msg.author == item:
+                                    await ctx.send(f"Adding [{msg.clean_content[:150]}] from [{msg.author}]")
                                     source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
                         except discord.errors.Forbidden:
                             pass
