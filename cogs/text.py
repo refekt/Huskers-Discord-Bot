@@ -106,15 +106,17 @@ class TextCommands(commands.Cog):
 
         source_data = cleanup_source_data(source_data)
 
+        broken_message = f"You broke me! Most likely because there is no source data for {source_data}."
+
         if not source_data:
-            await edit_msg.edit(content="You broke me!")
+            await edit_msg.edit(content="Source data: " + broken_message)
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
         sentence = chain.make_short_sentence(min_chars=45, max_chars=500)
 
         if sentence is None:
-            await edit_msg.edit(content="You broke me!")
+            await edit_msg.edit(content="Sentence" + broken_message)
         else:
             await edit_msg.edit(content=sentence)
 
