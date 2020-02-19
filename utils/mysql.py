@@ -189,7 +189,7 @@ def process_MySQL(query: str, **kwargs):
 
     try:
         with sqlConnection.cursor() as cursor:
-            if not "fetch" in kwargs:
+            if not "fetch" in kwargs: # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
                 if not "values" in kwargs:
                     cursor.execute(query=query)
                 else:

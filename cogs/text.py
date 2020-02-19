@@ -117,7 +117,7 @@ class TextCommands(commands.Cog):
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
-        sentence = chain.make_short_sentence(min_chars=45, max_chars=500)
+        sentence = chain.make_short_sentence(min_chars=45, max_chars=500, tries=50, max_overlap_ratio=.4)
 
         if sentence is None:
             await edit_msg.edit(content="Sentence: " + broken_message)
