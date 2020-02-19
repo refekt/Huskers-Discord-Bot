@@ -60,7 +60,7 @@ class TextCommands(commands.Cog):
         edit_msg = await ctx.send("Thinking...")
         source_data = ""
 
-        CHAN_HIST_LIMIT = 1750
+        CHAN_HIST_LIMIT = 2250
 
         def check_message(auth: discord.Member, msg: discord.Message = None, bot_provided: bool = False):
             if bot_provided:
@@ -110,7 +110,7 @@ class TextCommands(commands.Cog):
 
         source_data = cleanup_source_data(source_data)
 
-        broken_message = f"You broke me! Most likely because there is no source data for {repr(source_data[:150])}."
+        broken_message = f"You broke me! Most likely because there is no source data."
 
         if not source_data:
             await edit_msg.edit(content="Source data: " + broken_message)
@@ -120,7 +120,7 @@ class TextCommands(commands.Cog):
         sentence = chain.make_short_sentence(min_chars=45, max_chars=500)
 
         if sentence is None:
-            await edit_msg.edit(content="Sentence" + broken_message)
+            await edit_msg.edit(content="Sentence: " + broken_message)
         else:
             await edit_msg.edit(content=sentence)
 
