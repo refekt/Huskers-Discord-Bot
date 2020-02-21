@@ -156,7 +156,8 @@ def FootballRecruit(year, name):
 
     if not search_results:
 
-        raise commands.UserInputError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
+        # raise commands.UserInputError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
+        return commands.UserInputError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
 
     search_result_players = []
 

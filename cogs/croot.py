@@ -30,6 +30,10 @@ class RecruitCommands(commands.Cog):
         edit_msg = await ctx.send("Loading...")
         search = FootballRecruit(year, name)
 
+        if type(search) == commands.UserInputError:
+            await edit_msg.edit(content=search)
+            return
+
         if len(search) == 1:
             embed = build_recruit_embed(search[0])
             await edit_msg.edit(content="", embed=embed)
