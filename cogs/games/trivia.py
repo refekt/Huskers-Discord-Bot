@@ -311,13 +311,13 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         cat_list = ""
         for index, cat in enumerate(trivia_cats):
             pass
-            cat_list += f"#{index + 1:2}: {cat}\n"
+            cat_list += f"#{index + 1:2}: `{cat}`\n"
 
         setup_questions = [
             ["Channel", "What channel do you want to use?"],
             ["Timer", "How long of a question timer do you want to use?"],
             ["Questions", "How many question do you want to use?"],
-            ["Category", f"What category do you want to use? Must match __exactly__ as:\n{cat_list}"]
+            ["Category", f"What category do you want to use? Type the category **word** exactly as it appears:\n{cat_list}"]
         ]
 
         def check_channel(m):
