@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import CHAT_RULES, CHAN_BOTLOGS
+from utils.consts import CHAT_RULES, CHAN_BOTLOGS, CHAN_NORBOT
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed as build_embed
 from utils.consts import change_my_nickname
@@ -129,12 +129,13 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def rules(self, ctx):
+        unmodded = client.get_channel(id=CHAN_NORBOT)
         text = \
-        """
+        f"""
         1️⃣ Be respectful\n
         2️⃣ Sending or linking any harmful material such as viruses, IP grabbers, etc. results in an immediate and permanent ban.\n
         3️⃣ Abusing mentions to @everyone, the admins, the moderators (Frost Approved) or a specific person without proper reason is prohibited.\n
-        4️⃣ Act civil in all chats. #kingdom-of-no-hype-and-all-moaming is the only authorized channel for overt negative comments.\n
+        4️⃣ Act civil in all chats. {unmodded.mention} is the only unmoderated channel (with the exception of illegal activity).\n
         5️⃣ Post content in the correct channels.\n
         6️⃣ Absolutely no posting of personal information of others (doxxing).\n
         7️⃣ Do not post graphic text or pictures of minors (<18yo)\n

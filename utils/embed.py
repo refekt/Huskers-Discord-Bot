@@ -15,7 +15,7 @@ def build_image_embed(title, image):
 
 
 def build_embed(title, **kwargs):
-    timestamp = datetime.utcnow().astimezone(tz=TZ)
+    timestamp = datetime.now().astimezone(tz=TZ)
 
     if "color" in kwargs.keys():
         if "description" in kwargs.keys():
