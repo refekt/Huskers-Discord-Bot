@@ -7,6 +7,7 @@ import traceback
 from datetime import datetime
 
 import discord
+from chatterbot.conversation import Statement
 from discord.ext import commands
 
 import utils.consts as consts
@@ -17,8 +18,6 @@ from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
-from chatterbot.conversation import Statement
-from chatterbot.trainers import ChatterBotCorpusTrainer
 
 
 async def split_payload(payload):
@@ -200,43 +199,28 @@ async def monitor_messages(message: discord.Message):
             for arrow in arrows:
                 await message.add_reaction(arrow)
 
-    async def train_chatbot():
-        # message_list = await message.channel.history().flatten()
-        # training_list = []
-        #
-        # def cleanup_message(msg: str):
-        #     msg = msg.replace("`", "")
-        #     msg = msg.replace("\n", "")
-        #
-        #     return msg
-        #
-        # for msg in message_list:
-        #     if not msg.channel == CHAN_WAR_ROOM:
-        #         if msg.clean_content and not msg.clean_content.startswith(client.command_prefix):
-        #             training_list.append(cleanup_message(msg.clean_content))
-
-        # trainer.train(training_list)
-        trainer = ChatterBotCorpusTrainer(chatbot)
-        trainer.train("chatterbot.corpus.english")
-
     async def chatbot_reply():
-        try:
-            if message.mentions[0] == client.user:
-                query = message.clean_content[len(client.user.name):]
-                input_statement = Statement(text=query)
-                await message.channel.send(chatbot.get_response(input_statement))
-        except IndexError:
-            pass
+        client_raw_mention = f"<@!{client.user.id}>"
+
+        def check_message_synx(msg: discord.Message):
+            if not message.channel.id == CHAN_WAR_ROOM or not message.channel.id == CHAN_DBL_WAR_ROOM:
+                if str(msg.content).startswith(client_raw_mention):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        if check_message_synx(message):
+            query = message.content[len(client_raw_mention):]
+            input_statement = Statement(text=query)
+            await message.channel.send(chatbot.get_response(input_statement))
 
     if not message.author.bot:
         await auto_replies()
         await find_subreddits()
         await add_votes()
-
-        if not message.channel.id == CHAN_WAR_ROOM or not message.channel.id == CHAN_DBL_WAR_ROOM:
-            await chatbot_reply()
-            if random.randint(1, 100) >= 95:
-                await train_chatbot()
+        await chatbot_reply()
 
 
 async def monitor_reactions(channel, emoji, user, message):
