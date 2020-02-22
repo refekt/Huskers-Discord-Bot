@@ -12,7 +12,7 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST, GUILD_TEST
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
@@ -200,19 +200,16 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction(arrow)
 
     async def chatbot_reply():
-        client_raw_mention = f"<@!{client.user.id}>"
-        print(repr(client_raw_mention))
+        client_id_re = r"<@!{0,}(593949013443608596|595705663997476887)>"
 
         def check_message_synx(msg: discord.Message):
-            if str(msg.content).startswith(client_raw_mention):
+            if re.search(client_id_re, msg.content):
                 return True
             else:
                 return False
 
         if check_message_synx(message):
-            print("Message syntax correct")
-
-            query = str(message.content[len(client_raw_mention):]).strip()
+            query = str(re.sub(client_id_re, "", message.content)).strip()
             input_statement = Statement(text=query)
             response = chatbot.get_response(input_statement)
             await message.channel.send(response)
@@ -260,7 +257,7 @@ async def monitor_messages(message: discord.Message):
         await auto_replies()
         await find_subreddits()
         await add_votes()
-        if message.channel.id == CHAN_BOT_FROST:
+        if message.channel.id == CHAN_BOT_FROST or message.guild.id == GUILD_TEST:
             await chatbot_reply()
 
 
