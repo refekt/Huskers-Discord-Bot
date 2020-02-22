@@ -226,6 +226,7 @@ async def monitor_messages(message: discord.Message):
         await auto_replies()
         await find_subreddits()
         await add_votes()
+
         await chatbot_reply()
 
         if random.randint(1,100) >= 95:

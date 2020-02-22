@@ -10,6 +10,7 @@ trainer = ListTrainer(chatbot)
 class ChatBot(commands.Cog):
     @commands.command()
     async def cb_train(self, ctx):
+        edit_msg = await ctx.send("Training myself...")
         message_list = await ctx.channel.history().flatten()
         training_list = []
 
@@ -25,7 +26,7 @@ class ChatBot(commands.Cog):
 
         trainer.train(training_list)
 
-        await ctx.send("Chat bot trained!")
+        await edit_msg.edit(content="Chat bot trained!")
 
 
 def setup(bot):
