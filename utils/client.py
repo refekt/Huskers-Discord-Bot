@@ -18,6 +18,8 @@ from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 
+from cogs.chatbot import chatbot, trainer
+
 
 async def split_payload(payload):
     p = dict()
@@ -156,15 +158,15 @@ async def monitor_messages(message: discord.Message):
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
 
         if not type(channel) == discord.DMChannel and ROLE_GUMBY in [roleid.id for roleid in message.author.roles]:
-        #     # blocked = False
-        #     try:
-        #         if not message.author.is_blocked():
-        #             await message.add_reaction("🦐")
-        #         else:
-        #             print(f"Unable to add 🦐 reaction to {message.author}'s message because I am blocked by them!")
-        #     except discord.Forbidden:
-        #         print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
-        #
+            #     # blocked = False
+            #     try:
+            #         if not message.author.is_blocked():
+            #             await message.add_reaction("🦐")
+            #         else:
+            #             print(f"Unable to add 🦐 reaction to {message.author}'s message because I am blocked by them!")
+            #     except discord.Forbidden:
+            #         print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
+            #
             if random.random() >= .99:
                 await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
 
@@ -198,10 +200,35 @@ async def monitor_messages(message: discord.Message):
             for arrow in arrows:
                 await message.add_reaction(arrow)
 
+    async def train_chatbot():
+        message_list = await message.channel.history().flatten()
+        training_list = []
+
+        def cleanup_message(msg: str):
+            msg = msg.replace("`", "")
+            msg = msg.replace("\n", "")
+
+            return msg
+
+        for msg in message_list:
+            if msg.clean_content and not msg.clean_content.startswith(client.command_prefix):
+                training_list.append(cleanup_message(msg.clean_content))
+
+        trainer.train(training_list)
+
+    async def chatbot_reply():
+        if message.mentions[0] == client.user:
+            query = message.clean_content[len(client.user.name):]
+            await message.channel.send(chatbot.get_response(query))
+
     if not message.author.bot:
         await auto_replies()
         await find_subreddits()
         await add_votes()
+        await chatbot_reply()
+
+        if random.randint(1,100) >= 95:
+            await train_chatbot()
 
 
 async def monitor_reactions(channel, emoji, user, message):
@@ -231,47 +258,47 @@ async def monitor_reactions(channel, emoji, user, message):
 
 
 async def hall_of_fame_messages(reactions: list):
-        chan = client.get_channel(id=CHAN_HOF_PROD)
+    chan = client.get_channel(id=CHAN_HOF_PROD)
 
-        if chan is None:
-            chan = client.get_channel(id=CHAN_HOF_TEST)
+    if chan is None:
+        chan = client.get_channel(id=CHAN_HOF_TEST)
 
-        banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
+    banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
 
-        if chan.id in banned_channels:
-            return
+    if chan.id in banned_channels:
+        return
 
-        pinned_messages = []
-        message_history_raw = []
-        duplicate = False
+    pinned_messages = []
+    message_history_raw = []
+    duplicate = False
 
-        def server_member_count():
-            return len(client.users)
+    def server_member_count():
+        return len(client.users)
 
-        threshold = int(0.0075 * server_member_count())
+    threshold = int(0.0075 * server_member_count())
 
-        for reaction in reactions:
-            if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
-                if not reaction.message.author.bot:
-                    message_history_raw = await chan.history(limit=5000).flatten()
+    for reaction in reactions:
+        if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
+            if not reaction.message.author.bot:
+                message_history_raw = await chan.history(limit=5000).flatten()
 
-                    for message_raw in message_history_raw:
-                        if len(message_raw.embeds) > 0:
-                            if message_raw.embeds[0].footer.text == str(reaction.message.id):
-                                duplicate = True
-                                break
+                for message_raw in message_history_raw:
+                    if len(message_raw.embeds) > 0:
+                        if message_raw.embeds[0].footer.text == str(reaction.message.id):
+                            duplicate = True
+                            break
 
-                    if not duplicate:
-                        embed = discord.Embed(title=f"🏆 » Husker Discord Hall of Fame Message by [ {reaction.message.author} ] with the [ {reaction} ] reaction « 🏆",
-                                              color=0xFF0000)
-                        embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}", inline=False)
-                        embed.add_field(name="View Message", value=f"[View Message]({reaction.message.jump_url})", inline=False)
-                        embed.set_footer(text=reaction.message.id)
-                        await chan.send(embed=embed)
+                if not duplicate:
+                    embed = discord.Embed(title=f"🏆 » Husker Discord Hall of Fame Message by [ {reaction.message.author} ] with the [ {reaction} ] reaction « 🏆",
+                                          color=0xFF0000)
+                    embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}", inline=False)
+                    embed.add_field(name="View Message", value=f"[View Message]({reaction.message.jump_url})", inline=False)
+                    embed.set_footer(text=reaction.message.id)
+                    await chan.send(embed=embed)
 
-        del message_history_raw
-        del pinned_messages
-        del duplicate
+    del message_history_raw
+    del pinned_messages
+    del duplicate
 
 
 async def roles_message(action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
@@ -466,8 +493,7 @@ else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting",
-              "cogs.chatbot")  #reddit
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting")
 
 for extension in extensions:
     try:
