@@ -12,12 +12,14 @@ def convert_messages_to_list(messages):
         msg = msg.replace("`","")
         msg = msg.replace("\n", "")
 
+        return msg
+
     for message in messages:
         if message.clean_content and not message.clean_content == "\n":
             output_list.append(cleanup_message(message.clean_content))
 
-    from pprint import pprint
-    pprint(output_list)
+    # from pprint import pprint
+    # pprint(output_list)
 
     return output_list
 
