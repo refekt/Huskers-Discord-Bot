@@ -12,12 +12,13 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST, CHAN_BOT_FROST
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
+import asyncio
 
 
 async def split_payload(payload):
@@ -212,15 +213,54 @@ async def monitor_messages(message: discord.Message):
                 return False
 
         if check_message_synx(message):
-            query = message.content[len(client_raw_mention):]
+            query = str(message.content[len(client_raw_mention):]).strip()
             input_statement = Statement(text=query)
-            await message.channel.send(chatbot.get_response(input_statement))
+            response = chatbot.get_response(input_statement)
+            await message.channel.send(response)
+
+            if True:
+                def check_answer(msg: discord.Message):
+                    # This seems useless?
+                    if msg.author == message.author:
+                        if msg.clean_content.lower() == "yes":
+                            return "correct"
+                        elif msg.clean_content.lower() == "no":
+                            return "incorrect"
+                        else:
+                            return "what"
+                    else:
+                        return False
+
+                await message.channel.send("I'm trying to learn! Was my reply acceptable? Reply `yes` or `no` to help me get better.")
+                check_response = await client.wait_for("message", check=check_answer)
+
+                answer = check_response.content
+
+                if answer == "yes":
+                    await message.channel.send("Great! I'll keep that reply in my back pocket.")
+                elif answer == "no":
+                    await message.channel.send(f"Good to know! How should I reply to the below statement from now own?\n```{response}```")
+
+                    del check_response
+
+                    def check_correct_statement(msg: discord.Message):
+                        return msg.clean_content
+
+                    check_response = await client.wait_for("message", check=check_correct_statement)
+                    correct_statement = Statement(text=check_response.content)
+                    print(f"Replacing [{response}] with [{correct_statement}]")
+                    chatbot.learn_response(correct_statement, input_statement)
+
+                    await message.channel.send("Got it! I'll use this from now on.")
+                else:
+                    await message.channel.send("I don't understand. We can try again next time!")
 
     if not message.author.bot:
         await auto_replies()
         await find_subreddits()
         await add_votes()
-        await chatbot_reply()
+        if message.channel.id == CHAN_BOT_FROST:
+            await chatbot_reply()
 
 
 async def monitor_reactions(channel, emoji, user, message):
