@@ -28,6 +28,10 @@ class ChatBot(commands.Cog):
 
         await edit_msg.edit(content="Chat bot trained!")
 
+    @commands.command()
+    async def cb_export(self, ctx):
+        trainer.export_for_training("export.json")
+
 
 def setup(bot):
     bot.add_cog(ChatBot(bot))
