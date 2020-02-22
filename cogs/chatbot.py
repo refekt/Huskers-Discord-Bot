@@ -13,7 +13,7 @@ class ChatBot(commands.Cog):
     async def cb_train(self, ctx):
         edit_msg = await ctx.send("Training myself...")
         trainer = ChatterBotCorpusTrainer(chatbot)
-        trainer.train("chatterbot.corpus.english", "chatterbot.corpus.english.greetings", "chatterbot.corpus.english.conversations")
+        trainer.train("chatterbot.corpus.english")
 
         await edit_msg.edit(content="Chat bot trained!")
 
