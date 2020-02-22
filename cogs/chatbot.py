@@ -25,6 +25,8 @@ class ChatBot(commands.Cog):
 
         trainer.train(training_list)
 
+        await ctx.send("Chat bot trained!")
+
 
 def setup(bot):
     bot.add_cog(ChatBot(bot))

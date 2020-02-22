@@ -1,24 +1,22 @@
-import traceback
 import hashlib
 import json
-import logging
 import random
 import re
 import sys
+import traceback
 from datetime import datetime
 
 import discord
 from discord.ext import commands
 
 import utils.consts as consts
+from cogs.chatbot import chatbot, trainer
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST
-from utils.consts import change_my_nickname, change_my_status
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
+from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
-
-from cogs.chatbot import chatbot, trainer
 
 
 async def split_payload(payload):
@@ -217,9 +215,12 @@ async def monitor_messages(message: discord.Message):
         trainer.train(training_list)
 
     async def chatbot_reply():
-        if message.mentions[0] == client.user:
-            query = message.clean_content[len(client.user.name):]
-            await message.channel.send(chatbot.get_response(query))
+        try:
+            if message.mentions[0] == client.user:
+                query = message.clean_content[len(client.user.name):]
+                await message.channel.send(chatbot.get_response(query))
+        except IndexError:
+            pass
 
     if not message.author.bot:
         await auto_replies()
@@ -493,7 +494,7 @@ else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting")
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting", "cogs.chatbot")
 
 for extension in extensions:
     try:
