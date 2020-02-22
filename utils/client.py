@@ -10,7 +10,7 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
-from cogs.chatbot import chatbot, trainer
+from cogs.chatbot import chatbot  # , trainer
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.consts import change_my_nickname, change_my_status
@@ -18,6 +18,7 @@ from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 from chatterbot.conversation import Statement
+from chatterbot.trainers import ChatterBotCorpusTrainer
 
 
 async def split_payload(payload):
@@ -200,69 +201,23 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction(arrow)
 
     async def train_chatbot():
-        message_list = await message.channel.history().flatten()
-        training_list = []
+        # message_list = await message.channel.history().flatten()
+        # training_list = []
+        #
+        # def cleanup_message(msg: str):
+        #     msg = msg.replace("`", "")
+        #     msg = msg.replace("\n", "")
+        #
+        #     return msg
+        #
+        # for msg in message_list:
+        #     if not msg.channel == CHAN_WAR_ROOM:
+        #         if msg.clean_content and not msg.clean_content.startswith(client.command_prefix):
+        #             training_list.append(cleanup_message(msg.clean_content))
 
-        def cleanup_message(msg: str):
-            msg = msg.replace("`", "")
-            msg = msg.replace("\n", "")
-
-            return msg
-
-        for msg in message_list:
-            if not msg.channel == CHAN_WAR_ROOM:
-                if msg.clean_content and not msg.clean_content.startswith(client.command_prefix):
-                    training_list.append(cleanup_message(msg.clean_content))
-
-        trainer.train(training_list)
-
-    async def manual_train_chatbot():
-        print("entering training mode")
-
-        def check_message(m):
-            if not m.author.bot:
-                if "yes" in m.clean_content.lower():
-                    print("Returning true")
-                    return True
-                elif "no" in m.clean_content.lower():
-                    print("Returning false")
-                    return False
-
-        check_msg = await message.channel.send("Was my response appropriate? Answer `yes` or `no` to help me learn.")
-        print("Waiting for message")
-
-        msg = await client.wait_for("message", check=check_message)
-        print("msg: ", msg)
-        print("Message waited for")
-
-        if not msg:
-            print("No provided")
-            try:
-                def check_return_content(m):
-                    return m.clean_content
-
-                await message.channel.send("Send an appropriate reply")
-
-                new_reply = await client.wait_for("message", check=check_return_content)
-                new_statement = Statement(text=new_reply)
-
-                previous_message = await message.channel.history(limit=2)
-                input_statement = None
-                for msg in previous_message:
-                    if not msg.id == check_msg.id:
-                        input_statement = Statement(text=msg.clean_content)
-                        break
-
-                chatbot.learn_response(new_statement, input_statement)
-            except TimeoutError:
-                print("Timeout Error #2")
-
-            input_statement = Statement(text="")
-        else:
-            await message.channel.send("Glad to hear it. Thank you!")
-            del msg
-            training_mode = False
-            return
+        # trainer.train(training_list)
+        trainer = ChatterBotCorpusTrainer(chatbot)
+        trainer.train("chatterbot.corpus.english")
 
     async def chatbot_reply():
         try:
@@ -273,9 +228,6 @@ async def monitor_messages(message: discord.Message):
         except IndexError:
             pass
 
-        # if True:
-        #     await manual_train_chatbot()
-
     if not message.author.bot:
         await auto_replies()
         await find_subreddits()
@@ -283,7 +235,7 @@ async def monitor_messages(message: discord.Message):
 
         if not message.channel.id == CHAN_WAR_ROOM or not message.channel.id == CHAN_DBL_WAR_ROOM:
             await chatbot_reply()
-            if random.randint(1,100) >= 95:
+            if random.randint(1, 100) >= 95:
                 await train_chatbot()
 
 
