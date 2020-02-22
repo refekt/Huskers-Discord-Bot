@@ -1,13 +1,29 @@
+import logging
+
+from chatterbot import filters
 from chatterbot.chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from discord.ext import commands
+
 from utils.consts import ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD
-from chatterbot import filters
 
 chatbot = ChatBot("Bot Frost",
-                  logic_adapters=["chatterbot.logic.BestMatch", "chatterbot.logic.MathematicalEvaluation"],
-                  filters=[filters.get_recent_repeated_responses])
+                  logic_adapters=[{
+                      'import_path': 'chatterbot.logic.BestMatch',
+                      'default_response': 'Who knows what you\'re trying to say. You\'re probably a Gumby alt',
+                      'maximum_similarity_threshold': 0.90
+                  }],
+                  preprocessors=[
+                      "chatterbot.preprocessors.clean_whitespace",
+                      "chatterbot.preprocessors.convert_to_ascii"]
+                  ,
+                  filters=[filters.get_recent_repeated_responses],
+                  storage_adapter="chatterbot.storage.SQLStorageAdapter",
+                  read_only=False
+                  )
 trainer = ChatterBotCorpusTrainer(chatbot)
+
+logging.basicConfig(level=logging.INFO)
 
 
 class ChatBot(commands.Cog):
