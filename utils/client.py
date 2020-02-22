@@ -12,13 +12,12 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST, CHAN_BOT_FROST
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
-import asyncio
 
 
 async def split_payload(payload):
@@ -202,17 +201,17 @@ async def monitor_messages(message: discord.Message):
 
     async def chatbot_reply():
         client_raw_mention = f"<@!{client.user.id}>"
+        print(repr(client_raw_mention))
 
         def check_message_synx(msg: discord.Message):
-            if not message.channel.id == CHAN_WAR_ROOM or not message.channel.id == CHAN_DBL_WAR_ROOM:
-                if str(msg.content).startswith(client_raw_mention):
-                    return True
-                else:
-                    return False
+            if str(msg.content).startswith(client_raw_mention):
+                return True
             else:
                 return False
 
         if check_message_synx(message):
+            print("Message syntax correct")
+
             query = str(message.content[len(client_raw_mention):]).strip()
             input_statement = Statement(text=query)
             response = chatbot.get_response(input_statement)
@@ -254,6 +253,8 @@ async def monitor_messages(message: discord.Message):
                     await message.channel.send("Got it! I'll use this from now on.")
                 else:
                     await message.channel.send("I don't understand. We can try again next time!")
+        else:
+            print("Naaahhhh")
 
     if not message.author.bot:
         await auto_replies()
