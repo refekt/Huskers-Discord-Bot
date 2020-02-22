@@ -466,7 +466,8 @@ else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting")  #reddit
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting",
+              "cogs.chatbot")  #reddit
 
 for extension in extensions:
     try:
