@@ -3,7 +3,7 @@ from chatterbot.trainers import ListTrainer
 from discord.ext import commands
 
 
-chatbot = ChatBot("Bot Frost")
+chatbot = ChatBot("Bot Frost", logic_adapters=["chatterbot.logic.BestMatch", "chatterbot.logic.MathematicalEvaluation", "chatterbot.logic.TimeLogicAdapter"])
 trainer = ListTrainer(chatbot)
 
 
