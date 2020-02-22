@@ -17,6 +17,7 @@ from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
+from chatterbot.conversation import Statement
 
 
 async def split_payload(payload):
@@ -209,28 +210,81 @@ async def monitor_messages(message: discord.Message):
             return msg
 
         for msg in message_list:
-            if msg.clean_content and not msg.clean_content.startswith(client.command_prefix):
-                training_list.append(cleanup_message(msg.clean_content))
+            if not msg.channel == CHAN_WAR_ROOM:
+                if msg.clean_content and not msg.clean_content.startswith(client.command_prefix):
+                    training_list.append(cleanup_message(msg.clean_content))
 
         trainer.train(training_list)
+
+    async def manual_train_chatbot():
+        print("entering training mode")
+
+        def check_message(m):
+            if not m.author.bot:
+                if "yes" in m.clean_content.lower():
+                    print("Returning true")
+                    return True
+                elif "no" in m.clean_content.lower():
+                    print("Returning false")
+                    return False
+
+        check_msg = await message.channel.send("Was my response appropriate? Answer `yes` or `no` to help me learn.")
+        print("Waiting for message")
+
+        msg = await client.wait_for("message", check=check_message)
+        print("msg: ", msg)
+        print("Message waited for")
+
+        if not msg:
+            print("No provided")
+            try:
+                def check_return_content(m):
+                    return m.clean_content
+
+                await message.channel.send("Send an appropriate reply")
+
+                new_reply = await client.wait_for("message", check=check_return_content)
+                new_statement = Statement(text=new_reply)
+
+                previous_message = await message.channel.history(limit=2)
+                input_statement = None
+                for msg in previous_message:
+                    if not msg.id == check_msg.id:
+                        input_statement = Statement(text=msg.clean_content)
+                        break
+
+                chatbot.learn_response(new_statement, input_statement)
+            except TimeoutError:
+                print("Timeout Error #2")
+
+            input_statement = Statement(text="")
+        else:
+            await message.channel.send("Glad to hear it. Thank you!")
+            del msg
+            training_mode = False
+            return
 
     async def chatbot_reply():
         try:
             if message.mentions[0] == client.user:
                 query = message.clean_content[len(client.user.name):]
-                await message.channel.send(chatbot.get_response(query))
+                input_statement = Statement(text=query)
+                await message.channel.send(chatbot.get_response(input_statement))
         except IndexError:
             pass
+
+        # if True:
+        #     await manual_train_chatbot()
 
     if not message.author.bot:
         await auto_replies()
         await find_subreddits()
         await add_votes()
 
-        await chatbot_reply()
-
-        if random.randint(1,100) >= 95:
-            await train_chatbot()
+        if not message.channel.id == CHAN_WAR_ROOM or not message.channel.id == CHAN_DBL_WAR_ROOM:
+            await chatbot_reply()
+            if random.randint(1,100) >= 95:
+                await train_chatbot()
 
 
 async def monitor_reactions(channel, emoji, user, message):
