@@ -230,12 +230,13 @@ async def monitor_messages(message: discord.Message):
                 await message.channel.send("I'm trying to learn! Was my reply acceptable? Reply `yes` or `no` to help me get better.")
                 check_response = await client.wait_for("message", check=check_answer)
 
-                answer = check_response.content
+                answer = check_response.content.lower()
+                print(repr(answer))
 
                 if answer == "yes":
                     await message.channel.send("Great! I'll keep that reply in my back pocket.")
                 elif answer == "no":
-                    await message.channel.send(f"Good to know! How should I reply to the below statement from now own?\n```{response}```")
+                    await message.channel.send(f"Good to know! How should I reply to the below statement from now own?\n```{query}```")
 
                     del check_response
 
