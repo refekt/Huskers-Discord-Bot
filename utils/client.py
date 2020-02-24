@@ -297,9 +297,9 @@ async def hall_of_fame_messages(reactions: list):
     if chan is None:
         chan = client.get_channel(id=CHAN_HOF_TEST)
 
-    banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
+    # banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
 
-    if chan.id in banned_channels:
+    if chan.id in CHAN_BANNED:
         return
 
     pinned_messages = []

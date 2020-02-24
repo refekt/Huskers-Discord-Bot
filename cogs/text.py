@@ -8,7 +8,7 @@ import markovify
 import requests
 from discord.ext import commands
 
-from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
+from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
 from utils.consts import TZ
 from utils.games import ScheduleBackup
 from utils.games import Venue
@@ -69,9 +69,9 @@ class TextCommands(commands.Cog):
             else:
                 from utils.client import client
 
-                banned_channels = ["test-banned", "news-politics"]
+                # banned_channels = ["test-banned", "news-politics"]
 
-                if not auth.bot and msg.channel not in banned_channels and not [ele for ele in client.all_commands.keys() if(ele in msg.clean_content)]:
+                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if(ele in msg.clean_content)]:
                     return "\n" + str(msg.clean_content.capitalize())
 
             return ""
