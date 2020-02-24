@@ -469,7 +469,10 @@ class MyClient(commands.Bot):
 
         await monitor_messages(message)
 
-        await self.process_commands(message)  # Always needed to process commands
+        if message.channel.id not in CHAN_BANNED:
+            await self.process_commands(message)  # Always needed to process commands
+        else:
+            raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.")
 
     async def on_message_delete(self, message):
         pass
