@@ -199,7 +199,7 @@ async def monitor_messages(message: discord.Message):
             for arrow in arrows:
                 await message.add_reaction(arrow)
 
-    async def chatbot_reply():
+    async def chatbot_reply(bypass=False):
         client_id_re = r"<@!{0,}(593949013443608596|595705663997476887)>"
 
         def check_message_synx(msg: discord.Message):
@@ -208,7 +208,7 @@ async def monitor_messages(message: discord.Message):
             else:
                 return False
 
-        if check_message_synx(message):
+        if check_message_synx(message) or bypass:
             query = str(re.sub(client_id_re, "", message.content)).strip()
             input_statement = Statement(text=query, search_text=query)
             response = chatbot.generate_response(input_statement=input_statement)
@@ -255,8 +255,12 @@ async def monitor_messages(message: discord.Message):
         await auto_replies()
         await find_subreddits()
         await add_votes()
+
         if message.channel.id == CHAN_BOT_FROST or message.guild.id == GUILD_TEST:
             await chatbot_reply()
+
+        if random.randint(0, 200) > 190:
+            await chatbot_reply(bypass=True)
 
 
 async def monitor_reactions(channel, emoji, user, message):
