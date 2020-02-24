@@ -211,8 +211,6 @@ async def monitor_messages(message: discord.Message):
         if check_message_synx(message):
             query = str(re.sub(client_id_re, "", message.content)).strip()
             input_statement = Statement(text=query, search_text=query)
-            print(input_statement)
-            # response = chatbot.get_response(input_statement)
             response = chatbot.generate_response(input_statement=input_statement)
             await message.channel.send(response)
 
@@ -233,7 +231,6 @@ async def monitor_messages(message: discord.Message):
                 check_response = await client.wait_for("message", check=check_answer)
 
                 answer = check_response.content.lower()
-                print(repr(answer))
 
                 if answer == "yes":
                     await message.channel.send("Great! I'll keep that reply in my back pocket.")
@@ -247,9 +244,7 @@ async def monitor_messages(message: discord.Message):
 
                     check_response = await client.wait_for("message", check=check_correct_statement)
                     correct_statement = Statement(text=check_response.content)
-                    print(f"Adding [{correct_statement}] as a response to [{response}]")
                     chatbot.learn_response(correct_statement, input_statement)
-                    # chatbot.storage
 
                     await message.channel.send("Got it! I'll use this from now on.")
                 else:
