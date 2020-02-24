@@ -259,7 +259,7 @@ async def monitor_messages(message: discord.Message):
         if message.channel.id not in CHAN_BANNED or message.guild.id == GUILD_TEST:
             await chatbot_reply()
 
-        if random.randint(0, 200) > 190 and message.channel.id not in CHAN_BANNED:
+        if message.channel.id not in CHAN_BANNED and random.randint(0, 200) > 190:
             me = client.get_user(189554873778307073)
             await me.send(f"I responded to a conversation automatically! {message.jump_url}")
             await chatbot_reply(bypass=True)
