@@ -19,7 +19,8 @@ chatbot = ChatBot("Bot Frost",
                   ,
                   filters=[filters.get_recent_repeated_responses],
                   storage_adapter="chatterbot.storage.SQLStorageAdapter",
-                  read_only=False
+                  read_only=False,
+                  database_uri=None
                   )
 trainer = ChatterBotCorpusTrainer(chatbot)
 
