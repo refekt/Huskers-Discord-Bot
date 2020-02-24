@@ -261,7 +261,7 @@ async def monitor_messages(message: discord.Message):
 
         if random.randint(0, 200) > 190:
             me = client.get_user(189554873778307073)
-            me.send(f"I responded to a conversation automatically! {message.jump_url}")
+            await me.send(f"I responded to a conversation automatically! {message.jump_url}")
             await chatbot_reply(bypass=True)
 
 
