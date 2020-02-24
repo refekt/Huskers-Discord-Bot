@@ -25,7 +25,7 @@ chatbot = ChatBot("Bot Frost",
                   )
 trainer = ChatterBotCorpusTrainer(chatbot)
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 
 class ChatBot(commands.Cog):

@@ -86,11 +86,13 @@ CHAN_DBL_WAR_ROOM = 538419127535271946
 CHAN_WAR_ROOM = 525519594417291284
 CHAN_BOTLOGS = 458474143403212801
 CHAN_SCOTT = 507520543096832001
-CHAT_RULES = 651523695214329887
-CHAN_NORBOT = 620043869504929832
+CHAN_RULES = 651523695214329887
+CHAN_NORTH_BOTTTOMS = 620043869504929832
 CHAN_RADIO_PROD = 660610967733796902
 CHAN_RADIO_TEST = 595705205069185050
-CHAN_BOT_FROST = 593984711706279937
+CHAN_SCOTTS_BOTS = 593984711706279937
+
+CHAN_BANNED = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS, CHAN_RULES, CHAN_NORTH_BOTTTOMS)
 
 # Servers/guilds
 GUILD_PROD = 440632686185414677
@@ -145,22 +147,22 @@ async def change_my_status(client, ctx=None):
         print(f"Unknown error!")
 
 
-def establish_logger(category: int):
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="[%(asctime)s] [%(levelname)s]: %(message)s",
-        datefmt="%d-%b-%y %H:%M:%S"
-    )
+# def establish_logger(category: int):
+#     logging.basicConfig(
+#         level=logging.DEBUG,
+#         format="[%(asctime)s] [%(levelname)s]: %(message)s",
+#         datefmt="%d-%b-%y %H:%M:%S"
+#     )
 
 
-def print_log(category: int, message: str):
-    if category == logging.DEBUG:
-        logging.debug(msg=message)
-    elif category == logging.INFO:
-        logging.info(msg=message)
-    elif category == logging.WARNING:
-        logging.warning(msg=message)
-    elif category == logging.ERROR:
-        logging.error(msg=message)
-    elif category == logging.CRITICAL:
-        logging.critical(msg=message)
+# def print_log(category: int, message: str):
+#     if category == logging.DEBUG:
+#         logging.debug(msg=message)
+#     elif category == logging.INFO:
+#         logging.info(msg=message)
+#     elif category == logging.WARNING:
+#         logging.warning(msg=message)
+#     elif category == logging.ERROR:
+#         logging.error(msg=message)
+#     elif category == logging.CRITICAL:
+#         logging.critical(msg=message)

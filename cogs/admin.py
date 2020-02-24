@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import CHAT_RULES, CHAN_BOTLOGS, CHAN_NORBOT
+from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed as build_embed
 from utils.consts import change_my_nickname
@@ -129,7 +129,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def rules(self, ctx):
-        unmodded = client.get_channel(id=CHAN_NORBOT)
+        unmodded = client.get_channel(id=CHAN_NORTH_BOTTTOMS)
         text = \
         f"""
         1️⃣ Be respectful\n
@@ -142,7 +142,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         8️⃣ Fuck Iowa, Colorado, Texas, Florida\n
         9️⃣ All NSFW Images must be spoiler tagged
         """
-        rules_channel = client.get_channel(CHAT_RULES)
+        rules_channel = client.get_channel(CHAN_RULES)
         rules_title = "Huskers' Discord Rules"
         messages = await rules_channel.history().flatten()
 
@@ -181,7 +181,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         """
         roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧", "🪓")
 
-        rules_channel = client.get_channel(CHAT_RULES)
+        rules_channel = client.get_channel(CHAN_RULES)
         messages = await rules_channel.history().flatten()
         roles_title = "Huskers' Discord Roles"
 
@@ -199,7 +199,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         del messages
 
-        rules_message = await CHAT_RULES.send(
+        rules_message = await CHAN_RULES.send(
             embed=build_embed(
                 title=roles_title,
                 fields=[["Roles", roles]]

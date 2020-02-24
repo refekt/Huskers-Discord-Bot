@@ -12,7 +12,7 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BOT_FROST, GUILD_TEST
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
@@ -256,10 +256,10 @@ async def monitor_messages(message: discord.Message):
         await find_subreddits()
         await add_votes()
 
-        if message.channel.id == CHAN_BOT_FROST or message.guild.id == GUILD_TEST:
+        if message.channel.id not in CHAN_BANNED or message.guild.id == GUILD_TEST:
             await chatbot_reply()
 
-        if random.randint(0, 200) > 190:
+        if random.randint(0, 200) > 190 and message.channel.id not in CHAN_BANNED:
             me = client.get_user(189554873778307073)
             await me.send(f"I responded to a conversation automatically! {message.jump_url}")
             await chatbot_reply(bypass=True)
@@ -445,8 +445,19 @@ class MyClient(commands.Bot):
             f"### ~~~ Command Prefix: \"{self.command_prefix}\""
         )
 
+        guild = None
+
+        if sys.argv[1] == "prod":
+            guild = client.get_guild(id=GUILD_PROD)
+        elif sys.argv[1] == "test":
+            guild = client.get_guild(id=GUILD_TEST)
+
+        channels = guild.channels
+        for channel in channels:
+            print(f"### Channel - {channel.name} & {channel.id}")
+
         try:
-            hello_channel = client.get_channel(id=CHAN_BOT_FROST)
+            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
             await hello_channel.send("*Beep, boop* Greetings! I have arrived.")
         except AttributeError:
             pass
