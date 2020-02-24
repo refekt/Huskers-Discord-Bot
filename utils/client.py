@@ -214,7 +214,8 @@ async def monitor_messages(message: discord.Message):
             response = chatbot.generate_response(input_statement=input_statement)
             await message.channel.send(response)
 
-            if True:
+            train = False
+            if train:
                 def check_answer(msg: discord.Message):
                     # This seems useless?
                     if msg.author == message.author:
