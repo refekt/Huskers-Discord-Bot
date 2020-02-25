@@ -256,12 +256,12 @@ async def monitor_messages(message: discord.Message):
         await find_subreddits()
         await add_votes()
 
-        if message.channel.id not in CHAN_BANNED or message.guild.id == GUILD_TEST:
+        if message.channel.id not in CHAN_BANNED and message.channel.id in (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM) or message.guild.id == GUILD_TEST:
             await chatbot_reply()
 
-        if message.channel.id not in CHAN_BANNED and random.randint(0, 200) > 190:
+        if message.channel.id not in CHAN_BANNED and message.channel.id in (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM) and random.randint(0, 200) > 190:
             me = client.get_user(189554873778307073)
-            await me.send(f"I responded to a conversation automatically! {message.jump_url}")
+            # await me.send(f"I responded to a conversation automatically! {message.jump_url}")
             await chatbot_reply(bypass=True)
 
 
