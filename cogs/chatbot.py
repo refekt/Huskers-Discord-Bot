@@ -12,7 +12,7 @@ from utils.consts import ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD
 chatbot = ChatBot("Bot Frost",
                   logic_adapters=[{
                       'import_path': 'chatterbot.logic.BestMatch',
-                      'default_response': 'Who knows what you\'re trying to say. You\'re probably a Gumby alt',
+                      'default_response': 'Who knows what you\'re trying to say...not me',
                       'maximum_similarity_threshold': 0.90
                   }],
                   preprocessors=[
