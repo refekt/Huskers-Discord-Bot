@@ -257,8 +257,9 @@ async def monitor_messages(message: discord.Message):
         await add_votes()
 
         AUTO_REPLY_BANNED = CHAN_BANNED + (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM)
-        
+
         if message.id in AUTO_REPLY_BANNED:
+            print(f"### Message ID [{message.id}] found in {AUTO_REPLY_BANNED}. Exiting...")
             return
 
         if random.randint(0, 200) > 190:
