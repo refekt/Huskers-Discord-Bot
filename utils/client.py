@@ -258,12 +258,14 @@ async def monitor_messages(message: discord.Message):
 
         AUTO_REPLY_BANNED = CHAN_BANNED + (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM)
 
-        if message.id in AUTO_REPLY_BANNED:
-            print(f"### Message ID [{message.id}] found in {AUTO_REPLY_BANNED}. Exiting...")
+        if channel.id in AUTO_REPLY_BANNED:
+            # print(f"### Channel ID [{channel.name, channel.id}] found in {AUTO_REPLY_BANNED}. Exiting...")
             return
+        else:
+            await chatbot_reply()
 
         if random.randint(0, 200) > 190:
-            me = client.get_user(189554873778307073)
+            # me = client.get_user(189554873778307073)
             await chatbot_reply(bypass=True)
 
 
