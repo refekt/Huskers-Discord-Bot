@@ -256,17 +256,17 @@ async def monitor_messages(message: discord.Message):
         await find_subreddits()
         await add_votes()
 
-        AUTO_REPLY_BANNED = CHAN_BANNED + (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM)
-
-        if channel.id in AUTO_REPLY_BANNED:
-            # print(f"### Channel ID [{channel.name, channel.id}] found in {AUTO_REPLY_BANNED}. Exiting...")
-            return
-        else:
-            await chatbot_reply()
-
-        if random.randint(0, 200) > 190:
-            # me = client.get_user(189554873778307073)
-            await chatbot_reply(bypass=True)
+        # AUTO_REPLY_BANNED = CHAN_BANNED + (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM)
+        #
+        # if channel.id in AUTO_REPLY_BANNED:
+        #     # print(f"### Channel ID [{channel.name, channel.id}] found in {AUTO_REPLY_BANNED}. Exiting...")
+        #     return
+        # else:
+        #     await chatbot_reply()
+        #
+        # if random.randint(0, 200) > 190:
+        #     # me = client.get_user(189554873778307073)
+        #     await chatbot_reply(bypass=True)
 
 
 async def monitor_reactions(channel, emoji, user, message):
@@ -545,7 +545,7 @@ else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting", "cogs.chatbot")
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting")  # , "cogs.chatbot")
 
 for extension in extensions:
     try:
