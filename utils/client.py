@@ -360,10 +360,14 @@ async def roles_message(action, message: discord.Message, member: discord.User, 
             if not emoji.name in [emoji for emoji in roles.keys()]:
                 return
 
+            bot_logs = client.get_channel(id=CHAN_BOTLOGS)
+
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=roles_title)
+                await bot_logs.send(f"Added [{roles[emoji.name]}] to user [{member}].")
             elif action == "remove":
                 await member.remove_roles(roles[emoji.name], reason=roles_title)
+                await bot_logs.send(f"Removed [{roles[emoji.name]}] to user [{member}].")
     except IndexError:
         pass
 
