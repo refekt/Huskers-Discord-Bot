@@ -223,12 +223,31 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         role_some = guild.get_role(ROLE_HYPE_SOME)
         role_no = guild.get_role(ROLE_HYPE_NO)
 
+        fields = ["What side are you on!?", f"📈 {role_max.mention} believes rationale is a lie and there is only hype.\n"
+                                            f"\n"
+                                            f"⚠ {role_some.mention} believes in the numbers.\n"
+                                            f"\n"
+                                            f"⛔ {role_no.mention} is about knowledge, statistics, and models. "]
+
+        rule_messages = await chan_rules.history().flatten()
+        for hist in rule_messages:
+            if hist.author == client.user and hist.embeds[0].title == EMBED_TITLE_HYPE:
+                new_embed = hist.embeds[0]
+                new_embed.clear_fields()
+                new_embed.add_field(
+                    name=fields[0],
+                    value=fields[1]
+                )
+
+                await hist.edit(content="", embed=new_embed)
+
+                return
+
         hype_msg = await chan_rules.send(
             embed=build_embed(
                 title=EMBED_TITLE_HYPE,
                 fields=[
-                    ["Description", f"What side are you on!?\n{role_max.mention} believes rationale is a lie and there is only hype.\n{role_some.mention} believes in the "
-                                    f"numbers.\n{role_no.mention} is about knowledge, statistics, and models. "]
+                    fields
                 ]
             )
         )
