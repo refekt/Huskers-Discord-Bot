@@ -5,7 +5,10 @@ from discord.ext import commands
 
 from utils.client import client
 from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS
-from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
+from utils.consts import GUILD_PROD
+from utils.consts import EMBED_TITLE_HYPE
+from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_HYPE_SQUAD
+from utils.consts import REACTION_HYPE_SOME, REACTION_HYPE_NO, REACTION_HYPE_MAX, REACITON_HYPE_SQUAD
 from utils.embed import build_embed as build_embed
 from utils.consts import change_my_nickname
 
@@ -25,7 +28,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 title="About Me",
                 inline=False,
                 fields=[
-                    ["History", "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!"],
+                    ["History",
+                     "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!"],
                     ["Source Code", "[GitHub](https://www.github.com/refekt/Husker-Bot)"],
                     ["Hosting Location", f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
                     ["Hosting Status", "https://status.hyperexpert.com/"],
@@ -119,7 +123,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         except discord.HTTPException:
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
-    @commands.command(aliases=["q",], hidden=True)
+    @commands.command(aliases=["q", ], hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
@@ -131,7 +135,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     async def rules(self, ctx):
         unmodded = client.get_channel(id=CHAN_NORTH_BOTTTOMS)
         text = \
-        f"""
+            f"""
         1️⃣ Be respectful\n
         2️⃣ Sending or linking any harmful material such as viruses, IP grabbers, etc. results in an immediate and permanent ban.\n
         3️⃣ Abusing mentions to @everyone, the admins, the moderators (Frost Approved) or a specific person without proper reason is prohibited.\n
@@ -199,7 +203,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         del messages
 
-        rules_message = await CHAN_RULES.send(
+        rules_message = await rules_channel.send(
             embed=build_embed(
                 title=roles_title,
                 fields=[["Roles", roles]]
@@ -208,6 +212,29 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         for emoji in roles_emojis:
             await rules_message.add_reaction(emoji)
+
+    @commands.command(hidden=True)
+    @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD)
+    async def hypesquad(self, ctx):
+        chan_rules = client.get_channel(id=CHAN_RULES)
+        guild = client.get_guild(GUILD_PROD)
+
+        role_max = guild.get_role(ROLE_HYPE_MAX)
+        role_some = guild.get_role(ROLE_HYPE_SOME)
+        role_no = guild.get_role(ROLE_HYPE_NO)
+
+        hype_msg = await chan_rules.send(
+            embed=build_embed(
+                title=EMBED_TITLE_HYPE,
+                fields=[
+                    ["Description", f"What side are you on!?\n{role_max.mention} believes rationale is a lie and there is only hype.\n{role_some.mention} believes in the "
+                                    f"numbers.\n{role_no.mention} is about knowledge, statistics, and models. "]
+                ]
+            )
+        )
+
+        for reaction in REACITON_HYPE_SQUAD:
+            await hype_msg.add_reaction(reaction)
 
     @commands.command()
     async def updatenick(self, ctx):

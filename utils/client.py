@@ -12,8 +12,9 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
+from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED
-from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT
+from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -339,11 +340,11 @@ async def hall_of_fame_messages(reactions: list):
     del duplicate
 
 
-async def roles_message(action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
+async def monitor_msg_roles(action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
     roles_title = "Huskers' Discord Roles"
     try:
         if message.embeds[0].title == roles_title:
-            guild = client.get_guild(440632686185414677)
+            guild = client.get_guild(GUILD_PROD)
             member = guild.get_member(member.id)
             roles = {
                 "🥔": guild.get_role(ROLE_POTATO),
@@ -367,6 +368,32 @@ async def roles_message(action, message: discord.Message, member: discord.User, 
                 await bot_logs.send(f"Added [{roles[emoji.name]}] to user [{member.mention}].")
             elif action == "remove":
                 await member.remove_roles(roles[emoji.name], reason=roles_title)
+                await bot_logs.send(f"Removed [{roles[emoji.name]}] to user [{member.mention}].")
+    except IndexError:
+        pass
+
+
+async def monitor_msg_hype(action, message: discord.Message, member: discord.Member, emoji: discord.Emoji):
+    try:
+        if message.embeds[0].title == EMBED_TITLE_HYPE:
+            guild = client.get_guild(GUILD_PROD)
+            member = guild.get_member(member.id)
+            roles = {
+                "📈": guild.get_role(ROLE_HYPE_MAX),
+                "⚠": guild.get_role(ROLE_HYPE_SOME),
+                "⛔": guild.get_role(ROLE_HYPE_NO),
+            }
+
+            if not emoji.name in [emoji for emoji in roles.keys()]:
+                return
+
+            bot_logs = client.get_channel(id=CHAN_BOTLOGS)
+
+            if action == "add":
+                await member.add_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
+                await bot_logs.send(f"Added [{roles[emoji.name]}] to user [{member.mention}].")
+            elif action == "remove":
+                await member.remove_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
                 await bot_logs.send(f"Removed [{roles[emoji.name]}] to user [{member.mention}].")
     except IndexError:
         pass
@@ -508,7 +535,8 @@ class MyClient(commands.Bot):
 
         await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
         await hall_of_fame_messages(payload["message"].reactions)
-        await roles_message(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+        await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+        await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
     async def on_reaction_remove(reaction, user):
         pass
@@ -516,7 +544,8 @@ class MyClient(commands.Bot):
     async def on_raw_reaction_remove(self, payload):
         payload = await split_payload(payload)
 
-        await roles_message(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+        await monitor_msg_roles(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+        await monitor_msg_hype(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
     async def on_reaction_clear(self, message, reactions):
         pass
