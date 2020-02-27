@@ -374,20 +374,34 @@ async def monitor_msg_roles(action, message: discord.Message, member: discord.Us
 
 
 async def monitor_msg_hype(action, message: discord.Message, member: discord.Member, emoji: discord.Emoji):
+    guild = client.get_guild(GUILD_PROD)
+
+    role_hype_max = guild.get_role(ROLE_HYPE_MAX)
+    role_hype_some = guild.get_role(ROLE_HYPE_SOME)
+    role_hype_no = guild.get_role(ROLE_HYPE_NO)
+    hypesquad = (role_hype_max, role_hype_some, role_hype_no)
+
     try:
         if message.embeds[0].title == EMBED_TITLE_HYPE:
-            guild = client.get_guild(GUILD_PROD)
+
             member = guild.get_member(member.id)
             roles = {
-                "📈": guild.get_role(ROLE_HYPE_MAX),
-                "⚠": guild.get_role(ROLE_HYPE_SOME),
-                "⛔": guild.get_role(ROLE_HYPE_NO),
+                "📈": role_hype_max,
+                "⚠": role_hype_some,
+                "⛔": role_hype_no,
             }
 
             if not emoji.name in [emoji for emoji in roles.keys()]:
                 return
 
             bot_logs = client.get_channel(id=CHAN_BOTLOGS)
+
+            # for role in hypesquad:
+            #     try:
+            #         await member.remove_roles(role, reason="No stacking!")
+            #         await bot_logs.send(f"Removed [{role.mention}] to user [{member.mention}].")
+            #     except:
+            #         pass
 
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
