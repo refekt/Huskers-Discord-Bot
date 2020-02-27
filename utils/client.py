@@ -365,10 +365,10 @@ async def monitor_msg_roles(action, message: discord.Message, member: discord.Us
 
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=roles_title)
-                await bot_logs.send(f"Added [{roles[emoji.name]}] to user [{member.mention}].")
+                await bot_logs.send(f"Added [{roles[emoji.name].mention}] to user [{member.mention}].")
             elif action == "remove":
                 await member.remove_roles(roles[emoji.name], reason=roles_title)
-                await bot_logs.send(f"Removed [{roles[emoji.name]}] to user [{member.mention}].")
+                await bot_logs.send(f"Removed [{roles[emoji.name].mention}] to user [{member.mention}].")
     except IndexError:
         pass
 
@@ -391,10 +391,10 @@ async def monitor_msg_hype(action, message: discord.Message, member: discord.Mem
 
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
-                await bot_logs.send(f"Added [{roles[emoji.name]}] to user [{member.mention}].")
+                await bot_logs.send(f"Added [{roles[emoji.name].mention}] to user [{member.mention}].")
             elif action == "remove":
                 await member.remove_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
-                await bot_logs.send(f"Removed [{roles[emoji.name]}] to user [{member.mention}].")
+                await bot_logs.send(f"Removed [{roles[emoji.name].mention}] to user [{member.mention}].")
     except IndexError:
         pass
 
