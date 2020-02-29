@@ -379,7 +379,7 @@ async def monitor_msg_hype(action, message: discord.Message, member: discord.Mem
     role_hype_max = guild.get_role(ROLE_HYPE_MAX)
     role_hype_some = guild.get_role(ROLE_HYPE_SOME)
     role_hype_no = guild.get_role(ROLE_HYPE_NO)
-    hypesquad = (role_hype_max, role_hype_some, role_hype_no)
+    hypesquad = [role_hype_max, role_hype_some, role_hype_no]
 
     try:
         if message.embeds[0].title == EMBED_TITLE_HYPE:
@@ -391,17 +391,10 @@ async def monitor_msg_hype(action, message: discord.Message, member: discord.Mem
                 "⛔": role_hype_no,
             }
 
-            if not emoji.name in [emoji for emoji in roles.keys()]:
+            if emoji.name not in [emoji for emoji in roles.keys()]:
                 return
 
             bot_logs = client.get_channel(id=CHAN_BOTLOGS)
-
-            # for role in hypesquad:
-            #     try:
-            #         await member.remove_roles(role, reason="No stacking!")
-            #         await bot_logs.send(f"Removed [{role.mention}] to user [{member.mention}].")
-            #     except:
-            #         pass
 
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
@@ -521,7 +514,7 @@ class MyClient(commands.Bot):
         if message.channel.id not in CHAN_BANNED:
             await self.process_commands(message)  # Always needed to process commands
         else:
-            raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.")
+            raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.\nMessage: {message.clean_content}")
 
     async def on_message_delete(self, message):
         pass
@@ -549,6 +542,7 @@ class MyClient(commands.Bot):
 
         await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
         await hall_of_fame_messages(payload["message"].reactions)
+
         await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
         await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
