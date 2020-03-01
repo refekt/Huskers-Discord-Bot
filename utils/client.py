@@ -157,18 +157,18 @@ async def monitor_messages(message: discord.Message):
             if random.random() >= .99:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
 
-        if not type(channel) == discord.DMChannel and ROLE_GUMBY in [roleid.id for roleid in message.author.roles]:
-            #     # blocked = False
-            #     try:
-            #         if not message.author.is_blocked():
-            #             await message.add_reaction("🦐")
-            #         else:
-            #             print(f"Unable to add 🦐 reaction to {message.author}'s message because I am blocked by them!")
-            #     except discord.Forbidden:
-            #         print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
-            #
-            if random.random() >= .99:
-                await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
+        # if not type(channel) == discord.DMChannel and ROLE_GUMBY in [roleid.id for roleid in message.author.roles]:
+        #     #     # blocked = False
+        #     #     try:
+        #     #         if not message.author.is_blocked():
+        #     #             await message.add_reaction("🦐")
+        #     #         else:
+        #     #             print(f"Unable to add 🦐 reaction to {message.author}'s message because I am blocked by them!")
+        #     #     except discord.Forbidden:
+        #     #         print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
+        #     #
+        #     if random.random() >= .99:
+        #         await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
 
     async def find_subreddits():
         subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
