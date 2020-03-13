@@ -252,7 +252,7 @@ async def monitor_messages(message: discord.Message):
                 else:
                     await message.channel.send("I don't understand. We can try again next time!")
 
-    if not message.author.bot:
+    if not message.author.bot and message.channel.id not in CHAN_BANNED:
         await auto_replies()
         await find_subreddits()
         await add_votes()
