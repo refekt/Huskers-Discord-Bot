@@ -12,6 +12,7 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
+from cogs import music
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED
 from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
@@ -376,7 +377,8 @@ async def monitor_msg_roles(action, message: discord.Message, member: discord.Us
 
 async def monitor_msg_hype(action, message: discord.Message, member: discord.Member, emoji: discord.Emoji):
     guild = client.get_guild(GUILD_PROD)
-
+    if guild is None:
+        guild = client.get_guild(GUILD_TEST)
     role_hype_max = guild.get_role(ROLE_HYPE_MAX)
     role_hype_some = guild.get_role(ROLE_HYPE_SOME)
     role_hype_no = guild.get_role(ROLE_HYPE_NO)
@@ -587,7 +589,7 @@ else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting")  # , "cogs.chatbot")
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting", 'cogs.music')  # , "cogs.chatbot")
 
 for extension in extensions:
     try:
