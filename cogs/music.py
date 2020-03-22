@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from discord.ext import commands
 import discord
 import asyncio
@@ -7,6 +8,7 @@ import math
 from urllib import request
 import ffmpeg
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
+
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -166,7 +168,7 @@ class Music(commands.Cog):
         state.now_playing = song
         state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url, executable = "C:\\ffmpeg\\ffmpeg-20200315-c467328-win64-static\\bin\\ffmpeg.exe", before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
+            discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
         def after_playing(err):
             if len(state.playlist) > 0:
