@@ -350,7 +350,15 @@ class Video:
         """Plays audio from (or searches for) a URL."""
         with youtube_dl.YoutubeDL(YTDL_OPTS) as ydl:
             video = self._get_info(url_or_search)
-            video_format = video["formats"][0]
+            
+            #code originally just picked the first audio source, I added logic (commented out) to pick the audio format with largest filesize but I'm unsure if that's technically the "best" quality
+            video_format = video["formats"][0]           
+            # for f in video["formats"]:
+                # if 'audio only' in f['format']:
+                    # if f['filesize'] > video_format['filesize']:
+                        # video_format = f
+                        
+            
             self.stream_url = video_format["url"]
             self.video_url = video["webpage_url"]
             self.title = video["title"]
