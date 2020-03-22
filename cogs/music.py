@@ -188,7 +188,7 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["playlist"])
     @commands.guild_only()
-    @commands.check(audio_playing)
+    #@commands.check(audio_playing)
     async def queue(self, ctx):
         """Display the current play queue."""
         state = self.get_state(ctx.guild)
@@ -251,23 +251,22 @@ class Music(commands.Cog):
                 "Added to queue.", embed=video.get_embed())
             await self._add_reaction_controls(message)
         else:
-            if ctx.author.voice != None and ctx.author.voice.channel != None:
-                channel = ctx.author.voice.channel
-                #channel = ctx.guild.get_channel(channel_id=661661377378910239)
-                try:
-                    video = Video(url, ctx.author)
-                except youtube_dl.DownloadError as e:
-                    await ctx.send(
-                        "There was an error downloading your video, sorry.")
-                    return
-                client = await channel.connect()
-                self._play_song(client, state, video)
-                message = await ctx.send("", embed=video.get_embed())
-                await self._add_reaction_controls(message)
-                logging.info(f"Now playing '{video.title}'")
-            else:
-                raise commands.CommandError(
-                    "You need to be in a voice channel to do that.")
+            #channel = ctx.author.voice.channel
+            channel = ctx.guild.get_channel(channel_id=661661377378910239)
+            try:
+                video = Video(url, ctx.author)
+            except youtube_dl.DownloadError as e:
+                await ctx.send(
+                    "There was an error downloading your video, sorry.")
+                return
+            client = await channel.connect()
+            self._play_song(client, state, video)
+            message = await ctx.send("", embed=video.get_embed())
+            await self._add_reaction_controls(message)
+            logging.info(f"Now playing '{video.title}'")
+            # else:
+                # raise commands.CommandError(
+                    # "You need to be in a voice channel to do that.")
 
     async def on_reaction_add(self, reaction, user):
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
