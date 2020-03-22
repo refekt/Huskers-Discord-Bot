@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from discord.ext import commands
 import discord
 import asyncio
@@ -5,7 +6,8 @@ import youtube_dl
 import logging
 import math
 from urllib import request
-import ffmpeg
+from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
+
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -165,7 +167,7 @@ class Music(commands.Cog):
         state.now_playing = song
         state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url), volume=state.volume)
+            discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
         def after_playing(err):
             if len(state.playlist) > 0:
@@ -188,7 +190,7 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["playlist"])
     @commands.guild_only()
-    @commands.check(audio_playing)
+    #@commands.check(audio_playing)
     async def queue(self, ctx):
         """Display the current play queue."""
         state = self.get_state(ctx.guild)
@@ -251,23 +253,25 @@ class Music(commands.Cog):
                 "Added to queue.", embed=video.get_embed())
             await self._add_reaction_controls(message)
         else:
-            if ctx.author.voice != None and ctx.author.voice.channel != None:
-                channel = ctx.author.voice.channel
-                try:
-                    video = Video(url, ctx.author)
-                except youtube_dl.DownloadError as e:
-                    await ctx.send(
-                        "There was an error downloading your video, sorry.")
-                    return
-                client = await channel.connect()
-                self._play_song(client, state, video)
-                message = await ctx.send("", embed=video.get_embed())
-                await self._add_reaction_controls(message)
-                logging.info(f"Now playing '{video.title}'")
-            else:
-                raise commands.CommandError(
-                    "You need to be in a voice channel to do that.")
-
+            channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_PROD)
+            if not channel:
+                channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_TEST)
+            try:
+                video = Video(url, ctx.author)
+            except youtube_dl.DownloadError as e:
+                await ctx.send(
+                    "There was an error downloading your video, sorry.")
+                return
+            client = await channel.connect()
+            self._play_song(client, state, video)
+            message = await ctx.send("", embed=video.get_embed())
+            await self._add_reaction_controls(message)
+            logging.info(f"Now playing '{video.title}'")
+            # else:
+                # raise commands.CommandError(
+                    # "You need to be in a voice channel to do that.")
+    
+    @commands.Cog.listener()          
     async def on_reaction_add(self, reaction, user):
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
         message = reaction.message

@@ -537,7 +537,7 @@ class MyClient(commands.Bot):
     async def on_raw_message_edit(self, payload):
         pass
 
-    async def on_reaaction_add(reaction, user):
+    async def on_reaction_add(reaction, user):
         pass
 
     async def on_raw_reaction_add(self, payload):
