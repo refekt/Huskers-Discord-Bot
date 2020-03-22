@@ -7,6 +7,7 @@ import logging
 import math
 from urllib import request
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
+from utils.consts import change_my_status as change_status_nonlistening
 
 
 YTDL_OPTS = {
@@ -165,6 +166,12 @@ class Music(commands.Cog):
 
     def _play_song(self, client, state, song):
         state.now_playing = song
+        
+        #changes status to say listening to the title of the songs that's playing. Needed to do it real janky since _play is not a coroutine while change_presence is. Cleaning this is a potential todo
+        async def change_status(song):
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=song.title))
+        asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
+        
         state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
@@ -175,6 +182,9 @@ class Music(commands.Cog):
                 self._play_song(client, state, next_song)
             else:
                 asyncio.run_coroutine_threadsafe(client.disconnect(),
+                                                 self.bot.loop)
+                #uses the utils.consts.change_my_status (aliased) to change the status back to something else so it isn't stuck on the listening status for last song in the queue
+                asyncio.run_coroutine_threadsafe(change_status_nonlistening(self.bot),
                                                  self.bot.loop)
 
         client.play(source, after=after_playing)
