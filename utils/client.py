@@ -21,6 +21,7 @@ from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 
+#update vps
 
 async def split_payload(payload):
     p = dict()
