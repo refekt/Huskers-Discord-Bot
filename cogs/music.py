@@ -11,13 +11,13 @@ from urllib import request
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
 from utils.consts import change_my_status as change_status_nonlistening
 
-
 YTDL_OPTS = {
     "default_search": "ytsearch",
     "format": "bestaudio/best",
     "quiet": True,
     "extract_flat": "in_playlist"
 }
+
 
 async def audio_playing(ctx):
     """Checks that audio is currently playing before continuing."""
@@ -56,9 +56,9 @@ class Music(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = {'max_volume' : 250, 
-                       'vote_skip' : True,
-                       'vote_skip_ratio' : .5
+        self.config = {'max_volume': 250,
+                       'vote_skip': True,
+                       'vote_skip_ratio': .5
                        }
         self.states = {}
 
@@ -161,19 +161,20 @@ class Music(commands.Cog):
             member for member in channel.members if not member.bot
         ])  # don't count bots
         if (float(len(state.skip_votes)) /
-                users_in_channel) >= self.config["vote_skip_ratio"]:
+            users_in_channel) >= self.config["vote_skip_ratio"]:
             # enough members have voted to skip, so skip the song
             logging.info(f"Enough votes, skipping...")
             channel.guild.voice_client.stop()
 
     def _play_song(self, client, state, song):
         state.now_playing = song
-        
-        #changes status to say listening to the title of the songs that's playing. Needed to do it real janky since _play is not a coroutine while change_presence is. Cleaning this is a potential todo
+
+        # changes status to say listening to the title of the songs that's playing. Needed to do it real janky since _play is not a coroutine while change_presence is. Cleaning this is a potential todo
         async def change_status(song):
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=song.title))
+
         asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
-        
+
         state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
@@ -185,7 +186,7 @@ class Music(commands.Cog):
             else:
                 asyncio.run_coroutine_threadsafe(client.disconnect(),
                                                  self.bot.loop)
-                #uses the utils.consts.change_my_status (aliased) to change the status back to something else so it isn't stuck on the listening status for last song in the queue
+                # uses the utils.consts.change_my_status (aliased) to change the status back to something else so it isn't stuck on the listening status for last song in the queue
                 asyncio.run_coroutine_threadsafe(change_status_nonlistening(self.bot),
                                                  self.bot.loop)
 
@@ -202,7 +203,7 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["playlist"])
     @commands.guild_only()
-    #@commands.check(audio_playing)
+    # @commands.check(audio_playing)
     async def queue(self, ctx):
         """Display the current play queue."""
         state = self.get_state(ctx.guild)
@@ -213,7 +214,7 @@ class Music(commands.Cog):
         if len(queue) > 0:
             message = [f"{len(queue)} songs in queue:"]
             message += [
-                f"  {index+1}. **{song.title}** (requested by **{song.requested_by.name}**)"
+                f"  {index + 1}. **{song.title}** (requested by **{song.requested_by.name}**)"
                 for (index, song) in enumerate(queue)
             ]  # add individual songs
             return "\n".join(message)
@@ -237,8 +238,8 @@ class Music(commands.Cog):
         """Moves song at an index to `new_index` in queue."""
         state = self.get_state(ctx.guild)  # get state for this guild
         if 1 <= song <= len(state.playlist) and 1 <= new_index:
-            song = state.playlist.pop(song-1)  # take song at index...
-            state.playlist.insert(new_index-1, song)  # and insert it.
+            song = state.playlist.pop(song - 1)  # take song at index...
+            state.playlist.insert(new_index - 1, song)  # and insert it.
 
             await ctx.send(self._queue_text(state.playlist))
         else:
@@ -280,10 +281,10 @@ class Music(commands.Cog):
             await self._add_reaction_controls(message)
             logging.info(f"Now playing '{video.title}'")
             # else:
-                # raise commands.CommandError(
-                    # "You need to be in a voice channel to do that.")
-    
-    @commands.Cog.listener()          
+            # raise commands.CommandError(
+            # "You need to be in a voice channel to do that.")
+
+    @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
         message = reaction.message
@@ -341,8 +342,8 @@ class GuildState:
 
     def is_requester(self, user):
         return self.now_playing.requested_by == user
-        
-        
+
+
 class Video:
     """Class containing information about a particular video."""
 
@@ -380,7 +381,7 @@ class Video:
         if self.thumbnail:
             embed.set_thumbnail(url=self.thumbnail)
         return embed
-       
+
 
 def setup(bot):
     bot.add_cog(Music(bot))
