@@ -165,7 +165,7 @@ class Music(commands.Cog):
         state.now_playing = song
         state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url), volume=state.volume)
+            discord.FFmpegPCMAudio(song.stream_url, executable = "C:\\ffmpeg\\ffmpeg-20200315-c467328-win64-static\\bin\\ffmpeg.exe", before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
         def after_playing(err):
             if len(state.playlist) > 0:
@@ -253,6 +253,7 @@ class Music(commands.Cog):
         else:
             if ctx.author.voice != None and ctx.author.voice.channel != None:
                 channel = ctx.author.voice.channel
+                #channel = ctx.guild.get_channel(channel_id=661661377378910239)
                 try:
                     video = Video(url, ctx.author)
                 except youtube_dl.DownloadError as e:
