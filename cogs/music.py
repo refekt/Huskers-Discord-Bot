@@ -6,7 +6,6 @@ import youtube_dl
 import logging
 import math
 from urllib import request
-import ffmpeg
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
 
 
