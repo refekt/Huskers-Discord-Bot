@@ -6,6 +6,7 @@ import logging
 import math
 from urllib import request
 import ffmpeg
+from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -251,8 +252,9 @@ class Music(commands.Cog):
                 "Added to queue.", embed=video.get_embed())
             await self._add_reaction_controls(message)
         else:
-            #channel = ctx.author.voice.channel
-            channel = ctx.guild.get_channel(channel_id=661661377378910239)
+            channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_PROD)
+            if not channel:
+                channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_TEST)
             try:
                 video = Video(url, ctx.author)
             except youtube_dl.DownloadError as e:
@@ -267,7 +269,8 @@ class Music(commands.Cog):
             # else:
                 # raise commands.CommandError(
                     # "You need to be in a voice channel to do that.")
-
+    
+    @commands.Cog.listener()          
     async def on_reaction_add(self, reaction, user):
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
         message = reaction.message
