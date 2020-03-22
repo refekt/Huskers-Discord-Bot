@@ -380,5 +380,6 @@ class Video:
         return embed
        
 
+#dummy
 def setup(bot):
     bot.add_cog(Music(bot))
