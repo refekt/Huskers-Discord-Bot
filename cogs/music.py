@@ -4,6 +4,8 @@ import discord
 import asyncio
 import youtube_dl
 import logging
+import logging.handlers
+import os
 import math
 from urllib import request
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
@@ -168,9 +170,9 @@ class Music(commands.Cog):
         state.now_playing = song
         
         #changes status to say listening to the title of the songs that's playing. Needed to do it real janky since _play is not a coroutine while change_presence is. Cleaning this is a potential todo
-        # async def change_status(song):
-            # await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=song.title))
-        # asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
+        async def change_status(song):
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=song.title))
+        asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
         
         state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
@@ -184,8 +186,8 @@ class Music(commands.Cog):
                 asyncio.run_coroutine_threadsafe(client.disconnect(),
                                                  self.bot.loop)
                 #uses the utils.consts.change_my_status (aliased) to change the status back to something else so it isn't stuck on the listening status for last song in the queue
-                # asyncio.run_coroutine_threadsafe(change_status_nonlistening(self.bot),
-                                                 # self.bot.loop)
+                asyncio.run_coroutine_threadsafe(change_status_nonlistening(self.bot),
+                                                 self.bot.loop)
 
         client.play(source, after=after_playing)
 
