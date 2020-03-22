@@ -470,6 +470,7 @@ class MyClient(commands.Bot):
         process_MySQL(query=sqlDatabaseTimestamp, values=(client.user.display_name, True, str(datetime.utcnow()).split(".")[0]))
 
     async def on_disconnect(self):
+        print()
         process_MySQL(query=sqlDatabaseTimestamp, values=(f"{client.user}", False, str(datetime.utcnow()).split(".")[0]))
 
     async def on_ready(self):
