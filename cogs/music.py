@@ -10,6 +10,7 @@ import math
 from urllib import request
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
 from utils.consts import change_my_status as change_status_nonlistening
+from utils.consts import ROLE_MOD_PROD, ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -72,7 +73,7 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["stop"])
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD)
     async def leave(self, ctx):
         """Leaves the voice channel, if currently in one."""
         client = ctx.guild.voice_client
@@ -224,7 +225,7 @@ class Music(commands.Cog):
     @commands.command(aliases=["cq"])
     @commands.guild_only()
     @commands.check(audio_playing)
-    @commands.has_permissions(administrator=True)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD)
     async def clearqueue(self, ctx):
         """Clears the play queue without leaving the channel."""
         state = self.get_state(ctx.guild)
@@ -233,7 +234,7 @@ class Music(commands.Cog):
     @commands.command(aliases=["jq"])
     @commands.guild_only()
     @commands.check(audio_playing)
-    @commands.has_permissions(administrator=True)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD)
     async def jumpqueue(self, ctx, song: int, new_index: int):
         """Moves song at an index to `new_index` in queue."""
         state = self.get_state(ctx.guild)  # get state for this guild
