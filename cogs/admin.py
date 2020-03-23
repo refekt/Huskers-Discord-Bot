@@ -7,7 +7,7 @@ from utils.client import client
 from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS
 from utils.consts import GUILD_PROD
 from utils.consts import EMBED_TITLE_HYPE
-from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX
+from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD
 from utils.consts import REACTION_HYPE_SOME, REACTION_HYPE_NO, REACTION_HYPE_MAX, REACITON_HYPE_SQUAD
 from utils.embed import build_embed as build_embed
 from utils.consts import change_my_nickname
@@ -124,7 +124,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
     @commands.command(aliases=["q", ], hidden=True)
-    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD)
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
