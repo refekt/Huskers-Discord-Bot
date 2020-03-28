@@ -296,8 +296,8 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        print(repr(reaction))
-        print(repr(user))
+        # print(repr(reaction))
+        # print(repr(user))
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
         message = reaction.message
         if user != self.bot.user and message.author == self.bot.user:
