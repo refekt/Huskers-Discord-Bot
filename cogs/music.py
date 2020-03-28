@@ -182,6 +182,7 @@ class Music(commands.Cog):
         asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
 
         state.skip_votes = set()  # clear skip votes
+        await self._nowplaying(ctx)
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
@@ -198,7 +199,6 @@ class Music(commands.Cog):
 
         client.play(source, after=after_playing)
         # Commented this out to turn into a function to be called here and automatically after a new song is playing
-        await self._nowplaying(ctx)
 
     @commands.command(aliases=["np"])
     @commands.guild_only()
