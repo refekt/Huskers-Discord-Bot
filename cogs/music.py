@@ -187,7 +187,7 @@ class Music(commands.Cog):
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
-        def after_playing(err):
+        async def after_playing(err):
             if len(state.playlist) > 0:
                 next_song = state.playlist.pop(0)
                 await self._play_song(client, state, next_song)
