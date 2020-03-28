@@ -1,8 +1,8 @@
 # Bot Frost 2.0
 
-Bot Frost is the official bot for the Husker Discord server.
+Bot Frost is the official bot for the Husker Discord server. Join here: https://discord.gg/fVSbp2K. 
 
-## Usage
+## COMMANDS
 
 `$help` lists all the available commands.
 
