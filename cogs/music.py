@@ -296,7 +296,7 @@ class Music(commands.Cog):
                 permissions = message.channel.permissions_for(user)
                 guild = message.guild
                 state = self.get_state(guild)
-                if permissions.administrator or (user_in_channel and state.is_requester(user)):
+                if permissions.administrator or (user_in_channel and state.is_requester(user)): # Possibly changed permissions.administrator to roles
                     client = message.guild.voice_client
                     if reaction.emoji == "⏯":
                         # pause audio
