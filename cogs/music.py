@@ -189,7 +189,7 @@ class Music(commands.Cog):
         def after_playing(err):
             if len(state.playlist) > 0:
                 next_song = state.playlist.pop(0)
-                self._play_song(client, state, next_song)
+                await self._play_song(client, state, next_song)
             else:
                 asyncio.run_coroutine_threadsafe(client.disconnect(),
                                                  self.bot.loop)
