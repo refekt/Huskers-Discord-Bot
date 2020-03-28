@@ -172,7 +172,7 @@ class Music(commands.Cog):
             logging.info(f"Enough votes, skipping...")
             channel.guild.voice_client.stop()
 
-    async def _play_song(self, client, state, song, ctx=None):
+    def _play_song(self, client, state, song):
         state.now_playing = song
 
         # changes status to say listening to the title of the songs that's playing. Needed to do it real janky since _play is not a coroutine while change_presence is. Cleaning this is a potential todo
@@ -187,10 +187,10 @@ class Music(commands.Cog):
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
-        async def after_playing(err):
+        def after_playing(err):
             if len(state.playlist) > 0:
                 next_song = state.playlist.pop(0)
-                await self._play_song(client, state, next_song)
+                self._play_song(client, state, next_song)
             else:
                 asyncio.run_coroutine_threadsafe(client.disconnect(),
                                                  self.bot.loop)
@@ -287,7 +287,7 @@ class Music(commands.Cog):
                     "There was an error downloading your video, sorry.")
                 return
             client = await channel.connect()
-            await self._play_song(client, state, video, ctx)
+            await self._play_song(client, state, video)
             message = await ctx.send("", embed=video.get_embed())
             await self._add_reaction_controls(message)
             logging.info(f"Now playing '{video.title}'")
