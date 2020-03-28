@@ -71,10 +71,10 @@ class Music(commands.Cog):
             self.states[guild.id] = GuildState()
             return self.states[guild.id]
 
-    async def _nowplaying(self, ctx):  # Commented this out to turn into a function to be called here and automatically after a new song is playing
-        state = self.get_state(ctx.guild)
-        message = await ctx.send("", embed=state.now_playing.get_embed())
-        await self._add_reaction_controls(message)
+    # async def _nowplaying(self, ctx):  # Commented this out to turn into a function to be called here and automatically after a new song is playing
+    #     state = self.get_state(ctx.guild)
+    #     message = await ctx.send("", embed=state.now_playing.get_embed())
+    #     await self._add_reaction_controls(message)
 
     @commands.command(aliases=["stop"])
     @commands.guild_only()
@@ -207,10 +207,10 @@ class Music(commands.Cog):
     async def nowplaying(self, ctx):
         """Displays information about the current song."""
         # Commented this out to turn into a function to be called here and automatically after a new song is playing
-        # state = self.get_state(ctx.guild)
-        # message = await ctx.send("", embed=state.now_playing.get_embed())
-        # await self._add_reaction_controls(message)
-        await self._nowplaying(ctx)
+        state = self.get_state(ctx.guild)
+        message = await ctx.send("", embed=state.now_playing.get_embed())
+        await self._add_reaction_controls(message)
+        # await self._nowplaying(ctx)
 
     @commands.command(aliases=["playlist"])
     @commands.guild_only()
