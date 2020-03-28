@@ -71,11 +71,6 @@ class Music(commands.Cog):
             self.states[guild.id] = GuildState()
             return self.states[guild.id]
 
-    # async def _nowplaying(self, ctx):  # Commented this out to turn into a function to be called here and automatically after a new song is playing
-    #     state = self.get_state(ctx.guild)
-    #     message = await ctx.send("", embed=state.now_playing.get_embed())
-    #     await self._add_reaction_controls(message)
-
     @commands.command(aliases=["stop"])
     @commands.guild_only()
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD)
@@ -182,8 +177,6 @@ class Music(commands.Cog):
         asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
 
         state.skip_votes = set()  # clear skip votes
-        # await self._nowplaying(ctx) # Trying to show a message after a new song plays. Work!
-
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
@@ -199,18 +192,15 @@ class Music(commands.Cog):
                                                  self.bot.loop)
 
         client.play(source, after=after_playing)
-        # Commented this out to turn into a function to be called here and automatically after a new song is playing
 
     @commands.command(aliases=["np"])
     @commands.guild_only()
     @commands.check(audio_playing)
     async def nowplaying(self, ctx):
         """Displays information about the current song."""
-        # Commented this out to turn into a function to be called here and automatically after a new song is playing
         state = self.get_state(ctx.guild)
         message = await ctx.send("", embed=state.now_playing.get_embed())
         await self._add_reaction_controls(message)
-        # await self._nowplaying(ctx)
 
     @commands.command(aliases=["playlist"])
     @commands.guild_only()
@@ -287,7 +277,7 @@ class Music(commands.Cog):
                     "There was an error downloading your video, sorry.")
                 return
             client = await channel.connect()
-            await self._play_song(client, state, video)
+            self._play_song(client, state, video)
             message = await ctx.send("", embed=video.get_embed())
             await self._add_reaction_controls(message)
             logging.info(f"Now playing '{video.title}'")
@@ -297,8 +287,6 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        # print(repr(reaction))
-        # print(repr(user))
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
         message = reaction.message
         if user != self.bot.user and message.author == self.bot.user:
