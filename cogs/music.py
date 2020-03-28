@@ -182,7 +182,7 @@ class Music(commands.Cog):
         asyncio.run_coroutine_threadsafe(change_status(song), self.bot.loop)
 
         state.skip_votes = set()  # clear skip votes
-        await self._nowplaying(ctx)
+        # await self._nowplaying(ctx) # Trying to show a message after a new song plays
         source = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(song.stream_url, before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'), volume=state.volume)
 
