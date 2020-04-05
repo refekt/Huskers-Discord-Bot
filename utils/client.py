@@ -469,8 +469,20 @@ class MyClient(commands.Bot):
     async def on_connect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
 
+        try:
+            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
+            await hello_channel.send("I AM CONNECTED.")
+        except AttributeError:
+            pass
+
     async def on_disconnect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
+
+        try:
+            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
+            await hello_channel.send("I AM DISCONNECTED.")
+        except AttributeError:
+            pass
 
     async def on_ready(self):
         appinfo = await self.application_info()
@@ -497,9 +509,9 @@ class MyClient(commands.Bot):
         elif sys.argv[1] == "test":
             guild = client.get_guild(id=GUILD_TEST)
 
-        channels = guild.channels
-        for channel in channels:
-            print(f"### Channel - {channel.name} & {channel.id}")
+        # channels = guild.channels
+        # for channel in channels:
+        #     print(f"### Channel - {channel.name} & {channel.id}")
 
         try:
             hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
@@ -510,20 +522,11 @@ class MyClient(commands.Bot):
     async def on_resume(self, ctx):
         appinfo = await self.application_info()
 
-        print(
-            f"### RESUMING BOT! ###\n"
-            f"### Bot Frost version 2.0 (Loaded at {datetime.now()}) ###\n"
-            f"### ~~~ Name: {client.user}\n"
-            f"### ~~~ ID: {client.user.id}\n"
-            f"### ~~~ Description: {appinfo.description}\n"
-            f"### ~~~ Onwer Name: {appinfo.owner.name}#{appinfo.owner.discriminator}\n"
-            f"### ~~~ Owner ID: {appinfo.owner.id}\n"
-            f"### ~~~ Owner Created: {appinfo.owner.created_at}\n"
-            f"### ~~~ Latency: {self.latency * 1000:.2f} MS\n"
-            f"### ~~~ Command Prefix: \"{self.command_prefix}\""
-            f"### RESUMING BOT! ###"
-        )
-
+        try:
+            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
+            await hello_channel.send("I AM RESUMING.")
+        except AttributeError:
+            pass
     async def on_message(self, message):
 
         await monitor_messages(message)
