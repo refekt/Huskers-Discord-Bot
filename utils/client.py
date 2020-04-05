@@ -467,10 +467,10 @@ class MyClient(commands.Bot):
                 await process_error(ctx, error)
 
     async def on_connect(self):
-        process_MySQL(query=sqlDatabaseTimestamp, values=(client.user.display_name, True, str(datetime.utcnow()).split(".")[0]))
+        process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
 
     async def on_disconnect(self):
-        process_MySQL(query=sqlDatabaseTimestamp, values=(f"{client.user}", False, str(datetime.utcnow()).split(".")[0]))
+        process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
 
     async def on_ready(self):
         appinfo = await self.application_info()
@@ -479,7 +479,7 @@ class MyClient(commands.Bot):
         await change_my_nickname(client, ctx=None)
 
         print(
-            f"### Bot Frost version 2.0 ###\n"
+            f"### Bot Frost version 2.0 (Loaded at {datetime.now()}) ###\n"
             f"### ~~~ Name: {client.user}\n"
             f"### ~~~ ID: {client.user.id}\n"
             f"### ~~~ Description: {appinfo.description}\n"
@@ -508,7 +508,21 @@ class MyClient(commands.Bot):
             pass
 
     async def on_resume(self, ctx):
-        pass
+        appinfo = await self.application_info()
+
+        print(
+            f"### RESUMING BOT! ###\n"
+            f"### Bot Frost version 2.0 (Loaded at {datetime.now()}) ###\n"
+            f"### ~~~ Name: {client.user}\n"
+            f"### ~~~ ID: {client.user.id}\n"
+            f"### ~~~ Description: {appinfo.description}\n"
+            f"### ~~~ Onwer Name: {appinfo.owner.name}#{appinfo.owner.discriminator}\n"
+            f"### ~~~ Owner ID: {appinfo.owner.id}\n"
+            f"### ~~~ Owner Created: {appinfo.owner.created_at}\n"
+            f"### ~~~ Latency: {self.latency * 1000:.2f} MS\n"
+            f"### ~~~ Command Prefix: \"{self.command_prefix}\""
+            f"### RESUMING BOT! ###"
+        )
 
     async def on_message(self, message):
 
@@ -516,8 +530,8 @@ class MyClient(commands.Bot):
 
         if message.channel.id not in CHAN_BANNED:
             await self.process_commands(message)  # Always needed to process commands
-        else:
-            raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.\nMessage: {message.clean_content}")
+        # else:
+        #     raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.\nMessage: {message.clean_content}")
 
     async def on_message_delete(self, message):
         pass
