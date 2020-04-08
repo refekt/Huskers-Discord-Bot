@@ -22,6 +22,15 @@ from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
 
 
+async def current_guild():
+    guild = None
+    if sys.argv[1] == "prod":
+        guild = client.get_guild(GUILD_PROD)
+    elif sys.argv[1] == "test":
+        guild = client.get_guild(GUILD_TEST)
+    return guild
+
+
 async def split_payload(payload):
     p = dict()
     p["channel_id"] = client.get_channel(payload.channel_id)
@@ -346,7 +355,8 @@ async def monitor_msg_roles(action, message: discord.Message, member: discord.Us
     roles_title = "Huskers' Discord Roles"
     try:
         if message.embeds[0].title == roles_title:
-            guild = client.get_guild(GUILD_PROD)
+            # guild = client.get_guild(GUILD_PROD)
+            guild = await current_guild()
             member = guild.get_member(member.id)
             roles = {
                 "🥔": guild.get_role(ROLE_POTATO),
@@ -376,9 +386,11 @@ async def monitor_msg_roles(action, message: discord.Message, member: discord.Us
 
 
 async def monitor_msg_hype(action, message: discord.Message, member: discord.Member, emoji: discord.Emoji):
-    guild = client.get_guild(GUILD_PROD)
-    if guild is None:
-        guild = client.get_guild(GUILD_TEST)
+    # guild = client.get_guild(GUILD_PROD)
+    # if guild is None:
+    #     guild = client.get_guild(GUILD_TEST)
+    guild = await current_guild()
+
     role_hype_max = guild.get_role(ROLE_HYPE_MAX)
     role_hype_some = guild.get_role(ROLE_HYPE_SOME)
     role_hype_no = guild.get_role(ROLE_HYPE_NO)
@@ -415,12 +427,37 @@ class MyClient(commands.Bot):
         super().__init__(command_prefix, **options)
 
     async def send_salutations(self, msg: str):
-        global client
-        hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
-        if hello_channel is None:
-            hello_channel = client.get_channel(id=CHAN_TEST_SPAM)
+        guild = await current_guild()
+        channel = None
+        if sys.argv[1] == "prod":
+            channel = guild.get_channel(CHAN_SCOTTS_BOTS)
+        elif sys.argv[1] == "test":
+            channel = guild.get_channel(CHAN_TEST_SPAM)
 
-        await hello_channel.send(msg)
+        await channel.send(msg)
+
+    async def startup_procedures(self):
+        appinfo = await self.application_info()
+
+        await change_my_status(client)
+        await change_my_nickname(client, ctx=None)
+
+        print(
+            f"### The bot is ready! ###\n"
+            f"### Bot Frost version 2.0 (Loaded at {datetime.now()}) ###\n"
+            f"### ~~~ Name: {client.user}\n"
+            f"### ~~~ ID: {client.user.id}\n"
+            f"### ~~~ Description: {appinfo.description}\n"
+            f"### ~~~ Onwer Name: {appinfo.owner.name}#{appinfo.owner.discriminator}\n"
+            f"### ~~~ Owner ID: {appinfo.owner.id}\n"
+            f"### ~~~ Owner Created: {appinfo.owner.created_at}\n"
+            f"### ~~~ Latency: {self.latency * 1000:.2f} MS\n"
+            f"### ~~~ Command Prefix: \"{self.command_prefix}\""
+        )
+
+        # channels = guild.channels
+        # for channel in channels:
+        #     print(f"### Channel - {channel.name} & {channel.id}")
 
     def send_to_log(self, type, msg):
         if type == logging.DEBUG:
@@ -500,8 +537,7 @@ class MyClient(commands.Bot):
 
     async def on_connect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
-
-        await self.send_salutations("*Beep, boop* Greetings! I have arrived.")
+        await self.send_salutations(f"*Beep, boop* Greetings! I have arrived.")
 
     async def on_disconnect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
@@ -509,27 +545,8 @@ class MyClient(commands.Bot):
         await self.send_salutations("I AM DISCONNECTING.")
 
     async def on_ready(self):
-        appinfo = await self.application_info()
-
-        await change_my_status(client)
-        await change_my_nickname(client, ctx=None)
-
-        print(
-            f"### The bot is ready! ###\n"
-            f"### Bot Frost version 2.0 (Loaded at {datetime.now()}) ###\n"
-            f"### ~~~ Name: {client.user}\n"
-            f"### ~~~ ID: {client.user.id}\n"
-            f"### ~~~ Description: {appinfo.description}\n"
-            f"### ~~~ Onwer Name: {appinfo.owner.name}#{appinfo.owner.discriminator}\n"
-            f"### ~~~ Owner ID: {appinfo.owner.id}\n"
-            f"### ~~~ Owner Created: {appinfo.owner.created_at}\n"
-            f"### ~~~ Latency: {self.latency * 1000:.2f} MS\n"
-            f"### ~~~ Command Prefix: \"{self.command_prefix}\""
-        )
-
-        # channels = guild.channels
-        # for channel in channels:
-        #     print(f"### Channel - {channel.name} & {channel.id}")
+        await self.send_salutations("Ready to go Cap-i-tan!")
+        pass
 
     async def on_resume(self):
         await change_my_status(client)
@@ -615,9 +632,9 @@ if on_prod_server():
 else:
     command_prefix = "%"
 
-client = MyClient(command_prefix=command_prefix)
+client = MyClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
 extensions = (
-    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting",'cogs.music') #, "cogs.chatbot")
+    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting", 'cogs.music')  # ,
 
 for extension in extensions:
     try:
@@ -629,9 +646,9 @@ for extension in extensions:
 if len(sys.argv) > 0:
     if on_prod_server():
         token = consts.PROD_TOKEN
-        client.run(token)
     else:
         token = consts.TEST_TOKEN
-        client.run(token)
+
+    client.run(token)
 else:
     print("No arguments provided!")
