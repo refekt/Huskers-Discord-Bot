@@ -1,4 +1,3 @@
-import logging
 import re
 
 import discord
@@ -24,8 +23,6 @@ chatbot = ChatBot("Bot Frost",
                   read_only=False
                   )
 trainer = ChatterBotCorpusTrainer(chatbot)
-
-# logging.basicConfig(level=logging.INFO)
 
 
 class ChatBot(commands.Cog):

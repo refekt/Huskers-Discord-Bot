@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import random
 import re
 import sys
@@ -12,10 +13,9 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
-from cogs import music
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED, CHAN_TEST_SPAM
 from utils.consts import EMBED_TITLE_HYPE
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED
-from utils.consts import ROLE_GUMBY, ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
+from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -414,6 +414,26 @@ class MyClient(commands.Bot):
     def __init__(self, command_prefix, **options):
         super().__init__(command_prefix, **options)
 
+    async def send_salutations(self, msg: str):
+        global client
+        hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
+        if hello_channel is None:
+            hello_channel = client.get_channel(id=CHAN_TEST_SPAM)
+
+        await hello_channel.send(msg)
+
+    def send_to_log(self, type, msg):
+        if type == logging.DEBUG:
+            logging.debug(msg)
+        elif type == logging.INFO:
+            logging.info(msg)
+        elif type == logging.WARNING:
+            logging.warning(msg)
+        elif type == logging.ERROR:
+            logging.error(msg)
+        elif type == logging.CRITICAL:
+            logging.critical(msg)
+
     if on_prod_server():
         async def on_command_error(self, ctx, error):
             if ctx.message.content.startswith(f"{client.command_prefix}secret"):
@@ -466,23 +486,27 @@ class MyClient(commands.Bot):
             else:
                 await process_error(ctx, error)
 
+    async def on_shard_ready(self, shard_id):
+        pass
+        # logging.info(f"[on_shard_ready] Shard ID: {shard_id}")
+
+    async def on_socket_raw_receive(self, msg):
+        pass
+        # self.send_to_log(logging.INFO, msg)
+
+    async def on_socket_raw_send(self, payload):
+        pass
+        # self.send_to_log(logging.INFO, payload)
+
     async def on_connect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
 
-        try:
-            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
-            await hello_channel.send("I AM CONNECTED.")
-        except AttributeError:
-            pass
+        await self.send_salutations("*Beep, boop* Greetings! I have arrived.")
 
     async def on_disconnect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
 
-        try:
-            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
-            await hello_channel.send("I AM DISCONNECTED.")
-        except AttributeError:
-            pass
+        await self.send_salutations("I AM DISCONNECTING.")
 
     async def on_ready(self):
         appinfo = await self.application_info()
@@ -491,6 +515,7 @@ class MyClient(commands.Bot):
         await change_my_nickname(client, ctx=None)
 
         print(
+            f"### The bot is ready! ###\n"
             f"### Bot Frost version 2.0 (Loaded at {datetime.now()}) ###\n"
             f"### ~~~ Name: {client.user}\n"
             f"### ~~~ ID: {client.user.id}\n"
@@ -502,31 +527,16 @@ class MyClient(commands.Bot):
             f"### ~~~ Command Prefix: \"{self.command_prefix}\""
         )
 
-        guild = None
-
-        if sys.argv[1] == "prod":
-            guild = client.get_guild(id=GUILD_PROD)
-        elif sys.argv[1] == "test":
-            guild = client.get_guild(id=GUILD_TEST)
-
         # channels = guild.channels
         # for channel in channels:
         #     print(f"### Channel - {channel.name} & {channel.id}")
 
-        try:
-            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
-            await hello_channel.send("*Beep, boop* Greetings! I have arrived.")
-        except AttributeError:
-            pass
+    async def on_resume(self):
+        await change_my_status(client)
+        await change_my_nickname(client, ctx=None)
 
-    async def on_resume(self, ctx):
-        appinfo = await self.application_info()
+        await self.send_salutations("I have returned!")
 
-        try:
-            hello_channel = client.get_channel(id=CHAN_SCOTTS_BOTS)
-            await hello_channel.send("I AM RESUMING.")
-        except AttributeError:
-            pass
     async def on_message(self, message):
 
         await monitor_messages(message)
@@ -607,8 +617,7 @@ else:
 
 client = MyClient(command_prefix=command_prefix)
 extensions = (
-    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting",
-    'cogs.music')  # , "cogs.chatbot")
+    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting",'cogs.music') #, "cogs.chatbot")
 
 for extension in extensions:
     try:

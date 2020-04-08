@@ -1,4 +1,3 @@
-import logging
 import os
 import platform
 import random
@@ -100,6 +99,7 @@ CHAN_SCOTTS_BOTS = 593984711706279937
 CHAN_POLITICS = 504777800100741120
 CHAN_MINECRAFT_ADMIN = 662110504843739148
 CHAN_TWITTERVERSE = 636220560010903584
+CHAN_TEST_SPAM = 595705205069185047
 
 #teasdfasf
 
@@ -164,23 +164,3 @@ async def change_my_status(client, ctx=None):
     except:
         print(f"Unknown error!")
 
-
-# def establish_logger(category: int):
-#     logging.basicConfig(
-#         level=logging.DEBUG,
-#         format="[%(asctime)s] [%(levelname)s]: %(message)s",
-#         datefmt="%d-%b-%y %H:%M:%S"
-#     )
-
-
-# def print_log(category: int, message: str):
-#     if category == logging.DEBUG:
-#         logging.debug(msg=message)
-#     elif category == logging.INFO:
-#         logging.info(msg=message)
-#     elif category == logging.WARNING:
-#         logging.warning(msg=message)
-#     elif category == logging.ERROR:
-#         logging.error(msg=message)
-#     elif category == logging.CRITICAL:
-#         logging.critical(msg=message)
