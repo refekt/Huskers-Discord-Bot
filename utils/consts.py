@@ -1,6 +1,7 @@
 import os
 import platform
 import random
+import sys
 
 import discord
 import pytz
@@ -101,7 +102,7 @@ CHAN_MINECRAFT_ADMIN = 662110504843739148
 CHAN_TWITTERVERSE = 636220560010903584
 CHAN_TEST_SPAM = 595705205069185047
 
-#teasdfasf
+# teasdfasf
 
 CHAN_BANNED = (CHAN_BOTLOGS, CHAN_RULES, CHAN_POLITICS, CHAN_MINECRAFT_ADMIN, CHAN_TWITTERVERSE, CHAN_HOF_PROD, CHAN_RULES)
 
@@ -115,6 +116,8 @@ REACITON_HYPE_SQUAD = (REACTION_HYPE_MAX, REACTION_HYPE_SOME, REACTION_HYPE_NO)
 # Servers/guilds
 GUILD_PROD = 440632686185414677
 GUILD_TEST = 595705205069185045
+
+
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
 
@@ -127,17 +130,12 @@ async def change_my_nickname(client, ctx):
     try:
         print("~~~ Attempting to change nickname...")
         await client.user.edit(username=random.choice(nicks))
-        print(f"~~~ Changed nickname to {client.user.username}")
-
-        if ctx:
-            await ctx.send(f"Myw new name is... 🥁🥁🥁 {client.user.username}!")
+        print(f"~~~ Changed nickname to {client.user.display_name}")
     except discord.HTTPException as err:
         err_msg = "~~~ !!! " + str(err).replace("\n", " ")
         print(err_msg)
-        if ctx:
-            await ctx.send(err_msg)
     except:
-        print(f"Unknown error!")
+        print(f"~~~ !!! Unknown error!", sys.exc_info()[0])
 
 
 async def change_my_status(client, ctx=None):
@@ -151,16 +149,14 @@ async def change_my_status(client, ctx=None):
     )
     try:
         print("~~~ Attempting to change status...")
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=random.choice(statuses)))
-        print(f"~~~ Changed status to {client.user.username}")
-
-        if ctx:
-            await ctx.send(f"My new status is... 🥁🥁🥁 {client.user.username}!")
+        new_activity = random.choice(statuses)
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=new_activity))
+        print(f"~~~ Changed status to '{new_activity}'")
+    except AttributeError as err:
+        err_msg = "~~~ !!! " + str(err).replace("\n", " ")
+        print(err_msg)
     except discord.HTTPException as err:
         err_msg = "~~~ !!! " + str(err).replace("\n", " ")
         print(err_msg)
-        if ctx:
-            await ctx.send(err_msg)
     except:
-        print(f"Unknown error!")
-
+        print(f"~~~ !!! Unknown error!", sys.exc_info()[0])

@@ -537,6 +537,7 @@ class MyClient(commands.Bot):
 
     async def on_connect(self):
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
+        await self.startup_procedures()
         await self.send_salutations(f"*Beep, boop* Greetings! I have arrived.")
 
     async def on_disconnect(self):
