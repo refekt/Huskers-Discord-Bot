@@ -45,7 +45,6 @@ async def is_audio_requester(ctx):
     music = ctx.bot.get_cog("Music")
     state = music.get_state(ctx.guild)
     permissions = ctx.channel.permissions_for(ctx.author)
-    print("C")
     if permissions.administrator or state.is_requester(ctx.author):
         return True
     else:
@@ -86,6 +85,9 @@ class Music(commands.Cog):
         else:
             raise commands.CommandError("Not in a voice channel.")
 
+    #
+    # For some reason, calling the $help command calls the $pause command
+    #
     @commands.command()
     # @commands.guild_only()
     @commands.check(audio_playing)
@@ -343,7 +345,10 @@ class GuildState:
         self.now_playing = None
 
     def is_requester(self, user):
-        return self.now_playing.requested_by == user
+        if self.now_playing:
+            return self.now_playing.requested_by == user
+        else:
+            return False
 
 
 class Video:
