@@ -95,7 +95,7 @@ class Music(commands.Cog):
     @commands.check(is_audio_requester)
     async def pause(self, ctx):
         """Pauses any currently playing audio."""
-        client = ctx.guild.voice_client
+        client = ctx.guild.voice_clientl
         self._pause_audio(client)
 
     def _pause_audio(self, client):
