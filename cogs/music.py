@@ -292,6 +292,11 @@ class Music(commands.Cog):
     async def on_reaction_add(self, reaction, user):
         """Respods to reactions added to the bot's messages, allowing reactions to control playback."""
         message = reaction.message
+
+        # Do not use this on other commands.
+        if message.embeds[0].footer.text == "Created by Bot Frost":
+            return
+
         if user != self.bot.user and message.author == self.bot.user:
             await message.remove_reaction(reaction, user)
             if message.guild and message.guild.voice_client:
