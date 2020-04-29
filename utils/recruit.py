@@ -214,7 +214,8 @@ def FootballRecruit(year, name):
         try:
             for item in cbs_raw:
                 if item.contents[0] == "Crystal Ball® Predictions":
-                    cbs_raw = cbs_raw[1].parent.contents[5]
+                    #cbs_raw = cbs_raw[1].parent.contents[5]
+                    cbs_raw = cbs_raw[0].parent.contents[5]
                     break
         except:
             return False
