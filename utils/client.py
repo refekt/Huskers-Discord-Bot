@@ -15,6 +15,7 @@ import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED, CHAN_TEST_SPAM
 from utils.consts import EMBED_TITLE_HYPE
+from utils.consts import FOOTER_SECRET
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
@@ -511,7 +512,7 @@ class MyClient(commands.Bot):
 
                         embed = discord.Embed(title="Secret Mammal Messaging System (SMMS)", color=0xD00000)
                         embed.set_thumbnail(url="https://i.imgur.com/EGC1qNt.jpg")
-                        embed.set_footer(text="These messages are anonymous and there is no way to verify messages are accurate.")
+                        embed.set_footer(text=FOOTER_SECRET)
                         embed.add_field(name="Back Channel Communications", value=message)
 
                         await channel.send(embed=embed)

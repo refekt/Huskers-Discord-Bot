@@ -1,15 +1,17 @@
-from datetime import datetime
 import platform
-import discord
-from utils.games import ScheduleBackup
+from datetime import datetime
 
+import discord
+
+from utils.consts import FOOTER_BOT
 from utils.consts import TZ
+from utils.games import ScheduleBackup
 
 
 def build_image_embed(title, image):
     embed = discord.Embed(title=title, color=0xD00000)
     embed.set_author(name="Bot Frost", url="https://github.com/refekt/Husker-Bot", icon_url="https://i.imgur.com/Ah3x5NA.png")
-    embed.set_footer(text="Created by Bot Frost")
+    embed.set_footer(text=FOOTER_BOT)
     embed.set_image(url=image)
     return embed
 
@@ -162,8 +164,6 @@ def build_schedule_embed(year, **kwargs):
                 value
             ]
         )
-
-
 
     embed_extended = None
 

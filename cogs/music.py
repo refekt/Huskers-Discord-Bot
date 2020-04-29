@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-from discord.ext import commands
-import discord
 import asyncio
-import youtube_dl
 import logging
 import logging.handlers
-import os
 import math
-from urllib import request
+
+import discord
+import youtube_dl
+from discord.ext import commands
+
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
-from utils.consts import change_my_status as change_status_nonlistening
+from utils.consts import FOOTER_BOT
 from utils.consts import ROLE_MOD_PROD, ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
+from utils.consts import change_my_status as change_status_nonlistening
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -294,7 +295,7 @@ class Music(commands.Cog):
         message = reaction.message
 
         # Do not use this on other commands.
-        if message.embeds[0].footer.text == "Created by Bot Frost":
+        if message.embeds[0].footer.text == FOOTER_BOT:
             return
 
         if user != self.bot.user and message.author == self.bot.user:
@@ -304,7 +305,7 @@ class Music(commands.Cog):
                 permissions = message.channel.permissions_for(user)
                 guild = message.guild
                 state = self.get_state(guild)
-                if permissions.administrator or (user_in_channel and state.is_requester(user)): # Possibly changed permissions.administrator to roles
+                if permissions.administrator or (user_in_channel and state.is_requester(user)):  # Possibly changed permissions.administrator to roles
                     client = message.guild.voice_client
                     if reaction.emoji == "⏯":
                         # pause audio

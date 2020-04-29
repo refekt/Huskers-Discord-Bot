@@ -117,6 +117,10 @@ REACITON_HYPE_SQUAD = (REACTION_HYPE_MAX, REACTION_HYPE_SOME, REACTION_HYPE_NO)
 GUILD_PROD = 440632686185414677
 GUILD_TEST = 595705205069185045
 
+# Footer texts
+FOOTER_SECRET = "These messages are anonymous and there is no way to verify messages are accurate."
+FOOTER_BOT = "Created by Bot Frost"
+
 
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
