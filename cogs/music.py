@@ -9,7 +9,7 @@ import youtube_dl
 from discord.ext import commands
 
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
-from utils.consts import FOOTER_BOT
+from utils.consts import FOOTER_BOT, FOOTER_SECRET
 from utils.consts import ROLE_MOD_PROD, ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.consts import change_my_status as change_status_nonlistening
 
@@ -295,7 +295,7 @@ class Music(commands.Cog):
         message = reaction.message
 
         # Do not use this on other commands.
-        if message.embeds[0].footer.text == FOOTER_BOT:
+        if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET]:
             return
 
         if user != self.bot.user and message.author == self.bot.user:
