@@ -60,6 +60,12 @@ def build_recruit_embed(rec):  # rec == recruit
             pretty += f"{item}\n"
         return pretty
 
+    def epxerts_pretty():
+        pretty = ""
+        for item in rec.experts:
+            pretty += f"{item}\n"
+        return pretty
+
     def offers_pretty():
         pretty = ""
         for index, item in enumerate(rec.recruit_interests):
@@ -81,6 +87,11 @@ def build_recruit_embed(rec):  # rec == recruit
                               f"Height: {rec.height}\n"
                               f"Weight: {rec.weight}\n"],
 
+            ["**Social Media**", f"{'[@' + rec.twitter + '](' + 'https://twitter.com/' + rec.twitter + ')' if not rec.twitter == 'N/A' else 'N/A'}"],
+
+            ["**Highlights**", f"{'[247Sports](' + rec.x247_highlights + ')' if rec.x247_highlights else '247Sports N/A'}\n"
+                               f"{'[Rivals](' + rec.rivals_highlights + ')' if rec.rivals_highlights else 'Rivals N/A'}\n"],
+
             ["**Recruit Info**", f"[247Sports Profile]({rec.x247_profile})\n"
                                  f"[Rivals Profile]({rec.rivals_profile})\n"
                                  f"Comp. Rating: {rec.rating_numerical if rec.rating_numerical else 'N/A'} \n"
@@ -96,14 +107,11 @@ def build_recruit_embed(rec):  # rec == recruit
                                  f"{'Early Signee' + nl if rec.early_signee else ''}"
                                  f"{'Walk-On' + nl if rec.walk_on else ''}"],
 
-            ["**Highlights**", f"{'[247Sports](' + rec.x247_highlights + ')' if rec.x247_highlights else '247Sports N/A'}\n"
-                               f"{'[Rivals](' + rec.rivals_highlights + ')' if rec.rivals_highlights else 'Rivals N/A'}\n"],
+            ["**Lead Expert Averages**", f"{predictions_pretty() if rec.predictions else 'N/A'}"],
 
-            ["**Crystal Balls**", f"{predictions_pretty() if rec.predictions else 'N/A'}"],
+            ["**Lead Expert Picks**", f"{epxerts_pretty() if rec.experts else 'N/A'}"],
 
-            ["**Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"],
-
-            ["**Social Media**", f"{'[@' + rec.twitter + '](' + 'https://twitter.com/' + rec.twitter + ')' if not rec.twitter == 'N/A' else 'N/A'}"]
+            ["**Interests and Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"]
         ]
     )
     if not rec.thumbnail == "/.":

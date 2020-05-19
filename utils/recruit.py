@@ -49,6 +49,7 @@ class Recruit:
     committed_school = None
     early_enrollee = None
     early_signee = None
+    experts = None
     height = None
     key = None
     name = None
@@ -77,7 +78,7 @@ class Recruit:
     year = None
 
     def __init__(self=None, x247_highlights=None, x247_profile=None, all_time_ranking=None, bio=None, city=None, commitment_date=None, committed=None, committed_school=None, early_enrollee=None,
-                 early_signee=None, height=None, key=None, name=None, national_ranking=None, position=None, position_ranking=None, predictions=None, rating_numerical=None,
+                 early_signee=None, experts=None, height=None, key=None, name=None, national_ranking=None, position=None, position_ranking=None, predictions=None, rating_numerical=None,
                  rating_stars=None, recruit_interests=None, recruit_interests_url=None, red_shirt=None, rivals_ID=None, rivals_profile=None, rivals_highlights=None, school=None, school_type=None,
                  scout_evaluation=None, state=None, state_abbr=None, state_ranking=None, thumbnail=None, twitter=None, walk_on=None, weight=None, year=None):
         self.x247_highlights = x247_highlights
@@ -93,6 +94,7 @@ class Recruit:
         self.committed_school = committed_school
         self.early_enrollee = early_enrollee
         self.early_signee = early_signee
+        self.experts = experts
         self.height = str(height).replace("-", "' ") + "\""
         self.key = key
         self.name = name
@@ -155,7 +157,6 @@ def FootballRecruit(year, name):
         return
 
     if not search_results:
-
         # raise commands.UserInputError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
         return commands.UserInputError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
 
@@ -207,22 +208,67 @@ def FootballRecruit(year, name):
         else:
             return False
 
+    def cb_expert_picks():
+        experts = []
+        cbs_long_expert = None
+
+        # When there are multiple 'experts' listed
+        try:
+            cbs_long_expert = soup.find_all(attrs={"class": "prediction-list long expert"})
+        except:
+            pass
+
+        # Unable to extrapolate school from picture URL currently
+        if len(cbs_long_expert) > 0:
+            for expert in cbs_long_expert[0].contents:
+                try:
+                    expert_name = expert.contents[1].string
+                    expert_confidence = f"{expert.contents[5].contents[1].text.strip()}, {expert.contents[5].contents[3].text.strip()}"
+                    expert_string = f"{expert_name} picks [SCHOOL] ({expert_confidence})"
+                    experts.append(expert_string)
+                except:
+                    continue
+            pass
+
+        return experts
+
     def cb_predictions():
-        cbs_raw = soup.find_all("h4")
         cbs = []
 
-        try:
-            for item in cbs_raw:
-                if item.contents[0] == "Crystal Ball® Predictions":
-                    #cbs_raw = cbs_raw[1].parent.contents[5]
-                    cbs_raw = cbs_raw[0].parent.contents[5]
-                    break
-        except:
-            return False
+        cbs_long = cbs_one = None
 
-        for item in cbs_raw:
-            if not type(item) == element.NavigableString and "%" in item.text:
-                cbs.append(str(item.text).strip())
+        # When there are more than one predicted schools
+        try:
+            cbs_long = soup.find_all(attrs={"class": "prediction-list long"})
+        except:
+            pass
+        # When there is onyl one predicted school
+        try:
+            cbs_one = soup.find_all(attrs={"class": "prediction-list one"})
+        except:
+            pass
+
+        if len(cbs_long) > 0:
+            for cb in cbs_long[0].contents:
+                try:
+                    school_name = cb.contents[3].text
+                    school_weight = cb.contents[5].text.strip()
+                    school_confidence = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
+                    school_string = f"{school_name}: {school_weight} ({school_confidence})"
+
+                    cbs.append(school_string)
+                except:
+                    pass
+        elif len(cbs_one) > 0:
+            single_school = cbs_one[0].contents[1]
+            single_school_name = single_school.contents[3].text.strip()
+            single_school_weight = single_school.contents[5].text.strip()
+            single_school_confidence = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"
+            single_school_string = f"{single_school_name}: {single_school_weight} ({single_school_confidence})"
+
+            cbs.append(single_school_string)
+        else:
+            return ["N/A"]
 
         return cbs
 
@@ -261,7 +307,8 @@ def FootballRecruit(year, name):
             return "Err"
 
     def position_ranking(player):
-        rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&Position={player['PrimaryPlayerPosition']['Abbreviation']}"})
+        rank = soup.find_all(
+            attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&Position={player['PrimaryPlayerPosition']['Abbreviation']}"})
 
         ranking = 0
         try:
@@ -373,7 +420,7 @@ def FootballRecruit(year, name):
             Recruit(
                 key=p['Key'],
                 name=p['FullName'],
-                city=p['Hometown']['City']if p['Hometown']['City'] else 'N/A' ,
+                city=p['Hometown']['City'] if p['Hometown']['City'] else 'N/A',
                 state=p['Hometown']['State'] if p['Hometown']['State'] else 'N/A',
                 state_abbr=recruit_state,
                 height=p['Height'],
@@ -403,10 +450,11 @@ def FootballRecruit(year, name):
                 predictions=cb_predictions(),
                 twitter=twitter_handle(),
                 walk_on=walk_on(),
+                experts=cb_expert_picks()
                 # rivals_profile=rivals_prof,
                 # rivals_ID=rivals_id,
                 # rivals_highlights=rivals_highlights(rivals_id)
-           )
+            )
         )
 
     return search_result_players
