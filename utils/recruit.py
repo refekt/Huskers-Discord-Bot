@@ -259,11 +259,16 @@ def FootballRecruit(year, name):
                     cbs.append(school_string)
                 except:
                     pass
+
+            return cbs
         elif len(cbs_one) > 0:
             single_school = cbs_one[0].contents[1]
             single_school_name = single_school.contents[3].text.strip()
             single_school_weight = single_school.contents[5].text.strip()
-            single_school_confidence = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"
+            try:
+                single_school_confidence = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"
+            except:
+                single_school_confidence = ""
             single_school_string = f"{single_school_name}: {single_school_weight} ({single_school_confidence})"
 
             cbs.append(single_school_string)
