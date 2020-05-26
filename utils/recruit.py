@@ -235,6 +235,11 @@ def FootballRecruit(year, name):
     def cb_predictions():
         cbs = []
 
+        no_predictions = soup.find_all(attrs={"class": "list-header-item"})
+
+        if no_predictions:
+            return cbs
+
         cbs_long = cbs_one = None
 
         # When there are more than one predicted schools
