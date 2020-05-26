@@ -23,7 +23,7 @@ google==2.0.3
 google-api-python-client==1.7.11
 google-auth==1.10.0
 google-auth-httplib2==0.0.3
-httplib2==0.15.0
+httplib2==0.18.0
 idna==2.6
 keyring==10.6.0
 keyrings.alt==3.0
