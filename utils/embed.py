@@ -107,7 +107,7 @@ def build_recruit_embed(rec):  # rec == recruit
                                  f"{'Early Signee' + nl if rec.early_signee else ''}"
                                  f"{'Walk-On' + nl if rec.walk_on else ''}"],
 
-            ["**Lead Expert Averages**", f"{predictions_pretty() if rec.predictions else 'N/A'}"],
+            ["**Expert Averages**", f"{predictions_pretty() if rec.predictions else 'N/A'}"],
 
             ["**Lead Expert Picks**", f"{epxerts_pretty() if rec.experts else 'N/A'}"],
 

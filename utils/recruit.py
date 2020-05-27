@@ -275,11 +275,13 @@ def FootballRecruit(year, name):
         if len(cbs_long) > 0:
             for cb in cbs_long[0].contents:
                 try:
-                    school_name = cb.contents[3].text
+                    school_name = cb.contents[3].text.strip()
                     school_weight = cb.contents[5].text.strip()
-                    school_confidence = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
-                    school_string = f"{school_name}: {school_weight} ({school_confidence})"
-
+                    school_string = f"{school_name}: {school_weight}"
+                    #If there is an "Undecided" in the list, it won't have a confidence with it
+                    if school_name != 'Undecided':
+                        school_confidence = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
+                        school_string += f"({school_confidence})"
                     cbs.append(school_string)
                 except:
                     pass
