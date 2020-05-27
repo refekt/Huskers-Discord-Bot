@@ -258,6 +258,9 @@ def FootballRecruit(year, name):
 
         predictions_header = soup.find_all(attrs={"class": "list-header-item"})
         print(predictions_header)
+        
+        if len(predictions_header) == 0:
+            return cbs
         if predictions_header[0].text.strip() == 'No Lead Experts':
             return cbs
 
