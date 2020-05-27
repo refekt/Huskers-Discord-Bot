@@ -111,7 +111,7 @@ def build_recruit_embed(rec):  # rec == recruit
 
             ["**Lead Expert Picks**", f"{epxerts_pretty() if rec.experts else 'N/A'}"],
 
-            ["**Interests and Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"]
+            ["**Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"]
         ]
     )
     if not rec.thumbnail == "/.":
