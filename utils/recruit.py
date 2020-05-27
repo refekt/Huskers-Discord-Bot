@@ -261,8 +261,6 @@ def FootballRecruit(year, name):
         
         if len(predictions_header) == 0:
             return cbs
-        if predictions_header[0].text.strip() == 'No Lead Experts':
-            return cbs
 
         cbs_long = cbs_one = None
 
