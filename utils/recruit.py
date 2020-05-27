@@ -133,8 +133,9 @@ def FootballRecruit(year, name):
     team_ids = dict()
 
     for id in team_ids_raw:
-        team_ids.update({id['id']: id['name']})
+        team_ids.update({str(id['id']): id['name']})
 
+    print(team_ids)
     if len(name) == 1:
         x247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}"
         first_name = requests.get(url=x247_search, headers=HEADERS)
@@ -222,10 +223,30 @@ def FootballRecruit(year, name):
         if len(cbs_long_expert) > 0:
             for expert in cbs_long_expert[0].contents:
                 try:
-                    expert_name = expert.contents[1].string
-                    expert_confidence = f"{expert.contents[5].contents[1].text.strip()}, {expert.contents[5].contents[3].text.strip()}"
-                    expert_string = f"{expert_name} picks [SCHOOL] ({expert_confidence})"
-                    experts.append(expert_string)
+                    expert_name = expert.contents[1].string                   
+                    
+                    predicted_team = None
+                    if expert.find_all('img', src = True):
+                        predicted_team_id = int(expert.find_all('img', src = True)[0]['src'].split('/')[-1].split('.')[0])
+                        print(predicted_team_id)
+                        try:
+                            predicted_team = team_ids[str(predicted_team_id)] if predicted_team_id > 0 else None
+                        except KeyError:
+                            predicted_team = "Unknown Team"
+                    else:
+                        if len(expert.find_all('b', attrs= {'class' : 'question-icon'})) == 1:
+                            predicted_team = 'Undecided'
+                    
+                    #If the pick is undecided, it doesn't have a confidence
+                    if predicted_team != 'Undecided':
+                        expert_confidence = f"{expert.contents[5].contents[1].text.strip()}, {expert.contents[5].contents[3].text.strip()}"
+                        expert_string = f"{expert_name} picks {predicted_team} ({expert_confidence})"
+                    else:
+                        expert_string = f"{expert_name} is {predicted_team}"
+                        
+                    #I think 247 has some goofiness where there are some instances of "None" making a prediction, so I'm just not going to let those be added on    
+                    if expert_name is not None:
+                        experts.append(expert_string)
                 except:
                     continue
             pass
@@ -235,9 +256,9 @@ def FootballRecruit(year, name):
     def cb_predictions():
         cbs = []
 
-        no_predictions = soup.find_all(attrs={"class": "list-header-item"})
-
-        if no_predictions:
+        predictions_header = soup.find_all(attrs={"class": "list-header-item"})
+        print(predictions_header)
+        if predictions_header[0].text.strip() == 'No Lead Experts':
             return cbs
 
         cbs_long = cbs_one = None
@@ -373,18 +394,22 @@ def FootballRecruit(year, name):
         req = requests.get(url=player["RecruitInterestsUrl"], headers=HEADERS)
         interests_soup = BeautifulSoup(req.content, "html.parser")
 
-        interests = interests_soup.find_all(attrs={"class": "first_blk"})
-
+        #interests = interests_soup.find_all(attrs={"class": "first_blk"})
+        interests = interests_soup.find('ul', attrs = {'class' : "recruit-interest-index_lst"}).find_all('li', recursive = False)
+        
         all_interests = []
-
+        
+        # Goes through the list of interests and only adds in the ones that are offers
         for index, interest in enumerate(interests):
-            all_interests.append(
-                RecruitInterest(
-                    school=interest.contents[1].text.strip(),
-                    offered="",
-                    status=interest.contents[3].text.strip()
+            offered = interest.find('div', attrs = {'class' :  'secondary_blk'}).find('span', attrs = {'class' : 'offer'}).text.split(':')[1].strip()
+            if offered == "Yes":
+                all_interests.append(
+                    RecruitInterest(
+                        school=interest.find('div', attrs = {'class' :  'first_blk'}).find('a').text.strip(),
+                        offered = offered,
+                        status=interest.find('div', attrs = {'class' :  'first_blk'}).find('span', attrs = {'class' : 'status'}).find('span').text
+                    )
                 )
-            )
 
         del req
         del interests
