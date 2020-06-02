@@ -53,7 +53,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     ["About", "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware "
                               "performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs."],
                     ["Terms", "(1) Final discretion of donation usage is up to the creator(s). "
-                              "(2) Making a donation to the product(s) and/or service(s) does garner any control or authority over product(s) or service(s). "
+                              "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
                               "(3) No refunds. "
                               "(4) Monthly subscriptions can be terminated by either party at any time. "
                               "(5) These terms can be changed at any time. Please read before each donation. "

@@ -52,6 +52,7 @@ recruits = {
     "smothers": ["Logan Smothers", "4*", "DUAL", "https://247sports.com/player/logan-smothers-46051967", "Logan Smothers is officially N! 🖊",
                  "2020 4* DUAL Logan Smothers signs with Nebraska"],
     "togiai": ["Tanoa Togiai", "3*", "SDE", "https://247sports.com/player/tanoa-togiai-46047148/", "Tanoa Togiai is N!", "2020 3* SDE Tanoa Togiai signs with Nebraska"],
+    "noel": ["Jaylin Noel", "3*", "WR", "https://247sports.com/Player/Jaylin-Noel-46085482/", "Noel is N!", "2021 3* WR Jaylin Noel signs with Nebraska"]
 }
 
 eNSD = datetime(year=2019, day=18, month=12)
@@ -64,12 +65,7 @@ def is_me(ctx):
 class RedditCommands(commands.Cog):
     @commands.command(hidden=True)
     @commands.check(is_me)
-    async def nsd(self, ctx, recruit: str, source: str):
-        right_now = datetime.now()
-        if not right_now.date() == eNSD.date():
-            print("It is not early signing day!")
-            return
-
+    async def nsd(self, ctx, recruit: str, source: str = ""):
         me = client.get_user(189554873778307073)
 
         try:
@@ -97,19 +93,32 @@ class RedditCommands(commands.Cog):
                f"\n" \
                f"Source: {source}"
 
+        # Testing sub reddit
+        # huskers = reddit.subreddit("ThisIsDarkSouls")
+        # huskers.submit(
+        #     title=recruits[recruit][4],
+        #     selftext=text
+        # )
+
         huskers = reddit.subreddit("huskers")
         huskers.submit(
             title=recruits[recruit][4],
             selftext=text
         )
 
-        time.sleep(random.randint(3, 6))
+        time.sleep(random.randint(1, 4))
 
         cfb = reddit.subreddit("cfb")
-        cfb.submit(
+        cfb_post = cfb.submit(
             title=recruits[recruit][5],
             selftext=text
         )
+
+        try:
+            cfb_post.falir.select("Recruiting")
+        except:
+            await ctx.send("Unable to set flair! Make sure you do it.")
+            pass
 
 
 def setup(bot):
