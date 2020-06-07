@@ -9,7 +9,7 @@ from utils.client import client
 from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 
 recruits = {
-    "neville": ["Latrell Nville", "3*", "WR", "https://247sports.com/Player/Latrell-Neville-46054704/", "Neville is N!", "2021 3* WR Latrell Neville commits to Nebraska"]
+    "neville": ["Latrell Neville", "3*", "WR", "https://247sports.com/Player/Latrell-Neville-46054704/", "Neville is N!", "2021 3* WR Latrell Neville commits to Nebraska"]
 }
 
 eNSD = datetime(year=2019, day=18, month=12)
