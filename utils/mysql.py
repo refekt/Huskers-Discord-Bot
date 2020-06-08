@@ -166,6 +166,15 @@ sqlTeamIDs = """
 SELECT id, name FROM team_ids ORDER BY name ASC
 """
 
+sqlRecordStats = """\
+INSERT INTO stats (author, channel)
+VALUES (%s, %s)
+"""
+
+sqlGetStats = """\
+SELECT * FROM stats
+"""
+
 
 def process_MySQL(query: str, **kwargs):
     from utils.consts import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
@@ -180,7 +189,7 @@ def process_MySQL(query: str, **kwargs):
             cursorclass=pymysql.cursors.DictCursor
         )
         print(f"%%% Connected to the MySQL Database! %%%\n"
-              f"%%% Preparing to execute `{repr(query)}`{' and `' + repr(kwargs) + '`' if kwargs else ''}")
+              f"%%% Preparing to execute [`{repr(query)}`{'] and [`' + repr(kwargs) + '`' if kwargs else ''}]")
     except:
         print(f"Unable to connect to the `{SQL_DB}` database.")
         return
@@ -189,7 +198,7 @@ def process_MySQL(query: str, **kwargs):
 
     try:
         with sqlConnection.cursor() as cursor:
-            if not "fetch" in kwargs: # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
+            if not "fetch" in kwargs:  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
                 if not "values" in kwargs:
                     cursor.execute(query=query)
                 else:
@@ -214,5 +223,6 @@ def process_MySQL(query: str, **kwargs):
     finally:
         print(f"%%% Closing connection to the MySQL Database! %%%")
         sqlConnection.close()
+
         if result:
             return result

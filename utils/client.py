@@ -13,14 +13,14 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.chatbot import chatbot  # , trainer
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED, CHAN_TEST_SPAM
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser
+from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser, sqlRecordStats, sqlGetStats
 
 
 async def current_guild():
@@ -220,6 +220,12 @@ async def monitor_messages(message: discord.Message):
             for arrow in arrows:
                 await message.add_reaction(arrow)
 
+    async def record_statistics():
+        author = str(message.author)
+        channel = f"{message.guild}.#{message.channel.name}"
+
+        process_MySQL(query=sqlRecordStats, values=(author, channel))
+
     async def chatbot_reply(bypass=False):
         client_id_re = r"<@!{0,}(593949013443608596|595705663997476887)>"
 
@@ -275,7 +281,12 @@ async def monitor_messages(message: discord.Message):
     if not message.author.bot:
         if message.channel.id not in CHAN_BANNED:
             await auto_replies()
+
+        if message.channel.id not in CHAN_STATS_BANNED:
+            await record_statistics()
+
         await find_subreddits()
+
         await add_votes()
 
         # AUTO_REPLY_BANNED = CHAN_BANNED + (CHAN_WAR_ROOM, CHAN_DBL_WAR_ROOM)
