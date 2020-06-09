@@ -221,8 +221,8 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction(arrow)
 
     async def record_statistics():
-        author = str(message.author)
-        channel = f"{message.guild}.#{message.channel.name}"
+        author = str(message.author).encode(encoding="UTF-8", errors="replace")
+        channel = f"{message.guild}.#{message.channel.name}".encode(encoding="UTF-8", errors="replace")
 
         process_MySQL(query=sqlRecordStats, values=(author, channel))
 
@@ -575,6 +575,11 @@ class MyClient(commands.Bot):
         # self.send_to_log(logging.INFO, payload)
 
     async def on_connect(self):
+        async for guild in client.fetch_guilds():
+            if guild.id not in (GUILD_TEST, GUILD_PROD):
+                print(f"### !!! Stranger danger. Leaving guild {guild}!")
+                await guild.leave
+
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
         await self.startup_procedures()
         # await self.send_salutations(f"*Beep, boop* Greetings! I have arrived.")
