@@ -171,6 +171,11 @@ INSERT INTO stats (author, channel)
 VALUES (%s, %s)
 """
 
+sqlRecordStatsManual = """\
+INSERT INTO stats (author, channel, created_at)
+VALUES (%s, %s, %s)
+"""
+
 sqlGetStats = """\
 SELECT * FROM stats
 """
