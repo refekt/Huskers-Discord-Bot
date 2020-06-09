@@ -192,7 +192,7 @@ async def monitor_messages(message: discord.Message):
 
             for index, s in enumerate(subreddits):
                 if ["huskers", "cfb"] in s:
-                # if "huskers" in s or "cfb" in s:
+                    # if "huskers" in s or "cfb" in s:
                     return
 
                 url = 'https://reddit.com/' + s
@@ -577,8 +577,12 @@ class MyClient(commands.Bot):
     async def on_connect(self):
         async for guild in client.fetch_guilds():
             if guild.id not in (GUILD_TEST, GUILD_PROD):
-                print(f"### !!! Stranger danger. Leaving guild {guild}!")
-                await guild.leave
+                try:
+                    print(f"### !!! Stranger danger. Leaving guild {guild}!")
+                    await guild.leave()
+                except discord.HTTPException:
+                    print(f"### !!! Leaving guild failed!")
+                    pass
 
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
         await self.startup_procedures()
