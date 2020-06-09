@@ -221,8 +221,8 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction(arrow)
 
     async def record_statistics():
-        author = str(message.author).encode(encoding="UTF-8", errors="replace")
-        channel = f"{message.guild}.#{message.channel.name}".encode(encoding="UTF-8", errors="replace")
+        author = str(message.author).encode("ascii", "ignore").decode("ascii")
+        channel = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
 
         process_MySQL(query=sqlRecordStats, values=(author, channel))
 

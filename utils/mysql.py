@@ -188,8 +188,9 @@ def process_MySQL(query: str, **kwargs):
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
-        print(f"%%% Connected to the MySQL Database! %%%\n"
-              f"%%% Preparing to execute [`{repr(query)}`{'] and [`' + repr(kwargs) + '`' if kwargs else ''}]")
+        if not query == sqlRecordStats:
+            print(f"%%% Connected to the MySQL Database! %%%\n"
+                  f"%%% Preparing to execute [`{repr(query)}`{'] and [`' + repr(kwargs) + '`' if kwargs else ''}]")
     except:
         print(f"Unable to connect to the `{SQL_DB}` database.")
         return
@@ -221,7 +222,8 @@ def process_MySQL(query: str, **kwargs):
     except:
         raise ConnectionError("Error occurred opening the MySQL database.")
     finally:
-        print(f"%%% Closing connection to the MySQL Database! %%%")
+        if not query == sqlRecordStats:
+            print(f"%%% Closing connection to the MySQL Database! %%%")
         sqlConnection.close()
 
         if result:
