@@ -578,10 +578,10 @@ class MyClient(commands.Bot):
         async for guild in client.fetch_guilds():
             if guild.id not in (GUILD_TEST, GUILD_PROD):
                 try:
-                    print(f"### !!! Stranger danger. Leaving guild {guild}!")
+                    print(f"### ### !!! Stranger danger. Leaving guild [{guild}]!")
                     await guild.leave()
                 except discord.HTTPException:
-                    print(f"### !!! Leaving guild failed!")
+                    print(f"### ### !!! Leaving guild failed!")
                     pass
 
         process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
