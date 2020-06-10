@@ -10,7 +10,8 @@ from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 
 recruits = {
     "neville": ["Latrell Neville", "3*", "WR", "https://247sports.com/Player/Latrell-Neville-46054704/", "Neville is N!", "2021 3* WR Latrell Neville commits to Nebraska"],
-    "will": ["Will Schweitzer", "3*", "OLB", "https://247sports.com/Player/Will-Schweitzer-46081968/", "Schweitzer is N!", "2021 3* OLB Will Schweitzer commits to Nebraska"]
+    "will": ["Will Schweitzer", "3*", "OLB", "https://247sports.com/Player/Will-Schweitzer-46081968/", "Schweitzer is N!", "2021 3* OLB Will Schweitzer commits to Nebraska"],
+    "fidone": ["Thomas Fidone", "4*", "TE", "https://247sports.com/Player/Thomas-Fidone-46086515/", "Fidone is N!", "2021 3* TE Thomas Fidone commits to Nebraska"]
 }
 
 eNSD = datetime(year=2019, day=18, month=12)
