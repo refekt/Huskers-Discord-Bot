@@ -295,8 +295,11 @@ class Music(commands.Cog):
         message = reaction.message
 
         # Do not use this on other commands.
-        if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET]:
-            return
+        try:
+            if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET]:
+                return
+        except IndexError:
+            pass
 
         if user != self.bot.user and message.author == self.bot.user:
             await message.remove_reaction(reaction, user)
