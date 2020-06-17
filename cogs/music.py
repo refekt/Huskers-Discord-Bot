@@ -263,7 +263,6 @@ class Music(commands.Cog):
             try:
                 video = Video(url, ctx.author)
             except youtube_dl.DownloadError as e:
-                print(repr(e))
                 logging.warn(f"Error downloading video: {e}")
                 await ctx.send(
                     "There was an error downloading your video, sorry.")
@@ -280,7 +279,6 @@ class Music(commands.Cog):
             try:
                 video = Video(url, ctx.author)
             except youtube_dl.DownloadError as e:
-                print(repr(e))
                 await ctx.send(
                     "There was an error downloading your video, sorry.")
                 return
@@ -371,9 +369,10 @@ class Video:
         """Plays audio from (or searches for) a URL."""
         with youtube_dl.YoutubeDL(YTDL_OPTS) as ydl:
             video = self._get_info(url_or_search)
-
+            print("video:", video)
             # code originally just picked the first audio source, I added logic (commented out) to pick the audio format with largest filesize but I'm unsure if that's technically the "best" quality
             video_format = video["formats"][0]
+            print("video format", video_format)
             # for f in video["formats"]:
             # if 'audio only' in f['format']:
             # if f['filesize'] > video_format['filesize']:
