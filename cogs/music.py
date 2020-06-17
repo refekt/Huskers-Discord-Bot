@@ -17,8 +17,8 @@ YTDL_OPTS = {
     "default_search": "ytsearch",
     "format": "bestaudio/best",
     "quiet": True,
-    "extract_flat": "in_playlist",
-    "verbose": True
+    "extract_flat": "in_playlist"
+    #"verbose": True
 }
 
 
