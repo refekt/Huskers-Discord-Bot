@@ -17,7 +17,8 @@ YTDL_OPTS = {
     "default_search": "ytsearch",
     "format": "bestaudio/best",
     "quiet": True,
-    "extract_flat": "in_playlist"
+    "extract_flat": "in_playlist",
+    "verbose": True
 }
 
 
@@ -259,7 +260,6 @@ class Music(commands.Cog):
         state = self.get_state(ctx.guild)  # get the guild's state
 
         if client and client.channel:
-            print("Client channel")
             try:
                 video = Video(url, ctx.author)
             except youtube_dl.DownloadError as e:
@@ -272,7 +272,6 @@ class Music(commands.Cog):
                 "Added to queue.", embed=video.get_embed())
             await self._add_reaction_controls(message)
         else:
-            print("Not Client channel")
             channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_PROD)
             if not channel:
                 channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_TEST)
@@ -369,10 +368,8 @@ class Video:
         """Plays audio from (or searches for) a URL."""
         with youtube_dl.YoutubeDL(YTDL_OPTS) as ydl:
             video = self._get_info(url_or_search)
-            print("video:", video)
             # code originally just picked the first audio source, I added logic (commented out) to pick the audio format with largest filesize but I'm unsure if that's technically the "best" quality
             video_format = video["formats"][0]
-            print("video format", video_format)
             # for f in video["formats"]:
             # if 'audio only' in f['format']:
             # if f['filesize'] > video_format['filesize']:
