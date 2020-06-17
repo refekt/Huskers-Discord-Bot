@@ -259,9 +259,11 @@ class Music(commands.Cog):
         state = self.get_state(ctx.guild)  # get the guild's state
 
         if client and client.channel:
+            print("Client channel")
             try:
                 video = Video(url, ctx.author)
             except youtube_dl.DownloadError as e:
+                print(repr(e))
                 logging.warn(f"Error downloading video: {e}")
                 await ctx.send(
                     "There was an error downloading your video, sorry.")
@@ -271,6 +273,7 @@ class Music(commands.Cog):
                 "Added to queue.", embed=video.get_embed())
             await self._add_reaction_controls(message)
         else:
+            print("Not Client channel")
             channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_PROD)
             if not channel:
                 channel = ctx.guild.get_channel(channel_id=CHAN_RADIO_TEST)
