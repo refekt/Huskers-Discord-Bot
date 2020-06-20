@@ -10,7 +10,13 @@ from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 
 recruits = {
     "neville": ["Latrell Neville", "3*", "WR", "https://247sports.com/Player/Latrell-Neville-46054704/", "Neville is N!", "2021 3* WR Latrell Neville commits to Nebraska"],
-    "fidone": ["Thomas Fidone", "4*", "TE", "https://247sports.com/Player/Thomas-Fidone-46086515/", "Fidone is N!", "2021 3* TE Thomas Fidone commits to Nebraska"]
+    "fidone": ["Thomas Fidone", "4*", "TE", "https://247sports.com/Player/Thomas-Fidone-46086515/", "Fidone is N!", "2021 3* TE Thomas Fidone commits to Nebraska"],
+    "bryant": ["Sirad Bryant", "3*", "S", "https://247sports.com/player/sirad-bryant-46094973/", "Bryant is N!", "2021 3* S Sirad Bryant commits to Nebraska"],
+    "van": ["Geno VanDeMark", "4*", "OG", "https://247sports.com/player/geno-vandemark-46081733/", "VanDeMark is N!", "2021 4* OG Geno VanDeMark commits to Nebraska"],
+    "burkhalter": ["Christian Burkhalter", "3*", "WDE", "https://247sports.com/player/christian-burkhalter-46056902/", "Burkhalter is N!", "2021 3* WDE Christian Burkhalter commits to Nebraska"],
+    "buckley": ["Ru'Quan Buckley", "3*", "OT", "https://247sports.com/player/ruquan-buckley-46082019/", "Buckley is N!", "2021 3* OT Ru'Quan Buckley commits to Nebraska"],
+    "okoli": ["Tobechi Okoli", "3*", "SDE", "https://247sports.com/player/tobechi-okoli-46094840/", "Okoli is N!", "2021 3* SDE Tobechi Okoli commits to Nebraska"],
+    "berry": ["Caleb Berry", "3*", "RB", "https://247sports.com/player/caleb-berry-46080989/", "Berry is N!", "2021 3* RB Caleb Berry commits to Nebraska"]
 }
 
 eNSD = datetime(year=2019, day=18, month=12)
