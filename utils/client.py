@@ -221,10 +221,11 @@ async def monitor_messages(message: discord.Message):
                 await message.add_reaction(arrow)
 
     async def record_statistics():
-        author = str(message.author).encode("ascii", "ignore").decode("ascii")
-        channel = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
+        if not type(message.channel) == discord.DMChannel:
+            author = str(message.author).encode("ascii", "ignore").decode("ascii")
+            channel = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
 
-        process_MySQL(query=sqlRecordStats, values=(author, channel))
+            process_MySQL(query=sqlRecordStats, values=(author, channel))
 
     async def chatbot_reply(bypass=False):
         client_id_re = r"<@!{0,}(593949013443608596|595705663997476887)>"
