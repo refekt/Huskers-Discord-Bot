@@ -10,7 +10,6 @@ from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 
 recruits = {
     "neville": ["Latrell Neville", "3*", "WR", "https://247sports.com/Player/Latrell-Neville-46054704/", "Neville is N!", "2021 3* WR Latrell Neville commits to Nebraska"],
-    "will": ["Will Schweitzer", "3*", "OLB", "https://247sports.com/Player/Will-Schweitzer-46081968/", "Schweitzer is N!", "2021 3* OLB Will Schweitzer commits to Nebraska"],
     "fidone": ["Thomas Fidone", "4*", "TE", "https://247sports.com/Player/Thomas-Fidone-46086515/", "Fidone is N!", "2021 3* TE Thomas Fidone commits to Nebraska"]
 }
 
@@ -52,32 +51,44 @@ class RedditCommands(commands.Cog):
                f"\n" \
                f"Source: {source}"
 
-        # Testing sub reddit
-        # huskers = reddit.subreddit("ThisIsDarkSouls")
-        # huskers.submit(
-        #     title=recruits[recruit][4],
-        #     selftext=text
-        # )
+        from utils.misc import on_prod_server
 
-        huskers = reddit.subreddit("huskers")
-        huskers.submit(
-            title=recruits[recruit][4],
-            selftext=text
-        )
+        if on_prod_server():
+            huskers = reddit.subreddit("huskers")
+            huskers.submit(
+                title=recruits[recruit][4],
+                selftext=text
+            )
 
-        time.sleep(random.randint(1, 4))
+            time.sleep(random.randint(1, 3))
 
-        cfb = reddit.subreddit("cfb")
-        cfb_post = cfb.submit(
-            title=recruits[recruit][5],
-            selftext=text
-        )
+            cfb = reddit.subreddit("cfb")
+            cfb_post = cfb.submit(
+                title=recruits[recruit][5],
+                selftext=text
+            )
 
-        try:
-            cfb_post.falir.select("Recruiting")
-        except:
-            await ctx.send("Unable to set flair! Make sure you do it.")
-            pass
+            try:
+                cfb_post.falir.select("Recruiting")
+            except:
+                await ctx.send("Unable to set flair! Make sure you do it.")
+                pass
+        elif not on_prod_server():
+            testsub = reddit.subreddit("rngeezus")
+            testsub.submit(
+                title=recruits[recruit][4],
+                selftext=text
+            )
+
+            time.sleep(random.randint(1, 3))
+
+            testsub = reddit.subreddit("rngeezus")
+            testsub.submit(
+                title=recruits[recruit][5],
+                selftext=text
+            )
+
+        await ctx.send(f"Successfully posted threads about {recruits[recruit][0]}!")
 
 
 def setup(bot):
