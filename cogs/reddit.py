@@ -16,7 +16,8 @@ recruits = {
     "burkhalter": ["Christian Burkhalter", "3*", "WDE", "https://247sports.com/player/christian-burkhalter-46056902/", "Burkhalter is N!", "2021 3* WDE Christian Burkhalter commits to Nebraska"],
     "buckley": ["Ru'Quan Buckley", "3*", "OT", "https://247sports.com/player/ruquan-buckley-46082019/", "Buckley is N!", "2021 3* OT Ru'Quan Buckley commits to Nebraska"],
     "okoli": ["Tobechi Okoli", "3*", "SDE", "https://247sports.com/player/tobechi-okoli-46094840/", "Okoli is N!", "2021 3* SDE Tobechi Okoli commits to Nebraska"],
-    "berry": ["Caleb Berry", "3*", "RB", "https://247sports.com/player/caleb-berry-46080989/", "Berry is N!", "2021 3* RB Caleb Berry commits to Nebraska"]
+    "berry": ["Caleb Berry", "3*", "RB", "https://247sports.com/player/caleb-berry-46080989/", "Berry is N!", "2021 3* RB Caleb Berry commits to Nebraska"],
+    "mwilliams": ["Malik Williams", "3*", "CB", "https://247sports.com/Player/Malik-Williams-46080425/", "Malik Williams is N!"] 
 }
 
 eNSD = datetime(year=2019, day=18, month=12)
