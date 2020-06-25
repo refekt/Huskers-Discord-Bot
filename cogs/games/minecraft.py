@@ -11,9 +11,10 @@ class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
 
     @minecraft.command()
     async def server(self, ctx):
+        version = "1.16.1"
         await ctx.send(
             embed=build_embed(
-                title="Husker Discord Minecraft Server",
+                title=f"Husker Discord Minecraft {version} Server",
                 fields=[
                     ["Version", "Java"],
                     ["Survival Server", "202.5.24.139"],
