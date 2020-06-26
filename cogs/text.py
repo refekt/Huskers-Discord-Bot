@@ -70,8 +70,8 @@ class TextCommands(commands.Cog):
             else:
                 from utils.client import client
 
-                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.clean_content)]:
-                    return "\n" + str(msg.clean_content.capitalize())
+                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.content)]:
+                    return "\n" + str(msg.content.capitalize())
 
             return ""
 
@@ -87,7 +87,7 @@ class TextCommands(commands.Cog):
             for msg in messages:
                 source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=msg.author.bot)
         else:
-            if len(sources) > 5:
+            if len(sources) > 3:
                 await edit_msg.edit(content=edit_msg.content + "...this might take awhile...be patient...")
 
             for item in sources:
@@ -109,14 +109,14 @@ class TextCommands(commands.Cog):
 
         source_data = cleanup_source_data(source_data)
 
-        broken_message = f"You broke me! Most likely because there is no source data.\nThe source data is: {repr(source_data)}"
+        broken_message = f"```\nYou broke me! Most likely because there is no source data.\nThe source data is: {repr(source_data)}```"
 
         if not source_data:
             await edit_msg.edit(content="Source data: " + broken_message)
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
-        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=30, min_words=5, tries=100)
+        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100)
 
         if sentence is None:
             await edit_msg.edit(content="Sentence: " + broken_message)
