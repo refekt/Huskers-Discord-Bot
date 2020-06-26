@@ -15,7 +15,7 @@ from utils.games import Venue
 
 
 class TextCommands(commands.Cog):
-    @commands.command(aliases=["cd",])
+    @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def countdown(self, ctx, *, team=None):
         """ Countdown to the most current or specific Husker game """
@@ -59,6 +59,7 @@ class TextCommands(commands.Cog):
 
         edit_msg = await ctx.send("Thinking...")
         source_data = ""
+        messages = []
 
         CHAN_HIST_LIMIT = 2250
 
@@ -69,15 +70,14 @@ class TextCommands(commands.Cog):
             else:
                 from utils.client import client
 
-                # banned_channels = ["test-banned", "news-politics"]
-
-                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if(ele in msg.clean_content)]:
+                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.clean_content)]:
                     return "\n" + str(msg.clean_content.capitalize())
 
             return ""
 
         def cleanup_source_data(source_data: str):
             new_source_data = source_data.replace("`", "")
+            new_source_data = new_source_data.replace("\n\n", "\n")
             regex_url_finder = "((http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
             new_source_data = re.sub(regex_url_finder, "", new_source_data, flags=re.IGNORECASE)
             return new_source_data
@@ -85,7 +85,7 @@ class TextCommands(commands.Cog):
         if not sources:
             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
             for msg in messages:
-                source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=False)
+                source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=msg.author.bot)
         else:
             if len(sources) > 5:
                 await edit_msg.edit(content=edit_msg.content + "...this might take awhile...be patient...")
@@ -93,31 +93,30 @@ class TextCommands(commands.Cog):
             for item in sources:
                 if type(item) == discord.Member:
                     if item.bot:
-                        source_data += check_message(auth=ctx.message.author, bot_provided=True)
+                        source_data += check_message(auth=ctx.message.author, bot_provided=item.bot)
                     else:
                         try:
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
                             for msg in messages:
                                 if msg.author == item:
-                                    # await ctx.send(f"Adding [{msg.clean_content[:150]}] from [{msg.author}]")
-                                    source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
+                                    source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
                         except discord.errors.Forbidden:
-                            pass
+                            continue
                 elif type(item) == discord.TextChannel:
                     messages = await item.history(limit=CHAN_HIST_LIMIT).flatten()
                     for msg in messages:
-                        source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
+                        source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
 
         source_data = cleanup_source_data(source_data)
 
-        broken_message = f"You broke me! Most likely because there is no source data."
+        broken_message = f"You broke me! Most likely because there is no source data.\nThe source data is: {repr(source_data)}"
 
         if not source_data:
             await edit_msg.edit(content="Source data: " + broken_message)
             return
 
         chain = markovify.NewlineText(source_data, well_formed=True)
-        sentence = chain.make_short_sentence(min_chars=45, max_chars=500, tries=50, max_overlap_ratio=.4)
+        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=30, min_words=5, tries=100)
 
         if sentence is None:
             await edit_msg.edit(content="Sentence: " + broken_message)
@@ -167,8 +166,8 @@ class TextCommands(commands.Cog):
 
                 embed = discord.Embed(
                     title=f"Weather Forecast for the __[ {game.opponent} ]__ in __[ {_venue_name} / {_weather['data'][0]['city_name']}, {_weather['data'][0]['state_code']} ]__",
-                    color=0xFF0000)  #,
-                    # description=f"Nebraska's next opponent is __[ {game.opponent} ]__")
+                    color=0xFF0000)  # ,
+                # description=f"Nebraska's next opponent is __[ {game.opponent} ]__")
 
                 break
 
@@ -189,7 +188,7 @@ class TextCommands(commands.Cog):
         else:
             await ctx.send(embed=embed)
 
-    @commands.command(name="24hours", aliases=["24", "24hrs",])
+    @commands.command(name="24hours", aliases=["24", "24hrs", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
         """ You have 24 hours to cheer or moam about the game """
@@ -204,7 +203,7 @@ class TextCommands(commands.Cog):
             if now_cst > game_dt_cst:
                 try:
                     i = len(games) - (index + 1) if index < len(games) else len(games) - index
-                    next_opponent = games[i + 1].opponent # Should avoid out of bounds
+                    next_opponent = games[i + 1].opponent  # Should avoid out of bounds
 
                     if now_cst < _24hourspassed:
                         await ctx.send(f"You have 24 hours to #moaming the __[ {game.opponent} ]__ game! That ends in __[ {_24hourspassed - now_cst} ]__!")
@@ -247,7 +246,7 @@ class TextCommands(commands.Cog):
                     await ctx.send(f"`{who.display_name} joined at {user[1]}`")
                     return
 
-    @commands.command(aliases=["8b",])
+    @commands.command(aliases=["8b", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
@@ -282,6 +281,5 @@ class TextCommands(commands.Cog):
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))
-
 
 # print("### Text Commands loaded! ###")
