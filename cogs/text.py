@@ -298,7 +298,7 @@ class TextCommands(commands.Cog):
 
         from bs4 import BeautifulSoup
         r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
-        soup = BeautifulSoup(r.content)
+        soup = BeautifulSoup(r.content, features="html.parser")
         try:
             definition = soup.find("div", attrs={"class": "meaning"}).text
         except AttributeError:
@@ -311,6 +311,7 @@ class TextCommands(commands.Cog):
             text="",
             embed=build_embed(
                 title=f"Urban Dictionary Definition",
+                inline=False,
                 fields=[
                     [word, definition],
                     ["Link", f"https://www.urbandictionary.com/define.php?term={word}"]
