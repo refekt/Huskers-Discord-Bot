@@ -298,11 +298,11 @@ class Music(commands.Cog):
         # Do not use this on other commands.
         if not message.embeds:
             return
-        # try:
-        #     if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET]:
-        #         return
-        # except IndexError:
-        #     pass
+        try:
+            if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET]:
+                return
+        except IndexError:
+            pass
 
         if user != self.bot.user and message.author == self.bot.user:
             print("Removing becuase radio")
