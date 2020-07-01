@@ -312,7 +312,8 @@ class TextCommands(commands.Cog):
             embed=build_embed(
                 title=f"Urban Dictionary Definition",
                 fields=[
-                    [word, definition]
+                    [word, definition],
+                    ["Link", f"https://www.urbandictionary.com/define.php?term={word}"]
                 ]
             )
         )
