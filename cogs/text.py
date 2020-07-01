@@ -314,6 +314,7 @@ class TextCommands(commands.Cog):
             embed=build_embed(
                 title=f"Urban Dictionary Definition",
                 inline=False,
+                text="",
                 fields=[
                     [word, definition],
                     ["Link", f"https://www.urbandictionary.com/define.php?term={urllib.parse.quote(string=word)}"]
