@@ -307,6 +307,8 @@ class TextCommands(commands.Cog):
         if len(definition) > 1024:
             definition = definition[:1020] + "..."
 
+        import urllib.parse
+
         await edit_msg.edit(
             text="",
             embed=build_embed(
@@ -314,7 +316,7 @@ class TextCommands(commands.Cog):
                 inline=False,
                 fields=[
                     [word, definition],
-                    ["Link", f"https://www.urbandictionary.com/define.php?term={word}"]
+                    ["Link", f"https://www.urbandictionary.com/define.php?term={urllib.parse.quote(string=word)}"]
                 ]
             )
         )
