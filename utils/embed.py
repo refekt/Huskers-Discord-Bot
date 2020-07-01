@@ -31,7 +31,8 @@ def build_embed(title, **kwargs):
             embed = discord.Embed(title=title, color=0xD00000)
 
     embed.set_author(name="Bot Frost", url="https://github.com/refekt/Husker-Bot", icon_url="https://i.imgur.com/Ah3x5NA.png")
-    embed.set_footer(text=f"Embed created on {timestamp.strftime('%a %b %e, %Y at %I:%M %p')}")
+    # embed.set_footer(text=f"Embed created on {timestamp.strftime('%a %b %e, %Y at %I:%M %p')}")
+    embed.set_footer(text=FOOTER_BOT)
 
     if "image" in kwargs.keys():
         embed.set_image(url=kwargs["image"])
