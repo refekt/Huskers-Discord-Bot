@@ -1,3 +1,5 @@
+from utils.embed import build_embed
+import urbandict
 import random
 import re
 import typing
@@ -277,6 +279,22 @@ class TextCommands(commands.Cog):
                        f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. "
                        f"Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! "
                        f"🚫 ⛔ 👎 🙅‍♀️Thanks for your cooperation. 😍🤩😘 **")
+
+    @commands.command(aliases=["ud", ])
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def urbandictionary(self, ctx, *, word: str):
+        edit_msg = await ctx.send("Loading...")
+        definition = urbandict.define(word)
+
+        await edit_msg.edit(
+            text="",
+            embed=build_embed(
+                title="Urban Dictionary Definition",
+                fields=[
+                    [definition[0]["word"], definition[0]["def"]]
+                ]
+            )
+        )
 
 
 def setup(bot):
