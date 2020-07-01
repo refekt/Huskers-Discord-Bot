@@ -299,7 +299,10 @@ class TextCommands(commands.Cog):
         from bs4 import BeautifulSoup
         r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
         soup = BeautifulSoup(r.content)
-        definition = soup.find("div", attrs={"class": "meaning"}).text
+        try:
+            definition = soup.find("div", attrs={"class": "meaning"}).text
+        except AttributeError:
+            definition = f"Sorry, we couldn't find: {word}"
 
         await edit_msg.edit(
             text="",
