@@ -304,6 +304,9 @@ class TextCommands(commands.Cog):
         except AttributeError:
             definition = f"Sorry, we couldn't find: {word}"
 
+        if len(definition) > 1024:
+            definition = definition[:1020] + "..."
+
         await edit_msg.edit(
             text="",
             embed=build_embed(
