@@ -284,18 +284,32 @@ class TextCommands(commands.Cog):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def urbandictionary(self, ctx, *, word: str):
         edit_msg = await ctx.send("Loading...")
-        definition = urbandict.define(word)
+        # definition = urbandict.define(word)
+        #
+        # await edit_msg.edit(
+        #     text="",
+        #     embed=build_embed(
+        #         title="Urban Dictionary Definition",
+        #         fields=[
+        #             [definition[0]["word"], definition[0]["def"]]
+        #         ]
+        #     )
+        # )
+
+        from bs4 import BeautifulSoup
+        r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
+        soup = BeautifulSoup(r.content)
+        definition = soup.find("div", attrs={"class": "meaning"}).text
 
         await edit_msg.edit(
             text="",
             embed=build_embed(
-                title="Urban Dictionary Definition",
+                title=f"Urban Dictionary Definition",
                 fields=[
-                    [definition[0]["word"], definition[0]["def"]]
+                    [word, definition]
                 ]
             )
         )
-
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))
