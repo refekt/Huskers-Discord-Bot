@@ -297,7 +297,6 @@ class TextCommands(commands.Cog):
         import urllib.parse
 
         await ctx.send(
-            text="",
             embed=build_embed(
                 title=f"Urban Dictionary Definition",
                 inline=False,
