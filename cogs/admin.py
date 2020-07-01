@@ -124,7 +124,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
     @commands.command(aliases=["q", ], hidden=True)
-    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD)
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
