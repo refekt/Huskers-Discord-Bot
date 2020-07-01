@@ -46,7 +46,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ Yeeeeeeeeet """
         await ctx.send(embed=build_image_embed(title="BIG BOY PARTY", image="https://i.imgur.com/3sshtBD.gif"))
 
-    @commands.command()
+    @commands.command(aliases=["td",])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def touchdown(self, ctx):
         await ctx.send(embed=build_image_embed(title="🏈🎈🏈🎈", image="https://i.imgur.com/Wh4aLYo.gif"))
@@ -148,12 +148,6 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def guzzle(self, ctx):
         """ 🍻🍻🍻🍻🍻🍻🍻 """
         await ctx.send(embed=build_image_embed(title="Give it to me bb", image="https://i.imgur.com/OW7rChr.gif"))
-
-    @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def touchdown(self, ctx):
-        """ 🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈 """
-        await ctx.send(embed=build_image_embed(title="🏈🎈🏈🎈", image="https://i.imgur.com/Wh4aLYo.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
