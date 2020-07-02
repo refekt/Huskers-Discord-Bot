@@ -8,19 +8,6 @@ from discord.ext import commands
 from utils.client import client
 from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 
-recruits = {
-    "neville": ["Latrell Neville", "3*", "WR", "https://247sports.com/Player/Latrell-Neville-46054704/", "Neville is N!", "2021 3* WR Latrell Neville commits to Nebraska"],
-    "fidone": ["Thomas Fidone", "4*", "TE", "https://247sports.com/Player/Thomas-Fidone-46086515/", "Fidone is N!", "2021 3* TE Thomas Fidone commits to Nebraska"],
-    "bryant": ["Sirad Bryant", "3*", "S", "https://247sports.com/player/sirad-bryant-46094973/", "Bryant is N!", "2021 3* S Sirad Bryant commits to Nebraska"],
-    "geno": ["Geno VanDeMark", "4*", "OG", "https://247sports.com/player/geno-vandemark-46081733/", "VanDeMark is N!", "2021 4* OG Geno VanDeMark commits to Nebraska"],
-    "burkhalter": ["Christian Burkhalter", "3*", "WDE", "https://247sports.com/player/christian-burkhalter-46056902/", "Burkhalter is N!", "2021 3* WDE Christian Burkhalter commits to Nebraska"],
-    "buckley": ["Ru'Quan Buckley", "3*", "OT", "https://247sports.com/player/ruquan-buckley-46082019/", "Buckley is N!", "2021 3* OT Ru'Quan Buckley commits to Nebraska"],
-    "okoli": ["Tobechi Okoli", "3*", "SDE", "https://247sports.com/player/tobechi-okoli-46094840/", "Okoli is N!", "2021 3* SDE Tobechi Okoli commits to Nebraska"],
-    "berry": ["Caleb Berry", "3*", "RB", "https://247sports.com/player/caleb-berry-46080989/", "Berry is N!", "2021 3* RB Caleb Berry commits to Nebraska"],
-    "mwilliams": ["Malik Williams", "3*", "CB", "https://247sports.com/Player/Malik-Williams-46080425/", "Malik Williams is N!"],
-    "audric": ["Audric Estime", "4*", "RB", "https://247sports.com/Player/Audric-Estime-46081586/", "Audric Estime is N!"]
-}
-
 eNSD = datetime(year=2019, day=18, month=12)
 
 
@@ -31,20 +18,34 @@ def is_me(ctx):
 class RedditCommands(commands.Cog):
     @commands.command(hidden=True)
     @commands.check(is_me)
-    async def nsd(self, ctx, recruit: str, source: str = ""):
-        me = client.get_user(189554873778307073)
+    async def nsd(self, ctx, recruit: str, source: str = None):
+        if source is None:
+            await ctx.send(f"A source is required!")
+            return
 
-        try:
-            recruit = recruit.lower()
-            if not recruit in recruits:
-                await me.send(f"Unable to find {recruit}")
-                return
-        except IndexError:
-            await me.send(f"Key error on {recruit}")
-            return
-        except:
-            await me.send(f"No idea...{recruit}")
-            return
+        def load_recruits():
+            import csv
+            r = []
+            with open("recruits.csv", newline="") as csvfile:
+                recruits_raws = csv.reader(csvfile, delimiter=",")
+                for row in recruits_raws:
+                    r.append(
+                        dict(
+                            id=row[0],
+                            data=dict(
+                                year=row[1],
+                                name=row[2],
+                                profile=row[3],
+                                stars=row[4],
+                                position=row[5],
+                                cfb_title=f"{row[1]} {row[4]}* {row[5]} {row[2]} commits to Nebraska",
+                                huskers_title=f"{row[2]} is N!"
+                            )
+                        )
+                    )
+            del r[0]
+
+            return r
 
         reddit = praw.Reddit(
             client_id=REDDIT_CLIENT_ID,
@@ -54,49 +55,74 @@ class RedditCommands(commands.Cog):
             password=REDDIT_PW
         )
 
-        # 0 == name, 1 == stars, 2 == position, 3 == url, 4 == /r/huskers, 5 == /r/cfb
-        text = f"247Sports Profile: {recruits[recruit][3]}\n" \
-               f"\n" \
-               f"Source: {source}"
+        recruits = load_recruits()
 
-        from utils.misc import on_prod_server
+        me = client.get_user(189554873778307073)
+        recruit = recruit.lower()
 
-        if on_prod_server():
-            huskers = reddit.subreddit("huskers")
-            huskers.submit(
-                title=recruits[recruit][4],
-                selftext=text
-            )
+        try:
+            found = False
+            for recruit_row in recruits:
 
-            time.sleep(random.randint(1, 3))
+                if recruit_row["id"] == recruit:
+                    found = True
 
-            cfb = reddit.subreddit("cfb")
-            cfb_post = cfb.submit(
-                title=recruits[recruit][5],
-                selftext=text
-            )
+                    text = f"247Sports Profile: {recruit_row['data']['profile']}\n" \
+                           f"\n" \
+                           f"Source: {source}"
 
-            try:
-                cfb_post.falir.select("Recruiting")
-            except:
-                await ctx.send("Unable to set flair! Make sure you do it.")
-                pass
-        elif not on_prod_server():
-            testsub = reddit.subreddit("rngeezus")
-            testsub.submit(
-                title=recruits[recruit][4],
-                selftext=text
-            )
+                    from utils.misc import on_prod_server
 
-            time.sleep(random.randint(1, 3))
+                    if on_prod_server():
+                        huskers = reddit.subreddit("huskers")
+                        huskers.submit(
+                            title=recruit_row["data"]["huskers_title"],
+                            selftext=text
+                        )
 
-            testsub = reddit.subreddit("rngeezus")
-            testsub.submit(
-                title=recruits[recruit][5],
-                selftext=text
-            )
+                        time.sleep(random.randint(1, 3))
 
-        await ctx.send(f"Successfully posted threads about {recruits[recruit][0]}!")
+                        cfb = reddit.subreddit("cfb")
+                        cfb_post = cfb.submit(
+                            title=recruit_row["data"]["cfb_title"],
+                            selftext=text
+                        )
+
+                        try:
+                            cfb_post.falir.select("Recruiting")
+                        except:
+                            await ctx.send("Unable to set flair! Make sure you do it.")
+                            pass
+
+                    elif not on_prod_server():
+                        testsub = reddit.subreddit("rngeezus")
+                        testsub.submit(
+                            title=recruit_row["data"]["cfb_title"],
+                            selftext=text
+                        )
+
+                        time.sleep(random.randint(1, 3))
+
+                        testsub = reddit.subreddit("rngeezus")
+                        testsub.submit(
+                            title=recruit_row["data"]["huskers_title"],
+                            selftext=text
+                        )
+
+                    await ctx.send(f"Successfully posted threads about {recruit_row['data']['name']}!")
+
+                    break
+
+            if not found:
+                await ctx.send(f"Unable to find the player: {recruit}!")
+                return
+
+        except IndexError:
+            await ctx.send(f"Key error looking up: {recruit}!")
+            return
+        except:
+            await ctx.send(f"No idea... {recruit}")
+            return
 
 
 def setup(bot):
