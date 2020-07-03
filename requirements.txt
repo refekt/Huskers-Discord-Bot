@@ -61,6 +61,7 @@ thinc==7.4.1
 tqdm==4.46.1
 Unidecode==1.1.1
 update-checker==0.17
+urbandict==0.6.1
 urllib3==1.25.9
 urlwatch==2.18
 wasabi==0.7.0
