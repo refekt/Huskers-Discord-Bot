@@ -1,5 +1,3 @@
-from utils.embed import build_embed
-import urbandict
 import random
 import re
 import typing
@@ -12,6 +10,7 @@ from discord.ext import commands
 
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
 from utils.consts import TZ
+from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
 
@@ -306,6 +305,7 @@ class TextCommands(commands.Cog):
                 ]
             )
         )
+
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))

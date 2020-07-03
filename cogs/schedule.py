@@ -8,9 +8,6 @@ import requests
 from discord.ext import commands
 
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
-from utils.embed import build_embed
-from utils.games import ScheduleBackup
-import platform
 from utils.embed import build_schedule_embed
 
 leagueDict = {
@@ -243,6 +240,5 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
 
 def setup(bot):
     bot.add_cog(ScheduleCommands(bot))
-
 
 # print("### Schedule Commands loaded! ###")

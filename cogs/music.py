@@ -18,7 +18,7 @@ YTDL_OPTS = {
     "format": "bestaudio/best",
     "quiet": True,
     "extract_flat": "in_playlist"
-    #"verbose": True
+    # "verbose": True
 }
 
 

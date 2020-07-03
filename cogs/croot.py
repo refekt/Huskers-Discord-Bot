@@ -11,7 +11,7 @@ from utils.recruit import FootballRecruit
 
 
 class RecruitCommands(commands.Cog):
-    @commands.command(aliases=["cb",])
+    @commands.command(aliases=["cb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def crootboot(self, ctx, year: int, *name):
         """ Retreive information about a recruit """
@@ -84,6 +84,5 @@ class RecruitCommands(commands.Cog):
 
 def setup(bot):
     bot.add_cog(RecruitCommands(bot))
-
 
 # print("### Recruit Commands loaded! ###")

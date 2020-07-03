@@ -33,7 +33,8 @@ async def makeMD5():
     guild_members = guild.members
 
     admin_or_mods = []
-    animals = ["aardvark", "leopard", "baboon", "meerkat", "bobcat", "meerkat", "cheetah", "ocelot", "dingo", "platypus", "skunk", "squirrel", "horse", "koala", "zebra", "wolf", "fox", "giraffe", "leopard", "raccoon", "elephant", "cat", "dog"]
+    animals = ["aardvark", "leopard", "baboon", "meerkat", "bobcat", "meerkat", "cheetah", "ocelot", "dingo", "platypus", "skunk", "squirrel", "horse", "koala", "zebra", "wolf", "fox", "giraffe",
+               "leopard", "raccoon", "elephant", "cat", "dog"]
     mammals = {}
 
     for member in guild_members:

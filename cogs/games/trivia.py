@@ -10,7 +10,6 @@ from discord.ext import commands
 from discord.ext.commands import TextChannelConverter
 
 from utils.client import client
-from utils.consts import ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD
 from utils.embed import build_embed
 from utils.misc import bot_latency
 from utils.mysql import process_MySQL, sqlClearTriviaScore, sqlRetrieveTriviaScores, sqlInsertTriviaScore, sqlRetrieveTriviaQuestions
@@ -147,7 +146,7 @@ async def loop_questions():
 
         now = datetime.now()
         old = datetime.strptime(question_embed.footer.text, "%Y-%m-%d %H:%M:%S.%f")
-        question_embed.set_footer(text=f'{question_embed.footer.text}|{now} == {now-old}')
+        question_embed.set_footer(text=f'{question_embed.footer.text}|{now} == {now - old}')
         await msg.edit(embed=question_embed)
 
         game.current_question += 1
@@ -291,7 +290,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
         pass
 
-    @trivia.command(aliases=["s",])
+    @trivia.command(aliases=["s", ])
     # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def setup(self, ctx):
         """Admin/Trivia Boss Command: Setup the next trivia game"""
@@ -453,7 +452,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
 
         await start_messages()
 
-    @trivia.command(aliases=["n",], hidden=True)
+    @trivia.command(aliases=["n", ], hidden=True)
     # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def next(self, ctx):
         """Admin/Trivia Boss Command: Send the next question"""
@@ -469,7 +468,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         if not game.processing and game.started:
             await loop_questions()
 
-    @trivia.command(aliases=["q",])
+    @trivia.command(aliases=["q", ])
     # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
@@ -482,7 +481,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
                 )
             )
 
-    @trivia.command(aliases=["score",], hidden=True)
+    @trivia.command(aliases=["score", ], hidden=True)
     async def scores(self, ctx):
         """Shows the score for the current trivia game"""
         if not game.started:

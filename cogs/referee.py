@@ -54,7 +54,7 @@ class Referee(commands.Cog):
                 )
             )
 
-    @referee.command(aliases=["untimed",])
+    @referee.command(aliases=["untimed", ])
     async def ready(self, ctx):
         """
         Ready for play
@@ -76,14 +76,14 @@ class Referee(commands.Cog):
         """
         pass
 
-    @referee.command(aliases=["to", "tv",])
+    @referee.command(aliases=["to", "tv", ])
     async def timeout(self, ctx):
         """
         TV/radio timeout
         """
         pass
 
-    @referee.command(aliases=["td", "fieldgoal", "fg",])
+    @referee.command(aliases=["td", "fieldgoal", "fg", ])
     async def touchdown(self, ctx):
         """
         Touchdown
@@ -98,7 +98,7 @@ class Referee(commands.Cog):
         """
         pass
 
-    @referee.command(aliases=["dead","touchback"])
+    @referee.command(aliases=["dead", "touchback"])
     async def deadball(self, ctx):
         """
         Dead-ball foul
@@ -113,14 +113,14 @@ class Referee(commands.Cog):
         """
         pass
 
-    @referee.command(aliases=["loss",])
+    @referee.command(aliases=["loss", ])
     async def lossofdown(self, ctx):
         """
         Loss of down
         """
         pass
 
-    @referee.command(aliases=["nogood","declined"])
+    @referee.command(aliases=["nogood", "declined"])
     async def incomplete(self, ctx):
         """
         Incomplete pass
@@ -158,7 +158,7 @@ class Referee(commands.Cog):
         """
         pass
 
-    @referee.command(aliases=["encroachment","formation",])
+    @referee.command(aliases=["encroachment", "formation", ])
     async def falsestart(self, ctx):
         """
         False start
@@ -167,7 +167,7 @@ class Referee(commands.Cog):
         """
         pass
 
-    @referee.command(aliases=["shift",])
+    @referee.command(aliases=["shift", ])
     async def motion(self, ctx):
         """
         Illegal motion
@@ -210,21 +210,21 @@ class Referee(commands.Cog):
         """
         pass
 
-    @referee.command(aliases=["unsportsman",])
+    @referee.command(aliases=["unsportsman", ])
     async def unsportsmanlike(self, ctx):
         """
         Unsportsmanlike conduct
         """
         pass
 
-    @referee.command(aliases=["roughingkicker",])
+    @referee.command(aliases=["roughingkicker", ])
     async def runningkicker(self, ctx):
         """
         Running into or roughing the kicker or holder
         """
         pass
 
-    @referee.command(aliases=["kicking",])
+    @referee.command(aliases=["kicking", ])
     async def batting(self, ctx):
         """
         Illegal batting/kicking
@@ -288,7 +288,7 @@ class Referee(commands.Cog):
         Chop block
         """
         pass
-    
+
     @referee.command()
     async def holding(self, ctx):
         """
@@ -297,29 +297,29 @@ class Referee(commands.Cog):
         Illegal use of the hands or arms
         """
         pass
-    
-    @referee.command(aliases=["back",])
+
+    @referee.command(aliases=["back", ])
     async def blockinback(self, ctx):
         """
         Illegal block in the back
         """
         pass
-    
+
     @referee.command()
     async def facemask(self, ctx):
         """
         Grasping of the face mask or helmet opening
         """
         pass
-    
+
     @referee.command()
     async def tripping(self, ctx):
         """
         Tripping
         """
         pass
-    
-    @referee.command(aliases=["dq",])
+
+    @referee.command(aliases=["dq", ])
     async def disqualification(self, ctx):
         """
         Disqualification
@@ -336,6 +336,5 @@ class Referee(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Referee(bot))
-
 
 # print("### Referee Command loaded! ###")

@@ -39,7 +39,7 @@ flag_dict = {
 
 
 class CrappyFlags(commands.Cog, name="Flag Commands"):
-    @commands.command(aliases=["rf",])
+    @commands.command(aliases=["rf", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def randomflag(self, ctx):
         """ Random Nebraskan flags """
@@ -136,7 +136,7 @@ class CrappyFlags(commands.Cog, name="Flag Commands"):
     async def notredame(self, ctx):
         pass
 
-    @crappyflag.command(aliases=["osu","tosu"])
+    @crappyflag.command(aliases=["osu", "tosu"])
     async def ohio_state(self, ctx):
         pass
 
@@ -187,6 +187,5 @@ class CrappyFlags(commands.Cog, name="Flag Commands"):
 
 def setup(bot):
     bot.add_cog(CrappyFlags(bot))
-
 
 # print("### CrappyFlags Command loaded! ###")
