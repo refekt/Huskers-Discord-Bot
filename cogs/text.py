@@ -314,7 +314,7 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["rm", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, what: str):
+    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, message: str):
         ''' Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m '''
         if type(who) == discord.Member and not ctx.author == who:
             await ctx.send("You cannot set reminders for anyone other than yourself!")
@@ -327,27 +327,66 @@ class TextCommands(commands.Cog):
 
         def format_when(when):
             days = hours = minutes = seconds = 0
+            first_var_spot = 3
+
+            d_char = "d"
+            h_char = "h"
+            m_char = "m"
+            s_char = "s"
+
+            splice_start = splice_end = 0
+
             try:
-                if "d" in when:
-                    days = int(when[:when.find("d")])
+                if d_char in when:
+                    splice_end = when.rfind(d_char)
+                    splice_start = when.rfind(r"\D", 0, splice_end)
+
+                    if when.find(d_char) > first_var_spot:
+                        days = int(when[splice_end + splice_start:splice_end])
+                    else:
+                        days = int(when[:splice_end])
             except:
                 pass
 
+            splice_start = splice_end = 0
+
             try:
-                if "h" in when:
-                    hours = int(when[when.find("d") + 1:when.find("h")])
+                if h_char in when:
+                    splice_end = when.rfind(h_char)
+                    splice_start = when.rfind(r"\D", 0, splice_end)
+
+                    if when.find(h_char) > first_var_spot:
+                        hours = int(when[splice_end + splice_start:splice_end])
+                    else:
+                        hours = int(when[:splice_end])
             except:
                 pass
 
+            splice_start = splice_end = 0
+
             try:
-                if "m" in when:
-                    minutes = int(when[when.find("h") + 1:when.find("m")])
+                if m_char in when:
+                    splice_end = when.rfind(m_char)
+                    splice_start = when.rfind(r"\D", splice_end, 0)
+
+                    if when.find(m_char) > first_var_spot:
+                        minutes = int(when[splice_end + splice_start:splice_end])
+                    else:
+                        minutes = int(when[:splice_end])
             except:
                 pass
 
+            splice_start = splice_end = 0
+
             try:
-                if "s" in when:
-                    seconds = int(when[when.find("m") + 1:when.find("s")])
+                if s_char in when:
+                    splice_end = when.rfind(s_char)
+                    splice_start = when.rfind(r"\D", splice_end, 0)
+
+                    if when.find(s_char) > first_var_spot:
+                        seconds = int(when[splice_end + splice_start:splice_end])
+                    else:
+                        seconds = int(when[:splice_end])
             except:
                 pass
 
