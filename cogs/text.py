@@ -1,3 +1,4 @@
+from threading import Timer
 import random
 import re
 import typing
@@ -13,6 +14,11 @@ from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
+from utils.timer import start_timer_for
+
+
+async def send_message(who, what):
+    await who.send(what)
 
 
 class TextCommands(commands.Cog):
@@ -305,6 +311,52 @@ class TextCommands(commands.Cog):
                 ]
             )
         )
+
+    @commands.command(aliases=["rm", ])
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, what: str):
+        ''' Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m '''
+        if type(who) == discord.Member and not ctx.author == who:
+            await ctx.send("You cannot set reminders for anyone other than yourself!")
+            return
+        elif type(who) == discord.TextChannel and who.id in CHAN_BANNED:
+            await ctx.send(f"You cannot set reminders for {who}!")
+            return
+
+        today = datetime.today().astimezone(tz=TZ)
+
+        def format_when(when):
+            days = hours = minutes = seconds = 0
+            try:
+                if "d" in when:
+                    days = int(when[:when.find("d")])
+            except:
+                pass
+
+            try:
+                if "h" in when:
+                    hours = int(when[when.find("d") + 1:when.find("h")])
+            except:
+                pass
+
+            try:
+                if "m" in when:
+                    minutes = int(when[when.find("h") + 1:when.find("m")])
+            except:
+                pass
+
+            try:
+                if "s" in when:
+                    seconds = int(when[when.find("m") + 1:when.find("s")])
+            except:
+                pass
+
+            raw_when = today.replace(day=today.day + days, hour=today.hour + hours, minute=today.minute + minutes, second=today.second + seconds).astimezone(tz=TZ)
+            return raw_when - today
+
+        duration = format_when(when)
+
+        await ctx.send(f"Setting a timer for [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
 
 
 def setup(bot):
