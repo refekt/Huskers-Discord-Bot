@@ -476,6 +476,8 @@ class MyClient(commands.Bot):
                         return
                 except:
                     await process_error(ctx, error)
+            elif error.args[0] == "Command raised an exception: RuntimeError: This event loop is already running":
+                return
             else:
                 # get data from exception
                 etype = type(error)
