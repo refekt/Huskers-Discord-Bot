@@ -1,4 +1,3 @@
-from threading import Timer
 import random
 import re
 import typing
@@ -14,7 +13,6 @@ from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
-from utils.timer import start_timer_for
 
 
 async def send_message(who, what):
@@ -316,86 +314,55 @@ class TextCommands(commands.Cog):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, message: str):
         ''' Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m '''
+        d_char = "d"
+        h_char = "h"
+        m_char = "m"
+        s_char = "s"
+
         if type(who) == discord.Member and not ctx.author == who:
             await ctx.send("You cannot set reminders for anyone other than yourself!")
             return
         elif type(who) == discord.TextChannel and who.id in CHAN_BANNED:
             await ctx.send(f"You cannot set reminders for {who}!")
             return
+        # elif when.find(d_char + h_char + m_char + s_char) <= 0:
+        #     await ctx.send(f"Incorrect date format for [{when}]!")
+        #     return
 
         today = datetime.today().astimezone(tz=TZ)
 
-        def format_when(when):
-            days = hours = minutes = seconds = 0
-            first_var_spot = 3
+        def get_value(which: str, from_when: str):
+            import re
 
-            d_char = "d"
-            h_char = "h"
-            m_char = "m"
-            s_char = "s"
+            if which in from_when:
+                raw = from_when.split(which)[0]
+                # raw = re.split(which, from_when)[0]
+                if raw.isnumeric():
+                    return int(raw)
+                else:
+                    try:
+                        findall = re.findall(r"\D", raw)[-1]
+                        return int(raw[raw.find(findall) + 1:])
+                    except:
+                        return 0
+            else:
+                return 0
 
-            splice_start = splice_end = 0
+        days = get_value(d_char, when)
+        hours = get_value(h_char, when)
+        minutes = get_value(m_char, when)
+        seconds = get_value(s_char, when)
 
-            try:
-                if d_char in when:
-                    splice_end = when.rfind(d_char)
-                    splice_start = when.rfind(r"\D", 0, splice_end)
+        delta = timedelta(days=days, hours=hours, minutes=minutes)
 
-                    if when.find(d_char) > first_var_spot:
-                        days = int(when[splice_end + splice_start:splice_end])
-                    else:
-                        days = int(when[:splice_end])
-            except:
-                pass
+        try:
+            raw_when = today + delta
+        except ValueError:
+            raise ValueError("The duration entered is too large!")
 
-            splice_start = splice_end = 0
+        duration = raw_when - today
 
-            try:
-                if h_char in when:
-                    splice_end = when.rfind(h_char)
-                    splice_start = when.rfind(r"\D", 0, splice_end)
-
-                    if when.find(h_char) > first_var_spot:
-                        hours = int(when[splice_end + splice_start:splice_end])
-                    else:
-                        hours = int(when[:splice_end])
-            except:
-                pass
-
-            splice_start = splice_end = 0
-
-            try:
-                if m_char in when:
-                    splice_end = when.rfind(m_char)
-                    splice_start = when.rfind(r"\D", splice_end, 0)
-
-                    if when.find(m_char) > first_var_spot:
-                        minutes = int(when[splice_end + splice_start:splice_end])
-                    else:
-                        minutes = int(when[:splice_end])
-            except:
-                pass
-
-            splice_start = splice_end = 0
-
-            try:
-                if s_char in when:
-                    splice_end = when.rfind(s_char)
-                    splice_start = when.rfind(r"\D", splice_end, 0)
-
-                    if when.find(s_char) > first_var_spot:
-                        seconds = int(when[splice_end + splice_start:splice_end])
-                    else:
-                        seconds = int(when[:splice_end])
-            except:
-                pass
-
-            raw_when = today.replace(day=today.day + days, hour=today.hour + hours, minute=today.minute + minutes, second=today.second + seconds).astimezone(tz=TZ)
-            return raw_when - today
-
-        duration = format_when(when)
-
-        await ctx.send(f"Setting a timer for [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
+        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
 
 
 def setup(bot):
