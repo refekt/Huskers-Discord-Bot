@@ -363,6 +363,8 @@ class TextCommands(commands.Cog):
 
         duration = raw_when - today
 
+        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
+
         async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what):
             await asyncio.sleep(when)
             await who.send(what)
@@ -370,8 +372,6 @@ class TextCommands(commands.Cog):
         loop = asyncio.get_event_loop()
         # loop = asyncio.get_running_loop()
         loop.run_until_complete(send_message(duration.total_seconds(), who, what))
-
-        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
 
 
 def setup(bot):
