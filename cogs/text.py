@@ -1,3 +1,4 @@
+import asyncio
 import random
 import re
 import typing
@@ -312,7 +313,7 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["rm", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, message: str):
+    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, what: str):
         ''' Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m '''
         d_char = "d"
         h_char = "h"
@@ -361,6 +362,14 @@ class TextCommands(commands.Cog):
             raise ValueError("The duration entered is too large!")
 
         duration = raw_when - today
+
+        async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what):
+            await asyncio.sleep(when)
+            await who.send(what)
+
+        loop = asyncio.get_event_loop()
+        # loop = asyncio.get_running_loop()
+        loop.run_until_complete(send_message(duration.total_seconds(), who, what))
 
         await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
 
