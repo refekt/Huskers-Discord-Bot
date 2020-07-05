@@ -353,7 +353,7 @@ class TextCommands(commands.Cog):
         minutes = get_value(m_char, when)
         seconds = get_value(s_char, when)
 
-        delta = timedelta(days=days, hours=hours, minutes=minutes)
+        delta = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
         try:
             raw_when = today + delta
