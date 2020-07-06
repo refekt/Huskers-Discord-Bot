@@ -374,7 +374,7 @@ class TextCommands(commands.Cog):
 
         loop = asyncio.get_event_loop()
         # loop = asyncio.get_running_loop()
-        loop.run_until_complete(send_message(duration.total_seconds(), who, what))
+        loop.run_until_complete(await send_message(duration.total_seconds(), who, what))
 
 
 def setup(bot):
