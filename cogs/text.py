@@ -322,9 +322,6 @@ class TextCommands(commands.Cog):
         elif type(who) == discord.TextChannel and who.id in CHAN_BANNED:
             await ctx.send(f"You cannot set reminders for {who}!")
             return
-        # elif when.find(d_char + h_char + m_char + s_char) <= 0:
-        #     await ctx.send(f"Incorrect date format for [{when}]!")
-        #     return
 
         today = datetime.today().astimezone(tz=TZ)
 
@@ -333,7 +330,6 @@ class TextCommands(commands.Cog):
 
             if which in from_when:
                 raw = from_when.split(which)[0]
-                # raw = re.split(which, from_when)[0]
                 if raw.isnumeric():
                     return int(raw)
                 else:
@@ -366,14 +362,14 @@ class TextCommands(commands.Cog):
 
         alert = today + duration
 
-        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}].")
+        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}]. Keep in mind if I restart I will lose my all "
+                       f"timers!")
 
         async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what):
             await asyncio.sleep(when)
             await who.send(f"[Reminder for {who.mention}]: {what}")
 
         loop = asyncio.get_event_loop()
-        # loop = asyncio.get_running_loop()
         loop.run_until_complete(await send_message(duration.total_seconds(), who, what))
 
 
