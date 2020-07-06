@@ -16,10 +16,6 @@ from utils.games import ScheduleBackup
 from utils.games import Venue
 
 
-async def send_message(who, what):
-    await who.send(what)
-
-
 class TextCommands(commands.Cog):
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -356,6 +352,11 @@ class TextCommands(commands.Cog):
 
         delta = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
+        min_timer_allowed = 60
+
+        if delta.total_seconds() < min_timer_allowed:
+            raise ValueError(f"The duration entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
+
         try:
             raw_when = today + delta
         except ValueError:
@@ -363,11 +364,13 @@ class TextCommands(commands.Cog):
 
         duration = raw_when - today
 
-        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{today + duration}].")
+        alert = today + duration
+
+        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}].")
 
         async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what):
             await asyncio.sleep(when)
-            await who.send(what)
+            await who.send(f"[Reminder for {who.mention}]: {what}")
 
         loop = asyncio.get_event_loop()
         # loop = asyncio.get_running_loop()
