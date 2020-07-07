@@ -180,6 +180,22 @@ sqlGetStats = """\
 SELECT * FROM stats
 """
 
+sqlGetTasks = """\
+SELECT * FROM tasks_repo
+WHERE is_open = 1
+"""
+
+sqlRecordTasks = """\
+INSERT INTO tasks_repo (send_to, message, send_when, is_open)
+VALUES (%s, %s, %s, %s)
+"""
+
+sqlUpdateTasks = """\
+UPDATE tasks_repo
+SET is_open = %s
+WHERE send_to = %s AND message = %s AND send_when = %s
+"""
+
 
 def process_MySQL(query: str, **kwargs):
     from utils.consts import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER

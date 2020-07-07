@@ -1,3 +1,5 @@
+import time
+import asyncio
 import hashlib
 import json
 import logging
@@ -5,9 +7,10 @@ import random
 import re
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord
+from dateutil.tz import tzlocal
 from discord.ext import commands
 
 import utils.consts as consts
@@ -18,7 +21,8 @@ from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, RO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-from utils.mysql import process_MySQL, sqlLogError, sqlDatabaseTimestamp, sqlLogUser, sqlRecordStats
+from utils.misc import send_message
+from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
 
 
 async def current_guild():
@@ -81,7 +85,7 @@ async def process_error(ctx, error):
         except:
             await ctx.send("Unknown error happened!")
 
-    process_MySQL(query=sqlLogError, values=(f"{ctx.author.name}#{ctx.author.discriminator}", [err for err in error.args]))
+    # process_MySQL(query=sqlLogError, values=(f"{ctx.author.name}#{ctx.author.discriminator}", [err for err in error.args]))
 
 
 async def compare_users(before: discord.Member, after: discord.Member):
@@ -377,6 +381,71 @@ async def monitor_msg_hype(action, message: discord.Message, member: discord.Mem
         pass
 
 
+async def load_tasks():
+    tasks = process_MySQL(sqlGetTasks, fetch="all")
+    guild = await current_guild()
+
+    def convert_duration(value: str):
+        imported_datetime = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+        # when = datetime.today().astimezone(tz=TZ) - imported_datetime
+        now = datetime.now()
+        if imported_datetime > now:
+            duration = imported_datetime - now
+            return duration
+        return None
+
+    async def convert_member(value):
+        value = int(value)
+        try:
+            member = guild.get_member(value)
+            if member is not None:
+                return member
+        except:
+            pass
+
+        try:
+            channel = guild.get_channel(value)
+            if channel is not None:
+                return channel
+        except:
+            pass
+
+        return None
+
+    if tasks is None:
+        print("No tasks loaded")
+        return
+
+    print(f"There are {len(tasks)} to be loaded")
+
+    for task in tasks:
+        send_when = convert_duration(task["send_when"])
+        member_or_chan = await convert_member(task["send_to"])
+
+        if member_or_chan is None:
+            print(f"Skipping task because [{member_or_chan}] is None.")
+            continue
+        if send_when is None:
+            print(f"Alert time already passed! {task['send_when']}")
+            await send_message(0, member_or_chan, task["message"], task["send_when"])
+            continue
+        try:
+            print(f"Creating a task for [{send_when.total_seconds()}] seconds.")
+            asyncio.create_task(await send_message(send_when.total_seconds(), member_or_chan, task["message"]))
+        except TypeError:
+            print("TypeError raised when attempting to create task.")
+            print("When", send_when.total_seconds())
+            print("Member or Channel", member_or_chan)
+            print("Message", task["message"])
+            pass
+
+    try:
+        bots = guild.get_channle(CHAN_BOTLOGS)
+        bots.send(f"Resumed [{len(tasks)}] tasks!")
+    except:
+        pass
+
+
 class MyClient(commands.Bot):
 
     def __init__(self, command_prefix, **options):
@@ -397,6 +466,7 @@ class MyClient(commands.Bot):
 
         await change_my_status(client)
         await change_my_nickname(client, ctx=None)
+        await load_tasks()
 
         print(
             f"### The bot is ready! ###\n"
@@ -521,12 +591,13 @@ class MyClient(commands.Bot):
                     print(f"### ### !!! Leaving guild failed!")
                     pass
 
-        process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
+        # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
         await self.startup_procedures()
         # await self.send_salutations(f"*Beep, boop* Greetings! I have arrived.")
 
     async def on_disconnect(self):
-        process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
+        pass
+        # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
 
         # await self.send_salutations("I AM DISCONNECTING.")
 

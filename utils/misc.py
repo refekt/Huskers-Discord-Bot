@@ -1,6 +1,11 @@
+from datetime import datetime
+import asyncio
 import hashlib
 import sys
+import typing
+from utils.mysql import process_MySQL, sqlUpdateTasks
 
+import discord
 from unidecode import unidecode
 
 
@@ -46,3 +51,14 @@ async def makeMD5():
         mammals.update({animals[index]: hash_object.hexdigest()})
 
     print(mammals)
+
+
+async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what, extra=None):
+    await asyncio.sleep(when)
+    if not extra:
+        await who.send(f"[Reminder for {who.mention}]: {what}")
+        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, when))
+    else:
+        imported_datetime = datetime.strptime(extra, "%Y-%m-%d %H:%M:%S.%f")
+        await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {what}")
+        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, extra))

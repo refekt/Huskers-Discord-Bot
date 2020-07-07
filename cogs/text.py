@@ -14,6 +14,9 @@ from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
+from utils.misc import send_message
+from utils.mysql import process_MySQL
+from utils.mysql import sqlRecordTasks
 
 
 class TextCommands(commands.Cog):
@@ -323,7 +326,7 @@ class TextCommands(commands.Cog):
             await ctx.send(f"You cannot set reminders for {who}!")
             return
 
-        today = datetime.today().astimezone(tz=TZ)
+        today = datetime.today()  # .astimezone(tz=TZ)
 
         def get_value(which: str, from_when: str):
             import re
@@ -348,7 +351,7 @@ class TextCommands(commands.Cog):
 
         delta = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
-        min_timer_allowed = 60
+        min_timer_allowed = 1  # 60
 
         if delta.total_seconds() < min_timer_allowed:
             raise ValueError(f"The duration entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
@@ -365,12 +368,11 @@ class TextCommands(commands.Cog):
         await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}]. Keep in mind if I restart I will lose my all "
                        f"timers!")
 
-        async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what):
-            await asyncio.sleep(when)
-            await who.send(f"[Reminder for {who.mention}]: {what}")
+        process_MySQL(sqlRecordTasks, values=(who.id, what, str(alert), 1))
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(await send_message(duration.total_seconds(), who, what))
+        import nest_asyncio
+        nest_asyncio.apply()
+        asyncio.create_task(send_message(duration.total_seconds(), who, what))
 
 
 def setup(bot):
