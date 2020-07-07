@@ -372,7 +372,7 @@ class TextCommands(commands.Cog):
 
         import nest_asyncio
         nest_asyncio.apply()
-        asyncio.create_task(send_message(duration.total_seconds(), who, remove_mentions(what)))
+        asyncio.create_task(send_message(duration.total_seconds(), who, what))
 
 
 def setup(bot):

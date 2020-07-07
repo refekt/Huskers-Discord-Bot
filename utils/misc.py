@@ -61,10 +61,10 @@ async def makeMD5():
 async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what, extra=None):
     await asyncio.sleep(when)
     if not when == 0:
-        await who.send(f"[Reminder for {who.mention}]: {what}")
+        await who.send(f"[Reminder for {who.mention}]: {remove_mentions(what)}")
         # process_MySQL(sqlUpdateTasks, values=(0, who.id, what, when))
         process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))
     else:
         imported_datetime = datetime.strptime(extra, "%Y-%m-%d %H:%M:%S.%f")
-        await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {what}")
+        await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {remove_mentions(what)}")
         process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))

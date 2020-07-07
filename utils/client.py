@@ -426,11 +426,11 @@ async def load_tasks():
             continue
         if send_when is None:
             print(f"Alert time already passed! {task['send_when']}")
-            await send_message(0, member_or_chan, remove_mentions(task["message"]), task["send_when"])
+            await send_message(0, member_or_chan, task["message"], task["send_when"])
             continue
         try:
             print(f"Creating a task for [{send_when.total_seconds()}] seconds.")
-            asyncio.create_task(await send_message(send_when.total_seconds(), member_or_chan, remove_mentions(task["message"]), task["send_when"]))
+            asyncio.create_task(await send_message(send_when.total_seconds(), member_or_chan, task["message"], task["send_when"]))
         except TypeError:
             print("TypeError raised when attempting to create task.")
             print("When", send_when.total_seconds())
