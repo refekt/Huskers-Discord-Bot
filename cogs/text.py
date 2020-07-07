@@ -14,6 +14,7 @@ from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
+from utils.misc import remove_mentions
 from utils.misc import send_message
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
@@ -351,7 +352,7 @@ class TextCommands(commands.Cog):
 
         delta = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
-        min_timer_allowed = 1  # 60
+        min_timer_allowed = 5
 
         if delta.total_seconds() < min_timer_allowed:
             raise ValueError(f"The duration entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
@@ -365,14 +366,13 @@ class TextCommands(commands.Cog):
 
         alert = today + duration
 
-        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}]. Keep in mind if I restart I will lose my all "
-                       f"timers!")
+        await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}].")
 
         process_MySQL(sqlRecordTasks, values=(who.id, what, str(alert), 1))
 
         import nest_asyncio
         nest_asyncio.apply()
-        asyncio.create_task(send_message(duration.total_seconds(), who, what))
+        asyncio.create_task(send_message(duration.total_seconds(), who, remove_mentions(what)))
 
 
 def setup(bot):

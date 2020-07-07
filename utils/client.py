@@ -1,4 +1,3 @@
-import time
 import asyncio
 import hashlib
 import json
@@ -7,20 +6,21 @@ import random
 import re
 import sys
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import discord
-from dateutil.tz import tzlocal
 from discord.ext import commands
 
 import utils.consts as consts
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, GUILD_TEST, GUILD_PROD, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
+from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
+from utils.misc import remove_mentions
 from utils.misc import send_message
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
 
@@ -387,7 +387,6 @@ async def load_tasks():
 
     def convert_duration(value: str):
         imported_datetime = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-        # when = datetime.today().astimezone(tz=TZ) - imported_datetime
         now = datetime.now()
         if imported_datetime > now:
             duration = imported_datetime - now
@@ -427,11 +426,11 @@ async def load_tasks():
             continue
         if send_when is None:
             print(f"Alert time already passed! {task['send_when']}")
-            await send_message(0, member_or_chan, task["message"], task["send_when"])
+            await send_message(0, member_or_chan, remove_mentions(task["message"]), task["send_when"])
             continue
         try:
             print(f"Creating a task for [{send_when.total_seconds()}] seconds.")
-            asyncio.create_task(await send_message(send_when.total_seconds(), member_or_chan, task["message"]))
+            asyncio.create_task(await send_message(send_when.total_seconds(), member_or_chan, remove_mentions(task["message"]), task["send_when"]))
         except TypeError:
             print("TypeError raised when attempting to create task.")
             print("When", send_when.total_seconds())

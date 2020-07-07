@@ -1,12 +1,17 @@
-from datetime import datetime
 import asyncio
 import hashlib
 import sys
 import typing
-from utils.mysql import process_MySQL, sqlUpdateTasks
+from datetime import datetime
 
 import discord
 from unidecode import unidecode
+
+from utils.mysql import process_MySQL, sqlUpdateTasks
+
+
+def remove_mentions(message):
+    return str(message).replace("<", "[User: ").replace("@!", "").replace(">", "]")
 
 
 def remove_non_ascii(text):
@@ -55,10 +60,11 @@ async def makeMD5():
 
 async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what, extra=None):
     await asyncio.sleep(when)
-    if not extra:
+    if not when == 0:
         await who.send(f"[Reminder for {who.mention}]: {what}")
-        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, when))
+        # process_MySQL(sqlUpdateTasks, values=(0, who.id, what, when))
+        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))
     else:
         imported_datetime = datetime.strptime(extra, "%Y-%m-%d %H:%M:%S.%f")
         await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {what}")
-        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, extra))
+        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))
