@@ -347,30 +347,6 @@ def FootballRecruit(year, name):
 
         return dict(natl=natl, pos=pos, state=state)
 
-    # def national_ranking(school, year):
-    #     rank = soup.find_all(href=f"https://247sports.com/Season/{year}-Football/CompositeRecruitRankings/?InstitutionGroup={school}")
-    #
-    #     try:
-    #         return int(rank[0].text.strip())
-    #     except:
-    #         return None
-    #
-    # def state_ranking(player, year, school):
-    #     rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/{year}-Football/CompositeRecruitRankings/?InstitutionGroup={school}&State={states[player['Hometown']['State']]}"})
-    #
-    #     try:
-    #         return int(rank[0].text.strip())
-    #     except:
-    #         return None
-    #
-    # def position_ranking(player, year, school):
-    #     rank = soup.find_all(attrs = {"href": f"https://247sports.com/Season/{year}-Football/CompositeRecruitRankings/?InstitutionGroup={school}&Position={player['PrimaryPlayerPosition']['Abbreviation']}"})
-    #
-    #     try:
-    #         return int(rank[0].text.strip())
-    #     except:
-    #         return None
-
     def all_time_ranking():
         rank = soup.find_all(attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"})
 
