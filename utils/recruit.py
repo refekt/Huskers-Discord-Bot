@@ -311,45 +311,65 @@ def FootballRecruit(year, name):
         except:
             return "N/A"
 
-    def national_ranking():
-        rank = soup.find_all(href="https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool")
+    # def cleanup_school(school):
+    #     if school == "High School":
+    #         return "HighSchool"
+    #     elif school == "PREP":
+    #         return "PrepSchool"
+    #     elif school == "JUCO":
+    #         return "JuniorCollege"
+    #     else:
+    #         return None
 
-        if len(rank) > 1:
-            return int(rank[1].contents[3].text)
-        else:
-            return False
+    def collect_ranks(player_url):
+        ranks_r = requests.get(url=player_url, headers=HEADERS)
+        ranks_soup = BeautifulSoup(ranks_r.content, "html.parser")
+        ranks = ranks_soup.find_all(attrs={"class": "ranks-list"})
 
-    def state_ranking(player):
+        search_rank = ranks[1]
+
+        del ranks_r, ranks_soup, ranks
+
         try:
-            rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&State={states[player['Hometown']['State']]}"})
+            natl = int(search_rank.contents[1].contents[3].text.strip())
+        except:
+            natl = 0
 
-            ranking = 0
-            try:
-                ranking = int(rank[0].contents[3].text)
-            except IndexError:
-                pass
-
-            if len(rank) == 1:
-                return ranking
-            else:
-                return False
-        except KeyError:
-            return "Err"
-
-    def position_ranking(player):
-        rank = soup.find_all(
-            attrs={"href": f"https://247sports.com/Season/2020-Football/CompositeRecruitRankings/?InstitutionGroup=HighSchool&Position={player['PrimaryPlayerPosition']['Abbreviation']}"})
-
-        ranking = 0
         try:
-            ranking = int(rank[0].contents[3].text)
-        except IndexError:
-            pass
+            pos = int(search_rank.contents[3].contents[3].text.strip())
+        except:
+            pos = 0
 
-        if len(rank) == 1:
-            return ranking
-        else:
-            return False
+        try:
+            state = int(search_rank.contents[5].contents[3].text.strip())
+        except:
+            state = 0
+
+        return dict(natl=natl, pos=pos, state=state)
+
+    # def national_ranking(school, year):
+    #     rank = soup.find_all(href=f"https://247sports.com/Season/{year}-Football/CompositeRecruitRankings/?InstitutionGroup={school}")
+    #
+    #     try:
+    #         return int(rank[0].text.strip())
+    #     except:
+    #         return None
+    #
+    # def state_ranking(player, year, school):
+    #     rank = soup.find_all(attrs={"href": f"https://247sports.com/Season/{year}-Football/CompositeRecruitRankings/?InstitutionGroup={school}&State={states[player['Hometown']['State']]}"})
+    #
+    #     try:
+    #         return int(rank[0].text.strip())
+    #     except:
+    #         return None
+    #
+    # def position_ranking(player, year, school):
+    #     rank = soup.find_all(attrs = {"href": f"https://247sports.com/Season/{year}-Football/CompositeRecruitRankings/?InstitutionGroup={school}&Position={player['PrimaryPlayerPosition']['Abbreviation']}"})
+    #
+    #     try:
+    #         return int(rank[0].text.strip())
+    #     except:
+    #         return None
 
     def all_time_ranking():
         rank = soup.find_all(attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"})
@@ -379,15 +399,15 @@ def FootballRecruit(year, name):
     #         else:
     #             return None
 
-    def rivals_ID(profile):
-        if profile:
-            ID = profile[profile.rfind("-") + 1:]
-            return ID
-        else:
-            return None
-
-    def rivals_highlights(ID):
-        return f"https://n.rivals.com/content/prospects/{ID}/featured/videos"
+    # def rivals_ID(profile):
+    #     if profile:
+    #         ID = profile[profile.rfind("-") + 1:]
+    #         return ID
+    #     else:
+    #         return None
+    #
+    # def rivals_highlights(ID):
+    #     return f"https://n.rivals.com/content/prospects/{ID}/featured/videos"
 
     def recruit_interests():
         req = requests.get(url=player["RecruitInterestsUrl"], headers=HEADERS)
@@ -422,20 +442,17 @@ def FootballRecruit(year, name):
         r = requests.get(url=player['Player']['Url'], headers=HEADERS)
         soup = BeautifulSoup(r.content, "html.parser")
 
-        # TODO Grab all the other variables; red_shirt, rivals_profile, fix the JUCO issue with "NCAA" not showing up and crystal balls if only one team
-
         team_id = 0
         if player['CommitedInstitutionTeamImage'] is not None:
             team_id = int(player['CommitedInstitutionTeamImage'].split('/')[-1].split('_')[-1].split('.')[0])  # Thank you Psy
 
-        if p['NationalRank'] is None:
-            p['NationalRank'] = national_ranking()
+        schooltype = school_type()
+        p_year = player['Year']
 
-        if p['StateRank'] is None:
-            p['StateRank'] = state_ranking(p)
-
-        if p['PositionRank'] is None:
-            p['PositionRank'] = position_ranking(p)
+        ranks = collect_ranks(player['Player']['Url'])
+        p['NationalRank'] = ranks["natl"]
+        p['StateRank'] = ranks["state"]
+        p['PositionRank'] = ranks["pos"]
 
         # rivals_prof = rivals_profile(player)
         # rivals_id = rivals_ID(rivals_prof)
@@ -443,7 +460,7 @@ def FootballRecruit(year, name):
         try:
             recruit_state = states[p['Hometown']['State']]
         except KeyError:
-            recruit_state = "N/A"
+            recruit_state = p['Hometown']['State']
 
         try:
             recruit_committed_school = team_ids[team_id] if team_id > 0 else None
@@ -464,7 +481,7 @@ def FootballRecruit(year, name):
                 x247_profile=p['Url'],
                 x247_highlights=_247_highlights(),
                 school=p['PlayerHighSchool']['Name'],
-                school_type=school_type(),
+                school_type=schooltype,
                 position=p['PrimaryPlayerPosition']['Abbreviation'],
                 thumbnail=p['DefaultAssetUrl'],
                 rating_numerical=p['CompositeRating'],
@@ -477,7 +494,7 @@ def FootballRecruit(year, name):
                 commitment_date=player['AnnouncementDate'],
                 recruit_interests=recruit_interests(),
                 recruit_interests_url=player["RecruitInterestsUrl"],
-                year=player['Year'],
+                year=p_year,
                 early_enrollee=early_enrolee(),
                 early_signee=early_signee(),
                 all_time_ranking=all_time_ranking(),
