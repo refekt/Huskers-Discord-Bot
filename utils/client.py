@@ -285,7 +285,7 @@ async def hall_of_fame_messages(reactions: list):
     def server_member_count():
         return len(client.users)
 
-    threshold = int(0.0075 * server_member_count())
+    threshold = int(0.0047 * server_member_count())
 
     for reaction in reactions:
         if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
