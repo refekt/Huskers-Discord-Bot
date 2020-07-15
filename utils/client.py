@@ -40,7 +40,8 @@ async def split_payload(payload):
     p["emoji"] = payload.emoji
     p["guild_id"] = client.get_guild(payload.guild_id)
     p["user_id"] = client.get_user(payload.user_id)
-    c = await client.fetch_channel(payload.channel_id)
+    c = client.get_channel(payload.channel_id)
+    # c = await client.fetch_channel(payload.channel_id)
     p["message"] = await c.fetch_message(payload.message_id)
 
     del c
@@ -268,15 +269,15 @@ async def monitor_reactions(channel, emoji, user, message):
 
 
 async def hall_of_fame_messages(reactions: list):
-    chan = client.get_channel(id=CHAN_HOF_PROD)
+    HOF_chan = client.get_channel(id=CHAN_HOF_PROD)
 
-    if chan is None:
-        chan = client.get_channel(id=CHAN_HOF_TEST)
+    if HOF_chan is None:
+        HOF_chan = client.get_channel(id=CHAN_HOF_TEST)
 
     # banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
 
-    if chan.id in CHAN_BANNED:
-        return
+    # if chan.id in CHAN_BANNED:
+    #     #     return
 
     pinned_messages = []
     message_history_raw = []
@@ -288,9 +289,9 @@ async def hall_of_fame_messages(reactions: list):
     threshold = int(0.0047 * server_member_count())
 
     for reaction in reactions:
-        if reaction.count >= threshold and not reaction.message.channel.name == chan.name and not ".addvotes" in reaction.message.content:
+        if reaction.count >= threshold and not reaction.message.channel.name == HOF_chan.name and not ".addvotes" in reaction.message.content:
             if not reaction.message.author.bot:
-                message_history_raw = await chan.history(limit=5000).flatten()
+                message_history_raw = await HOF_chan.history(limit=5000).flatten()
 
                 for message_raw in message_history_raw:
                     if len(message_raw.embeds) > 0:
@@ -304,7 +305,7 @@ async def hall_of_fame_messages(reactions: list):
                     embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}", inline=False)
                     embed.add_field(name="View Message", value=f"[View Message]({reaction.message.jump_url})", inline=False)
                     embed.set_footer(text=reaction.message.id)
-                    await chan.send(embed=embed)
+                    await HOF_chan.send(embed=embed)
 
     del message_history_raw
     del pinned_messages
