@@ -326,7 +326,7 @@ def FootballRecruit(year, name):
         ranks_soup = BeautifulSoup(ranks_r.content, "html.parser")
         ranks = ranks_soup.find_all(attrs={"class": "ranks-list"})
 
-        search_rank = ranks[1]
+        search_rank = ranks[0]
 
         del ranks_r, ranks_soup, ranks
 
