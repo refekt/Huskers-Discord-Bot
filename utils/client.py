@@ -300,12 +300,6 @@ async def hall_of_fame_messages(reactions: list):
     if HOF_chan is None:
         HOF_chan = client.get_channel(id=CHAN_HOF_TEST)
 
-    # banned_channels = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS)
-
-    # if chan.id in CHAN_BANNED:
-    #     #     return
-
-    pinned_messages = []
     message_history_raw = []
     duplicate = False
 
@@ -334,7 +328,6 @@ async def hall_of_fame_messages(reactions: list):
                     await HOF_chan.send(embed=embed)
 
     del message_history_raw
-    del pinned_messages
     del duplicate
 
 
@@ -672,10 +665,9 @@ class MyClient(commands.Bot):
 
     async def on_raw_reaction_add(self, payload):
         payload = await split_payload(payload)
-
+        if not payload["message"].channel.id in CHAN_BANNED:
+            await hall_of_fame_messages(payload["message"].reactions)
         await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
-        await hall_of_fame_messages(payload["message"].reactions)
-
         await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
         await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
