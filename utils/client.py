@@ -274,24 +274,20 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
                 pass
 
     async def twitterverse_reacts():
-        async def tweeted(r):
-            await message.edit(text=message.content + f"\n{r}")
-            pass
+        for react in message.reactions:
+            if react.count > 1:
+                return
 
-        if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content: # Balloon = General
+        if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content:  # Balloon = General
             c = client.get_channel(CHAN_GENERAL)
             await c.send(message.content)
-            await tweeted(tweet_reactions[0])
 
-        elif emoji.name == tweet_reactions[1] and not tweet_reactions[1] in message.content: # Corn = Scotts
-            c = client.get_channel(CHAN_GENERAL)
+        elif emoji.name == tweet_reactions[1] and not tweet_reactions[1] in message.content:  # Corn = Scotts
+            c = client.get_channel(CHAN_SCOTT)
             await c.send(message.content)
-            await tweeted(tweet_reactions[1])
 
         elif emoji.name == tweet_reactions[2] and user.id == 189554873778307073:
             pass
-
-        await message.remove_reaction(emoji, user)
 
     await trivia_message()
     if not user.bot:
