@@ -3,7 +3,7 @@ import html
 import random
 import time
 from datetime import datetime
-
+import typing
 import discord
 import requests
 from discord.ext import commands
@@ -199,7 +199,7 @@ async def delete_collection():
     await game.channel.delete_messages(game.message_collection)
 
 
-def tally_score(message: discord.Message, author: discord.Member, end):
+def tally_score(message: discord.Message, author: typing.Union[discord.Member, discord.User], end):
     """1000 points per second"""
     if end == 0:
         process_MySQL(query=sqlInsertTriviaScore, value=(author.display_name, 0, 0))

@@ -12,7 +12,7 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
@@ -20,9 +20,10 @@ from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, RO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-from utils.misc import remove_mentions
 from utils.misc import send_message
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
+
+tweet_reactions = ("🎈", "🌽", "🕸")
 
 
 async def current_guild():
@@ -230,6 +231,11 @@ async def monitor_messages(message: discord.Message):
 
             process_MySQL(query=sqlRecordStats, values=(author, channel))
 
+    async def twitterverse():
+        if message.channel.id == CHAN_TWITTERVERSE:
+            for reaction in tweet_reactions:
+                await message.add_reaction(reaction)
+
     if not message.author.bot:
         if message.channel.id not in CHAN_BANNED:
             await auto_replies()
@@ -237,12 +243,14 @@ async def monitor_messages(message: discord.Message):
         if message.channel.id not in CHAN_STATS_BANNED:
             await record_statistics()
 
+        await twitterverse()
+
         await find_subreddits()
 
         await add_votes()
 
 
-async def monitor_reactions(channel, emoji, user, message):
+async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.User, message: discord.Message):
     async def trivia_message():
         from cogs.games.trivia import reactions, game, tally_score
 
@@ -265,7 +273,29 @@ async def monitor_reactions(channel, emoji, user, message):
             except TypeError:
                 pass
 
+    async def twitterverse_reacts():
+        async def tweeted(r):
+            await message.edit(text=message.content + f"\n{r}")
+            pass
+
+        if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content: # Balloon = General
+            c = client.get_channel(CHAN_GENERAL)
+            await c.send(message.content)
+            await tweeted(tweet_reactions[0])
+
+        elif emoji.name == tweet_reactions[1] and not tweet_reactions[1] in message.content: # Corn = Scotts
+            c = client.get_channel(CHAN_GENERAL)
+            await c.send(message.content)
+            await tweeted(tweet_reactions[1])
+
+        elif emoji.name == tweet_reactions[2] and user.id == 189554873778307073:
+            pass
+
+        await message.remove_reaction(emoji, user)
+
     await trivia_message()
+    if not user.bot:
+        await twitterverse_reacts()
 
 
 async def hall_of_fame_messages(reactions: list):
