@@ -231,11 +231,6 @@ async def monitor_messages(message: discord.Message):
 
             process_MySQL(query=sqlRecordStats, values=(author, channel))
 
-    async def twitterverse():
-        if message.channel.id == CHAN_TWITTERVERSE:
-            for reaction in tweet_reactions:
-                await message.add_reaction(reaction)
-
     if not message.author.bot:
         if message.channel.id not in CHAN_BANNED:
             await auto_replies()
@@ -243,11 +238,15 @@ async def monitor_messages(message: discord.Message):
         if message.channel.id not in CHAN_STATS_BANNED:
             await record_statistics()
 
-        await twitterverse()
-
         await find_subreddits()
 
         await add_votes()
+
+
+async def twitterverse(message: discord.Message):
+    if message.channel.id == CHAN_TWITTERVERSE:
+        for reaction in tweet_reactions:
+            await message.add_reaction(reaction)
 
 
 async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.User, message: discord.Message):
@@ -275,7 +274,7 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
 
     async def twitterverse_reacts():
         for react in message.reactions:
-            if react.count > 1:
+            if react.count > 2:
                 return
 
         if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content:  # Balloon = General
@@ -290,6 +289,7 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             pass
 
     await trivia_message()
+
     if not user.bot:
         await twitterverse_reacts()
 
@@ -638,6 +638,9 @@ class MyClient(commands.Bot):
         await self.send_salutations("I have returned!")
 
     async def on_message(self, message):
+
+        if message.webhook_id:
+            await twitterverse(message)
 
         await monitor_messages(message)
 
