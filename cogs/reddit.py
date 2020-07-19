@@ -89,7 +89,7 @@ class RedditCommands(commands.Cog):
                         )
 
                         try:
-                            cfb_post.falir.select("Recruiting")
+                            cfb_post.flair.select("Recruiting")
                         except:
                             await ctx.send("Unable to set flair! Make sure you do it.")
                             pass
