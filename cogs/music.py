@@ -347,6 +347,10 @@ class Music(commands.Cog):
         for control in CONTROLS:
             await message.add_reaction(control)
 
+    async def on_error(self, event, *args, **kwargs):
+        print(event, *args, **kwargs)
+        pass
+
 
 class GuildState:
     """Helper class managing per-guild state."""

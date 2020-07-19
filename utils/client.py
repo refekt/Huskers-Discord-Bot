@@ -14,7 +14,7 @@ from discord.ext import commands
 import utils.consts as consts
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL
 from utils.consts import EMBED_TITLE_HYPE
-from utils.consts import FOOTER_SECRET
+from utils.consts import FOOTER_SECRET, FOOTER_BOT
 from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
@@ -39,8 +39,10 @@ async def split_payload(payload):
     p = dict()
     p["channel_id"] = client.get_channel(payload.channel_id)
     p["emoji"] = payload.emoji
-    p["guild_id"] = client.get_guild(payload.guild_id)
-    p["user_id"] = client.get_user(payload.user_id)
+    guild = client.get_guild(payload.guild_id)
+    p["guild_id"] = guild.id
+    # p["user_id"] = client.get_user(payload.user_id)
+    p["user_id"] = guild.get_member(payload.user_id)
     c = client.get_channel(payload.channel_id)
     # c = await client.fetch_channel(payload.channel_id)
     p["message"] = await c.fetch_message(payload.message_id)
@@ -249,7 +251,7 @@ async def twitterverse(message: discord.Message):
             await message.add_reaction(reaction)
 
 
-async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.User, message: discord.Message):
+async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.Member, message: discord.Message):
     async def trivia_message():
         from cogs.games.trivia import reactions, game, tally_score
 
@@ -277,13 +279,15 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             if react.count > 2:
                 return
 
+        msg = f"[Shared by {user}] "
+
         if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content:  # Balloon = General
             c = client.get_channel(CHAN_GENERAL)
-            await c.send(message.content)
+            await c.send(msg + message.content)
 
         elif emoji.name == tweet_reactions[1] and not tweet_reactions[1] in message.content:  # Corn = Scotts
             c = client.get_channel(CHAN_SCOTT)
-            await c.send(message.content)
+            await c.send(msg + message.content)
 
         elif emoji.name == tweet_reactions[2] and user.id == 189554873778307073:
             pass
@@ -665,8 +669,10 @@ class MyClient(commands.Bot):
 
     async def on_raw_reaction_add(self, payload):
         payload = await split_payload(payload)
+
         if not payload["message"].channel.id in CHAN_BANNED:
             await hall_of_fame_messages(payload["message"].reactions)
+
         await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
         await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
         await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
