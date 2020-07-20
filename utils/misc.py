@@ -10,8 +10,8 @@ from unidecode import unidecode
 from utils.mysql import process_MySQL, sqlUpdateTasks
 
 
-def remove_mentions(message):
-    return str(message).replace("<", "[User: ").replace("@!", "").replace(">", "]")
+# def remove_mentions(message):
+#     return str(message).replace("<", "[User: ").replace("@!", "").replace(">", "]")
 
 
 def remove_non_ascii(text):
@@ -58,13 +58,15 @@ async def makeMD5():
     print(mammals)
 
 
-async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what, extra=None):
-    await asyncio.sleep(when)
-    if not when == 0:
-        await who.send(f"[Reminder for {who.mention}]: {remove_mentions(what)}")
-        # process_MySQL(sqlUpdateTasks, values=(0, who.id, what, when))
-        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))
-    else:
-        imported_datetime = datetime.strptime(extra, "%Y-%m-%d %H:%M:%S.%f")
-        await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {remove_mentions(what)}")
-        process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))
+# async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what, extra=None):
+#     print("send message, sleeping")
+#     await asyncio.sleep(when)
+#     print("slept")
+#     if not when == 0:
+#         await who.send(f"[Reminder for {who.mention}]: {remove_mentions(what)}")
+#         # process_MySQL(sqlUpdateTasks, values=(0, who.id, what, when))
+#         process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))
+#     else:
+#         imported_datetime = datetime.strptime(extra, "%Y-%m-%d %H:%M:%S.%f")
+#         await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {remove_mentions(what)}")
+#         process_MySQL(sqlUpdateTasks, values=(0, who.id, what, str(extra)))

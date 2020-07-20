@@ -349,7 +349,6 @@ class Music(commands.Cog):
 
     async def on_command_error(self, error):
         print(error)
-        pass
 
 
 class GuildState:

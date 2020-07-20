@@ -1,3 +1,4 @@
+import threading
 import asyncio
 import hashlib
 import json
@@ -20,7 +21,8 @@ from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, RO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-from utils.misc import send_message
+# from utils.misc import send_message
+from utils.thread import TaskThread, send_message
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
 
 tweet_reactions = ("🎈", "🌽", "🕸")
@@ -439,34 +441,42 @@ async def load_tasks():
         print("No tasks loaded")
         return
 
-    print(f"There are {len(tasks)} to be loaded")
+    print(f"### ;;; There are {len(tasks)} to be loaded")
 
-    for task in tasks:
+    task_repo = []
+
+    for index, task in enumerate(tasks):
         send_when = convert_duration(task["send_when"])
         member_or_chan = await convert_member(task["send_to"])
 
         if member_or_chan is None:
-            print(f"Skipping task because [{member_or_chan}] is None.")
+            print(f"### ;;; Skipping task because [{member_or_chan}] is None.")
             continue
-        if send_when is None:
-            print(f"Alert time already passed! {task['send_when']}")
-            await send_message(0, member_or_chan, task["message"], task["send_when"])
-            continue
-        try:
-            print(f"Creating a task for [{send_when.total_seconds()}] seconds.")
-            asyncio.create_task(await send_message(send_when.total_seconds(), member_or_chan, task["message"], task["send_when"]))
-        except TypeError:
-            print("TypeError raised when attempting to create task.")
-            print("When", send_when.total_seconds())
-            print("Member or Channel", member_or_chan)
-            print("Message", task["message"])
-            pass
 
-    try:
-        bots = guild.get_channle(CHAN_BOTLOGS)
-        bots.send(f"Resumed [{len(tasks)}] tasks!")
-    except:
-        pass
+        if send_when is None:
+            print(f"### ;;; Alert time already passed! {task['send_when']}")
+            await send_message(None, -1, member_or_chan, task["message"], task["send_when"])
+            continue
+
+        # thread = TaskThread(index, member_or_chan.id, send_when.seconds, member_or_chan, task["message"], task["send_when"])
+
+        task_repo.append(
+            asyncio.create_task(
+                send_message(
+                    member_or_chan.id,
+                    send_when.seconds,
+                    member_or_chan,
+                    task["message"],
+                    task["send_when"]
+                )
+            )
+        )
+
+    for index, task in enumerate(task_repo):
+        await task
+        print(f"### ;;; [{index}] Created task!")
+
+    print("### ;;; All tasks loaded!")
 
 
 class MyClient(commands.Bot):
@@ -570,6 +580,8 @@ class MyClient(commands.Bot):
                 except:
                     await process_error(ctx, error)
             elif error.args[0] == "Command raised an exception: RuntimeError: This event loop is already running":
+                return
+            elif error == TypeError:
                 return
             else:
                 # get data from exception

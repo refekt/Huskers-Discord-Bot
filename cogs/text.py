@@ -14,8 +14,8 @@ from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
-from utils.misc import remove_mentions
-from utils.misc import send_message
+# from utils.thread import remove_mentions
+from utils.thread import send_message
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 
@@ -313,7 +313,7 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["rm", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, what: str):
+    async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, message: str):
         ''' Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m '''
         d_char = "d"
         h_char = "h"
@@ -368,11 +368,19 @@ class TextCommands(commands.Cog):
 
         await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}].")
 
-        process_MySQL(sqlRecordTasks, values=(who.id, what, str(alert), 1))
+        process_MySQL(sqlRecordTasks, values=(who.id, message, str(alert), 1))
 
         import nest_asyncio
         nest_asyncio.apply()
-        asyncio.create_task(send_message(duration.total_seconds(), who, what))
+        asyncio.create_task(
+            send_message(
+                thread=1,
+                duration=duration.total_seconds(),
+                who=who,
+                message=message,
+                flag=str(alert)
+            )
+        )
 
 
 def setup(bot):
