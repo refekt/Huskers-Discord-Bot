@@ -34,7 +34,7 @@ async def send_message(thread, duration, who: typing.Union[discord.Member, disco
     if exitFlag:
         thread.exit()
 
-    print(f"Starting [{thread}] thread.")
+    print(f"### ;;; Starting [{thread}] thread for [{duration}] seconds. Send_When == [{flag}].")
 
     if duration > 0:
         print(f"### ;;; Creating a task for [{duration}] seconds. [{who}] [{message[:15] + '...'}]")
@@ -46,3 +46,5 @@ async def send_message(thread, duration, who: typing.Union[discord.Member, disco
         imported_datetime = datetime.strptime(flag, "%Y-%m-%d %H:%M:%S.%f")
         await who.send(f"[Missed reminder for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!]: {remove_mentions(message)}")
         process_MySQL(sqlUpdateTasks, values=(0, who.id, message, str(flag)))
+
+    print(f"### ;;; Thread [{thread}] completed successfully!")

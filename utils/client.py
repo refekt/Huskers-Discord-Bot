@@ -445,7 +445,7 @@ async def load_tasks():
 
     task_repo = []
 
-    for index, task in enumerate(tasks):
+    for task in tasks:
         send_when = convert_duration(task["send_when"])
         member_or_chan = await convert_member(task["send_to"])
 
@@ -459,11 +459,12 @@ async def load_tasks():
             continue
 
         # thread = TaskThread(index, member_or_chan.id, send_when.seconds, member_or_chan, task["message"], task["send_when"])
+        # print(f"### ;;; Task [{member_or_chan.id}] is set for [{send_when} / {send_when.total_seconds()}]")
 
         task_repo.append(
             asyncio.create_task(
                 send_message(
-                    member_or_chan.id,
+                    member_or_chan.id + send_when.seconds,
                     send_when.seconds,
                     member_or_chan,
                     task["message"],
@@ -474,9 +475,6 @@ async def load_tasks():
 
     for index, task in enumerate(task_repo):
         await task
-        print(f"### ;;; [{index}] Created task!")
-
-    print("### ;;; All tasks loaded!")
 
 
 class MyClient(commands.Bot):
