@@ -367,8 +367,8 @@ class TextCommands(commands.Cog):
         alert = today + duration
 
         await ctx.send(f"Setting a timer for [{who}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert.strftime('%x %X')}].")
-
-        process_MySQL(sqlRecordTasks, values=(who.id, message, str(alert), 1))
+        author = f"{ctx.author.name}#{ctx.author.discriminator}"
+        process_MySQL(sqlRecordTasks, values=(who.id, message, str(alert), 1, author))
 
         import nest_asyncio
         nest_asyncio.apply()
@@ -378,6 +378,7 @@ class TextCommands(commands.Cog):
                 duration=duration.total_seconds(),
                 who=who,
                 message=message,
+                author=ctx.author,
                 flag=str(alert)
             )
         )

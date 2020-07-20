@@ -186,14 +186,14 @@ WHERE is_open = 1
 """
 
 sqlRecordTasks = """\
-INSERT INTO tasks_repo (send_to, message, send_when, is_open)
-VALUES (%s, %s, %s, %s)
+INSERT INTO tasks_repo (send_to, message, send_when, is_open, author)
+VALUES (%s, %s, %s, %s, %s)
 """
 
 sqlUpdateTasks = """\
 UPDATE tasks_repo
 SET is_open = %s
-WHERE send_to = %s AND message = %s AND send_when = %s
+WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
 """
 
 

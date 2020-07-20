@@ -453,22 +453,29 @@ async def load_tasks():
             print(f"### ;;; Skipping task because [{member_or_chan}] is None.")
             continue
 
+        if task["author"] is None:
+            task["author"] = "N/A"
+
         if send_when is None:
             print(f"### ;;; Alert time already passed! {task['send_when']}")
-            await send_message(None, -1, member_or_chan, task["message"], task["send_when"])
+            await send_message(
+                thread=None,
+                duration=-1,
+                who=member_or_chan,
+                message=task["message"],
+                author=task["author"],
+                flag=task["send_when"])
             continue
-
-        # thread = TaskThread(index, member_or_chan.id, send_when.seconds, member_or_chan, task["message"], task["send_when"])
-        # print(f"### ;;; Task [{member_or_chan.id}] is set for [{send_when} / {send_when.total_seconds()}]")
 
         task_repo.append(
             asyncio.create_task(
                 send_message(
-                    member_or_chan.id + send_when.seconds,
-                    send_when.seconds,
-                    member_or_chan,
-                    task["message"],
-                    task["send_when"]
+                    thread=member_or_chan.id + send_when.seconds,
+                    duration=send_when.seconds,
+                    who=member_or_chan,
+                    message=task["message"],
+                    author=task["author"],
+                    flag=task["send_when"]
                 )
             )
         )
