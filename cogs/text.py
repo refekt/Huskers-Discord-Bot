@@ -14,10 +14,10 @@ from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
 from utils.games import Venue
-# from utils.thread import remove_mentions
-from utils.thread import send_message
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
+# from utils.thread import remove_mentions
+from utils.thread import send_message
 
 
 class TextCommands(commands.Cog):
@@ -314,7 +314,7 @@ class TextCommands(commands.Cog):
     @commands.command(aliases=["rm", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def remind(self, ctx, who: typing.Union[discord.TextChannel, discord.Member], when: str, *, message: str):
-        ''' Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m '''
+        """ Set a reminder for yourself or channel. Time format examples: 1d, 7h, 3h30m, 1d7h,15m """
         d_char = "d"
         h_char = "h"
         m_char = "m"

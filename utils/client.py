@@ -1,4 +1,3 @@
-import threading
 import asyncio
 import hashlib
 import json
@@ -15,15 +14,15 @@ from discord.ext import commands
 import utils.consts as consts
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL
 from utils.consts import EMBED_TITLE_HYPE
-from utils.consts import FOOTER_SECRET, FOOTER_BOT
+from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-# from utils.misc import send_message
-from utils.thread import TaskThread, send_message
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
+# from utils.misc import send_message
+from utils.thread import send_message
 
 tweet_reactions = ("🎈", "🌽", "🕸")
 
@@ -609,17 +608,17 @@ class MyClient(commands.Bot):
 
                 await process_error(ctx, error)
 
-    async def on_shard_ready(self, shard_id):
-        pass
-        # logging.info(f"[on_shard_ready] Shard ID: {shard_id}")
+    # async def on_shard_ready(self, shard_id):
+    #     pass
+    #     # logging.info(f"[on_shard_ready] Shard ID: {shard_id}")
 
-    async def on_socket_raw_receive(self, msg):
-        pass
-        # self.send_to_log(logging.INFO, msg)
+    # async def on_socket_raw_receive(self, msg):
+    #     pass
+    #     # self.send_to_log(logging.INFO, msg)
 
-    async def on_socket_raw_send(self, payload):
-        pass
-        # self.send_to_log(logging.INFO, payload)
+    # async def on_socket_raw_send(self, payload):
+    #     pass
+    #     # self.send_to_log(logging.INFO, payload)
 
     async def on_connect(self):
         async for guild in client.fetch_guilds():
@@ -635,15 +634,15 @@ class MyClient(commands.Bot):
         await self.startup_procedures()
         # await self.send_salutations(f"*Beep, boop* Greetings! I have arrived.")
 
-    async def on_disconnect(self):
-        pass
-        # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
+    # async def on_disconnect(self):
+    #     pass
+    #     # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
+    #
+    #     # await self.send_salutations("I AM DISCONNECTING.")
 
-        # await self.send_salutations("I AM DISCONNECTING.")
-
-    async def on_ready(self):
-        # await self.send_salutations("Ready to go Cap-i-tan!")
-        pass
+    # async def on_ready(self):
+    #     # await self.send_salutations("Ready to go Cap-i-tan!")
+    #     pass
 
     async def on_resume(self):
         await change_my_status(client)
@@ -663,26 +662,26 @@ class MyClient(commands.Bot):
         # else:
         #     raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.\nMessage: {message.clean_content}")
 
-    async def on_message_delete(self, message):
-        pass
+    # async def on_message_delete(self, message):
+    #     pass
 
-    async def on_bulk_message_delete(self, message):
-        pass
+    # async def on_bulk_message_delete(self, message):
+    #     pass
 
-    async def on_raw_message_delete(self, payload):
-        pass
+    # async def on_raw_message_delete(self, payload):
+    #     pass
 
-    async def on_raw_bulk_message_delete(self, payload):
-        pass
+    # async def on_raw_bulk_message_delete(self, payload):
+    #     pass
 
-    async def on_message_edit(self, before, after):
-        pass
+    # async def on_message_edit(self, before, after):
+    #     pass
 
-    async def on_raw_message_edit(self, payload):
-        pass
+    # async def on_raw_message_edit(self, payload):
+    #     pass
 
-    async def on_reaction_add(reaction, user):
-        pass
+    # async def on_reaction_add(reaction, user):
+    #     pass
 
     async def on_raw_reaction_add(self, payload):
         payload = await split_payload(payload)
@@ -694,8 +693,8 @@ class MyClient(commands.Bot):
         await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
         await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
-    async def on_reaction_remove(reaction, user):
-        pass
+    # async def on_reaction_remove(reaction, user):
+    #     pass
 
     async def on_raw_reaction_remove(self, payload):
         payload = await split_payload(payload)
@@ -703,11 +702,11 @@ class MyClient(commands.Bot):
         await monitor_msg_roles(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
         await monitor_msg_hype(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
-    async def on_reaction_clear(self, message, reactions):
-        pass
+    # async def on_reaction_clear(self, message, reactions):
+    #     pass
 
-    async def on_raw_reaction_clear(self, payload):
-        pass
+    # async def on_raw_reaction_clear(self, payload):
+    #     pass
 
     async def on_member_join(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
@@ -715,8 +714,8 @@ class MyClient(commands.Bot):
     async def on_member_remove(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))
 
-    async def on_member_update(self, before, after):
-        pass
+    # async def on_member_update(self, before, after):
+    #     pass
 
     async def on_user_udpate(self, before, after):
         process_MySQL(query=sqlLogUser, values=(f"{before.name}#{before.discriminator}", "user_update", await compare_users(before, after)))

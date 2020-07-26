@@ -2,8 +2,9 @@ import asyncio
 import html
 import random
 import time
-from datetime import datetime
 import typing
+from datetime import datetime
+
 import discord
 import requests
 from discord.ext import commands

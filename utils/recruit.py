@@ -131,8 +131,8 @@ def FootballRecruit(year, name):
     team_ids_raw = process_MySQL(fetch="all", query=TeamIDs)
     team_ids = dict()
 
-    for id in team_ids_raw:
-        team_ids.update({str(id['id']): id['name']})
+    for team_id in team_ids_raw:
+        team_ids.update({str(team_id['id']): team_id['name']})
 
     if len(name) == 1:
         x247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}"

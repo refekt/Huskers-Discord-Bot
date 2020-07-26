@@ -62,10 +62,10 @@ nflWeeks = [
 ]
 
 
-def hex_to_rgb(hex):
-    hex = hex.lstrip("#")
-    hlen = len(hex)
-    rgb = tuple(int(hex[i:i + hlen // 3], 16) for i in range(0, hlen, int(hlen // 3)))
+def hex_to_rgb(_hex):
+    new_hex = _hex.lstrip("#")
+    hlen = len(new_hex)
+    rgb = tuple(int(new_hex[i:i + hlen // 3], 16) for i in range(0, hlen, int(hlen // 3)))
     r = rgb[0]
     g = rgb[1]
     b = rgb[2]

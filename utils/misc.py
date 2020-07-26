@@ -1,13 +1,7 @@
-import asyncio
 import hashlib
 import sys
-import typing
-from datetime import datetime
 
-import discord
 from unidecode import unidecode
-
-from utils.mysql import process_MySQL, sqlUpdateTasks
 
 
 # def remove_mentions(message):
