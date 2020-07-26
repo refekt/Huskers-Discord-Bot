@@ -413,6 +413,7 @@ async def load_tasks():
     def convert_duration(value: str):
         imported_datetime = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
         now = datetime.now()
+
         if imported_datetime > now:
             duration = imported_datetime - now
             return duration
@@ -469,8 +470,8 @@ async def load_tasks():
         task_repo.append(
             asyncio.create_task(
                 send_message(
-                    thread=member_or_chan.id + send_when.seconds,
-                    duration=send_when.seconds,
+                    thread=member_or_chan.id + send_when.total_seconds(),
+                    duration=send_when.total_seconds(),
                     who=member_or_chan,
                     message=task["message"],
                     author=task["author"],
@@ -750,6 +751,8 @@ if len(sys.argv) > 0:
     else:
         token = consts.TEST_TOKEN
 
+    print("### Starting the bot...")
     client.run(token)
+    print("### The bot has been started!")
 else:
     print("No arguments provided!")
