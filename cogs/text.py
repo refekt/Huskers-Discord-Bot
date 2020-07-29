@@ -275,9 +275,30 @@ class TextCommands(commands.Cog):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
-        eight_ball = ['As I see it, yes', 'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Coach V\'s cigar would like this', 'Concentrate and ask again', 'Definitely yes',
-                      'Don’t count on it', 'Frosty', 'Fuck Iowa', 'It is certain', 'It is decidedly so', 'Most Likely', 'My reply is no', 'My sources say no', 'Outlook not so good, and very doubtful',
-                      'Reply hazy', 'Scott Frost approves', 'These are the affirmative answers.', 'Try again', 'Try again', 'Without a doubt', 'Yes – definitely', 'You may rely on it']
+        eight_ball = [
+            'As I see it, yes.',
+            'Ask again later.',
+            'Better not tell you now.',
+            'Cannot predict now.',
+            'Coach V\'s cigar would like this!',
+            'Concentrate and ask again.',
+            'Definitely yes!',
+            'Don’t count on it...',
+            'Frosty!',
+            'Fuck Iowa!',
+            'It is certain.',
+            'It is decidedly so.',
+            'Most likely...',
+            'My reply is no.',
+            'My sources say no.',
+            'Outlook not so good and reply hazy',
+            'Scott Frost approves!',
+            'These are the affirmative answers.',
+            'Try again...',
+            'Without a doubt.',
+            'Yes – definitely!',
+            'You may rely on it.'
+        ]
 
         random.shuffle(eight_ball)
 
