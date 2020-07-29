@@ -9,6 +9,7 @@ import markovify
 import requests
 from discord.ext import commands
 
+from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
 from utils.consts import TZ
 from utils.embed import build_embed
@@ -16,7 +17,6 @@ from utils.games import ScheduleBackup
 from utils.games import Venue
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
-# from utils.thread import remove_mentions
 from utils.thread import send_message
 
 
@@ -74,7 +74,6 @@ class TextCommands(commands.Cog):
                 f = open("resources/scofro.txt", "r")
                 return re.sub(r'[^\x00-\x7f]', r'', f.read())
             else:
-                from utils.client import client
 
                 if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.content)]:
                     return "\n" + str(msg.content.capitalize())
@@ -82,36 +81,56 @@ class TextCommands(commands.Cog):
             return ""
 
         def cleanup_source_data(source_data: str):
-            new_source_data = source_data.replace("`", "")
-            new_source_data = new_source_data.replace("\n\n", "\n")
-            regex_url_finder = "((http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
-            new_source_data = re.sub(regex_url_finder, "", new_source_data, flags=re.IGNORECASE)
+            regex_strings = [
+                r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
+                r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?" # All URLs
+            ]
+
+            new_source_data = source_data
+
+            for regex in regex_strings:
+                new_source_data = re.sub(regex, "", new_source_data, flags=re.IGNORECASE)
+
+            regex_new_line = r"(\r\n|\r|\n){1,}"  # All new lines
+            new_source_data = re.sub(regex_new_line, "\n", new_source_data, flags=re.IGNORECASE)
+
+            regex_front_new_line = r"^\n"
+            new_source_data = re.sub(regex_front_new_line, "", new_source_data, flags=re.IGNORECASE)
+
+            regex_multiple_whitespace = r"\s{2,}"
+            new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
+
             return new_source_data
 
         if not sources:
             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
             for msg in messages:
-                source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=msg.author.bot)
+                if not msg.author.bot:
+                    # source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=msg.author.bot)
+                    source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=False)
         else:
             if len(sources) > 3:
-                await edit_msg.edit(content=edit_msg.content + "...this might take awhile...be patient...")
+                await edit_msg.edit(content=edit_msg.content + "Please be patient. Processing might take awhile.")
 
-            for item in sources:
-                if type(item) == discord.Member:
-                    if item.bot:
-                        source_data += check_message(auth=ctx.message.author, bot_provided=item.bot)
+            for source in sources:
+                if type(source) == discord.Member:
+                    if source.bot:
+                        # source_data += check_message(auth=ctx.message.author, bot_provided=item.bot)
+                        continue
                     else:
                         try:
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
                             for msg in messages:
-                                if msg.author == item:
-                                    source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
+                                if msg.author == source:
+                                    # source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
+                                    source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
                         except discord.errors.Forbidden:
                             continue
-                elif type(item) == discord.TextChannel:
-                    messages = await item.history(limit=CHAN_HIST_LIMIT).flatten()
+                elif type(source) == discord.TextChannel:
+                    messages = await source.history(limit=CHAN_HIST_LIMIT).flatten()
                     for msg in messages:
-                        source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
+                        # source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
+                        source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
 
         source_data = cleanup_source_data(source_data)
 
@@ -119,7 +138,9 @@ class TextCommands(commands.Cog):
             raise ValueError(f"The Markov chain not processed successfully. Please try again. ")
 
         chain = markovify.NewlineText(source_data, well_formed=True)
-        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100)
+        punctuation = ("!", ".", "?", "...")
+
+        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100) + random.choice(punctuation)
 
         if sentence is None:
             raise ValueError(f"The Markov chain not processed successfully. Please try again. ")
