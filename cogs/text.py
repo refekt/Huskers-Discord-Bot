@@ -11,6 +11,7 @@ from discord.ext import commands
 
 from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
+from utils.consts import FOOTER_BOT
 from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
@@ -83,7 +84,7 @@ class TextCommands(commands.Cog):
         def cleanup_source_data(source_data: str):
             regex_strings = [
                 r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
-                r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?" # All URLs
+                r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"  # All URLs
             ]
 
             new_source_data = source_data
@@ -98,7 +99,7 @@ class TextCommands(commands.Cog):
             new_source_data = re.sub(regex_front_new_line, "", new_source_data, flags=re.IGNORECASE)
 
             regex_multiple_whitespace = r"\s{2,}"
-            new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
+            new_source_data = re.sub(reegex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
 
             return new_source_data
 
@@ -280,8 +281,16 @@ class TextCommands(commands.Cog):
 
         random.shuffle(eight_ball)
 
-        embed = discord.Embed(title="The HuskerBot 8-Ball :8ball: says...", description=random.choice(eight_ball), color=0xFF0000)
-        embed.set_thumbnail(url="https://i.imgur.com/L5Gpu0z.png")
+        embed = build_embed(
+            title="BotFrost Magic 8-Ball :8ball: says...",
+            description="These are all 100% accurate. No exceptions! Unless an answer says anyone other than Nebraska is good.",
+            fields=[
+                ["Response", random.choice(eight_ball)]
+            ],
+            thumbnail="https://i.imgur.com/L5Gpu0z.png",
+            footer=FOOTER_BOT
+        )
+
         await ctx.send(embed=embed)
 
     @commands.command()
