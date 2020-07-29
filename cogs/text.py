@@ -115,17 +115,14 @@ class TextCommands(commands.Cog):
 
         source_data = cleanup_source_data(source_data)
 
-        broken_message = f"```\nYou broke me! Most likely because there is no source data.\nThe source data is: {repr(source_data)}```"
-
         if not source_data:
-            await edit_msg.edit(content="Source data: " + broken_message)
-            return
+            raise ValueError(f"The Markov chain not processed successfully. Please try again. ")
 
         chain = markovify.NewlineText(source_data, well_formed=True)
         sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100)
 
         if sentence is None:
-            await edit_msg.edit(content="Sentence: " + broken_message)
+            raise ValueError(f"The Markov chain not processed successfully. Please try again. ")
         else:
             await edit_msg.edit(content=sentence)
 
