@@ -74,7 +74,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.has_role(ROLE_POTATO)
     async def potatoes(self, ctx):
         """ Po-tay-toes! """
-        await ctx.send(embed=build_image_embed(title="Po-Tay-Toes", image="https://media.giphy.com/media/q7kofYLObTVUk/giphy.gif"))
+        await ctx.send(embed=build_image_embed(title="Po-Tay-Toes", image="https://media1.tenor.com/images/9e7881b55627ba4a2b2cbce5649372a3/tenor.gif?itemid=11409033"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
