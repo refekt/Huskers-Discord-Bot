@@ -99,7 +99,7 @@ class TextCommands(commands.Cog):
             new_source_data = re.sub(regex_front_new_line, "", new_source_data, flags=re.IGNORECASE)
 
             regex_multiple_whitespace = r"\s{2,}"
-            new_source_data = re.sub(reegex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
+            new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
 
             return new_source_data
 
@@ -133,10 +133,10 @@ class TextCommands(commands.Cog):
                         # source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
                         source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
 
-        source_data = cleanup_source_data(source_data)
-
-        if not source_data:
-            raise ValueError(f"The Markov chain not processed successfully. Please try again. ")
+        if source_data:
+            source_data = cleanup_source_data(source_data)
+        else:
+            raise ValueError(f"The Markov chain not processed successfully. The new Markov bot does not include any bot responses. Please try again. ")
 
         chain = markovify.NewlineText(source_data, well_formed=True)
         punctuation = ("!", ".", "?", "...")
