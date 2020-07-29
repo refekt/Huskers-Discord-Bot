@@ -11,7 +11,7 @@ exitFlag = 0
 
 
 def remove_mentions(message):
-    return str(message).replace("<", "[User: ").replace("@!", "").replace(">", "]")
+    return str(message).replace("<", "[").replace("@!", "").replace(">", "]")
 
 
 class TaskThread(threading.Thread):
@@ -38,11 +38,11 @@ async def send_message(thread, duration, who: typing.Union[discord.Member, disco
     if duration > 0:
         print(f"### ;;; Creating a task for [{duration}] seconds. [{who}] [{message[:15] + '...'}]")
         await asyncio.sleep(duration)
-        await who.send(f"[Reminder from [{author}] for {who.mention}]: {remove_mentions(message)}")
+        await who.send(f"[Reminder from [{author.mention}] for {who.mention}]: {remove_mentions(message)}")
         process_MySQL(sqlUpdateTasks, values=(0, who.id, message, str(flag), author))
     else:
         imported_datetime = datetime.strptime(flag, "%Y-%m-%d %H:%M:%S.%f")
-        await who.send(f"[Missed reminder from [{author}] for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!: {remove_mentions(message)}")
+        await who.send(f"[Missed reminder from [{author.mention}] for [{who.mention}] set for [{imported_datetime.strftime('%x %X')}]!: {remove_mentions(message)}")
         process_MySQL(sqlUpdateTasks, values=(0, who.id, message, str(flag), author))
 
     print(f"### ;;; Thread [{thread}] completed successfully!")
