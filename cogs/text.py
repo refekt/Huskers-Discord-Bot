@@ -11,7 +11,6 @@ from discord.ext import commands
 
 from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
-from utils.consts import FOOTER_BOT
 from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import ScheduleBackup
@@ -308,8 +307,7 @@ class TextCommands(commands.Cog):
             fields=[
                 ["Response", random.choice(eight_ball)]
             ],
-            thumbnail="https://i.imgur.com/L5Gpu0z.png",
-            footer=FOOTER_BOT
+            thumbnail="https://i.imgur.com/L5Gpu0z.png"
         )
 
         await ctx.send(embed=embed)
@@ -369,11 +367,9 @@ class TextCommands(commands.Cog):
         s_char = "s"
 
         if type(who) == discord.Member and not ctx.author == who:
-            await ctx.send("You cannot set reminders for anyone other than yourself!")
-            return
+            raise ValueError("You cannot set reminders for anyone other than yourself!")
         elif type(who) == discord.TextChannel and who.id in CHAN_BANNED:
-            await ctx.send(f"You cannot set reminders for {who}!")
-            return
+            raise ValueError(f"You cannot set reminders for {who}!")
 
         today = datetime.today()  # .astimezone(tz=TZ)
 

@@ -55,42 +55,20 @@ async def split_payload(payload):
 
 
 async def process_error(ctx, error):
-    err = getattr(error, "original", error)
-
-    if isinstance(err, commands.CommandNotFound):
+    if isinstance(error, commands.CommandNotFound):
         return
-
-    elif isinstance(err, commands.BadArgument):
-        return await ctx.send(f"Command `{client.command_prefix}{ctx.command.qualified_name}` received a bad argument. Review `{client.command_prefix}help {ctx.command.qualified_name}` for more "
-                              f"information.")
-
-    elif isinstance(err, discord.ext.commands.CommandOnCooldown):
-        return await ctx.send(f"HOLD UP {ctx.message.author.mention}! ${ctx.command.qualified_name} is cooling down. {str(error).split('.')[1]} seconds.")
-
-    elif isinstance(err, (discord.ext.commands.MissingRole, discord.ext.commands.MissingAnyRole)):
-        return await ctx.send(f"{ctx.message.author.mention}! You are not authorized to use this command!")
-
-    elif isinstance(err, (discord.ext.commands.CommandInvokeError, discord.ext.commands.UserInputError)):
-        return await ctx.send(f"{err}")
-
-    elif isinstance(err, discord.ext.commands.NoPrivateMessage):
-        return await ctx.send(f"The command `{client.command_prefix}{ctx.command.qualified_name}` cannot be used in private messages.")
-
     else:
-        try:
-            output_msg = f"Whoa there, {ctx.message.author.mention}! Something went doesn't look quite right. Please review `$help` for further assistance. Contact my creators if the problem continues.\n" \
-                         f"```" \
-                         f"Message ID: {ctx.message.id}\n" \
-                         f"Channel: {ctx.message.channel.name} / {ctx.message.channel.id}\n" \
-                         f"Author: {ctx.message.author}\n" \
-                         f"Content: {ctx.message.content}\n" \
-                         f"Error: {error}" \
-                         f"```"
-            await ctx.send(output_msg)
-        except:
-            await ctx.send("Unknown error happened!")
-
-    # process_MySQL(query=sqlLogError, values=(f"{ctx.author.name}#{ctx.author.discriminator}", [err for err in error.args]))
+        embed = build_embed(
+            title="BotFrost Error Message",
+            description=str(error),
+            fields=[
+                ["Author", ctx.message.author],
+                ["Message ID", ctx.message.id],
+                ["Channel", ctx.message.channel.name],
+                ["Content", ctx.message.clean_content]
+            ]
+        )
+        await ctx.send(embed=embed)
 
 
 async def compare_users(before: discord.Member, after: discord.Member):
