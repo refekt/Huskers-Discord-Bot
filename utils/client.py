@@ -21,8 +21,8 @@ from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
-# from utils.misc import send_message
-from utils.thread import send_message
+
+from utils.thread import send_reminder
 
 tweet_reactions = ("🎈", "🌽", "🕸")
 
@@ -436,7 +436,7 @@ async def load_tasks():
 
         if send_when is None:
             print(f"### ;;; Alert time already passed! {task['send_when']}")
-            await send_message(
+            await send_reminder(
                 thread=None,
                 duration=-1,
                 who=member_or_chan,
@@ -447,7 +447,7 @@ async def load_tasks():
 
         task_repo.append(
             asyncio.create_task(
-                send_message(
+                send_reminder(
                     thread=member_or_chan.id + send_when.total_seconds(),
                     duration=send_when.total_seconds(),
                     who=member_or_chan,

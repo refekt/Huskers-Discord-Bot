@@ -16,7 +16,6 @@ def remove_mentions(message):
 
 class TaskThread(threading.Thread):
     def __init__(self, threadID, name, duration, who: typing.Union[discord.Member, discord.User], message: str, flag):
-        # super().__init__(name)
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
@@ -26,10 +25,10 @@ class TaskThread(threading.Thread):
         self.flag = flag
 
     async def run(self):
-        await send_message(self.name, self.duration, self.who, self.message, self.flag)
+        await send_reminder(self.name, self.duration, self.who, self.message, self.flag)
 
 
-async def send_message(thread, duration, who: typing.Union[discord.Member, discord.TextChannel], message, author: typing.Union[discord.Member, discord.TextChannel], flag=None):
+async def send_reminder(thread, duration, who: typing.Union[discord.Member, discord.TextChannel], message, author: typing.Union[discord.Member, discord.TextChannel], flag=None):
     if exitFlag:
         thread.exit()
 

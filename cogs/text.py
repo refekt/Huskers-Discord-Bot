@@ -17,7 +17,7 @@ from utils.games import ScheduleBackup
 from utils.games import Venue
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
-from utils.thread import send_message
+from utils.thread import send_reminder
 
 
 class TextCommands(commands.Cog):
@@ -417,7 +417,7 @@ class TextCommands(commands.Cog):
         import nest_asyncio
         nest_asyncio.apply()
         asyncio.create_task(
-            send_message(
+            send_reminder(
                 thread=1,
                 duration=duration.total_seconds(),
                 who=who,
