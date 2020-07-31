@@ -1,4 +1,5 @@
 import asyncio
+import random
 import threading
 import typing
 from datetime import datetime
@@ -14,18 +15,24 @@ def remove_mentions(message):
     return str(message).replace("<", "[").replace("@!", "").replace(">", "]")
 
 
-class TaskThread(threading.Thread):
-    def __init__(self, threadID, name, duration, who: typing.Union[discord.Member, discord.User], message: str, flag):
+async def send_math(channel: discord.TextChannel):
+    first = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    second = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+    await channel.send(f"Math time! What is {random.choice(first)} x {random.choice(second)}?")
+
+
+class MathThread(threading.Thread):
+    def __init__(self, event, channel: discord.TextChannel):
         threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.duration = duration
-        self.who = who
-        self.message = message
-        self.flag = flag
+        self.stopped = event
+        self.channel = channel
 
     async def run(self):
-        await send_reminder(self.name, self.duration, self.who, self.message, self.flag)
+        duration = 2700  # 45 minutes
+        while True:
+            await send_math(channel=self.channel)
+            await asyncio.sleep(duration)
 
 
 async def send_reminder(thread, duration, who: typing.Union[discord.Member, discord.TextChannel], message, author: typing.Union[discord.Member, discord.TextChannel], flag=None):
@@ -45,3 +52,17 @@ async def send_reminder(thread, duration, who: typing.Union[discord.Member, disc
         process_MySQL(sqlUpdateTasks, values=(0, who.id, message, str(flag), author))
 
     print(f"### ;;; Thread [{thread}] completed successfully!")
+
+
+class TaskThread(threading.Thread):
+    def __init__(self, threadID, name, duration, who: typing.Union[discord.Member, discord.User], message: str, flag):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.duration = duration
+        self.who = who
+        self.message = message
+        self.flag = flag
+
+    async def run(self):
+        await send_reminder(self.name, self.duration, self.who, self.message, self.flag)

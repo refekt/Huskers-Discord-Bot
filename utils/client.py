@@ -21,8 +21,7 @@ from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
-
-from utils.thread import send_reminder
+from utils.thread import send_reminder, send_math
 
 tweet_reactions = ("🎈", "🌽", "🕸")
 
@@ -462,6 +461,15 @@ async def load_tasks():
         await task
 
 
+async def start_maths():
+    print("### /// Start maths")
+    guild = await current_guild()
+    math_channel = guild.get_channel(CHAN_SCOTTS_BOTS)
+    discord_math = asyncio.create_task(send_math(math_channel))
+    await discord_math
+    print("### /// Finished maths")
+
+
 class MyClient(commands.Bot):
 
     def __init__(self, command_prefix, **options):
@@ -482,7 +490,9 @@ class MyClient(commands.Bot):
 
         await change_my_status(client)
         await change_my_nickname(client, ctx=None)
+        await start_maths()
         await load_tasks()
+
 
         print(
             f"### The bot is ready! ###\n"
