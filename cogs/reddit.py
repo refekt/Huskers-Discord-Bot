@@ -39,7 +39,7 @@ class RedditCommands(commands.Cog):
                                 stars=row[4],
                                 position=row[5],
                                 cfb_title=f"{row[1]} {row[4]}* {row[5]} {row[2]} commits to Nebraska",
-                                huskers_title=f"{row[2]} is N!"
+                                huskers_title=f"🌽 {row[2]} is N! 🎈"
                             )
                         )
                     )
