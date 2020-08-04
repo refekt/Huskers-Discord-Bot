@@ -490,9 +490,8 @@ class MyClient(commands.Bot):
 
         await change_my_status(client)
         await change_my_nickname(client, ctx=None)
-        await start_maths()
+        # await start_maths()
         await load_tasks()
-
 
         print(
             f"### The bot is ready! ###\n"

@@ -29,10 +29,13 @@ class MathThread(threading.Thread):
         self.channel = channel
 
     async def run(self):
-        duration = 2700  # 45 minutes
+        duration = 180
         while True:
+            print("Sending math problem")
             await send_math(channel=self.channel)
+            print(f"Sleeping {duration} seconds")
             await asyncio.sleep(duration)
+            print("Slept!")
 
 
 async def send_reminder(thread, duration, who: typing.Union[discord.Member, discord.TextChannel], message, author: typing.Union[discord.Member, discord.TextChannel], flag=None):
