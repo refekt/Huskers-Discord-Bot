@@ -298,11 +298,9 @@ class Music(commands.Cog):
         # Do not use this on other commands.
         if not message.embeds:
             return
-        # try:
-        if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET]:
+
+        if message.embeds[0].footer.text in [FOOTER_BOT, FOOTER_SECRET] or "Husker Discord Hall of Fame Message" in message.embeds[0].title:
             return
-        # except IndexError:
-        #     return
 
         if user != self.bot.user and message.author == self.bot.user:
             print("Removing becuase radio")
