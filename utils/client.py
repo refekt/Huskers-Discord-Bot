@@ -257,15 +257,27 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             if react.count > 2:
                 return
 
-        msg = f"[Shared by {user}] "
+        async def send_tweet(channel):
+            def embeds_exist():
+                if len(message.embeds) == 0:
+                    return False
+                else:
+                    return True
+
+            share_string = f"[Shared by {user}]: "
+
+            if embeds_exist():
+                await channel.send(content=share_string + message.content,embed=message.embeds[0])
+            else:
+                await channel.send(content=share_string + message.content)
 
         if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content:  # Balloon = General
             c = client.get_channel(CHAN_GENERAL)
-            await c.send(msg + message.content)
+            await send_tweet(c)
 
         elif emoji.name == tweet_reactions[1] and not tweet_reactions[1] in message.content:  # Corn = Scotts
             c = client.get_channel(CHAN_SCOTT)
-            await c.send(msg + message.content)
+            await send_tweet(c)
 
         elif emoji.name == tweet_reactions[2] and user.id == 189554873778307073:
             pass
