@@ -80,22 +80,14 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         """ [year|week] Nebraska's football schedule """
         if not ctx.invoked_subcommand:
             from utils.client import client
-            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
+            raise AttributeError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
 
     @schedule.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def year(self, ctx, year=datetime.now().year):
         """ Specific year of Nebraska's football schedule """
         edit_msg = await ctx.send("Loading...")
-
-        embeds = build_schedule_embed(year)
-
-        await edit_msg.edit(content="", embed=embeds[0])
-
-        try:
-            await ctx.send(embed=embeds[1])
-        except discord.HTTPException:
-            pass
+        await edit_msg.edit(content="", embed=build_schedule_embed(year))
 
     @schedule.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)

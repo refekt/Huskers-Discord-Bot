@@ -5,7 +5,7 @@ import discord
 
 from utils.consts import FOOTER_BOT
 from utils.consts import TZ
-from utils.games import ScheduleBackup
+from utils.games import HuskerSchedule
 
 
 def build_image_embed(title, image):
@@ -120,68 +120,39 @@ def build_recruit_embed(rec):  # rec == recruit
 
 
 def build_schedule_embed(year, **kwargs):
-    scheduled_games, season_stats = ScheduleBackup(year=year)
+    scheduled_games, season_stats = HuskerSchedule(year=year)
 
-    title = value = ""
-    arrow_bullet = "» "
-    nl = "\n"
-    total_len = 0
-    game_data = []
+    ARROW = "» "
+    _NL = "\n"
 
-    title_str = f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})"
     embed = build_embed(
-        title_str,
+        title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
     )
 
-    for index, game in enumerate(scheduled_games):
-        title = f"Game {game.week}"
+    if "week" in kwargs:
+        game = scheduled_games[int(kwargs["week"]) - 1]
 
-        value = \
-            f"{game.opponent + ' (' + game.outcome + ')' + nl if game.outcome else game.opponent + nl}"
+        value_string = f"{ARROW + ' ' + game.outcome + _NL if not game.outcome == '' else ''}" \
+                       f"{ARROW}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_NL}" \
+                       f"{ARROW}{game.opponent.date_time}{_NL}" \
+                       f"{ARROW}{game.location}"
 
-        if game.game_date_time.hour >= 16:
-            value += f"{arrow_bullet + game.game_date_time.strftime('%b %d') + '/TBD' + nl}"
-        else:
-            if "linux" in platform.platform():
-                value += f"{arrow_bullet + game.game_date_time.strftime('%b %d/%-I:%M %p') + nl}"
-            else:
-                value += f"{arrow_bullet + game.game_date_time.strftime('%b %d/%I:%M %p') + nl}"
-
-        value += \
-            f"{arrow_bullet + game.bets.lines[0].formatted_spread + nl if len(game.bets.lines) else ''}" \
-            f"{arrow_bullet + game.location[0] + ', ' + game.location[1] + nl}" \
-            f"{arrow_bullet + game.tv_station + nl if game.tv_station else ''}" \
-            f"{'[Boxscore](' + game.boxscore_url + ')' + nl if game.boxscore_url else ''}" \
-            f"{'[Recap](' + game.recap_url + ')' + nl if game.recap_url else ''}" \
-            f"{'[Notes](' + game.notes_url + ')' + nl if game.notes_url else ''}" \
-            f"{'[Quotes](' + game.quotes_url + ')' + nl if game.quotes_url else ''}" \
-            f"{'[History](' + game.history_url + ')' + nl if game.history_url else ''}" \
-            f"{'[Gallery](' + game.gallery_url + ')' + nl if game.gallery_url else ''}"
-
-        total_len += len(title) + len(value)
-
-        if "week" in kwargs.keys():
-            if game.week == int(kwargs["week"]):
-                embed.add_field(name=title, value=value)
-                embed.set_thumbnail(url=game.opponent_url)
-                return embed
-
-        game_data.append(
-            [
-                title,
-                value
-            ]
+        embed.add_field(
+            name=f"**#{game.week}: {game.opponent.name}**",
+            value=value_string
         )
 
-    embed_extended = None
+        embed.set_image(url=game.opponent.icon)
+    else:
+        for index, game in enumerate(scheduled_games):
+            value_string = f"{ARROW + ' ' + game.outcome + _NL if not game.outcome == '' else ''}" \
+                           f"{ARROW}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_NL}" \
+                           f"{ARROW}{game.opponent.date_time}{_NL}" \
+                           f"{ARROW}{game.location}"
 
-    for game in game_data:
-        if len(embed) + len(game[0]) + len(game[1]) <= 6000:
-            embed.add_field(name=game[0], value=game[1])
-        else:
-            if embed_extended is None:
-                embed_extended = build_embed(title_str)
+            embed.add_field(
+                name=f"**#{game.week}: {game.opponent.name}**",
+                value=value_string
+            )
 
-            embed_extended.add_field(name=game[0], value=game[1])
-
-    return embed, embed_extended
+    return embed

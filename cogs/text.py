@@ -13,7 +13,7 @@ from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
 from utils.consts import TZ
 from utils.embed import build_embed
-from utils.games import ScheduleBackup
+from utils.games import HuskerSchedule
 from utils.games import Venue
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
@@ -39,7 +39,7 @@ class TextCommands(commands.Cog):
         async def send_countdown(days: int, hours: int, minutes: int, opponent: str, datetime: datetime):
             await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent} ]__ game at __[ {datetime.strftime('%B %d, %Y %I:%M %p')} ]__")
 
-        games, stats = ScheduleBackup(year=now_cst.year)
+        games, stats = HuskerSchedule(year=now_cst.year)
 
         if team is None:
             for game in games:
@@ -166,7 +166,7 @@ class TextCommands(commands.Cog):
 
         edit_msg = await ctx.send("Loading...")
 
-        season, season_stats = ScheduleBackup(year=datetime.now().year)
+        season, season_stats = HuskerSchedule(year=datetime.now().year)
         # season = reversed(season)
 
         for game in season:
@@ -216,7 +216,7 @@ class TextCommands(commands.Cog):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
         """ You have 24 hours to cheer or moam about the game """
-        games = ScheduleBackup(year=datetime.now().year)
+        games = HuskerSchedule(year=datetime.now().year)
 
         for index, game in enumerate(reversed(games)):
             game_dt_cst = game.game_date_time.astimezone(tz=TZ)
