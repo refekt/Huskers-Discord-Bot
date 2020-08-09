@@ -200,7 +200,7 @@ def HuskerSchedule(year=datetime.datetime.now().year):
                   }
 
         if "TBA" in opp.date_time:
-            gdt_string = f"{opp.date_time[0:6]} {year} 12:00 PM"
+            gdt_string = f"{opp.date_time[0:6]} {year} 10:58 PM"
 
             game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
         else:
