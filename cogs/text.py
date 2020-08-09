@@ -36,8 +36,9 @@ class TextCommands(commands.Cog):
 
             return hour, mins
 
-        async def send_countdown(days: int, hours: int, minutes: int, opponent: str, datetime: datetime):
-            await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent} ]__ game at __[ {datetime.strftime('%B %d, %Y %I:%M %p')} ]__")
+        async def send_countdown(days: int, hours: int, minutes: int, opponent, datetime: datetime):
+            await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
+                                        f" {datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
 
         games, stats = HuskerSchedule(year=now_cst.year)
 

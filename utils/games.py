@@ -1,5 +1,7 @@
+from utils.consts import TZ
 import datetime
-
+import pytz
+import re
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
@@ -107,14 +109,16 @@ class HuskerDotComSchedule:
     outcome = None
     ranking = None
     week = None
+    game_date_time = None
 
-    def __init__(self, bets, location, opponent, outcome, ranking, week):
+    def __init__(self, bets, location, opponent, outcome, ranking, week, game_date_time):
         self.bets = bets
         self.location = location
         self.opponent = opponent
         self.outcome = outcome
         self.ranking = ranking
         self.week = week
+        self.game_date_time = game_date_time
 
 
 def HuskerSchedule(year=datetime.datetime.now().year):
@@ -139,7 +143,7 @@ def HuskerSchedule(year=datetime.datetime.now().year):
                 ranking=None,
                 icon=icon,
                 date_time=date_time,
-                conference=conference
+                conference=conference,
             )
         except IndexError:
             return "Unknown Opponent"
@@ -181,6 +185,39 @@ def HuskerSchedule(year=datetime.datetime.now().year):
             except IndexError:
                 out = ""
 
+        months = {"Jan": 1,
+                  "Feb": 2,
+                  "Mar": 3,
+                  "Apr": 4,
+                  "May": 5,
+                  "Jun": 6,
+                  "Jul": 7,
+                  "Aug": 8,
+                  "Sep": 9,
+                  "Oct": 10,
+                  "Nov": 11,
+                  "Dec": 12
+                  }
+
+        if "TBA" in opp.date_time:
+            gdt_string = f"{opp.date_time[0:6]} {year} 12:00 PM"
+
+            game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
+        else:
+            if re.match(r"\w{3}\s{1}\d{1}", opp.date_time):
+                gdt_string = f"{opp.date_time[0:4] + '0' + opp.date_time[4:5]} {year}"
+            else:
+                gdt_string = f"{opp.date_time[0:7]} {year}"
+
+            t_string = str(opp.date_time[-8:]).strip()
+
+            if len(t_string) == 7:
+                t_string = '0' + t_string
+
+            gdt_string = gdt_string + ' ' + t_string
+
+            game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
+
         games.append(
             HuskerDotComSchedule(
                 bets=None,
@@ -188,7 +225,8 @@ def HuskerSchedule(year=datetime.datetime.now().year):
                 opponent=opp,
                 outcome=out,
                 ranking=None,
-                week=wk
+                week=wk,
+                game_date_time=game_date_time
             )
         )
 
