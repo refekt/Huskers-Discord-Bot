@@ -176,11 +176,11 @@ INSERT INTO stats (author, channel, created_at)
 VALUES (%s, %s, %s)
 """
 
-sqlGetStats = """\
+sqlRetrieveStats = """\
 SELECT * FROM stats
 """
 
-sqlGetTasks = """\
+sqlRetrieveTasks = """\
 SELECT * FROM tasks_repo
 WHERE is_open = 1
 """
@@ -194,6 +194,18 @@ sqlUpdateTasks = """\
 UPDATE tasks_repo
 SET is_open = %s
 WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
+"""
+
+sqlRetrieveUserCurrency = """\
+SELECT value
+FROM currency
+WHERE ID = %s
+"""
+
+sqlUpdateCurrency = """\
+UPDATE currency
+SET value = %s
+WHERE ID = %s
 """
 
 

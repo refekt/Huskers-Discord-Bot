@@ -20,7 +20,7 @@ from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, RO
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlGetTasks
+from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlRetrieveTasks
 from utils.thread import send_reminder, send_math
 
 tweet_reactions = ("🎈", "🌽", "🕸")
@@ -396,7 +396,7 @@ async def monitor_msg_hype(action, message: discord.Message, member: discord.Mem
 
 
 async def load_tasks():
-    tasks = process_MySQL(sqlGetTasks, fetch="all")
+    tasks = process_MySQL(sqlRetrieveTasks, fetch="all")
     guild = await current_guild()
 
     def convert_duration(value: str):
