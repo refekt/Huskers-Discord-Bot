@@ -108,7 +108,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         process_MySQL(
             query=sqlUpdateCurrency,
-            values=(value, full_author(ctx))
+            values=(value, full_author(user))
         )
 
         await ctx.send(f"You have granted {user.mention} {value} {CURRENCY_NAME}!")
@@ -117,26 +117,23 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def balance(self, ctx, user: discord.Member = None):
-        if user:
-            if check_author_initialized(user):
-                balance = process_MySQL(
-                    query=sqlRetrieveUserCurrency,
-                    values=full_author(ctx)
-                )
-
-                await ctx.send(f"{user.mention}'s balance is {balance} {CURRENCY_NAME}.")
-            else:
-                raise AttributeError(f"{user.mention} has not initialized their account! This is completed by submitting the following command: `$money new`]")
+        if check_author_initialized(ctx):
+            balance = process_MySQL(
+                fetch="all",
+                query=sqlRetrieveUserCurrency
+            )
         else:
-            if check_author_initialized(ctx):
-                balance = process_MySQL(
-                    query=sqlRetrieveUserCurrency,
-                    values=full_author(ctx)
-                )
+            raise AttributeError("Unable to find user!")
 
-                await ctx.send(f"{ctx.mention}'s balance is {balance} {CURRENCY_NAME}.")
-            else:
-                raise AttributeError(f"{ctx.mention}, you have not initialized your account! This is completed by submitting the following command: `$money new`]")
+        if balance is None:
+            raise AttributeError("Unable to find user!")
+
+        if user:
+            bal = [username for username in balance if username["username"] == full_author(user)]
+            await ctx.send(f"{user.mention}'s balance is {bal[0]['balance']} {CURRENCY_NAME}.")
+        else:
+            bal = [username for username in balance if username["username"] == full_author(ctx)]
+            await ctx.send(f"{ctx.author.mention}'s balance is {bal[0]['balance']} {CURRENCY_NAME}.")
 
 
 def setup(bot):
