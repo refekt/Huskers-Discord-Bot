@@ -115,7 +115,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @money.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def balance(self, ctx, user: discord.Member = None):
         if check_author_initialized(ctx):
             balance = process_MySQL(
