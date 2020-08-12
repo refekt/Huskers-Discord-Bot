@@ -1,5 +1,7 @@
 import pymysql.cursors
 
+from utils.consts import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
+
 sqlDatabaseTimestamp = """\
 INSERT INTO bot_connections (user, connected, timestamp)
 VALUES (%s, %s, %s)"""
@@ -197,21 +199,25 @@ WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
 """
 
 sqlRetrieveUserCurrency = """\
-SELECT value
-FROM currency
+SELECT value FROM currency
 WHERE ID = %s
+"""
+
+sqlCheckCurrencyInit = "SELECT username FROM currency"
+
+sqlSetCurrency = """\
+INSERT INTO currency (username, init, balance)
+VALUES (%s, 1, %s)
 """
 
 sqlUpdateCurrency = """\
 UPDATE currency
-SET value = %s
-WHERE ID = %s
+SET balance = balance + %s
+WHERE username = %s
 """
 
 
 def process_MySQL(query: str, **kwargs):
-    from utils.consts import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
-
     try:
         sqlConnection = pymysql.connect(
             host=SQL_HOST,

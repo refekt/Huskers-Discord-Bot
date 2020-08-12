@@ -126,6 +126,8 @@ PROD_BOT_MEMBER = 593949013443608596
 FOOTER_SECRET = "These messages are anonymous and there is no way to verify messages are accurate."
 FOOTER_BOT = "Created by Bot Frost"
 
+# Currency
+CURRENCY_NAME = "Verduzcoins"
 
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
