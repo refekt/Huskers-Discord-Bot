@@ -172,7 +172,7 @@ async def monitor_messages(message: discord.Message):
             subs = []
 
             for index, s in enumerate(subreddits):
-                if ["huskers", "cfb"] in s:
+                if [sub for sub in ["huskers", "cfb"] if (sub in s)]:
                     return
 
                 url = 'https://reddit.com/' + s
