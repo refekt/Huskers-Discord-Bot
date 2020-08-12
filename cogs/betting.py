@@ -20,14 +20,17 @@ def check_author_initialized(context: typing.Union[discord.ext.commands.Context,
         query=sqlCheckCurrencyInit
     )
 
-    if len(author_init) > 0:
-        search = [author for author in author_init if author["username"] == full_author(context)]
+    try:
+        if len(author_init) > 0:
+            search = [author for author in author_init if author["username"] == full_author(context)]
 
-        if len(search):
-            return True
+            if len(search):
+                return True
+            else:
+                return False
         else:
             return False
-    else:
+    except TypeError:
         return False
 
 
