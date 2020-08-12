@@ -166,28 +166,19 @@ async def monitor_messages(message: discord.Message):
         #         await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
 
     async def find_subreddits():
-        # import praw
-        # x = praw.Reddit()
-
-        subreddits = re.findall(r'(?:^| )(/?r/[a-z]+)', message.content.lower())
+        subreddits = re.findall(r'/?r/[a-z]+', message.content.lower())
 
         if len(subreddits) > 0:
             subs = []
 
             for index, s in enumerate(subreddits):
                 if ["huskers", "cfb"] in s:
-                    # if "huskers" in s or "cfb" in s:
                     return
 
                 url = 'https://reddit.com/' + s
                 if '.com//r/' in url:
                     url = url.replace('.com//r', '.com/r')
                 subs.append([s, url])
-
-                # reddit = praw.Reddit()
-                #
-                # for submission in reddit.subreddit(subs[index]):
-                #     print(submission)
 
             await message.channel.send(
                 embed=build_embed(
