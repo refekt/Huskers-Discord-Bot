@@ -122,7 +122,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 query=sqlRetrieveUserCurrency
             )
         else:
-            raise AttributeError("Unable to find user!")
+            raise AttributeError("Unable to find user! Establish a balance wiht `$money new`.")
 
         if balance is None:
             raise AttributeError("Unable to find user!")
