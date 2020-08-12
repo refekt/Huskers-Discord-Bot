@@ -412,7 +412,7 @@ def FootballRecruit(year, name):
 
         return all_interests
 
-    for index, player in enumerate(search_results):
+    for index, player in enumerate(search_results):       
         p = player['Player']
 
         r = requests.get(url=player['Player']['Url'], headers=HEADERS)
@@ -483,5 +483,8 @@ def FootballRecruit(year, name):
                 # rivals_highlights=rivals_highlights(rivals_id)
             )
         )
+        
+        if index == 9:
+            break
 
     return search_result_players
