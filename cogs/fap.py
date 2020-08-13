@@ -51,8 +51,9 @@ class fapCommands(commands.Cog):
                 channel.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message.")
                 return
             else:
-                if prediction_response.content in valid_teams:
-                    team_prediction = prediction_response.content
+                if prediction_response.content.lower() in [t.lower() for t in valid_teams]:
+                    team_index = [t.lower() for t in valid_teams].index(prediction_response.content.lower())
+                    team_prediction = valid_teams[team_index]
                     await channel.send(f"You've selected {team_prediction} as your prediction, what is your confidence in that pick from 1 to 10?")                   
                 else:
                     await channel.send("That isn't a valid team. Please try again or ask my creators to add that as a valid team.")
