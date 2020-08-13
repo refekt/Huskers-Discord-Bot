@@ -14,7 +14,6 @@ from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BAN
 from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import HuskerSchedule
-from utils.games import Venue
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 from utils.thread import send_reminder
