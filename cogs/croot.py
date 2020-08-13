@@ -8,6 +8,9 @@ from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.embed import build_embed, build_recruit_embed
 from utils.recruit import FootballRecruit
+from utils.consts import FOOTER_BOT
+
+from cogs.fap import fapCommands as FAP
 
 
 class RecruitCommands(commands.Cog):
@@ -33,10 +36,28 @@ class RecruitCommands(commands.Cog):
         if type(search) == commands.UserInputError:
             await edit_msg.edit(content=search)
             return
-
+        
+        async def final_send_embed_fap_loop(target_recruit, embed_msg):
+            embed = build_recruit_embed(target_recruit)
+            await embed_msg.edit(content="", embed=embed)
+            await embed_msg.add_reaction('🔮')
+            fap_wait = True
+            while(fap_wait):
+                try:
+                    reaction, user = await client.wait_for('reaction_add', 
+                                                       check=lambda reaction, user: (not user.bot and reaction.emoji == '🔮'))                    
+                except asyncio.TimeoutError:
+                    embed_msg.set_footer(text=FOOTER_BOT)
+                    await embed_msg.remove_reaction('🔮', client.user)
+                    fap_wait = False
+                else:
+                    if reaction.message.id == embed_msg.id:
+                        await embed_msg.remove_reaction('🔮', user)
+                        await FAP.initiate_fap(user, target_recruit)
+                    
+        
         if len(search) == 1:
-            embed = build_recruit_embed(search[0])
-            await edit_msg.edit(content="", embed=embed)
+            await final_send_embed_fap_loop(search[0], edit_msg)
             return
 
         result_info = ""
@@ -70,16 +91,20 @@ class RecruitCommands(commands.Cog):
             pass
         else:
             search_result_player = search[search_reactions[reaction.emoji]]
-
-        embed = build_recruit_embed(search_result_player)
-        await edit_msg.edit(content="", embed=embed)
-
+        
         try:
             await edit_msg.clear_reactions()
         except discord.HTTPException:
             print("Removing reactions from the message failed.")
         except discord.ClientException:
             print("Unable to remove reactions due to lack of permissions.")
+            
+        await final_send_embed_fap_loop(search_result_player, edit_msg)
+        #embed = build_recruit_embed(search_result_player)
+        #await edit_msg.edit(content="", embed=embed)
+        #await edit_msg.add_reaction('🔮')
+
+
 
 
 def setup(bot):
