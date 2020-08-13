@@ -8,6 +8,7 @@ from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.embed import build_embed, build_recruit_embed
 from utils.recruit import FootballRecruit
+from utils.consts import FOOTER_BOT
 
 from cogs.fap import fapCommands as FAP
 
@@ -44,9 +45,9 @@ class RecruitCommands(commands.Cog):
             while(fap_wait):
                 try:
                     reaction, user = await client.wait_for('reaction_add', 
-                                                       check=lambda reaction, user: (not user.bot and reaction.emoji == '🔮'),
-                                                       timeout = 10)                    
+                                                       check=lambda reaction, user: (not user.bot and reaction.emoji == '🔮'))                    
                 except asyncio.TimeoutError:
+                    embed_msg.set_footer(text=FOOTER_BOT)
                     await embed_msg.remove_reaction('🔮', client.user)
                     fap_wait = False
                 else:
