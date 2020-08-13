@@ -81,7 +81,8 @@ class TextCommands(commands.Cog):
             else:
 
                 if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.content)]:
-                    return "\n" + str(msg.content.capitalize())
+                    msg_content = str(msg.content.capitalize())
+                    return "\n" + msg_content
 
             return ""
 
@@ -111,7 +112,6 @@ class TextCommands(commands.Cog):
             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
             for msg in messages:
                 if not msg.author.bot:
-                    # source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=msg.author.bot)
                     source_data += check_message(auth=ctx.message.author, msg=msg, bot_provided=False)
         else:
             if len(sources) > 3:
@@ -120,36 +120,33 @@ class TextCommands(commands.Cog):
             for source in sources:
                 if type(source) == discord.Member:
                     if source.bot:
-                        # source_data += check_message(auth=ctx.message.author, bot_provided=item.bot)
                         continue
                     else:
                         try:
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
                             for msg in messages:
                                 if msg.author == source:
-                                    # source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
                                     source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
                         except discord.errors.Forbidden:
                             continue
                 elif type(source) == discord.TextChannel:
                     messages = await source.history(limit=CHAN_HIST_LIMIT).flatten()
                     for msg in messages:
-                        # source_data += check_message(auth=msg.author, msg=msg, bot_provided=msg.author.bot)
                         source_data += check_message(auth=msg.author, msg=msg, bot_provided=False)
-
+        fail_string = f"There was not enough information available to make a Markov chain for [ {[source.name for source in sources]} ]."
         if source_data:
             source_data = cleanup_source_data(source_data)
         else:
-            raise ValueError(f"The Markov chain not processed successfully. The new Markov bot does not include any bot responses. Please try again. ")
+            await edit_msg.edit(content=fail_string)
 
         chain = markovify.NewlineText(source_data, well_formed=True)
         punctuation = ("!", ".", "?", "...")
-
-        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100) + random.choice(punctuation)
+        sentence = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100)
 
         if sentence is None:
-            raise ValueError(f"The Markov chain not processed successfully. Please try again. ")
+            await edit_msg.edit(content=fail_string)
         else:
+            sentence += random.choice(punctuation)
             await edit_msg.edit(content=sentence)
 
     # @commands.group()
