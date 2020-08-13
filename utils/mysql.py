@@ -241,17 +241,30 @@ def process_MySQL(query: str, **kwargs):
                 else:
                     cursor.execute(query=query, args=kwargs["values"])
             else:
-                if kwargs["fetch"] == "one":
-                    cursor.execute(query=query)
-                    result = cursor.fetchone()
-                elif kwargs["fetch"] == "many":
-                    if not "size" in kwargs:
-                        raise ValueError("Fetching many requires a `size` kwargs.")
-                    cursor.execute(query=query)
-                    result = cursor.fetchmany(many=kwargs["size"])
-                elif kwargs["fetch"] == "all":
-                    cursor.execute(query=query)
-                    result = cursor.fetchall()
+                if not 'values' in kwargs:
+                    if kwargs["fetch"] == "one":
+                        cursor.execute(query=query)
+                        result = cursor.fetchone()
+                    elif kwargs["fetch"] == "many":
+                        if not "size" in kwargs:
+                            raise ValueError("Fetching many requires a `size` kwargs.")
+                        cursor.execute(query=query)
+                        result = cursor.fetchmany(many=kwargs["size"])
+                    elif kwargs["fetch"] == "all":
+                        cursor.execute(query=query)
+                        result = cursor.fetchall()
+                else:
+                    if kwargs["fetch"] == "one":
+                        cursor.execute(query=query, args = kwargs['values'])
+                        result = cursor.fetchone()
+                    elif kwargs["fetch"] == "many":
+                        if not "size" in kwargs:
+                            raise ValueError("Fetching many requires a `size` kwargs.")
+                        cursor.execute(query=query, args = kwargs['values'])
+                        result = cursor.fetchmany(many=kwargs["size"])
+                    elif kwargs["fetch"] == "all":
+                        cursor.execute(query=query, args = kwargs['values'])
+                        result = cursor.fetchall()
 
         sqlConnection.commit()
 
