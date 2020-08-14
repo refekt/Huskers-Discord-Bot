@@ -114,7 +114,7 @@ def build_recruit_embed(rec):  # rec == recruit
             ["**Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"]
         ]
     )
-    embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to.")
+    embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to." + "\nClick the 📈 to get the predictions for this recruit.")
     if not rec.thumbnail == "/.":
         embed.set_thumbnail(url=rec.thumbnail)
     return embed
