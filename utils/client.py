@@ -166,7 +166,7 @@ async def monitor_messages(message: discord.Message):
         #         await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
 
     async def find_subreddits():
-        subreddits = re.findall(r"(\/r\/\w{1,}|r\/\w{1,})", message.content.lower())
+        subreddits = re.findall(r"(\/|)r\/[a-z0-9]{1,}(\/|)", message.content.lower())
 
         if len(subreddits) > 0:
             subs = []
