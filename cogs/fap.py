@@ -1,8 +1,6 @@
 import asyncio
 import discord
 from discord.ext import commands
-
-from utils.client import client
 from utils.mysql import process_MySQL
 
 async def get_teams():
@@ -28,7 +26,7 @@ async def insert_prediction(user, recruit, team_prediction, prediction_confidenc
                                      WHERE user_id = %s and recruit_profile = %s;'''
         process_MySQL(query = update_prediction_query, values = (team_prediction, prediction_confidence, user.id, recruit.x247_profile))
         
-async def get_croot_predictions(recruit):
+def get_croot_predictions(recruit):
     get_croot_preds_query = '''SELECT f.recruit_name, f.team, avg(f.confidence) as 'confidence', (count(f.team) / t.sumr) * 100 as 'percent', t.sumr as 'total'
                                FROM fap_predictions as f
                                JOIN (SELECT recruit_profile, COUNT(recruit_profile) as sumr FROM fap_predictions GROUP BY recruit_profile) as t on t.recruit_profile = f.recruit_profile
@@ -41,7 +39,7 @@ async def get_croot_predictions(recruit):
 
 class fapCommands(commands.Cog):
 
-    async def initiate_fap(user, recruit):
+    async def initiate_fap(user, recruit, client):
         valid_teams = await get_teams()
         team_prediction = None
         prediction_confidence = None
@@ -92,17 +90,18 @@ class fapCommands(commands.Cog):
         await insert_prediction(user, recruit, team_prediction, prediction_confidence, previous_prediction)
         await channel.send(f"Your prediction of {recruit.name} to {team_prediction} has been logged!")
         
-    async def get_faps(recruit, ctx):
-        croot_preds = await get_croot_predictions(recruit)
-        if croot_preds is None:
-            await ctx.send('This recruit has no predictions.')
-        else:
-            title = f'FAP Predictions for {recruit.name}'
-            subtitle = f"Total Predictions: {croot_preds[0]['total']}"
-            embed = discord.Embed(title=title, description = subtitle, color=0xD00000, inline = False)
-            embed.add_field(name = 'Team:', value = 'Percent (Avg Confidence)', inline = False)
-            for p in croot_preds:
-                embed.add_field(name = f"{p['team']}:", value = f"{p['percent']:.2f}% ({p['confidence']:.1f})", inline = False)
-            await ctx.send(embed = embed)
+    def get_faps(recruit):
+        croot_preds = get_croot_predictions(recruit)
+        # if croot_preds is None:
+            # await ctx.send('This recruit has no predictions.')
+        # else:
+            # title = f'FAP Predictions for {recruit.name}'
+            # subtitle = f"Total Predictions: {croot_preds[0]['total']}"
+            # embed = discord.Embed(title=title, description = subtitle, color=0xD00000, inline = False)
+            # embed.add_field(name = 'Team:', value = 'Percent (Avg Confidence)', inline = False)
+            # for p in croot_preds:
+                # embed.add_field(name = f"{p['team']}:", value = f"{p['percent']:.2f}% ({p['confidence']:.1f})", inline = False)
+            # await ctx.send(embed = embed)
+        return croot_preds
         
         

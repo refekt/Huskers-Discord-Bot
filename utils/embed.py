@@ -1,12 +1,13 @@
 import platform
 from datetime import datetime
+import asyncio
 
 import discord
 
 from utils.consts import FOOTER_BOT
 from utils.consts import TZ
 from utils.games import HuskerSchedule
-
+from cogs.fap import fapCommands as FAP
 
 def build_image_embed(title, image):
     embed = discord.Embed(title=title, color=0xD00000)
@@ -76,6 +77,18 @@ def build_recruit_embed(rec):  # rec == recruit
 
         return pretty
 
+    def fap_predictions(recruit):
+        fap_preds = FAP.get_faps(recruit)
+        if fap_preds is None:
+            return "There are no predictions for this recruit."
+        else:
+            init_string = f'''
+                              Team: Percent (Avg Confidence)'''
+            for p in fap_preds:
+                init_string += f"\n{p['team']}: {p['percent']:.0f}% ({p['confidence']:.1f})"
+            init_string += f"\nTotal Predictions: {fap_preds[0]['total']}"
+            return init_string
+    
     nl = "\n"
     embed = build_embed(
         title=f"{rec.name}, {str(rec.rating_stars) + '⭐ ' if rec.rating_stars else ''}{rec.year} {rec.position}",
@@ -111,10 +124,12 @@ def build_recruit_embed(rec):  # rec == recruit
 
             ["**Lead Expert Picks**", f"{epxerts_pretty() if rec.experts else 'N/A'}"],
 
-            ["**Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"]
+            ["**Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"],
+            
+            ["**FAP Predictions**", f"{fap_predictions(rec)}"]
         ]
     )
-    embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to." + "\nClick the 📈 to get the predictions for this recruit.")
+    embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to.")
     if not rec.thumbnail == "/.":
         embed.set_thumbnail(url=rec.thumbnail)
     return embed
