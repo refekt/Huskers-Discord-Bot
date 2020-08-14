@@ -41,19 +41,25 @@ class RecruitCommands(commands.Cog):
             embed = build_recruit_embed(target_recruit)
             await embed_msg.edit(content="", embed=embed)
             await embed_msg.add_reaction('🔮')
+            await embed_msg.add_reaction('📈')
             fap_wait = True
             while(fap_wait):
                 try:
                     reaction, user = await client.wait_for('reaction_add', 
-                                                       check=lambda reaction, user: (not user.bot and reaction.emoji == '🔮'))                    
+                                                       check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📈')))                    
                 except asyncio.TimeoutError:
                     embed_msg.set_footer(text=FOOTER_BOT)
                     await embed_msg.remove_reaction('🔮', client.user)
+                    await embed_msg.remove_reaction('📈', client.user)
                     fap_wait = False
                 else:
                     if reaction.message.id == embed_msg.id:
-                        await embed_msg.remove_reaction('🔮', user)
-                        await FAP.initiate_fap(user, target_recruit)
+                        if reaction.emoji == '🔮':
+                            await embed_msg.remove_reaction('🔮', user)
+                            await FAP.initiate_fap(user, target_recruit)
+                        if reaction.emoji == '📈':
+                            await reaction.clear()
+                            await FAP.get_faps(target_recruit, ctx)
                     
         
         if len(search) == 1:
