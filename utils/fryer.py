@@ -1,5 +1,4 @@
 import math
-import random as RAN
 import cv2
 import numpy
 from PIL import Image

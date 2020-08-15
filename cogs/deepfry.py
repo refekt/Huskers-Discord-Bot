@@ -1,7 +1,7 @@
 from PIL import Image
 import requests
 import utils.fryer as fryer
-from utils.consts import HEADERS
+from utils.consts import HEADERS, CHAN_NORTH_BOTTTOMS, CHAN_TEST_SPAM, CHAN_POSSUMS
 import discord
 from discord.ext import commands
 import io
@@ -31,25 +31,30 @@ def load(url):
 class RecruitCommands(commands.Cog):
     @commands.command()
     async def deepfry(self, ctx, url):
-        #image, layers, emote_amount, noise, contrast = load()
-        emote_amount = random.randrange(6)
-        noise = random.uniform(0.1, 1.0)
-        contrast = random.randrange(501)
-        layers = random.randrange(1, 5)
-        image = load(url)
-        fried = fryer.fry(image, emote_amount, noise, contrast)
-        #fried = fryer.fry(image)
-        for layer in range(layers - 1):
-            #fried = fryer.fry(fried, emote_amount, noise, contrast)
-            fried = fryer.fry(fried)
-            
-        # arr = io.BytesIO()
-        # fried.save(arr, format='PNG')
-        # arr.seek(0)
-        # file = discord.File(arr)
+        if ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM]:
+            await ctx.send("This command isn't allowed here!")
+            return
+        msg = await ctx.send("Loading...")
+        try:
+            emote_amount = random.randrange(1,6)
+            noise = random.uniform(0.1, 1.0)
+            contrast = random.randrange(501)
+            layers = random.randrange(1, 5)
+            image = load(url)
+            fried = fryer.fry(image, emote_amount, noise, contrast)
+
+            for layer in range(layers - 1):
+                emote_amount = random.randrange(1,6)
+                noise = random.uniform(0.1, 1.0)
+                contrast = random.randrange(501)
+                fried = fryer.fry(fried, emote_amount, noise, contrast)
+
+        except:
+            await msg.edit("Something went wrong. Blame my creators.")
         with io.BytesIO() as image_binary:
             fried.save(image_binary, 'PNG')
             image_binary.seek(0)
+            await msg.delete()
             await ctx.send(file = discord.File(fp=image_binary, filename='image.png'))
         
 def setup(bot):
