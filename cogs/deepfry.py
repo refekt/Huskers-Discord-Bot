@@ -12,7 +12,7 @@ import random
     Quick meme thrown together with the help of StackOverflow and some GitHub repos found online
 '''
     
-def load(url):
+async def load(url):
     # image = Image.open(input('Enter the image name: '))
     # layers = int(input('How many layers do you want? '))
     # emote_amount = int(input('How many emotes per layer do you want? '))
@@ -39,15 +39,15 @@ class RecruitCommands(commands.Cog):
             emote_amount = random.randrange(1,6)
             noise = random.uniform(0.1, 1.0)
             contrast = random.randrange(501)
-            layers = random.randrange(1, 5)
-            image = load(url)
-            fried = fryer.fry(image, emote_amount, noise, contrast)
+            layers = random.randrange(1, 4)
+            image = await load(url)
+            fried = await fryer.fry(image, emote_amount, noise, contrast)
 
             for layer in range(layers - 1):
                 emote_amount = random.randrange(1,6)
                 noise = random.uniform(0.1, 1.0)
                 contrast = random.randrange(501)
-                fried = fryer.fry(fried, emote_amount, noise, contrast)
+                fried = await fryer.fry(fried, emote_amount, noise, contrast)
 
         except:
             await msg.edit(content = "Something went wrong. Blame my creators.")

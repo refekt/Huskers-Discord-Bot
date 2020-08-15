@@ -10,21 +10,21 @@ eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + './classifiers/haarc
 
 
 # Pass an image to fry, pretty self explanatory
-def fry(image, emote_amount, noise, contrast):
+async def fry(image, emote_amount, noise, contrast):
   
     print('Generating gray image...')
     gray = numpy.array(image.convert('L'))
 
     print('Adding emotes...')
-    add_emotes(image, emote_amount)
+    await add_emotes(image, emote_amount)
 
     print('Finding eyes and characters...')
-    eye_coods = find_eyes(gray)
-    char_coords = find_chars(gray)
+    eye_coods = await find_eyes(gray)
+    char_coords = await find_chars(gray)
 
     print('Adding lens flare and chars...')
-    add_flares(image, eye_coods)
-    add_chars(image, char_coords)
+    await add_flares(image, eye_coods)
+    await add_chars(image, char_coords)
 
     [w, h] = [image.width - 1, image.height - 1]
     w *= numpy.random.random(1)
@@ -32,18 +32,18 @@ def fry(image, emote_amount, noise, contrast):
     r = int(((image.width + image.height) / 10) * (numpy.random.random(1)[0] + 1))
 
     print('Bulging the image...')
-    image = bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
+    image = await bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
 
     print('Increasing the noise...')
-    image = add_noise(image, random.random() * noise)
+    image = await add_noise(image, random.random() * noise)
     print('Changing contrast...')
-    image = change_contrast(image, random.random() * contrast)
+    image = await change_contrast(image, random.random() * contrast)
 
     print('Done!')
     return image
 
 
-def find_chars(gray):
+async def find_chars(gray):
     ret, mask = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
     image_final = cv2.bitwise_and(gray, gray, mask=mask)
     ret, new_img = cv2.threshold(image_final, 180, 255, cv2.THRESH_BINARY_INV)
@@ -60,7 +60,7 @@ def find_chars(gray):
     return coords
 
 
-def find_eyes(gray):
+async def find_eyes(gray):
     coords = []
 
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -75,14 +75,14 @@ def find_eyes(gray):
     return coords
 
 
-def add_flares(image, coords):
+async def add_flares(image, coords):
     flare = Image.open(random_file('utils/images/flares/'))
     for coord in coords:
         image.paste(flare, (int(coord[0] - flare.size[0] / 2), int(coord[1] - flare.size[1] / 2)), flare)
     return image
 
 
-def add_chars(image, coords):
+async def add_chars(image, coords):
     char = Image.open(random_file('utils/images/chars/'))
     for coord in coords:
         if numpy.random.random(1)[0] > 0.1:
@@ -93,7 +93,7 @@ def add_chars(image, coords):
     return image
 
 
-def add_emotes(image, max):
+async def add_emotes(image, max):
     for i in range(int(numpy.random.random(1)[0] * max)):
         emote = Image.open(random_file('utils/images/emotes/'))
 
@@ -104,7 +104,7 @@ def add_emotes(image, max):
         image.paste(emote, (int(coord[0]), int(coord[1])), emote)
 
 
-def change_contrast(image, level):
+async def change_contrast(image, level):
     factor = (259 * (level + 255)) / (255 * (259 - level))
 
     def contrast(c):
@@ -112,7 +112,7 @@ def change_contrast(image, level):
     return image.point(contrast)
 
 
-def add_noise(image, factor):
+async def add_noise(image, factor):
     def noise(c):
         return c * (1 + numpy.random.random(1)[0] * factor - factor / 2)
     return image.point(noise)
@@ -126,7 +126,7 @@ def add_noise(image, factor):
 #   a   = flatness of the bulge, 1 = spherical, > 1 increases flatness
 #   h   = height of the bulge
 #   ior = index of refraction of the bulge material
-def bulge(img, f, r, a, h, ior):
+async def bulge(img, f, r, a, h, ior):
     # print("Creating a bulge at ({0}, {1}) with radius {2}... ".format(f[0], f[1], r))
 
     # load image to numpy array
