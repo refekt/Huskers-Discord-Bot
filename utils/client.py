@@ -1,5 +1,3 @@
-from cogs.images import build_quote
-
 import asyncio
 import hashlib
 import json
@@ -14,6 +12,7 @@ import discord
 from discord.ext import commands
 
 import utils.consts as consts
+from cogs.images import build_quote
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
@@ -260,7 +259,7 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             share_string = f"[Shared by {user}]: "
 
             if embeds_exist():
-                await channel.send(content=share_string + message.content,embed=message.embeds[0])
+                await channel.send(content=share_string + message.content, embed=message.embeds[0])
             else:
                 await channel.send(content=share_string + message.content)
 
@@ -277,14 +276,19 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
 
     async def quote_reacts():
         quote_emoji = "📝"
-        if emoji.name == quote_emoji:
+        reactions = message.reactions
+        already_run = False
+        for reaction in reactions:
+            if reaction.emoji == quote_emoji and reaction.count > 1:
+                already_run = True
+
+        if not already_run and emoji.name == quote_emoji and message.reactions:
             await channel.send(
                 file=build_quote(
                     quote=message.clean_content,
                     author=message.author
                 )
             )
-
 
     await trivia_message()
     await quote_reacts()
