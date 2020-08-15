@@ -90,21 +90,21 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             lose_string = f"Lose! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been deducted 5 {CURRENCY_NAME}."
 
             if choice.lower() == options[0]:
-                if throw == options[1]:
-                    award_currency()
-                    return await ctx.send(win_string)
-                else:
-                    deduct_currency()
-                    return await ctx.send(lose_string)
-            elif choice.lower() == options[1]:
                 if throw == options[2]:
                     award_currency()
                     return await ctx.send(win_string)
                 else:
                     deduct_currency()
                     return await ctx.send(lose_string)
-            elif choice.lower() == options[2]:
+            elif choice.lower() == options[1]:
                 if throw == options[0]:
+                    award_currency()
+                    return await ctx.send(win_string)
+                else:
+                    deduct_currency()
+                    return await ctx.send(lose_string)
+            elif choice.lower() == options[2]:
+                if throw == options[1]:
                     award_currency()
                     return await ctx.send(win_string)
                 else:
