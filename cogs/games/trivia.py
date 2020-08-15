@@ -5,6 +5,9 @@ import time
 import typing
 from datetime import datetime
 
+from utils.consts import CURRENCY_NAME
+
+
 import discord
 import requests
 from discord.ext import commands
@@ -14,6 +17,7 @@ from utils.client import client
 from utils.embed import build_embed
 from utils.misc import bot_latency
 from utils.mysql import process_MySQL, sqlClearTriviaScore, sqlRetrieveTriviaScores, sqlInsertTriviaScore, sqlRetrieveTriviaQuestions
+from utils.mysql import sqlUpdateCurrency
 
 errors = {
     "wrong_channel": "You used the command in the wrong channel!",
@@ -75,7 +79,7 @@ def clear_scoreboard():
     process_MySQL(sqlClearTriviaScore)
 
 
-async def start_messages():
+async def start_messages(ctx):
     if game.setup_complete:
         game.started = True
 
@@ -104,10 +108,10 @@ async def start_messages():
         )
         return
 
-    await loop_questions()
+    await loop_questions(ctx)
 
 
-async def loop_questions():
+async def loop_questions(ctx):
     if game.started:
         game.processing = True
 
@@ -158,7 +162,7 @@ async def loop_questions():
             return u == game.trivia_master and str(r.emoji) == "⏭"
 
         if game.current_question >= len(game.questions):
-            await quit_game()
+            await quit_game(ctx)
 
         try:
             reaction, user = await client.wait_for("reaction_add", check=check_reaction)
@@ -166,7 +170,7 @@ async def loop_questions():
             pass
         else:
             if not game.processing and game.started:
-                await loop_questions()
+                await loop_questions(ctx)
 
 
 def scoreboard():
@@ -181,7 +185,7 @@ def scoreboard():
         return "N/A"
 
 
-async def quit_game():
+async def quit_game(ctx):
     global game
 
     scores = scoreboard()
@@ -191,6 +195,12 @@ async def quit_game():
             ["Quitting", "The current trivia game has ended!"],
             ["Scores", scores]
         )
+    )
+
+    # award server currency
+    process_MySQL(
+        query=sqlUpdateCurrency,
+        values=(25, f"{ctx.message.author.name}#{ctx.message.author.discriminator}")
     )
 
     game = TriviaGame(channel=None)
@@ -232,6 +242,7 @@ class TriviaGame:
         self.processing = False
         self.trivia_master = None
         self.message_collection = list()
+        self.winner = None
 
     def setup(self, user: discord.Member, chan, timer, questions, category):
         self.trivia_master = user
@@ -437,7 +448,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
         except asyncio.TimeoutError:
             await ctx.send("ur dumb lol")
         else:
-            await start_messages()
+            await start_messages(ctx)
 
     @trivia.command()
     # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
@@ -451,7 +462,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             )
             return
 
-        await start_messages()
+        await start_messages(ctx)
 
     @trivia.command(aliases=["n", ], hidden=True)
     # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
@@ -467,14 +478,14 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             return
 
         if not game.processing and game.started:
-            await loop_questions()
+            await loop_questions(ctx)
 
     @trivia.command(aliases=["q", ])
     # @commands.has_any_role(role_admin_test, role_admin_prod, role_mod_prod)
     async def quit(self, ctx):
         """Admin/Trivia Boss Command: Quit the current trivia game"""
         if game.setup_complete:
-            await quit_game()
+            await quit_game(ctx)
         else:
             await ctx.send(
                 embed=trivia_embed(
