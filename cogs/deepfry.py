@@ -30,7 +30,7 @@ async def load(url):
     return image
 
 
-class RecruitCommands(commands.Cog):
+class RecruitCommands(commands.Cog, name="Deep Frying"):
     @commands.command()
     async def deepfry(self, ctx, url=None):
         if ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM, CHAN_SCOTTS_BOTS]:
