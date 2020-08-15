@@ -90,10 +90,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return 1 <= bet <= 36
 
         def validate_number_range_bet(range):
-            try:
-                if 1 <= range[0] <= 36 and 1 <= range[1] <= 36 and range[0] > range[1]:
-                    return True
-            except:
+            if 1 <= range[0] <= 36 and 1 <= range[1] <= 36 and range[0] > range[1]:
+                return True
+            else:
                 raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
 
         def convert_bet_range():
