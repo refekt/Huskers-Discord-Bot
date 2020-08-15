@@ -1,7 +1,7 @@
 from PIL import Image
 import requests
 import utils.fryer as fryer
-from utils.consts import HEADERS, CHAN_NORTH_BOTTTOMS, CHAN_TEST_SPAM, CHAN_POSSUMS
+from utils.consts import HEADERS, CHAN_NORTH_BOTTTOMS, CHAN_TEST_SPAM, CHAN_POSSUMS, CHAN_SCOTTS_BOTS
 import discord
 from discord.ext import commands
 import io
@@ -31,7 +31,7 @@ def load(url):
 class RecruitCommands(commands.Cog):
     @commands.command()
     async def deepfry(self, ctx, url):
-        if ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM]:
+        if ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM, CHAN_SCOTTS_BOTS]:
             await ctx.send("This command isn't allowed here!")
             return
         msg = await ctx.send("Loading...")
