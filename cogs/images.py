@@ -55,6 +55,8 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def quote(self, ctx, *, quote: str, author=None):
+        """ Build a quote scroll! You can either reaction to a message with the pencil (📝) reaction or include a quote oyu want.
+        $quote This is a test quote."""
         await ctx.send(file=build_quote(quote, author))
 
     @commands.command()
