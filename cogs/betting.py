@@ -198,6 +198,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @money.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def pitty(self, ctx):
+        if self.check_author_initialized(ctx) and self.check_balance(ctx) == 0:
+            pitty_value = 25
+            self.award_currency(ctx, pitty_value)
+            return await ctx.send(f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
+        else:
+            return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is not 0.")
+
+    @money.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def balance(self, ctx, user: discord.Member = None):
         """ Show current balance of server currency for self or another member """
         if user:
