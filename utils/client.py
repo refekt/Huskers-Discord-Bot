@@ -1,3 +1,5 @@
+from cogs.images import build_quote
+
 import asyncio
 import hashlib
 import json
@@ -273,7 +275,19 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
         elif emoji.name == tweet_reactions[2] and user.id == 189554873778307073:
             pass
 
+    async def quote_reacts():
+        quote_emoji = "📝"
+        if emoji.name == quote_emoji:
+            await channel.send(
+                file=build_quote(
+                    quote=message.clean_content,
+                    author=message.author
+                )
+            )
+
+
     await trivia_message()
+    await quote_reacts()
 
     if not user.bot:
         await twitterverse_reacts()

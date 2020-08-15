@@ -1,9 +1,7 @@
-import typing
 import random
 import textwrap
-import discord
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont
 from discord import File
 from discord.ext import commands
 
@@ -12,47 +10,52 @@ from utils.consts import ROLE_ASPARAGUS, ROLE_POTATO
 from utils.embed import build_image_embed
 
 
+def build_quote(quote: str, author: str = None):
+    if author is not None:
+        quote = f"{author}: " + quote
+
+    if len(quote) > 267:
+        quote = quote[0:267] + "..."
+
+    scroll_path = "resources/scroll.png"
+    scroll = Image.open(fp=scroll_path)
+
+    img_size = (640, 533)
+    img = Image.new(mode="RGBA", size=img_size, color=(255, 0, 0, 0))
+
+    img.paste(im=scroll, box=(0, 0, scroll.width, scroll.height))
+
+    d = ImageDraw.Draw(im=img, mode="RGBA")
+
+    quote_coords = [74, 70]  # [536, 449]
+    quote_width = 30
+
+    font_path = "resources/Canterbury.ttf"
+    font_size = 45
+    font = ImageFont.truetype(font=font_path, size=font_size)
+
+    lines = textwrap.wrap(quote, width=quote_width)
+    for line in lines:
+        d.multiline_text(
+            xy=quote_coords,
+            font=font,
+            text=line,
+            fill=(0, 0, 0)
+        )
+        quote_coords[1] += font.getsize(line)[1]
+
+    image_path = "resources/quote.png"
+    img.save(fp=image_path)
+    discord_file = File(fp=image_path)
+
+    return discord_file
+
+
 class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def quote(self, ctx, *, quote: typing.Union[discord.Message, str]):
-        if type(quote) == discord.Message:
-            quote = quote.clean_content
-
-        if len(quote) > 267:
-            quote = quote[0:267] + "..."
-
-        scroll_path = "resources/scroll.png"
-        scroll = Image.open(fp=scroll_path)
-
-        img_size = (640, 533)
-        img = Image.new(mode="RGBA", size=img_size, color=(255, 0, 0, 0))
-
-        img.paste(im=scroll, box=(0, 0, scroll.width, scroll.height))
-
-        d = ImageDraw.Draw(im=img, mode="RGBA")
-
-        quote_coords = [74, 70]  # [536, 449]
-        quote_width = 30
-
-        font_path = "resources/Canterbury.ttf"
-        font_size = 45
-        font = ImageFont.truetype(font=font_path, size=font_size)
-
-        lines = textwrap.wrap(quote, width=quote_width)
-        for line in lines:
-            d.multiline_text(
-                xy=quote_coords,
-                font=font,
-                text=line,
-                fill=(0, 0, 0)
-            )
-            quote_coords[1] += font.getsize(line)[1]
-
-        image_path = "resources/quote.png"
-        img.save(fp=image_path)
-        discord_file = File(fp=image_path)
-        return await ctx.send(file=discord_file)
+    async def quote(self, ctx, *, quote: str, author=None):
+        await ctx.send(file=build_quote(quote, author))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
