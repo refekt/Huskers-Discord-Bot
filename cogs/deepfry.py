@@ -50,7 +50,7 @@ class RecruitCommands(commands.Cog):
                 fried = fryer.fry(fried, emote_amount, noise, contrast)
 
         except:
-            await msg.edit("Something went wrong. Blame my creators.")
+            await msg.edit(content = "Something went wrong. Blame my creators.")
         with io.BytesIO() as image_binary:
             fried.save(image_binary, 'PNG')
             image_binary.seek(0)
