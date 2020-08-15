@@ -97,7 +97,7 @@ async def add_chars(image, coords):
 
 
 async def add_emotes(image, max):
-    for i in range(int(numpy.random.random(1)[0] * max)):
+    for i in range(max):
         emote = Image.open(random_file('utils/images/emotes/')).convert('RGBA')
 
         coord = numpy.random.random(2) * numpy.array([image.width, image.height])
