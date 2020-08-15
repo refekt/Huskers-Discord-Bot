@@ -5,8 +5,10 @@ from PIL import Image
 from numpy import random
 import os
 
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + './classifiers/haarcascade_eye.xml')
+face_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_frontalface_default.xml'))
+eye_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_eye.xml'))
+print(os.path.join(cv2.data.haarcascades, 'haarcascade_frontalface_default.xml'))
+print(os.path.join(cv2.data.haarcascades, 'haarcascade_eye.xml'))
 
 
 # Pass an image to fry, pretty self explanatory
