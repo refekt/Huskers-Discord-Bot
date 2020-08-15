@@ -43,8 +43,8 @@ class RecruitCommands(commands.Cog):
         msg = await ctx.send("Loading...")
         try:
             emote_amount = random.randrange(1, 6)
-            noise = random.uniform(0.1, 1.0)
-            contrast = random.randrange(501)
+            noise = random.uniform(0.4, 1.0)
+            contrast = random.randrange(160, 500)
             layers = random.randrange(1, 3)
             if url is None and len(ctx.message.attachments) > 0:
                 image = await load(ctx.message.attachments[0].url)
