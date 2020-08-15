@@ -51,6 +51,9 @@ class RecruitCommands(commands.Cog):
             
             with io.BytesIO() as image_binary:   
                 fried.save(image_binary, 'PNG')
+                if image_binary.tell() > 8000000:
+                    image_binary = io.BytesIO()
+                    fried.convert('RGB').save(image_binary, 'JPEG', quality = 50, optimize = True)
                 image_binary.seek(0)
                 await msg.delete()
                 await ctx.send(file = discord.File(fp=image_binary, filename='image.png'))
