@@ -122,11 +122,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         balance = self.check_balance(ctx)
 
         if user:
-            bal = [username for username in balance if username["username"] == self.full_author(user)]
-            await ctx.send(f"{user.mention}'s balance is {bal[0]['balance']} {CURRENCY_NAME}.")
+            # bal = [username for username in balance if username["username"] == self.full_author(user)]
+            # await ctx.send(f"{user.mention}'s balance is {bal[0]['balance']} {CURRENCY_NAME}.")
+            await ctx.send(f"{user.mention}'s balance is {balance} {CURRENCY_NAME}.")
         else:
-            bal = [username for username in balance if username["username"] == self.full_author(ctx)]
-            await ctx.send(f"{ctx.author.mention}'s balance is {bal[0]['balance']} {CURRENCY_NAME}.")
+            # bal = [username for username in balance if username["username"] == self.full_author(ctx)]
+            # await ctx.send(f"{ctx.author.mention}'s balance is {bal[0]['balance']} {CURRENCY_NAME}.")
+            await ctx.send(f"{ctx.author.mention}'s balance is {balance} {CURRENCY_NAME}.")
 
     @money.command()
     async def give(self, ctx, user: discord.Member, value: int):
