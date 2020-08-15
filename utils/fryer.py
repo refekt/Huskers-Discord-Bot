@@ -86,7 +86,7 @@ async def add_flares(image, coords):
 
 
 async def add_chars(image, coords):
-    char = Image.open(random_file('utils/images/chars/'))
+    char = Image.open(random_file('utils/images/chars/')).convert('RGBA')
     for coord in coords:
         if numpy.random.random(1)[0] > 0.1:
             continue
@@ -98,7 +98,7 @@ async def add_chars(image, coords):
 
 async def add_emotes(image, max):
     for i in range(int(numpy.random.random(1)[0] * max)):
-        emote = Image.open(random_file('utils/images/emotes/'))
+        emote = Image.open(random_file('utils/images/emotes/')).convert('RGBA')
 
         coord = numpy.random.random(2) * numpy.array([image.width, image.height])
 
