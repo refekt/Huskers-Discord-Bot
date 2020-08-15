@@ -66,7 +66,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             values=(-value, self.full_author(ctx))
         )
 
-    @commands.command(aliases=["rlt",])
+    @commands.command(aliases=["rlt", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def roulette(self, ctx, bet_amount: int, bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
@@ -203,7 +203,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if self.check_author_initialized(ctx) and self.check_balance(ctx) == 0:
             pitty_value = 25
             self.award_currency(ctx, pitty_value)
-            return await ctx.send(f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
+            return await ctx.send(content=f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is not 0.")
 
@@ -236,7 +236,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             elif balance >= value:
                 self.award_currency(ctx, -value)
                 self.award_currency(user, value)
-                await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {self.full_author(user)}!")
+                await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {user}!")
             else:
                 raise AttributeError(f"You do not have {value} {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
         else:
