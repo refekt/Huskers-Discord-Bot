@@ -1,6 +1,7 @@
 import typing
 
 import discord
+import random
 from discord.ext import commands
 
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
@@ -53,18 +54,61 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         elif type(user) == discord.Member:
             return f"{user.name.lower()}#{user.discriminator}"
 
-    @commands.group(aliases=["b"])
+    @commands.command(aliases=["rps", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def bet(self, ctx):
-        if ctx.subcommand_passed:
-            return None
-        else:
-            raise AttributeError(f"A subcommand must be used. Review $help.")
+    async def rockpaperscissors(self, ctx, choice: str):
+        if self.check_balance(ctx) <= 0:
+            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
-    @bet.command()
-    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def create(self, ctx):
-        pass
+        options = ["rock", "paper", "scissors"]
+
+        def validate_choice():
+            return choice.lower().strip() in options
+
+        def award_currency():
+            process_MySQL(
+                query=sqlUpdateCurrency,
+                values=(5, self.full_author(ctx))
+            )
+
+        def deduct_currency():
+            process_MySQL(
+                query=sqlUpdateCurrency,
+                values=(-5, self.full_author(ctx))
+            )
+
+        if not validate_choice():
+            raise AttributeError(f"You can only pick Rock, Paper, or Scissors. Your option was: {choice}.")
+
+        throw = random.choice(options)
+
+        if choice.lower() == throw:
+            return await ctx.send(f"Draw! Computer also threw {throw}. No {CURRENCY_NAME} change.")
+        else:
+            win_string = f"Win! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been awarded 5 {CURRENCY_NAME}."
+            lose_string = f"Lose! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been deducted 5 {CURRENCY_NAME}."
+
+            if choice.lower() == options[0]:
+                if throw == options[1]:
+                    award_currency()
+                    return await ctx.send(win_string)
+                else:
+                    deduct_currency()
+                    return await ctx.send(lose_string)
+            elif choice.lower() == options[1]:
+                if throw == options[2]:
+                    award_currency()
+                    return await ctx.send(win_string)
+                else:
+                    deduct_currency()
+                    return await ctx.send(lose_string)
+            elif choice.lower() == options[2]:
+                if throw == options[0]:
+                    award_currency()
+                    return await ctx.send(win_string)
+                else:
+                    deduct_currency()
+                    return await ctx.send(lose_string)
 
     @commands.group(aliases=["m", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -127,6 +171,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             await ctx.send(f"{ctx.author.mention}'s balance is {balance} {CURRENCY_NAME}.")
 
     @money.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def give(self, ctx, user: discord.Member, value: int):
         """ Give some of your server currency to another member """
         if not user:
