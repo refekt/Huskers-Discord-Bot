@@ -198,7 +198,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @money.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def pitty(self, ctx):
+    async def pity(self, ctx):
         if self.check_author_initialized(ctx) and self.check_balance(ctx) == 0:
             pitty_value = 25
             self.award_currency(ctx, pitty_value)
