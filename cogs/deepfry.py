@@ -48,14 +48,16 @@ class RecruitCommands(commands.Cog):
                 noise = random.uniform(0.1, 1.0)
                 contrast = random.randrange(501)
                 fried = await fryer.fry(fried, emote_amount, noise, contrast)
-
-        except:
+            
+            with io.BytesIO() as image_binary:   
+                fried.save(image_binary, 'PNG')
+                image_binary.seek(0)
+                await msg.delete()
+                await ctx.send(file = discord.File(fp=image_binary, filename='image.png'))
+        except Exception as e:
+            print(e)
             await msg.edit(content = "Something went wrong. Blame my creators.")
-        with io.BytesIO() as image_binary:
-            fried.save(image_binary, 'PNG')
-            image_binary.seek(0)
-            await msg.delete()
-            await ctx.send(file = discord.File(fp=image_binary, filename='image.png'))
+        
         
 def setup(bot):
     bot.add_cog(RecruitCommands(bot))
