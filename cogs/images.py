@@ -4,7 +4,7 @@ import textwrap
 from PIL import Image, ImageDraw, ImageFont
 from discord import File
 from discord.ext import commands
-
+from utils.consts import CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS
 from utils.consts import CD_GLOBAL_PER, CD_GLOBAL_RATE, CD_GLOBAL_TYPE
 from utils.consts import ROLE_ASPARAGUS, ROLE_POTATO
 from utils.embed import build_image_embed
@@ -57,7 +57,10 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def quote(self, ctx, *, quote: str, author=None):
         """ Build a quote scroll! You can either reaction to a message with the pencil (📝) reaction or include a quote oyu want.
         $quote This is a test quote."""
-        await ctx.send(file=build_quote(quote, author))
+        if not ctx.channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
+            await ctx.send(file=build_quote(quote, author))
+        else:
+            raise AttributeError(f"You are not allowed to use this command in this channel!")
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
