@@ -13,7 +13,8 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.images import build_quote
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL, \
+    CHAN_POSSUMS, CHAN_NORTH_BOTTTOMS
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
@@ -275,6 +276,9 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             pass
 
     async def quote_reacts():
+        if channel.id in [CHAN_SCOTTS_BOTS, CHAN_POSSUMS, CHAN_NORTH_BOTTTOMS]:
+            raise AttributeError(f"You are not allowed to use this command in this channel!")
+
         quote_emoji = "📝"
         reactions = message.reactions
         already_run = False
