@@ -36,6 +36,10 @@ class RecruitCommands(commands.Cog):
         if ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM, CHAN_SCOTTS_BOTS]:
             await ctx.send("This command isn't allowed here!")
             return
+
+        if url is None and len(ctx.message.attachments) == 0:
+            raise AttributeError("You must provide a URL or an attached image!")
+
         msg = await ctx.send("Loading...")
         try:
             emote_amount = random.randrange(1, 6)
