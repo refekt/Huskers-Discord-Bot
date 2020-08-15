@@ -24,7 +24,7 @@ async def load(url):
     # if image_size is None:
         # image_size = (256, 256)
         
-    image = Image.open(io.BytesIO(image_response.content))
+    image = Image.open(io.BytesIO(image_response.content)).convert('RGBA')
     #image = Image.frombytes('RGBA', image_size, image_response.content, 'raw')
     return image
 
@@ -39,7 +39,7 @@ class RecruitCommands(commands.Cog):
             emote_amount = random.randrange(1,6)
             noise = random.uniform(0.1, 1.0)
             contrast = random.randrange(501)
-            layers = random.randrange(1, 4)
+            layers = random.randrange(1, 3)
             image = await load(url)
             fried = await fryer.fry(image, emote_amount, noise, contrast)
 

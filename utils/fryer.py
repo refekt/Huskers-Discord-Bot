@@ -4,11 +4,10 @@ import numpy
 from PIL import Image
 from numpy import random
 import os
+import random as RAN
 
 face_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_frontalface_default.xml'))
 eye_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_eye.xml'))
-print(os.path.join(cv2.data.haarcascades, 'haarcascade_frontalface_default.xml'))
-print(os.path.join(cv2.data.haarcascades, 'haarcascade_eye.xml'))
 
 
 # Pass an image to fry, pretty self explanatory
@@ -24,17 +23,20 @@ async def fry(image, emote_amount, noise, contrast):
     eye_coods = await find_eyes(gray)
     char_coords = await find_chars(gray)
 
-    print('Adding lens flare and chars...')
+    print('Adding lens flare...')
     await add_flares(image, eye_coods)
+    print('Adding chars...')
     await add_chars(image, char_coords)
 
     [w, h] = [image.width - 1, image.height - 1]
     w *= numpy.random.random(1)
     h *= numpy.random.random(1)
     r = int(((image.width + image.height) / 10) * (numpy.random.random(1)[0] + 1))
-
-    print('Bulging the image...')
-    image = await bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
+   
+    bulge_bool = RAN.choice([True, False])
+    if bulge_bool:
+        print('Bulging the image...')
+        image = await bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
 
     print('Increasing the noise...')
     image = await add_noise(image, random.random() * noise)
@@ -78,7 +80,7 @@ async def find_eyes(gray):
 
 
 async def add_flares(image, coords):
-    flare = Image.open(random_file('utils/images/flares/'))
+    flare = Image.open(random_file('utils/images/flares/')).convert('RGBA')
     for coord in coords:
         image.paste(flare, (int(coord[0] - flare.size[0] / 2), int(coord[1] - flare.size[1] / 2)), flare)
     return image
@@ -196,7 +198,7 @@ async def bulge(img, f, r, a, h, ior):
                 if 0 < intersect[0] < width-1 and 0 < intersect[1] < height-1:
                     bulged[y][x] = img_data[int(intersect[1])][int(intersect[0])]
                 else:
-                    bulged[y][x] = [0, 0, 0]
+                    bulged[y][x] = [0,0,0,0]
             else:
                 bulged[y][x] = img_data[y][x]
     img = Image.fromarray(bulged)
