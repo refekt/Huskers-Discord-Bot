@@ -12,7 +12,6 @@ eye_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcas
 
 # Pass an image to fry, pretty self explanatory
 async def fry(image, emote_amount, noise, contrast):
-  
     print('Generating gray image...')
     gray = numpy.array(image.convert('L'))
 
@@ -32,7 +31,7 @@ async def fry(image, emote_amount, noise, contrast):
     w *= numpy.random.random(1)
     h *= numpy.random.random(1)
     r = int(((image.width + image.height) / 10) * (numpy.random.random(1)[0] + 1))
-   
+
     bulge_bool = RAN.choice([True, False])
     if bulge_bool:
         print('Bulging the image...')
@@ -113,12 +112,14 @@ async def change_contrast(image, level):
 
     def contrast(c):
         return 128 + factor * (c - 128)
+
     return image.point(contrast)
 
 
 async def add_noise(image, factor):
     def noise(c):
         return c * (1 + numpy.random.random(1)[0] * factor - factor / 2)
+
     return image.point(noise)
 
 
@@ -139,7 +140,7 @@ async def bulge(img, f, r, a, h, ior):
     img_data = numpy.array(img)
 
     # ignore too large images
-    if width*height > 3000*3000:
+    if width * height > 3000 * 3000:
         return img
 
     # determine range of pixels to be checked (square enclosing bulge), max exclusive
@@ -178,27 +179,27 @@ async def bulge(img, f, r, a, h, ior):
             # if the ray is in the centre of the bulge or beyond the radius it doesn't need to be modified
             if 0 < s < r:
                 # slope of the bulge relative to xy plane at (x, y) of the ray
-                m = -s/(a*math.sqrt(r**2-s**2))
+                m = -s / (a * math.sqrt(r ** 2 - s ** 2))
 
                 # find the angle between the ray and the normal of the bulge
-                theta = numpy.pi/2 + numpy.arctan(1/m)
+                theta = numpy.pi / 2 + numpy.arctan(1 / m)
 
                 # find the magnitude of the angle between xy plane and refracted ray using snell's law
                 # s >= 0 -> m <= 0 -> arctan(-1/m) > 0, but ray is below xy plane so we want a negative angle
                 # arctan(-1/m) is therefore negated
-                phi = numpy.abs(numpy.arctan(1/m) - numpy.arcsin(numpy.sin(theta)/ior))
+                phi = numpy.abs(numpy.arctan(1 / m) - numpy.arcsin(numpy.sin(theta) / ior))
 
                 # find length the ray travels in xy plane before hitting z=0
-                k = (h+(math.sqrt(r**2-s**2)/a))/numpy.sin(phi)
+                k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
 
                 # find intersection point
                 intersect = ray + normalise(f - ray) * k
 
                 # assign pixel with ray's coordinates the colour of pixel at intersection
-                if 0 < intersect[0] < width-1 and 0 < intersect[1] < height-1:
+                if 0 < intersect[0] < width - 1 and 0 < intersect[1] < height - 1:
                     bulged[y][x] = img_data[int(intersect[1])][int(intersect[0])]
                 else:
-                    bulged[y][x] = [0,0,0,0]
+                    bulged[y][x] = [0, 0, 0, 0]
             else:
                 bulged[y][x] = img_data[y][x]
     img = Image.fromarray(bulged)
