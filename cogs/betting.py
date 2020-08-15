@@ -236,7 +236,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             elif balance >= value:
                 self.award_currency(ctx, -value)
                 self.award_currency(user, value)
-                await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {user}!")
+                await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {user.mention}!")
             else:
                 raise AttributeError(f"You do not have {value} {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
         else:
