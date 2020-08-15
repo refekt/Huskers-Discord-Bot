@@ -70,9 +70,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def roulette(self, ctx, bet_amount: int, bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
-        $roulette 10 red
-        $roulette 10 25
-        $roulette 10 black
+        $roulette 10 red -- Bet a color
+        $roulette 10 25 -- Bet a specific number (225% bonus)
+        $roulette 10 1:17 -- Bet a specific number range (5% scaling bonus)
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet! ")
@@ -89,25 +89,51 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         def validate_number_bet():
             return 1 <= bet <= 36
 
+        def validate_number_range_bet(range):
+            try:
+                if 1 <= range[0] <= 36 and 1 <= range[1] <= 36 and range[0] > range[1]:
+                    return True
+            except:
+                raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
+
+        def convert_bet_range():
+            raw_range = bet.split(bet_range_char)
+            raw_map = map(int, raw_range)
+            return list(raw_map)
+
         win = False
         result = None
+        bet_range_char = ":"
 
         if type(bet) == str:
-            colors = ["red", "black"]
+            if bet_range_char in bet:
+                try:
+                    range = convert_bet_range()
+                    validate_number_range_bet(range)
 
-            if validate_color_bet():
-                result = random.choice(colors)
-                if result == bet.lower():
-                    win = True
+                    result = random.randint(1, 36)
+                    if range[0] <= result <= range[1]:
+                        win = True
+                        bonus = (37 - (max(range) - min(range))) * .05
+                        bet_amount = int(bet_amount * (1 + bonus))
+                except:
+                    raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
             else:
-                raise AttributeError(f"You can only place a bet for Red or Black. Try again!")
+                colors = ["red", "black"]
+
+                if validate_color_bet():
+                    result = random.choice(colors)
+                    if result == bet.lower():
+                        win = True
+                else:
+                    raise AttributeError(f"You can only place a bet for Red or Black. Try again!")
 
         elif type(bet) == int:
 
             if validate_number_bet():
                 result = random.randint(1, 36)
                 if result == bet:
-                    bet_amount = int(bet_amount * 1.45)
+                    bet_amount = int(bet_amount * 2.25)
                     win = True
             else:
                 raise AttributeError(f"You can only play a number from 1 to 36. Try again!")
