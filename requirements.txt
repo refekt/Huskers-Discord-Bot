@@ -13,3 +13,4 @@ requests
 typing
 unidecode
 youtube_dl
+opencv-python
