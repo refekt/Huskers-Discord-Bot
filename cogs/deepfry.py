@@ -56,6 +56,7 @@ class RecruitCommands(commands.Cog):
                 await ctx.send(file = discord.File(fp=image_binary, filename='image.png'))
         except Exception as e:
             print(e)
+            await ctx.send(e)
             await msg.edit(content = "Something went wrong. Blame my creators.")
         
         
