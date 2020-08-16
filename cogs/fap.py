@@ -55,9 +55,9 @@ async def initiate_fap(user, recruit, client):
         try:
             prediction_response = await client.wait_for('message', 
                                                         check=lambda message:message.author == user and message.channel == channel,
-                                                        timeout = 120)
+                                                        timeout = 30)
         except asyncio.TimeoutError:
-            channel.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message.")
+            await channel.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message or using the $predict command.")
             return
         else:
             if prediction_response.content.lower() in [t.lower() for t in valid_teams]:
@@ -71,9 +71,9 @@ async def initiate_fap(user, recruit, client):
         try:
             confidence_response = await client.wait_for('message', 
                                                         check=lambda message:message.author == user and message.channel == channel,
-                                                        timeout = 120)
+                                                        timeout = 30)
         except asyncio.TimeoutError:
-            await channel.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message.")
+            await channel.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message or using the $predict command.")
             return
         else:
             try:
