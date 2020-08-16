@@ -48,6 +48,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         raise AttributeError("Unable to find user!")
 
+    def validate_bet_amount(self, bet_amount):
+        if bet_amount > 0:
+            return True
+        else:
+            return False
+
     def full_author(self, user: typing.Union[discord.ext.commands.Context, discord.Member]):
         if type(user) == discord.ext.commands.Context:
             return f"{user.author.name.lower()}#{user.author.discriminator}"
@@ -76,6 +82,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet! ")
+
+        if not self.validate_bet_amount(bet_amount):
+            raise AttributeError(f"You must place a proper bet. Try again.")
 
         if not self.check_author_initialized(ctx):
             raise AttributeError(f"You do not have a wallet setup! Perform `$money new` to have a wallet established.")
