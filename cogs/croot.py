@@ -10,7 +10,7 @@ from utils.embed import build_embed, build_recruit_embed
 from utils.recruit import FootballRecruit
 from utils.consts import FOOTER_BOT
 
-from cogs.fap import fapCommands as FAP
+import cogs.fap as FAP
 
 
 class RecruitCommands(commands.Cog):

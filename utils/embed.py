@@ -7,7 +7,7 @@ import discord
 from utils.consts import FOOTER_BOT
 from utils.consts import TZ
 from utils.games import HuskerSchedule
-from cogs.fap import fapCommands as FAP
+import cogs.fap as FAP
 
 def build_image_embed(title, image):
     embed = discord.Embed(title=title, color=0xD00000)
