@@ -54,11 +54,6 @@ class RecruitCommands(commands.Cog):
                             await embed_msg.remove_reaction('🔮', client.user)
                         except:
                             pass
-                    # if reaction.emoji == '📈':
-                        # try:
-                            # await embed_msg.remove_reaction('📈', client.user)
-                        # except:
-                            # pass
                     fap_wait = False
                 else:
                     if reaction.message.id == embed_msg.id:
@@ -68,12 +63,6 @@ class RecruitCommands(commands.Cog):
                             except:
                                 pass
                             await FAP.initiate_fap(user, target_recruit, client)
-                        # if reaction.emoji == '📈':
-                            # try:
-                                # await reaction.remove_reaction('📈', user)
-                            # except:
-                                # pass
-                            # await FAP.get_faps(target_recruit, ctx)
                     
         
         if len(search) == 1:

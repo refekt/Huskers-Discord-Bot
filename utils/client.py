@@ -277,7 +277,8 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
 
     async def quote_reacts():
         if not channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
-            raise AttributeError(f"You are not allowed to use this command in this channel!")
+            return
+            # raise AttributeError(f"You are not allowed to use this command in this channel!")
 
         quote_emoji = "📝"
         reactions = message.reactions
@@ -748,7 +749,7 @@ else:
 client = MyClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
 extensions = (
     "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting", 'cogs.music',
-    'cogs.reddit', 'cogs.message_history', 'cogs.deepfry')
+    'cogs.reddit', 'cogs.message_history', 'cogs.deepfry', 'cogs.fap')
 
 for extension in extensions:
     try:
