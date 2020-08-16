@@ -420,7 +420,7 @@ def FootballRecruit(year, name):
 
         team_id = 0
         if player['CommitedInstitutionTeamImage'] is not None:
-            team_id = int(player['CommitedInstitutionTeamImage'].split('/')[-1].split('_')[-1].split('.')[0])  # Thank you Psy
+            team_id = int(player['CommitedInstitutionTeamImage'].split('/')[-1].split('_')[-1].split('.')[0])            # Thank you Psy
 
         schooltype = school_type()
         p_year = player['Year']
@@ -439,7 +439,7 @@ def FootballRecruit(year, name):
             recruit_state = p['Hometown']['State']
 
         try:
-            recruit_committed_school = team_ids[team_id] if team_id > 0 else None
+            recruit_committed_school = team_ids[str(team_id)] if team_id > 0 else None
         except KeyError:
             recruit_committed_school = None
 

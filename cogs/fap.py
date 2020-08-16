@@ -5,6 +5,9 @@ from utils.recruit import FootballRecruit
 from discord.ext import commands
 from utils.mysql import process_MySQL
 
+CURRENT_CLASS = 2021
+
+
 async def get_teams():
     get_teams_query = '''SELECT name FROM team_ids;'''
     sql_teams = process_MySQL(query = get_teams_query, fetch = 'all')
@@ -46,7 +49,10 @@ async def initiate_fap(user, recruit, client):
     channel = user.dm_channel
     if user.dm_channel is None:
         channel = await user.create_dm()
-        
+    if recruit.year < CURRENT_CLASS:
+       await channel.send(f"You cannot make predictions on recruits from previous classes. {recruit.name} was in the {recruit.year} recruiting class.")
+       return
+       
     previous_prediction = await get_prediction(user, recruit)
     if previous_prediction is not None:
         await channel.send(f"It appears that you've previously predicted {recruit.name} to {previous_prediction['team']} with confidence {previous_prediction['confidence']}. You can answer the prompts to update your prediction.")       
@@ -63,10 +69,13 @@ async def initiate_fap(user, recruit, client):
             if prediction_response.content.lower() in [t.lower() for t in valid_teams]:
                 team_index = [t.lower() for t in valid_teams].index(prediction_response.content.lower())
                 team_prediction = valid_teams[team_index]
+                if recruit.committed_school == team_prediction:
+                    await channel.send(f"{recruit.name} is already committed to {recruit.committed_school}. Nice try.")
+                    return
                 await channel.send(f"You've selected {team_prediction} as your prediction, what is your confidence in that pick from 1 to 10?")                   
             else:
                 await channel.send("That isn't a valid team. Please try again or ask my creators to add that as a valid team.")
-    
+        
     while(prediction_confidence is None):
         try:
             confidence_response = await client.wait_for('message', 
@@ -86,7 +95,8 @@ async def initiate_fap(user, recruit, client):
                     prediction_confidence = int(confidence_response.content)
                 else:
                     await channel.send(f"{confidence} is not between 1 and 10. Try again.")
-              
+    
+    
     await insert_prediction(user, recruit, team_prediction, prediction_confidence, previous_prediction)
     await channel.send(f"Your prediction of {recruit.name} to {team_prediction} has been logged!")
     
