@@ -78,7 +78,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """ Win or lose some server currency playing roulette
         $roulette 10 red -- Bet a color
         $roulette 10 25 -- Bet a specific number (225% bonus)
-        $roulette 10 1:17 -- Bet a specific number range (5% scaling bonus)
+        $roulette 10 1:17 -- Bet a specific number range (scaling bonus)
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet! ")
@@ -236,7 +236,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         await ctx.send(f"You have granted {user.mention} {value} {CURRENCY_NAME}!")
 
     @money.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def pity(self, ctx):
         if self.check_author_initialized(ctx) and self.check_balance(ctx) == 0:
             pitty_value = 25
