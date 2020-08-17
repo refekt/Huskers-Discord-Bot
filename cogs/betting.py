@@ -124,9 +124,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     result = random.randint(1, 36)
                     if range[0] <= result <= range[1]:
                         win = True
-                        bonus_rate = 0.03
-                        bonus = (37 - (max(range) - min(range))) * bonus_rate
-                        bet_amount = int(bet_amount * (1 + bonus))
+                        #bonus_rate = 0.03
+                        bet_amount = (36 / (max(range) - min(range) + 1)) * bet_amount
+                        #bonus = (37 - (max(range) - min(range))) * bonus_rate
+                        #bet_amount = int(bet_amount * (1 + bonus))
                 except:
                     raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
             else:
