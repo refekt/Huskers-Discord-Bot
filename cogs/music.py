@@ -303,11 +303,12 @@ class Music(commands.Cog):
             return
 
         if user != self.bot.user and message.author == self.bot.user:
-            print("Removing becuase radio")
-            try:
-                await message.remove_reaction(reaction, user)
-            except:
-                pass
+            if (reaction.emoji == "⏯") or (reaction.emoji == "⏭") or (reaction.emoji == "⏮"):
+                try:                
+                    print("Removing because radio")
+                    await message.remove_reaction(reaction, user)
+                except:
+                    pass
             if message.guild and message.guild.voice_client:
                 user_in_channel = user.voice and user.voice.channel and user.voice.channel == message.guild.voice_client.channel
                 permissions = message.channel.permissions_for(user)

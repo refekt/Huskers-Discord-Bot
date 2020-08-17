@@ -9,7 +9,7 @@ from discord.ext import commands
 from utils.mysql import process_MySQL
 
 CURRENT_CLASS = 2021
-
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 async def get_teams():
     get_teams_query = '''SELECT name FROM team_ids;'''
@@ -109,6 +109,41 @@ async def initiate_fap(user, recruit, client):
 def get_faps(recruit):
     croot_preds = get_croot_predictions(recruit)
     return croot_preds
+    
+async def individual_predictions(recruit, ctx):
+    get_individual_preds_query = 'SELECT * FROM fap_predictions WHERE recruit_profile = %s ORDER BY prediction_date ASC'
+    individual_preds = process_MySQL(query = get_individual_preds_query, fetch = 'all', values = (recruit.x247_profile,))
+    if individual_predictions is None:
+        ctx.send('This recruit has no predictions.')
+        return
+    
+    embed_title = f'Predictions for {recruit.name}'
+    embed = discord.Embed(title = embed_title)
+    for i, p in enumerate(individual_preds):
+        try:
+            pred_user = (await ctx.guild.get_member(p['user_id'])).display_name
+        except:
+            pred_user = p['user']
+        if pred_user is None:
+            pred_user = p['user']
+        # if i > 0:
+            # embed_description += '\n'
+        pred_dt = p['prediction_date']
+        if isinstance(pred_dt, str):
+            pred_dt = datetime.datetime.strptime(p['prediction_date'], DATETIME_FORMAT)       
+        pred_field = [f"{pred_user}", f"{p['team']} ({p['confidence']}) - {pred_dt.month}/{pred_dt.day}/{pred_dt.year}"]
+        if p['correct'] == 1:
+            pred_field[0] = '✅ ' + pred_field[0]
+        elif p['correct'] == 0:
+            pred_field[0] = '❌ ' + pred_field[0]
+        elif p['correct'] is None:
+            pred_field[0] = '⌛ ' + pred_field[0]
+        embed.add_field(name = pred_field[0], value = pred_field[1], inline = False)
+    
+    embed.set_footer(text = '✅ = Correct, ❌ = Wrong, ⌛ = TBD')
+    await ctx.send(embed=embed)
+        
+    
 
 class fapCommands(commands.Cog):        
     @commands.command()  

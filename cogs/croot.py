@@ -41,20 +41,15 @@ class RecruitCommands(commands.Cog):
             embed = build_recruit_embed(target_recruit)
             await embed_msg.edit(content="", embed=embed)
             await embed_msg.add_reaction('🔮')
-            # await embed_msg.add_reaction('📈')
+            await embed_msg.add_reaction('📜')
             fap_wait = True
+            indie_preds_clicked = False
             while(fap_wait):
                 try:
                     reaction, user = await client.wait_for('reaction_add', 
-                                                       check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📈')))                    
+                                                       check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📜')))                    
                 except asyncio.TimeoutError:
-                    embed_msg.set_footer(text=FOOTER_BOT)
-                    if reaction.emoji == '🔮':
-                        try:
-                            await embed_msg.remove_reaction('🔮', client.user)
-                        except:
-                            pass
-                    fap_wait = False
+                    pass
                 else:
                     if reaction.message.id == embed_msg.id:
                         if reaction.emoji == '🔮':
@@ -62,8 +57,14 @@ class RecruitCommands(commands.Cog):
                                 await embed_msg.remove_reaction('🔮', user)
                             except:
                                 pass
-                            await FAP.initiate_fap(user, target_recruit, client)
-                    
+                            await FAP.initiate_fap(user, target_recruit, client) 
+                        if reaction.emoji == '📜' and indie_preds_clicked == False:
+                            try:
+                                await reaction.clear()
+                            except:
+                                pass
+                            await FAP.individual_predictions(target_recruit, ctx)
+                            indie_preds_clicked = True
         
         if len(search) == 1:
             await final_send_embed_fap_loop(search[0], edit_msg)
