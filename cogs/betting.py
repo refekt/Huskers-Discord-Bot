@@ -145,7 +145,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             if validate_number_bet():
                 result = random.randint(1, 36)
                 if result == bet:
-                    bet_amount = int(bet_amount * 2.25)
+                    bet_amount = int(bet_amount * 36)
                     win = True
             else:
                 raise AttributeError(f"You can only play a number from 1 to 36. Try again!")
