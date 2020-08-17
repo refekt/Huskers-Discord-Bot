@@ -31,6 +31,10 @@ async def insert_prediction(user, recruit, team_prediction, prediction_confidenc
         update_prediction_query = '''UPDATE fap_predictions
                                      SET team = %s, confidence = %s, prediction_date = NOW()
                                      WHERE user_id = %s and recruit_profile = %s;'''
+        if team_prediction == previous_prediction['team']:
+            update_prediction_query = '''UPDATE fap_predictions
+                                         SET team = %s, confidence = %s
+                                         WHERE user_id = %s and recruit_profile = %s;'''
         process_MySQL(query = update_prediction_query, values = (team_prediction, prediction_confidence, user.id, recruit.x247_profile))
         
 def get_croot_predictions(recruit):
@@ -97,8 +101,7 @@ async def initiate_fap(user, recruit, client):
                     prediction_confidence = int(confidence_response.content)
                 else:
                     await channel.send(f"{confidence} is not between 1 and 10. Try again.")
-    
-    
+
     await insert_prediction(user, recruit, team_prediction, prediction_confidence, previous_prediction)
     await channel.send(f"Your prediction of {recruit.name} to {team_prediction} has been logged!")
     
