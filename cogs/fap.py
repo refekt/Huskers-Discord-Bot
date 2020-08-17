@@ -2,6 +2,7 @@ import asyncio
 import discord
 import datetime
 import pandas as pd
+import numpy as np
 import discord
 from utils.recruit import FootballRecruit
 from discord.ext import commands
@@ -241,15 +242,39 @@ class fapCommands(commands.Cog):
             target_member = ctx.author
         embed_title = f"FAP Stats for {target_member.display_name}"
         get_stats_query = f'''SELECT * FROM fap_predictions WHERE user_id = {target_member.id}'''
-        faps = process_MySQL(query = get_stats_query, fetch = 'all')
+        faps = process_MySQL(query = get_stats_query, fetch = 'all')    
+        if faps is None:
+            await ctx.send("You have made no predictions previously. You can do so by calling `$predict <Recruiting Class> <Recruit Name>`")
+            return
         faps_df = pd.DataFrame(faps)
         overall_pct = faps_df['correct'].mean() * 100
         current_pct = faps_df.loc[faps_df['recruit_class']==CURRENT_CLASS, 'correct'].mean() * 100
         overall_count = len(faps_df.index)
         current_count = len(faps_df[faps_df['recruit_class'] == CURRENT_CLASS].index)
+        overall_correct_count = len(faps_df[faps_df['correct']==1].index)
+        current_correct_count = len(faps_df[(faps_df['correct']==1) & (faps_df['recruit_class'] == CURRENT_CLASS)])
+        overall_wrong_count = len(faps_df[faps_df['correct']==0].index)
+        current_wrong_count = len(faps_df[(faps_df['correct']==0) & (faps_df['recruit_class'] == CURRENT_CLASS)])
+        overall_ratio_str = "N/A"
+        current_ratio_str = "N/A"
+        if overall_correct_count + overall_wrong_count > 0:
+            overall_ratio_str = f"{overall_correct_count}/{overall_correct_count + overall_wrong_count}"
+        if current_correct_count + current_wrong_count > 0:
+            current_ratio_str = f"{current_correct_count}/{current_correct_count + current_wrong_count}"
+            
+            
         embed_msg = discord.Embed(title = embed_title)
-        embed_msg.add_field(name = '**Overall**', value = f'Predictions: {overall_count}\nPercent Correct: {overall_pct:.0f}%', inline = False)
-        embed_msg.add_field(name = f'**{CURRENT_CLASS} Class**', value = f'Predictions: {current_count}\nPercent Correct: {current_pct:.0f}%', inline = False)
+        if np.isnan(overall_pct):
+            overall_pct = "N/A"
+            embed_msg.add_field(name = '**Overall**', value = f'Predictions: {overall_count}\nPercent Correct: {overall_pct}% ({overall_ratio_str})', inline = False)
+        else:
+            embed_msg.add_field(name = '**Overall**', value = f'Predictions: {overall_count}\nPercent Correct: {overall_pct:.0f}% ({overall_ratio_str})', inline = False)
+        if np.isnan(current_pct):
+            current_pct = "N/A"
+            embed_msg.add_field(name = f'**{CURRENT_CLASS} Class**', value = f'Predictions: {current_count}\nPercent Correct: {current_pct}% ({current_ratio_str})', inline = False)
+        else:
+            embed_msg.add_field(name = f'**{CURRENT_CLASS} Class**', value = f'Predictions: {current_count}\nPercent Correct: {current_pct:.0f}% ({current_ratio_str})', inline = False)
+        
         await ctx.send(embed = embed_msg)
         
 
