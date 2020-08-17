@@ -125,7 +125,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     if range[0] <= result <= range[1]:
                         win = True
                         #bonus_rate = 0.03
-                        bet_amount = int(((36 / (max(range) - min(range) + 1)) * bet_amount)) - bet_amount
+                        bet_amount = int(((36 / (max(range) - min(range) + 1)) - 1) * bet_amount)
                         #bonus = (37 - (max(range) - min(range))) * bonus_rate
                         #bet_amount = int(bet_amount * (1 + bonus))
                 except:
