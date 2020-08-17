@@ -121,7 +121,7 @@ async def individual_predictions(recruit, ctx):
     embed = discord.Embed(title = embed_title)
     for i, p in enumerate(individual_preds):
         try:
-            pred_user = await ctx.guild.get_member(p['user_id'])
+            pred_user = ctx.guild.get_member(p['user_id'])
             pred_user = pred_user.display_name
         except:
             pred_user = p['user']
