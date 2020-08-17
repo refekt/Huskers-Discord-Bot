@@ -114,7 +114,7 @@ async def individual_predictions(recruit, ctx):
     get_individual_preds_query = 'SELECT * FROM fap_predictions WHERE recruit_profile = %s ORDER BY prediction_date ASC'
     individual_preds = process_MySQL(query = get_individual_preds_query, fetch = 'all', values = (recruit.x247_profile,))
     if individual_predictions is None:
-        ctx.send('This recruit has no predictions.')
+        await ctx.send('This recruit has no predictions.')
         return
     
     embed_title = f'Predictions for {recruit.name}'
