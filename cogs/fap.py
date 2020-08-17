@@ -194,15 +194,13 @@ class fapCommands(commands.Cog):
     async def leaderboard(self, ctx, year=None):
         from utils.client import client
         if year is None:
-            year = CURRENT_CLASS
+            year = str(CURRENT_CLASS)
         embed_title = f'{year} FAP Leaderboard'
         get_all_preds_query = f"SELECT * FROM fap_predictions WHERE recruit_class = {year}"
-        if isinstance(year, str):
-            if year.lower() == 'overall':
-                get_all_preds_query = '''SELECT * FROM fap_predictions'''
-                embed_title = 'All-Time FAP Leaderboard'
-            else:
-                return
+        if year.lower() == 'overall':
+            get_all_preds_query = '''SELECT * FROM fap_predictions'''
+            embed_title = 'All-Time FAP Leaderboard'
+            
         faps = process_MySQL(query = get_all_preds_query, fetch = 'all')
         faps_df = pd.DataFrame(faps)
         faps_nn = faps_df[(faps_df['correct'].notnull())].copy()
