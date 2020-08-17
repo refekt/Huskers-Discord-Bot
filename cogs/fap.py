@@ -1,6 +1,8 @@
 import asyncio
 import discord
 import datetime
+import pandas as pd
+import discord
 from utils.recruit import FootballRecruit
 from discord.ext import commands
 from utils.mysql import process_MySQL
@@ -104,10 +106,9 @@ def get_faps(recruit):
     croot_preds = get_croot_predictions(recruit)
     return croot_preds
 
-class fapCommands(commands.Cog):
-        
-    @commands.command(aliases=["predict", ])  
-    async def fap(self, ctx, year: int, *name):
+class fapCommands(commands.Cog):        
+    @commands.command()  
+    async def predict(self, ctx, year: int, *name):
         """ Put in a FAP prediction for a recruit """
         from utils.client import client
         from utils.embed import build_embed
@@ -180,6 +181,62 @@ class fapCommands(commands.Cog):
             print("Unable to delete message due to lack of permissions.")
             
         await send_fap_convo(search_result_player)
+        
+    @commands.group()
+    async def fap(self, ctx):
+        '''Frost Approved Predictions commands'''
+        if ctx.subcommand_passed:
+            return
+        else:
+            raise AttributeError(f"A subcommand must be used. Review $help.")
+            
+    @fap.command()
+    async def leaderboard(self, ctx, year=None):
+        from utils.client import client
+        if year is None:
+            year = CURRENT_CLASS
+        embed_title = f'{year} FAP Leaderboard'
+        get_all_preds_query = f"SELECT * FROM fap_predictions WHERE recruit_class = {year}"
+        if isinstance(year, str):
+            if year.lower() == 'overall':
+                get_all_preds_query = '''SELECT * FROM fap_predictions'''
+                embed_title = 'All-Time FAP Leaderboard'
+            else:
+                return
+        faps = process_MySQL(query = get_all_preds_query, fetch = 'all')
+        faps_df = pd.DataFrame(faps)
+        faps_nn = faps_df[(faps_df['correct'].notnull())].copy()
+        leaderboard = pd.DataFrame(faps_nn['user_id'].unique(), columns=['user_id'])
+        leaderboard['points'] = 0
+        leaderboard['correct_pct'] = 0
+        for u in leaderboard['user_id'].unique():
+            faps_user = faps_nn[faps_nn['user_id'] == u].copy()
+            leaderboard.loc[leaderboard['user_id']==u,'correct_pct'] = faps_user['correct'].mean()*100
+            faps_user['correct'] = faps_user['correct'].replace(0.0, -1.0)
+            faps_user['points'] = faps_user['correct'] * faps_user['confidence']
+            leaderboard.loc[leaderboard['user_id']==u,'points'] = faps_user['points'].sum()
+        leaderboard = leaderboard.sort_values('points', ascending = False)
+        
+        embed_string = 'User: Points (Pct Correct)'
+        place = 1
+        for u in leaderboard['user_id']:
+            try:
+                user = ctx.guild.get_member(u)
+            except:
+                continue
+            if user is None:
+                continue
+            points = leaderboard.loc[leaderboard['user_id']==u,'points'].values[0]
+            correct_pct = leaderboard.loc[leaderboard['user_id']==u,'correct_pct'].values[0]
+            embed_string += f'\n#{place} {user.display_name}: {points:.0f} ({correct_pct:.0f}%)'
+            place += 1
+        
+        embed_msg = discord.Embed(title = embed_title, description = embed_string)
+        await ctx.send(embed = embed_msg)
+        
+        
+        
+
         
 def setup(bot):
     bot.add_cog(fapCommands(bot))      
