@@ -223,7 +223,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def grant(self, ctx, user: discord.Member, value: int):
         """ Admin command. Give user server currency """
         if not user:
-            raise AttributeError("You must specific who this is going to!")
+            raise AttributeError("You must specify who this is going to!")
 
         if not value:
             raise AttributeError("You must specific how much to give!")
@@ -267,7 +267,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if self.check_author_initialized(user=ctx) and self.check_author_initialized(user=user):
             balance = self.check_balance(user=ctx.message.author)
-
+            if value < 0:
+                await ctx.send("You can't give negative money you dummy."
+            elif value == 0:
+                await ctx.send("It makes no sense to give someone 0 of something, smh.")
             if type(balance) == AttributeError:
                 await ctx.send(balance)
             elif balance >= value:
