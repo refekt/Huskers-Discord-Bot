@@ -235,7 +235,22 @@ class fapCommands(commands.Cog):
         embed_msg = discord.Embed(title = embed_title, description = embed_string)
         await ctx.send(embed = embed_msg)
         
-        
+    @fap.command()
+    async def stats(self, ctx, target_member: discord.Member = None):
+        if target_member is None:
+            target_member = ctx.author
+        embed_title = f"FAP Stats for {target_member.display_name}"
+        get_stats_query = f'''SELECT * FROM fap_predictions WHERE user_id = {target_member.id}'''
+        faps = process_MySQL(query = get_stats_query, fetch = 'all')
+        faps_df = pd.DataFrame(faps)
+        overall_pct = faps_df['correct'].mean() * 100
+        current_pct = faps_df.loc[faps_df['recruit_class']==CURRENT_CLASS, 'correct'].mean() * 100
+        overall_count = len(faps_df.index)
+        current_count = len(faps_df[faps_df['recruit_class'] == CURRENT_CLASS].index)
+        embed_msg = discord.Embed(title = embed_title)
+        embed_msg.add_field(name = '**Overall**', value = f'Predictions: {overall_count}\nPercent Correct: {overall_pct:.0f}%', inline = False)
+        embed_msg.add_field(name = f'**{CURRENT_CLASS} Class**', value = f'Predictions: {current_count}\nPercent Correct: {current_pct:.0f}%', inline = False)
+        await ctx.send(embed = embed_msg)
         
 
         
