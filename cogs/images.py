@@ -14,8 +14,9 @@ def build_quote(quote: str, author: str = None):
     if author is not None:
         quote = f"{author}: " + quote
 
-    if len(quote) > 267:
-        quote = quote[0:267] + "..."
+    max_len = 95
+    if len(quote) > max_len:
+        quote = quote[0:max_len] + "..."
 
     scroll_path = "resources/scroll.png"
     scroll = Image.open(fp=scroll_path)
@@ -27,10 +28,11 @@ def build_quote(quote: str, author: str = None):
 
     d = ImageDraw.Draw(im=img, mode="RGBA")
 
-    quote_coords = [100, 70]  # [536, 449]
-    quote_width = 18
+    quote_coords = [100, 65]  # [536, 449]
+    quote_width = 16
 
-    font_path = "resources/Canterbury.ttf"
+    # font_path = "resources/Canterbury.ttf"
+    font_path = "resources/Olde English Regular.ttf"
     font_size = 65
     font = ImageFont.truetype(font=font_path, size=font_size)
 
