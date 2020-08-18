@@ -18,7 +18,7 @@ def build_quote(quote: str, author):
         quote = quote[0:max_len] + "..."
 
     if author is not None:
-        quote = quote.capitalize() + f" - {author.name.capitalize()}"
+        quote = '"' + quote.capitalize() + '"' + f" - {author.display_name.capitalize()}"
 
     scroll_path = "resources/scroll.png"
     scroll = Image.open(fp=scroll_path)
@@ -31,7 +31,7 @@ def build_quote(quote: str, author):
     d = ImageDraw.Draw(im=img, mode="RGBA")
 
     quote_coords = [75, 65]  # [536, 449]
-    quote_width = 23
+    quote_width = 27
 
     # font_path = "resources/Canterbury.ttf"
     # font_path = "resources/Olde English Regular.ttf"
