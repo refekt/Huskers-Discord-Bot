@@ -27,11 +27,11 @@ def build_quote(quote: str, author: str = None):
 
     d = ImageDraw.Draw(im=img, mode="RGBA")
 
-    quote_coords = [74, 70]  # [536, 449]
-    quote_width = 30
+    quote_coords = [100, 70]  # [536, 449]
+    quote_width = 18
 
     font_path = "resources/Canterbury.ttf"
-    font_size = 45
+    font_size = 65
     font = ImageFont.truetype(font=font_path, size=font_size)
 
     lines = textwrap.wrap(quote, width=quote_width)
@@ -56,11 +56,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def quote(self, ctx, *, quote: str, author=None):
         """ Build a quote scroll! You can either reaction to a message with the pencil (📝) reaction or include a quote you want.
-        $quote This is a test quote."""
-        if ctx.message.channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
-            await ctx.send(file=build_quote(quote, author))
-        else:
-            raise AttributeError(f"You are not allowed to use this command in this channel!")
+        # $quote This is a test quote."""
+        # if ctx.message.channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
+        #     await ctx.send(file=build_quote(quote, author))
+        # else:
+        #     raise AttributeError(f"You are not allowed to use this command in this channel!")
+        await ctx.send(file=build_quote(quote, author))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
