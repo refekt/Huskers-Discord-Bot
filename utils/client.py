@@ -59,13 +59,18 @@ async def process_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
     else:
+        if type(ctx.channel) == discord.channel.DMChannel:
+            chan = "DM"
+        else:
+            chan = ctx.channel.name
+
         embed = build_embed(
             title="BotFrost Error Message",
             description=str(error),
             fields=[
                 ["Author", ctx.message.author],
                 ["Message ID", ctx.message.id],
-                ["Channel", ctx.message.channel.name],
+                ["Channel", chan],
                 ["Content", ctx.message.clean_content]
             ]
         )
