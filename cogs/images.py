@@ -4,19 +4,21 @@ import textwrap
 from PIL import Image, ImageDraw, ImageFont
 from discord import File
 from discord.ext import commands
-from utils.consts import CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS
+
 from utils.consts import CD_GLOBAL_PER, CD_GLOBAL_RATE, CD_GLOBAL_TYPE
+from utils.consts import CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_SCOTTS_BOTS
 from utils.consts import ROLE_ASPARAGUS, ROLE_POTATO
 from utils.embed import build_image_embed
 
 
-def build_quote(quote: str, author: str = None):
-    if author is not None:
-        quote = f"{author}: " + quote
+def build_quote(quote: str, author):
 
-    max_len = 95
+    max_len = 125
     if len(quote) > max_len:
         quote = quote[0:max_len] + "..."
+
+    if author is not None:
+        quote = quote + f" - {author.name.capitalize()}"
 
     scroll_path = "resources/scroll.png"
     scroll = Image.open(fp=scroll_path)
@@ -29,10 +31,16 @@ def build_quote(quote: str, author: str = None):
     d = ImageDraw.Draw(im=img, mode="RGBA")
 
     quote_coords = [100, 65]  # [536, 449]
-    quote_width = 16
+    quote_width = 25
 
     # font_path = "resources/Canterbury.ttf"
-    font_path = "resources/Olde English Regular.ttf"
+    # font_path = "resources/Olde English Regular.ttf"
+    # font_path = "resources/Demo_ConeriaScript.ttf"
+    # font_path = "resources/AngillaTattoo.ttf"
+    # font_path = "resources/always forever.ttf"
+    # font_path = "resources/Silent Reaction.ttf"
+    # font_path = "resources/CoalhandLuke.ttf"
+    font_path = "resources/Chocolate Covered Raindrops BOLD.ttf"
     font_size = 65
     font = ImageFont.truetype(font=font_path, size=font_size)
 
@@ -59,11 +67,13 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def quote(self, ctx, *, quote: str, author=None):
         """ Build a quote scroll! You can either reaction to a message with the pencil (📝) reaction or include a quote you want.
         # $quote This is a test quote."""
+
+        await ctx.send(file=build_quote(quote, ctx.author))
+
         # if ctx.message.channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
         #     await ctx.send(file=build_quote(quote, author))
         # else:
         #     raise AttributeError(f"You are not allowed to use this command in this channel!")
-        await ctx.send(file=build_quote(quote, author))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -223,3 +233,4 @@ def setup(bot):
     bot.add_cog(ImageCommands(bot))
 
 # print("### Image Commands loaded! ###")
+

@@ -281,8 +281,8 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             pass
 
     async def quote_reacts():
-        if not channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
-            return
+        # if not channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
+        #     return
             # raise AttributeError(f"You are not allowed to use this command in this channel!")
 
         quote_emoji = "📝"
