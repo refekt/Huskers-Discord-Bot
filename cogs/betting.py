@@ -71,6 +71,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             query=sqlUpdateCurrency,
             values=(-value, self.full_author(ctx))
         )
+        
+    def initiate_user(self, ctx, value):
+        process_MySQL(
+            query=sqlSetCurrency, 
+            values = (self.full_author(ctx), value, ctx.author.id,)
+        )
 
     @commands.command(aliases=["rlt", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -215,7 +221,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"🔔🔔🔔 SHAME {ctx.author.mention} 🔔🔔🔔! You cannot initialize more than once!")
 
         starter_money = 100
-        self.award_currency(ctx, starter_money)
+        self.initiate_user(ctx, starter_money)
+        #self.award_currency(ctx, starter_money)
         await ctx.send(f"Congratulations {ctx.author.mention}! You now have {starter_money} {CURRENCY_NAME}. Use it wisely!")
 
     @money.command(hidden=True)
