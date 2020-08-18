@@ -313,7 +313,56 @@ class fapCommands(commands.Cog):
         
         await ctx.send(embed = embed_msg)
         
-
+    @fap.command()
+    async def user(self, ctx, target_member: discord.Member = None, year: int = None):
+        if target_member is None:
+            target_member = ctx.author
+        if year is None:
+            year = CURRENT_CLASS
+        get_user_preds_query = '''SELECT * FROM fap_predictions 
+                                  WHERE user_id = %s AND recruit_class = %s
+                                  ORDER BY prediction_date ASC'''
+        user_preds = process_MySQL(query = get_user_preds_query, values = (target_member.id, year,), fetch = 'all')
+        if user_preds is None:
+            if target_member.id == ctx.author.id:
+                await ctx.send(f"You do not have any predictions for the {year} class. Get on it already.")
+            else:
+                await ctx.send(f"{target_member.display_name} doesn't have any predictions for the {year} class.")
+            return
+            
+        embed_title = f"{target_member.display_name}'s {year} Predictions"
+        embed = discord.Embed(title = embed_title)
+        
+        correct_amount = 0
+        incorrect_amount = 0
+        for i, p in enumerate(user_preds):
+            field_title = ''
+            field_value = ''
+                
+            if p['correct'] == 1:
+                field_title += '✅ '
+                correct_amount += 1
+            elif p['correct'] == 0:
+                field_title = '❌ '
+                incorrect_amount += 1
+            elif p['correct'] is None:
+                field_title += '⌛ '
+            field_title += f"{p['recruit_name']}"
+            
+            pred_date = p['prediction_date']
+            if isinstance(pred_date, str):
+                pred_date = datetime.datetime.strptime(p['prediction_date'], DATETIME_FORMAT)  
+            field_value = f"{p['team']} ({p['confidence']}) - {pred_date.month}/{pred_date.day}/{pred_date.year} \[[247 Profile]({p['recruit_profile']})\]"
+            embed.add_field(name = field_title, value = field_value, inline = False)
+        
+        embed_description = ''
+        if correct_amount + incorrect_amount > 0:
+            embed_description = f"""Total {year} Predictions: {len(user_preds)}\nPercent Correct: {(correct_amount / (correct_amount + incorrect_amount))*100:.0f}% ({correct_amount}/{correct_amount + incorrect_amount})\n\n"""
+        else:
+            embed_description = f"""Total {year} Predictions: {len(user_preds)}\n\n"""
+        embed.description = embed_description    
+        embed.set_footer(text = '✅ = Correct, ❌ = Wrong, ⌛ = TBD')
+        await ctx.send(embed = embed)
         
 def setup(bot):
     bot.add_cog(fapCommands(bot))      
