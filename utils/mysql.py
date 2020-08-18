@@ -203,8 +203,8 @@ sqlRetrieveUserCurrency = "SELECT * FROM currency"
 sqlCheckCurrencyInit = "SELECT username FROM currency"
 
 sqlSetCurrency = """\
-INSERT INTO currency (username, init, balance)
-VALUES (%s, 1, %s)
+INSERT INTO currency (username, init, balance, user_id)
+VALUES (%s, 1, %s, %s)
 """
 
 sqlUpdateCurrency = """\
