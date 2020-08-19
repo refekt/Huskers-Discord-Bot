@@ -173,7 +173,7 @@ async def monitor_messages(message: discord.Message):
         #         await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
 
     async def find_subreddits():
-        subreddits = re.findall(r" +(\/|)r\/[a-z0-9]{1,}(\/|)", message.content.lower())
+        subreddits = re.findall(r"r\/[a-zA-Z0-9]{1,}", message.content.lower())
 
         if len(subreddits) > 0:
             subs = []
@@ -216,7 +216,8 @@ async def monitor_messages(message: discord.Message):
         if message.channel.id not in CHAN_STATS_BANNED:
             await record_statistics()
 
-        await find_subreddits()
+        if not [ele for ele in client.all_commands.keys() if (ele in message.content)]:
+            await find_subreddits()
 
         await add_votes()
 
