@@ -277,7 +277,7 @@ class fapCommands(commands.Cog):
         
     @fap.command()
     async def stats(self, ctx, target_member: discord.Member = None):
-        """Get the number of predictions and percent correct for a user for all-time and the current recruiting class. If no user, is given, it will return the results
+        """Get the number of predictions and percent correct for a user for all-time and the current recruiting class. If no user is given, it will return the results
            for the user that calls it."""
         if target_member is None:
             target_member = ctx.author
