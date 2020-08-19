@@ -147,9 +147,19 @@ async def individual_predictions(recruit, ctx):
     
 
 class fapCommands(commands.Cog):        
-    @commands.command()  
+    
+        
+    @commands.group()
+    async def fap(self, ctx):
+        '''Frost Approved Predictions commands'''
+        if ctx.subcommand_passed:
+            return
+        else:
+            raise AttributeError(f"A subcommand must be used. Review $help.")
+            
+    @fap.command()  
     async def predict(self, ctx, year: int, *name):
-        """ Put in a FAP prediction for a recruit """
+        """Put in a FAP prediction for a recruit."""
         from utils.client import client
         from utils.embed import build_embed
         
@@ -222,16 +232,9 @@ class fapCommands(commands.Cog):
             
         await send_fap_convo(search_result_player)
         
-    @commands.group()
-    async def fap(self, ctx):
-        '''Frost Approved Predictions commands'''
-        if ctx.subcommand_passed:
-            return
-        else:
-            raise AttributeError(f"A subcommand must be used. Review $help.")
-            
     @fap.command()
     async def leaderboard(self, ctx, year=None):
+        """Get the FAP leaderboard. If no year is given, it will provide the leaderboard for the current recruiting class."""
         from utils.client import client
         if year is None:
             year = str(CURRENT_CLASS)
@@ -274,6 +277,8 @@ class fapCommands(commands.Cog):
         
     @fap.command()
     async def stats(self, ctx, target_member: discord.Member = None):
+        """Get the number of predictions and percent correct for a user for all-time and the current recruiting class. If no user is given, it will return the results
+           for the user that calls it."""
         if target_member is None:
             target_member = ctx.author
         embed_title = f"FAP Stats for {target_member.display_name}"
@@ -315,6 +320,7 @@ class fapCommands(commands.Cog):
         
     @fap.command()
     async def user(self, ctx, target_member: discord.Member = None, year: int = None):
+        """Get the predictions for a user for a given year."""
         if target_member is None:
             target_member = ctx.author
         if year is None:
