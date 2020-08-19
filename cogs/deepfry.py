@@ -33,7 +33,7 @@ async def load(url):
 class RecruitCommands(commands.Cog, name="Deep Frying"):
     @commands.command()
     async def deepfry(self, ctx, url=None):
-        if (ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM, CHAN_SCOTTS_BOTS]):
+        if (ctx.channel.id not in [CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS, CHAN_TEST_SPAM, CHAN_SCOTTS_BOTS]) and (not isinstance(ctx.channel, discord.channel.DMChannel)):
             await ctx.send("This command isn't allowed here!")
             return
 
