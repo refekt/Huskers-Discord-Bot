@@ -92,7 +92,7 @@ def build_recruit_embed(rec):  # rec == recruit
     nl = "\n"
     embed = build_embed(
         title=f"{rec.name}, {str(rec.rating_stars) + '⭐ ' if rec.rating_stars else ''}{rec.year} {rec.position}",
-        description=f"{rec.committed if rec.committed is not None else ''} {': ' + rec.committed_school if rec.committed_school is not None else ''} {': ' + str(rec.commitment_date.strftime('%b %d, %Y')) if rec.commitment_date is not None else ''}",
+        description=f"{rec.committed if rec.committed is not None else ''}{': ' + rec.committed_school if rec.committed_school is not None else ''} {': ' + str(rec.commitment_date.strftime('%b %d, %Y')) if rec.commitment_date is not None else ''}",
         fields=[
             ["**Biography**", f"{rec.city}, {rec.state}\n"
                               f"School: {rec.school}\n"
@@ -129,8 +129,19 @@ def build_recruit_embed(rec):  # rec == recruit
             ["**FAP Predictions**", f"{fap_predictions(rec)}"]
         ]
     )
-    embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to."
-                     + "\nClick the 📜 to get the inividual predictions for this recruit.")
+    
+    if (rec.committed.lower() if rec.committed is not None else None) not in ['signed', 'enrolled']:
+        if ((FAP.get_croot_predictions(rec)) is not None):
+            embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to."
+                         + "\nClick the 📜 to get the inividual predictions for this recruit.")
+        else:
+            embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to.")
+    else:
+        if ((FAP.get_croot_predictions(rec)) is not None):
+            embed.set_footer(text=FOOTER_BOT + "\nClick the 📜 to get the inividual predictions for this recruit.")
+        else:
+            embed.set_footer(text=FOOTER_BOT)
+            
     if not rec.thumbnail == "/.":
         embed.set_thumbnail(url=rec.thumbnail)
     return embed

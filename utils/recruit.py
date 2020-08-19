@@ -169,7 +169,7 @@ def FootballRecruit(year, name):
         elif player['HighestRecruitInterestEventType'] == "0":
             return None
         else:
-            return player['HighestRecruitInterestEventType']
+            return player['HighestRecruitInterestEventType'].strip()
 
     def school_type():
         school_type = soup.find_all(attrs={"data-js": "institution-selector"})

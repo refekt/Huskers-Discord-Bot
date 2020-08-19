@@ -40,16 +40,19 @@ class RecruitCommands(commands.Cog):
         async def final_send_embed_fap_loop(target_recruit, embed_msg):
             embed = build_recruit_embed(target_recruit)
             await embed_msg.edit(content="", embed=embed)
-            await embed_msg.add_reaction('🔮')
-            await embed_msg.add_reaction('📜')
+            if (target_recruit.committed.lower() if target_recruit.committed is not None else None) not in ['signed', 'enrolled']:
+                await embed_msg.add_reaction('🔮')
+            if ((FAP.get_croot_predictions(target_recruit)) is not None):
+                await embed_msg.add_reaction('📜')
             fap_wait = True
             indie_preds_clicked = False
             while(fap_wait):
                 try:
                     reaction, user = await client.wait_for('reaction_add', 
-                                                       check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📜')))                    
+                                                       check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📜')),
+                                                       timeout = 1800)                    
                 except asyncio.TimeoutError:
-                    pass
+                    return
                 else:
                     if reaction.message.id == embed_msg.id:
                         if reaction.emoji == '🔮':

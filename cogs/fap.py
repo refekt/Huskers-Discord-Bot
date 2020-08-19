@@ -9,6 +9,7 @@ from discord.ext import commands
 from utils.mysql import process_MySQL
 
 CURRENT_CLASS = 2021
+NO_MORE_PREDS = 2021
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 async def get_teams():
@@ -56,8 +57,11 @@ async def initiate_fap(user, recruit, client):
     channel = user.dm_channel
     if user.dm_channel is None:
         channel = await user.create_dm()
-    if recruit.year < CURRENT_CLASS:
-       await channel.send(f"You cannot make predictions on recruits from previous classes. {recruit.name} was in the {recruit.year} recruiting class.")
+    if (recruit.committed.lower() if recruit.committed is not None else None) in ['signed', 'enrolled']:
+       await channel.send("You cannot make predictions on recruits that have been signed or have enrolled in their school.")
+       return
+    if recruit.year < NO_MORE_PREDS:
+       await channel.send(f"You cannot make predictions on recruits from before the {NO_MORE_PREDS} class. {recruit.name} was in the {recruit.year} recruiting class.")
        return
        
     previous_prediction = await get_prediction(user, recruit)
