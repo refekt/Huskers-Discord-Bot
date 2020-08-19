@@ -50,7 +50,8 @@ class RecruitCommands(commands.Cog):
                 try:
                     reaction, user = await client.wait_for('reaction_add', 
                                                        check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📜')),
-                                                       timeout = 1800)                    
+                                                       timeout = 127800) #Putting a timeout of 2 days just in case the event loop gets too busy after a while, not sure if that's
+                                                                         #actually possible though
                 except asyncio.TimeoutError:
                     return
                 else:
