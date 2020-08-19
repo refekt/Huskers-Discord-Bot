@@ -753,8 +753,8 @@ else:
 
 client = MyClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
 extensions = (
-    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.betting", 'cogs.music',
-    'cogs.reddit', 'cogs.message_history', 'cogs.deepfry', 'cogs.fap')
+    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg", 
+    "cogs.betting", 'cogs.music', 'cogs.reddit', 'cogs.message_history', 'cogs.deepfry', 'cogs.fap')
 
 for extension in extensions:
     try:
