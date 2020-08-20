@@ -306,7 +306,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         for index, person in enumerate(leaderboard):
             member = client.get_user(id=int(person["user_id"]))
             if member is not None:
-                lb += f"#{index} {member.display_name} - {person['balance']} {CURRENCY_NAME}\n"
+                lb += f"#{index + 1} {member.display_name} - {person['balance']} {CURRENCY_NAME}\n"
 
         await ctx.send(
             embed=build_embed(
