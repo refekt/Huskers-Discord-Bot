@@ -198,7 +198,7 @@ SET is_open = %s
 WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
 """
 
-sqlRetrieveUserCurrency = "SELECT * FROM currency"
+sqlRetrieveUserCurrency = "SELECT * FROM currency ORDER BY balance DESC"
 
 sqlCheckCurrencyInit = "SELECT username FROM currency"
 
