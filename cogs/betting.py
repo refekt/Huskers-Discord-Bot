@@ -3,7 +3,7 @@ import typing
 import discord
 import random
 from discord.ext import commands
-
+from utils.embed import build_embed
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
@@ -71,11 +71,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             query=sqlUpdateCurrency,
             values=(-value, self.full_author(ctx))
         )
-        
+
     def initiate_user(self, ctx, value):
         process_MySQL(
-            query=sqlSetCurrency, 
-            values = (self.full_author(ctx), value, ctx.author.id,)
+            query=sqlSetCurrency,
+            values=(self.full_author(ctx), value, ctx.author.id,)
         )
 
     @commands.command(aliases=["rlt", ])
@@ -130,10 +130,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     result = random.randint(1, 36)
                     if range[0] <= result <= range[1]:
                         win = True
-                        #bonus_rate = 0.03
+                        # bonus_rate = 0.03
                         bet_amount = int(((36 / (max(range) - min(range) + 1)) - 1) * bet_amount)
-                        #bonus = (37 - (max(range) - min(range))) * bonus_rate
-                        #bet_amount = int(bet_amount * (1 + bonus))
+                        # bonus = (37 - (max(range) - min(range))) * bonus_rate
+                        # bet_amount = int(bet_amount * (1 + bonus))
                 except:
                     raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
             else:
@@ -222,7 +222,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         starter_money = 100
         self.initiate_user(ctx, starter_money)
-        #self.award_currency(ctx, starter_money)
+        # self.award_currency(ctx, starter_money)
         await ctx.send(f"Congratulations {ctx.author.mention}! You now have {starter_money} {CURRENCY_NAME}. Use it wisely!")
 
     @money.command(hidden=True)
@@ -252,7 +252,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is not 0.")
 
-    @money.command()
+    @money.command(aliases=["bal", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def balance(self, ctx, user: discord.Member = None):
         """ Show current balance of server currency for self or another member """
@@ -281,7 +281,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             elif value == 0:
                 await ctx.send("It makes no sense to give someone 0 of something, smh.")
                 return
-                
+
             if type(balance) == AttributeError:
                 await ctx.send(balance)
             elif balance >= value:
@@ -292,6 +292,30 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You do not have {value} {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
         else:
             raise AttributeError("This user has not established a wallet. Please have them set one up with `$money new`.")
+
+    @money.command(aliases=["lb", ])
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def leaderboard(self, ctx):
+        leaderboard = process_MySQL(
+            query=sqlRetrieveUserCurrency,
+            fetch="all"
+        )
+
+        from utils.client import client
+        lb = ""
+        for index, person in enumerate(leaderboard):
+            member = client.get_user(id=int(person["user_id"]))
+            if member is not None:
+                lb += f"#{index} {member.display_name} - {person['balance']} {CURRENCY_NAME}\n"
+
+        await ctx.send(
+            embed=build_embed(
+                title=f"Husker Discord Currency Leaderboard",
+                fields=[
+                    ["Leaderboard", lb]
+                ]
+            )
+        )
 
 
 def setup(bot):
