@@ -51,7 +51,12 @@ class RecruitCommands(commands.Cog, name="Deep Frying"):
             else:
                 image = await load(url)
             fried = await fryer.fry(image, emote_amount, noise, contrast)
-
+            
+            try:
+                await ctx.message.delete()
+            except:
+                pass
+            
             for layer in range(layers - 1):
                 emote_amount = random.randrange(1, 6)
                 noise = random.uniform(0.1, 1.0)
@@ -66,7 +71,7 @@ class RecruitCommands(commands.Cog, name="Deep Frying"):
                 image_binary.seek(0)
                 # await ctx.message.delete()
                 await msg.delete()
-                await ctx.send(content="Here is your deep fried image:\n", file=discord.File(fp=image_binary, filename='image.png'))
+                await ctx.send(content=f"Here is your deep fried image {ctx.author.mention}:\n", file=discord.File(fp=image_binary, filename='image.png'), delete_after = 3600)
         except Exception as e:
             print(e)
             # await ctx.send(e)
