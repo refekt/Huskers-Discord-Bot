@@ -130,10 +130,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     result = random.randint(1, 36)
                     if range[0] <= result <= range[1]:
                         win = True
-                        # bonus_rate = 0.03
                         bet_amount = int(((36 / (max(range) - min(range) + 1)) - 1) * bet_amount)
-                        # bonus = (37 - (max(range) - min(range))) * bonus_rate
-                        # bet_amount = int(bet_amount * (1 + bonus))
                 except:
                     raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
             else:
@@ -158,10 +155,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if win:
             self.award_currency(ctx, bet_amount)
-            return await ctx.send(f"Winner! The computer spun the wheel and it landed on [ {result} ]. You have been awarded {bet_amount} {CURRENCY_NAME}.")
+            return await ctx.send(f"Winner! The computer spun the wheel and it landed on [ {result} ]. You have been awarded {bet_amount} {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is "
+                                  f"{self.check_balance(ctx.author):,}")
         else:
             self.award_currency(ctx, -bet_amount)
-            return await ctx.send(f"Loser! The computer spun the wheel and it landed on [ {result} ]. You have lost {bet_amount} {CURRENCY_NAME}.")
+            return await ctx.send(f"Loser! The computer spun the wheel and it landed on [ {result} ]. You have lost {bet_amount} {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is "
+                                  f"{self.check_balance(ctx.author):,}")
 
     @commands.command(aliases=["rps", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -183,8 +182,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if choice.lower() == throw:
             return await ctx.send(f"Draw! Computer also threw {throw}. No {CURRENCY_NAME} change.")
         else:
-            win_string = f"Win! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been awarded 5 {CURRENCY_NAME}."
-            lose_string = f"Lose! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been deducted 5 {CURRENCY_NAME}."
+            win_string = f"Win! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been awarded 5 {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is {self.check_balance(ctx.author):,}"
+            lose_string = f"Lose! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been deducted 5 {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is {self.check_balance(ctx.author):,}"
 
             win = False
             if choice.lower() == options[0]:
