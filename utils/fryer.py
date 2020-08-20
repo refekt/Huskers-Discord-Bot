@@ -193,7 +193,7 @@ async def bulge(img, f, r, a, h, ior):
                 k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
 
                 # find intersection point
-                intersect = ray + normalise(f - ray) * k
+                intersect = ray + (normalise(f - ray)) * k
 
                 # assign pixel with ray's coordinates the colour of pixel at intersection
                 if 0 < intersect[0] < width - 1 and 0 < intersect[1] < height - 1:
@@ -202,6 +202,16 @@ async def bulge(img, f, r, a, h, ior):
                     bulged[y][x] = [0, 0, 0, 0]
             else:
                 bulged[y][x] = img_data[y][x]
+    #Work in progress -- vectorizing the above for loop for time efficiency       
+    # f_new = f - [x_min, y_min]
+    # bulge_square = img_data[x_min:x_max, y_min:y_max]
+    # bulge_x, bulge_y = numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]]
+    # bulge_x = bulge_x - f_new[0]
+    # bulge_y = bulge_y - f_new[1]
+    # bulge_s = numpy.hypot(bulge_x, bulge_y)
+    # bulge_s[0 < bulge_s < r]  = (-1 * (0 < bulge_s < r).all()) / (a * math.sqrt(r**2 - s**2))
+    
+    
     img = Image.fromarray(bulged)
     return img
 
@@ -213,7 +223,7 @@ def length(v):
 
 # returns the unit vector in the direction of v
 def normalise(v):
-    return v / length(v)
+    return v / (length(v))
 
 
 def random_file(path):
