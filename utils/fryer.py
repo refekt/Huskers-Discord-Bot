@@ -5,6 +5,7 @@ from PIL import Image
 from numpy import random
 import os
 import random as RAN
+import time
 
 face_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_frontalface_default.xml'))
 eye_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_eye.xml'))
@@ -169,6 +170,7 @@ async def bulge(img, f, r, a, h, ior):
 
     # array for holding bulged image
     bulged = numpy.copy(img_data)
+    time_start = time.time()
     for y in range(y_min, y_max):
         for x in range(x_min, x_max):
             ray = numpy.array([x, y])
@@ -202,15 +204,41 @@ async def bulge(img, f, r, a, h, ior):
                     bulged[y][x] = [0, 0, 0, 0]
             else:
                 bulged[y][x] = img_data[y][x]
-    #Work in progress -- vectorizing the above for loop for time efficiency       
-    # f_new = f - [x_min, y_min]
-    # bulge_square = img_data[x_min:x_max, y_min:y_max]
-    # bulge_x, bulge_y = numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]]
-    # bulge_x = bulge_x - f_new[0]
-    # bulge_y = bulge_y - f_new[1]
-    # bulge_s = numpy.hypot(bulge_x, bulge_y)
-    # bulge_s[0 < bulge_s < r]  = (-1 * (0 < bulge_s < r).all()) / (a * math.sqrt(r**2 - s**2))
+    time_end = time.time()
+    print(f"First algorithm: {time_end - time_start}")
     
+
+    time_start = time.time()
+    #Work in progress -- vectorizing the above for loop for time efficiency       
+    f_new = f - [x_min, y_min]
+    bulge_square = img_data[x_min:x_max, y_min:y_max]
+    
+    #following is equivalent to s = length(ray - f)
+    bulge_x, bulge_y = numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]]
+    bulge_x = bulge_x - f_new[0]
+    bulge_y = bulge_y - f_new[1]
+    bulge_s = numpy.hypot(bulge_x, bulge_y)
+    circle = ((0<bulge_s) & (bulge_s<r))
+    
+    #following is equivalent to m = -s / (a * math.sqrt(r ** 2 - s ** 2))
+    bulge_m = numpy.copy(bulge_s)
+    bulge_m[circle] = (-1 * bulge_m[circle]) / (a * numpy.sqrt(r**2 - bulge_m[circle]**2))
+    
+    #following is equivalent to theta = numpy.pi / 2 + numpy.arctan(1 / m)
+    bulge_theta = numpy.copy(bulge_s)
+    bulge_theta[circle] = (numpy.pi / 2) - numpy.arctan(1 / bulge_theta[circle])
+    
+    #following is equivalent to phi = numpy.abs(numpy.arctan(1 / m) - numpy.arcsin(numpy.sin(theta) / ior))
+    bulge_phi = numpy.copy(bulge_s)
+    bulge_phi[circle] = (numpy.abs(numpy.arctan(1 / bulge_m[circle]) - numpy.arcsin(numpy.sin(bulge_theta[circle] / ior))))
+                                                
+    #following is equivalent to k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
+    bulge_k = numpy.copy(bulge_s)
+    bulge_k[circle] = (h + (numpy.sqrt(r**2 - bulge_s[circle]) / a)) / numpy.sin(bulge_phi[circle])
+    time_end = time.time()
+    print(f"Second Algorithm: {time_end - time_start})")
+    
+    print(bulge_k)
     
     img = Image.fromarray(bulged)
     return img
