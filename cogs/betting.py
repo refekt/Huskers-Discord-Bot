@@ -44,11 +44,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             if author_init["init"] == 1:
                 return True
             elif author_init["init"] == 0:
-                raise err
+                raise False
             else:
                 raise err
         except:
-            raise err
+            raise False
 
     def check_balance(self, user: discord.Member, amount_check):
         if self.check_author_initialized(user):
