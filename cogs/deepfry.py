@@ -71,7 +71,7 @@ class RecruitCommands(commands.Cog, name="Deep Frying"):
                 image_binary.seek(0)
                 # await ctx.message.delete()
                 await msg.delete()
-                await ctx.send(content=f"Here is your deep fried image {ctx.author.mention}:\n", file=discord.File(fp=image_binary, filename='image.png'), delete_after = 3600)
+                await ctx.send(content=f"Here is your deep fried image {ctx.author.mention}:\n", file=discord.File(fp=image_binary, filename='image.png'), delete_after = 300)
         except Exception as e:
             print(e)
             # await ctx.send(e)
