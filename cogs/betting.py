@@ -39,16 +39,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         )
 
         err = AttributeError(f"You have not established a wallet yet. This is accomplished by completing `$money new`.")
-
+        
+        if author_init is None:
+            return False
+        
         try:
             if author_init["init"] == 1:
                 return True
             elif author_init["init"] == 0:
-                raise False
+                return False
             else:
-                raise False
+                return False
         except:
-            raise False
+            return False
 
     def check_balance(self, user: discord.Member, amount_check):
         if self.check_author_initialized(user):
