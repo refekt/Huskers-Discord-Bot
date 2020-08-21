@@ -5,6 +5,7 @@ from PIL import Image
 from numpy import random
 import os
 import random as RAN
+import time
 
 face_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_frontalface_default.xml'))
 eye_cascade = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, 'haarcascade_eye.xml'))
@@ -30,9 +31,9 @@ async def fry(image, emote_amount, noise, contrast):
     [w, h] = [image.width - 1, image.height - 1]
     w *= numpy.random.random(1)
     h *= numpy.random.random(1)
-    r = int(((image.width + image.height) / 10) * (numpy.random.random(1)[0] + 1))
+    r = int(((image.width + image.height) / 12) * (numpy.random.random(1)[0] + 1))
 
-    bulge_bool = RAN.choice([True, False])
+    bulge_bool = True#RAN.choice([True, False])
     if bulge_bool:
         print('Bulging the image...')
         image = await bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
@@ -167,54 +168,109 @@ async def bulge(img, f, r, a, h, ior):
     if isinstance(y_max, type(numpy.array([]))):
         y_max = y_max[0]
 
-    # array for holding bulged image
-    bulged = numpy.copy(img_data)
-    for y in range(y_min, y_max):
-        for x in range(x_min, x_max):
-            ray = numpy.array([x, y])
+    # # array for holding bulged image
+    # bulged = numpy.copy(img_data)
+    # time_start = time.time()
+    # for y in range(y_min, y_max):
+        # for x in range(x_min, x_max):
+            # ray = numpy.array([x, y])
 
-            # find the magnitude of displacement in the xy plane between the ray and focus
-            s = length(ray - f)
+            # # find the magnitude of displacement in the xy plane between the ray and focus
+            # s = length(ray - f)
 
-            # if the ray is in the centre of the bulge or beyond the radius it doesn't need to be modified
-            if 0 < s < r:
-                # slope of the bulge relative to xy plane at (x, y) of the ray
-                m = -s / (a * math.sqrt(r ** 2 - s ** 2))
+            # # if the ray is in the centre of the bulge or beyond the radius it doesn't need to be modified
+            # if 0 < s < r:
+                # # slope of the bulge relative to xy plane at (x, y) of the ray
+                # m = -s / (a * math.sqrt(r ** 2 - s ** 2))
 
-                # find the angle between the ray and the normal of the bulge
-                theta = numpy.pi / 2 + numpy.arctan(1 / m)
+                # # find the angle between the ray and the normal of the bulge
+                # theta = numpy.pi / 2 + numpy.arctan(1 / m)
 
-                # find the magnitude of the angle between xy plane and refracted ray using snell's law
-                # s >= 0 -> m <= 0 -> arctan(-1/m) > 0, but ray is below xy plane so we want a negative angle
-                # arctan(-1/m) is therefore negated
-                phi = numpy.abs(numpy.arctan(1 / m) - numpy.arcsin(numpy.sin(theta) / ior))
+                # # find the magnitude of the angle between xy plane and refracted ray using snell's law
+                # # s >= 0 -> m <= 0 -> arctan(-1/m) > 0, but ray is below xy plane so we want a negative angle
+                # # arctan(-1/m) is therefore negated
+                # phi = numpy.abs(numpy.arctan(1 / m) - numpy.arcsin(numpy.sin(theta) / ior))
 
-                # find length the ray travels in xy plane before hitting z=0
-                k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
+                # # find length the ray travels in xy plane before hitting z=0
+                # k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
 
-                # find intersection point
-                intersect = ray + (normalise(f - ray)) * k
+                # # find intersection point
+                # intersect = ray + (normalise(f - ray)) * k
 
-                # assign pixel with ray's coordinates the colour of pixel at intersection
-                if 0 < intersect[0] < width - 1 and 0 < intersect[1] < height - 1:
-                    bulged[y][x] = img_data[int(intersect[1])][int(intersect[0])]
-                else:
-                    bulged[y][x] = [0, 0, 0, 0]
-            else:
-                bulged[y][x] = img_data[y][x]
-    #Work in progress -- vectorizing the above for loop for time efficiency       
-    # f_new = f - [x_min, y_min]
-    # bulge_square = img_data[x_min:x_max, y_min:y_max]
-    # bulge_x, bulge_y = numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]]
-    # bulge_x = bulge_x - f_new[0]
-    # bulge_y = bulge_y - f_new[1]
-    # bulge_s = numpy.hypot(bulge_x, bulge_y)
-    # bulge_s[0 < bulge_s < r]  = (-1 * (0 < bulge_s < r).all()) / (a * math.sqrt(r**2 - s**2))
+                # # assign pixel with ray's coordinates the colour of pixel at intersection
+                # if 0 < intersect[0] < width - 1 and 0 < intersect[1] < height - 1:
+                    # bulged[y][x] = img_data[int(intersect[1])][int(intersect[0])]
+                # else:
+                    # bulged[y][x] = [0, 0, 0, 0]
+            # else:
+                # bulged[y][x] = img_data[y][x]
+    # time_end = time.time()
+    # print(f"First algorithm: {time_end - time_start}")
+
+   
+    f_new = f
+    bulge_square = numpy.copy(img_data)#img_data[x_min:x_max, y_min:y_max]
     
+    #following is equivalent to s = length(ray - f)
+    bulge_y, bulge_x = numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]]
+    bulge_x = bulge_x - f_new[0]
+    bulge_y = bulge_y - f_new[1]
+    bulge_s = numpy.hypot(bulge_x, bulge_y)
+    circle = ((0<bulge_s) & (bulge_s<r))
+    
+    #following is equivalent to m = -s / (a * math.sqrt(r ** 2 - s ** 2))
+    bulge_m = numpy.copy(bulge_s)
+    bulge_m[circle] = (-1 * bulge_m[circle]) / (a * numpy.sqrt(r**2 - bulge_m[circle]**2))
+    
+    #following is equivalent to theta = numpy.pi / 2 + numpy.arctan(1 / m)
+    bulge_theta = numpy.copy(bulge_s)
+    bulge_theta[circle] = (numpy.pi / 2) + numpy.arctan(1 / bulge_m[circle])
+    
+    #following is equivalent to phi = numpy.abs(numpy.arctan(1 / m) - numpy.arcsin(numpy.sin(theta) / ior))
+    bulge_phi = numpy.copy(bulge_s)
+    bulge_phi[circle] = numpy.abs(numpy.arctan(1 / bulge_m[circle]) - numpy.arcsin(numpy.sin(bulge_theta[circle]) / ior))
+                                                
+    #following is equivalent to k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
+    bulge_k = numpy.copy(bulge_s)
+    bulge_k[circle] = (h + (numpy.sqrt(r**2 - bulge_s[circle]**2) / a)) / numpy.sin(bulge_phi[circle])
+    
+    bulge_norm_y, bulge_norm_x = numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]].astype(numpy.float32)
+    bulge_norm_x =  f_new[1] - bulge_norm_x
+    bulge_norm_y =  f_new[0] - bulge_norm_y
+    bulge_norm_x[circle] = (bulge_norm_x[circle] / bulge_s[circle])
+    bulge_norm_y[circle] = (bulge_norm_y[circle] / bulge_s[circle])
+    
+    #following is equivalent to intersect = ray + (normalise(f - ray)) * k
+    bulge_intersect_y, bulge_intersect_x =   numpy.mgrid[0:bulge_square.shape[0], 0:bulge_square.shape[1]].astype(numpy.float32)
+    bulge_intersect_x[circle] = bulge_intersect_x[circle] + (bulge_norm_x[circle]) * bulge_k[circle]
+    bulge_intersect_y[circle] = bulge_intersect_y[circle] + (bulge_norm_y[circle]) * bulge_k[circle]
+    
+    # if 0 < intersect[0] < width - 1 and 0 < intersect[1] < height - 1:
+        # bulged[y][x] = img_data[int(intersect[1])][int(intersect[0])]
+    # else:
+        # bulged[y][x] = [0, 0, 0, 0]
+    orig_image_square = numpy.copy(img_data)
+    intersect_area = ((0 < bulge_intersect_x) & (bulge_intersect_x < orig_image_square.shape[1])) & ((0 < bulge_intersect_y) & (bulge_intersect_y < orig_image_square.shape[0]))
+    #bulge_square[(numpy.logical_not(intersect_area)&circle)] = [0,0,0,0]
+    bulge_square = replace_values(numpy.copy(orig_image_square), numpy.copy(bulge_square), circle, intersect_area, bulge_intersect_x, bulge_intersect_y)
+    bulge_square[numpy.logical_not(circle)] = orig_image_square[numpy.logical_not(circle)]
+    
+    bulged = numpy.copy(img_data)
+    bulged = bulge_square
     
     img = Image.fromarray(bulged)
     return img
 
+def replace_values(orig_image_square, bulge_square, circle, intersect_area, bulge_intersect_x, bulge_intersect_y):
+    indices = (numpy.transpose(numpy.nonzero(intersect_area&circle)))
+    
+    
+    img_ix = (bulge_intersect_y[[*indices.T]].astype(int), bulge_intersect_x[[*indices.T]].astype(int))
+    orig_img_ix = numpy.transpose(img_ix)
+    
+    bulge_square[[*indices.T]] = orig_image_square[[*orig_img_ix.T]]
+            
+    return bulge_square
 
 # return the length of vector v
 def length(v):
