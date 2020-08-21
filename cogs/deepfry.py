@@ -45,7 +45,7 @@ class RecruitCommands(commands.Cog, name="Deep Frying"):
             emote_amount = random.randrange(1, 6)
             noise = random.uniform(0.4, 1.0)
             contrast = random.randrange(160, 500)
-            layers = random.randrange(1, 3)
+            layers = random.randrange(1, 4)
             if url is None and len(ctx.message.attachments) > 0:
                 image = await load(ctx.message.attachments[0].url)
             else:
