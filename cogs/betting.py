@@ -257,7 +257,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @money.command()
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def pity(self, ctx):
-        if not self.check_author_initialized(ctx.message.author) and self.get_balance(ctx.message.author) <= 0:
+        if not self.check_author_initialized(ctx.message.author) and self.get_balance(ctx.message.author) == 0:
             pitty_value = 25
             self.adjust_currency(ctx.message.author, pitty_value)
             return await ctx.send(content=f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
