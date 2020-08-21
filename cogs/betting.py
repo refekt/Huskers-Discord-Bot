@@ -1,40 +1,61 @@
+import random
 import typing
 
 import discord
-import random
 from discord.ext import commands
-from utils.embed import build_embed
+
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
-from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveUserCurrency
+from utils.embed import build_embed
+from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
-    def check_author_initialized(self, user: typing.Union[discord.ext.commands.Context, discord.Member]):
+    def result_string(self, result, who: discord.Member, amount, **kwargs):
+        output = ""
+
+        if result == "win":
+            output = "Win! "
+            self.adjust_currency(who, amount)
+        elif result == "lose":
+            output = "Lose! "
+            self.adjust_currency(who, amount)
+
+        if kwargs["game"] == "rps":
+            output += f"You threw [ {kwargs['mbr_throw']} ] and the computer threw [ {kwargs['cpu_throw']} ]. "
+        elif kwargs["game"] == "rlt":
+            output += f"The comptuer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
+
+        output += f"You have been {'awarded' if result == 'win' else 'deducted'} {amount} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
+
+        return output
+
+    def check_author_initialized(self, user: discord.Member):
         author_init = process_MySQL(
-            fetch="all",
-            query=sqlCheckCurrencyInit
+            fetch="one",
+            query=sqlCheckCurrencyInit,
+            values=user.id
         )
 
+        err = AttributeError(f"You have not established a wallet yet. This is accomplished by completing `$money new`.")
+
         try:
-            if len(author_init) > 0:
-                search = [author for author in author_init if author["username"] == self.full_author(user)]
-
-                if len(search):
-                    return True
-                else:
-                    return False
+            if author_init["init"] == 1:
+                return True
+            elif author_init["init"] == 0:
+                raise err
             else:
-                return False
-        except TypeError:
-            return False
+                raise err
+        except:
+            raise err
 
-    def check_balance(self, user: typing.Union[discord.ext.commands.Context, discord.Member]):
+    def check_balance(self, user: discord.Member, amount_check):
         if self.check_author_initialized(user):
             balance = process_MySQL(
-                fetch="all",
-                query=sqlRetrieveUserCurrency
+                fetch="one",
+                query=sqlRetrieveCurrencyUser,
+                values=user.id
             )
         else:
             raise AttributeError("Unable to find user! Establish a balance with `$money new`.")
@@ -42,11 +63,25 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if balance is None:
             raise AttributeError("Unable to find user!")
 
-        for bal in balance:
-            if bal["username"] == self.full_author(user):
-                return bal["balance"]
+        if balance["balance"] >= amount_check:
+            return True
+        else:
+            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
-        raise AttributeError("Unable to find user!")
+    def get_balance(self, user: discord.Member):
+        if self.check_author_initialized(user):
+            balance = process_MySQL(
+                fetch="one",
+                query=sqlRetrieveCurrencyUser,
+                values=user.id
+            )
+        else:
+            raise AttributeError("Unable to find user! Establish a balance with `$money new`.")
+
+        if balance is None:
+            raise AttributeError("Unable to find user!")
+
+        return balance["balance"]
 
     def validate_bet_amount(self, bet_amount):
         if bet_amount > 0:
@@ -54,28 +89,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             return False
 
-    def full_author(self, user: typing.Union[discord.ext.commands.Context, discord.Member]):
-        if type(user) == discord.ext.commands.Context:
-            return f"{user.author.name.lower()}#{user.author.discriminator}"
-        elif type(user) == discord.Member:
-            return f"{user.name.lower()}#{user.discriminator}"
+    def full_author(self, user: discord.Member):
+        return f"{user.name.lower()}#{user.discriminator}"
 
-    def award_currency(self, ctx, value):
+    def adjust_currency(self, who: discord.Member, value):
         process_MySQL(
             query=sqlUpdateCurrency,
-            values=(value, self.full_author(ctx))
-        )
-
-    def deduct_currency(self, ctx, value):
-        process_MySQL(
-            query=sqlUpdateCurrency,
-            values=(-value, self.full_author(ctx))
+            values=(value, self.full_author(who))
         )
 
     def initiate_user(self, ctx, value):
         process_MySQL(
             query=sqlSetCurrency,
-            values=(self.full_author(ctx), value, ctx.author.id,)
+            values=(self.full_author(ctx.message.author), value, ctx.message.author.id,)
         )
 
     @commands.command(aliases=["rlt", ])
@@ -87,16 +113,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         $roulette 10 1:17 -- Bet a specific number range (scaling bonus)
         """
         if bet_amount is None or bet is None:
-            raise AttributeError(f"You must select a bet! ")
+            raise AttributeError(f"You must select a bet!")
 
         if not self.validate_bet_amount(bet_amount):
             raise AttributeError(f"You must place a proper bet. Try again.")
 
-        if not self.check_author_initialized(ctx):
-            raise AttributeError(f"You do not have a wallet setup! Perform `$money new` to have a wallet established.")
-
-        if self.check_balance(user=ctx) < bet_amount:
-            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to place that bet. Try again!")
+        self.check_balance(ctx.message.author, bet_amount) # Checks if initialized and has the proper balance
 
         def validate_color_bet():
             return bet.lower() in colors
@@ -154,20 +176,17 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from 1 to 36. Try again!")
 
         if win:
-            self.award_currency(ctx, bet_amount)
-            return await ctx.send(f"Winner! The computer spun the wheel and it landed on [ {result} ]. You have been awarded {bet_amount} {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is "
-                                  f"{self.check_balance(ctx.author):,}")
+            # self.adjust_currency(ctx.message.author, bet_amount)
+            return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result))
         else:
-            self.award_currency(ctx, -bet_amount)
-            return await ctx.send(f"Loser! The computer spun the wheel and it landed on [ {result} ]. You have lost {bet_amount} {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is "
-                                  f"{self.check_balance(ctx.author):,}")
+            # self.adjust_currency(ctx.message.author, -bet_amount)
+            return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result))
 
     @commands.command(aliases=["rps", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def rockpaperscissors(self, ctx, choice: str):
         """ Play Rock Paper Scissors for 5 server currency. Choices are 'rock', 'paper', or 'scissors' """
-        if self.check_balance(ctx) <= 0:
-            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+        self.check_balance(ctx.message.author, 5)
 
         options = ["rock", "paper", "scissors"]
 
@@ -182,10 +201,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if choice.lower() == throw:
             return await ctx.send(f"Draw! Computer also threw {throw}. No {CURRENCY_NAME} change.")
         else:
-            win_string = f"Win! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been awarded 5 {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is {self.check_balance(ctx.author):,}"
-            lose_string = f"Lose! You threw [ {choice} ] and the computer threw [ {throw} ]. You have been deducted 5 {CURRENCY_NAME}. Your {CURRENCY_NAME} balance is {self.check_balance(ctx.author):,}"
-
             win = False
+
             if choice.lower() == options[0]:
                 if throw == options[2]:
                     win = True
@@ -197,11 +214,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                self.award_currency(ctx, 5)
-                return await ctx.send(win_string)
+                return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=5, game="rps", mbr_throw=choice, cpu_throw=throw))
             else:
-                self.award_currency(ctx, -5)
-                return await ctx.send(lose_string)
+                return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-5, game="rps", mbr_throw=choice, cpu_throw=throw))
 
     @commands.group(aliases=["m", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -216,13 +231,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def new(self, ctx):
         """ Establish a wallet for server currency """
-        if self.check_author_initialized(ctx):
-            raise AttributeError(f"🔔🔔🔔 SHAME {ctx.author.mention} 🔔🔔🔔! You cannot initialize more than once!")
-
-        starter_money = 100
-        self.initiate_user(ctx, starter_money)
-        # self.award_currency(ctx, starter_money)
-        await ctx.send(f"Congratulations {ctx.author.mention}! You now have {starter_money} {CURRENCY_NAME}. Use it wisely!")
+        if not self.check_author_initialized(ctx.message.author):
+            starter_money = 100
+            self.initiate_user(ctx, starter_money)
+            await ctx.send(f"Congratulations {ctx.message.author.mention}! You now have {starter_money} {CURRENCY_NAME}. Use it wisely!")
+        else:
+            return await ctx.send(f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
 
     @money.command(hidden=True)
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -235,32 +249,31 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not value:
             raise AttributeError("You must specific how much to give!")
 
-        if not self.check_author_initialized(user):
-            raise AttributeError(f"{user.mention} has not initialized their account! This is completed by submitting the following command: `$money new`]")
+        self.check_author_initialized(user)
+        self.adjust_currency(user, value)
 
-        self.award_currency(user, value)
-        await ctx.send(f"You have granted {user.mention} {value} {CURRENCY_NAME}!")
+        await ctx.send(f"{ctx.message.author.mention} has granted {user.mention} {value} {CURRENCY_NAME}!")
 
     @money.command()
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def pity(self, ctx):
-        if self.check_author_initialized(ctx) and self.check_balance(ctx) == 0:
+        if not self.check_author_initialized(ctx.message.author) and self.get_balance(ctx.message.author) <= 0:
             pitty_value = 25
-            self.award_currency(ctx, pitty_value)
+            self.adjust_currency(ctx.message.author, pitty_value)
             return await ctx.send(content=f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
-            return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is not 0.")
+            return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
 
     @money.command(aliases=["bal", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def balance(self, ctx, user: discord.Member = None):
         """ Show current balance of server currency for self or another member """
         if user:
-            balance = self.check_balance(user)
-            await ctx.send(f"{user.mention}'s balance is {balance} {CURRENCY_NAME}.")
+            balance = self.get_balance(user)
+            await ctx.send(f"{user.mention}'s balance is {balance:,} {CURRENCY_NAME}.")
         else:
-            balance = self.check_balance(ctx)
-            await ctx.send(f"{ctx.author.mention}'s balance is {balance} {CURRENCY_NAME}.")
+            balance = self.get_balance(ctx.message.author)
+            await ctx.send(f"{ctx.message.author.mention}'s balance is {balance:,} {CURRENCY_NAME}.")
 
     @money.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -272,31 +285,27 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not value:
             raise AttributeError("You must specific how much to give!")
 
-        if self.check_author_initialized(user=ctx) and self.check_author_initialized(user=user):
-            balance = self.check_balance(user=ctx.message.author)
-            if value < 0:
-                await ctx.send("You can't give negative money you dummy.")
-                return
-            elif value == 0:
-                await ctx.send("It makes no sense to give someone 0 of something, smh.")
-                return
+        self.check_author_initialized(ctx.message.author)
+        self.check_author_initialized(user)
+        balance = self.get_balance(user=ctx.message.author)
 
-            if type(balance) == AttributeError:
-                await ctx.send(balance)
-            elif balance >= value:
-                self.award_currency(ctx, -value)
-                self.award_currency(user, value)
-                await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {user.mention}!")
-            else:
-                raise AttributeError(f"You do not have {value} {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
+        if value < 0:
+            return await ctx.send("You can't give negative money you dummy.")
+        elif value == 0:
+            return await ctx.send("It makes no sense to give someone 0 of something, smh.")
+
+        if balance >= value:
+            self.adjust_currency(ctx.message.author, -value)
+            self.adjust_currency(user, value)
+            return await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {user.mention}!")
         else:
-            raise AttributeError("This user has not established a wallet. Please have them set one up with `$money new`.")
+            raise AttributeError(f"You do not have {value} {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
 
     @money.command(aliases=["lb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def leaderboard(self, ctx):
         leaderboard = process_MySQL(
-            query=sqlRetrieveUserCurrency,
+            query=sqlRetrieveCurrencyLeaderboard,
             fetch="all"
         )
 

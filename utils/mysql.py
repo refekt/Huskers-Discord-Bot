@@ -198,9 +198,11 @@ SET is_open = %s
 WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
 """
 
-sqlRetrieveUserCurrency = "SELECT * FROM currency ORDER BY balance DESC"
+sqlRetrieveCurrencyLeaderboard = "SELECT * FROM currency ORDER BY balance DESC"
 
-sqlCheckCurrencyInit = "SELECT username FROM currency"
+sqlRetrieveCurrencyUser = "SELECT balance FROM currency WHERE user_id = %s"
+
+sqlCheckCurrencyInit = "SELECT init FROM currency WHERE user_id = %s"
 
 sqlSetCurrency = """\
 INSERT INTO currency (username, init, balance, user_id)
