@@ -19,15 +19,15 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             output = "Win! "
             self.adjust_currency(who, amount)
         elif result == "lose":
-            output = "Lose! "
+            output = "Loser! "
             self.adjust_currency(who, amount)
 
         if kwargs["game"] == "rps":
             output += f"You threw [ {kwargs['mbr_throw']} ] and the computer threw [ {kwargs['cpu_throw']} ]. "
         elif kwargs["game"] == "rlt":
-            output += f"The comptuer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
-
-        output += f"You have been {'awarded' if result == 'win' else 'deducted'} {amount} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
+            output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
+        
+        output += f"You have been {'awarded' if result == 'win' else 'deducted'} {abs(amount)} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
         return output
 
