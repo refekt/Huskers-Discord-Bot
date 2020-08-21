@@ -27,7 +27,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         elif kwargs["game"] == "rlt":
             output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
         
-        output += f"You have been {'awarded' if result == 'win' else 'deducted'} {abs(amount)} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
+        output += f" You have been {'awarded' if result == 'win' else 'deducted'} {abs(amount)} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
         return output
 
