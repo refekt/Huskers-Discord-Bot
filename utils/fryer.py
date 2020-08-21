@@ -31,9 +31,9 @@ async def fry(image, emote_amount, noise, contrast):
     [w, h] = [image.width - 1, image.height - 1]
     w *= numpy.random.random(1)
     h *= numpy.random.random(1)
-    r = int(((image.width + image.height) / 12) * (numpy.random.random(1)[0] + 1))
+    r = int(((image.width + image.height) / 15) * (numpy.random.random(1)[0] + 1))
 
-    bulge_bool = True#RAN.choice([True, False])
+    bulge_bool = RAN.choice([True, False])
     if bulge_bool:
         print('Bulging the image...')
         image = await bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
@@ -251,7 +251,7 @@ async def bulge(img, f, r, a, h, ior):
         # bulged[y][x] = [0, 0, 0, 0]
     orig_image_square = numpy.copy(img_data)
     intersect_area = ((0 < bulge_intersect_x) & (bulge_intersect_x < orig_image_square.shape[1])) & ((0 < bulge_intersect_y) & (bulge_intersect_y < orig_image_square.shape[0]))
-    #bulge_square[(numpy.logical_not(intersect_area)&circle)] = [0,0,0,0]
+    bulge_square[(numpy.logical_not(intersect_area)&circle)] = [0,0,0,0]
     bulge_square = replace_values(numpy.copy(orig_image_square), numpy.copy(bulge_square), circle, intersect_area, bulge_intersect_x, bulge_intersect_y)
     bulge_square[numpy.logical_not(circle)] = orig_image_square[numpy.logical_not(circle)]
     

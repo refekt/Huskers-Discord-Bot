@@ -44,7 +44,7 @@ class RecruitCommands(commands.Cog, name="Deep Frying"):
         try:
             emote_amount = random.randrange(1, 6)
             noise = random.uniform(0.4, 1.0)
-            contrast = random.randrange(160, 500)
+            contrast = random.randrange(160, 501)
             layers = random.randrange(1, 4)
             if url is None and len(ctx.message.attachments) > 0:
                 image = await load(ctx.message.attachments[0].url)
@@ -59,8 +59,8 @@ class RecruitCommands(commands.Cog, name="Deep Frying"):
             
             for layer in range(layers - 1):
                 emote_amount = random.randrange(1, 6)
-                noise = random.uniform(0.1, 1.0)
-                contrast = random.randrange(501)
+                noise = random.uniform(0.4, 1.0)
+                contrast = random.randrange(160,501)
                 fried = await fryer.fry(fried, emote_amount, noise, contrast)
 
             with io.BytesIO() as image_binary:
