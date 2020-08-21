@@ -180,7 +180,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result))
         else:
             # self.adjust_currency(ctx.message.author, -bet_amount)
-            return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result))
+            return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result))
 
     @commands.command(aliases=["rps", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
