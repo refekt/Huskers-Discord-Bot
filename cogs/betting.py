@@ -46,7 +46,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             elif author_init["init"] == 0:
                 raise False
             else:
-                raise err
+                raise False
         except:
             raise False
 
