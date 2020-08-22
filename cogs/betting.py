@@ -26,7 +26,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             output += f"You threw [ {kwargs['mbr_throw']} ] and the computer threw [ {kwargs['cpu_throw']} ]. "
         elif kwargs["game"] == "rlt":
             output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
-        
+
         output += f" You have been {'awarded' if result == 'win' else 'deducted'} {abs(amount)} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
         return output
@@ -39,10 +39,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         )
 
         err = AttributeError(f"You have not established a wallet yet. This is accomplished by completing `$money new`.")
-        
+
         if author_init is None:
             return False
-        
+
         try:
             if author_init["init"] == 1:
                 return True
@@ -87,7 +87,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         return balance["balance"]
 
     def validate_bet_amount(self, bet_amount):
-        if bet_amount > 0:
+        if type(bet_amount) == int and bet_amount > 0:
+            return True
+        elif type(bet_amount) == str and bet_amount == "max":
             return True
         else:
             return False
@@ -109,7 +111,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @commands.command(aliases=["rlt", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def roulette(self, ctx, bet_amount: int, bet: typing.Union[int, str]):
+    async def roulette(self, ctx, bet_amount: typing.Union[int, str], bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
         $roulette 10 red -- Bet a color
         $roulette 10 25 -- Bet a specific number (225% bonus)
@@ -121,7 +123,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not self.validate_bet_amount(bet_amount):
             raise AttributeError(f"You must place a proper bet. Try again.")
 
-        self.check_balance(ctx.message.author, bet_amount) # Checks if initialized and has the proper balance
+        if bet_amount == "max":
+            bet_amount = self.get_balance(ctx.message.author)
+
+        self.check_balance(ctx.message.author, bet_amount)  # Checks if initialized and has the proper balance
 
         def validate_color_bet():
             return bet.lower() in colors
