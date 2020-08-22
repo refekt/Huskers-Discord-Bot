@@ -27,7 +27,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         elif kwargs["game"] == "rlt":
             output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
 
-        output += f" You have been {'awarded' if result == 'win' else 'deducted'} {abs(amount)} {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
+        output += f" You have been {'awarded' if result == 'win' else 'deducted'} [ {abs(amount)} ] {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
         return output
 
@@ -278,7 +278,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if balance == 0:
             pitty_value = 100
             self.adjust_currency(ctx.message.author, pitty_value)
-            return await ctx.send(content=f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
+            return await ctx.send(content=f"Pity on you. You have been awarded [ {pitty_value} ] {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
 
