@@ -232,7 +232,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-5, game="rps", mbr_throw=choice, cpu_throw=throw))
 
     @commands.group(aliases=["m", ])
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def money(self, ctx):
         """ Husker server currency """
         if ctx.subcommand_passed:
