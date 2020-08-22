@@ -91,6 +91,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return True
         elif type(bet_amount) == str and bet_amount == "max":
             return True
+        elif type(bet_amount) == str and "%" in bet_amount:
+            return True
         else:
             return False
 
@@ -125,6 +127,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if bet_amount == "max":
             bet_amount = self.get_balance(ctx.message.author)
+        elif "%" in bet_amount:
+            perc = float(bet_amount.strip("%")) / 100
+            bet_amount = self.get_balance(ctx.message.author) * perc
 
         self.check_balance(ctx.message.author, bet_amount)  # Checks if initialized and has the proper balance
 
