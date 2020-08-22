@@ -276,7 +276,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         balance = self.get_balance(ctx.message.author)
 
         if balance == 0:
-            pitty_value = 25
+            pitty_value = 100
             self.adjust_currency(ctx.message.author, pitty_value)
             return await ctx.send(content=f"Pity on you. You have been awarded {pitty_value} {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
