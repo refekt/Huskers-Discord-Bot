@@ -176,7 +176,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     if bet_range[0] <= result <= bet_range[1]:
                         win = True
                         result = f"{bet_color} and {str(result)}"
-                        bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * (bet_amount * 1.025))
+                        bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * bet_amount)
+                        bet_amount *= 1.025
 
             elif bet_range_char in bet and bet_color is None:  # Range
                 bet_range = convert_bet_range()
