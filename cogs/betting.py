@@ -118,7 +118,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @commands.command(aliases=["rlt", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def roulette(self, ctx, bet_amount: typing.Union[int, str], bet: typing.Union[int, str]):
+    async def roulette(self, ctx, bet_amount: typing.Union[int, str], *, bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
         $roulette 10 red -- Bet a color
         $roulette 10 25 -- Bet a specific number (225% bonus)
@@ -127,9 +127,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet!")
-
+        
+        #checks to see if the bet is iterable, if so, it joins it into a string
+        try:
+            iter(bet)
+            bet = ''.join(bet)
+        except:
+            pass
+        
         self.validate_bet_amount_syntax(bet_amount)
-
+        
         if bet_amount == "max":
             bet_amount = self.get_balance(ctx.message.author)
         elif type(bet_amount) == str and "%" in bet_amount:
@@ -162,9 +169,15 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if type(bet) == str:
             color_re = r"(red|black)"
-            bet_color = re.search(color_re, bet.lower())
-            if bet_color is not None:
+            bet_color = re.findall(color_re, bet.lower())
+            print(bet_color)
+            if len(bet_color) == 1:
                 bet_color = str(bet_color[0])
+            elif len(bet_color) > 1:
+                await ctx.send('You can put at most one color in your bet!')
+                return
+            else:
+                bet_color = None
 
             if bet_range_char in bet and bet_color:  # Color and range
                 result = roll_color()
@@ -176,8 +189,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     if bet_range[0] <= result <= bet_range[1]:
                         win = True
                         result = f"{bet_color} and {str(result)}"
-                        bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * bet_amount)
-                        bet_amount = int(bet_amount * 4.25)
+                        bet_amount = int(((72 / (max(bet_range) - min(bet_range) + 1)) - 1) * bet_amount)
 
             elif bet_range_char in bet and bet_color is None:  # Range
                 bet_range = convert_bet_range()
