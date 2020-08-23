@@ -259,7 +259,11 @@ class fapCommands(commands.Cog):
             leaderboard.loc[leaderboard['user_id']==u,'correct_pct'] = faps_user['correct'].mean()*100
             faps_user['correct'] = faps_user['correct'].replace(0.0, -1.0)
             faps_user['points'] = faps_user['correct'] * faps_user['confidence']
-            leaderboard.loc[leaderboard['user_id']==u,'points'] = faps_user['points'].sum()
+            
+            pred_time_deltas = (faps_user.loc[faps_user['correct']==1,'decision_date'] - faps_user.loc[faps_user['correct']==1,'prediction_date']).values
+            pred_time_delta_sum = float(sum(pred_time_deltas))
+            pred_time_bonus = (pred_time_delta_sum / 86400000000000) * 0.1
+            leaderboard.loc[leaderboard['user_id']==u,'points'] = faps_user['points'].sum() + pred_time_bonus
         leaderboard = leaderboard.sort_values('points', ascending = False)
         
         embed_string = 'User: Points (Pct Correct)'
@@ -267,14 +271,18 @@ class fapCommands(commands.Cog):
         for u in leaderboard['user_id']:
             try:
                 user = ctx.guild.get_member(u)
+                username = user.display_name
             except:
-                continue
+                user = faps_df.loc[faps_df['user_id']==u, 'user'].values[-1]
+                username = user
             if user is None:
                 continue
             points = leaderboard.loc[leaderboard['user_id']==u,'points'].values[0]
             correct_pct = leaderboard.loc[leaderboard['user_id']==u,'correct_pct'].values[0]
-            embed_string += f'\n#{place} {user.display_name}: {points:.0f} ({correct_pct:.0f}%)'
+            embed_string += f'\n#{place} {username}: {points:.1f} ({correct_pct:.0f}%)'
             place += 1
+            
+        
         
         embed_msg = discord.Embed(title = embed_title, description = embed_string)
         await ctx.send(embed = embed_msg)
