@@ -1,4 +1,5 @@
 import random
+import re
 import typing
 
 import discord
@@ -86,15 +87,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         return balance["balance"]
 
-    def validate_bet_amount(self, bet_amount):
+    def validate_bet_amount(self, bet_amount: typing.Union[int, str]):
+        err = AttributeError(f"You submitted an incorrect amount to bet.")
         if type(bet_amount) == int and bet_amount > 0:
             return True
-        elif type(bet_amount) == str and bet_amount == "max":
-            return True
-        elif type(bet_amount) == str and "%" in bet_amount:
-            return True
+        elif type(bet_amount) == str:
+            if bet_amount == "max":
+                return True
+            elif "%" in bet_amount:
+                return True
+            else:
+                raise err
         else:
-            return False
+            return err
 
     def full_author(self, user: discord.Member):
         return f"{user.name.lower()}#{user.discriminator}"
@@ -118,12 +123,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         $roulette 10 red -- Bet a color
         $roulette 10 25 -- Bet a specific number (225% bonus)
         $roulette 10 1:17 -- Bet a specific number range (scaling bonus)
+        $roulette 10 red1:36 -- Bet a color and number range
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet!")
 
-        if not self.validate_bet_amount(bet_amount):
-            raise AttributeError(f"You must place a proper bet. Try again.")
+        self.validate_bet_amount(bet_amount)
+        self.check_balance(ctx.message.author, bet_amount)  # Checks if initialized and has the proper balance
 
         if bet_amount == "max":
             bet_amount = self.get_balance(ctx.message.author)
@@ -131,18 +137,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             perc = float(bet_amount.strip("%")) / 100
             bet_amount = int(self.get_balance(ctx.message.author) * perc)
 
-        self.check_balance(ctx.message.author, bet_amount)  # Checks if initialized and has the proper balance
+        def roll_color():
+            return random.choice(colors)
 
-        def validate_color_bet():
-            return bet.lower() in colors
-
-        def validate_number_bet():
-            return 1 <= bet <= 36
-
-        def validate_number_range_bet(range):
-            check_one = 1 <= range[0] <= 36
-            check_two = 1 <= range[1] <= 36
-            if check_one and check_two and range[0] < range[1]:
+        def validate_bet_range(bet_range):
+            check_one = 1 <= bet_range[0] <= 36
+            check_two = 1 <= bet_range[1] <= 36
+            if check_one and check_two and bet_range[0] < bet_range[1]:
                 return True
             else:
                 raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
@@ -155,32 +156,44 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         win = False
         result = None
         bet_range_char = ":"
+        colors = ["red", "black"]
 
         if type(bet) == str:
             if bet_range_char in bet:
-                try:
-                    range = convert_bet_range()
-                    validate_number_range_bet(range)
+                color_re = r"(red|black)"
+                bet_color = str(re.search(color_re, bet.lower())[0])
 
+                if bet_color and bet_range_char in bet:  # Color and range
+                    result = roll_color()
+                    if bet_color == result:
+                        bet = bet[len(bet_color):]
+                        bet_range = convert_bet_range()
+                        validate_bet_range(bet_range)
+                        result = random.randint(1, 36)
+                        if bet_range[0] <= result <= bet_range[1]:
+                            win = True
+                            result = f"{bet_color} and {str(result)}"
+                            bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * (bet_amount * 1.012))
+
+                else:  # Range
+                    bet_range = convert_bet_range()
+                    validate_bet_range(bet_range)
                     result = random.randint(1, 36)
-                    if range[0] <= result <= range[1]:
-                        win = True
-                        bet_amount = int(((36 / (max(range) - min(range) + 1)) - 1) * bet_amount)
-                except:
-                    raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
-            else:
-                colors = ["red", "black"]
 
-                if validate_color_bet():
-                    result = random.choice(colors)
+                    if bet_range[0] <= result <= bet_range[1]:
+                        win = True
+                        bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * bet_amount)
+            else:  # Color
+                if bet.lower() in colors:
+                    result = roll_color()
                     if result == bet.lower():
                         win = True
                 else:
-                    raise AttributeError(f"You can only place a bet for Red or Black. Try again!")
+                    raise AttributeError(f"You can only place a bet for {[color for color in colors]}. Try again!")
 
-        elif type(bet) == int:
+        elif type(bet) == int:  # One number
 
-            if validate_number_bet():
+            if 1 <= bet <= 36:
                 result = random.randint(1, 36)
                 if result == bet:
                     bet_amount = int(bet_amount * 36) - bet_amount
@@ -189,10 +202,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from 1 to 36. Try again!")
 
         if win:
-            # self.adjust_currency(ctx.message.author, bet_amount)
             return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result))
         else:
-            # self.adjust_currency(ctx.message.author, -bet_amount)
             return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result))
 
     @commands.command(aliases=["rps", ])
