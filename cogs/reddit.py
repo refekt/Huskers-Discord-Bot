@@ -1,7 +1,7 @@
 import csv
 import random
 import time
-from datetime import datetime
+# from datetime import datetime
 
 import praw
 from discord.ext import commands
@@ -9,7 +9,7 @@ from discord.ext import commands
 from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
 from utils.misc import on_prod_server
 
-eNSD = datetime(year=2020, day=16, month=12)
+# eNSD = datetime(year=2020, day=16, month=12)
 
 
 def is_me(ctx):
