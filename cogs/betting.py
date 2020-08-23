@@ -233,7 +233,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def rockpaperscissors(self, ctx, choice: str):
         """ Play Rock Paper Scissors for 5 server currency. Choices are 'rock', 'paper', or 'scissors' """
-        self.check_balance(ctx.message.author, 5)
+        if(self.check_balance(ctx.message.author, 5) == False):
+            await ctx.send(f"You don't have enough {CURRENCY_NAME} to make that bet!")
+            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         options = ["rock", "paper", "scissors"]
 
