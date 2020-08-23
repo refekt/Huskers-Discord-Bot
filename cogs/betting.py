@@ -87,7 +87,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         return balance["balance"]
 
-    def validate_bet_amount(self, bet_amount: typing.Union[int, str]):
+    def validate_bet_amount_syntax(self, bet_amount: typing.Union[int, str]):
         err = AttributeError(f"You submitted an incorrect amount to bet.")
         if type(bet_amount) == int and bet_amount > 0:
             return True
@@ -128,14 +128,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet!")
 
-        self.validate_bet_amount(bet_amount)
-        self.check_balance(ctx.message.author, bet_amount)  # Checks if initialized and has the proper balance
+        self.validate_bet_amount_syntax(bet_amount)
 
         if bet_amount == "max":
             bet_amount = self.get_balance(ctx.message.author)
         elif type(bet_amount) == str and "%" in bet_amount:
             perc = float(bet_amount.strip("%")) / 100
             bet_amount = int(self.get_balance(ctx.message.author) * perc)
+
+        if bet_amount <= 0:
+            raise AttributeError(f"You do not have enough server currency to place this bet.")
 
         def roll_color():
             return random.choice(colors)
@@ -159,30 +161,31 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         colors = ["red", "black"]
 
         if type(bet) == str:
-            if bet_range_char in bet:
-                color_re = r"(red|black)"
-                bet_color = str(re.search(color_re, bet.lower())[0])
+            color_re = r"(red|black)"
+            bet_color = re.search(color_re, bet.lower())
+            if bet_color is not None:
+                bet_color = str(bet_color[0])
 
-                if bet_color and bet_range_char in bet:  # Color and range
-                    result = roll_color()
-                    if bet_color == result:
-                        bet = bet[len(bet_color):]
-                        bet_range = convert_bet_range()
-                        validate_bet_range(bet_range)
-                        result = random.randint(1, 36)
-                        if bet_range[0] <= result <= bet_range[1]:
-                            win = True
-                            result = f"{bet_color} and {str(result)}"
-                            bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * (bet_amount * 1.012))
-
-                else:  # Range
+            if bet_range_char in bet and bet_color:  # Color and range
+                result = roll_color()
+                if bet_color == result:
+                    bet = bet[len(bet_color):]
                     bet_range = convert_bet_range()
                     validate_bet_range(bet_range)
                     result = random.randint(1, 36)
-
                     if bet_range[0] <= result <= bet_range[1]:
                         win = True
-                        bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * bet_amount)
+                        result = f"{bet_color} and {str(result)}"
+                        bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * (bet_amount * 1.012))
+
+            elif bet_range_char in bet and bet_color is None:  # Range
+                bet_range = convert_bet_range()
+                validate_bet_range(bet_range)
+                result = random.randint(1, 36)
+
+                if bet_range[0] <= result <= bet_range[1]:
+                    win = True
+                    bet_amount = int(((36 / (max(bet_range) - min(bet_range) + 1)) - 1) * bet_amount)
             else:  # Color
                 if bet.lower() in colors:
                     result = roll_color()
