@@ -70,7 +70,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if balance["balance"] >= amount_check:
             return True
         else:
-            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+            return False
+            #raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
     def get_balance(self, user: discord.Member):
         if self.check_author_initialized(user):
@@ -135,7 +136,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         except:
             pass
         
-        self.validate_bet_amount_syntax(bet_amount)
+        self.validate_bet_amount_syntax(bet_amount)      
         
         if bet_amount == "max":
             bet_amount = self.get_balance(ctx.message.author)
@@ -144,7 +145,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             bet_amount = int(self.get_balance(ctx.message.author) * perc)
 
         if bet_amount <= 0:
-            raise AttributeError(f"You do not have enough server currency to place this bet.")
+            await ctx.send("You can't make negative or 0 coin bets you dummy.")
+            raise AttributeError(f"You cannot make bets for amounts that are 0 or lower.")
+
+        if(self.check_balance(ctx.author, bet_amount) == False):
+            await ctx.send(f"You don't have enough {CURRENCY_NAME} to make that bet!")
+            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+            
 
         def roll_color():
             return random.choice(colors)
