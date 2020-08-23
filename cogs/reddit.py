@@ -1,3 +1,4 @@
+import csv
 import random
 import time
 from datetime import datetime
@@ -5,10 +6,10 @@ from datetime import datetime
 import praw
 from discord.ext import commands
 
-from utils.client import client
 from utils.consts import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_PW
+from utils.misc import on_prod_server
 
-eNSD = datetime(year=2019, day=18, month=12)
+eNSD = datetime(year=2020, day=16, month=12)
 
 
 def is_me(ctx):
@@ -20,26 +21,24 @@ class RedditCommands(commands.Cog):
     @commands.check(is_me)
     async def nsd(self, ctx, recruit: str, source: str = None):
         if source is None:
-            await ctx.send(f"A source is required!")
-            return
+            return await ctx.send(f"A source is required!")
 
         def load_recruits():
-            import csv
             r = []
             with open("recruits.csv", newline="") as csvfile:
-                recruits_raws = csv.reader(csvfile, delimiter=",")
-                for row in recruits_raws:
+                recruits_raw = csv.reader(csvfile, delimiter=",")
+                for recruit_data in recruits_raw:
                     r.append(
                         dict(
-                            id=row[0],
+                            id=recruit_data[0],
                             data=dict(
-                                year=row[1],
-                                name=row[2],
-                                profile=row[3],
-                                stars=row[4],
-                                position=row[5],
-                                cfb_title=f"{row[1]} {row[4]}* {row[5]} {row[2]} commits to Nebraska",
-                                huskers_title=f"🌽 {row[2]} is N! 🎈"
+                                year=recruit_data[1],
+                                name=recruit_data[2],
+                                profile=recruit_data[3],
+                                stars=recruit_data[4],
+                                position=recruit_data[5],
+                                cfb_title=f"{recruit_data[1]} {recruit_data[4]}* {recruit_data[5]} {recruit_data[2]} commits to Nebraska",
+                                huskers_title=f"🌽 {recruit_data[2]} is N! 🎈"
                             )
                         )
                     )
@@ -56,8 +55,6 @@ class RedditCommands(commands.Cog):
         )
 
         recruits = load_recruits()
-
-        me = client.get_user(189554873778307073)
         recruit = recruit.lower()
 
         try:
@@ -71,8 +68,6 @@ class RedditCommands(commands.Cog):
                            f"\n" \
                            f"Source: {source}"
 
-                    from utils.misc import on_prod_server
-
                     if on_prod_server():
                         huskers = reddit.subreddit("huskers")
                         huskers.submit(
@@ -80,7 +75,7 @@ class RedditCommands(commands.Cog):
                             selftext=text
                         )
 
-                        time.sleep(random.randint(1, 3))
+                        time.sleep(random.randint(1, 2))
 
                         cfb = reddit.subreddit("cfb")
                         cfb_post = cfb.submit(
@@ -90,18 +85,17 @@ class RedditCommands(commands.Cog):
 
                         try:
                             cfb_post.flair.select("Recruiting")
+                            await ctx.send("Set the flair to Recruiting.")
                         except:
                             await ctx.send("Unable to set flair! Make sure you do it.")
-                            pass
-
-                    elif not on_prod_server():
+                    else:
                         testsub = reddit.subreddit("rngeezus")
                         testsub.submit(
                             title=recruit_row["data"]["cfb_title"],
                             selftext=text
                         )
 
-                        time.sleep(random.randint(1, 3))
+                        time.sleep(random.randint(1, 2))
 
                         testsub = reddit.subreddit("rngeezus")
                         testsub.submit(
@@ -109,20 +103,15 @@ class RedditCommands(commands.Cog):
                             selftext=text
                         )
 
-                    await ctx.send(f"Successfully posted threads about {recruit_row['data']['name']}!")
-
-                    break
+                    return await ctx.send(f"Successfully posted threads about {recruit_row['data']['name']}!")
 
             if not found:
-                await ctx.send(f"Unable to find the player: {recruit}!")
-                return
+                return await ctx.send(f"Unable to find the player: {recruit}!")
 
         except IndexError:
-            await ctx.send(f"Key error looking up: {recruit}!")
-            return
+            return await ctx.send(f"Key error looking up: {recruit}!")
         except:
-            await ctx.send(f"No idea... {recruit}")
-            return
+            return await ctx.send(f"No idea... {recruit}")
 
 
 def setup(bot):
