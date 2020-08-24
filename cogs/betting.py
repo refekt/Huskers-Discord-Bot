@@ -145,11 +145,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             bet_amount = int(self.get_balance(ctx.message.author) * perc)
 
         if bet_amount <= 0:
-            await ctx.send("You can't make negative or 0 coin bets you dummy.")
             raise AttributeError(f"You cannot make bets for amounts that are 0 or lower.")
 
         if(self.check_balance(ctx.author, bet_amount) == False):
-            await ctx.send(f"You don't have enough {CURRENCY_NAME} to make that bet!")
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
             
 
@@ -234,7 +232,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def rockpaperscissors(self, ctx, choice: str):
         """ Play Rock Paper Scissors for 5 server currency. Choices are 'rock', 'paper', or 'scissors' """
         if(self.check_balance(ctx.message.author, 5) == False):
-            await ctx.send(f"You don't have enough {CURRENCY_NAME} to make that bet!")
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         options = ["rock", "paper", "scissors"]
