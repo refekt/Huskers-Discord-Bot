@@ -71,7 +71,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return True
         else:
             return False
-            #raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+            # raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
     def get_balance(self, user: discord.Member):
         if self.check_author_initialized(user):
@@ -128,16 +128,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet!")
-        
-        #checks to see if the bet is iterable, if so, it joins it into a string
+
+        # checks to see if the bet is iterable, if so, it joins it into a string
         try:
             iter(bet)
             bet = ''.join(bet)
         except:
             pass
-        
-        self.validate_bet_amount_syntax(bet_amount)      
-        
+
+        self.validate_bet_amount_syntax(bet_amount)
+
         if bet_amount == "max":
             bet_amount = self.get_balance(ctx.message.author)
         elif type(bet_amount) == str and "%" in bet_amount:
@@ -147,9 +147,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if bet_amount <= 0:
             raise AttributeError(f"You cannot make bets for amounts that are 0 or lower.")
 
-        if(self.check_balance(ctx.author, bet_amount) == False):
+        if (self.check_balance(ctx.author, bet_amount) == False):
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
-            
 
         def roll_color():
             return random.choice(colors)
@@ -231,7 +230,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def rockpaperscissors(self, ctx, choice: str):
         """ Play Rock Paper Scissors for 5 server currency. Choices are 'rock', 'paper', or 'scissors' """
-        if(self.check_balance(ctx.message.author, 5) == False):
+        if (self.check_balance(ctx.message.author, 5) == False):
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         options = ["rock", "paper", "scissors"]
@@ -375,6 +374,59 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 ]
             )
         )
+
+    @money.command(hidden=True)
+    async def buy(self, ctx):
+        roles = ctx.guild.roles
+        buyable_roles = [747241238692102155]
+
+        if roles is None:
+            return
+
+        vals = []
+        for index, role in enumerate(roles):
+            if role.id in buyable_roles:
+                vals.append(f"{index + 1}: {role}")
+
+        embed = build_embed(
+            title=f"Spend your {CURRENCY_NAME}!",
+            fields=[
+                ["Roles", vals]
+            ]
+        )
+
+        buy_msg = await ctx.send(embed=embed)
+        role_cost = 10000
+        emojis = "1️⃣"
+
+        try:
+            await buy_msg.add_reaction(emojis)
+        except discord.Forbidden:
+            raise AttributeError(f"You do not have permission to add reactions.")
+        except discord.NotFound:
+            raise AttributeError(f"The emoji is not found.")
+        except discord.InvalidArgument:
+            raise AttributeError(f"The emoji parameter is invalid.")
+        except discord.HTTPException:
+            raise AttributeError(f"Reaction failed to add.")
+
+        from utils.client import client
+
+        def can_buy(r: discord.Reaction, u: discord.Member):
+            if not u.bot:
+                if self.get_balance(u) < role_cost:
+                    raise AttributeError(f"You do not have {role_cost} to buy the role!")
+                else:
+                    return r.emoji == emojis
+
+        try:
+            reaction, user = await client.wait_for("reaction_add", check=can_buy)
+            print(reaction, user)
+            await user.add_roles(buyable_roles[0], reason=f"Bought with {role_cost} {CURRENCY_NAME}")
+        except TimeoutError:
+            return
+        else:
+            pass
 
 
 def setup(bot):
