@@ -28,7 +28,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         elif kwargs["game"] == "rlt":
             output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]."
 
-        output += f" You have been {'awarded' if result == 'win' else 'deducted'} [ {abs(amount)} ] {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
+        output += f" You have been {'awarded' if result == 'win' else 'deducted'} [ {abs(amount):,} ] {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
         return output
 
@@ -124,7 +124,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         $roulette 10 red -- Bet a color
         $roulette 10 25 -- Bet a specific number (225% bonus)
         $roulette 10 1:17 -- Bet a specific number range (scaling bonus)
-        $roulette 10 red1:36 -- Bet a color and number range
+        $roulette 10 red1:36 -- Bet a color and number range (scaling bonus)
         """
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet!")
@@ -145,9 +145,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             bet_amount = int(self.get_balance(ctx.message.author) * perc)
 
         if bet_amount <= 0:
-            raise AttributeError(f"You cannot make bets for amounts that are 0 or lower.")
+            raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
 
-        if (self.check_balance(ctx.author, bet_amount) == False):
+        if not self.check_balance(ctx.author, bet_amount):
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         def roll_color():
@@ -270,7 +270,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if ctx.subcommand_passed:
             return
         else:
-            raise AttributeError(f"A subcommand must be used. Review $help.")
+            raise AttributeError(f"A sub command must be used. Review $help.")
 
     @money.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -279,7 +279,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not self.check_author_initialized(ctx.message.author):
             starter_money = 100
             self.initiate_user(ctx, starter_money)
-            await ctx.send(f"Congratulations {ctx.message.author.mention}! You now have {starter_money} {CURRENCY_NAME}. Use it wisely!")
+            await ctx.send(f"Congratulations {ctx.message.author.mention}! You now have [ {starter_money:,} ] {CURRENCY_NAME}. Use it wisely!")
         else:
             return await ctx.send(f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
 
@@ -297,7 +297,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         self.check_author_initialized(user)
         self.adjust_currency(user, value)
 
-        await ctx.send(f"{ctx.message.author.mention} has granted {user.mention} {value} {CURRENCY_NAME}!")
+        await ctx.send(f"{ctx.message.author.mention} has granted {user.mention} [ {value:,} ] {CURRENCY_NAME}!")
 
     @money.command()
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -310,7 +310,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if balance == 0:
             pitty_value = 100
             self.adjust_currency(ctx.message.author, pitty_value)
-            return await ctx.send(content=f"Pity on you. You have been awarded [ {pitty_value} ] {CURRENCY_NAME}. Try not to suck so much next time!")
+            return await ctx.send(content=f"Pity on you. You have been awarded [ {pitty_value:,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
 
@@ -320,10 +320,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """ Show current balance of server currency for self or another member """
         if user:
             balance = self.get_balance(user)
-            await ctx.send(f"{user.mention}'s balance is {balance:,} {CURRENCY_NAME}.")
+            await ctx.send(f"{user.mention}'s balance is [ {balance:,} ] {CURRENCY_NAME}.")
         else:
             balance = self.get_balance(ctx.message.author)
-            await ctx.send(f"{ctx.message.author.mention}'s balance is {balance:,} {CURRENCY_NAME}.")
+            await ctx.send(f"{ctx.message.author.mention}'s balance is [ {balance:,} ] {CURRENCY_NAME}.")
 
     @money.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -347,9 +347,26 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if balance >= value:
             self.adjust_currency(ctx.message.author, -value)
             self.adjust_currency(user, value)
-            return await ctx.send(f"You have sent {value} {CURRENCY_NAME} to {user.mention}!")
+            return await ctx.send(f"You have sent [ {value:,} ] {CURRENCY_NAME} to {user.mention}!")
         else:
-            raise AttributeError(f"You do not have {value} {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
+            raise AttributeError(f"You do not have [ {value:,} ] {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
+
+    @money.command()
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
+    async def giveall(self, ctx, value: int):
+        users = process_MySQL(
+            query=sqlRetrieveCurrencyLeaderboard,
+            fetch="all"
+        )
+
+        from utils.client import client
+
+        for user in users:
+            usr = client.get_user(id=user["user_id"])
+            if usr:
+                self.adjust_currency(usr, value)
+
+        return await ctx.send(f"Everyone with a server currency wallet has received [ {value:,} ] {CURRENCY_NAME}!")
 
     @money.command(aliases=["lb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
