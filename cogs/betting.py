@@ -174,12 +174,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if type(bet) == str:
             color_re = r"(red|black)"
             bet_color = re.findall(color_re, bet.lower())
-            print(bet_color)
+
             if len(bet_color) == 1:
                 bet_color = str(bet_color[0])
             elif len(bet_color) > 1:
-                await ctx.send('You can put at most one color in your bet!')
-                return
+                return await ctx.send('You can put at most one color in your bet!')
             else:
                 bet_color = None
 
@@ -270,7 +269,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                bet_amount = int(bet_amount * 2.25)
+                bet_amount = int(bet_amount * 1.5)
                 return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
             else:
                 return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
