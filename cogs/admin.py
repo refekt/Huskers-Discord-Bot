@@ -342,6 +342,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
     async def iowa(self, ctx, who: discord.Member, *, reason: str):
+        """ Removes all roles from a user, applies the @Time Out role, and records the user's ID to prevent leaving and rejoining to remove @Time Out """
         if not who:
             raise AttributeError("You must include a user!")
 
