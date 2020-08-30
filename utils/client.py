@@ -14,15 +14,15 @@ from discord.ext import commands
 import utils.consts as consts
 from cogs.images import build_quote
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL, \
-    CHAN_POSSUMS, CHAN_NORTH_BOTTTOMS
+    CHAN_POSSUMS, CHAN_NORTH_BOTTTOMS, CHAN_IOWA
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
-from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
+from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
-from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlRetrieveTasks
+from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlRetrieveTasks, sqlRetrieveIowa
 from utils.thread import send_reminder, send_math
 
 tweet_reactions = ("🎈", "🌽", "🕸")
@@ -284,7 +284,7 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
     async def quote_reacts():
         # if not channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
         #     return
-            # raise AttributeError(f"You are not allowed to use this command in this channel!")
+        # raise AttributeError(f"You are not allowed to use this command in this channel!")
 
         quote_emoji = "📝"
         reactions = message.reactions
@@ -731,6 +731,21 @@ class MyClient(commands.Bot):
     async def on_member_join(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
 
+        iowegians = process_MySQL(
+            query=sqlRetrieveIowa,
+            fetch="all"
+        )
+
+        timeout = member.guild.get_role(ROLE_TIME_OUT)
+        iowa = member.guild.get_channel(CHAN_IOWA)
+
+        for iowegian in iowegians:
+            if member.id == iowegian["user_id"]:
+                await member.add_role(timeout, reason="Back to Iowa")
+                return
+
+        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
+
     async def on_member_remove(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))
 
@@ -754,7 +769,7 @@ else:
 
 client = MyClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
 extensions = (
-    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg", 
+    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg",
     "cogs.betting", 'cogs.music', 'cogs.reddit', 'cogs.message_history', 'cogs.deepfry', 'cogs.fap')
 
 for extension in extensions:

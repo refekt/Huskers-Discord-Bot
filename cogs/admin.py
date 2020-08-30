@@ -8,9 +8,10 @@ from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import GUILD_PROD
 from utils.consts import REACITON_HYPE_SQUAD
-from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX
+from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, ROLE_TIME_OUT
 from utils.consts import change_my_nickname
 from utils.embed import build_embed as build_embed
+from utils.mysql import process_MySQL, sqlInsertIowa
 
 
 def not_botlogs(chan: discord.TextChannel):
@@ -337,6 +338,41 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 message = ""
 
         await ctx.send(f"```\n{message}\n```")
+
+    @commands.command(hidden=True)
+    @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
+    async def iowa(self, ctx, who: discord.Member, *, reason: str):
+        if not who:
+            raise AttributeError("You must include a user!")
+
+        if not reason:
+            raise AttributeError("You must include a reason why!")
+
+        timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+        added_reason = "Put in Time Out and escorted to #Iowa. "
+        roles = who.roles
+
+        for role in roles:
+            try:
+                await who.remove_roles(role, reason=added_reason + reason)
+            except discord.Forbidden:
+                pass
+            except discord.HTTPException:
+                pass
+
+        try:
+            await who.add_roles(timeout, reason=added_reason + reason)
+        except discord.Forbidden:
+            pass
+        except discord.HTTPException:
+            pass
+
+        process_MySQL(
+            query=sqlInsertIowa,
+            values=(who.id, added_reason + reason)
+        )
+
+        return await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
 
 
 def setup(bot):

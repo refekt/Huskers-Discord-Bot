@@ -215,6 +215,10 @@ SET balance = balance + %s
 WHERE username = %s
 """
 
+sqlInsertIowa = "INSERT INTO iowa (user_id, reason) VALUES (%s, %s)"
+
+sqlRetrieveIowa = "SELECT * FROM iowa"
+
 
 def process_MySQL(query: str, **kwargs):
     try:
@@ -257,15 +261,15 @@ def process_MySQL(query: str, **kwargs):
                         result = cursor.fetchall()
                 else:
                     if kwargs["fetch"] == "one":
-                        cursor.execute(query=query, args = kwargs['values'])
+                        cursor.execute(query=query, args=kwargs['values'])
                         result = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if not "size" in kwargs:
                             raise ValueError("Fetching many requires a `size` kwargs.")
-                        cursor.execute(query=query, args = kwargs['values'])
+                        cursor.execute(query=query, args=kwargs['values'])
                         result = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
-                        cursor.execute(query=query, args = kwargs['values'])
+                        cursor.execute(query=query, args=kwargs['values'])
                         result = cursor.fetchall()
 
         sqlConnection.commit()
