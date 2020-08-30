@@ -736,15 +736,18 @@ class MyClient(commands.Bot):
             fetch="all"
         )
 
+        if not iowegians:
+            return
+
         timeout = member.guild.get_role(ROLE_TIME_OUT)
         iowa = member.guild.get_channel(CHAN_IOWA)
 
+        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
+
         for iowegian in iowegians:
             if member.id == iowegian["user_id"]:
-                await member.add_role(timeout, reason="Back to Iowa")
+                await member.add_roles(timeout, reason="Back to Iowa")
                 return
-
-        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
 
     async def on_member_remove(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))

@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from utils.client import client
-from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS
+from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS, CHAN_IOWA
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import GUILD_PROD
 from utils.consts import REACITON_HYPE_SQUAD
@@ -349,6 +349,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             raise AttributeError("You must include a reason why!")
 
         timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+        iowa = ctx.guild.get_channel(CHAN_IOWA)
         added_reason = "Put in Time Out and escorted to #Iowa. "
         roles = who.roles
 
@@ -372,6 +373,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             values=(who.id, added_reason + reason)
         )
 
+        await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
         return await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
 
 
