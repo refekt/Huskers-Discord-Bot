@@ -228,7 +228,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.command(aliases=["rps", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
-        """ Play Rock Paper Scissors for 5 server currency. Choices are 'rock', 'paper', or 'scissors' """
+        """ Play Rock Paper Scissors for server currency. Choices are 'rock', 'paper', or 'scissors' """
         self.validate_bet_amount_syntax(bet_amount)
 
         if bet_amount == "max":
@@ -269,7 +269,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                bet_amount = int(bet_amount * 1.5)
                 return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
             else:
                 return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
