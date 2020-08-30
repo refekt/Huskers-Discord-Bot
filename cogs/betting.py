@@ -228,9 +228,20 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @commands.command(aliases=["rps", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def rockpaperscissors(self, ctx, choice: str):
+    async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
         """ Play Rock Paper Scissors for 5 server currency. Choices are 'rock', 'paper', or 'scissors' """
-        if (self.check_balance(ctx.message.author, 5) == False):
+        self.validate_bet_amount_syntax(bet_amount)
+
+        if bet_amount == "max":
+            bet_amount = self.get_balance(ctx.message.author)
+        elif type(bet_amount) == str and "%" in bet_amount:
+            perc = float(bet_amount.strip("%")) / 100
+            bet_amount = int(self.get_balance(ctx.message.author) * perc)
+
+        if bet_amount <= 0:
+            raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
+
+        if not self.check_balance(ctx.author, bet_amount):
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         options = ["rock", "paper", "scissors"]
@@ -259,9 +270,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=5, game="rps", mbr_throw=choice, cpu_throw=throw))
+                bet_amount = int(bet_amount * 3.25)
+                return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
             else:
-                return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-5, game="rps", mbr_throw=choice, cpu_throw=throw))
+                return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
 
     @commands.group(aliases=["m", ])
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
