@@ -270,7 +270,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                bet_amount = int(bet_amount * 3.25)
+                bet_amount = int(bet_amount * 2.25)
                 return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
             else:
                 return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
