@@ -398,7 +398,6 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
         previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-        reapply_roles = []
 
         try:
             if previous_roles:
