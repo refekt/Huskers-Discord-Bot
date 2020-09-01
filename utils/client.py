@@ -14,7 +14,7 @@ from discord.ext import commands
 import utils.consts as consts
 from cogs.images import build_quote
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL, \
-    CHAN_POSSUMS, CHAN_NORTH_BOTTTOMS, CHAN_IOWA
+    CHAN_IOWA
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
@@ -742,10 +742,9 @@ class MyClient(commands.Bot):
         timeout = member.guild.get_role(ROLE_TIME_OUT)
         iowa = member.guild.get_channel(CHAN_IOWA)
 
-        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
-
         for iowegian in iowegians:
             if member.id == iowegian["user_id"]:
+                await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
                 await member.add_roles(timeout, reason="Back to Iowa")
                 return
 
