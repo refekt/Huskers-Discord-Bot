@@ -375,7 +375,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
         await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
-        return await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
+        await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
+        await who.send(f"You have been moved to [ {iowa.mention} ] for the following reason: {reason}.")
 
 
 def setup(bot):
