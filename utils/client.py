@@ -731,22 +731,20 @@ class MyClient(commands.Bot):
     async def on_member_join(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
 
-        iowegians = process_MySQL(
+        iowegian = process_MySQL(
             query=sqlRetrieveIowa,
+            values=member.id,
             fetch="all"
         )
 
-        if not iowegians:
+        if not iowegian:
             return
 
         timeout = member.guild.get_role(ROLE_TIME_OUT)
         iowa = member.guild.get_channel(CHAN_IOWA)
 
-        for iowegian in iowegians:
-            if member.id == iowegian["user_id"]:
-                await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
-                await member.add_roles(timeout, reason="Back to Iowa")
-                return
+        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
+        await member.add_roles(timeout, reason="Back to Iowa")
 
     async def on_member_remove(self, member):
         process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))

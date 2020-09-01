@@ -11,7 +11,7 @@ from utils.consts import REACITON_HYPE_SQUAD
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, ROLE_TIME_OUT
 from utils.consts import change_my_nickname
 from utils.embed import build_embed as build_embed
-from utils.mysql import process_MySQL, sqlInsertIowa
+from utils.mysql import process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
 
 def not_botlogs(chan: discord.TextChannel):
@@ -351,8 +351,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         iowa = ctx.guild.get_channel(CHAN_IOWA)
-        added_reason = "Put in Time Out and escorted to #Iowa. "
+        added_reason = f"Time Out by {ctx.message.author}: "
+
         roles = who.roles
+        previous_roles = [str(role.id) for role in who.roles[1:]]
+        if previous_roles:
+            previous_roles = ",".join(previous_roles)
 
         for role in roles:
             try:
@@ -371,12 +375,50 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         process_MySQL(
             query=sqlInsertIowa,
-            values=(who.id, added_reason + reason)
+            values=(who.id, added_reason + reason, previous_roles)
         )
 
         await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
         await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
         await who.send(f"You have been moved to [ {iowa.mention} ] for the following reason: {reason}.")
+
+    @commands.command(hidden=True)
+    @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
+    async def nebraska(self, ctx, who: discord.Member):
+        if not who:
+            raise AttributeError("You must include a user!")
+
+        timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+        await who.remove_roles(timeout)
+
+        previous_roles_raw = process_MySQL(
+            query=sqlRetrieveIowa,
+            values=who.id,
+            fetch="all"
+        )
+
+        previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+        reapply_roles = []
+
+        try:
+            if previous_roles:
+                for role in previous_roles:
+                    new_role = ctx.guild.get_role(int(role))
+                    await who.add_roles(new_role, reason="Returning from Iowa")
+        except discord.Forbidden:
+            pass
+        except discord.HTTPException:
+            pass
+
+        process_MySQL(
+            query=sqlRemoveIowa,
+            values=who.id
+        )
+
+        iowa = ctx.guild.get_channel(CHAN_IOWA)
+
+        await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
+        await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
 
 
 def setup(bot):

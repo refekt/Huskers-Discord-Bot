@@ -215,9 +215,11 @@ SET balance = balance + %s
 WHERE username = %s
 """
 
-sqlInsertIowa = "INSERT INTO iowa (user_id, reason) VALUES (%s, %s)"
+sqlInsertIowa = "INSERT INTO iowa (user_id, reason, previous_roles) VALUES (%s, %s, %s)"
 
-sqlRetrieveIowa = "SELECT * FROM iowa"
+sqlRetrieveIowa = "SELECT previous_roles FROM iowa WHERE user_id = %s"
+
+sqlRemoveIowa = "DELETE FROM iowa WHERE user_id = %s"
 
 
 def process_MySQL(query: str, **kwargs):
