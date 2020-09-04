@@ -485,7 +485,7 @@ class TextCommands(commands.Cog):
         comparision = Winsipedia(compare=compare, against=against)
 
         await ctx.send(embed=build_embed(
-            title=f"Historical Records for [ {compare.title()} ] vs. [ {compare.title()} ]",
+            title=f"Historical Records for [ {compare.title()} ] vs. [ {against.title()} ]",
             fields=[
                 ["Links", f"[Full List of Games]({comparision.full_games_url})\n"
                           f"[{compare.title()} Games]({'http://www.winsipedia.com/' + compare.lower()})\n"
