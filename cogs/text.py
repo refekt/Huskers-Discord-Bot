@@ -479,8 +479,11 @@ class TextCommands(commands.Cog):
             title=f"Historical Records for [ {compare.title()} ] vs. [ {against.title()} ]",
             fields=[
                 [f"{compare.title()}'s Largest MOV", f"{comparision.compare.largest_mov} ({comparision.compare.largest_mov_date})"],
+                [f"{compare.title()}'s Longest Win Streak", f"{comparision.compare.longest_win_streak} ({comparision.compare.largest_win_streak_date})"],
                 [f"{against.title()}'s Largest MOV", f"{comparision.against.largest_mov} ({comparision.against.largest_mov_date})"],
-            ]
+                [f"{compare.title()}'s Longest Win Streak", f"{comparision.against.longest_win_streak} ({comparision.against.largest_win_streak_date})"]
+            ],
+            inline=False
         ))
 
 
