@@ -37,6 +37,7 @@ class Winsipedia:
 
     def __init__(self, compare: str, against: str):
         self.url = f"http://www.winsipedia.com/{compare.lower()}/vs/{against.lower()}"
+        self.full_games_url = f"http://www.winsipedia.com/games/{compare.lower()}/vs/{against.lower()}"
 
         def mov(which: int):
             raw_mov = soup.find_all(attrs={"class": f"ranking span2 item{which}"})
@@ -484,13 +485,16 @@ class TextCommands(commands.Cog):
         comparision = Winsipedia(compare=compare, against=against)
 
         await ctx.send(embed=build_embed(
-            title=f"Historical Records for [ {compare.title()} ] vs. [ {against.title()} ]",
+            title=f"Historical Records for [ {compare.title()} ] vs. [ {compare.title()} ]",
             fields=[
+                ["Links", f"[Full List of Games]({comparision.full_games_url})\n"
+                          f"[{compare.title()} Games]({'http://www.winsipedia.com/' + compare.lower()})\n"
+                          f"[{against.title()} Games]({'http://www.winsipedia.com/' + against.lower()})"],
                 ["All Time Record", comparision.all_time_record],
                 [f"{compare.title()}'s Largest MOV", f"{comparision.compare.largest_mov} ({comparision.compare.largest_mov_date})"],
                 [f"{compare.title()}'s Longest Win Streak", f"{comparision.compare.longest_win_streak} ({comparision.compare.largest_win_streak_date})"],
                 [f"{against.title()}'s Largest MOV", f"{comparision.against.largest_mov} ({comparision.against.largest_mov_date})"],
-                [f"{compare.title()}'s Longest Win Streak", f"{comparision.against.longest_win_streak} ({comparision.against.largest_win_streak_date})"]
+                [f"{against.title()}'s Longest Win Streak", f"{comparision.against.longest_win_streak} ({comparision.against.largest_win_streak_date})"]
             ],
             inline=False
         ))
