@@ -9,6 +9,8 @@ import markovify
 import requests
 from discord.ext import commands
 
+from bs4 import BeautifulSoup
+
 from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
 from utils.consts import TZ
@@ -17,6 +19,45 @@ from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 from utils.thread import send_reminder
+from utils.consts import HEADERS
+
+
+class WinsipediaTeam():
+    name = None
+
+    def __init__(self, name, largest_mov, largest_mov_date, longest_win_streak, largest_win_streak_date):
+        self.name = name
+        self.largest_mov = largest_mov
+        self.largest_mov_date = largest_mov_date
+        self.longest_win_streak = longest_win_streak
+        self.largest_win_streak_date = largest_win_streak_date
+
+
+class Winsipedia:
+
+    def __init__(self, compare: str, against: str):
+        self.url = f"http://www.winsipedia.com/{compare.lower()}/vs/{against.lower()}"
+
+        def mov(which: int):
+            raw_mov = soup.find_all(attrs={"class": f"ranking span2 item{which}"})
+            raw_mov = raw_mov[0].contents[3].text.replace("\n \n", ":").strip()
+            return raw_mov.split(":")
+
+        def win(which: int):
+            raw_win = soup.find_all(attrs={"class": f"ranking span2 item{which}"})
+            raw_win = raw_win[0].contents[3].text.replace("\n \n", ":").strip()
+            return raw_win.split(":")
+
+        re = requests.get(url=self.url, headers=HEADERS)
+        soup = BeautifulSoup(re.content, features="html.parser")
+
+        margin_of_victory = mov(1)
+        win_stream = win(2)
+        self.compare = WinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0], largest_win_streak_date=win_stream[1])
+
+        margin_of_victory = mov(6)
+        win_stream = win(5)
+        self.against = WinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0], largest_win_streak_date=win_stream[1])
 
 
 class TextCommands(commands.Cog):
@@ -427,6 +468,20 @@ class TextCommands(commands.Cog):
                 flag=str(alert)
             )
         )
+
+    @commands.command()
+    async def compare(self, ctx, compare: str, against: str):
+        """Compare two team's record. Must use a dash (-) for teams with spaces.
+        $compare Nebraska Ohio-State"""
+        comparision = Winsipedia(compare=compare, against=against)
+
+        await ctx.send(embed=build_embed(
+            title=f"Historical Records for [ {compare.title()} ] vs. [ {against.title()} ]",
+            fields=[
+                [f"{compare.title()}'s Largest MOV", f"{comparision.compare.largest_mov} ({comparision.compare.largest_mov_date})"],
+                [f"{against.title()}'s Largest MOV", f"{comparision.against.largest_mov} ({comparision.against.largest_mov_date})"],
+            ]
+        ))
 
 
 def setup(bot):
