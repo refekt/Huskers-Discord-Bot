@@ -48,11 +48,19 @@ class Winsipedia:
             raw_win = raw_win[0].contents[3].text.replace("\n \n", ":").strip()
             return raw_win.split(":")
 
+        def all_time_wins():
+            wins = soup.find_all(attrs={"class": "titleItem left"})[0].contents[1].text
+            ties = soup.find_all(attrs={"class": "titleItem center"})[0].contents[1].text
+            losses = soup.find_all(attrs={"class": "titleItem right"})[0].contents[1].text
+
+            return f"{wins} wins - {ties} ties - {losses} losses"
+
         re = requests.get(url=self.url, headers=HEADERS)
         soup = BeautifulSoup(re.content, features="html.parser")
 
         margin_of_victory = mov(1)
         win_stream = win(2)
+        self.all_time_record = all_time_wins()
         self.compare = WinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0], largest_win_streak_date=win_stream[1])
 
         margin_of_victory = mov(6)
@@ -478,6 +486,7 @@ class TextCommands(commands.Cog):
         await ctx.send(embed=build_embed(
             title=f"Historical Records for [ {compare.title()} ] vs. [ {against.title()} ]",
             fields=[
+                ["All Time Record", comparision.all_time_record],
                 [f"{compare.title()}'s Largest MOV", f"{comparision.compare.largest_mov} ({comparision.compare.largest_mov_date})"],
                 [f"{compare.title()}'s Longest Win Streak", f"{comparision.compare.longest_win_streak} ({comparision.compare.largest_win_streak_date})"],
                 [f"{against.title()}'s Largest MOV", f"{comparision.against.largest_mov} ({comparision.against.largest_mov_date})"],
