@@ -605,6 +605,10 @@ class TextCommands(commands.Cog):
 
     @commands.command()
     async def teamstats(self, ctx, *, team_name: str):
+        """Display a team's historical stats and ranking.
+        $teamstats Nebraska
+        $teamstats Ohio State
+        $teamstats Miami FL"""
         edit_msg = await ctx.send("Loading...")
 
         team = TeamStatsWinsipediaTeam(team_name=team_name)
@@ -621,7 +625,7 @@ class TextCommands(commands.Cog):
                 ["Consensus All American", f"{team.conf_championships} ({team.conf_championships_rank})"],
                 ["Heisman Winners", f"{team.heisman_winners} ({team.heisman_winners_rank})"],
                 ["NFL Draft Picks", f"{team.nfl_draft_picks} ({team.nfl_draft_picks_rank})"],
-                ["Weeks in AP Poll", f"{team.week_in_ap_poll} ({team.week_in_ap_poll})"]
+                ["Weeks in AP Poll", f"{team.week_in_ap_poll} ({team.week_in_ap_poll_rank})"]
             ],
             inline=False
         ))
