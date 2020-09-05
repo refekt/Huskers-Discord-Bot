@@ -22,7 +22,53 @@ from utils.thread import send_reminder
 from utils.consts import HEADERS
 
 
-class WinsipediaTeam():
+class TeamStatsWinsipediaTeam():
+
+    def __init__(self, *, team_name: str):
+
+        def all_time_record():
+            atr = soup.find_all(attrs={"class": "ranking span2 item2"})
+            return (
+                atr[0].contents[1].contents[3].contents[1].text,
+                atr[0].contents[3].contents[1].text.strip()
+            )
+
+        def championships():
+            champs = soup.find_all(attrs={"class": "ranking span2 item3"})
+            return (
+                champs[0].contents[3].contents[1].text,
+                champs[0].contents[5].contents[1].text
+            )
+
+        self.team_name = team_name.replace(" ", "-")
+        self.url = f"http://www.winsipedia.com/{self.team_name}"
+
+        re = requests.get(url=self.url, headers=HEADERS)
+        soup = BeautifulSoup(re.content, features="html.parser")
+
+        self.all_time_record = all_time_record()[0]
+        self.all_time_record_rank = all_time_record()[1]
+        self.championships = championships()[0]
+        self.championships_rank = championships()[1]
+        self.conf_championships = None
+        self.conf_championships_rank = None
+        self.bowl_games = None
+        self.bowl_games_rank = None
+        self.all_time_wins = None
+        self.all_time_wins_rank = None
+        self.bowl_record = None
+        self.bowl_record_rank = None
+        self.consensus_all_americans = None
+        self.consensus_all_americans_rank = None
+        self.heisman_winners = None
+        self.heisman_winners_rank = None
+        self.nfl_draft_picks = None
+        self.nfl_draft_picks_rank = None
+        self.week_in_ap_poll = None
+        self.week_in_ap_poll_rank = None
+
+
+class CompareWinsipediaTeam():
     name = None
 
     def __init__(self, name, largest_mov, largest_mov_date, longest_win_streak, largest_win_streak_date):
@@ -33,7 +79,7 @@ class WinsipediaTeam():
         self.largest_win_streak_date = largest_win_streak_date
 
 
-class Winsipedia:
+class CompareWinsipedia:
 
     def __init__(self, compare: str, against: str):
         self.url = f"http://www.winsipedia.com/{compare.lower()}/vs/{against.lower()}"
@@ -62,11 +108,13 @@ class Winsipedia:
         margin_of_victory = mov(1)
         win_stream = win(2)
         self.all_time_record = all_time_wins()
-        self.compare = WinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0], largest_win_streak_date=win_stream[1])
+        self.compare = CompareWinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0],
+                                             largest_win_streak_date=win_stream[1])
 
         margin_of_victory = mov(6)
         win_stream = win(5)
-        self.against = WinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0], largest_win_streak_date=win_stream[1])
+        self.against = CompareWinsipediaTeam(name=compare, largest_mov=margin_of_victory[0], largest_mov_date=margin_of_victory[1], longest_win_streak=win_stream[0],
+                                             largest_win_streak_date=win_stream[1])
 
 
 class TextCommands(commands.Cog):
@@ -482,7 +530,7 @@ class TextCommands(commands.Cog):
     async def compare(self, ctx, compare: str, against: str):
         """Compare two team's record. Must use a dash (-) for teams with spaces.
         $compare Nebraska Ohio-State"""
-        comparision = Winsipedia(compare=compare, against=against)
+        comparision = CompareWinsipedia(compare=compare, against=against)
 
         await ctx.send(embed=build_embed(
             title=f"Historical Records for [ {compare.title()} ] vs. [ {against.title()} ]",
@@ -498,6 +546,11 @@ class TextCommands(commands.Cog):
             ],
             inline=False
         ))
+
+    @commands.command()
+    async def teamstats(self, ctx):
+        a = TeamStatsWinsipediaTeam(team_name="nebraska")
+        print(a)
 
 
 def setup(bot):
