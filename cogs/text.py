@@ -126,7 +126,7 @@ class TeamStatsWinsipediaTeam():
             except:
                 return ("UNK", "UNK")
 
-        self.team_name = team_name.replace(" ", "-")
+        self.team_name = team_name.replace(" ", "-").replace("&", "")
         self.url = f"http://www.winsipedia.com/{self.team_name}"
 
         re = requests.get(url=self.url, headers=HEADERS)
