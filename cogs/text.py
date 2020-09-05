@@ -229,6 +229,9 @@ class TextCommands(commands.Cog):
 
         games, stats = HuskerSchedule(year=now_cst.year)
 
+        if not games:
+            return await edit_msg.edit(content="No games found!")
+
         if team is None:
             for game in games:
                 if game.game_date_time > now_cst:
