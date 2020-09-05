@@ -28,73 +28,103 @@ class TeamStatsWinsipediaTeam():
 
         def all_time_record():
             atr = soup.find_all(attrs={"class": "ranking span2 item2"})
-            return (
-                atr[0].contents[1].contents[3].contents[1].text,
-                atr[0].contents[3].contents[1].text.strip()
-            )
+            try:
+                    return (
+                    atr[0].contents[1].contents[3].contents[1].text,
+                    atr[0].contents[3].contents[1].text.strip()
+                )
+            except:
+                return ("UNK", "UNK")
 
         def championships():
             champs = soup.find_all(attrs={"class": "ranking span2 item3"})
-            return (
-                champs[0].contents[3].contents[1].text,
-                champs[0].contents[5].contents[1].text
-            )
+            try:
+                return (
+                    champs[0].contents[3].contents[1].text,
+                    champs[0].contents[5].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         def conf_championships():
             conf = soup.find_all(attrs={"class": "ranking span2 item4h"})
-            return (
-                conf[0].contents[3].contents[1].text,
-                conf[0].contents[5].contents[1].text
-            )
+            try:
+                return (
+                    conf[0].contents[3].contents[1].text,
+                    conf[0].contents[5].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         def bowl_games():
             bowl = soup.find_all(attrs={"class": "ranking span2 item5h"})
-            return (
-                bowl[0].contents[1].contents[1].text,
-                bowl[0].contents[3].contents[1].text
-            )
+            try:
+                return (
+                    bowl[0].contents[1].contents[1].text,
+                    bowl[0].contents[3].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         def all_time_wins():
             atw = soup.find_all(attrs={"class": "ranking span2 item1"})
-            return (
-                atw[0].contents[1].contents[1].text,
-                atw[0].contents[3].contents[1].text
-            )
+            try:
+                return (
+                    atw[0].contents[1].contents[1].text,
+                    atw[0].contents[3].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         def bowl_record():
             bowl = soup.find_all(attrs={"class": "ranking span2 item2"})
-            return (
-                bowl[1].contents[1].contents[3].contents[1].text,  #\n and \t
-                bowl[1].contents[3].contents[1].text.strip()
-            )
+            try:
+                return (
+                    bowl[1].contents[1].contents[3].contents[1].text,  #\n and \t
+                    bowl[1].contents[3].contents[1].text.strip()
+                )
+            except:
+                return ("UNK", "UNK")
 
         def consensus_all_americans():
             caa = soup.find_all(attrs={"class": "ranking span2 item3"})
-            return (
-                caa[1].contents[1].contents[1].text,
-                caa[1].contents[3].contents[1].text
-            )
+            try:
+                return (
+                    caa[1].contents[1].contents[1].text,
+                    caa[1].contents[3].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         def heisman_winners():
             hw = soup.find_all(attrs={"class": "ranking span2 item4"})
-            return (
-                hw[1].contents[3].contents[1].text,
-                hw[1].contents[5].contents[1].text
-            )
+            try:
+                return (
+                    hw[1].contents[3].contents[1].text,
+                    hw[1].contents[5].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         def nfl_draft_picks():
             nfl_picks = soup.find_all(attrs={"class": "ranking span2 item5"})
-            return (
-                nfl_picks[1].contents[3].contents[1].text,
-                nfl_picks[1].contents[5].contents[1].text
-            )
+            try:
+                return (
+                    nfl_picks[1].contents[3].contents[1].text,
+                    nfl_picks[1].contents[5].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
         
         def weeks_ap_poll():
             ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})
-            return (
-                ap_poll[0].contents[3].contents[1].text,
-                ap_poll[0].contents[5].contents[1].text
-            )
+            try:
+                return (
+                    ap_poll[0].contents[3].contents[1].text,
+                    ap_poll[0].contents[5].contents[1].text
+                )
+            except:
+                return ("UNK", "UNK")
 
         self.team_name = team_name.replace(" ", "-")
         self.url = f"http://www.winsipedia.com/{self.team_name}"
