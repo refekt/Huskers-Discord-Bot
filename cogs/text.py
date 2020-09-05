@@ -40,6 +40,62 @@ class TeamStatsWinsipediaTeam():
                 champs[0].contents[5].contents[1].text
             )
 
+        def conf_championships():
+            conf = soup.find_all(attrs={"class": "ranking span2 item4h"})
+            return (
+                conf[0].contents[3].contents[1].text,
+                conf[0].contents[5].contents[1].text
+            )
+
+        def bowl_games():
+            bowl = soup.find_all(attrs={"class": "ranking span2 item5h"})
+            return (
+                bowl[0].contents[1].contents[1].text,
+                bowl[0].contents[3].contents[1].text
+            )
+
+        def all_time_wins():
+            atw = soup.find_all(attrs={"class": "ranking span2 item1"})
+            return (
+                atw[0].contents[1].contents[1].text,
+                atw[0].contents[3].contents[1].text
+            )
+
+        def bowl_record():
+            bowl = soup.find_all(attrs={"class": "ranking span2 item2"})
+            return (
+                bowl[1].contents[1].contents[3].contents[1].text,  #\n and \t
+                bowl[1].contents[3].contents[1].text.strip()
+            )
+
+        def consensus_all_americans():
+            caa = soup.find_all(attrs={"class": "ranking span2 item3"})
+            return (
+                caa[1].contents[1].contents[1].text,
+                caa[1].contents[3].contents[1].text
+            )
+
+        def heisman_winners():
+            hw = soup.find_all(attrs={"class": "ranking span2 item4"})
+            return (
+                hw[1].contents[3].contents[1].text,
+                hw[1].contents[5].contents[1].text
+            )
+
+        def nfl_draft_picks():
+            nfl_picks = soup.find_all(attrs={"class": "ranking span2 item5"})
+            return (
+                nfl_picks[1].contents[3].contents[1].text,
+                nfl_picks[1].contents[5].contents[1].text
+            )
+        
+        def weeks_ap_poll():
+            ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})
+            return (
+                ap_poll[0].contents[3].contents[1].text,
+                ap_poll[0].contents[5].contents[1].text
+            )
+
         self.team_name = team_name.replace(" ", "-")
         self.url = f"http://www.winsipedia.com/{self.team_name}"
 
@@ -50,22 +106,22 @@ class TeamStatsWinsipediaTeam():
         self.all_time_record_rank = all_time_record()[1]
         self.championships = championships()[0]
         self.championships_rank = championships()[1]
-        self.conf_championships = None
-        self.conf_championships_rank = None
-        self.bowl_games = None
-        self.bowl_games_rank = None
-        self.all_time_wins = None
-        self.all_time_wins_rank = None
-        self.bowl_record = None
-        self.bowl_record_rank = None
-        self.consensus_all_americans = None
-        self.consensus_all_americans_rank = None
-        self.heisman_winners = None
-        self.heisman_winners_rank = None
-        self.nfl_draft_picks = None
-        self.nfl_draft_picks_rank = None
-        self.week_in_ap_poll = None
-        self.week_in_ap_poll_rank = None
+        self.conf_championships = conf_championships()[0]
+        self.conf_championships_rank = conf_championships()[1]
+        self.bowl_games = bowl_games()[0]
+        self.bowl_games_rank = bowl_games()[1]
+        self.all_time_wins = all_time_wins()[0]
+        self.all_time_wins_rank = all_time_wins()[1]
+        self.bowl_record = bowl_record()[0]
+        self.bowl_record_rank = bowl_record()[1]
+        self.consensus_all_americans = consensus_all_americans()[0]
+        self.consensus_all_americans_rank = consensus_all_americans()[1]
+        self.heisman_winners = heisman_winners()[0]
+        self.heisman_winners_rank = heisman_winners()[1]
+        self.nfl_draft_picks = nfl_draft_picks()[0]
+        self.nfl_draft_picks_rank = nfl_draft_picks()[1]
+        self.week_in_ap_poll = weeks_ap_poll()[0]
+        self.week_in_ap_poll_rank = weeks_ap_poll()[1]
 
 
 class CompareWinsipediaTeam():
@@ -548,9 +604,27 @@ class TextCommands(commands.Cog):
         ))
 
     @commands.command()
-    async def teamstats(self, ctx):
-        a = TeamStatsWinsipediaTeam(team_name="nebraska")
-        print(a)
+    async def teamstats(self, ctx, *, team_name: str):
+        edit_msg = await ctx.send("Loading...")
+
+        team = TeamStatsWinsipediaTeam(team_name=team_name)
+
+        await edit_msg.edit(content="", embed=build_embed(
+            title=f"{team_name.title()} Historical Stats",
+            fields=[
+                ["All Time Record", f"{team.all_time_record} ({team.all_time_record_rank})"],
+                ["All Time Wins", f"{team.all_time_wins} ({team.all_time_wins_rank})"],
+                ["Bowl Games", f"{team.bowl_games} ({team.bowl_games_rank})"],
+                ["Bowl Record", f"{team.bowl_record} ({team.bowl_record_rank})"],
+                ["Championships", f"{team.championships} ({team.championships_rank})"],
+                ["Conference Championships", f"{team.conf_championships} ({team.conf_championships_rank})"],
+                ["Consensus All American", f"{team.conf_championships} ({team.conf_championships_rank})"],
+                ["Heisman Winners", f"{team.heisman_winners} ({team.heisman_winners_rank})"],
+                ["NFL Draft Picks", f"{team.nfl_draft_picks} ({team.nfl_draft_picks_rank})"],
+                ["Weeks in AP Poll", f"{team.week_in_ap_poll} ({team.week_in_ap_poll})"]
+            ],
+            inline=False
+        ))
 
 
 def setup(bot):
