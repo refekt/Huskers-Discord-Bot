@@ -279,9 +279,8 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
             await send_tweet(c)
 
         elif emoji.name == tweet_reactions[2]:  # Web = Reddit
-            import webbrowser
-            reddit_post_url = f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}"
-            webbrowser.open(url=reddit_post_url.encode(encoding="UTF-8",errors="strict"))
+            await user.send(f"Here is your post URL!\n"
+                            f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
 
     async def quote_reacts():
         # if not channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
