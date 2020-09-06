@@ -1,3 +1,4 @@
+import pymysql
 import random
 import re
 import typing
@@ -9,7 +10,8 @@ from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
-from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
+from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser, sqlInsertCustomBet, sqlRetrieveCustomBet, \
+    sqlRetrieveCustomBetKeyword
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
@@ -454,6 +456,98 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return
         else:
             pass
+
+    @commands.group()
+    async def bet(self, ctx):
+        if ctx.subcommand_passed:
+            return
+        else:
+            raise AttributeError(f"A sub command must be used. Review $help.")
+
+    @bet.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def create(self, ctx, keyword: str, bet_amount: int, *, description: str):
+        """Creates a custom bet.
+        Key = single word descriptor
+        Value = bet amount
+        Description = full description of the bet"""
+        if not self.check_balance(user=ctx.message.author, amount_check=bet_amount):
+            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+
+        try:
+            process_MySQL(
+                query=sqlInsertCustomBet,
+                values=(ctx.message.author.id, keyword, description, bet_amount)
+            )
+        except ConnectionError:
+            return await ctx.send(f"A bet with the keyword [ {keyword} ] already exists! Try again.")
+        else:
+            await ctx.send(embed=build_embed(
+                title="Custom Bet",
+                description=f"{ctx.message.author.mention}'s bet was successfully created!",
+                fields=[
+                    ["Author", ctx.message.author.mention],
+                    ["Amount", f"{bet_amount:,}"],
+                    ["Keyword", keyword],
+                    ["Description", description]
+                ]
+            ))
+
+    @bet.command()
+    async def show(self, ctx, keyword=None):
+        if not keyword:
+            bets = process_MySQL(
+                query=sqlRetrieveCustomBet,
+                fetch="all"
+            )
+        else:
+            bets = process_MySQL(
+                query=sqlRetrieveCustomBetKeyword,
+                fetch="one",
+                values=keyword
+            )
+
+        if type(bets) == list:
+            bet_fields = []
+
+            for bet in bets:
+                author = ctx.guild.get_member(bet["author"])
+                if author is None:
+                    author = "Unknown Member"
+                else:
+                    author = f"{author.name}#{author.discriminator}"
+
+                bet_fields.append([
+                    bet["keyword"], f"Author: {author}\n"
+                                    f"Value: {bet['bet_amount']:,}\n"
+                                    f"Description: {str(bet['description']).capitalize()}\n"
+                                    f"Betting For: \n"
+                                    f"Betting Against: "
+                ])
+
+            await ctx.send(embed=build_embed(
+                title="All Open Bets",
+                fields=bet_fields,
+                inline=False
+            ))
+        elif type(bets) == dict:
+            author = ctx.guild.get_member(bets["author"])
+            await ctx.send(embed=build_embed(
+                title="All Open Bets",
+                fields=[
+                    [
+                        bets["keyword"],
+                        f"Author: {author}\n"
+                        f"Value: {bets['bet_amount']:,}\n"
+                        f"Description: {str(bets['description']).capitalize()}\n"
+                        f"Betting For: \n"
+                        f"Betting Against: "
+                    ]
+                ],
+                inline=False
+            ))
+        elif bets is None:
+            return await ctx.send(f"No bet found with the keyword [ {keyword} ]. Please try again!")
 
 
 def setup(bot):

@@ -221,6 +221,14 @@ sqlRetrieveIowa = "SELECT previous_roles FROM iowa WHERE user_id = %s"
 
 sqlRemoveIowa = "DELETE FROM iowa WHERE user_id = %s"
 
+sqlRetrieveCustomBetKeywords = "SELECT keyword FROM custom_lines"
+
+sqlInsertCustomBet = "INSERT INTO custom_lines (author, keyword, description, bet_amount) VALUES (%s, %s, %s, %s)"
+
+sqlRetrieveCustomBet = "SELECT * FROM custom_lines"
+
+sqlRetrieveCustomBetKeyword = "SELECT * FROM custom_lines WHERE keyword = %s"
+
 
 def process_MySQL(query: str, **kwargs):
     try:
