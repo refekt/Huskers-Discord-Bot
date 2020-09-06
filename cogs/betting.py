@@ -474,6 +474,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not self.check_balance(user=ctx.message.author, amount_check=bet_amount):
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
+        keyword = keyword.replace(" ", "")
+
         try:
             process_MySQL(
                 query=sqlInsertCustomBet,
