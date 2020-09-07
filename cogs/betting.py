@@ -1,4 +1,4 @@
-import pymysql
+import random
 import random
 import re
 import typing
@@ -10,8 +10,9 @@ from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
-from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser, sqlInsertCustomBet, sqlRetrieveCustomBet, \
-    sqlRetrieveCustomBetKeyword, sqlUpdateCustomBetFor, sqlUpdateCustomBetAgainst, sqlRetrieveCustomBetFor, sqlUpdateCustomBetAgainst, sqlRetrieveCustomBetAgainst, sqlRetreiveCustomBetForAgainst
+from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
+from utils.mysql import sqlRetreiveCustomLinesForAgainst, sqlInsertCustomLinesBets, sqlRetrieveCustomLinesKeywords
+from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, sqlInsertCustomLines
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
@@ -457,74 +458,57 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             pass
 
-    def previous_bets(self, ctx: discord.ext.commands.Context, keyword: str, which: str):
+    def check_bet_exists(self, ctx: discord.ext.commands.Context, keyword: str, which: str):
         try:
             previous_bets = process_MySQL(
-                query=sqlRetreiveCustomBetForAgainst,
+                query=sqlRetreiveCustomLinesForAgainst,
                 values=keyword,
-                fetch="one"
+                fetch="all"
             )
         except ConnectionError:
             raise AttributeError(f"No previous bets found for [ {keyword} ] keyword!")
         else:
-            if str(ctx.message.author.id) in previous_bets["bet_for"]:
-                raise AttributeError(f"You have already placed a bet {which} [ {keyword} ] bet!")
-            else:
-                return previous_bets
+            if previous_bets is None:
+                return False
 
-    def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str):
+            for bet in previous_bets:
+                if bet["author"] == ctx.message.author.id:
+                    if which == "for" and bet["_for"] == 1 or which == "against" and bet["against"] == 1:
+                        raise AttributeError(f"You have already placed a bet [ {which} ] [ {keyword} ] bet!")
+
+            return False
+
+    def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
-            previous_bets = self.previous_bets(ctx, keyword, which)
-
-            if previous_bets["bet_for"] is not None:
-                new_bets = previous_bets["bet_for"] + "," + str(ctx.message.author.id)
-            else:
-                new_bets = str(ctx.message.author.id)
+            self.check_bet_exists(ctx, keyword, which)
 
             if which == "for":
                 process_MySQL(
-                    query=sqlUpdateCustomBetFor,
-                    values=(new_bets, keyword)
+                    query=sqlInsertCustomLinesBets,
+                    values=(ctx.message.author.id, keyword, 1, 0, value)
                 )
             elif which == "against":
                 process_MySQL(
-                    query=sqlUpdateCustomBetAgainst,
-                    values=(new_bets, keyword)
+                    query=sqlInsertCustomLinesBets,
+                    values=(ctx.message.author.id, keyword, 0, 1, value)
                 )
 
             keyword_bet = process_MySQL(
-                query=sqlRetrieveCustomBetKeyword,
+                query=sqlRetrieveCustomLinesKeywords,
                 values=keyword,
                 fetch="one"
             )
         except ConnectionError:
             raise AttributeError(f"A bet with the keyword [ {keyword} ] already exists! Try again.")
         else:
-            author = ctx.guild.get_member(keyword_bet["author"])
-
-            if author is None:
-                raise AttributeError(f"Unable to find author for [ {keyword} ] bet!")
-
-            if keyword_bet["bet_for"] is None:
-                bet_for = "N/A"
-            else:
-                bet_for = keyword_bet["bet_for"].split(",")
-
-            if keyword_bet["bet_against"] is None:
-                bet_against = "N/A"
-            else:
-                bet_against = keyword_bet["bet_against"].split(",")
-
+            author = ctx.guild.get_member(keyword_bet["orig_author"])
             return build_embed(
                 title="Custom Bet",
-                description=f"{ctx.message.author.mention}'s bet {which} the [ {keyword} ] bet!",
+                description=f"{ctx.message.author.mention}'s bet [ {which} ] the [ {keyword} ] bet!",
                 fields=[
                     ["Author", author],
-                    ["Amount", f"{keyword_bet['bet_amount']:,}"],
                     ["Keyword", keyword],
-                    ["Description", keyword_bet['description']],
-                    ["Betting For", bet_for],
-                    ["Betting Against", bet_against]
+                    ["Description", str(keyword_bet['description']).capitalize()]
                 ]
             )
 
@@ -537,20 +521,17 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @bet.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def create(self, ctx, keyword: str, bet_amount: int, *, description: str):
+    async def create(self, ctx, keyword: str, *, description: str):
         """Creates a custom bet.
         Key = single word descriptor
-        Value = bet amount
         Description = full description of the bet"""
-        if not self.check_balance(user=ctx.message.author, amount_check=bet_amount):
-            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         keyword = keyword.replace(" ", "").lower()
 
         try:
             process_MySQL(
-                query=sqlInsertCustomBet,
-                values=(ctx.message.author.id, keyword, description, bet_amount)
+                query=sqlInsertCustomLines,
+                values=(ctx.message.author.id, keyword, description)
             )
         except ConnectionError:
             return await ctx.send(f"A bet with the keyword [ {keyword} ] already exists! Try again.")
@@ -560,7 +541,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 description=f"{ctx.message.author.mention}'s bet was successfully created!",
                 fields=[
                     ["Author", ctx.message.author.mention],
-                    ["Amount", f"{bet_amount:,}"],
                     ["Keyword", keyword],
                     ["Description", description]
                 ]
@@ -570,12 +550,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def show(self, ctx, keyword=None):
         if not keyword:
             bets = process_MySQL(
-                query=sqlRetrieveCustomBet,
+                query=sqlRetrieveCustomLines,
                 fetch="all"
             )
         else:
             bets = process_MySQL(
-                query=sqlRetrieveCustomBetKeyword,
+                query=sqlRetrieveCustomLinesKeyword,
                 fetch="one",
                 values=keyword
             )
@@ -592,10 +572,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                 bet_fields.append([
                     bet["keyword"], f"Author: {author}\n"
-                                    f"Value: {bet['bet_amount']:,}\n"
                                     f"Description: {str(bet['description']).capitalize()}\n"
-                                    f"Betting For: {bet['bet_for']}\n"
-                                    f"Betting Against: {bet['bet_against']}"
                 ])
 
             await ctx.send(embed=build_embed(
@@ -611,10 +588,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     [
                         bets["keyword"],
                         f"Author: {author}\n"
-                        f"Value: {bets['bet_amount']:,}\n"
                         f"Description: {str(bets['description']).capitalize()}\n"
-                        f"Betting For: {bets['bet_for']}\n"
-                        f"Betting Against: {bets['bet_against']}"
                     ]
                 ],
                 inline=False
@@ -623,12 +597,14 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return await ctx.send(f"No bet found with the keyword [ {keyword} ]. Please try again!")
 
     @bet.command(aliases=["for", ])
-    async def _for(self, ctx, keyword: str):
-        await ctx.send(embed=self.set_bet(ctx, "for", keyword.lower()))
+    async def _for(self, ctx, keyword: str, value: int):
+        if self.check_balance(ctx.message.author, value):
+            await ctx.send(embed=self.set_bet(ctx, "for", keyword.lower(), value))
 
     @bet.command()
-    async def against(self, ctx, keyword: str):
-        await ctx.send(embed=self.set_bet(ctx, "against", keyword.lower()))
+    async def against(self, ctx, keyword: str, value: int):
+        if self.check_balance(ctx.message.author, value):
+            await ctx.send(embed=self.set_bet(ctx, "against", keyword.lower(), value))
 
 
 def setup(bot):

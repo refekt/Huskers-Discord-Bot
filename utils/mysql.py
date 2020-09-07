@@ -221,23 +221,28 @@ sqlRetrieveIowa = "SELECT previous_roles FROM iowa WHERE user_id = %s"
 
 sqlRemoveIowa = "DELETE FROM iowa WHERE user_id = %s"
 
-sqlRetrieveCustomBetKeywords = "SELECT keyword FROM custom_lines"
+sqlRetrieveCustomLinesKeywords = "SELECT " \
+                                 " clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author " \
+                                 "FROM custom_lines_bets clb " \
+                                 "INNER JOIN custom_lines cl " \
+                                 "ON (cl.keyword = clb.keyword ) " \
+                                 "WHERE clb.keyword = %s"
 
-sqlInsertCustomBet = "INSERT INTO custom_lines (author, keyword, description, bet_amount) VALUES (%s, %s, %s, %s)"
+sqlInsertCustomLines = "INSERT INTO custom_lines (author, keyword, description) VALUES (%s, %s, %s)"
 
-sqlRetrieveCustomBet = "SELECT * FROM custom_lines"
+sqlRetrieveCustomLines = "SELECT * FROM custom_lines"
 
-sqlRetreiveCustomBetForAgainst = "SELECT bet_for, bet_against FROM custom_lines WHERE keyword = %s"
+sqlRetreiveCustomLinesForAgainst = "SELECT author, _for, against FROM custom_lines_bets WHERE keyword = %s"
 
-sqlRetrieveCustomBetKeyword = "SELECT * FROM custom_lines WHERE keyword = %s"
+sqlRetrieveCustomLinesKeyword = "SELECT * FROM custom_lines WHERE keyword = %s"
 
-sqlRetrieveCustomBetFor = "SELECT bet_for FROM custom_lines WHERE keyword = %s"
+# sqlRetrieveCustomLinesFor = "SELECT bet_for FROM custom_lines WHERE keyword = %s"
 
-sqlUpdateCustomBetFor = "UPDATE custom_lines SET bet_for = %s WHERE keyword = %s"
+sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for, against, value) VALUES (%s, %s, %s, %s, %s)"
 
-sqlRetrieveCustomBetAgainst = "SELECT bet_against FROM custom_lines WHERE keyword = %s"
+# sqlRetrieveCustomLinesAgainst = "SELECT bet_against FROM custom_lines WHERE keyword = %s"
 
-sqlUpdateCustomBetAgainst = "UPDATE custom_lines SET bet_for = %s WHERE keyword = %s"
+# sqlUpdateCustomLinesAgainst = "UPDATE custom_lines SET bet_for = %s WHERE keyword = %s"
 
 
 def process_MySQL(query: str, **kwargs):
