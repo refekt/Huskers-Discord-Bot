@@ -679,17 +679,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             losers = []
 
             for user in bet_users:
+                member = ctx.guild.get_member(user["author"])
+
                 if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
                     try:
-                        member = ctx.guild.get_member(user["author"])
                         self.adjust_currency(member, user["value"])
                         winners.append(member)
                     except:
                         winners.append(user["author"])
-                # elif user["_for"] == 0 and result == "for" or user["against"] == 0 and result == "against":
                 else:
                     try:
-                        member = ctx.guild.get_member(user["author"])
                         self.adjust_currency(member, -user["value"])
                         losers.append(member.mention)
                     except:
@@ -700,9 +699,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             await ctx.send(embed=build_embed(
                 title=f"[ {author}'s ] [ {keyword_bet['keyword']} ] bet has been resolved!",
+                description=keyword_bet["description"],
                 fields=[
                     ["Result", keyword_bet["result"]],
-                    ["Winners",winners],
+                    ["Winners", winners],
                     ["Losers", losers]
                 ],
                 inline=True

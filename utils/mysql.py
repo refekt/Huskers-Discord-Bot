@@ -228,11 +228,11 @@ sqlRetrieveCustomLinesKeywords = "SELECT " \
                                  "ON (cl.keyword = clb.keyword ) " \
                                  "WHERE clb.keyword = %s"
 
-sqlInsertCustomLines = "INSERT INTO custom_lines (author, keyword, description) VALUES (%s, %s, %s)"
+sqlInsertCustomLines = "INSERT INTO custom_lines (author, keyword, description, result) VALUES (%s, %s, %s, 'tbd')"
 
 sqlRetrieveCustomLines = "SELECT * FROM custom_lines"
 
-sqlRetreiveCustomLinesForAgainst = "SELECT author, _for, against FROM custom_lines_bets WHERE keyword = %s"
+sqlRetreiveCustomLinesForAgainst = "SELECT author, _for, against, value FROM custom_lines_bets WHERE keyword = %s"
 
 sqlRetrieveCustomLinesKeyword = "SELECT * FROM custom_lines WHERE keyword = %s"
 
