@@ -372,10 +372,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             fetch="all"
         )
 
-        from utils.client import client
-
         for user in users:
-            usr = client.get_user(id=user["user_id"])
+            usr = ctx.guild.get_member(user["user_id"])
             if usr:
                 self.adjust_currency(usr, value)
 
@@ -478,7 +476,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
             return False
 
-    def check_bet_resolved(self, ctx: discord.ext.commands.Context, keyword: str):
+    def check_bet_resolved(self, keyword: str):
         try:
             previous_bets = process_MySQL(
                 query=sqlRetrieveCustomLinesKeyword,
@@ -636,13 +634,15 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @bet.command()
     async def resolve(self, ctx, keyword: str, result: str):
         keyword = keyword.lower()
+
         if not self.check_bet_exists(ctx, keyword):
             raise AttributeError(f"Unable to find [ {keyword} ] bet! Try again.")
 
-        if self.check_bet_resolved(ctx, keyword):
+        if self.check_bet_resolved(keyword):
             raise AttributeError(f"The [ {keyword} ] bet has already been resolved!")
 
         result = result.lower()
+
         if not (result == "for" or result == "against"):
             raise AttributeError(f"The result must be `for` or `against`. Not [ {result} ]. Try again!")
 
@@ -668,16 +668,44 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 values=keyword,
                 fetch="one"
             )
+
+            bet_users = process_MySQL(
+                query=sqlRetreiveCustomLinesForAgainst,
+                fetch="all",
+                values=keyword
+            )
+
+            winners = []
+            losers = []
+
+            for user in bet_users:
+                if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
+                    try:
+                        member = ctx.guild.get_member(user["author"])
+                        self.adjust_currency(member, user["value"])
+                        winners.append(member)
+                    except:
+                        winners.append(user["author"])
+                # elif user["_for"] == 0 and result == "for" or user["against"] == 0 and result == "against":
+                else:
+                    try:
+                        member = ctx.guild.get_member(user["author"])
+                        self.adjust_currency(member, -user["value"])
+                        losers.append(member.mention)
+                    except:
+                        losers.append(user["author"])
+
         except ConnectionError:
             raise AttributeError(f"A MySQL query error occurred!")
         else:
             await ctx.send(embed=build_embed(
-                title=f"[ {keyword_bet['orig_author']}'s ] [ {keyword_bet['keyword']} ] bet has been resolved!",
+                title=f"[ {author}'s ] [ {keyword_bet['keyword']} ] bet has been resolved!",
                 fields=[
                     ["Result", keyword_bet["result"]],
-                    ["Winners", "TBD"],
-                    ["Losers", "TBD"]
-                ]
+                    ["Winners",winners],
+                    ["Losers", losers]
+                ],
+                inline=True
             ))
 
 
