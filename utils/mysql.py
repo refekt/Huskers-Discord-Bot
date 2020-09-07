@@ -227,7 +227,17 @@ sqlInsertCustomBet = "INSERT INTO custom_lines (author, keyword, description, be
 
 sqlRetrieveCustomBet = "SELECT * FROM custom_lines"
 
+sqlRetreiveCustomBetForAgainst = "SELECT bet_for, bet_against FROM custom_lines WHERE keyword = %s"
+
 sqlRetrieveCustomBetKeyword = "SELECT * FROM custom_lines WHERE keyword = %s"
+
+sqlRetrieveCustomBetFor = "SELECT bet_for FROM custom_lines WHERE keyword = %s"
+
+sqlUpdateCustomBetFor = "UPDATE custom_lines SET bet_for = %s WHERE keyword = %s"
+
+sqlRetrieveCustomBetAgainst = "SELECT bet_against FROM custom_lines WHERE keyword = %s"
+
+sqlUpdateCustomBetAgainst = "UPDATE custom_lines SET bet_for = %s WHERE keyword = %s"
 
 
 def process_MySQL(query: str, **kwargs):
