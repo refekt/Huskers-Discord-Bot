@@ -533,7 +533,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 fields=[
                     ["Author", author],
                     ["Keyword", keyword],
-                    ["Description", str(keyword_bet['description']).capitalize()]
+                    ["Description", str(keyword_bet['description']).capitalize()],
+                    ["Bet Amount", f"{value:,}"]
                 ]
             )
 
