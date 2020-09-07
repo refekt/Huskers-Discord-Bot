@@ -236,13 +236,12 @@ sqlRetreiveCustomLinesForAgainst = "SELECT author, _for, against FROM custom_lin
 
 sqlRetrieveCustomLinesKeyword = "SELECT * FROM custom_lines WHERE keyword = %s"
 
-# sqlRetrieveCustomLinesFor = "SELECT bet_for FROM custom_lines WHERE keyword = %s"
+sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for, against, value) " \
+                           "VALUES (%s, %s, %s, %s, %s)"
 
-sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for, against, value) VALUES (%s, %s, %s, %s, %s)"
-
-# sqlRetrieveCustomLinesAgainst = "SELECT bet_against FROM custom_lines WHERE keyword = %s"
-
-# sqlUpdateCustomLinesAgainst = "UPDATE custom_lines SET bet_for = %s WHERE keyword = %s"
+sqlUpdateCustomLinesBets = "UPDATE custom_lines_bets " \
+                           "SET `_for`=%s, against=%s, value=%s " \
+                           "WHERE author=%s AND keyword=%s"
 
 
 def process_MySQL(query: str, **kwargs):

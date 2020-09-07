@@ -12,7 +12,7 @@ from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
 from utils.mysql import sqlRetreiveCustomLinesForAgainst, sqlInsertCustomLinesBets, sqlRetrieveCustomLinesKeywords
-from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, sqlInsertCustomLines
+from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, sqlInsertCustomLines, sqlUpdateCustomLinesBets
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
@@ -466,32 +466,45 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 fetch="all"
             )
         except ConnectionError:
-            raise AttributeError(f"No previous bets found for [ {keyword} ] keyword!")
+            raise AttributeError(f"A MySQL query error occurred!")
         else:
             if previous_bets is None:
                 return False
 
             for bet in previous_bets:
                 if bet["author"] == ctx.message.author.id:
-                    if which == "for" and bet["_for"] == 1 or which == "against" and bet["against"] == 1:
-                        raise AttributeError(f"You have already placed a bet [ {which} ] [ {keyword} ] bet!")
+                    if bet["_for"] == 1 or bet["against"] == 1:
+                        # raise AttributeError(f"You have already placed a bet [ {which} ] [ {keyword} ] bet!")
+                        return True
 
             return False
 
     def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
-            self.check_bet_exists(ctx, keyword, which)
+            prev = self.check_bet_exists(ctx, keyword, which)
 
-            if which == "for":
-                process_MySQL(
-                    query=sqlInsertCustomLinesBets,
-                    values=(ctx.message.author.id, keyword, 1, 0, value)
-                )
-            elif which == "against":
-                process_MySQL(
-                    query=sqlInsertCustomLinesBets,
-                    values=(ctx.message.author.id, keyword, 0, 1, value)
-                )
+            if prev:
+                if which == "for":
+                    process_MySQL(
+                        query=sqlUpdateCustomLinesBets,
+                        values=(1, 0, value, ctx.message.author.id, keyword)
+                    )
+                elif which == "against":
+                    process_MySQL(
+                        query=sqlUpdateCustomLinesBets,
+                        values=(0, 1, value, ctx.message.author.id, keyword)
+                    )
+            else:
+                if which == "for":
+                    process_MySQL(
+                        query=sqlInsertCustomLinesBets,
+                        values=(ctx.message.author.id, keyword, 1, 0, value)
+                    )
+                elif which == "against":
+                    process_MySQL(
+                        query=sqlInsertCustomLinesBets,
+                        values=(ctx.message.author.id, keyword, 0, 1, value)
+                    )
 
             keyword_bet = process_MySQL(
                 query=sqlRetrieveCustomLinesKeywords,
@@ -499,7 +512,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 fetch="one"
             )
         except ConnectionError:
-            raise AttributeError(f"A bet with the keyword [ {keyword} ] already exists! Try again.")
+            raise AttributeError(f"A MySQL query error occurred!")
         else:
             author = ctx.guild.get_member(keyword_bet["orig_author"])
             return build_embed(
@@ -534,7 +547,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 values=(ctx.message.author.id, keyword, description)
             )
         except ConnectionError:
-            return await ctx.send(f"A bet with the keyword [ {keyword} ] already exists! Try again.")
+            raise AttributeError(f"A MySQL query error occurred!")
         else:
             await ctx.send(embed=build_embed(
                 title="Custom Bet",
