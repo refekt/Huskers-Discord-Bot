@@ -552,6 +552,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.group()
     async def bet(self, ctx):
         """Create custom bets for server currency"""
+        if ctx.channel.type == discord.channel.ChannelType.private:
+            raise AttributeError("You cannot use bet commands in DMs.")
+
         if ctx.subcommand_passed:
             return
         else:
