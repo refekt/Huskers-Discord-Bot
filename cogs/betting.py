@@ -501,7 +501,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 fetch="one"
             )
 
-            bet_value = keyword_bet["value"] + value
+            if keyword_bet is None:
+                bet_value = value
+            else:
+                bet_value = keyword_bet["value"] + value
 
             if prev:
                 if which == "for":
