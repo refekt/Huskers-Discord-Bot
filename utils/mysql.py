@@ -222,7 +222,7 @@ sqlRetrieveIowa = "SELECT previous_roles FROM iowa WHERE user_id = %s"
 sqlRemoveIowa = "DELETE FROM iowa WHERE user_id = %s"
 
 sqlRetrieveCustomLinesKeywords = "SELECT " \
-                                 " clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author " \
+                                 "clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author, cl.result " \
                                  "FROM custom_lines_bets clb " \
                                  "INNER JOIN custom_lines cl " \
                                  "ON (cl.keyword = clb.keyword ) " \
@@ -242,6 +242,8 @@ sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for
 sqlUpdateCustomLinesBets = "UPDATE custom_lines_bets " \
                            "SET `_for`=%s, against=%s, value=%s " \
                            "WHERE author=%s AND keyword=%s"
+
+sqlUpdateCustomLinesResult = "UPDATE custom_lines SET result = %s WHERE keyword = %s"
 
 
 def process_MySQL(query: str, **kwargs):

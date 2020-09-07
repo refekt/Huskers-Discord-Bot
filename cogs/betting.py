@@ -12,7 +12,7 @@ from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
 from utils.mysql import sqlRetreiveCustomLinesForAgainst, sqlInsertCustomLinesBets, sqlRetrieveCustomLinesKeywords
-from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, sqlInsertCustomLines, sqlUpdateCustomLinesBets
+from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, sqlInsertCustomLines, sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
@@ -458,7 +458,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         else:
             pass
 
-    def check_bet_exists(self, ctx: discord.ext.commands.Context, keyword: str, which: str):
+    def check_bet_exists(self, ctx: discord.ext.commands.Context, keyword: str):
         try:
             previous_bets = process_MySQL(
                 query=sqlRetreiveCustomLinesForAgainst,
@@ -474,14 +474,28 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             for bet in previous_bets:
                 if bet["author"] == ctx.message.author.id:
                     if bet["_for"] == 1 or bet["against"] == 1:
-                        # raise AttributeError(f"You have already placed a bet [ {which} ] [ {keyword} ] bet!")
                         return True
 
             return False
 
+    def check_bet_resolved(self, ctx: discord.ext.commands.Context, keyword: str):
+        try:
+            previous_bets = process_MySQL(
+                query=sqlRetrieveCustomLinesKeyword,
+                values=keyword,
+                fetch="one"
+            )
+        except ConnectionError:
+            raise AttributeError(f"A MySQL query error occurred!")
+        else:
+            if previous_bets["result"] == "tbd":
+                return False
+            else:
+                return True
+
     def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
-            prev = self.check_bet_exists(ctx, keyword, which)
+            prev = self.check_bet_exists(ctx, keyword)
 
             if prev:
                 if which == "for":
@@ -618,6 +632,53 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def against(self, ctx, keyword: str, value: int):
         if self.check_balance(ctx.message.author, value):
             await ctx.send(embed=self.set_bet(ctx, "against", keyword.lower(), value))
+
+    @bet.command()
+    async def resolve(self, ctx, keyword: str, result: str):
+        keyword = keyword.lower()
+        if not self.check_bet_exists(ctx, keyword):
+            raise AttributeError(f"Unable to find [ {keyword} ] bet! Try again.")
+
+        if self.check_bet_resolved(ctx, keyword):
+            raise AttributeError(f"The [ {keyword} ] bet has already been resolved!")
+
+        result = result.lower()
+        if not (result == "for" or result == "against"):
+            raise AttributeError(f"The result must be `for` or `against`. Not [ {result} ]. Try again!")
+
+        try:
+            keyword_bet = process_MySQL(
+                query=sqlRetrieveCustomLinesKeywords,
+                values=keyword,
+                fetch="one"
+            )
+
+            author = ctx.guild.get_member(keyword_bet["orig_author"])
+
+            if not keyword_bet["orig_author"] == ctx.message.author.id:
+                raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
+
+            process_MySQL(
+                query=sqlUpdateCustomLinesResult,
+                values=(result, keyword)
+            )
+
+            keyword_bet = process_MySQL(
+                query=sqlRetrieveCustomLinesKeywords,
+                values=keyword,
+                fetch="one"
+            )
+        except ConnectionError:
+            raise AttributeError(f"A MySQL query error occurred!")
+        else:
+            await ctx.send(embed=build_embed(
+                title=f"[ {keyword_bet['orig_author']}'s ] [ {keyword_bet['keyword']} ] bet has been resolved!",
+                fields=[
+                    ["Result", keyword_bet["result"]],
+                    ["Winners", "TBD"],
+                    ["Losers", "TBD"]
+                ]
+            ))
 
 
 def setup(bot):
