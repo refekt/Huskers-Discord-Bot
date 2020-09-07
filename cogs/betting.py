@@ -495,27 +495,35 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         try:
             prev = self.check_bet_exists(ctx, keyword)
 
+            keyword_bet = process_MySQL(
+                query=sqlRetrieveCustomLinesKeywords,
+                values=keyword,
+                fetch="one"
+            )
+
+            bet_value = keyword_bet["value"] + value
+
             if prev:
                 if which == "for":
                     process_MySQL(
                         query=sqlUpdateCustomLinesBets,
-                        values=(1, 0, value, ctx.message.author.id, keyword)
+                        values=(1, 0, bet_value, ctx.message.author.id, keyword)
                     )
                 elif which == "against":
                     process_MySQL(
                         query=sqlUpdateCustomLinesBets,
-                        values=(0, 1, value, ctx.message.author.id, keyword)
+                        values=(0, 1, bet_value, ctx.message.author.id, keyword)
                     )
             else:
                 if which == "for":
                     process_MySQL(
                         query=sqlInsertCustomLinesBets,
-                        values=(ctx.message.author.id, keyword, 1, 0, value)
+                        values=(ctx.message.author.id, keyword, 1, 0, bet_value)
                     )
                 elif which == "against":
                     process_MySQL(
                         query=sqlInsertCustomLinesBets,
-                        values=(ctx.message.author.id, keyword, 0, 1, value)
+                        values=(ctx.message.author.id, keyword, 0, 1, bet_value)
                     )
 
             keyword_bet = process_MySQL(
@@ -534,7 +542,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     ["Author", author],
                     ["Keyword", keyword],
                     ["Description", str(keyword_bet['description']).capitalize()],
-                    ["Bet Amount", f"{value:,}"]
+                    ["Bet Amount", f"{keyword_bet['value']:,}"]
                 ]
             )
 
@@ -630,14 +638,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def _for(self, ctx, keyword: str, value: int):
         """Place a bet in favor for bet
         $bet for <keyword> <bet amount>"""
-        if self.check_balance(ctx.message.author, value):
+        if self.validate_bet_amount_syntax(value) and self.check_balance(ctx.message.author, value):
+            self.adjust_currency(ctx.message.author, -value)
             await ctx.send(embed=self.set_bet(ctx, "for", keyword.lower(), value))
 
     @bet.command()
     async def against(self, ctx, keyword: str, value: int):
         """Place a bet against for bet
         $bet against <keyword> <bet amount>"""
-        if self.check_balance(ctx.message.author, value):
+        if self.validate_bet_amount_syntax(value) and self.check_balance(ctx.message.author, value):
+            self.adjust_currency(ctx.message.author, -value)
             await ctx.send(embed=self.set_bet(ctx, "against", keyword.lower(), value))
 
     @bet.command()
