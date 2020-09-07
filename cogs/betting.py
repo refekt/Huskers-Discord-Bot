@@ -539,6 +539,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @commands.group()
     async def bet(self, ctx):
+        """Create custom bets for server currency"""
         if ctx.subcommand_passed:
             return
         else:
@@ -573,6 +574,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @bet.command()
     async def show(self, ctx, keyword=None):
+        """Show all bets or a specific bet
+        $bet show
+        $bet show <keyword>"""
         if not keyword:
             bets = process_MySQL(
                 query=sqlRetrieveCustomLines,
@@ -623,16 +627,22 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @bet.command(aliases=["for", ])
     async def _for(self, ctx, keyword: str, value: int):
+        """Place a bet in favor for bet
+        $bet for <keyword> <bet amount>"""
         if self.check_balance(ctx.message.author, value):
             await ctx.send(embed=self.set_bet(ctx, "for", keyword.lower(), value))
 
     @bet.command()
     async def against(self, ctx, keyword: str, value: int):
+        """Place a bet against for bet
+        $bet against <keyword> <bet amount>"""
         if self.check_balance(ctx.message.author, value):
             await ctx.send(embed=self.set_bet(ctx, "against", keyword.lower(), value))
 
     @bet.command()
     async def resolve(self, ctx, keyword: str, result: str):
+        """Resolve a bet
+        $resolve <keyword> <for|against>"""
         keyword = keyword.lower()
 
         if not self.check_bet_exists(ctx, keyword):
@@ -684,7 +694,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
                     try:
                         self.adjust_currency(member, user["value"])
-                        winners.append(member)
+                        winners.append(member.mention)
                     except:
                         winners.append(user["author"])
                 else:
