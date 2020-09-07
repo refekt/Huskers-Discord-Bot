@@ -704,13 +704,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                 if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
                     try:
-                        self.adjust_currency(member, user["value"])
+                        self.adjust_currency(member, user["value"] * 2)
                         winners.append(member.mention)
                     except:
                         winners.append(user["author"])
                 else:
                     try:
-                        self.adjust_currency(member, -user["value"])
+                        self.adjust_currency(member, -(user["value"] * 2))
                         losers.append(member.mention)
                     except:
                         losers.append(user["author"])
