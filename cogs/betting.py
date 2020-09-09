@@ -660,12 +660,14 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             ))
         elif type(bets) == dict:
             author = ctx.guild.get_member(bets["author"])
+            if author is None:
+                author = "Unknown Author"
             await ctx.send(embed=build_embed(
                 title="All Open Bets",
                 fields=[
                     [
                         bets["keyword"],
-                        f"Author: {author}\n"
+                        f"Author: {author.mention if type(author) == discord.Member else author}\n"
                         f"Description: {str(bets['description']).capitalize()}\n"
                     ]
                 ],
