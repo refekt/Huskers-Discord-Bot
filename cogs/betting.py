@@ -644,13 +644,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             for bet in bets:
                 author = ctx.guild.get_member(bet["author"])
                 if author is None:
-                    author = "Unknown Member"
-                else:
-                    author = f"{author.name}#{author.discriminator}"
+                    author = "Unknown Author"
 
                 bet_fields.append([
-                    bet["keyword"], f"Author: {author}\n"
-                                    f"Description: {str(bet['description']).capitalize()}\n"
+                    bet["keyword"],
+                    f"Author: {author.mention if type(author) == discord.Member else author}\n"
+                    f"Description: {str(bet['description']).capitalize()}\n"
                 ])
 
             await ctx.send(embed=build_embed(
@@ -662,6 +661,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             author = ctx.guild.get_member(bets["author"])
             if author is None:
                 author = "Unknown Author"
+
             await ctx.send(embed=build_embed(
                 title="All Open Bets",
                 fields=[
