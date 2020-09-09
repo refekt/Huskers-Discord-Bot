@@ -493,6 +493,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     async def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
+            if value <= 100:
+                raise AttributeError(f"Bets must be more than 100 {CURRENCY_NAME}. Try again.")
+
             keyword_bet = self.keyword_bet(keyword)
 
             if not self.validate_keyword_bet(keyword):
