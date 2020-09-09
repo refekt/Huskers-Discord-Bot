@@ -491,63 +491,94 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             else:
                 return True
 
-    def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
+    async def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
-            prev = self.check_bet_exists(ctx, keyword)
+            keyword_bet = self.keyword_bet(keyword)
 
-            keyword_bet = process_MySQL(
-                query=sqlRetrieveCustomLinesKeywords,
-                values=keyword,
-                fetch="one"
-            )
+            if not self.validate_keyword_bet(keyword):
+                raise AttributeError(f"The bet [ {keyword} ] was not found. Try again.")
+
+            if not self.validate_bet_amount_syntax(value):
+                raise AttributeError(f"The bet amount of [ {value:,} ] was not correct. Try again.")
+
+            if not self.check_balance(ctx.message.author, value):
+                raise AttributeError(f"You do not have the [ {value:,} ] [ {CURRENCY_NAME} ] to place this bet. Try again.")
 
             if keyword_bet is None:
-                bet_value = value
+                total_bet_value = value
             else:
-                bet_value = keyword_bet["value"] + value
+                total_bet_value = keyword_bet["value"] + value
 
-            if prev:
+            previous_bet_exists = self.check_bet_exists(ctx, keyword)
+
+            if previous_bet_exists:
                 if which == "for":
                     process_MySQL(
                         query=sqlUpdateCustomLinesBets,
-                        values=(1, 0, bet_value, ctx.message.author.id, keyword)
+                        values=(1, 0, total_bet_value, ctx.message.author.id, keyword)
                     )
                 elif which == "against":
                     process_MySQL(
                         query=sqlUpdateCustomLinesBets,
-                        values=(0, 1, bet_value, ctx.message.author.id, keyword)
+                        values=(0, 1, total_bet_value, ctx.message.author.id, keyword)
                     )
             else:
                 if which == "for":
                     process_MySQL(
                         query=sqlInsertCustomLinesBets,
-                        values=(ctx.message.author.id, keyword, 1, 0, bet_value)
+                        values=(ctx.message.author.id, keyword, 1, 0, total_bet_value)
                     )
                 elif which == "against":
                     process_MySQL(
                         query=sqlInsertCustomLinesBets,
-                        values=(ctx.message.author.id, keyword, 0, 1, bet_value)
+                        values=(ctx.message.author.id, keyword, 0, 1, total_bet_value)
                     )
 
-            keyword_bet = process_MySQL(
-                query=sqlRetrieveCustomLinesKeywords,
-                values=keyword,
-                fetch="one"
-            )
+            self.adjust_currency(ctx.message.author, -value)
+
+            keyword_bet = self.keyword_bet(keyword)
+
         except ConnectionError:
             raise AttributeError(f"A MySQL query error occurred!")
         else:
             author = ctx.guild.get_member(keyword_bet["orig_author"])
-            return build_embed(
+
+            await ctx.send(embed=build_embed(
                 title="Custom Bet",
                 description=f"{ctx.message.author.mention}'s bet [ {which} ] the [ {keyword} ] bet!",
                 fields=[
                     ["Author", author],
                     ["Keyword", keyword],
                     ["Description", str(keyword_bet['description']).capitalize()],
-                    ["Bet Amount", f"{keyword_bet['value']:,}"]
+                    ["Total Bet Amount", f"{keyword_bet['value']:,}"],
+                    ["Most Recent Bet Amount", f"{value:,}"]
                 ]
             )
+            )
+
+    def keyword_bet(self, keyword):
+        return process_MySQL(
+            query=sqlRetrieveCustomLinesKeywords,
+            values=keyword,
+            fetch="one"
+        )
+
+    def validate_keyword_bet(self, keyword: str):
+        try:
+            check = process_MySQL(
+                query=sqlRetrieveCustomLinesKeyword,
+                values=keyword,
+                fetch="all"
+            )
+        except ConnectionError:
+            return False
+        else:
+            if check is None:
+                return False
+
+            for ch in check:
+                if keyword in ch.values():
+                    return True
 
     @commands.group()
     async def bet(self, ctx):
@@ -644,17 +675,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def _for(self, ctx, keyword: str, value: int):
         """Place a bet in favor for bet
         $bet for <keyword> <bet amount>"""
-        if self.validate_bet_amount_syntax(value) and self.check_balance(ctx.message.author, value):
-            self.adjust_currency(ctx.message.author, -value)
-            await ctx.send(embed=self.set_bet(ctx, "for", keyword.lower(), value))
+        await self.set_bet(ctx, "for", keyword.lower(), value)
 
     @bet.command()
     async def against(self, ctx, keyword: str, value: int):
         """Place a bet against for bet
         $bet against <keyword> <bet amount>"""
-        if self.validate_bet_amount_syntax(value) and self.check_balance(ctx.message.author, value):
-            self.adjust_currency(ctx.message.author, -value)
-            await ctx.send(embed=self.set_bet(ctx, "against", keyword.lower(), value))
+        await self.set_bet(ctx, "against", keyword.lower(), value)
 
     @bet.command()
     async def resolve(self, ctx, keyword: str, result: str):
@@ -674,11 +701,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"The result must be `for` or `against`. Not [ {result} ]. Try again!")
 
         try:
-            keyword_bet = process_MySQL(
-                query=sqlRetrieveCustomLinesKeywords,
-                values=keyword,
-                fetch="one"
-            )
+            keyword_bet = self.keyword_bet(keyword)
 
             author = ctx.guild.get_member(keyword_bet["orig_author"])
 
@@ -690,11 +713,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 values=(result, keyword)
             )
 
-            keyword_bet = process_MySQL(
-                query=sqlRetrieveCustomLinesKeywords,
-                values=keyword,
-                fetch="one"
-            )
+            keyword_bet = self.keyword_bet(keyword)
 
             bet_users = process_MySQL(
                 query=sqlRetreiveCustomLinesForAgainst,
