@@ -312,6 +312,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         await ctx.send(f"{ctx.message.author.mention} has granted {user.mention} [ {value:,} ] {CURRENCY_NAME}!")
 
+    def pity(self):
+        return 100
+
     @money.command()
     # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def pity(self, ctx):
@@ -321,9 +324,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         balance = self.get_balance(ctx.message.author)
 
         if balance == 0:
-            pitty_value = 100
-            self.adjust_currency(ctx.message.author, pitty_value)
-            return await ctx.send(content=f"Pity on you. You have been awarded [ {pitty_value:,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
+            self.adjust_currency(ctx.message.author, self.pity())
+            return await ctx.send(content=f"Pity on you. You have been awarded [ {self.pity():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
 
@@ -493,8 +495,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     async def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
-            if value <= 100:
-                raise AttributeError(f"Bets must be more than 100 {CURRENCY_NAME}. Try again.")
+            if value <= self.pity():
+                raise AttributeError(f"Bets must be more than [ {self.pity()} ] {CURRENCY_NAME}. Try again.")
 
             keyword_bet = self.keyword_bet(keyword)
 
