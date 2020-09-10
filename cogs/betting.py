@@ -392,11 +392,14 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         lb = ""
         for index, person in enumerate(leaderboard):
+            if index > 10:
+                break
+
             member = ctx.guild.get_member(person["user_id"])
 
             if member is not None:
                 spacer = "." * (
-                        20 - len(str(person['balance']))
+                        50 - len(str(person['balance']))
                 )
                 lb += f"#{index + 1}: {member.mention if type(member) == discord.Member else member}{spacer}{person['balance']:,}\n"
 
@@ -404,7 +407,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             embed=build_embed(
                 title=f"Husker Discord Currency Leaderboard",
                 fields=[
-                    [f"{CURRENCY_NAME} Leaderboard", lb]
+                    [f"Top 10 {CURRENCY_NAME} Leaderboard", lb]
                 ]
             )
         )
