@@ -392,7 +392,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         lb = ""
         for index, person in enumerate(leaderboard):
-            if index > 10:
+            if index > 9:
                 break
 
             member = ctx.guild.get_member(person["user_id"])
