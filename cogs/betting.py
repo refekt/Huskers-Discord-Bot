@@ -396,7 +396,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
             if member is not None:
                 spacer = "." * (
-                        50 - len(str(person['balance']))
+                        20 - len(str(person['balance']))
                 )
                 lb += f"#{index + 1}: {member.mention if type(member) == discord.Member else member}{spacer}{person['balance']:,}\n"
 
