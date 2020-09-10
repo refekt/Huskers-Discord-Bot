@@ -16,7 +16,7 @@ from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, s
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
-    
+
     def pity_value(self):
         return 15000
 
@@ -390,19 +390,21 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             fetch="all"
         )
 
-        from utils.client import client
         lb = ""
         for index, person in enumerate(leaderboard):
-            member = ctx.guild.get_member(person["user_id"])  #client.get_user(id=int(person["user_id"]))
+            member = ctx.guild.get_member(person["user_id"])
 
             if member is not None:
-                lb += f"#{index + 1} {member.mention if type(member) == discord.Member else member} - {person['balance']:,} {CURRENCY_NAME}\n"
+                spacer = "." * (
+                        50 - len(str(person['balance']))
+                )
+                lb += f"#{index + 1}: {member.mention if type(member) == discord.Member else member}{spacer}{person['balance']:,}\n"
 
         await ctx.send(
             embed=build_embed(
                 title=f"Husker Discord Currency Leaderboard",
                 fields=[
-                    ["Leaderboard", lb]
+                    [f"{CURRENCY_NAME} Leaderboard", lb]
                 ]
             )
         )
