@@ -398,8 +398,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             member = ctx.guild.get_member(person["user_id"])
 
             if member is not None:
+                name_balance = str(person['balance']) + str(member.name)
                 spacer = "." * (
-                        50 - len(str(person['balance']))
+                        50 - len(name_balance)
                 )
                 lb += f"#{index + 1}: {member.mention if type(member) == discord.Member else member}{spacer}{person['balance']:,}\n"
 
