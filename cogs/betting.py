@@ -317,7 +317,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         await ctx.send(f"{ctx.message.author.mention} has granted {user.mention} [ {value:,} ] {CURRENCY_NAME}!")
 
     @money.command()
-    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    @commands.cooldown(rate=10, per=86400, type=discord.ext.commands.BucketType.user)
     async def pity(self, ctx):
         if not self.check_author_initialized(ctx.message.author):
             return
