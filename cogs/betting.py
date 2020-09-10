@@ -290,7 +290,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"A sub command must be used. Review $help.")
 
     @money.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def new(self, ctx):
         """ Establish a wallet for server currency """
         if not self.check_author_initialized(ctx.message.author):
@@ -301,7 +300,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return await ctx.send(f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
 
     @money.command(hidden=True)
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def grant(self, ctx, user: discord.Member, value: int):
         """ Admin command. Give user server currency """
@@ -369,7 +367,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @money.command()
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
-    async def giveall(self, ctx, value: int):
+    async def grantall(self, ctx, value: int):
         users = process_MySQL(
             query=sqlRetrieveCurrencyLeaderboard,
             fetch="all"
