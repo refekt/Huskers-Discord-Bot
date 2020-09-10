@@ -396,7 +396,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 break
 
             # member = ctx.guild.get_member(person["user_id"])
-            member = ctx.guild.fetch_member(person["user_id"])
+            member = await ctx.guild.fetch_member(person["user_id"])
 
             if member is not None:
                 name_balance = f"{person['balance']:,}" + "@" + str(member.name)
