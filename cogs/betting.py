@@ -645,7 +645,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
         try:
             if value <= self.pity_value():
-                raise AttributeError(f"Bets must be more than [ {self.pity_value()} ] {CURRENCY_NAME}. Try again.")
+                raise AttributeError(f"Bets must be more than [ {self.pity_value():,} ] {CURRENCY_NAME}. Try again.")
 
             keyword_bet = self.keyword_bet(keyword)
 
