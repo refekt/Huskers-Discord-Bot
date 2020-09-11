@@ -30,17 +30,17 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if result == "win":
             output = "Win! "
+            self.adjust_currency(who, amount)
         elif result == "lose":
             output = "Loser! "
-
-        self.adjust_currency(who, amount)
+            self.adjust_currency(who, -amount)
 
         if kwargs["game"] == "rps":
             output += f"You threw [ {kwargs['mbr_throw']} ] and the computer threw [ {kwargs['cpu_throw']} ]. "
         elif kwargs["game"] == "rlt":
             output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]. You chose [ {kwargs['bet']} ]."
         elif kwargs["game"] == "arlt":
-            output += f"The computer ran [ {kwargs['cycles']} ] cycles and you winnings are [ {amount:,} ]. You chose [ {kwargs['bet']} ]."
+            output += f"The computer ran [ {kwargs['cycles']} ] cycles. You chose [ {kwargs['bet']} ] and you won [ {kwargs['wins']} ] of those cycles. Your winnings are [ {amount:,} ]."
 
         output += f" You have been {'awarded' if result == 'win' else 'deducted'} [ {abs(amount):,} ] {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
@@ -309,13 +309,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
 
         iteration = 1
-        pities_used = 0
         current_balance = self.get_balance(ctx.message.author)
         bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
         total_bet_amount = bet_amount
-        result = None
         colors = ["red", "black"]
-        bet_color = None
+        win_count = 0
 
         edit_msg = await ctx.send("Loading...")
 
@@ -337,7 +335,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                         if bet_range[0] <= result <= bet_range[1]:
                             total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="color_and_range")
-                            result = f"{bet_color} and {str(result)}"
+                            win_count += 1
 
                 elif BET_RANGE_CHAR in bet and bet_color is None:  # Range only
                     bet_range = self.convert_bet_range(bet)
@@ -349,6 +347,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                     if bet_range[0] <= result <= bet_range[1]:
                         total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="range")
+                        win_count += 1
 
                 else:  # Color only
                     if bet.lower() in colors:
@@ -356,6 +355,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                         if result == bet.lower():
                             total_bet_amount += bet_amount
+                            win_count += 1
                     else:
                         raise AttributeError(f"You can only place a bet for {[color for color in colors]}. Try again!")
 
@@ -366,12 +366,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                     if result == bet:
                         total_bet_amount += self.generate_win_amount(bet_amount, method="number")
+                        win_count += 1
                 else:
                     raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
             iteration += 1
 
-        await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=total_bet_amount, game="arlt", cycles=num_cycles, bet=bet))
+        await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=total_bet_amount, game="arlt", cycles=num_cycles, bet=bet, wins=win_count))
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
