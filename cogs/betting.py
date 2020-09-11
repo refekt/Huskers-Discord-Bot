@@ -30,10 +30,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if result == "win":
             output = "Win! "
-            self.adjust_currency(who, amount)
         elif result == "lose":
             output = "Loser! "
-            self.adjust_currency(who, -amount)
+
+        self.adjust_currency(who, amount)
 
         if kwargs["game"] == "rps":
             output += f"You threw [ {kwargs['mbr_throw']} ] and the computer threw [ {kwargs['cpu_throw']} ]. "
