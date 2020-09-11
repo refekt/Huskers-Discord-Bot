@@ -276,7 +276,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
         if win:
-            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result, bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
+            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result,
+                                                           bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
         else:
             await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
 
@@ -315,10 +316,26 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         total_bet_amount = bet_amount
         colors = ["red", "black"]
         win_count = 0
+        pities_used = 0
 
         edit_msg = await ctx.send("Loading...")
 
         while iteration <= num_cycles:
+            if total_bet_amount <= 0:
+                pity = self.pity_value()
+                total_bet_amount = pity
+
+                if bet_amount > pity:
+                    bet_amount = pity
+
+                pities_used += 1
+                print(pities_used)
+
+                self.adjust_currency(ctx.message.author, pity)
+
+                if pities_used > 3:
+                    raise AttributeError(f"You can only use {PITY_CAP} pities. Your current balance is [ {total_bet_amount:,} ].")
+
             if type(bet) == str:
                 bet_color = self.find_color_string(bet)
 
@@ -337,6 +354,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                         if bet_range[0] <= result <= bet_range[1]:
                             total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="color_and_range")
                             win_count += 1
+                        else:
+                            total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
+                            self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
 
                 elif BET_RANGE_CHAR in bet and bet_color is None:  # Range only
                     bet_range = self.convert_bet_range(bet)
@@ -349,6 +369,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     if bet_range[0] <= result <= bet_range[1]:
                         total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="range")
                         win_count += 1
+                    else:
+                        total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
+                        self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
 
                 else:  # Color only
                     if bet.lower() in colors:
@@ -357,6 +380,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                         if result == bet.lower():
                             total_bet_amount += bet_amount
                             win_count += 1
+                        else:
+                            total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
+                            self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
                     else:
                         raise AttributeError(f"You can only place a bet for {[color for color in colors]}. Try again!")
 
@@ -368,12 +394,15 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     if result == bet:
                         total_bet_amount += self.generate_win_amount(bet_amount, method="number")
                         win_count += 1
+                    else:
+                        total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
+                        self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
                 else:
                     raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
             iteration += 1
 
-        await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=total_bet_amount, game="arlt", cycles=num_cycles, bet=bet, wins=win_count))
+        await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=total_bet_amount, game="arlt", cycles=iteration - 1, bet=bet, wins=win_count))
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
