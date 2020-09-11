@@ -30,15 +30,17 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if result == "win":
             output = "Win! "
-            self.adjust_currency(who, amount)
         elif result == "lose":
             output = "Loser! "
-            self.adjust_currency(who, amount)
+
+        self.adjust_currency(who, amount)
 
         if kwargs["game"] == "rps":
             output += f"You threw [ {kwargs['mbr_throw']} ] and the computer threw [ {kwargs['cpu_throw']} ]. "
         elif kwargs["game"] == "rlt":
             output += f"The computer spun the wheel and it landed on [ {kwargs['wheel_spin']} ]. You chose [ {kwargs['bet']} ]."
+        elif kwargs["game"] == "arlt":
+            output += f"The computer ran [ {kwargs['cycles']} ] cycles and you winnings are [ {amount:,} ]. You chose [ {kwargs['bet']} ]."
 
         output += f" You have been {'awarded' if result == 'win' else 'deducted'} [ {abs(amount):,} ] {CURRENCY_NAME}. Your current balance is [ {self.get_balance(who):,} ]."
 
@@ -200,16 +202,21 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if bet_amount is None or bet is None:
             raise AttributeError(f"You must select a bet!")
 
+        current_balance = self.get_balance(ctx.message.author)
+
+        if not self.validate_bet_amount_syntax(bet_amount):
+            raise AttributeError(f"You submitted an incorrect amount to bet.")
+
+        bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
+
         if not self.check_balance(ctx.message.author, bet_amount):
             raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
 
         if bet_amount <= 0:
             raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
 
-        if not self.validate_bet_amount_syntax(bet_amount):
-            raise AttributeError(f"You submitted an incorrect amount to bet.")
+        edit_msg = await ctx.send("Loading...")
 
-        current_balance = self.get_balance(ctx.message.author)
         bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
         win = False
         result = None
@@ -269,18 +276,102 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
         if win:
-            return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result, bet=bet if not bet_color else f"{bet_color} {bet}"))
+            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result, bet=bet if not bet_color else f"{bet_color} {bet}"))
         else:
-            return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
+            await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
 
     @commands.command(aliases=["arlt", ])
-    async def autoroulette(self, ctx, goal_balance: int, bet: typing.Union[int, str]):
+    async def autoroulette(self, ctx, num_cycles: int, bet_amount: typing.Union[int, str], *, bet: typing.Union[int, str]):
+        """ Win or lose some server currency playing roulette
+        $roulette 10 red -- Bet a color
+        $roulette 10 25 -- Bet a specific number (225% bonus)
+        $roulette 10 1:17 -- Bet a specific number range (scaling bonus)
+        $roulette 10 red1:36 -- Bet a color and number range (scaling bonus)
+        """
 
-        starting_balance = self.get_balance(ctx.message.author)
+        if num_cycles > 10:
+            raise AttributeError(f"You can only run 10 cycles!")
+
+        if bet_amount is None or bet is None:
+            raise AttributeError(f"You must select a bet!")
+
+        current_balance = self.get_balance(ctx.message.author)
+
+        if not self.validate_bet_amount_syntax(bet_amount):
+            raise AttributeError(f"You submitted an incorrect amount to bet.")
+
+        bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
+
+        if not self.check_balance(ctx.message.author, bet_amount):
+            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+
+        if bet_amount <= 0:
+            raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
+
+        iteration = 1
         pities_used = 0
+        current_balance = self.get_balance(ctx.message.author)
+        bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
+        total_bet_amount = bet_amount
+        result = None
+        colors = ["red", "black"]
+        bet_color = None
 
-        while pities_used <= PITY_CAP:
-            pass
+        edit_msg = await ctx.send("Loading...")
+
+        while iteration <= num_cycles:
+            if type(bet) == str:
+                bet_color = self.find_color_string(bet)
+
+                if BET_RANGE_CHAR in bet and bet_color:  # Color and range
+                    result = self.roll_red_or_black()
+
+                    if bet_color == result:
+                        bet = bet[len(bet_color):]
+                        bet_range = self.convert_bet_range(bet)
+
+                        if not self.validate_bet_range(bet_range):
+                            raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
+
+                        result = self.roll_single_int()
+
+                        if bet_range[0] <= result <= bet_range[1]:
+                            total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="color_and_range")
+                            result = f"{bet_color} and {str(result)}"
+
+                elif BET_RANGE_CHAR in bet and bet_color is None:  # Range only
+                    bet_range = self.convert_bet_range(bet)
+
+                    if not self.validate_bet_range(bet_range):
+                        raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
+
+                    result = self.roll_single_int()
+
+                    if bet_range[0] <= result <= bet_range[1]:
+                        total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="range")
+
+                else:  # Color only
+                    if bet.lower() in colors:
+                        result = self.roll_red_or_black()
+
+                        if result == bet.lower():
+                            total_bet_amount += bet_amount
+                    else:
+                        raise AttributeError(f"You can only place a bet for {[color for color in colors]}. Try again!")
+
+            elif type(bet) == int:  # One number only
+
+                if RLT_FLOOR <= bet <= RLT_CEILING:
+                    result = self.roll_single_int()
+
+                    if result == bet:
+                        total_bet_amount += self.generate_win_amount(bet_amount, method="number")
+                else:
+                    raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
+
+            iteration += 1
+
+        await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=total_bet_amount, game="arlt", cycles=num_cycles, bet=bet))
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
