@@ -276,7 +276,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
         if win:
-            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result, bet=bet if not bet_color else f"{bet_color} {bet}"))
+            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result, bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
         else:
             await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
 
