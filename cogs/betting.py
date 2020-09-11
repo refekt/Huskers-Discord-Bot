@@ -281,6 +281,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
 
     @commands.command(aliases=["arlt", ])
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def autoroulette(self, ctx, num_cycles: int, bet_amount: typing.Union[int, str], *, bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
         $roulette 10 red -- Bet a color
