@@ -305,7 +305,7 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
     await trivia_message()
     await quote_reacts()
 
-    if not user.bot:
+    if not user.bot and channel.id == CHAN_TWITTERVERSE:
         await twitterverse_reacts()
 
 
