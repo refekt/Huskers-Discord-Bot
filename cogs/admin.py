@@ -424,7 +424,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         await ctx.send(embed=build_embed(
             title=f"Bug Reporter",
             fields=[
-                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new"]
+                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
             ]
         ))
 
