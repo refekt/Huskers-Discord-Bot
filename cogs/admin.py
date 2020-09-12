@@ -419,6 +419,15 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
         await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
 
+    @commands.command()
+    async def bug(self, ctx):
+        await ctx.send(embed=build_embed(
+            title=f"Bug Reporter",
+            fields=[
+                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new"]
+            ]
+        ))
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
