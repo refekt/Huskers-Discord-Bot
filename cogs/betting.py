@@ -921,7 +921,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                         winners.append(user["author"])
                 else:
                     try:
-                        self.adjust_currency(member, -(user["value"] * 2))
+                        # self.adjust_currency(member, -(user["value"] * 2))
                         losers.append(member.mention)
                     except:
                         losers.append(user["author"])
