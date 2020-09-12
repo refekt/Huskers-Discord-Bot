@@ -29,6 +29,11 @@ else:
 # Decrypt Env file
 env_file = "variables.json"
 key = load_key()
+
+# Save decrypted file
+# decrypt(env_file, key)
+# encrypt(env_file, key)
+
 env_vars = decrypt_return_data(env_file, key)
 
 # Cooldown rates for commands
@@ -62,6 +67,7 @@ TWITTER_CONSUMER_KEY = env_vars["twitter_consumer_key"]
 TWITTER_CONSUMER_SECRET = env_vars["twitter_consumer_secret"]
 TWITTER_TOKEN_KEY = env_vars["twitter_token_key"]
 TWITTER_TOKEN_SECRET = env_vars["twitter_token_secret"]
+TWITTER_WEBHOOK_ENV = "dev"
 
 del env_vars, env_file, key
 
