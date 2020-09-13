@@ -571,8 +571,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 spacer = "." * (
                         50 - len(f"{person['balance']:,}" + "@" + str(member) + f"#{index + 1}")
                 )
-                print(len(spacer))
-                # spacer = " --- "
+
                 if index == 0:
                     lb += f"`🥇: {member}{spacer}{person['balance']:,}`\n"
                 elif index == 1:
