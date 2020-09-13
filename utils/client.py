@@ -9,6 +9,7 @@ import traceback
 from datetime import datetime
 
 import discord
+import twitter
 from discord.ext import commands
 
 import utils.consts as consts
@@ -19,6 +20,7 @@ from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
+from utils.consts import TWITTER_TOKEN_SECRET, TWITTER_TOKEN_KEY, TWITTER_CONSUMER_SECRET, TWITTER_CONSUMER_KEY
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -26,6 +28,37 @@ from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlRetrieveTa
 from utils.thread import send_reminder, send_math
 
 tweet_reactions = ("🎈", "🌽", "🕸")
+
+
+async def start_twitter_stream():
+    api = twitter.Api(
+        consumer_key=TWITTER_CONSUMER_KEY,
+        consumer_secret=TWITTER_CONSUMER_SECRET,
+        access_token_key=TWITTER_TOKEN_KEY,
+        access_token_secret=TWITTER_TOKEN_SECRET
+    )
+
+    twitter_stream = api.GetStreamFilter(
+        track=["#nebraska", "#huskers", "#gbr"],  # Search terms
+        languages=["en"]
+    )
+
+    chan = client.get_channel(CHAN_TEST_SPAM)  # Your bot variable must be accessible or have another way to create a TextChannel
+
+    for tweet in twitter_stream:
+        dt = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
+
+        await chan.send(
+            embed=build_embed(
+                title=f"Tweet by: @{tweet['user']['screen_name']}",
+                description=f"[Twitter link](https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id']})",
+                fields=[
+                    ["Content", f"{tweet['text']}"]
+                ],
+                thumbnail=tweet["user"]["profile_image_url"],
+                footer=f"{dt.strftime('%B %d, %Y at %H:%M%p')} | 🎈 = General 🌽 = Scott's Tots"
+            )
+        )
 
 
 async def current_guild():
@@ -662,8 +695,10 @@ class MyClient(commands.Bot):
     #
     #     # await self.send_salutations("I AM DISCONNECTING.")
 
-    # async def on_ready(self):
-    # await self.send_salutations("Ready to go Cap-i-tan!")
+    async def on_ready(self):
+        # await start_twitter_stream()
+        task = asyncio.create_task(start_twitter_stream())
+        await task
 
     async def on_resume(self):
         await change_my_status(client)
