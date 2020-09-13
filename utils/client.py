@@ -697,8 +697,9 @@ class MyClient(commands.Bot):
 
     async def on_ready(self):
         # await start_twitter_stream()
-        task = asyncio.create_task(start_twitter_stream())
-        await task
+        if not on_prod_server():
+            task = asyncio.create_task(start_twitter_stream())
+            await task
 
     async def on_resume(self):
         await change_my_status(client)
