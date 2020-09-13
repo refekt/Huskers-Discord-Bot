@@ -563,15 +563,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             if index > 9:
                 break
 
-            # member = ctx.guild.get_member(person["user_id"])
-            # member = await ctx.guild.fetch_member(person["user_id"])
             member = person["username"]
+            spacer = "." * (50 - len(f"`🥇: {member}{person['balance']:,}`"))
 
             if member is not None:
-                spacer = "." * (
-                        50 - len(f"{person['balance']:,}" + "@" + str(member) + f"#{index + 1}")
-                )
-
                 if index == 0:
                     lb += f"`🥇: {member}{spacer}{person['balance']:,}`\n"
                 elif index == 1:
@@ -579,7 +574,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 elif index == 2:
                     lb += f"`🥉: {member}{spacer}{person['balance']:,}`\n"
                 else:
-                    lb += f"`#{index + 1}: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"`🏅: {member}{spacer}{person['balance']:,}`\n"
 
         await ctx.send(
             embed=build_embed(
