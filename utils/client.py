@@ -505,8 +505,9 @@ async def start_maths():
 
 class MyClient(commands.Bot):
 
-    def __init__(self, command_prefix, **options):
-        super().__init__(command_prefix, **options)
+    # I'm not sure what this was used for?
+    # def __init__(self, command_prefix, **options):
+    #     super().__init__(command_prefix, **options)
 
     async def send_salutations(self, msg: str):
         guild = await current_guild()
@@ -662,8 +663,7 @@ class MyClient(commands.Bot):
     #     # await self.send_salutations("I AM DISCONNECTING.")
 
     # async def on_ready(self):
-    #     # await self.send_salutations("Ready to go Cap-i-tan!")
-    #     pass
+    # await self.send_salutations("Ready to go Cap-i-tan!")
 
     async def on_resume(self):
         await change_my_status(client)
@@ -771,7 +771,7 @@ else:
 client = MyClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
 extensions = (
     "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg",
-    "cogs.betting", "cogs.music", "cogs.reddit", "cogs.message_history", "cogs.deepfry", "cogs.fap", "cogs.twitter")
+    "cogs.betting", "cogs.music", "cogs.reddit", "cogs.message_history", "cogs.deepfry", "cogs.fap")  # , "cogs.twitter")
 
 for extension in extensions:
     try:

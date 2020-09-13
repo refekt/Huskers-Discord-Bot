@@ -1,55 +1,73 @@
-import tweepy
-from discord.ext import commands
+import twitter
+# from discord.ext import commands
 
 from utils.consts import TWITTER_TOKEN_SECRET, TWITTER_TOKEN_KEY, TWITTER_CONSUMER_SECRET, TWITTER_CONSUMER_KEY
+from utils.consts import CHAN_TWITTERVERSE, CHAN_TEST_SPAM
 from utils.embed import build_embed
 
 
-def twitter_api():
-    auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
-    auth.set_access_token(TWITTER_TOKEN_KEY, TWITTER_TOKEN_SECRET)
+async def start_twitter_stream(client):
 
-    return tweepy.API(auth)
+    print(f"Loading Twitter stream...")
 
+    api = twitter.Api(
+        consumer_key=TWITTER_CONSUMER_KEY,
+        consumer_secret=TWITTER_CONSUMER_SECRET,
+        access_token_key=TWITTER_TOKEN_KEY,
+        access_token_secret=TWITTER_TOKEN_SECRET
+    )
 
-class WebhookCommands(commands.Cog, name="Webhook Commands"):
+    twitter_stream = api.GetStreamFilter(
+        track=["nebraska", "huskers", "gbr"],
+        languages=["en"]
+    )
 
-    @commands.command()
-    async def webhooktest(self, ctx):
-        # TODO This grabs the "stream" of whatever you want to search for, but I am having troubles passing it from sync to async.
-        class MyStreamListener(tweepy.StreamListener):
-            def on_status(self, status):
-                print(status.text)
+    print(twitter_stream)
 
-        myStream = tweepy.Stream(auth=twitter_api().auth, listener=MyStreamListener())
+    chan = client.get_channel(CHAN_TEST_SPAM)
 
-        search_tearms = ["huskers", "nebraska", "big ten", "b1g", "gbr", "frost"]
-
-        myStream.filter(track=search_tearms, is_async=True)
-
-    @commands.command()
-    async def searchtest(self, ctx):
-        auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
-        auth.set_access_token(TWITTER_TOKEN_KEY, TWITTER_TOKEN_SECRET)
-
-        api = tweepy.API(auth)
-
-        list_id = 1223689242896977922
-
-        # public_tweets = api.home_timeline(count=2)
-        list_tweets = api.list_timeline(list_id=list_id, count=2)
-
-        for tweet in list_tweets:
-            await ctx.send(embed=build_embed(
-                title=f"Tweet from: @{tweet.author.screen_name}",
+    for tweet in twitter_stream:
+        await chan.send(
+            embed=build_embed(
+                title=f"Tweet by: @{tweet['user']['screen_name']}",
+                description=f"[Twitter link](https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id']}) | {tweet['created_at']}",
                 fields=[
-                    ["Content", tweet.text]
+                    ["Content", f"{tweet['text']}"]
                 ],
-                inline=True,
-                thumbnail=tweet.author.profile_image_url,
-                url=f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id}"
-            ))
+                thumbnail=tweet["user"]["profile_image_url"],
+                footer="🎈 = General 🌽 = Scott's Tots"
+            )
+        )
 
-
-def setup(bot):
-    bot.add_cog(WebhookCommands(bot))
+# class WebhookCommands(commands.Cog, name="Webhook Commands"):
+#
+#     @commands.command()
+#     async def twitter_package(self, ctx):
+#         api = twitter.Api(
+#             consumer_key=TWITTER_CONSUMER_KEY,
+#             consumer_secret=TWITTER_CONSUMER_SECRET,
+#             access_token_key=TWITTER_TOKEN_KEY,
+#             access_token_secret=TWITTER_TOKEN_SECRET
+#         )
+#
+#         twitter_steam = api.GetStreamFilter(
+#             track=["nebraska", "huskers", "gbr"],
+#             languages=["en"]
+#         )
+#
+#         for tweet in twitter_steam:
+#             await ctx.send(
+#                 embed=build_embed(
+#                     title=f"Tweet by: @{tweet['user']['screen_name']}",
+#                     description=f"[Twitter link](https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id']}) | {tweet['created_at']}",
+#                     fields=[
+#                         ["Content", f"{tweet['text']}"]
+#                     ],
+#                     thumbnail=tweet["user"]["profile_image_url"],
+#                     footer="🎈 = General 🌽 = Scott's Tots"
+#                 )
+#             )
+#
+#
+# def setup(bot):
+#     bot.add_cog(WebhookCommands(bot))

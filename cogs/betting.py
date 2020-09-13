@@ -564,15 +564,23 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 break
 
             # member = ctx.guild.get_member(person["user_id"])
-            member = await ctx.guild.fetch_member(person["user_id"])
+            # member = await ctx.guild.fetch_member(person["user_id"])
+            member = person["username"]
 
             if member is not None:
-                name_balance = f"{person['balance']:,}" + "@" + str(member.name)
+                name_balance = f"{person['balance']:,}" + "@" + str(member)
                 # spacer = "." * (
                 #         50 - len(name_balance)
                 # )
                 spacer = " --- "
-                lb += f"#{index + 1}: {member.mention if type(member) == discord.Member else member}{spacer}{person['balance']:,}\n"
+                if index == 0:
+                    lb += f"🥇: {member}{spacer}{person['balance']:,}\n"
+                elif index == 1:
+                    lb += f"🥈: {member}{spacer}{person['balance']:,}\n"
+                elif index == 2:
+                    lb += f"🥉: {member}{spacer}{person['balance']:,}\n"
+                else:
+                    lb += f"#{index + 1}: {member}{spacer}{person['balance']:,}\n"
 
         await ctx.send(
             embed=build_embed(

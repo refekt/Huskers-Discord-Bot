@@ -9,6 +9,7 @@ from utils.consts import TZ
 from utils.games import HuskerSchedule
 import cogs.fap as FAP
 
+
 def build_image_embed(title, image):
     embed = discord.Embed(title=title, color=0xD00000)
     embed.set_author(name="Bot Frost", url="https://github.com/refekt/Husker-Bot", icon_url="https://i.imgur.com/Ah3x5NA.png")
@@ -30,7 +31,6 @@ def build_embed(title, **kwargs):
             embed = discord.Embed(title=title, description=kwargs["description"], color=0xD00000)
         else:
             embed = discord.Embed(title=title, color=0xD00000)
-
 
     embed.set_author(name="Bot Frost", url="https://github.com/refekt/Husker-Bot", icon_url="https://i.imgur.com/Ah3x5NA.png")
 
@@ -96,7 +96,7 @@ def build_recruit_embed(rec):  # rec == recruit
                 init_string += f"\n{p['team']}: {p['percent']:.0f}% ({p['confidence']:.1f})"
             init_string += f"\nTotal Predictions: {fap_preds[0]['total']}"
             return init_string
-    
+
     nl = "\n"
     embed = build_embed(
         title=f"{rec.name}, {str(rec.rating_stars) + '⭐ ' if rec.rating_stars else ''}{rec.year} {rec.position}",
@@ -133,15 +133,15 @@ def build_recruit_embed(rec):  # rec == recruit
             ["**Lead Expert Picks**", f"{epxerts_pretty() if rec.experts else 'N/A'}"],
 
             ["**Offers**", f"{offers_pretty() if rec.recruit_interests else 'N/A'}"],
-            
+
             ["**FAP Predictions**", f"{fap_predictions(rec)}"]
         ]
     )
-    
+
     if (rec.committed.lower() if rec.committed is not None else None) not in ['signed', 'enrolled']:
         if ((FAP.get_croot_predictions(rec)) is not None):
             embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to."
-                         + "\nClick the 📜 to get the inividual predictions for this recruit.")
+                                  + "\nClick the 📜 to get the inividual predictions for this recruit.")
         else:
             embed.set_footer(text=FOOTER_BOT + "\nClick the 🔮 to predict what school you think this recruit will commit to.")
     else:
@@ -149,7 +149,7 @@ def build_recruit_embed(rec):  # rec == recruit
             embed.set_footer(text=FOOTER_BOT + "\nClick the 📜 to get the inividual predictions for this recruit.")
         else:
             embed.set_footer(text=FOOTER_BOT)
-            
+
     if not rec.thumbnail == "/.":
         embed.set_thumbnail(url=rec.thumbnail)
     return embed
