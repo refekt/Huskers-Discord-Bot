@@ -568,19 +568,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             member = person["username"]
 
             if member is not None:
-                name_balance = f"{person['balance']:,}" + "@" + str(member)
-                # spacer = "." * (
-                #         50 - len(name_balance)
-                # )
-                spacer = " --- "
+                spacer = "." * (
+                        50 - len(f"{person['balance']:,}" + "@" + str(member) + f"#{index + 1}")
+                )
+                print(len(spacer))
+                # spacer = " --- "
                 if index == 0:
-                    lb += f"🥇: {member}{spacer}{person['balance']:,}\n"
+                    lb += f"`🥇: {member}{spacer}{person['balance']:,}`\n"
                 elif index == 1:
-                    lb += f"🥈: {member}{spacer}{person['balance']:,}\n"
+                    lb += f"`🥈: {member}{spacer}{person['balance']:,}`\n"
                 elif index == 2:
-                    lb += f"🥉: {member}{spacer}{person['balance']:,}\n"
+                    lb += f"`🥉: {member}{spacer}{person['balance']:,}`\n"
                 else:
-                    lb += f"#{index + 1}: {member}{spacer}{person['balance']:,}\n"
+                    lb += f"`#{index + 1}: {member}{spacer}{person['balance']:,}`\n"
 
         await ctx.send(
             embed=build_embed(
