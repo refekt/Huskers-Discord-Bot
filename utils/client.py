@@ -38,14 +38,53 @@ async def start_twitter_stream():
         access_token_secret=TWITTER_TOKEN_SECRET
     )
 
+    list = api.GetListMembers(
+        list_id=1223689242896977922
+    )
+
+    list_ids = []
+    for member in list:
+        list_ids.append(member.id_str)
+
+    track_terms = [
+        "@GerrodLambrecht",
+        "@coachdawsgbr",
+        "@SeanDillonNU",
+        "@GregAustin2717",
+        "@CoachRHeld",
+        "@Coach_Verdu",
+        "@coachwilhite",
+        "@CoachTuioti92",
+        "@CoachChinander",
+        "@BarrettRuud",
+        "@CoachLubick",
+        "@TMossbrucker",
+        "@CoachTFisher",
+        "@CoachBeckton",
+        "@zduval1",
+        "@coach_frost",
+        "@Matt_Davison",
+        "@huskerfbnation",
+        "@Callaghan_NEB",
+        "@CoachJRut"
+    ]
+
     twitter_stream = api.GetStreamFilter(
-        track=["#nebraska", "#huskers", "#gbr"],  # Search terms
-        languages=["en"]
+        follow=list_ids,
+        track=track_terms,
+        languages=["en"],
+        stall_warnings=True
     )
 
     chan = client.get_channel(CHAN_TEST_SPAM)  # Your bot variable must be accessible or have another way to create a TextChannel
 
     for tweet in twitter_stream:
+        try:
+            test = tweet['retweeted_status']
+            continue
+        except:
+            pass
+
         dt = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
 
         await chan.send(
