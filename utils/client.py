@@ -76,7 +76,7 @@ async def start_twitter_stream():
         stall_warnings=True
     )
 
-    chan = client.get_channel(CHAN_TEST_SPAM)  # Your bot variable must be accessible or have another way to create a TextChannel
+    chan = client.get_channel(CHAN_TEST_SPAM)
 
     for tweet in twitter_stream:
         try:
@@ -735,10 +735,11 @@ class MyClient(commands.Bot):
     #     # await self.send_salutations("I AM DISCONNECTING.")
 
     async def on_ready(self):
+        pass
         # await start_twitter_stream()
-        if not on_prod_server():
-            task = asyncio.create_task(start_twitter_stream())
-            await task
+        # if not on_prod_server():
+        #     task = asyncio.create_task(start_twitter_stream())
+        #     await task
 
     async def on_resume(self):
         await change_my_status(client)
