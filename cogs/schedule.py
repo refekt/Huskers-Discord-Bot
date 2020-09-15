@@ -99,7 +99,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
 
     @commands.command()  ## Jeyrad's code ###
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def cfb(self, ctx, league='top25', week=-1, year=2019):
+    async def cfb(self, ctx, league='top25', week=-1, year=datetime.now().year):
         """Returns a schedule w/ scores (if in past or in progress) from ESPN for a given league, week and year.
         Usage is: `cfbsched <league> <week> <year>"""
 
