@@ -11,8 +11,8 @@ from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
-from utils.mysql import sqlRetreiveCustomLinesForAgainst, sqlInsertCustomLinesBets, sqlRetrieveCustomLinesKeywords
-from utils.mysql import sqlRetrieveCustomLines, sqlRetrieveCustomLinesKeyword, sqlInsertCustomLines, sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
+from utils.mysql import sqlRetreiveCustomLinesForAgainst, sqlInsertCustomLinesBets, sqlRetrieveOneCustomLinesKeywords, sqlRetrieveAllCustomLinesKeywords
+from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
 
 PITY_CAP = 10
 RLT_FLOOR = 1
@@ -103,11 +103,14 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         return balance["balance"]
 
     def validate_bet_amount_syntax(self, bet_amount: typing.Union[int, str]):
+        # No zero or negative numbers.
         if type(bet_amount) == int and bet_amount > 0:
             return True
         elif type(bet_amount) == str:
+            # Maximum server currency
             if bet_amount == "max":
                 return True
+            # Percent of users current server currency balance
             elif "%" in bet_amount:
                 return True
             else:
@@ -585,129 +588,83 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             )
         )
 
-    @money.command(hidden=True)
-    async def buy(self, ctx):
-        roles = ctx.guild.roles
-        buyable_roles = [747241238692102155]
-
-        if roles is None:
-            return
-
-        vals = []
-        for index, role in enumerate(roles):
-            if role.id in buyable_roles:
-                vals.append(f"{index + 1}: {role}")
-
-        embed = build_embed(
-            title=f"Spend your {CURRENCY_NAME}!",
-            fields=[
-                ["Roles", vals]
-            ]
-        )
-
-        buy_msg = await ctx.send(embed=embed)
-        role_cost = 10000
-        emojis = "1️⃣"
-
+    def retrieve_one_bet_keyword_custom_line(self, ctx: discord.ext.commands.Context, keyword):
         try:
-            await buy_msg.add_reaction(emojis)
-        except discord.Forbidden:
-            raise AttributeError(f"You do not have permission to add reactions.")
-        except discord.NotFound:
-            raise AttributeError(f"The emoji is not found.")
-        except discord.InvalidArgument:
-            raise AttributeError(f"The emoji parameter is invalid.")
-        except discord.HTTPException:
-            raise AttributeError(f"Reaction failed to add.")
+            return process_MySQL(
+                query=sqlRetrieveOneCustomLinesKeywords,
+                values=(keyword, ctx.message.author.id),
+                fetch="one"
+            )
+        except:
+            return None
 
-        from utils.client import client
-
-        def can_buy(r: discord.Reaction, u: discord.Member):
-            if not u.bot:
-                if self.get_balance(u) < role_cost:
-                    raise AttributeError(f"You do not have {role_cost} to buy the role!")
-                else:
-                    return r.emoji == emojis
-
+    def retrieve_all_bet_keyword_custom_line(self, ctx: discord.ext.commands.Context, keyword):
         try:
-            reaction, user = await client.wait_for("reaction_add", check=can_buy)
-            print(reaction, user)
-            await user.add_roles(buyable_roles[0], reason=f"Bought with {role_cost} {CURRENCY_NAME}")
-        except TimeoutError:
-            return
-        else:
-            pass
+            return process_MySQL(
+                query=sqlRetrieveAllCustomLinesKeywords,
+                values=keyword,
+                fetch="all"
+            )
+        except:
+            return None
 
-    def check_bet_exists(self, ctx: discord.ext.commands.Context, keyword: str):
+    def validate_keyword_bet(self, keyword: str):
+        """
+        Retrieves all bets from `custom_lines` database. Returns True if `keyword` exists else returns False
+
+        :param keyword:
+        :return:
+        """
         try:
-            previous_bets = process_MySQL(
-                query=sqlRetreiveCustomLinesForAgainst,
+            check = process_MySQL(
+                query=sqlRetrieveOneOpenCustomLine,
                 values=keyword,
                 fetch="all"
             )
         except ConnectionError:
-            raise AttributeError(f"A MySQL query error occurred!")
-        else:
-            if previous_bets is None:
-                return False
-
-            for bet in previous_bets:
-                if bet["author"] == ctx.message.author.id:
-                    if bet["_for"] == 1 or bet["against"] == 1:
-                        return True
-
             return False
-
-    def check_bet_resolved(self, keyword: str):
-        try:
-            previous_bets = process_MySQL(
-                query=sqlRetrieveCustomLinesKeyword,
-                values=keyword,
-                fetch="one"
-            )
-        except ConnectionError:
-            raise AttributeError(f"A MySQL query error occurred!")
         else:
-            if previous_bets["result"] == "tbd":
+            if check is None:
                 return False
-            else:
-                return True
+
+            for ch in check:
+                if keyword in ch.values():
+                    return True
 
     async def set_bet(self, ctx: discord.ext.commands.Context, which: str, keyword: str, value):
+        """
+        Create or update a bet `custom_lines_bets` database entry "for" or "against" and server currency value.
+
+        :param ctx:
+        :param which: Either "for" or "against".
+        :param keyword: The `keyword` bet (line).
+        :param value: The amount of server currency the user is betting.
+        :return:
+        """
         try:
+            # Prevent spamming bets by betting max balance, and then using pity.
             if value <= self.pity_value():
                 raise AttributeError(f"Bets must be more than [ {self.pity_value():,} ] {CURRENCY_NAME}. Try again.")
 
-            keyword_bet = self.keyword_bet(keyword)
+            #
+            keyword_bet = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
 
+            # Validate the `keyword` bet (line) exists or has not already resolved.
             if not self.validate_keyword_bet(keyword):
-                raise AttributeError(f"The bet [ {keyword} ] was not found. Try again.")
+                raise AttributeError(f"The bet [ {keyword} ] was not found in the bet register. Try again.")
 
+            # Validate the betting syntax.
             if not self.validate_bet_amount_syntax(value):
                 raise AttributeError(f"The bet amount of [ {value:,} ] was not correct. Try again.")
 
+            # Validate the user has enough server currency to place this bet.
             if not self.check_balance(ctx.message.author, value):
                 raise AttributeError(f"You do not have the [ {value:,} ] [ {CURRENCY_NAME} ] to place this bet. Try again.")
 
+            # Bets are additive.
             if keyword_bet is None:
                 total_bet_value = value
-            else:
-                total_bet_value = keyword_bet["value"] + value
 
-            previous_bet_exists = self.check_bet_exists(ctx, keyword)
-
-            if previous_bet_exists:
-                if which == "for":
-                    process_MySQL(
-                        query=sqlUpdateCustomLinesBets,
-                        values=(1, 0, total_bet_value, ctx.message.author.id, keyword)
-                    )
-                elif which == "against":
-                    process_MySQL(
-                        query=sqlUpdateCustomLinesBets,
-                        values=(0, 1, total_bet_value, ctx.message.author.id, keyword)
-                    )
-            else:
                 if which == "for":
                     process_MySQL(
                         query=sqlInsertCustomLinesBets,
@@ -718,10 +675,23 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                         query=sqlInsertCustomLinesBets,
                         values=(ctx.message.author.id, keyword, 0, 1, total_bet_value)
                     )
+            else:
+                total_bet_value = keyword_bet["value"] + value
+
+                if which == "for":
+                    process_MySQL(
+                        query=sqlUpdateCustomLinesBets,
+                        values=(1, 0, total_bet_value, ctx.message.author.id, keyword)
+                    )
+                elif which == "against":
+                    process_MySQL(
+                        query=sqlUpdateCustomLinesBets,
+                        values=(0, 1, total_bet_value, ctx.message.author.id, keyword)
+                    )
+
+            keyword_bet = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
 
             self.adjust_currency(ctx.message.author, -value)
-
-            keyword_bet = self.keyword_bet(keyword)
 
         except ConnectionError:
             raise AttributeError(f"A MySQL query error occurred!")
@@ -741,29 +711,33 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             )
             )
 
-    def keyword_bet(self, keyword):
-        return process_MySQL(
-            query=sqlRetrieveCustomLinesKeywords,
-            values=keyword,
-            fetch="one"
-        )
+    def retrieve_open_custom_lines(self, keyword=None):
+        """
+        Returns all or one bet (line).
 
-    def validate_keyword_bet(self, keyword: str):
-        try:
-            check = process_MySQL(
-                query=sqlRetrieveCustomLinesKeyword,
-                values=keyword,
+        :param keyword:
+        :return:
+        """
+        if keyword is None:
+            return process_MySQL(
+                query=sqlRetrieveAllOpenCustomLines,
                 fetch="all"
             )
-        except ConnectionError:
-            return False
         else:
-            if check is None:
-                return False
+            return process_MySQL(
+                query=sqlRetrieveOneOpenCustomLine,
+                values=keyword,
+                fetch="one"
+            )
 
-            for ch in check:
-                if keyword in ch.values():
-                    return True
+    def convert_author(self, ctx: discord.ext.commands.Context, author):
+        # Attempt to created a `discord.Member` object.
+        author = ctx.guild.get_member(author)
+        # Create a `str` if attempt fails.
+        if author is None:
+            return "Unknown Author"
+        else:
+            return author
 
     @commands.group()
     @commands.guild_only()
@@ -780,20 +754,29 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @bet.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def create(self, ctx, keyword: str, *, description: str):
-        """Creates a custom bet.
-        Key = single word descriptor
-        Description = full description of the bet"""
+        """
+        Create a custom bet (line) for the Discord to place bets against.
 
+        :param ctx:
+        :param keyword: A single-word identifier for the bet (line).
+        :param description: A detailed description of the bet (line). This should include conditions on "for" and "against" results.
+        :return:
+        """
+
+        # Prevent errors
         keyword = keyword.replace(" ", "").lower()
 
         try:
+            # Insert into `custom_lines` database.
             process_MySQL(
                 query=sqlInsertCustomLines,
                 values=(ctx.message.author.id, keyword, description)
             )
         except ConnectionError:
+            # Was not able to insert into `custom_lines` database.
             raise AttributeError(f"A MySQL query error occurred!")
         else:
+            # Alert the user that the bet (line) was created.
             await ctx.send(embed=build_embed(
                 title="Custom Bet",
                 description=f"{ctx.message.author.mention}'s bet was successfully created!",
@@ -806,113 +789,124 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @bet.command()
     async def show(self, ctx, keyword=None):
-        """Show all bets or a specific bet
-        $bet show
-        $bet show <keyword>"""
-        if not keyword:
-            bets = process_MySQL(
-                query=sqlRetrieveCustomLines,
-                fetch="all"
-            )
-        else:
-            bets = process_MySQL(
-                query=sqlRetrieveCustomLinesKeyword,
-                fetch="one",
-                values=keyword
-            )
+        """
+        Show the list of open bets (lines) or a specified bet (line).
 
-        if type(bets) == list:
+        :param ctx:
+        :param keyword: Optional. Retrieves a bet (line) if provided.
+        :return:
+        """
+
+        # Show the list of open bets (lines).
+        if not keyword:
+            # Retrieve all open bets (lines).
+            bets = self.retrieve_open_custom_lines()
             bet_fields = []
 
+            # Iterate through all bets (lines).
             for bet in bets:
-                author = ctx.guild.get_member(bet["author"])
-                if author is None:
-                    author = "Unknown Author"
+                # Attempt to created a `discord.Member` object.
+                author = self.convert_author(ctx, bet["author"])
 
+                # Append list of members.
                 bet_fields.append([
-                    bet["keyword"],
+                    f"Keyword: {bet['keyword']}",
                     f"Author: {author.mention if type(author) == discord.Member else author}\n"
                     f"Description: {str(bet['description']).capitalize()}\n"
                 ])
 
-            await ctx.send(embed=build_embed(
+            return await ctx.send(embed=build_embed(
                 title="All Open Bets",
                 fields=bet_fields,
                 inline=False
             ))
-        elif type(bets) == dict:
-            author = ctx.guild.get_member(bets["author"])
-            if author is None:
-                author = "Unknown Author"
+        else:
+            # Retrieve single bet (line).
+            bets = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
 
-            await ctx.send(embed=build_embed(
+            # Raise error if no bet (line) was found.
+            if bets is None:
+                raise AttributeError(f"No bet found with the keyword [ {keyword} ]. Please try again!")
+
+            # Attempt to created a `discord.Member` object.
+            author = self.convert_author(ctx, bets["author"])
+
+            return await ctx.send(embed=build_embed(
                 title="All Open Bets",
                 fields=[
                     [
-                        bets["keyword"],
+                        f"Keyword: {bets['keyword']}",
                         f"Author: {author.mention if type(author) == discord.Member else author}\n"
                         f"Description: {str(bets['description']).capitalize()}\n"
                     ]
                 ],
                 inline=False
             ))
-        elif bets is None:
-            return await ctx.send(f"No bet found with the keyword [ {keyword} ]. Please try again!")
 
     @bet.command(aliases=["for", ])
     async def _for(self, ctx, keyword: str, value: int):
-        """Place a bet in favor for bet
-        $bet for <keyword> <bet amount>"""
+        """
+        Please a bet for a specified `keyword` bet (line).
+
+        :param ctx:
+        :param keyword: The `keyword` of the bet (line) you want to bet against.
+        :param value: The amount of server currency you want to place against the `keyword` bet.
+        :return:
+        """
         await self.set_bet(ctx, "for", keyword.lower(), value)
 
     @bet.command()
     async def against(self, ctx, keyword: str, value: int):
-        """Place a bet against for bet
-        $bet against <keyword> <bet amount>"""
+        """
+        Please a bet against a specified `keyword` bet (line).
+
+        :param ctx:
+        :param keyword: The `keyword` of the bet (line) you want to bet against.
+        :param value: The amount of server currency you want to place against the `keyword` bet.
+        :return:
+        """
         await self.set_bet(ctx, "against", keyword.lower(), value)
 
     @bet.command()
     async def resolve(self, ctx, keyword: str, result: str):
-        """Resolve a bet
-        $resolve <keyword> <for|against>"""
+        """
+        Resolve a bet (line).
+
+        :param ctx:
+        :param keyword: The `keyword` for a bet (line).
+        :param result: Either "for" or "against".
+        :return:
+        """
         keyword = keyword.lower()
 
-        if not self.check_bet_exists(ctx, keyword):
-            raise AttributeError(f"Unable to find [ {keyword} ] bet! Try again.")
+        original_bet = self.retrieve_open_custom_lines(keyword)
 
-        if self.check_bet_resolved(keyword):
-            raise AttributeError(f"The [ {keyword} ] bet has already been resolved!")
+        if original_bet is None:
+            raise AttributeError(f"Unable to find any [ {keyword} ] bet or it has already been resolved! Try again.")
 
         result = result.lower()
 
         if not (result == "for" or result == "against"):
             raise AttributeError(f"The result must be `for` or `against`. Not [ {result} ]. Try again!")
 
+        author = ctx.guild.get_member(original_bet["author"])
+
+        if not original_bet["author"] == ctx.message.author.id:
+            raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
+
         try:
-            keyword_bet = self.keyword_bet(keyword)
-
-            author = ctx.guild.get_member(keyword_bet["orig_author"])
-
-            if not keyword_bet["orig_author"] == ctx.message.author.id:
-                raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
 
             process_MySQL(
                 query=sqlUpdateCustomLinesResult,
                 values=(result, keyword)
             )
 
-            keyword_bet = self.keyword_bet(keyword)
-
-            bet_users = process_MySQL(
-                query=sqlRetreiveCustomLinesForAgainst,
-                fetch="all",
-                values=keyword
-            )
+            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(ctx, keyword)
 
             winners = []
             losers = []
 
-            for user in bet_users:
+            for user in keyword_bet_uers:
                 member = ctx.guild.get_member(user["author"])
 
                 if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
@@ -931,11 +925,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         except ConnectionError:
             raise AttributeError(f"A MySQL query error occurred!")
         else:
-            await ctx.send(embed=build_embed(
-                title=f"[ {author}'s ] [ {keyword_bet['keyword']} ] bet has been resolved!",
-                description=keyword_bet["description"],
+            return await ctx.send(embed=build_embed(
+                title=f"[ {author}'s ] [ {keyword} ] bet has been resolved!",
+                description=keyword_bet_uers[0]["description"],
                 fields=[
-                    ["Result", keyword_bet["result"]],
+                    ["Result", result],
                     ["Winners", winners],
                     ["Losers", losers]
                 ],

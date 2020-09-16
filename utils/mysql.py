@@ -221,20 +221,39 @@ sqlRetrieveIowa = "SELECT previous_roles FROM iowa WHERE user_id = %s"
 
 sqlRemoveIowa = "DELETE FROM iowa WHERE user_id = %s"
 
-sqlRetrieveCustomLinesKeywords = "SELECT " \
-                                 "clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author, cl.result " \
-                                 "FROM custom_lines_bets clb " \
-                                 "INNER JOIN custom_lines cl " \
-                                 "ON (cl.keyword = clb.keyword ) " \
-                                 "WHERE clb.keyword = %s"
+sqlRetrieveAllCustomLinesKeywords = """
+SELECT
+	clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author, cl.result
+FROM
+	custom_lines_bets clb
+INNER JOIN
+	custom_lines cl 
+ON 
+	(cl.keyword = clb.keyword )
+WHERE
+	clb.keyword = %s
+"""
+
+sqlRetrieveOneCustomLinesKeywords = """
+SELECT
+	clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author, cl.result
+FROM
+	custom_lines_bets clb
+INNER JOIN
+	custom_lines cl 
+ON 
+	(cl.keyword = clb.keyword )
+WHERE
+	clb.keyword = %s AND clb.author = %s
+"""
 
 sqlInsertCustomLines = "INSERT INTO custom_lines (author, keyword, description, result) VALUES (%s, %s, %s, 'tbd')"
 
-sqlRetrieveCustomLines = "SELECT * FROM custom_lines WHERE result = 'tbd'"
+sqlRetrieveAllOpenCustomLines = "SELECT * FROM custom_lines WHERE result = 'tbd'"
 
 sqlRetreiveCustomLinesForAgainst = "SELECT author, _for, against, value FROM custom_lines_bets WHERE keyword = %s"
 
-sqlRetrieveCustomLinesKeyword = "SELECT * FROM custom_lines WHERE keyword = %s and result = 'tbd'"
+sqlRetrieveOneOpenCustomLine = "SELECT * FROM custom_lines WHERE keyword = %s and result = 'tbd'"
 
 sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for, against, value) " \
                            "VALUES (%s, %s, %s, %s, %s)"
