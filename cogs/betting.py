@@ -566,7 +566,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             if index > 9:
                 break
 
-            member = person["username"]
+            member = person["username"][:13]
             spacer = "." * (35 - len(f"`🥇: {member}{person['balance']:,}`"))
 
             if member is not None:
