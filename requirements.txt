@@ -17,3 +17,4 @@ youtube_dl
 opencv-python
 numpy
 pandas
+cryptography

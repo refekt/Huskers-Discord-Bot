@@ -9,7 +9,6 @@ import traceback
 from datetime import datetime
 
 import discord
-import twitter
 from discord.ext import commands
 
 import utils.consts as consts
