@@ -1,5 +1,4 @@
 import random
-import random
 import re
 import typing
 
@@ -11,7 +10,7 @@ from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
 from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
-from utils.mysql import sqlRetreiveCustomLinesForAgainst, sqlInsertCustomLinesBets, sqlRetrieveOneCustomLinesKeywords, sqlRetrieveAllCustomLinesKeywords
+from utils.mysql import sqlInsertCustomLinesBets, sqlRetrieveOneCustomLinesKeywords, sqlRetrieveAllCustomLinesKeywords
 from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
 
 PITY_CAP = 10
@@ -285,127 +284,108 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
 
     @commands.command(aliases=["arlt", ])
-    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
-    async def autoroulette(self, ctx, num_cycles: int, bet_amount: typing.Union[int, str], *, bet: typing.Union[int, str]):
-        """ Win or lose some server currency playing roulette
-        $roulette 10 red -- Bet a color
-        $roulette 10 25 -- Bet a specific number (225% bonus)
-        $roulette 10 1:17 -- Bet a specific number range (scaling bonus)
-        $roulette 10 red1:36 -- Bet a color and number range (scaling bonus)
+    # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
+    @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
+    async def autoroulette(self, ctx, goal: int, bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
         """
+        Spin the roulette wheel automatically up to 10,000 times!
 
-        if num_cycles > 10:
-            raise AttributeError(f"You can only run 10 cycles!")
+        LIMIT 2 PER 24 HOURS!
 
-        if bet_amount is None or bet is None:
-            raise AttributeError(f"You must select a bet!")
+        :param goal: Your target ending balance.
+        :param bet_multiplier: How much you are betting for each spin.
+        :param cycles: How many spins?
+        :param strat: Voodoo magic. I don't understand it.
+        """
+        balance = self.get_balance(ctx.message.author)
 
-        current_balance = self.get_balance(ctx.message.author)
+        if balance > goal:
+            raise AttributeError(f"You must be more than your current balance of [ {balance:,} ].")
 
-        if not self.validate_bet_amount_syntax(bet_amount):
-            raise AttributeError(f"You submitted an incorrect amount to bet.")
+        pities = 0
+        pity_cap = 10
 
-        bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
+        edit_msg = await ctx.send(f"Spinning the wheel [ {cycles:,} ] times in an attempt to get to [ {goal:,} ] {CURRENCY_NAME} from [ {balance:,} ]! You have [ {pity_cap} ] pities available. Here "
+                                  f"we go!")
 
-        if not self.check_balance(ctx.message.author, bet_amount):
-            raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+        max_cycles = 10000
+        cycles = min(cycles, max_cycles)
+        i = -1
+        pity_money = self.pity_value()
+        ran = .9
+        bet2 = 0
+        losses_current = 0
+        losses_max = 0
+        wins_current = -1
+        wins_max = 0
+        balance_max = balance
 
-        if bet_amount <= 0:
-            raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
+        strat = strat.replace('x', 'bet2')
+        strat = strat.replace('z', 'bet1')
 
-        iteration = 1
-        current_balance = self.get_balance(ctx.message.author)
-        bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
-        total_bet_amount = bet_amount
-        colors = ["red", "black"]
-        win_count = 0
-        pities_used = 0
+        self.adjust_currency(ctx.message.author, -balance)
 
-        edit_msg = await ctx.send("Loading...")
+        while i < cycles and balance < goal:
+            # await edit_msg.edit(content=edit_msg.content + " New wheel spin! ")
+            if ran >= 0.5:
+                wins_current += 1
+                wins_max = max(wins_current, wins_max)
+                losses_current = 0
+                balance = balance + bet2
+                bet1 = max(int(bet_multiplier * balance), 1)
+                bet2 = min(bet1, balance)
+                balance_max = max(balance, balance_max)
+            else:
+                losses_current += 1
+                losses_max = max(losses_current, losses_max)
+                wins_current = 0
+                balance = balance - bet2
 
-        while iteration <= num_cycles:
-            if total_bet_amount <= 0:
-                pity = self.pity_value()
-                total_bet_amount = pity
-
-                if bet_amount > pity:
-                    bet_amount = pity
-
-                pities_used += 1
-                print(pities_used)
-
-                self.adjust_currency(ctx.message.author, pity)
-
-                if pities_used > 3:
-                    raise AttributeError(f"You can only use {PITY_CAP} pities. Your current balance is [ {total_bet_amount:,} ].")
-
-            if type(bet) == str:
-                bet_color = self.find_color_string(bet)
-
-                if BET_RANGE_CHAR in bet and bet_color:  # Color and range
-                    result = self.roll_red_or_black()
-
-                    if bet_color == result:
-                        bet = bet[len(bet_color):]
-                        bet_range = self.convert_bet_range(bet)
-
-                        if not self.validate_bet_range(bet_range):
-                            raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
-
-                        result = self.roll_single_int()
-
-                        if bet_range[0] <= result <= bet_range[1]:
-                            total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="color_and_range")
-                            win_count += 1
-                        else:
-                            total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
-                            self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
-
-                elif BET_RANGE_CHAR in bet and bet_color is None:  # Range only
-                    bet_range = self.convert_bet_range(bet)
-
-                    if not self.validate_bet_range(bet_range):
-                        raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
-
-                    result = self.roll_single_int()
-
-                    if bet_range[0] <= result <= bet_range[1]:
-                        total_bet_amount += self.generate_win_amount(bet_amount, bet_range, method="range")
-                        win_count += 1
+                if balance <= 0:
+                    if pities >= pity_cap:
+                        raise AttributeError("Pity is on cooldown! Auto Roulette has stopped.")
                     else:
-                        total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
-                        self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
+                        await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
 
-                else:  # Color only
-                    if bet.lower() in colors:
-                        result = self.roll_red_or_black()
+                        pities += 1
+                        balance = pity_money
+                        await self.pity_no_text(ctx)
+                        self.adjust_currency(ctx.message.author, -balance)
+                        bet1 = max(int(bet_multiplier * balance), 1)
+                        bet2 = 0
+                bet2 = int(min(max(eval(strat), 1), balance))
+            ran = random.random()
+            i += 1
 
-                        if result == bet.lower():
-                            total_bet_amount += bet_amount
-                            win_count += 1
-                        else:
-                            total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
-                            self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
-                    else:
-                        raise AttributeError(f"You can only place a bet for {[color for color in colors]}. Try again!")
+        self.adjust_currency(ctx.message.author, balance)
 
-            elif type(bet) == int:  # One number only
+        await edit_msg.edit(content=edit_msg.content + f" Done! New balance is [ {self.get_balance(ctx.message.author):,} ] {CURRENCY_NAME}. The wheel spun [ {i:,} ] times to get there!")
 
-                if RLT_FLOOR <= bet <= RLT_CEILING:
-                    result = self.roll_single_int()
+    # return the fun data/message after the loop is completed
 
-                    if result == bet:
-                        total_bet_amount += self.generate_win_amount(bet_amount, method="number")
-                        win_count += 1
-                    else:
-                        total_bet_amount -= self.adjust_bet_amount(bet_amount, total_bet_amount)
-                        self.adjust_currency(ctx.message.author, -self.adjust_bet_amount(bet_amount, total_bet_amount))
-                else:
-                    raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
-
-            iteration += 1
-
-        await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=total_bet_amount, game="arlt", cycles=iteration - 1, bet=bet, wins=win_count))
+    # if num_cycles > 10:
+    #     raise AttributeError(f"You can only run 10 cycles!")
+    #
+    # if bet_amount is None or bet is None:
+    #     raise AttributeError(f"You must select a bet!")
+    #
+    # current_balance = self.get_balance(ctx.message.author)
+    #
+    # if not self.validate_bet_amount_syntax(bet_amount):
+    #     raise AttributeError(f"You submitted an incorrect amount to bet.")
+    #
+    # bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
+    #
+    # if not self.check_balance(ctx.message.author, bet_amount):
+    #     raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
+    #
+    # if bet_amount <= 0:
+    #     raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
+    #
+    # iterations = 0
+    # while iterations < num_cycles:
+    #     await self.roulette(ctx, bet_amount=bet_amount, bet=bet)
+    #     iterations += 1
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
@@ -500,6 +480,21 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return await ctx.send(content=f"Pity on you. You have been awarded [ {self.pity_value():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
+
+    @money.command()
+    async def pity_no_text(self, ctx):
+        if not self.check_author_initialized(ctx.message.author):
+            return
+
+        balance = self.get_balance(ctx.message.author)
+
+        if balance == 0:
+            self.adjust_currency(ctx.message.author, self.pity_value())
+            return
+            # return await ctx.send(content=f"Pity on you. You have been awarded [ {self.pity_value():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
+        else:
+            # return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
+            return
 
     @money.command(aliases=["bal", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -797,6 +792,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         :param keyword: Optional. Retrieves a bet (line) if provided.
         :return:
         """
+
+        await ctx.message.delete()
 
         # Show the list of open bets (lines).
         if not keyword:
