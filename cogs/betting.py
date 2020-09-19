@@ -556,6 +556,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @money.command(aliases=["lb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def leaderboard(self, ctx):
+
         leaderboard = process_MySQL(
             query=sqlRetrieveCurrencyLeaderboard,
             fetch="all"
