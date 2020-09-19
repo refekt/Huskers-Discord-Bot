@@ -293,7 +293,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         LIMIT 2 PER 24 HOURS!
 
         :param goal: Your target ending balance.
-        :param bet_multiplier: How much you are betting for each spin.
+        :param bet_multiplier: The percentage of your current balance you'd like to bet on each spin.
         :param cycles: How many spins?
         :param strat: Voodoo magic. I don't understand it.
         """
