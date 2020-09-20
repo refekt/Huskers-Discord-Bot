@@ -131,7 +131,9 @@ def HuskerSchedule(year=datetime.datetime.now().year):
         try:
             name = g.contents[1].contents[3].contents[3].contents[3].text.strip().replace("\n", " ")
             icon = "https://huskers.com" + g.contents[1].contents[1].contents[1].attrs["data-src"]
-            date_time = g.contents[1].contents[3].contents[1].contents[1].text.strip().replace("\n", " ")
+            _date = g.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
+            _time = g.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
+            date_time = f"{_date[0:6]} {year} {_time}"
             conference = g.contents[1].contents[3].contents[1].contents[3]
             if len(conference.contents) > 1:
                 conference = conference.contents[1].text.strip()
@@ -200,8 +202,8 @@ def HuskerSchedule(year=datetime.datetime.now().year):
                   }
 
         if "TBA" in opp.date_time:
+            print(opp.date_time[0:6])
             gdt_string = f"{opp.date_time[0:6]} {year} 10:58 PM"
-
             game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
         else:
             if re.match(r"\w{3}\s{1}\d{1}", opp.date_time):
@@ -211,12 +213,18 @@ def HuskerSchedule(year=datetime.datetime.now().year):
 
             t_string = str(opp.date_time[-8:]).strip()
 
-            if len(t_string) == 7:
-                t_string = '0' + t_string
+
+            if "a.m." in t_string:
+                t_string = t_string.split(" ")[0] + ":00 AM"
+            elif "p.m." in t_string:
+                t_string = t_string.split(" ")[0] + ":00 PM"
+            else:
+                t_string = "12:00 AM"
 
             gdt_string = gdt_string + ' ' + t_string
 
             game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
+            game_date_time += datetime.timedelta(hours=1)
 
         games.append(
             HuskerDotComSchedule(

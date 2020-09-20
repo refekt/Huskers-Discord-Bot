@@ -243,7 +243,7 @@ class TextCommands(commands.Cog):
             team = str(team)
 
             for game in games:
-                if team.lower() == game.opponent.lower():
+                if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
