@@ -285,7 +285,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
     @commands.command(aliases=["arlt", ])
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
-    @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
+    # @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
     async def autoroulette(self, ctx, goal: int, bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
         """
         Spin the roulette wheel automatically up to 10,000 times!
@@ -360,32 +360,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         self.adjust_currency(ctx.message.author, balance)
 
         await edit_msg.edit(content=edit_msg.content + f" Done! New balance is [ {self.get_balance(ctx.message.author):,} ] {CURRENCY_NAME}. The wheel spun [ {i:,} ] times to get there!")
-
-    # return the fun data/message after the loop is completed
-
-    # if num_cycles > 10:
-    #     raise AttributeError(f"You can only run 10 cycles!")
-    #
-    # if bet_amount is None or bet is None:
-    #     raise AttributeError(f"You must select a bet!")
-    #
-    # current_balance = self.get_balance(ctx.message.author)
-    #
-    # if not self.validate_bet_amount_syntax(bet_amount):
-    #     raise AttributeError(f"You submitted an incorrect amount to bet.")
-    #
-    # bet_amount = self.adjust_bet_amount(bet_amount, current_balance)
-    #
-    # if not self.check_balance(ctx.message.author, bet_amount):
-    #     raise AttributeError(f"You do not have enough {CURRENCY_NAME} to play the game.")
-    #
-    # if bet_amount <= 0:
-    #     raise AttributeError(f"You cannot make bets for amounts that are 0 or lower {CURRENCY_NAME}.")
-    #
-    # iterations = 0
-    # while iterations < num_cycles:
-    #     await self.roulette(ctx, bet_amount=bet_amount, bet=bet)
-    #     iterations += 1
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
