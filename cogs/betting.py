@@ -348,7 +348,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     else:
                         # await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
 
-                        pities += 1
+                        pities += 1 #git
                         balance = pity_money
                         bet1 = max(int(bet_multiplier * balance), 1)
                         bet2 = 0
