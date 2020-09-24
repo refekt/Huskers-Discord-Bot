@@ -110,8 +110,9 @@ class HuskerDotComSchedule:
     ranking = None
     week = None
     game_date_time = None
+    game_date_time_dt = None
 
-    def __init__(self, bets, location, opponent, outcome, ranking, week, game_date_time):
+    def __init__(self, bets, location, opponent, outcome, ranking, week, game_date_time, game_date_time_dt=None):
         self.bets = bets
         self.location = location
         self.opponent = opponent
@@ -119,6 +120,7 @@ class HuskerDotComSchedule:
         self.ranking = ranking
         self.week = week
         self.game_date_time = game_date_time
+        self.game_date_time_dt = game_date_time_dt
 
 
 def HuskerSchedule(year=datetime.datetime.now().year):
@@ -202,28 +204,10 @@ def HuskerSchedule(year=datetime.datetime.now().year):
                   }
 
         if "TBA" in opp.date_time:
-            print(opp.date_time[0:6])
             gdt_string = f"{opp.date_time[0:6]} {year} 10:58 PM"
             game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
         else:
-            if re.match(r"\w{3}\s{1}\d{1}", opp.date_time):
-                gdt_string = f"{opp.date_time[0:4] + '0' + opp.date_time[4:5]} {year}"
-            else:
-                gdt_string = f"{opp.date_time[0:7]} {year}"
-
-            t_string = str(opp.date_time[-8:]).strip()
-
-
-            if "a.m." in t_string:
-                t_string = t_string.split(" ")[0] + ":00 AM"
-            elif "p.m." in t_string:
-                t_string = t_string.split(" ")[0] + ":00 PM"
-            else:
-                t_string = "12:00 AM"
-
-            gdt_string = gdt_string + ' ' + t_string
-
-            game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
+            game_date_time = datetime.datetime.strptime(opp.date_time.replace("A.M.", "AM").replace("P.M.", "PM"), "%b %d %Y %I:%M %p").astimezone(tz=TZ)
             game_date_time += datetime.timedelta(hours=1)
 
         games.append(
