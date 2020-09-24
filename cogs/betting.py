@@ -310,6 +310,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         i = -1
         pity_money = self.pity_value()
         ran = .9
+        bet1 = 0
         bet2 = 0
         losses_current = 0
         losses_max = 0
@@ -319,6 +320,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         strat = strat.replace('x', 'bet2')
         strat = strat.replace('z', 'bet1')
+        
+        eval(strat)
 
         self.adjust_currency(ctx.message.author, -balance)
 
@@ -347,8 +350,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                         pities += 1
                         balance = pity_money
-                        await self.pity_no_text(ctx)
-                        self.adjust_currency(ctx.message.author, -balance)
                         bet1 = max(int(bet_multiplier * balance), 1)
                         bet2 = 0
                 bet2 = int(min(max(eval(strat), 1), balance))
