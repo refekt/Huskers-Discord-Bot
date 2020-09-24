@@ -86,7 +86,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 if message.created_at >= max_age and message.author.bot:
                     msgs.append(message)
             await ctx.message.channel.delete_messages(msgs)
-            print("Bulk delete of {} messages successful.".format(len(msgs)))
+            print(f"Bulk delete of {len(msgs)} messages successful.")
         except discord.ClientException:
             print("Cannot delete more than 100 messages at a time.")
         except discord.Forbidden:
@@ -116,7 +116,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 if message.created_at >= max_age:
                     msgs.append(message)
             await ctx.message.channel.delete_messages(msgs)
-            print("Bulk delete of {} messages successful.".format(len(msgs)))
+            print(f"Bulk delete of {len(msgs)} messages successful.")
         except discord.ClientException:
             print("Cannot delete more than 100 messages at a time.")
         except discord.Forbidden:

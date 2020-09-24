@@ -108,12 +108,11 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         if week == -1:
             week = self.getCurrentWeek(cfbWeeks)
 
-        url = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard" \
-              "?lang=en&region=us&calendartype=blacklist&limit=300&dates={}&seasontype=2&week={}" \
-            .format(year, week)
+        url = f"https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard" \
+              f"?lang=en&region=us&calendartype=blacklist&limit=300&dates={year}&seasontype=2&week={week}"
 
         if leagueInt > 0:
-            url += "&groups={}".format(leagueInt)
+            url += f"&groups={leagueInt}"
 
         try:
             r = requests.get(url)
@@ -135,9 +134,8 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         if week == -1:
             week = self.getCurrentWeek(nflWeeks)
 
-        url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" \
-              "?lang=en&region=us&calendartype=blacklist&limit=100&dates={}&seasontype=2&week={}" \
-            .format(year, week)
+        url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" \
+              f"?lang=en&region=us&calendartype=blacklist&limit=100&dates={year}&seasontype=2&week={week}"
 
         try:
             r = requests.get(url)
@@ -172,7 +170,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
                 if current_date != "":
                     response += "\n"
                 current_date = event_day
-                response += "\n{} - {}".format(event_day, date.strftime("%#m/%#d"))
+                response += "\n{event_day} - {date.strftime('%#m/%#d')}"
                 response += "\n-------------------------------------------------"
 
             game = event["competitions"][0]
@@ -188,12 +186,12 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
             if period > 0:
                 # Game has started progress. Display scores.
                 status_txt = event["status"]["type"]["shortDetail"]
-                status = "{:>3}-{:<3}{:<12}".format(away["score"], home["score"], status_txt)
+                status = f"{away['score']:>3}-{home['score']:<3}{status_txt:<12}"
             elif date.hour != 0:
                 # ESPN sets their TBD games to midnight Eastern.
-                status = "{:>12}".format(date_central.strftime("%#I:%M %p %Z"))
+                status = "{date_central.strftime('%#I:%M %p %Z'):>12}"
 
-            response += "\n{:<8}{:>10} @ {:<10} {:<7}".format(network, away["name"], home["name"], status)
+            response += f"\n{network:<8}{away['name']:>10} @ {home['name']:<10} {status:<7}"
 
         response += '\n```'
 
@@ -207,7 +205,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         if is_winner:
             name = name + "*" if isHomeTeam else "*" + name
         if rank <= 25:
-            name = "{} {}".format(name if isHomeTeam else rank, rank if isHomeTeam else name)
+            name = f"{name if isHomeTeam else rank} {rank if isHomeTeam else name}"
 
         return {
             'name': name,
