@@ -290,8 +290,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """
         Spin the roulette wheel automatically up to 10,000 times!
 
-        LIMIT 2 PER 24 HOURS!
-
         :param goal: Your target ending balance.
         :param bet_multiplier: The proportion of your current balance as a decimal you'd like to bet on each spin.
         :param cycles: How many spins?
@@ -305,8 +303,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         pities = 0
         pity_cap = 10
 
-        edit_msg = await ctx.send(f"Spinning the wheel [ {cycles:,} ] times in an attempt to get to [ {goal:,} ] {CURRENCY_NAME} from [ {balance:,} ]! You have [ {pity_cap} ] pities available. Here "
-                                  f"we go!")
+        edit_msg = await ctx.send(f"Spinning the wheel [ {cycles:,} ] times to reach [ {goal:,} ] {CURRENCY_NAME}!")
 
         max_cycles = 10000
         cycles = min(cycles, max_cycles)
@@ -343,9 +340,10 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
                 if balance <= 0:
                     if pities >= pity_cap:
-                        raise AttributeError("Pity is on cooldown! Auto Roulette has stopped.")
+                        # raise AttributeError("Pity is on cooldown! Auto Roulette has stopped.")
+                        return await edit_msg.edit(content=edit_msg.content + " You suck and used up all the pities.")
                     else:
-                        await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
+                        # await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
 
                         pities += 1
                         balance = pity_money
@@ -359,7 +357,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         self.adjust_currency(ctx.message.author, balance)
 
-        await edit_msg.edit(content=edit_msg.content + f" Done! New balance is [ {self.get_balance(ctx.message.author):,} ] {CURRENCY_NAME}. The wheel spun [ {i:,} ] times to get there!")
+        await edit_msg.edit(content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
