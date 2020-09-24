@@ -19,7 +19,6 @@ from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
-from utils.consts import TWITTER_TOKEN_SECRET, TWITTER_TOKEN_KEY, TWITTER_CONSUMER_SECRET, TWITTER_CONSUMER_KEY
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
