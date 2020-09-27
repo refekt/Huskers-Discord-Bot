@@ -344,7 +344,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 if balance <= 0:
                     if pities >= pity_cap:
                         # raise AttributeError("Pity is on cooldown! Auto Roulette has stopped.")
-                        return await edit_msg.edit(content=edit_msg.content + " You suck and used up all the pities.")
+                        return await edit_msg.edit(content=edit_msg.content + f" You suck and used up all the pities and you now have [ {balance:,}. ] {CURRENCY_NAME}")
                     else:
                         # await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
 
