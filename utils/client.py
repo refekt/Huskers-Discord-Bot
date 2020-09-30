@@ -18,12 +18,19 @@ from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_RO
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
+from utils.consts import TWITTER_BOT_MEMBER
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlRetrieveTasks, sqlRetrieveIowa
 from utils.thread import send_reminder, send_math
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 tweet_reactions = ("🎈", "🌽", "🕸")
 
@@ -172,28 +179,28 @@ async def monitor_messages(message: discord.Message):
         #     if random.random() >= .99:
         #         await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
 
-    async def find_subreddits():
-        subreddits = re.findall(r"r\/[a-zA-Z0-9]{1,}", message.content.lower())
-
-        if len(subreddits) > 0:
-            subs = []
-
-            for index, s in enumerate(subreddits):
-                if [sub for sub in ["huskers", "cfb"] if (sub in s)]:
-                    return
-
-                url = 'https://reddit.com/' + s
-                if '.com//r/' in url:
-                    url = url.replace('.com//r', '.com/r')
-                subs.append([s, url])
-
-            await message.channel.send(
-                embed=build_embed(
-                    title="Found Subreddits",
-                    fields=subs,
-                    inline=False
-                )
-            )
+    # async def find_subreddits():
+    #     subreddits = re.findall(r"r\/[a-zA-Z0-9]{1,}", message.content.lower())
+    #
+    #     if len(subreddits) > 0:
+    #         subs = []
+    #
+    #         for index, s in enumerate(subreddits):
+    #             if [sub for sub in ["huskers", "cfb"] if (sub in s)]:
+    #                 return
+    #
+    #             url = 'https://reddit.com/' + s
+    #             if '.com//r/' in url:
+    #                 url = url.replace('.com//r', '.com/r')
+    #             subs.append([s, url])
+    #
+    #         await message.channel.send(
+    #             embed=build_embed(
+    #                 title="Found Subreddits",
+    #                 fields=subs,
+    #                 inline=False
+    #             )
+    #         )
 
     async def add_votes():
         arrows = ("⬆", "⬇", "↔")
@@ -216,16 +223,15 @@ async def monitor_messages(message: discord.Message):
         if message.channel.id not in CHAN_STATS_BANNED:
             await record_statistics()
 
-        if not [ele for ele in client.all_commands.keys() if (ele in message.content)]:
-            await find_subreddits()
+        # if not [ele for ele in client.all_commands.keys() if (ele in message.content)]:
+        #     await find_subreddits()
 
         await add_votes()
 
 
 async def twitterverse(message: discord.Message):
-    if message.channel.id == CHAN_TWITTERVERSE:
-        for reaction in tweet_reactions:
-            await message.add_reaction(reaction)
+    for reaction in tweet_reactions:
+        await message.add_reaction(reaction)
 
 
 async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.Member, message: discord.Message):
@@ -677,7 +683,7 @@ class MyClient(commands.Bot):
 
     async def on_message(self, message):
 
-        if message.webhook_id:
+        if message.author.id == TWITTER_BOT_MEMBER:
             await twitterverse(message)
 
         await monitor_messages(message)

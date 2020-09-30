@@ -138,6 +138,7 @@ GUILD_TEST = 595705205069185045
 # Member ID
 TEST_BOT_MEMBER = 595705663997476887
 PROD_BOT_MEMBER = 593949013443608596
+TWITTER_BOT_MEMBER = 755193317997674607
 
 # Footer texts
 FOOTER_SECRET = "These messages are anonymous and there is no way to verify messages are accurate."
