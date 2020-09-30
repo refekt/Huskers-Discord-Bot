@@ -75,9 +75,7 @@ async def process_error(ctx, error):
         await ctx.send(embed=embed)
 
 
-async def monitor_messages(message: discord.Message):
-    channel = client.get_channel(message.channel.id)
-
+def monitor_messages(message: discord.Message):
     async def auto_replies():
         myass = ("https://66.media.tumblr.com/b9a4c96d0c83bace5e3ff303abc08f1f/tumblr_oywc87sfsP1w8f7y5o3_500.gif",
                  "https://66.media.tumblr.com/2ae73f93fcc20311b00044abc5bad05f/tumblr_oywc87sfsP1w8f7y5o1_500.gif",
@@ -87,59 +85,43 @@ async def monitor_messages(message: discord.Message):
                  "https://66.media.tumblr.com/f833da26820867601cd7ad3a7c2d96a5/tumblr_oywc87sfsP1w8f7y5o6_500.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo1_250.gif",
                  "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo2_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo3_250.gif",
                  "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo4_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo6_250.gif")
+        embed = None
 
         if re.search(r"fuck (you|u) bot", message.content, re.IGNORECASE):
-            await channel.send(
-                embed=build_embed(
-                    title="BITE MY SHINY, METAL ASS",
-                    image=random.choice(myass)
-                ),
-                content=message.author.mention
+            embed = build_embed(
+                title="BITE MY SHINY, METAL ASS",
+                image=random.choice(myass)
             )
 
         elif re.search(r"love (you|u) bot", message.content, re.IGNORECASE):
-            await channel.send(
-                embed=build_embed(
-                    title="Shut Up Baby, I Know It",
-                    image="https://media1.tenor.com/images/c1fd95af4433edf940fdc8d08b411622/tenor.gif?itemid=7506108"
-                ),
-                content=message.author.mention
+            embed = build_embed(
+                title="Shut Up Baby, I Know It",
+                image="https://media1.tenor.com/images/c1fd95af4433edf940fdc8d08b411622/tenor.gif?itemid=7506108"
             )
 
-        elif re.search(r"good bot", message.content, re.IGNORECASE):
-            await channel.send(
-                embed=build_embed(
-                    title="😝",
-                    image="https://i.imgur.com/52v1upi.png"
-                ),
-                content=message.author.mention
+        elif "good bot" in message.content.lower():
+            embed = build_embed(
+                title="😝",
+                image="https://i.imgur.com/52v1upi.png"
             )
 
-        elif re.search(r"bad bot", message.content, re.IGNORECASE):
-            await channel.send(
-                embed=build_embed(
-                    title="╰（‵□′）╯",
-                    image="https://i.redd.it/6vznew4w92211.jpg"
-                ),
-                content=message.author.mention
+        elif "bad bot" in message.content.clean():
+            embed = build_embed(
+                title="╰（‵□′）╯",
+                image="https://i.redd.it/6vznew4w92211.jpg"
             )
 
-        elif "isms" in message.content.lower():
-            if random.random() >= .99:
-                await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
+        return await message.channel.send(content=message.author.mention, embed=embed)
 
     async def add_votes():
-        arrows = ("⬆", "⬇", "↔")
-
         if ".addvotes" in message.content.lower():
-            for arrow in arrows:
+            for arrow in ("⬆", "⬇", "↔"):
                 await message.add_reaction(arrow)
 
     async def record_statistics():
         if not type(message.channel) == discord.DMChannel:
             author = str(message.author).encode("ascii", "ignore").decode("ascii")
             chan = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
-
             process_MySQL(query=sqlRecordStats, values=(author, chan))
 
     if not message.author.bot:
@@ -406,6 +388,13 @@ async def load_tasks():
 
 class MyClient(commands.Bot):
 
+    def is_iowegian(self, member: discord.Member):
+        return process_MySQL(
+            query=sqlRetrieveIowa,
+            values=member.id,
+            fetch="all"
+        )
+
     async def send_salutations(self, msg: str):
         guild = await current_guild()
         channel = None
@@ -537,12 +526,12 @@ class MyClient(commands.Bot):
         if message.author.id == TWITTER_BOT_MEMBER:
             await twitterverse(message)
 
-        await monitor_messages(message)
+        monitor_messages(message)
 
         if message.channel.id not in CHAN_BANNED:
             await self.process_commands(message)  # Always needed to process commands
-        # else:
-        #     raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.\nMessage: {message.clean_content}")
+        else:
+            return await message.channel.send(f"I am not authorized to perform commands in {message.channel.mention}!")
 
     async def on_raw_reaction_add(self, payload):
         payload = await split_payload(payload)
@@ -561,15 +550,7 @@ class MyClient(commands.Bot):
         await monitor_msg_hype(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
     async def on_member_join(self, member):
-        process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
-
-        iowegian = process_MySQL(
-            query=sqlRetrieveIowa,
-            values=member.id,
-            fetch="all"
-        )
-
-        if not iowegian:
+        if not self.is_iowegian(member):
             return
 
         timeout = member.guild.get_role(ROLE_TIME_OUT)
@@ -650,9 +631,7 @@ else:
     command_prefix = "%"
 
 client = MyClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
-extensions = (
-    "cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg",
-    "cogs.betting", "cogs.music", "cogs.reddit", "cogs.message_history", "cogs.deepfry", "cogs.fap")  # , "cogs.twitter")
+extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg", "cogs.betting", "cogs.music", "cogs.reddit", "cogs.message_history", "cogs.deepfry", "cogs.fap")  # , "cogs.twitter")
 
 for extension in extensions:
     try:
@@ -669,6 +648,5 @@ if len(sys.argv) > 0:
 
     print("### Starting the bot...")
     client.run(token)
-    print("### The bot has been started!")
 else:
     print("No arguments provided!")
