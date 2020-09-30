@@ -1,7 +1,6 @@
 import asyncio
 import hashlib
 import json
-import logging
 import random
 import re
 import sys
@@ -13,24 +12,17 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.images import build_quote
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_BOTLOGS, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL, \
-    CHAN_IOWA
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL, CHAN_IOWA
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
-from utils.consts import TWITTER_BOT_MEMBER
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
+from utils.consts import TWITTER_BOT_MEMBER
 from utils.consts import change_my_nickname, change_my_status
 from utils.embed import build_embed
 from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlLogUser, sqlRecordStats, sqlRetrieveTasks, sqlRetrieveIowa
-from utils.thread import send_reminder, send_math
-
-logger = logging.getLogger('discord')
-logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
+from utils.thread import send_reminder
 
 tweet_reactions = ("🎈", "🌽", "🕸")
 
@@ -45,21 +37,20 @@ async def current_guild():
 
 
 async def split_payload(payload):
-    p = dict()
-    p["channel_id"] = client.get_channel(payload.channel_id)
-    p["emoji"] = payload.emoji
+    payload_dict = dict()
+    payload_dict["channel_id"] = client.get_channel(payload.channel_id)
+    payload_dict["emoji"] = payload.emoji
     guild = client.get_guild(payload.guild_id)
-    p["guild_id"] = guild.id
+    payload_dict["guild_id"] = guild.id
     # p["user_id"] = client.get_user(payload.user_id)
-    p["user_id"] = guild.get_member(payload.user_id)
+    payload_dict["user_id"] = guild.get_member(payload.user_id)
     c = client.get_channel(payload.channel_id)
     # c = await client.fetch_channel(payload.channel_id)
-    p["message"] = await c.fetch_message(payload.message_id)
+    payload_dict["message"] = await c.fetch_message(payload.message_id)
 
-    del c
-    del payload
+    del c, payload
 
-    return p
+    return payload_dict
 
 
 async def process_error(ctx, error):
@@ -82,24 +73,6 @@ async def process_error(ctx, error):
             ]
         )
         await ctx.send(embed=embed)
-
-
-async def compare_users(before: discord.Member, after: discord.Member):
-    differences = []
-
-    if not before.display_name == after.display_name:
-        differences.append(f"{before.display_name} >> {after.display_name}")
-
-    if not before.nick == after.nick:
-        differences.append(f"{before.nick} >> {after.nick}")
-
-    if not before.status == after.status:
-        differences.append(f"{before.status} >> {after.status}")
-
-    if not before.roles == after.roles:
-        differences.append(f"{before.roles} >> {after.roles}")
-
-    return str([diff for diff in differences])
 
 
 async def monitor_messages(message: discord.Message):
@@ -151,56 +124,9 @@ async def monitor_messages(message: discord.Message):
                 content=message.author.mention
             )
 
-        # elif re.search(r"(should|could|would|might)\sof", message.content, re.IGNORECASE):
-        #     await channel.send(
-        #         embed=build_embed(
-        #             title="Grammar Police",
-        #             fields=[
-        #                 ["Fix yourself!", "~~of~~ have*"],
-        #                 ["Not My Idea", "This was <@440885775132000266>'s idea!"]
-        #             ]
-        #         )
-        #     )
-
         elif "isms" in message.content.lower():
             if random.random() >= .99:
                 await message.channel.send("Isms? That no talent having, no connection having hack? All he did was lie and make **shit** up for fake internet points. I'm glad he's gone.")
-
-        # if not type(channel) == discord.DMChannel and ROLE_GUMBY in [roleid.id for roleid in message.author.roles]:
-        #     #     # blocked = False
-        #     #     try:
-        #     #         if not message.author.is_blocked():
-        #     #             await message.add_reaction("🦐")
-        #     #         else:
-        #     #             print(f"Unable to add 🦐 reaction to {message.author}'s message because I am blocked by them!")
-        #     #     except discord.Forbidden:
-        #     #         print(f"Unable to add 🦐 reaction to {message.author}'s message. They most likely blocked me!")
-        #     #
-        #     if random.random() >= .99:
-        #         await message.channel.send(f"{message.author.mention} https://i.imgur.com/1tVJ2tW.gif")
-
-    # async def find_subreddits():
-    #     subreddits = re.findall(r"r\/[a-zA-Z0-9]{1,}", message.content.lower())
-    #
-    #     if len(subreddits) > 0:
-    #         subs = []
-    #
-    #         for index, s in enumerate(subreddits):
-    #             if [sub for sub in ["huskers", "cfb"] if (sub in s)]:
-    #                 return
-    #
-    #             url = 'https://reddit.com/' + s
-    #             if '.com//r/' in url:
-    #                 url = url.replace('.com//r', '.com/r')
-    #             subs.append([s, url])
-    #
-    #         await message.channel.send(
-    #             embed=build_embed(
-    #                 title="Found Subreddits",
-    #                 fields=subs,
-    #                 inline=False
-    #             )
-    #         )
 
     async def add_votes():
         arrows = ("⬆", "⬇", "↔")
@@ -212,9 +138,9 @@ async def monitor_messages(message: discord.Message):
     async def record_statistics():
         if not type(message.channel) == discord.DMChannel:
             author = str(message.author).encode("ascii", "ignore").decode("ascii")
-            channel = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
+            chan = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
 
-            process_MySQL(query=sqlRecordStats, values=(author, channel))
+            process_MySQL(query=sqlRecordStats, values=(author, chan))
 
     if not message.author.bot:
         if message.channel.id not in CHAN_BANNED:
@@ -222,9 +148,6 @@ async def monitor_messages(message: discord.Message):
 
         if message.channel.id not in CHAN_STATS_BANNED:
             await record_statistics()
-
-        # if not [ele for ele in client.all_commands.keys() if (ele in message.content)]:
-        #     await find_subreddits()
 
         await add_votes()
 
@@ -289,10 +212,6 @@ async def monitor_reactions(channel, emoji: discord.PartialEmoji, user: discord.
                             f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
 
     async def quote_reacts():
-        # if not channel.id in [CHAN_SCOTTS_BOTS, CHAN_NORTH_BOTTTOMS, CHAN_POSSUMS]:
-        #     return
-        # raise AttributeError(f"You are not allowed to use this command in this channel!")
-
         quote_emoji = "📝"
         reactions = message.reactions
         already_run = False
@@ -341,22 +260,19 @@ async def hall_of_fame_messages(reactions: list):
                             break
 
                 if not duplicate:
-                    embed = discord.Embed(title=f"🏆 » Husker Discord Hall of Fame Message by [ {reaction.message.author} ] with the [ {reaction} ] reaction « 🏆",
-                                          color=0xFF0000)
+                    embed = discord.Embed(title=f"🏆 » Husker Discord Hall of Fame Message by [ {reaction.message.author} ] with the [ {reaction} ] reaction « 🏆", color=0xFF0000)
                     embed.add_field(name=f"Author: {reaction.message.author}", value=f"{reaction.message.content}", inline=False)
                     embed.add_field(name="View Message", value=f"[View Message]({reaction.message.jump_url})", inline=False)
                     embed.set_footer(text=reaction.message.id)
                     await HOF_chan.send(embed=embed)
 
-    del message_history_raw
-    del duplicate
+    del message_history_raw, duplicate
 
 
 async def monitor_msg_roles(action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
     roles_title = "Huskers' Discord Roles"
     try:
         if message.embeds[0].title == roles_title:
-            # guild = client.get_guild(GUILD_PROD)
             guild = await current_guild()
             member = guild.get_member(member.id)
             roles = {
@@ -371,31 +287,23 @@ async def monitor_msg_roles(action, message: discord.Message, member: discord.Us
                 "🪓": guild.get_role(ROLE_MINECRAFT)
             }
 
-            if not emoji.name in [emoji for emoji in roles.keys()]:
+            if emoji.name not in [emoji for emoji in roles.keys()]:
                 return
-
-            bot_logs = client.get_channel(id=CHAN_BOTLOGS)
 
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=roles_title)
-                # await bot_logs.send(f"Added [{roles[emoji.name].mention}] to user [{member.mention}].")
             elif action == "remove":
                 await member.remove_roles(roles[emoji.name], reason=roles_title)
-                # await bot_logs.send(f"Removed [{roles[emoji.name].mention}] to user [{member.mention}].")
     except IndexError:
         pass
 
 
 async def monitor_msg_hype(action, message: discord.Message, member: discord.Member, emoji: discord.Emoji):
-    # guild = client.get_guild(GUILD_PROD)
-    # if guild is None:
-    #     guild = client.get_guild(GUILD_TEST)
     guild = await current_guild()
 
     role_hype_max = guild.get_role(ROLE_HYPE_MAX)
     role_hype_some = guild.get_role(ROLE_HYPE_SOME)
     role_hype_no = guild.get_role(ROLE_HYPE_NO)
-    hypesquad = [role_hype_max, role_hype_some, role_hype_no]
 
     try:
         if message.embeds[0].title == EMBED_TITLE_HYPE:
@@ -410,14 +318,10 @@ async def monitor_msg_hype(action, message: discord.Message, member: discord.Mem
             if emoji.name not in [emoji for emoji in roles.keys()]:
                 return
 
-            bot_logs = client.get_channel(id=CHAN_BOTLOGS)
-
             if action == "add":
                 await member.add_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
-                # await bot_logs.send(f"Added [{roles[emoji.name].mention}] to user [{member.mention}].")
             elif action == "remove":
                 await member.remove_roles(roles[emoji.name], reason=EMBED_TITLE_HYPE)
-                # await bot_logs.send(f"Removed [{roles[emoji.name].mention}] to user [{member.mention}].")
     except IndexError:
         pass
 
@@ -500,24 +404,12 @@ async def load_tasks():
         await task
 
 
-async def start_maths():
-    print("### /// Start maths")
-    guild = await current_guild()
-    math_channel = guild.get_channel(CHAN_SCOTTS_BOTS)
-    discord_math = asyncio.create_task(send_math(math_channel))
-    await discord_math
-    print("### /// Finished maths")
-
-
 class MyClient(commands.Bot):
-
-    # I'm not sure what this was used for?
-    # def __init__(self, command_prefix, **options):
-    #     super().__init__(command_prefix, **options)
 
     async def send_salutations(self, msg: str):
         guild = await current_guild()
         channel = None
+
         if sys.argv[1] == "prod":
             channel = guild.get_channel(CHAN_SCOTTS_BOTS)
         elif sys.argv[1] == "test":
@@ -545,22 +437,6 @@ class MyClient(commands.Bot):
             f"### ~~~ Latency: {self.latency * 1000:.2f} MS\n"
             f"### ~~~ Command Prefix: \"{self.command_prefix}\""
         )
-
-        # channels = guild.channels
-        # for channel in channels:
-        #     print(f"### Channel - {channel.name} & {channel.id}")
-
-    def send_to_log(self, type, msg):
-        if type == logging.DEBUG:
-            logging.debug(msg)
-        elif type == logging.INFO:
-            logging.info(msg)
-        elif type == logging.WARNING:
-            logging.warning(msg)
-        elif type == logging.ERROR:
-            logging.error(msg)
-        elif type == logging.CRITICAL:
-            logging.critical(msg)
 
     if on_prod_server():
         async def on_command_error(self, ctx, error):
@@ -636,18 +512,6 @@ class MyClient(commands.Bot):
 
                 await process_error(ctx, error)
 
-    # async def on_shard_ready(self, shard_id):
-    #     pass
-    #     # logging.info(f"[on_shard_ready] Shard ID: {shard_id}")
-
-    # async def on_socket_raw_receive(self, msg):
-    #     pass
-    #     # self.send_to_log(logging.INFO, msg)
-
-    # async def on_socket_raw_send(self, payload):
-    #     pass
-    #     # self.send_to_log(logging.INFO, payload)
-
     async def on_connect(self):
         async for guild in client.fetch_guilds():
             if guild.id not in (GUILD_TEST, GUILD_PROD):
@@ -661,19 +525,6 @@ class MyClient(commands.Bot):
         # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), True, str(datetime.now())))
         await self.startup_procedures()
         # await self.send_salutations(f"*Beep, boop* Greetings! I have arrived.")
-
-    # async def on_disconnect(self):
-    #     pass
-    #     # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
-    #
-    #     # await self.send_salutations("I AM DISCONNECTING.")
-
-    async def on_ready(self):
-        pass
-        # await start_twitter_stream()
-        # if not on_prod_server():
-        #     task = asyncio.create_task(start_twitter_stream())
-        #     await task
 
     async def on_resume(self):
         await change_my_status(client)
@@ -692,6 +543,60 @@ class MyClient(commands.Bot):
             await self.process_commands(message)  # Always needed to process commands
         # else:
         #     raise PermissionError(f"I am not authorized to perform commands in {message.channel.name}.\nMessage: {message.clean_content}")
+
+    async def on_raw_reaction_add(self, payload):
+        payload = await split_payload(payload)
+
+        if not payload["message"].channel.id in CHAN_BANNED:
+            await hall_of_fame_messages(payload["message"].reactions)
+
+        await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
+        await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+        await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+
+    async def on_raw_reaction_remove(self, payload):
+        payload = await split_payload(payload)
+
+        await monitor_msg_roles(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+        await monitor_msg_hype(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+
+    async def on_member_join(self, member):
+        process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
+
+        iowegian = process_MySQL(
+            query=sqlRetrieveIowa,
+            values=member.id,
+            fetch="all"
+        )
+
+        if not iowegian:
+            return
+
+        timeout = member.guild.get_role(ROLE_TIME_OUT)
+        iowa = member.guild.get_channel(CHAN_IOWA)
+
+        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
+        await member.add_roles(timeout, reason="Back to Iowa")
+
+    # async def on_shard_ready(self, shard_id):
+    #     pass
+    #     # logging.info(f"[on_shard_ready] Shard ID: {shard_id}")
+
+    # async def on_socket_raw_receive(self, msg):
+    #     pass
+    #     # self.send_to_log(logging.INFO, msg)
+
+    # async def on_socket_raw_send(self, payload):
+    #     pass
+    #     # self.send_to_log(logging.INFO, payload)
+
+    # async def on_disconnect(self):
+    #     # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
+    #
+    #     # await self.send_salutations("I AM DISCONNECTING.")
+
+    # async def on_ready(self):
+    #     pass
 
     # async def on_message_delete(self, message):
     #     pass
@@ -714,24 +619,8 @@ class MyClient(commands.Bot):
     # async def on_reaction_add(reaction, user):
     #     pass
 
-    async def on_raw_reaction_add(self, payload):
-        payload = await split_payload(payload)
-
-        if not payload["message"].channel.id in CHAN_BANNED:
-            await hall_of_fame_messages(payload["message"].reactions)
-
-        await monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
-        await monitor_msg_roles(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
-        await monitor_msg_hype(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
-
     # async def on_reaction_remove(reaction, user):
     #     pass
-
-    async def on_raw_reaction_remove(self, payload):
-        payload = await split_payload(payload)
-
-        await monitor_msg_roles(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
-        await monitor_msg_hype(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
 
     # async def on_reaction_clear(self, message, reactions):
     #     pass
@@ -739,38 +628,20 @@ class MyClient(commands.Bot):
     # async def on_raw_reaction_clear(self, payload):
     #     pass
 
-    async def on_member_join(self, member):
-        process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "member_join", "N/A"))
-
-        iowegian = process_MySQL(
-            query=sqlRetrieveIowa,
-            values=member.id,
-            fetch="all"
-        )
-
-        if not iowegian:
-            return
-
-        timeout = member.guild.get_role(ROLE_TIME_OUT)
-        iowa = member.guild.get_channel(CHAN_IOWA)
-
-        await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
-        await member.add_roles(timeout, reason="Back to Iowa")
-
-    async def on_member_remove(self, member):
-        process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))
+    # async def on_member_remove(self, member):
+    #     process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))
 
     # async def on_member_update(self, before, after):
     #     pass
 
-    async def on_user_udpate(self, before, after):
-        process_MySQL(query=sqlLogUser, values=(f"{before.name}#{before.discriminator}", "user_update", await compare_users(before, after)))
+    # async def on_user_udpate(self, before, after):
+    # process_MySQL(query=sqlLogUser, values=(f"{before.name}#{before.discriminator}", "user_update", await compare_users(before, after)))
 
-    async def on_member_ban(self, guild, user):
-        process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "ban", "N/A"))
+    # async def on_member_ban(self, guild, user):
+    # process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "ban", "N/A"))
 
-    async def on_member_unban(self, guild, user):
-        process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "unban", "N/A"))
+    # async def on_member_unban(self, guild, user):
+    # process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "unban", "N/A"))
 
 
 if on_prod_server():

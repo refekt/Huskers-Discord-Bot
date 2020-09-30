@@ -15,27 +15,27 @@ def remove_mentions(message):
     return str(message).replace("<", "[").replace("@!", "").replace(">", "]")
 
 
-async def send_math(channel: discord.TextChannel):
-    first = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-    second = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-
-    await channel.send(f"Math time! What is {random.choice(first)} x {random.choice(second)}?")
-
-
-class MathThread(threading.Thread):
-    def __init__(self, event, channel: discord.TextChannel):
-        threading.Thread.__init__(self)
-        self.stopped = event
-        self.channel = channel
-
-    async def run(self):
-        duration = 180
-        while True:
-            print("Sending math problem")
-            await send_math(channel=self.channel)
-            print(f"Sleeping {duration} seconds")
-            await asyncio.sleep(duration)
-            print("Slept!")
+# async def send_math(channel: discord.TextChannel):
+#     first = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+#     second = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+#
+#     await channel.send(f"Math time! What is {random.choice(first)} x {random.choice(second)}?")
+#
+#
+# class MathThread(threading.Thread):
+#     def __init__(self, event, channel: discord.TextChannel):
+#         threading.Thread.__init__(self)
+#         self.stopped = event
+#         self.channel = channel
+#
+#     async def run(self):
+#         duration = 180
+#         while True:
+#             print("Sending math problem")
+#             await send_math(channel=self.channel)
+#             print(f"Sleeping {duration} seconds")
+#             await asyncio.sleep(duration)
+#             print("Slept!")
 
 
 async def send_reminder(thread, duration, who: typing.Union[discord.Member, discord.TextChannel], message, author: typing.Union[discord.Member, discord.TextChannel], flag=None):
