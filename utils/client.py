@@ -242,7 +242,7 @@ class BotFrostClient(commands.Bot):
             )
             await ctx.send(embed=embed)
 
-    async def monitor_reactions(self, channel, emoji: discord.PartialEmoji, user: discord.Member, message: discord.Message, **kwargs):
+    async def monitor_reactions(self, channel, emoji: discord.PartialEmoji, user: discord.Member, message: discord.Message):
         async def trivia_message():
             from cogs.games.trivia import reactions, game, tally_score
 
