@@ -12,8 +12,7 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.images import build_quote
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_SCOTTS_BOTS, CHAN_BANNED, CHAN_TEST_SPAM, CHAN_STATS_BANNED, CHAN_TWITTERVERSE, CHAN_GENERAL, CHAN_IOWA, CHAN_RULES
-from utils.consts import EMBED_TITLE_HYPE
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BANNED, CHAN_STATS_BANNED, CHAN_GENERAL, CHAN_IOWA, CHAN_RULES
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
@@ -23,40 +22,15 @@ from utils.misc import on_prod_server
 from utils.mysql import process_MySQL, sqlRecordStats, sqlRetrieveTasks, sqlRetrieveIowa
 from utils.thread import send_reminder
 
-tweet_reactions = ("🎈", "🌽", "🕸")
 
-
-async def current_guild():
-    guild = None
-    if sys.argv[1] == "prod":
-        guild = client.get_guild(GUILD_PROD)
-    elif sys.argv[1] == "test":
-        guild = client.get_guild(GUILD_TEST)
-    return guild
-
-
-async def split_payload(payload):
-    payload_dict = dict()
-    payload_dict["channel_id"] = client.get_channel(payload.channel_id)
-    payload_dict["emoji"] = payload.emoji
-    guild = client.get_guild(payload.guild_id)
-    payload_dict["guild_id"] = guild.id
-    payload_dict["user_id"] = guild.get_member(payload.user_id)
-    c = client.get_channel(payload.channel_id)
-    payload_dict["message"] = await c.fetch_message(payload.message_id)
-
-    del c, payload
-
-    return payload_dict
-
-
-async def twitterverse(message: discord.Message):
-    for reaction in tweet_reactions:
-        await message.add_reaction(reaction)
-
-
-# noinspection PyMethodMayBeStatic
 class BotFrostClient(commands.Bot):
+    tweet_reactions = ("🎈", "🌽", "🕸")
+
+    def current_guild(self):
+        if sys.argv[1] == "prod":
+            return client.get_guild(GUILD_PROD)
+        elif sys.argv[1] == "test":
+            return client.get_guild(GUILD_TEST)
 
     def is_iowegian(self, member: discord.Member):
         return process_MySQL(
@@ -174,7 +148,7 @@ class BotFrostClient(commands.Bot):
 
     async def load_tasks(self):
         tasks = process_MySQL(sqlRetrieveTasks, fetch="all")
-        guild = await current_guild()
+        guild = self.current_guild()
 
         def convert_duration(value: str):
             imported_datetime = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
@@ -300,15 +274,15 @@ class BotFrostClient(commands.Bot):
                 share_string = f"[Shared by {user.mention}]: "
                 await ch.send(content=share_string + message.content, embed=message.embeds[0])
 
-            if emoji.name == tweet_reactions[0] and not tweet_reactions[0] in message.content:  # Balloon = General
+            if emoji.name == self.tweet_reactions[0] and not self.tweet_reactions[0] in message.content:  # Balloon = General
                 c = client.get_channel(CHAN_GENERAL)
                 await send_tweet(c)
 
-            elif emoji.name == tweet_reactions[1] and not tweet_reactions[1] in message.content:  # Corn = Scotts
+            elif emoji.name == self.tweet_reactions[1] and not self.tweet_reactions[1] in message.content:  # Corn = Scotts
                 c = client.get_channel(CHAN_SCOTT)
                 await send_tweet(c)
 
-            elif emoji.name == tweet_reactions[2]:  # Web = Reddit
+            elif emoji.name == self.tweet_reactions[2]:  # Web = Reddit
                 await user.send(f"Here is your post URL!\n"
                                 f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
 
@@ -337,7 +311,7 @@ class BotFrostClient(commands.Bot):
         roles_title = "Huskers' Discord Roles"
         try:
             if message.embeds[0].title == roles_title:
-                guild = await current_guild()
+                guild = self.current_guild()
                 member = guild.get_member(member.id)
 
                 roles = {
@@ -400,6 +374,25 @@ class BotFrostClient(commands.Bot):
                     return await hof_channel.send(embed=embed)
 
         del message_history_raw, duplicate, server_member_count
+
+    async def split_payload(self, payload):
+        guild = client.get_guild(payload.guild_id)
+        c = client.get_channel(payload.channel_id)
+
+        payload_dict = dict()
+        payload_dict["channel_id"] = client.get_channel(payload.channel_id)
+        payload_dict["emoji"] = payload.emoji
+        payload_dict["guild_id"] = guild.id
+        payload_dict["user_id"] = guild.get_member(payload.user_id)
+        payload_dict["message"] = await c.fetch_message(payload.message_id)
+
+        del c, payload
+
+        return payload_dict
+
+    async def twitterverse(self, message: discord.Message):
+        for reaction in self.tweet_reactions:
+            await message.add_reaction(reaction)
 
     if on_prod_server():
         async def on_command_error(self, ctx, error):
@@ -494,7 +487,7 @@ class BotFrostClient(commands.Bot):
     async def on_message(self, message):
 
         if message.author.id == TWITTER_BOT_MEMBER:
-            await twitterverse(message)
+            await self.twitterverse(message)
 
         self.monitor_messages(message)
 
@@ -504,7 +497,7 @@ class BotFrostClient(commands.Bot):
             return await message.channel.send(f"I am not authorized to perform commands in {message.channel.mention}!")
 
     async def on_raw_reaction_add(self, payload):
-        payload = await split_payload(payload)
+        payload = await self.split_payload(payload)
 
         if payload["message"].channel.id == CHAN_RULES:
             await self.role_reactions(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
@@ -515,7 +508,7 @@ class BotFrostClient(commands.Bot):
         await self.monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
 
     async def on_raw_reaction_remove(self, payload):
-        payload = await split_payload(payload)
+        payload = await self.split_payload(payload)
 
         if payload["message"].channel.id == CHAN_RULES:
             await self.role_reactions(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
@@ -530,74 +523,28 @@ class BotFrostClient(commands.Bot):
         await iowa.send(f"[ {member.mention} ] left the server and has been returned to {iowa.mention}.")
         await member.add_roles(timeout, reason="Back to Iowa")
 
+    # Unused Events
     # async def on_resume(self):
-    #     await change_my_status(client)
-    #     await change_my_nickname(client, ctx=None)
-
     # async def on_shard_ready(self, shard_id):
-    #     pass
-    #     # logging.info(f"[on_shard_ready] Shard ID: {shard_id}")
-
     # async def on_socket_raw_receive(self, msg):
-    #     pass
-    #     # self.send_to_log(logging.INFO, msg)
-
     # async def on_socket_raw_send(self, payload):
-    #     pass
-    #     # self.send_to_log(logging.INFO, payload)
-
     # async def on_disconnect(self):
-    #     # process_MySQL(query=sqlDatabaseTimestamp, values=(str(client.user), False, str(datetime.now())))
-    #
-    #     # await self.send_salutations("I AM DISCONNECTING.")
-
     # async def on_ready(self):
-    #     pass
-
     # async def on_message_delete(self, message):
-    #     pass
-
     # async def on_bulk_message_delete(self, message):
-    #     pass
-
     # async def on_raw_message_delete(self, payload):
-    #     pass
-
     # async def on_raw_bulk_message_delete(self, payload):
-    #     pass
-
     # async def on_message_edit(self, before, after):
-    #     pass
-
     # async def on_raw_message_edit(self, payload):
-    #     pass
-
     # async def on_reaction_add(reaction, user):
-    #     pass
-
     # async def on_reaction_remove(reaction, user):
-    #     pass
-
     # async def on_reaction_clear(self, message, reactions):
-    #     pass
-
     # async def on_raw_reaction_clear(self, payload):
-    #     pass
-
     # async def on_member_remove(self, member):
-    #     process_MySQL(query=sqlLogUser, values=(f"{member.name}#{member.discriminator}", "remove", "N/A"))
-
     # async def on_member_update(self, before, after):
-    #     pass
-
     # async def on_user_udpate(self, before, after):
-    # process_MySQL(query=sqlLogUser, values=(f"{before.name}#{before.discriminator}", "user_update", await compare_users(before, after)))
-
     # async def on_member_ban(self, guild, user):
-    # process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "ban", "N/A"))
-
     # async def on_member_unban(self, guild, user):
-    # process_MySQL(query=sqlLogUser, values=(f"{user.name}#{user.discriminator}", "unban", "N/A"))
 
 
 if on_prod_server():
@@ -605,8 +552,31 @@ if on_prod_server():
 else:
     command_prefix = "%"
 
-client = BotFrostClient(command_prefix=command_prefix, case_insensitive=True, description="Husker Discord Bot: Bot Frost", owner_id=189554873778307073)
-extensions = ("cogs.admin", "cogs.flags", "cogs.images", "cogs.referee", "cogs.schedule", "cogs.text", "cogs.croot", "cogs.games.trivia", "cogs.games.minecraft", "cogs.games.tcg.tcg", "cogs.betting", "cogs.music", "cogs.reddit", "cogs.message_history", "cogs.deepfry", "cogs.fap")  # , "cogs.twitter")
+client = BotFrostClient(
+    command_prefix=command_prefix,
+    case_insensitive=True,
+    description="Husker Discord Bot: Bot Frost",
+    owner_id=189554873778307073
+)
+
+extensions = (
+    "cogs.admin",
+    "cogs.flags",
+    "cogs.images",
+    "cogs.referee",
+    "cogs.schedule",
+    "cogs.text",
+    "cogs.croot",
+    "cogs.games.trivia",
+    "cogs.games.minecraft",
+    "cogs.games.tcg.tcg",
+    "cogs.betting",
+    "cogs.music",
+    "cogs.reddit",
+    "cogs.message_history",
+    "cogs.deepfry",
+    "cogs.fap"
+)
 
 for extension in extensions:
     try:
