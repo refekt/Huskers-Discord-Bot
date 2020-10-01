@@ -69,7 +69,7 @@ class BotFrostClient(commands.Bot):
                     image="https://i.imgur.com/52v1upi.png"
                 )
 
-            elif "bad bot" in message.content.clean():
+            elif "bad bot" in message.content.lower():
                 embed = build_embed(
                     title="╰（‵□′）╯",
                     image="https://i.redd.it/6vznew4w92211.jpg"
