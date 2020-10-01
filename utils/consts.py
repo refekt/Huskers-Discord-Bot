@@ -150,42 +150,5 @@ CURRENCY_NAME = "Verduzcoins"
 # bet_emojis = ["⬆", "⬇", "❎", "⏫", "⏬", "❌", "🔼", "🔽", "✖"]
 
 
-async def change_my_nickname(client, ctx):
-    nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
-             "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
-             "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto", "economybot",
-             "NotaBot_Human", "psybot", "2020: the year of the bot", "bottech129", "deerebot129")
-
-    try:
-        print("~~~ Attempting to change nickname...")
-        await client.user.edit(username=random.choice(nicks))
-        print(f"~~~ Changed nickname to {client.user.display_name}")
-    except discord.HTTPException as err:
-        err_msg = "~~~ !!! " + str(err).replace("\n", " ")
-        print(err_msg)
-    except:
-        print(f"~~~ !!! Unknown error!", sys.exc_info()[0])
 
 
-async def change_my_status(client, ctx=None):
-    statuses = (
-        "Husker Football 24/7",
-        "Currently beating Florida 62-24",
-        "Currently giving up 400 yards rushing to one guy",
-        "Attempting a swing pass for -1 yards",
-        "Missing a PAT or a missing a 21 yard FG",
-        "Getting wasted in Haymarket"
-    )
-    try:
-        print("~~~ Attempting to change status...")
-        new_activity = random.choice(statuses)
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=new_activity))
-        print(f"~~~ Changed status to '{new_activity}'")
-    except AttributeError as err:
-        err_msg = "~~~ !!! " + str(err).replace("\n", " ")
-        print(err_msg)
-    except discord.HTTPException as err:
-        err_msg = "~~~ !!! " + str(err).replace("\n", " ")
-        print(err_msg)
-    except:
-        print(f"~~~ !!! Unknown error!", sys.exc_info()[0])
