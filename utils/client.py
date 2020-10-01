@@ -75,7 +75,8 @@ class BotFrostClient(commands.Bot):
                     image="https://i.redd.it/6vznew4w92211.jpg"
                 )
 
-            return await message.channel.send(content=message.author.mention, embed=embed)
+            if embed is not None:
+                return await message.channel.send(content=message.author.mention, embed=embed)
 
         async def add_votes():
             if ".addvotes" in message.content.lower():
@@ -88,14 +89,13 @@ class BotFrostClient(commands.Bot):
                 chan = f"{message.guild}.#{message.channel.name}".encode("ascii", "ignore").decode("ascii")
                 process_MySQL(query=sqlRecordStats, values=(author, chan))
 
-        if not message.author.bot:
-            if message.channel.id not in CHAN_BANNED:
-                await auto_replies()
+        if message.channel.id not in CHAN_BANNED:
+            await auto_replies()
 
-            if message.channel.id not in CHAN_STATS_BANNED:
-                await record_statistics()
+        if message.channel.id not in CHAN_STATS_BANNED:
+            await record_statistics()
 
-            await add_votes()
+        await add_votes()
 
     async def check_current_guild(self):
         async for guild in client.fetch_guilds():
@@ -486,15 +486,16 @@ class BotFrostClient(commands.Bot):
 
     async def on_message(self, message):
 
-        if message.author.id == TWITTER_BOT_MEMBER:
-            await self.twitterverse(message)
+        if not message.author.bot:
+            if message.author.id == TWITTER_BOT_MEMBER:
+                await self.twitterverse(message)
 
-        await self.monitor_messages(message)
+            await self.monitor_messages(message)
 
-        if message.channel.id not in CHAN_BANNED:
-            return await self.process_commands(message)  # Always needed to process commands
-        else:
-            return await message.channel.send(f"I am not authorized to perform commands in {message.channel.mention}!")
+            if message.channel.id not in CHAN_BANNED:
+                return await self.process_commands(message)  # Always needed to process commands
+            else:
+                return await message.channel.send(f"I am not authorized to perform commands in {message.channel.mention}!")
 
     async def on_raw_reaction_add(self, payload):
         payload = await self.split_payload(payload)
