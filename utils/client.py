@@ -24,7 +24,7 @@ from utils.thread import send_reminder
 
 
 class BotFrostClient(commands.Bot):
-    tweet_reactions = ("🎈", "🌽", "🕸")
+    tweet_reactions = ("🎈", "🌽")
 
     def current_guild(self):
         if sys.argv[1] == "prod":
