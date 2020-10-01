@@ -39,7 +39,7 @@ class BotFrostClient(commands.Bot):
             fetch="all"
         )
 
-    def monitor_messages(self, message: discord.Message):
+    async def monitor_messages(self, message: discord.Message):
         async def auto_replies():
             myass = ("https://66.media.tumblr.com/b9a4c96d0c83bace5e3ff303abc08f1f/tumblr_oywc87sfsP1w8f7y5o3_500.gif",
                      "https://66.media.tumblr.com/2ae73f93fcc20311b00044abc5bad05f/tumblr_oywc87sfsP1w8f7y5o1_500.gif",
@@ -97,7 +97,7 @@ class BotFrostClient(commands.Bot):
 
             await add_votes()
 
-    def check_current_guild(self):
+    async def check_current_guild(self):
         async for guild in client.fetch_guilds():
             if guild.id not in (GUILD_TEST, GUILD_PROD):
                 try:
@@ -105,9 +105,9 @@ class BotFrostClient(commands.Bot):
                     await guild.leave()
                 except discord.HTTPException:
                     print(f"### ### !!! Leaving guild failed!")
-                client.logout()
+                await client.logout()
 
-    def change_my_status(self):
+    async def change_my_status(self):
         statuses = (
             "Husker Football 24/7",
             "Currently beating Florida 62-24",
@@ -130,7 +130,7 @@ class BotFrostClient(commands.Bot):
         except:
             print(f"~~~ !!! Unknown error!", sys.exc_info()[0])
 
-    def change_my_nickname(self):
+    async def change_my_nickname(self):
         nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
                  "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
                  "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto", "economybot",
@@ -479,9 +479,9 @@ class BotFrostClient(commands.Bot):
             f"### ~~~ Command Prefix: \"{self.command_prefix}\""
         )
 
-        self.change_my_status()
-        self.change_my_nickname()
-        self.check_current_guild()
+        await self.change_my_status()
+        await self.change_my_nickname()
+        await self.check_current_guild()
         await self.load_tasks()
 
     async def on_message(self, message):
@@ -489,7 +489,7 @@ class BotFrostClient(commands.Bot):
         if message.author.id == TWITTER_BOT_MEMBER:
             await self.twitterverse(message)
 
-        self.monitor_messages(message)
+        await self.monitor_messages(message)
 
         if message.channel.id not in CHAN_BANNED:
             return await self.process_commands(message)  # Always needed to process commands

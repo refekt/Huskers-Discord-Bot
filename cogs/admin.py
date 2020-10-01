@@ -9,7 +9,6 @@ from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import GUILD_PROD
 from utils.consts import REACITON_HYPE_SQUAD
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, ROLE_TIME_OUT
-from utils.consts import change_my_nickname
 from utils.embed import build_embed as build_embed
 from utils.mysql import process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
@@ -255,11 +254,6 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         for reaction in REACITON_HYPE_SQUAD:
             await hype_msg.add_reaction(reaction)
-
-    @commands.command()
-    async def updatenick(self, ctx):
-        """ Update the bot's nickname """
-        await change_my_nickname(client, ctx)
 
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)

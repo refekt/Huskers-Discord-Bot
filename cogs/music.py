@@ -11,7 +11,6 @@ from discord.ext import commands
 from utils.consts import CHAN_RADIO_PROD, CHAN_RADIO_TEST
 from utils.consts import FOOTER_BOT, FOOTER_SECRET
 from utils.consts import ROLE_MOD_PROD, ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
-from utils.consts import change_my_status as change_status_nonlistening
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
