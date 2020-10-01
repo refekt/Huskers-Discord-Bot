@@ -494,8 +494,6 @@ class BotFrostClient(commands.Bot):
 
             if message.channel.id not in CHAN_BANNED:
                 return await self.process_commands(message)  # Always needed to process commands
-            else:
-                return await message.channel.send(f"I am not authorized to perform commands in {message.channel.mention}!")
 
     async def on_raw_reaction_add(self, payload):
         payload = await self.split_payload(payload)
