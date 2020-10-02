@@ -551,23 +551,16 @@ if on_prod_server():
 else:
     command_prefix = "%"
 
-intents = discord.Intents
-intents.members = True
-intents.guilds = True
-intents.bans = True
-intents.emojis = True
-intents.presences = True
-intents.messages = True
-intents.guild_messages = True
-intents.reactions = True
-
+# client_intents = discord.Intents(
+#     members=True
+# )
 
 client = BotFrostClient(
     command_prefix=command_prefix,
     case_insensitive=True,
     description="Husker Discord Bot: Bot Frost",
     owner_id=189554873778307073,
-    intents=intents
+    # intents=client_intents
 )
 
 extensions = (
