@@ -9,6 +9,8 @@ Go Huskers! 🏈 🏈 🏈
 ## COMMANDS
 `$help` lists all the available commands.
 
+## Get to know your team
+Not sure whom to cheer for? Check out our newest team members [here](/recruits.csv)!
 
 ## TODO
 1. Redesign betting functionality.
