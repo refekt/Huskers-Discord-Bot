@@ -16,3 +16,6 @@ Not sure whom to cheer for? Check out our newest team members [here](/recruits.c
 1. Redesign betting functionality.
 2. Introduce a currency used for betting.
 3. Create radio capability.
+
+## Follow Huskers on Social Media
+[![icons8-facebook-48](https://user-images.githubusercontent.com/30497847/94885472-3fcfd280-043e-11eb-88ee-627d17680677.png)](https://www.facebook.com/huskers/) [![icons8-twitter-48](https://user-images.githubusercontent.com/30497847/94885176-8bce4780-043d-11eb-82fe-cebdd8c0dd47.png)](https://twitter.com/Huskers) [![icons8-instagram-48](https://user-images.githubusercontent.com/30497847/94885555-802f5080-043e-11eb-867a-0b443248d05b.png)](https://www.instagram.com/huskers/?hl=en)
