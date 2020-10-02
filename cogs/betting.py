@@ -301,7 +301,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"You must be more than your current balance of [ {balance:,} ].")
 
         pities = 0
-        pity_cap = 10
+        pity_cap = 1000
 
         edit_msg = await ctx.send(f"Spinning the wheel [ {cycles:,} ] times to reach [ {goal:,} ] {CURRENCY_NAME}!")
 
