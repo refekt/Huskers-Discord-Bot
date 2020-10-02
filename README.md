@@ -19,5 +19,6 @@ Not sure whom to cheer for? Check out our newest team members [here](/recruits.c
 
 
 ## Follow us on Twitter:
-[<img target="_blank" src="https://user-images.githubusercontent.com/30497847/94883417-a05c1100-0438-11eb-9576-89de311154d8.png" target="_blank"></img>](https://twitter.com/Huskers)
+[<img src="![icons8-twitter-64](https://user-images.githubusercontent.com/30497847/94884832-90dec700-043c-11eb-80f9-b51f2000ba69.png)
+" target="_blank"></img>](https://twitter.com/Huskers)
 
