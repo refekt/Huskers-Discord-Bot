@@ -4,6 +4,8 @@
 
 Bot Frost is the official bot for the Husker Discord server. Join here: https://discord.gg/fVSbp2K. 
 
+Go Huskers! 🏈 🏈 🏈
+
 ## COMMANDS
 `$help` lists all the available commands.
 
