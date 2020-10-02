@@ -17,8 +17,7 @@ Not sure whom to cheer for? Check out our newest team members [here](/recruits.c
 2. Introduce a currency used for betting.
 3. Create radio capability.
 
+## Follow us on Twitter
+[![icons8-twitter-48](https://user-images.githubusercontent.com/30497847/94885176-8bce4780-043d-11eb-82fe-cebdd8c0dd47.png)](https://twitter.com/Huskers)
 
-## Follow us on Twitter:
-[<img src="![icons8-twitter-64](https://user-images.githubusercontent.com/30497847/94884832-90dec700-043c-11eb-80f9-b51f2000ba69.png)
-" target="_blank"></img>](https://twitter.com/Huskers)
 
