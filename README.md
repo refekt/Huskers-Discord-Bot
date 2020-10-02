@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/discord/440632686185414677?style=plastic"></img> <img alt="GitHub followers" src="https://img.shields.io/github/followers/refekt?style=plastic"> <img alt="GitHub Hacktoberfest combined status" src="https://img.shields.io/github/hacktoberfest/2020/refekt/Bot-Frost?style=plastic">
+<img src="https://img.shields.io/discord/440632686185414677?style=plastic"></img> <img alt="GitHub followers" src="https://img.shields.io/github/followers/refekt?style=plastic"> <img alt="GitHub Hacktoberfest combined status" src="https://img.shields.io/github/hacktoberfest/2020/refekt/Bot-Frost?style=plastic"> <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/refekt/Bot-Frost?style=plastic">
 
 # Bot Frost 2.0
 
