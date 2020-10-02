@@ -10,7 +10,7 @@ Go Huskers! 🏈 🏈 🏈
 `$help` lists all the available commands.
 
 ## Get to know your team
-Not sure whom to cheer for? Check out our newest team members [here](/recruits.csv)!
+Not sure whom to cheer for? Check out our newest team members [here](https://huskers.com/roster.aspx?path=football)!
 
 ## TODO
 1. Redesign betting functionality.
