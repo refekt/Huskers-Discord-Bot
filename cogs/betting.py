@@ -419,7 +419,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     async def new(self, ctx):
         """ Establish a wallet for server currency """
         if not self.check_author_initialized(ctx.message.author):
-            starter_money = 100
+            starter_money = 15000
             self.initiate_user(ctx, starter_money)
             await ctx.send(f"Congratulations {ctx.message.author.mention}! You now have [ {starter_money:,} ] {CURRENCY_NAME}. Use it wisely!")
         else:
