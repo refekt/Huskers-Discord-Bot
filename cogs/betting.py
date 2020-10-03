@@ -530,32 +530,34 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             fetch="all"
         )
 
-        lb = ""
+        lb = "```html\n"
         for index, person in enumerate(leaderboard):
             if index > 9:
                 break
 
-            member = person["username"][:13]
-            spacer = "." * (35 - len(f"`🥇: {member}{person['balance']:,}`"))
+            member = person["username"]
+            spacer = "." * (50 - len(f"🥇: {member}{person['balance']:,}"))
 
             if member is not None:
                 if index == 0:
-                    lb += f"`🥇: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🥇: {member}{spacer}{person['balance']:,}\n"
                 elif index == 1:
-                    lb += f"`🥈: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🥈: {member}{spacer}{person['balance']:,}\n"
                 elif index == 2:
-                    lb += f"`🥉: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🥉: {member}{spacer}{person['balance']:,}\n"
                 else:
-                    lb += f"`🏅: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🏅: {member}{spacer}{person['balance']:,}\n"
 
-        await ctx.send(
-            embed=build_embed(
-                title=f"Husker Discord Currency Leaderboard",
-                fields=[
-                    [f"Top 10 {CURRENCY_NAME} Leaderboard", lb]
-                ]
-            )
-        )
+        # await ctx.send(
+        #     embed=build_embed(
+        #         title=f"Husker Discord Currency Leaderboard",
+        #         fields=[
+        #             [f"Top 10 {CURRENCY_NAME} Leaderboard", lb]
+        #         ]
+        #     )
+        # )
+
+        await ctx.send(lb + "\n```")
 
     def retrieve_one_bet_keyword_custom_line(self, ctx: discord.ext.commands.Context, keyword):
         try:

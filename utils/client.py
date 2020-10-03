@@ -537,7 +537,7 @@ class BotFrostClient(commands.Bot):
     # async def on_raw_message_edit(self, payload):
     # async def on_reaction_add(reaction, user):
     # async def on_reaction_remove(reaction, user):
-    # async def on_reaction_clear(self, message, reactions):
+    # async def on_reaction_clear(self, message, reactions):lea
     # async def on_raw_reaction_clear(self, payload):
     # async def on_member_remove(self, member):
     # async def on_member_update(self, before, after):
