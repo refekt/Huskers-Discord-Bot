@@ -593,7 +593,7 @@ extensions = (
     "cogs.games.minecraft",
     "cogs.games.tcg.tcg",
     "cogs.betting",
-    "cogs.music",
+    "cogs.music_test",
     "cogs.reddit",
     "cogs.message_history",
     "cogs.deepfry",

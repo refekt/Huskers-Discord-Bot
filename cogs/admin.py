@@ -8,7 +8,8 @@ from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS, CHAN_IOW
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import GUILD_PROD
 from utils.consts import REACITON_HYPE_SQUAD
-from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, ROLE_TIME_OUT
+from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, \
+    ROLE_TIME_OUT
 from utils.embed import build_embed as build_embed
 from utils.mysql import process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
@@ -31,11 +32,13 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     ["History",
                      "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!"],
                     ["Source Code", "[GitHub](https://www.github.com/refekt/Husker-Bot)"],
-                    ["Hosting Location", f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
+                    ["Hosting Location",
+                     f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
                     ["Hosting Status", "https://status.hyperexpert.com/"],
                     ["Latency", f"{client.latency * 1000:.2f} ms"],
                     ["Username", client.user.mention],
-                    ["Feeling generous?", f"Check out `{client.command_prefix}donate` to help out the production and upkeep of the bot."]
+                    ["Feeling generous?",
+                     f"Check out `{client.command_prefix}donate` to help out the production and upkeep of the bot."]
                 ]
             )
         )
@@ -50,15 +53,17 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 inline=False,
                 thumbnail="https://i.imgur.com/53GeCvm.png",
                 fields=[
-                    ["About", "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware "
-                              "performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs."],
+                    ["About",
+                     "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware "
+                     "performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs."],
                     ["Terms", "(1) Final discretion of donation usage is up to the creator(s). "
                               "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
                               "(3) No refunds. "
                               "(4) Monthly subscriptions can be terminated by either party at any time. "
                               "(5) These terms can be changed at any time. Please read before each donation. "
                               "(6) Clicking the donation link signifies your agreement to these terms."],
-                    ["Donation Link", "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
+                    ["Donation Link",
+                     "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
                 ]
             )
         )
@@ -66,7 +71,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @donate.after_invoke
     async def after_donate(self, ctx):
         from utils.mysql import process_MySQL, sqlLogUser
-        process_MySQL(query=sqlLogUser, values=(f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "after_donate", "N/A"))
+        process_MySQL(query=sqlLogUser,
+                      values=(f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "after_donate", "N/A"))
 
     @commands.group(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -80,7 +86,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         msgs = []
         try:
-            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
+            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23,
+                                                                   minutes=59)  # Discord only lets you delete 14 day old messages
             async for message in ctx.message.channel.history(limit=100):
                 if message.created_at >= max_age and message.author.bot:
                     msgs.append(message)
@@ -110,7 +117,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         msgs = []
         try:
-            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
+            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23,
+                                                                   minutes=59)  # Discord only lets you delete 14 day old messages
             async for message in ctx.message.channel.history(limit=100):
                 if message.created_at >= max_age:
                     msgs.append(message)
@@ -373,7 +381,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
         await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
-        await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
+        await ctx.send(
+            f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
         await who.send(f"You have been moved to [ {iowa.mention} ] for the following reason: {reason}.")
 
     @commands.command(hidden=True)
@@ -418,9 +427,17 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         await ctx.send(embed=build_embed(
             title=f"Bug Reporter",
             fields=[
-                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
+                ["Report Bugs",
+                 "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
             ]
         ))
+
+    @commands.command()
+    async def test(self, ctx, test=None):
+        if test is None:
+            return await ctx.send("Test is None")
+
+        await ctx.send("Test is not None.")
 
 
 def setup(bot):
