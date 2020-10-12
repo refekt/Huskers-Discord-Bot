@@ -572,13 +572,14 @@ client_intents.bans = True
 client_intents.emojis = True
 client_intents.messages = True
 client_intents.guilds = True
+client_intents.voice_states = True
 
 client = BotFrostClient(
     command_prefix=command_prefix,
     case_insensitive=True,
     description="Husker Discord Bot: Bot Frost",
     owner_id=189554873778307073,
-    intents=client_intents
+    # intents=client_intents
 )
 
 extensions = (
@@ -593,7 +594,7 @@ extensions = (
     "cogs.games.minecraft",
     "cogs.games.tcg.tcg",
     "cogs.betting",
-    # "cogs.music_test",
+    "cogs.music_test",
     "cogs.reddit",
     "cogs.message_history",
     "cogs.deepfry",
