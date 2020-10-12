@@ -9,9 +9,11 @@ from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
-from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
+from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, \
+    sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
 from utils.mysql import sqlInsertCustomLinesBets, sqlRetrieveOneCustomLinesKeywords, sqlRetrieveAllCustomLinesKeywords
-from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
+from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, \
+    sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
 
 PITY_CAP = 10
 RLT_FLOOR = 1
@@ -236,7 +238,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     bet_range = self.convert_bet_range(bet)
 
                     if not self.validate_bet_range(bet_range):
-                        raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
+                        raise AttributeError(
+                            f"Error in your bet format. Please review `$help roulette` for more information.")
 
                     result = self.roll_single_int()
 
@@ -278,10 +281,14 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
         if win:
-            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result,
-                                                           bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
+            await edit_msg.edit(
+                content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt",
+                                           wheel_spin=result,
+                                           bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
         else:
-            await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
+            await edit_msg.edit(
+                content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt",
+                                           wheel_spin=result, bet=bet))
 
     @commands.command(aliases=["arlt", ])
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -320,7 +327,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         strat = strat.replace('x', 'bet2')
         strat = strat.replace('z', 'bet1')
-        
+
         eval(strat)
 
         self.adjust_currency(ctx.message.author, -balance)
@@ -344,11 +351,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 if balance <= 0:
                     if pities >= pity_cap:
                         # raise AttributeError("Pity is on cooldown! Auto Roulette has stopped.")
-                        return await edit_msg.edit(content=edit_msg.content + f" You suck and used up all the pities and you now have [ {balance:,}. ] {CURRENCY_NAME}")
+                        return await edit_msg.edit(
+                            content=edit_msg.content + f" You suck and used up all the pities and you now have [ {balance:,}. ] {CURRENCY_NAME}")
                     else:
                         # await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
 
-                        pities += 1 #git
+                        pities += 1  # git
                         balance = pity_money
                         bet1 = max(int(bet_multiplier * balance), 1)
                         bet2 = 0
@@ -358,7 +366,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         self.adjust_currency(ctx.message.author, balance)
 
-        await edit_msg.edit(content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
+        await edit_msg.edit(
+            content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
 
     @commands.command(aliases=["rps", ])
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
@@ -403,9 +412,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
+                return await ctx.send(
+                    self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice,
+                                       cpu_throw=throw))
             else:
-                return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
+                return await ctx.send(
+                    self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps",
+                                       mbr_throw=choice, cpu_throw=throw))
 
     @commands.group(aliases=["m", ])
     async def money(self, ctx):
@@ -421,9 +434,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not self.check_author_initialized(ctx.message.author):
             starter_money = 15000
             self.initiate_user(ctx, starter_money)
-            await ctx.send(f"Congratulations {ctx.message.author.mention}! You now have [ {starter_money:,} ] {CURRENCY_NAME}. Use it wisely!")
+            await ctx.send(
+                f"Congratulations {ctx.message.author.mention}! You now have [ {starter_money:,} ] {CURRENCY_NAME}. Use it wisely!")
         else:
-            return await ctx.send(f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
+            return await ctx.send(
+                f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
 
     @money.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -450,7 +465,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if balance == 0:
             self.adjust_currency(ctx.message.author, self.pity_value())
-            return await ctx.send(content=f"Pity on you. You have been awarded [ {self.pity_value():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
+            return await ctx.send(
+                content=f"Pity on you. You have been awarded [ {self.pity_value():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
 
@@ -504,7 +520,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             self.adjust_currency(user, value)
             return await ctx.send(f"You have sent [ {value:,} ] {CURRENCY_NAME} to {user.mention}!")
         else:
-            raise AttributeError(f"You do not have [ {value:,} ] {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
+            raise AttributeError(
+                f"You do not have [ {value:,} ] {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
 
     @money.command()
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -865,7 +882,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         author = ctx.guild.get_member(original_bet["author"])
 
         if not original_bet["author"] == ctx.message.author.id:
-            raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
+            raise AttributeError(
+                f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
 
         try:
 
