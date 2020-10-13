@@ -579,7 +579,7 @@ client = BotFrostClient(
     case_insensitive=True,
     description="Husker Discord Bot: Bot Frost",
     owner_id=189554873778307073,
-    # intents=client_intents
+    intents=client_intents
 )
 
 extensions = (

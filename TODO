@@ -1,0 +1,2 @@
+- Upgrade to Python 3.9
+-- Pillow currently does not support Python 3.9
