@@ -566,7 +566,7 @@ else:
     command_prefix = "%"
 
 client_intents = discord.Intents()
-client_intents.members = True
+# client_intents.members = True
 client_intents.reactions = True
 client_intents.bans = True
 client_intents.emojis = True
@@ -579,7 +579,7 @@ client = BotFrostClient(
     case_insensitive=True,
     description="Husker Discord Bot: Bot Frost",
     owner_id=189554873778307073,
-    intents=client_intents # Turn on or off for debug...
+    intents=client_intents  # Turn on or off for debug...
 )
 
 extensions = (

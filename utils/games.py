@@ -161,13 +161,13 @@ def HuskerSchedule(year=datetime.datetime.now().year):
     season_stats = SeasonStats()
     exempt_games = ("Spring Game", "Fan Day")
     special_games = ("Homecoming", "Bowl")
-    wk = 0
+    week = 0
 
     for game in games_raw:
-        wk += 1
+        week += 1
 
         if any(g in game.text for g in exempt_games):
-            wk -= 1
+            week -= 1
             continue
 
         if any(g in game.text for g in special_games):
@@ -189,20 +189,6 @@ def HuskerSchedule(year=datetime.datetime.now().year):
             except IndexError:
                 out = ""
 
-        months = {"Jan": 1,
-                  "Feb": 2,
-                  "Mar": 3,
-                  "Apr": 4,
-                  "May": 5,
-                  "Jun": 6,
-                  "Jul": 7,
-                  "Aug": 8,
-                  "Sep": 9,
-                  "Oct": 10,
-                  "Nov": 11,
-                  "Dec": 12
-                  }
-
         if "TBA" in opp.date_time:
             gdt_string = f"{opp.date_time[0:6]} {year} 10:58 PM"
             game_date_time = datetime.datetime.strptime(gdt_string, "%b %d %Y %I:%M %p").astimezone(tz=TZ)
@@ -217,7 +203,7 @@ def HuskerSchedule(year=datetime.datetime.now().year):
                 opponent=opp,
                 outcome=out,
                 ranking=None,
-                week=wk,
+                week=week,
                 game_date_time=game_date_time
             )
         )
