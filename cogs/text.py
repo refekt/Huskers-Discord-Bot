@@ -1,3 +1,4 @@
+import platform
 import asyncio
 import random
 import re
@@ -219,15 +220,19 @@ class TextCommands(commands.Cog):
 
             return hour, mins
 
-        async def send_countdown(days: int, hours: int, minutes: int, opponent, datetime: datetime):
-            print(f"datetime.hour == {datetime.hour} and datetime.minute == {datetime.minute}")
-            print(f"Test format... {datetime.strftime('%B %d, %Y %I:%M %p %Z')}")
-            if datetime.hour == 21 and datetime.minute == 58:
+        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime):
+            if "linux" in platform.platform():
+                _datetime += timedelta(hours=6)
+
+            print(f"datetime.hour == {_datetime.hour} and datetime.minute == {_datetime.minute}")
+            print(f"Test format... {_datetime.strftime('%B %d, %Y %I:%M %p %Z')}")
+
+            if _datetime.hour == 21 and _datetime.minute == 58:
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
-                                            f" {datetime.strftime('%B %d, %Y')} ]__")
+                                            f" {_datetime.strftime('%B %d, %Y')} ]__")
             else:
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
-                                            f" {datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
+                                            f" {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
 
         games, stats = HuskerSchedule(year=now_cst.year)
 
