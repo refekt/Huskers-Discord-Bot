@@ -223,7 +223,7 @@ class TextCommands(commands.Cog):
         async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime):
             print(platform.platform())
 
-            if "linux" in platform.platform():
+            if "Linux" in platform.platform():
                 _datetime += timedelta(hours=6)
 
             print(f"datetime.hour == {_datetime.hour} and datetime.minute == {_datetime.minute}")
