@@ -220,6 +220,8 @@ class TextCommands(commands.Cog):
             return hour, mins
 
         async def send_countdown(days: int, hours: int, minutes: int, opponent, datetime: datetime):
+            print(f"datetime.hour == {datetime.hour} and datetime.minute == {datetime.minute}")
+            print(f"Test format... {datetime.strftime('%B %d, %Y %I:%M %p %Z')}")
             if datetime.hour == 21 and datetime.minute == 58:
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
                                             f" {datetime.strftime('%B %d, %Y')} ]__")
