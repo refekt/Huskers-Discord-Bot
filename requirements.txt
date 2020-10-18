@@ -13,3 +13,4 @@ python-dateutil
 python-dotenv
 pytz
 youtube-dl
+nest-asyncio
