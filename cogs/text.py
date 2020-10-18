@@ -246,6 +246,7 @@ class TextCommands(commands.Cog):
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
+                    print(f"Diff days: {diff.days}, diff hours: {diff_cd[0]}, diff minutes: {diff_cd[1]}")
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
                     break
         else:

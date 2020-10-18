@@ -22,7 +22,6 @@ BET_RANGE_CHAR = ":"
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
-
     def pity_value(self):
         return 15000
 
