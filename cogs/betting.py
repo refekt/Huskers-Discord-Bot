@@ -304,7 +304,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         balance = self.get_balance(ctx.message.author)
 
         if type(goal) == str and "%" in goal:
-            goal = int(goal.split("%")[0] // 100) * balance
+            goal = int((int(goal.split("%")[0]) / 100) * balance)
         else:
             raise AttributeError("Incorrect goal format! The goal must be a proper percent. Try again.")
 
