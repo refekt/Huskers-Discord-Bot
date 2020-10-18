@@ -292,7 +292,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.command(aliases=["arlt", ])
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     # @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
-    async def autoroulette(self, ctx, goal: int, bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
+    async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
         """
         Spin the roulette wheel automatically up to 10,000 times!
 
@@ -302,6 +302,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         :param strat: Voodoo magic. I don't understand it.
         """
         balance = self.get_balance(ctx.message.author)
+
+        if type(goal) == str and "%" in goal:
+            goal = int(goal.split("%")[0]) * balance
+        else:
+            raise AttributeError("Incorrect goal format! The goal must be a proper percent. Try again.")
 
         if balance > goal:
             raise AttributeError(f"You must be more than your current balance of [ {balance:,} ].")
