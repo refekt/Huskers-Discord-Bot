@@ -221,13 +221,10 @@ class TextCommands(commands.Cog):
             return hour, mins
 
         async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime):
-            print(platform.platform())
-
             if "Linux" in platform.platform():
-                _datetime += timedelta(hours=6)
-
-            print(f"datetime.hour == {_datetime.hour} and datetime.minute == {_datetime.minute}")
-            print(f"Test format... {_datetime.strftime('%B %d, %Y %I:%M %p %Z')}")
+                offset = 6
+                _datetime += timedelta(hours=offset)
+                hours += offset
 
             if _datetime.hour == 21 and _datetime.minute == 58:
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
@@ -246,7 +243,6 @@ class TextCommands(commands.Cog):
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    print(f"Diff days: {diff.days}, diff hours: {diff_cd[0]}, diff minutes: {diff_cd[1]}")
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
                     break
         else:
