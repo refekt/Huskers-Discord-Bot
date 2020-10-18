@@ -226,8 +226,8 @@ class TextCommands(commands.Cog):
                 _datetime += timedelta(hours=offset)
                 hours += offset
 
-            if _datetime.hour == 21 and _datetime.minute == 58:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
+            if "TBA" in opponent.date_time:
+                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days ]__ until the __[ {opponent.name} ]__ game at __["
                                             f" {_datetime.strftime('%B %d, %Y')} ]__")
             else:
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
