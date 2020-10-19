@@ -432,13 +432,5 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
             ]
         ))
 
-    @commands.command()
-    async def test(self, ctx, test=None):
-        if test is None:
-            return await ctx.send("Test is None")
-
-        await ctx.send("Test is not None.")
-
-
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
