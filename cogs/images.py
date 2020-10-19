@@ -12,7 +12,6 @@ from utils.embed import build_image_embed
 
 
 def build_quote(quote: str, author):
-
     max_len = 125
     if len(quote) > max_len:
         quote = quote[0:max_len] + "..."
@@ -228,9 +227,20 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ I AM A TALL BOY """
         await ctx.send(embed=build_image_embed(title="HYPE", image="https://giant.gfycat.com/ImpishSevereAfricanfisheagle.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def siryacht(self, ctx):
+        """ SirYacht was never wrong! """
+        await ctx.send(embed=build_image_embed(title="I am the captain now", image="https://imgur.com/a/ii63p9v"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def deeretroll(self, ctx):
+        """ His pessimism knows no bounds """
+        await ctx.send(embed=build_image_embed(title="Whomp, whomp", image="https://imgur.com/a/Pznpj3u"))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
 
 # print("### Image Commands loaded! ###")
-

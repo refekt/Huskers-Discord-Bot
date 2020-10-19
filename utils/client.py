@@ -359,6 +359,7 @@ class BotFrostClient(commands.Bot):
         duplicate = False
         server_member_count = len(client.users)
         threshold = int(0.0047 * server_member_count)
+        message_history_raw = None
 
         for reaction in reactions:
             if reaction.count >= threshold and reaction.message.channel.id != hof_channel.id and ".addvotes" not in reaction.message.content:
