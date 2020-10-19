@@ -231,13 +231,13 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def siryacht(self, ctx):
         """ SirYacht was never wrong! """
-        await ctx.send(embed=build_image_embed(title="I am the captain now", image="https://imgur.com/a/ii63p9v"))
+        await ctx.send(embed=build_image_embed(title="I am the captain now", image="https://i.imgur.com/0CoT3Jg.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def deeretroll(self, ctx):
         """ His pessimism knows no bounds """
-        await ctx.send(embed=build_image_embed(title="Whomp, whomp", image="https://imgur.com/a/Pznpj3u"))
+        await ctx.send(embed=build_image_embed(title="Whomp, whomp", image="https://i.imgur.com/4Gwlpap.jpg"))
 
 
 def setup(bot):
