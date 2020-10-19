@@ -221,11 +221,6 @@ class TextCommands(commands.Cog):
             return hour, mins
 
         async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime):
-            if "Linux" in platform.platform():
-                offset = 6
-                _datetime += timedelta(hours=offset)
-                hours += offset
-
             if "TBA" in opponent.date_time:
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days ]__ until the __[ {opponent.name} ]__ game at __["
                                             f" {_datetime.strftime('%B %d, %Y')} ]__")

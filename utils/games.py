@@ -1,3 +1,4 @@
+import platform
 from utils.consts import TZ
 import datetime
 import pytz
@@ -195,6 +196,10 @@ def HuskerSchedule(year=datetime.datetime.now().year):
         else:
             game_date_time = datetime.datetime.strptime(opp.date_time.replace("A.M.", "AM").replace("P.M.", "PM"), "%b %d %Y %I:%M %p").astimezone(tz=TZ)
             game_date_time += datetime.timedelta(hours=1)
+
+        if "Linux" in platform.platform():
+            offset = 6
+            game_date_time += datetime.timedelta(hours=offset)
 
         games.append(
             HuskerDotComSchedule(
