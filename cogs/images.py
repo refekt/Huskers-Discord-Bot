@@ -224,11 +224,11 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ I AM A TALL BOY """
         await ctx.send(embed=build_image_embed(title="Big Boye", image="https://i.imgur.com/nHG9xxP.gif"))
 
-    @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def maxhype(self, ctx):
-        """ I AM A TALL BOY """
-        await ctx.send(embed=build_image_embed(title="HYPE", image="https://giant.gfycat.com/ImpishSevereAfricanfisheagle.gif"))
+    # @commands.command()
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # async def maxhype(self, ctx):
+    #     """ I AM A TALL BOY """
+    #     await ctx.send(embed=build_image_embed(title="HYPE", image="https://giant.gfycat.com/ImpishSevereAfricanfisheagle.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
