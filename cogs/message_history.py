@@ -3,7 +3,6 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-from utils.client import client
 from utils.consts import GUILD_PROD, GUILD_TEST
 from utils.consts import PROD_BOT_MEMBER, TEST_BOT_MEMBER
 from utils.consts import ROLE_ADMIN_TEST, ROLE_ADMIN_PROD
@@ -20,10 +19,10 @@ class HistoryCommands(commands.Cog, name="History Commands"):
         history = []
         guild = member = None
 
-        guild = client.get_guild(id=GUILD_PROD)
+        guild = self.bot.get_guild(id=GUILD_PROD)
 
         if guild is None:
-            guild = client.get_guild(id=GUILD_TEST)
+            guild = self.bot.get_guild(id=GUILD_TEST)
 
         member = guild.get_member(PROD_BOT_MEMBER)
 

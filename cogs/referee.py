@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.embed import build_embed
 
@@ -37,7 +36,7 @@ class Referee(commands.Cog):
     async def referee(self, ctx):
         """ A list of referee signals """
         if not ctx.invoked_subcommand:
-            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
+            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{self.bot.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
 
         scmd = ctx.invoked_subcommand
 

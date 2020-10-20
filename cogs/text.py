@@ -1,4 +1,3 @@
-import platform
 import asyncio
 import random
 import re
@@ -8,19 +7,17 @@ from datetime import datetime, timedelta
 import discord
 import markovify
 import requests
+from bs4 import BeautifulSoup
 from discord.ext import commands
 
-from bs4 import BeautifulSoup
-
-from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
+from utils.consts import HEADERS
 from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 from utils.thread import send_reminder
-from utils.consts import HEADERS
 
 
 class TeamStatsWinsipediaTeam:
@@ -270,7 +267,7 @@ class TextCommands(commands.Cog):
                 return re.sub(r'[^\x00-\x7f]', r'', f.read())
             else:
 
-                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.content)]:
+                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in self.bot.all_commands.keys() if (ele in msg.content)]:
                     msg_content = str(msg.content.capitalize())
                     return "\n" + msg_content
 

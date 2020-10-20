@@ -1,12 +1,13 @@
 import asyncio
-import discord
 import datetime
-import pandas as pd
-import numpy as np
+
 import discord
-from utils.recruit import FootballRecruit
+import numpy as np
+import pandas as pd
 from discord.ext import commands
+
 from utils.mysql import process_MySQL
+from utils.recruit import FootballRecruit
 
 CURRENT_CLASS = 2021
 NO_MORE_PREDS = 2021
@@ -73,7 +74,7 @@ async def initiate_fap(user, recruit, client):
     if previous_prediction is not None:
         await channel.send(f"It appears that you've previously predicted {recruit.name} to {previous_prediction['team']} with confidence {previous_prediction['confidence']}. You can answer the prompts to update your prediction.")
     await channel.send(f'Please predict which team you think {recruit.name} will commit to. (247 Profile: {recruit.x247_profile})')
-    while (team_prediction is None):
+    while team_prediction is None:
         try:
             prediction_response = await client.wait_for('message',
                                                         check=lambda message: message.author == user and message.channel == channel,
@@ -92,7 +93,7 @@ async def initiate_fap(user, recruit, client):
             else:
                 await channel.send("That isn't a valid team. Please try again or ask my creators to add that as a valid team.")
 
-    while (prediction_confidence is None):
+    while prediction_confidence is None:
         try:
             confidence_response = await client.wait_for('message',
                                                         check=lambda message: message.author == user and message.channel == channel,
@@ -106,7 +107,7 @@ async def initiate_fap(user, recruit, client):
             except:
                 await channel.send("That input was not accepted, please enter a number between 1 and 10.")
             else:
-                if confidence >= 1 and confidence <= 10:
+                if 1 <= confidence <= 10:
                     await channel.send(f"You've selected {confidence} as your confidence level.")
                     prediction_confidence = int(confidence_response.content)
                 else:
@@ -171,7 +172,6 @@ class fapCommands(commands.Cog):
     @fap.command()
     async def predict(self, ctx, year: int, *name):
         """Put in a FAP prediction for a recruit."""
-        from utils.client import client
         from utils.embed import build_embed
 
         if len(name) == 0:
@@ -194,7 +194,7 @@ class fapCommands(commands.Cog):
             return
 
         async def send_fap_convo(target_recruit):
-            await initiate_fap(ctx.message.author, target_recruit, client)
+            await initiate_fap(ctx.message.author, target_recruit, self.bot)
 
         if len(search) == 1:
             await edit_msg.delete()
@@ -227,7 +227,7 @@ class fapCommands(commands.Cog):
         search_result_player = None
 
         try:
-            reaction, user = await client.wait_for("reaction_add", check=checking_reaction)
+            reaction, user = await self.bot.wait_for("reaction_add", check=checking_reaction)
         except asyncio.TimeoutError:
             pass
         else:
@@ -245,7 +245,6 @@ class fapCommands(commands.Cog):
     @fap.command()
     async def leaderboard(self, ctx, year=None):
         """Get the FAP leaderboard. If no year is given, it will provide the leaderboard for the current recruiting class."""
-        from utils.client import client
         if year is None:
             year = str(CURRENT_CLASS)
         embed_title = f'{year} FAP Leaderboard'
@@ -316,7 +315,7 @@ class fapCommands(commands.Cog):
 
         avg_days_overall_str = ''
         avg_days_current_str = ''
-        if ((faps_df.loc[faps_df['correct'] == 1, 'decision_date'].notna() * faps_df.loc[faps_df['correct'] == 1, 'prediction_date'].notna()).sum() > 0):
+        if (faps_df.loc[faps_df['correct'] == 1, 'decision_date'].notna() * faps_df.loc[faps_df['correct'] == 1, 'prediction_date'].notna()).sum() > 0:
             timedeltas_correct_overall = (faps_df.loc[faps_df['correct'] == 1, 'decision_date'] - faps_df.loc[faps_df['correct'] == 1, 'prediction_date']).values
             avg_days_overall = float(sum(timedeltas_correct_overall) / len(timedeltas_correct_overall)) / 86400000000000
             if avg_days_overall > 0:

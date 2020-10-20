@@ -3,7 +3,6 @@ import datetime
 import discord
 from discord.ext import commands
 
-from utils.client import client
 from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS, CHAN_IOWA
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import GUILD_PROD
@@ -38,10 +37,10 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     ["Hosting Location",
                      f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
                     ["Hosting Status", "https://status.hyperexpert.com/"],
-                    ["Latency", f"{client.latency * 1000:.2f} ms"],
-                    ["Username", client.user.mention],
+                    ["Latency", f"{self.bot.latency * 1000:.2f} ms"],
+                    ["Username", self.bot.user.mention],
                     ["Feeling generous?",
-                     f"Check out `{client.command_prefix}donate` to help out the production and upkeep of the bot."]
+                     f"Check out `{self.bot.command_prefix}donate` to help out the production and upkeep of the bot."]
                 ]
             )
         )
@@ -139,12 +138,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
-        await client.logout()
+        await self.bot.logout()
 
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def rules(self, ctx):
-        unmodded = client.get_channel(id=CHAN_NORTH_BOTTTOMS)
+        unmodded = self.bot.get_channel(id=CHAN_NORTH_BOTTTOMS)
         text = \
             f"""
         1️⃣ Be respectful\n
@@ -157,12 +156,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         8️⃣ Fuck Iowa, Colorado, Texas, Florida\n
         9️⃣ All NSFW Images must be spoiler tagged
         """
-        rules_channel = client.get_channel(CHAN_RULES)
+        rules_channel = self.bot.get_channel(CHAN_RULES)
         rules_title = "Huskers' Discord Rules"
         messages = await rules_channel.history().flatten()
 
         for message in messages:
-            if message.author == client.user and message.embeds[0].title == rules_title:
+            if message.author == self.bot.user and message.embeds[0].title == rules_title:
                 new_embed = message.embeds[0]
                 new_embed.clear_fields()
                 new_embed.add_field(name="Rules", value=text)
@@ -196,12 +195,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         """
         roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧", "🪓")
 
-        rules_channel = client.get_channel(CHAN_RULES)
+        rules_channel = self.bot.get_channel(CHAN_RULES)
         messages = await rules_channel.history().flatten()
         roles_title = "Huskers' Discord Roles"
 
         for message in messages:
-            if message.author == client.user and message.embeds[0].title == roles_title:
+            if message.author == self.bot.user and message.embeds[0].title == roles_title:
                 new_embed = message.embeds[0]
                 new_embed.clear_fields()
                 new_embed.add_field(name="Rules", value=roles)
@@ -227,8 +226,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD)
     async def hypesquad(self, ctx):
-        chan_rules = client.get_channel(id=CHAN_RULES)
-        guild = client.get_guild(GUILD_PROD)
+        chan_rules = self.bot.get_channel(id=CHAN_RULES)
+        guild = self.bot.get_guild(GUILD_PROD)
 
         role_max = guild.get_role(ROLE_HYPE_MAX)
         role_some = guild.get_role(ROLE_HYPE_SOME)
@@ -242,7 +241,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         rule_messages = await chan_rules.history().flatten()
         for hist in rule_messages:
-            if hist.author == client.user and hist.embeds[0].title == EMBED_TITLE_HYPE:
+            if hist.author == self.bot.user and hist.embeds[0].title == EMBED_TITLE_HYPE:
                 new_embed = hist.embeds[0]
                 new_embed.clear_fields()
                 new_embed.add_field(
@@ -270,7 +269,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def repeat(self, ctx, *, message=""):
         if ctx.channel.type == discord.ChannelType.private:
-            channels_list = [channel for channel in client.get_all_channels() if channel.type == discord.ChannelType.text]
+            channels_list = [channel for channel in self.bot.get_all_channels() if channel.type == discord.ChannelType.text]
 
             nl = "\n"
 
@@ -284,7 +283,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
                 return False
 
-            msg = await client.wait_for("message", check=check_chan)
+            msg = await self.bot.wait_for("message", check=check_chan)
 
             if msg:
                 repeat_channel = None
@@ -301,7 +300,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                         if m.channel.type == discord.ChannelType.private:
                             return m.content
 
-                    output = await client.wait_for("message", check=check_message)
+                    output = await self.bot.wait_for("message", check=check_message)
                     await repeat_channel.send(output.content)
                 else:
                     print("wat")
@@ -434,6 +433,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                  "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
             ]
         ))
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))

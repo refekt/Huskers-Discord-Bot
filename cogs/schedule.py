@@ -82,8 +82,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
     async def schedule(self, ctx):
         """ [year|week] Nebraska's football schedule """
         if not ctx.invoked_subcommand:
-            from utils.client import client
-            raise AttributeError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
+            raise AttributeError(f"Missing a subcommand. Review '{self.bot.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
 
     @schedule.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
