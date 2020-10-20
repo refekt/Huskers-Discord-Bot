@@ -130,7 +130,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def fuckminnesota(self, ctx):
         """ FUCK MINNESOTA """
-        await ctx.send(embed=build_image_embed(title="SINK THE BOAT", image="https://i.imgur.com/k3j86qq.mp4"))
+        await ctx.send(embed=build_image_embed(title="SINK THE BOAT", image="https://i.imgur.com/k3j86qq.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
