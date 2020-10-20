@@ -4,6 +4,7 @@ import typing
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import BucketType
 
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
@@ -198,6 +199,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return int(bet_amount * RLT_CEILING) - bet_amount
 
     @commands.command(aliases=["rlt", ])
+    @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     async def roulette(self, ctx, bet_amount: typing.Union[int, str], *, bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
         $roulette 10 red -- Bet a color
@@ -293,6 +295,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                                            wheel_spin=result, bet=bet))
 
     @commands.command(aliases=["arlt", ])
+    @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     # @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
     async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
@@ -377,6 +380,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
 
     @commands.command(aliases=["rps", ])
+    @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
         """ Play Rock Paper Scissors for server currency. Choices are 'rock', 'paper', or 'scissors' """
         self.validate_bet_amount_syntax(bet_amount)
