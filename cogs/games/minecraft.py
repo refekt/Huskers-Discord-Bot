@@ -4,6 +4,9 @@ from utils.embed import build_embed
 
 
 class MinecraftCommands(commands.Cog, name="Minecraft Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group(aliases=["mc", ])
     async def minecraft(self, ctx):
         """ View Husker Minecraft server information"""

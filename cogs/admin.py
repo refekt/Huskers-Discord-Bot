@@ -19,6 +19,9 @@ def not_botlogs(chan: discord.TextChannel):
 
 
 class AdminCommands(commands.Cog, name="Admin Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command()
     async def about(self, ctx):
         """ All about Bot Frost """

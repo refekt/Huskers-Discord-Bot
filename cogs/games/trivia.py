@@ -295,6 +295,9 @@ game = TriviaGame(channel=None)
 
 
 class Trivia(commands.Cog, name="Husker Trivia"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group()
     async def trivia(self, ctx):
         """Husker trivia"""

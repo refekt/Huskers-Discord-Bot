@@ -14,6 +14,9 @@ import cogs.fap as FAP
 
 
 class RecruitCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(aliases=["cb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def crootboot(self, ctx, year: int, *name):

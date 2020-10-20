@@ -74,6 +74,9 @@ def hex_to_rgb(_hex):
 
 
 class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group(aliases=["sched"])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def schedule(self, ctx):

@@ -61,6 +61,9 @@ def build_quote(quote: str, author):
 
 
 class ImageCommands(commands.Cog, name="Fun Image Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def quote(self, ctx, *, quote: str, author=None):

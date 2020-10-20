@@ -22,6 +22,9 @@ BET_RANGE_CHAR = ":"
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     def pity_value(self):
         return 15000
 

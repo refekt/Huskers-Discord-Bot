@@ -205,6 +205,9 @@ class CompareWinsipedia:
 
 
 class TextCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def countdown(self, ctx, *, team=None):

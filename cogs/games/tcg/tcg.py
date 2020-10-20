@@ -20,6 +20,9 @@ class Card:
 
 
 class TCGCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group()
     async def tcg(self, ctx):
         '''Husker Discord TCG commands'''

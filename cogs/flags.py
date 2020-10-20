@@ -39,6 +39,9 @@ flag_dict = {
 
 
 class CrappyFlags(commands.Cog, name="Flag Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(aliases=["rf", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def randomflag(self, ctx):

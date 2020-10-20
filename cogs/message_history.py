@@ -11,6 +11,9 @@ from utils.mysql import process_MySQL, sqlRecordStatsManual
 
 
 class HistoryCommands(commands.Cog, name="History Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def genhis(self, ctx):

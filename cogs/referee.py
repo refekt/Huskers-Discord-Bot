@@ -29,6 +29,9 @@ signals = {
 
 
 class Referee(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group(aliases=["ref", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def referee(self, ctx):
