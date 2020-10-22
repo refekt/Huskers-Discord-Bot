@@ -21,6 +21,47 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(aliases=["gd", ])
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
+    async def gameday(self, ctx, toggle: str):
+        toggle_options = ("on", "off")
+
+        if not toggle.lower() in toggle_options:
+            raise AttributeError("Invalid toggle! Options are \"on\" or \"off\".")
+
+        ROLE_EVERYONE_ID = 440632686185414677
+        ROLE_EVERYONE = ctx.guild.get_role(ROLE_EVERYONE_ID)
+
+        if ROLE_EVERYONE is None:
+            raise AttributeError("Unable to find `@everyone` role!")
+
+        GAMEDAY_CATEGORY_ID = 768828439636606996
+        GAMEDAY_CATEGORY = self.bot.get_channel(GAMEDAY_CATEGORY_ID)
+
+        perms = discord.PermissionOverwrite()
+
+        GENERAL_ID = 440868279150444544
+        GENERAL_CHANNEL = self.bot.get_channel(GENERAL_ID)
+
+        if toggle.lower() == "on":
+            perms.send_messages = True
+            perms.read_messages = True
+            perms.view_channel = True
+            perms.connect = True
+            perms.speak = True
+
+            await GENERAL_CHANNEL.send(f"🚨 ❗ Game day mode is now {toggle} for the server! Live TV text and voice channels are for users who are watching live. Streaming text and voice channels are for users who are streaming the game. All game chat belongs in these channels during the game. ❗ 🚨")
+        elif toggle.lower() == "off":
+            perms.send_messages = False
+            perms.read_messages = False
+            perms.view_channel = False
+            perms.connect = False
+            perms.speak = False
+
+            await GENERAL_CHANNEL.send(f"🚨 ❗ Game day mode is now {toggle} for the server! Normal server discussion may resume! ❗ 🚨")
+
+        await GAMEDAY_CATEGORY.set_permissions(ROLE_EVERYONE, overwrite=perms)
+
     @commands.command()
     async def about(self, ctx):
         """ All about Bot Frost """
