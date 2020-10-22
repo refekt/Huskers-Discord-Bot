@@ -298,24 +298,34 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     # @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
-    async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
+    async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z', floor: typing.Union[str, int] = 0):
         """
         Spin the roulette wheel automatically up to 10,000 times!
-
         :param goal: Your target ending balance.
         :param bet_multiplier: The proportion of your current balance as a decimal you'd like to bet on each spin.
         :param cycles: How many spins?
         :param strat: Voodoo magic. I don't understand it.
+        :param floor: The lowest arlt will allow your ending balance to go.
         """
         balance = self.get_balance(ctx.message.author)
 
-        if type(goal) == str and "%" in goal:
-            goal = int((int(goal.split("%")[0]) / 100) * balance)
-        else:
-            raise AttributeError("Incorrect goal format! The goal must be a proper percent. Try again.")
+        if type(goal) == str
+            if "%" in goal:
+                goal = int((float(goal.split("%")[0]) / 100) * balance)
+            else:
+                raise AttributeError("Incorrect goal format! The goal must be a proper percent or integer. Try again.")
+        
+        if type(floor) == str
+            if "%" in floor:
+                goal = int((float(floor.split("%")[0]) / 100) * balance)
+            else:
+                raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
 
         if balance > goal:
-            raise AttributeError(f"You must be more than your current balance of [ {balance:,} ].")
+            raise AttributeError(f"Your goal cannot be less than your current balance of [ {balance:,} ].")
+        
+        if floor > balance:
+            raise AttributeError(f"Your floor must be less than your current balance of [ {balance:,} ].")
 
         pities = 0
         pity_cap = 1000
@@ -342,7 +352,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         self.adjust_currency(ctx.message.author, -balance)
 
-        while i < cycles and balance < goal:
+        while i < cycles and balance < goal and balance > floor:
             # await edit_msg.edit(content=edit_msg.content + " New wheel spin! ")
             if ran >= 0.5:
                 wins_current += 1
@@ -350,7 +360,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 losses_current = 0
                 balance = balance + bet2
                 bet1 = max(int(bet_multiplier * balance), 1)
-                bet2 = min(bet1, balance)
+                bet2 = min(bet1, balance - floor)
                 balance_max = max(balance, balance_max)
             else:
                 losses_current += 1
@@ -370,7 +380,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                         balance = pity_money
                         bet1 = max(int(bet_multiplier * balance), 1)
                         bet2 = 0
-                bet2 = int(min(max(eval(strat), 1), balance))
+                bet2 = int(min(max(eval(strat), 1), balance - floor))
             ran = random.random()
             i += 1
 
