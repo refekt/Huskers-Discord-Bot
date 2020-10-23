@@ -319,10 +319,12 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if balance > goal:
             raise AttributeError(f"Your goal cannot be less than your current balance of [ {balance:,} ].")
-
-        if not floor == 0:
-            try:
+        
+        try:
+            if "%" in floor:
                 floor = int((float(floor.split("%")[0]) / 100) * balance)
+            else:
+                floor = int(floor)
             except:
                 raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
 
@@ -346,6 +348,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         wins_current = -1
         wins_max = 0
         balance_max = balance
+        floor = max(floor, 0)
 
         strat = strat.replace('x', 'bet2')
         strat = strat.replace('z', 'bet1')
@@ -354,7 +357,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         self.adjust_currency(ctx.message.author, -balance)
 
-        while i < cycles and goal > balance > floor:
+        while i < cycles and goal > balance >= floor:
             # await edit_msg.edit(content=edit_msg.content + " New wheel spin! ")
             if ran >= 0.5:
                 wins_current += 1
