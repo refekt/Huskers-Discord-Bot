@@ -319,14 +319,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if balance > goal:
             raise AttributeError(f"Your goal cannot be less than your current balance of [ {balance:,} ].")
-        
-        try:
-            if "%" in floor:
-                floor = int((float(floor.split("%")[0]) / 100) * balance)
-            else:
-                floor = int(floor)
-        except:
-            raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
+
+        if type(floor) == str:
+            try:
+                if "%" in floor:
+                    floor = int((float(floor.split("%")[0]) / 100) * balance)
+            except:
+                raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
 
         if floor > balance:
             raise AttributeError(f"Your floor must be less than your current balance of [ {balance:,} ].")
