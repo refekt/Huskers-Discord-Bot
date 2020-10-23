@@ -41,7 +41,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 _hour = 60 * 60
                 if diff.seconds >= _hour:
                     raise AttributeError("This command can only be turned on 1 hour before the schedule game start!")
-                elif diff.seconds <= -(_hour * 5):
+                elif game.game_date_time > _now and diff.seconds <= -(_hour * 5):
                     raise AttributeError("This command can only be turned off after 5 hours from kick off!")
 
         ROLE_EVERYONE_ID = 440632686185414677
