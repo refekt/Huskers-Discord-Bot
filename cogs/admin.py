@@ -9,7 +9,9 @@ from utils.consts import GUILD_PROD
 from utils.consts import REACITON_HYPE_SQUAD
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, \
     ROLE_TIME_OUT
+from utils.consts import TZ
 from utils.embed import build_embed as build_embed
+from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
 
@@ -28,6 +30,19 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         if not toggle.lower() in toggle_options:
             raise AttributeError("Invalid toggle! Options are \"on\" or \"off\".")
+
+        _now = datetime.datetime.now().astimezone(tz=TZ)
+        games, stats = HuskerSchedule(year=_now.year)
+        del stats
+
+        for game in games:
+            if game.game_date_time > _now:
+                diff = game.game_date_time - _now
+                _hour = 60 * 60
+                if diff.seconds >= _hour:
+                    raise AttributeError("This command can only be turned on 1 hour before the schedule game start!")
+                elif diff.seconds <= -(_hour * 5):
+                    raise AttributeError("This command can only be turned off after 5 hours from kick off!")
 
         ROLE_EVERYONE_ID = 440632686185414677
         ROLE_EVERYONE = ctx.guild.get_role(ROLE_EVERYONE_ID)
