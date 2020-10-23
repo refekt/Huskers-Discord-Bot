@@ -298,7 +298,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
     @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     # @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
-    async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z', floor: typing.Union[str, int] = 0):
+    async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, floor: typing.Union[int, str] = 0, cycles: int = 10000, strat: str = '2*x+z'):
         """
         Spin the roulette wheel automatically up to 10,000 times!
         :param goal: Your target ending balance.
@@ -309,23 +309,25 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         """
         balance = self.get_balance(ctx.message.author)
 
-        if type(goal) == str
+        try:
             if "%" in goal:
                 goal = int((float(goal.split("%")[0]) / 100) * balance)
             else:
-                raise AttributeError("Incorrect goal format! The goal must be a proper percent or integer. Try again.")
-        
-        if type(floor) == str
-            if "%" in floor:
-                goal = int((float(floor.split("%")[0]) / 100) * balance)
-            else:
-                raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
+                goal = int(goal)
+        except:
+            raise AttributeError("Incorrect goal format! The goal must be a proper percent or integer. Try again.")
 
         if balance > goal:
             raise AttributeError(f"Your goal cannot be less than your current balance of [ {balance:,} ].")
-        
-        if floor > balance:
-            raise AttributeError(f"Your floor must be less than your current balance of [ {balance:,} ].")
+
+        if not floor == 0:
+            try:
+                floor = int((float(floor.split("%")[0]) / 100) * balance)
+            except:
+                raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
+
+            if floor > balance:
+                raise AttributeError(f"Your floor must be less than your current balance of [ {balance:,} ].")
 
         pities = 0
         pity_cap = 1000
@@ -352,7 +354,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         self.adjust_currency(ctx.message.author, -balance)
 
-        while i < cycles and balance < goal and balance > floor:
+        while i < cycles and goal > balance > floor:
             # await edit_msg.edit(content=edit_msg.content + " New wheel spin! ")
             if ran >= 0.5:
                 wins_current += 1

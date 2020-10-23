@@ -427,38 +427,6 @@ class TextCommands(commands.Cog):
                     await ctx.send("The season is over! No upcoming games found.")
                     return
 
-    # @commands.command()
-    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    # async def whenjoined(self, ctx, who: discord.Member):
-    #     """ When did you join the server? """
-    #     from utils.client import client
-    #
-    #     def sort_second(val):
-    #         return val[1]
-    #
-    #     users = client.get_all_members()
-    #     users_sorted = []
-    #
-    #     for user in users:
-    #         users_sorted.append([user.name, user.joined_at])
-    #
-    #     users_sorted.sort(key=sort_second)
-    #
-    #     count = 10
-    #
-    #     if not who:
-    #         earliest = "```\n"
-    #         for index, user in enumerate(users_sorted):
-    #             if index < count:
-    #                 earliest += f"#{index + 1:2} - {user[1]}: {user[0]}\n"
-    #         earliest += "```"
-    #         await ctx.send(earliest)
-    #     else:
-    #         for user in users_sorted:
-    #             if user[0] == who.display_name:
-    #                 await ctx.send(f"`{who.display_name} joined at {user[1]}`")
-    #                 return
-
     @commands.command(aliases=["8b", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def eightball(self, ctx):

@@ -293,9 +293,9 @@ class BotFrostClient(commands.Bot):
                 c = client.get_channel(CHAN_SCOTT)
                 await send_tweet(c)
 
-            elif emoji.name == self.tweet_reactions[2]:  # Web = Reddit
-                await user.send(f"Here is your post URL!\n"
-                                f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
+            # elif emoji.name == self.tweet_reactions[2]:  # Web = Reddit
+            #     await user.send(f"Here is your post URL!\n"
+            #                     f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
 
         async def quote_reacts():
             quote_emoji = "📝"
