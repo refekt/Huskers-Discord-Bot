@@ -235,7 +235,7 @@ class TextCommands(commands.Cog):
 
         if team is None:
             for game in games:
-                if game.game_date_time > now_cst:g
+                if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
