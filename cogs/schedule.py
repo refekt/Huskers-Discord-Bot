@@ -25,21 +25,22 @@ leagueDict = {
     'independent': 18
 }
 cfbWeeks = [
-    datetime(datetime.now().year, 1, 1),
-    datetime(datetime.now().year, 9, 2),
-    datetime(datetime.now().year, 9, 9),
-    datetime(datetime.now().year, 9, 16),
-    datetime(datetime.now().year, 9, 23),
-    datetime(datetime.now().year, 9, 30),
-    datetime(datetime.now().year, 10, 7),
-    datetime(datetime.now().year, 10, 14),
-    datetime(datetime.now().year, 10, 21),
-    datetime(datetime.now().year, 10, 28),
-    datetime(datetime.now().year, 11, 4),
-    datetime(datetime.now().year, 11, 11),
-    datetime(datetime.now().year, 11, 18),
-    datetime(datetime.now().year, 11, 25),
-    datetime(datetime.now().year, 12, 2)
+    datetime(datetime.now().year, 9, 5),
+    datetime(datetime.now().year, 9, 12),
+    datetime(datetime.now().year, 9, 19),
+    datetime(datetime.now().year, 9, 26),
+    datetime(datetime.now().year, 10, 3),
+    datetime(datetime.now().year, 10, 10),
+    datetime(datetime.now().year, 10, 17),
+    datetime(datetime.now().year, 10, 24),
+    datetime(datetime.now().year, 10, 31),
+    datetime(datetime.now().year, 11, 7),
+    datetime(datetime.now().year, 11, 14),
+    datetime(datetime.now().year, 11, 21),
+    datetime(datetime.now().year, 11, 28),
+    datetime(datetime.now().year, 12, 5),
+    datetime(datetime.now().year, 12, 12),
+    datetime(datetime.now().year, 12, 19)
 ]
 nflWeeks = [
     datetime(datetime.now().year, 9, 13),
