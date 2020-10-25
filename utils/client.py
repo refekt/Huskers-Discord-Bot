@@ -319,9 +319,9 @@ class BotFrostClient(commands.Bot):
             await twitter_reacts()
 
     async def role_reactions(self, action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
-        roles_title = "Huskers' Discord Roles"
+        roles_title = ("Huskers' Discord Roles", "Nebraska Football Hype Squad 📈 ⚠ ⛔")
         try:
-            if message.embeds[0].title == roles_title:
+            if message.embeds[0].title in roles_title:
                 guild = self.current_guild()
                 member = guild.get_member(member.id)
 
@@ -343,10 +343,14 @@ class BotFrostClient(commands.Bot):
                 if emoji.name not in [emoji for emoji in roles.keys()]:
                     return
 
+                print(
+                    type(roles[emoji.name])
+                )
+
                 if action == "add":
-                    await member.add_roles(roles[emoji.name], reason=roles_title)
+                    await member.add_roles(roles[emoji.name], reason="User added a role from #rules")
                 elif action == "remove":
-                    await member.remove_roles(roles[emoji.name], reason=roles_title)
+                    await member.remove_roles(roles[emoji.name], reason="User removed a role from #rules")
         except IndexError:
             pass
 
