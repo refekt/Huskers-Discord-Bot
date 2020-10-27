@@ -907,17 +907,19 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         author = ctx.guild.get_member(original_bet["author"])
 
         if not original_bet["author"] == ctx.message.author.id:
-            raise AttributeError(
-                f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
+            raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
 
         try:
+            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(ctx, keyword)
+
+            if keyword_bet_uers is None:
+                raise AttributeError(f"No bets were placed against [ {keyword} ].")
 
             process_MySQL(
                 query=sqlUpdateCustomLinesResult,
                 values=(result, keyword)
             )
 
-            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(ctx, keyword)
 
             winners = []
             losers = []
