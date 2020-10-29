@@ -288,7 +288,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             await edit_msg.edit(
                 content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt",
                                            wheel_spin=result,
-                                           bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
+                                           bet=bet if not BET_RANGE_CHAR and type(bet) == str in bet and bet_color else f"{bet_color} {bet}"))
         else:
             await edit_msg.edit(
                 content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt",
@@ -919,7 +919,6 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 query=sqlUpdateCustomLinesResult,
                 values=(result, keyword)
             )
-
 
             winners = []
             losers = []
