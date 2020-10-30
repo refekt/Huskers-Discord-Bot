@@ -242,6 +242,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ His pessimism knows no bounds """
         await ctx.send(embed=build_image_embed(title="Whomp, whomp", image="https://i.imgur.com/4Gwlpap.jpg"))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def study(self, ctx):
+        """ Study for else! """
+        await ctx.send(embed=build_image_embed(title="Marty finally contributing to the server", image="https://i.imgur.com/2jNrzeK.gif"))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
