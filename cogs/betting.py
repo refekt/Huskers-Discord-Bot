@@ -901,7 +901,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         result = result.lower()
 
-        if not (result == "for" or result == "against"):
+        if not result in ("for", "against", "wash"):
             raise AttributeError(f"The result must be `for` or `against`. Not [ {result} ]. Try again!")
 
         author = ctx.guild.get_member(original_bet["author"])
@@ -926,7 +926,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             for user in keyword_bet_uers:
                 member = ctx.guild.get_member(user["author"])
 
-                if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
+                if result == "wash":
+                    self.adjust_currency(member, user["value"])
+                elif user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
                     try:
                         self.adjust_currency(member, user["value"] * 2)
                         winners.append(member.mention)
