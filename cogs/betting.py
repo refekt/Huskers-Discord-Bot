@@ -906,7 +906,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         author = ctx.guild.get_member(original_bet["author"])
 
-        if not original_bet["author"] == ctx.message.author.id or ROLE_ADMIN_PROD in [role.id for role in ctx.message.author.roles]:
+        if ROLE_ADMIN_PROD not in [role.id for role in ctx.message.author.roles] or not original_bet["author"] == ctx.message.author.id:
             raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
 
         try:
