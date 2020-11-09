@@ -247,9 +247,9 @@ class TextCommands(commands.Cog):
 
         async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus):
             if "TBA" in opponent.date_time:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days ]__ until the __[ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ]__ game at __[ {_datetime.strftime('%B %d, %Y')} ]__")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y')} ]")
             else:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ]__ game at __[ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]")
 
         games, stats = HuskerSchedule(year=now_cst.year)
 
