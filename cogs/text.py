@@ -243,7 +243,7 @@ class TextCommands(commands.Cog):
             except IndexError:
                 consensus_line = None
 
-            return  consensus_line
+            return consensus_line
 
         async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus):
             if "TBA" in opponent.date_time:
