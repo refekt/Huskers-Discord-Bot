@@ -248,6 +248,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ Study for else! """
         await ctx.send(embed=build_image_embed(title="Marty finally contributing to the server", image="https://i.imgur.com/2jNrzeK.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def dodgeball(self, ctx):
+        """ Ben is issuing the pain! """
+        await ctx.send(embed=build_image_embed(title="Ben is issuing the pain!", image="https://i.imgur.com/y3Na18c.gif"))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
