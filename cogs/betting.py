@@ -865,7 +865,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             # Attempt to created a `discord.Member` object.
             author = self.convert_author(ctx, single_bet["author"])
 
-            guild = self.bot.get_guild(GUILD_TEST)
+            guild = self.bot.get_guild(GUILD_PROD)
             bets_detail = {"for": [], "against": []}
             for bet in placed_bets:
                 member = guild.get_member(bet["author"])
