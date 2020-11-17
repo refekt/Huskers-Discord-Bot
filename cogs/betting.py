@@ -14,7 +14,8 @@ from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlChe
     sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
 from utils.mysql import sqlInsertCustomLinesBets, sqlRetrieveOneCustomLinesKeywords, sqlRetrieveAllCustomLinesKeywords
 from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, \
-    sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
+    sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult, sqlRetreiveCustomLinesForAgainst
+from utils.consts import GUILD_PROD, GUILD_TEST
 
 PITY_CAP = 10
 RLT_FLOOR = 1
@@ -611,7 +612,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         except:
             return None
 
-    def retrieve_all_bet_keyword_custom_line(self, ctx: discord.ext.commands.Context, keyword):
+    def retrieve_all_bet_keyword_custom_line(self, keyword):
         try:
             return process_MySQL(
                 query=sqlRetrieveAllCustomLinesKeywords,
@@ -743,6 +744,23 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 fetch="one"
             )
 
+    def retrieve_custom_lines_bets(self, keyword):
+        """
+        Return all bets placed against keyword.
+
+        :param keyword:
+        :return:
+        """
+
+        if keyword:
+            return process_MySQL(
+                query=sqlRetreiveCustomLinesForAgainst,
+                values=keyword,
+                fetch="all"
+            )
+
+        return None
+
     def convert_author(self, ctx: discord.ext.commands.Context, author):
         # Attempt to created a `discord.Member` object.
         author = ctx.guild.get_member(author)
@@ -837,22 +855,37 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             ))
         else:
             # Retrieve single bet (line).
-            bets = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
+            single_bet = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
+            placed_bets = self.retrieve_custom_lines_bets(keyword)
 
             # Raise error if no bet (line) was found.
-            if bets is None:
+            if single_bet is None:
                 raise AttributeError(f"No bet found with the keyword [ {keyword} ]. Please try again!")
 
             # Attempt to created a `discord.Member` object.
-            author = self.convert_author(ctx, bets["author"])
+            author = self.convert_author(ctx, single_bet["author"])
+
+            guild = self.bot.get_guild(GUILD_TEST)
+            bets_detail = {"for": [], "against": []}
+            for bet in placed_bets:
+                member = guild.get_member(bet["author"])
+
+                if bet["_for"]:
+                    bets_detail["for"].append(f"{member.mention}: {bet['value']:,} {CURRENCY_NAME}")
+                elif bet["against"]:
+                    bets_detail["against"].append(f"{member.mention}: {bet['value']:,} {CURRENCY_NAME}")
+                else:
+                    ...
 
             return await ctx.send(embed=build_embed(
                 title="All Open Bets",
                 fields=[
                     [
-                        f"Keyword: {bets['keyword']}",
+                        f"Keyword: {single_bet['keyword']}",
                         f"Author: {author.mention if type(author) == discord.Member else author}\n"
-                        f"Description: {str(bets['description']).capitalize()}\n"
+                        f"Description: {str(single_bet['description']).capitalize()}\n"
+                        f"Bets For: {bets_detail['for']}\n"
+                        f"Bets Against: {bets_detail['against']}\n"
                     ]
                 ],
                 inline=False
@@ -913,7 +946,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
 
         try:
-            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(ctx, keyword)
+            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(keyword)
 
             if keyword_bet_uers is None:
                 raise AttributeError(f"No bets were placed against [ {keyword} ].")
