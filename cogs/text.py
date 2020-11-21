@@ -245,11 +245,11 @@ class TextCommands(commands.Cog):
 
             return consensus_line
 
-        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus):
+        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus, location):
             if "TBA" in opponent.date_time:
-                await edit_msg.edit(content=f"📢 📅:There are [ {days} days ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y')} ]")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y')} ] located at [ {location} ].")
             else:
-                await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ] located at [ {location} ].")
 
         games, stats = HuskerSchedule(year=now_cst.year)
 
@@ -261,7 +261,7 @@ class TextCommands(commands.Cog):
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game))
+                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
         else:
             team = str(team)
@@ -270,7 +270,7 @@ class TextCommands(commands.Cog):
                 if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game))
+                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
 
     @commands.command(aliases=["mkv"])
