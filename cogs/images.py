@@ -254,6 +254,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ Ben is issuing the pain! """
         await ctx.send(embed=build_image_embed(title="Ben is issuing the pain!", image="https://i.imgur.com/y3Na18c.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def jojo(self, ctx):
+        """ Jojo """
+        await ctx.send(embed=build_image_embed(title="Jojo Domann", image=random.choice(["https://i.imgur.com/WAj4hl7.gif", "https://i.imgur.com/ZvYEpwz.gif", "https://i.imgur.com/oNhYQUo.gif", "https://i.imgur.com/0zUPXEw.gif"])))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
