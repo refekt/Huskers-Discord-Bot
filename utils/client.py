@@ -458,6 +458,8 @@ class BotFrostClient(commands.Bot):
                 return
             elif error == TypeError:
                 return
+            elif type(error) == discord.ext.commands.CommandNotFound:
+                await self.process_error(ctx, error)
             else:
                 # get data from exception
                 etype = type(error)
