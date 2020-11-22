@@ -474,10 +474,10 @@ class BotFrostClient(commands.Bot):
                 traceback_text = ''.join(lines)
 
                 # now we can send it to the user
-                # it would probably be best to wrap this in a codeblock via e.g. a Paginator
+                # it would probably be best to wrap this in a code block via e.g. a Paginator
                 print(traceback_text)
 
-                await self.process_error(ctx, error)
+                await self.process_error(ctx, error.original)
 
     async def on_connect(self):
         appinfo = await self.application_info()
@@ -581,22 +581,23 @@ client = BotFrostClient(
 )
 
 extensions = (
-    "cogs.admin",
-    "cogs.flags",
-    "cogs.images",
-    "cogs.referee",
-    "cogs.schedule",
-    "cogs.text",
-    "cogs.croot",
-    "cogs.games.trivia",
-    "cogs.games.minecraft",
-    "cogs.games.tcg.tcg",
-    "cogs.betting",
-    "cogs.music_test",
-    "cogs.reddit",
-    "cogs.message_history",
-    "cogs.deepfry",
-    "cogs.fap"
+    # "cogs.admin",
+    # "cogs.flags",
+    # "cogs.images",
+    # "cogs.referee",
+    # "cogs.schedule",
+    # "cogs.text",
+    # "cogs.croot",
+    # "cogs.games.trivia",
+    # "cogs.games.minecraft",
+    # "cogs.games.tcg.tcg",
+    # "cogs.betting",
+    # "cogs.music_test",
+    # "cogs.reddit",
+    # "cogs.message_history",
+    # "cogs.deepfry",
+    "cogs.fap",
+    "cogs.games.blackjack"
 )
 
 for extension in extensions:
