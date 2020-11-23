@@ -122,7 +122,7 @@ class MusicCommands(commands.Cog):
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
-        elif ctx.voice_client.is_playing():
+        elif ctx.voice_client.check_if_playing():
             ctx.voice_client.stop()
 
 

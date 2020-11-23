@@ -410,7 +410,7 @@ class BotFrostClient(commands.Bot):
         for reaction in self.tweet_reactions:
             await message.add_reaction(reaction)
 
-    if on_prod_server():
+    if on_prod_server() or True:
         async def on_command_error(self, ctx, error):
             if ctx.message.content.startswith(f"{client.command_prefix}secret"):
                 try:
@@ -567,10 +567,12 @@ class BotFrostClient(commands.Bot):
     # async def on_member_unban(self, guild, user):
 
 
-if on_prod_server():
-    command_prefix = "$"
-else:
-    command_prefix = "%"
+# if on_prod_server():
+#     command_prefix = "$"
+# else:
+#     command_prefix = "%"
+
+command_prefix = "$"
 
 client_intents = discord.Intents().all()
 
@@ -583,21 +585,21 @@ client = BotFrostClient(
 )
 
 extensions = (
-    # "cogs.admin",
-    # "cogs.flags",
-    # "cogs.images",
-    # "cogs.referee",
-    # "cogs.schedule",
-    # "cogs.text",
-    # "cogs.croot",
-    # "cogs.games.trivia",
-    # "cogs.games.minecraft",
-    # "cogs.games.tcg.tcg",
-    # "cogs.betting",
-    # "cogs.music_test",
-    # "cogs.reddit",
-    # "cogs.message_history",
-    # "cogs.deepfry",
+    "cogs.admin",
+    "cogs.flags",
+    "cogs.images",
+    "cogs.referee",
+    "cogs.schedule",
+    "cogs.text",
+    "cogs.croot",
+    "cogs.games.trivia",
+    "cogs.games.minecraft",
+    "cogs.games.tcg.tcg",
+    "cogs.betting",
+    "cogs.music_test",
+    "cogs.reddit",
+    "cogs.message_history",
+    "cogs.deepfry",
     "cogs.fap",
     "cogs.games.blackjack"
 )
