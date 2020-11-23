@@ -48,6 +48,7 @@ class BlackjackHand:
     def hit_me(self, player):
         if player == "cpu" and card_char in self.hand:
             self.hand.remove(card_char)
+
         dealt = random.randint(0, len(deck) - 1)
         self.count += 1
         self.hand.append(deck[dealt])
@@ -121,6 +122,7 @@ class BlackjackCommands(commands.Cog):
         }
         embed = build_embed(
             title="Bot Frost Blackjack",
+            description=f"{self.player.user.mention}'s hand",
             fields=[
                 ["Player Hand:", " ".join(convert_hand[elem] for elem in self.player.hand) + f"  ({self.player.total})"],
                 ["Dealer Hand:", " ".join(convert_hand[elem] for elem in self.dealer.hand) + f"  ({self.dealer.total})"],
