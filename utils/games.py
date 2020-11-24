@@ -137,6 +137,8 @@ def HuskerSchedule(year=datetime.datetime.now().year):
             _date = g.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
             _time = g.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
             date_time = f"{_date[0:6]} {year} {_time}"
+            if "Noon" in date_time: # I blame Iowa
+                date_time = date_time.replace("Noon", "12:00 P.M.")
             conference = g.contents[1].contents[3].contents[1].contents[3]
             if len(conference.contents) > 1:
                 conference = conference.contents[1].text.strip()

@@ -18,6 +18,8 @@ from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 from utils.thread import send_reminder
+from cfbd import BettingApi, ApiClient
+from cfbd.rest import ApiException
 
 
 class TeamStatsWinsipediaTeam:
@@ -220,13 +222,34 @@ class TextCommands(commands.Cog):
 
             return hour, mins
 
-        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime):
+        def get_consensus_line(check_game):
+            cfb_api = BettingApi(ApiClient())
+            team = "nebraska"
+            conference = "B1G"
+            season = "both"
+            year = datetime.now().year
+            try:
+                api_response = cfb_api.get_lines(team=team, year=year, conference=conference)
+            except ApiException:
+                return None
+
+            check_lines = [
+                entries for entries in api_response  # for lines in entries.lines
+                if entries.home_team.lower() == game.opponent.name.lower() or entries.away_team.lower() == game.opponent.name.lower()
+            ]
+
+            try:
+                consensus_line = check_lines[0].lines[0].formatted_spread
+            except IndexError:
+                consensus_line = None
+
+            return consensus_line
+
+        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus, location):
             if "TBA" in opponent.date_time:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days ]__ until the __[ {opponent.name} ]__ game at __["
-                                            f" {_datetime.strftime('%B %d, %Y')} ]__")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y')} ] played at [ {location} ].")
             else:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
-                                            f" {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ] played at [ {location} ].")
 
         games, stats = HuskerSchedule(year=now_cst.year)
 
@@ -238,7 +261,7 @@ class TextCommands(commands.Cog):
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
+                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
         else:
             team = str(team)
@@ -247,7 +270,7 @@ class TextCommands(commands.Cog):
                 if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
+                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
 
     @commands.command(aliases=["mkv"])

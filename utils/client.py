@@ -319,9 +319,9 @@ class BotFrostClient(commands.Bot):
             await twitter_reacts()
 
     async def role_reactions(self, action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
-        roles_title = "Huskers' Discord Roles"
+        roles_title = ("Huskers' Discord Roles", "Nebraska Football Hype Squad 📈 ⚠ ⛔")
         try:
-            if message.embeds[0].title == roles_title:
+            if message.embeds[0].title in roles_title:
                 guild = self.current_guild()
                 member = guild.get_member(member.id)
 
@@ -343,10 +343,14 @@ class BotFrostClient(commands.Bot):
                 if emoji.name not in [emoji for emoji in roles.keys()]:
                     return
 
+                print(
+                    type(roles[emoji.name])
+                )
+
                 if action == "add":
-                    await member.add_roles(roles[emoji.name], reason=roles_title)
+                    await member.add_roles(roles[emoji.name], reason="User added a role from #rules")
                 elif action == "remove":
-                    await member.remove_roles(roles[emoji.name], reason=roles_title)
+                    await member.remove_roles(roles[emoji.name], reason="User removed a role from #rules")
         except IndexError:
             pass
 
@@ -406,7 +410,7 @@ class BotFrostClient(commands.Bot):
         for reaction in self.tweet_reactions:
             await message.add_reaction(reaction)
 
-    if on_prod_server():
+    if on_prod_server() or True:
         async def on_command_error(self, ctx, error):
             if ctx.message.content.startswith(f"{client.command_prefix}secret"):
                 try:
@@ -454,6 +458,8 @@ class BotFrostClient(commands.Bot):
                 return
             elif error == TypeError:
                 return
+            elif type(error) == discord.ext.commands.CommandNotFound:
+                await self.process_error(ctx, error)
             else:
                 # get data from exception
                 etype = type(error)
@@ -470,10 +476,10 @@ class BotFrostClient(commands.Bot):
                 traceback_text = ''.join(lines)
 
                 # now we can send it to the user
-                # it would probably be best to wrap this in a codeblock via e.g. a Paginator
+                # it would probably be best to wrap this in a code block via e.g. a Paginator
                 print(traceback_text)
 
-                await self.process_error(ctx, error)
+                await self.process_error(ctx, error.original)
 
     async def on_connect(self):
         appinfo = await self.application_info()
@@ -561,10 +567,12 @@ class BotFrostClient(commands.Bot):
     # async def on_member_unban(self, guild, user):
 
 
-if on_prod_server():
-    command_prefix = "$"
-else:
-    command_prefix = "%"
+# if on_prod_server():
+#     command_prefix = "$"
+# else:
+#     command_prefix = "%"
+
+command_prefix = "$"
 
 client_intents = discord.Intents().all()
 
@@ -592,7 +600,8 @@ extensions = (
     "cogs.reddit",
     "cogs.message_history",
     "cogs.deepfry",
-    "cogs.fap"
+    "cogs.fap",
+    "cogs.games.blackjack"
 )
 
 for extension in extensions:
