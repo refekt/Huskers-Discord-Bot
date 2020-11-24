@@ -43,7 +43,6 @@ class BlackjackHand:
             self.hand.append(card_char)
         else:
             [self.hit_me(player) for _ in range(2)]
-        self.check_bust()
 
     def hit_me(self, player):
         if player == "cpu" and card_char in self.hand:
@@ -53,8 +52,6 @@ class BlackjackHand:
         self.count += 1
         self.hand.append(deck[dealt])
         del deck[dealt]
-        self.tally_hand()
-        self.check_bust()
 
     def tally_hand(self):
         self.total = 0
@@ -67,16 +64,10 @@ class BlackjackHand:
                         self.total += 1
                     else:
                         self.total += ace_value
+                elif card == card_char:
+                    continue
                 else:
                     self.total += face_card_value
-
-        self.check_bust()
-
-    def check_bust(self):
-        if self.total > hand_val_max:
-            raise_str = f"You have lost! Your hand totals {self.total} with the following cards: {self.hand}."
-            self.restart()
-            raise HandBustedError(raise_str)
 
 
 class BlackjackCommands(commands.Cog):
@@ -86,6 +77,22 @@ class BlackjackCommands(commands.Cog):
         self.dealer = None
         self.message_string = ""
         self.current_message = None
+        self.convert_hand = {
+            2: "2️⃣",
+            3: "3️⃣",
+            4: "4️⃣",
+            5: "5️⃣",
+            6: "6️⃣",
+            7: "7️⃣",
+            8: "8️⃣",
+            9: "9️⃣",
+            10: "🔟",
+            "J": ":regional_indicator_j:",
+            "Q": ":regional_indicator_q:",
+            "K": ":regional_indicator_k:",
+            "A": ":regional_indicator_a:",
+            "🃏": "🃏"
+        }
 
     def initiate_hand(self, user: discord.Member):
         self.player = BlackjackHand(user)
@@ -104,28 +111,12 @@ class BlackjackCommands(commands.Cog):
         self.current_message = None
 
     def current_move_string(self, result=""):
-        convert_hand = {
-            2: "2️⃣",
-            3: "3️⃣",
-            4: "4️⃣",
-            5: "5️⃣",
-            6: "6️⃣",
-            7: "7️⃣",
-            8: "8️⃣",
-            9: "9️⃣",
-            10: "🔟",
-            "J": ":regional_indicator_j:",
-            "Q": ":regional_indicator_q:",
-            "K": ":regional_indicator_k:",
-            "A": ":regional_indicator_a:",
-            "🃏": "🃏"
-        }
         embed = build_embed(
             title="Bot Frost Blackjack",
             description=f"{self.player.user.mention}'s hand",
             fields=[
-                ["Player Hand:", " ".join(convert_hand[elem] for elem in self.player.hand) + f"  ({self.player.total})"],
-                ["Dealer Hand:", " ".join(convert_hand[elem] for elem in self.dealer.hand) + f"  ({self.dealer.total})"],
+                ["Player Hand:", " ".join(self.convert_hand[elem] for elem in self.player.hand) + f"  ({self.player.total})"],
+                ["Dealer Hand:", " ".join(self.convert_hand[elem] for elem in self.dealer.hand) + f"  ({self.dealer.total})"],
             ],
             inline=False
         )
@@ -133,10 +124,37 @@ class BlackjackCommands(commands.Cog):
             embed.insert_field_at(0, name="Game Result", value=result, inline=False)
         return embed
 
+    async def check_bust(self, ctx, hand):
+        if hand.total > hand_val_max:
+            await self.current_message.delete()
+            self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
+
     def set_current_message(self, msg: discord.Message):
         self.current_message = msg
 
-    @commands.command()
+    @commands.group(aliases=["bj", ])
+    async def blackjack(self, ctx):
+        pass
+
+    async def cog_after_invoke(self, ctx):
+        try:
+            await ctx.message.delete()
+        except discord.errors.NotFound:
+            pass
+
+        if ctx.subcommand_passed == "hit":
+            await self.check_bust(ctx, self.player)
+
+    async def cog_before_invoke(self, ctx):
+        if ctx.subcommand_passed is None:
+            return
+
+        if ctx.subcommand_passed == "hit":
+            self.check_if_playing()
+        else:
+            return
+
+    @blackjack.command()
     async def deal(self, ctx):
         self.initiate_hand(ctx.message.author)
 
@@ -148,20 +166,20 @@ class BlackjackCommands(commands.Cog):
 
         self.current_message = await ctx.send(embed=self.current_move_string())
 
-    @commands.command()
+    @blackjack.command()
     async def hit(self, ctx):
-        self.check_if_playing()
-
         self.player.hit_me("player")
+        self.player.tally_hand()
 
         await self.current_message.delete()
         self.current_message = await ctx.send(embed=self.current_move_string())
 
-    @commands.command(aliases=["sit", ])
+    @blackjack.command(aliases=["sit", ])
     async def stand(self, ctx):
-        self.check_if_playing()
-
-        self.dealer.hit_me("cpu")
+        while self.dealer.total < 17:
+            self.dealer.hit_me("cpu")
+            self.dealer.tally_hand()
+            await self.check_bust(ctx, self.dealer)
 
         if self.player.total > self.dealer.total:
             await self.current_message.delete()
@@ -173,12 +191,11 @@ class BlackjackCommands(commands.Cog):
             self.restart_game()
         else:
             await self.current_message.delete()
-            self.current_message = await ctx.send(embed=self.current_move_string(result="Lower!"))
+            self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
             self.restart_game()
 
-    @commands.command()
+    @blackjack.command()
     async def surrender(self, ctx):
-        self.check_if_playing()
         self.restart_game()
         await self.current_message.delete()
         self.current_message = await ctx.send("Restarted your game!")
