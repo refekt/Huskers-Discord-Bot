@@ -52,9 +52,23 @@ class BlackjackHand:
         self.count += 1
         self.hand.append(deck[dealt])
         del deck[dealt]
+        
+    def sort_hand(card):
+        if type(card) == int:
+            return card
+        elif type(card) == str:
+            if card == "J":
+                return 11
+            elif card == "Q":
+                return 12
+            elif card == "K":
+                return 13
+            elif card == "A":
+                return 14
 
     def tally_hand(self):
         self.total = 0
+        self.hand.sort(key = sort_hand)
         for card in self.hand:
             if type(card) == int:
                 self.total += card
@@ -127,7 +141,10 @@ class BlackjackCommands(commands.Cog):
     async def check_bust(self, ctx, hand):
         if hand.total > hand_val_max:
             await self.current_message.delete()
-            self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
+            if hand.user.bot:
+              self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))  
+            else:
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
 
     def set_current_message(self, msg: discord.Message):
         self.current_message = msg
