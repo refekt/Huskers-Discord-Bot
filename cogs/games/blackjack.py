@@ -146,7 +146,7 @@ class BlackjackCommands(commands.Cog):
     async def check_bust(self, ctx, hand):
         if hand.total > hand_val_max:
             await self.current_message.delete()
-            slef.busted = True
+            hand.busted = True
             if hand.user.bot:
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))
                 self.restart_game()
