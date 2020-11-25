@@ -53,17 +53,17 @@ class BlackjackHand:
         self.hand.append(deck[dealt])
         del deck[dealt]
         
-    def sort_hand(card):
-        if type(card) == int:
-            return card
-        elif type(card) == str:
-            if card == "J":
+    def sort_hand(x):
+        if type(x) == int:
+            return x
+        elif type(x) == str:
+            if x == "J":
                 return 11
-            elif card == "Q":
+            elif x == "Q":
                 return 12
-            elif card == "K":
+            elif x == "K":
                 return 13
-            elif card == "A":
+            elif x == "A":
                 return 14
 
     def tally_hand(self):
@@ -142,7 +142,7 @@ class BlackjackCommands(commands.Cog):
         if hand.total > hand_val_max:
             await self.current_message.delete()
             if hand.user.bot:
-              self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))  
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))  
             else:
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
 
