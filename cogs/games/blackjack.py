@@ -13,6 +13,7 @@ orig = deck.copy()
 card_char = "🃏"
 
 
+
 class NoGamePlayingError(Exception):
     pass
 
@@ -28,6 +29,7 @@ class BlackjackHand:
         self.count = 0
         self.hand = []
         self.total = 0
+        self.busted = False
 
     def restart(self):
         self.user = None
@@ -35,6 +37,7 @@ class BlackjackHand:
         self.count = 0
         self.hand = []
         self.total = 0
+        self.busted = False
 
     def deal_hand(self, player):
         self.init = True
@@ -143,6 +146,7 @@ class BlackjackCommands(commands.Cog):
     async def check_bust(self, ctx, hand):
         if hand.total > hand_val_max:
             await self.current_message.delete()
+            slef.busted = True
             if hand.user.bot:
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))
                 self.restart_game()
@@ -191,29 +195,29 @@ class BlackjackCommands(commands.Cog):
     async def hit(self, ctx):
         self.player.hit_me("player")
         self.player.tally_hand()
-
         await self.current_message.delete()
         self.current_message = await ctx.send(embed=self.current_move_string())
-
+        await self.check_bust(ctx, self.player)
+        
     @blackjack.command(aliases=["sit", ])
     async def stand(self, ctx):
         while self.dealer.total < 17:
             self.dealer.hit_me("cpu")
             self.dealer.tally_hand()
             await self.check_bust(ctx, self.dealer)
-
-        if self.player.total > self.dealer.total:
-            await self.current_message.delete()
-            self.current_message = await ctx.send(embed=self.current_move_string(result="Winner!"))
-            self.restart_game()
-        elif self.player.total == self.dealer.total:
-            await self.current_message.delete()
-            self.current_message = await ctx.send(embed=self.current_move_string(result="Draw!"))
-            self.restart_game()
-        else:
-            await self.current_message.delete()
-            self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
-            self.restart_game()
+        if self.busted == False:
+            if self.player.total > self.dealer.total:
+                await self.current_message.delete()
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Winner!"))
+                self.restart_game()
+            elif self.player.total == self.dealer.total:
+                await self.current_message.delete()
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Draw!"))
+                self.restart_game()
+            else:
+                await self.current_message.delete()
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
+                self.restart_game()
 
     @blackjack.command()
     async def surrender(self, ctx):
