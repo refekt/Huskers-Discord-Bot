@@ -144,9 +144,11 @@ class BlackjackCommands(commands.Cog):
         if hand.total > hand_val_max:
             await self.current_message.delete()
             if hand.user.bot:
-                self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))  
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))
+                self.restart_game()
             else:
-                self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Loser! User bust."))
+                self.restart_game()
 
     def set_current_message(self, msg: discord.Message):
         self.current_message = msg
