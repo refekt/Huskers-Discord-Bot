@@ -53,7 +53,7 @@ class BlackjackHand:
         self.hand.append(deck[dealt])
         del deck[dealt]
         
-    def sort_hand(x):
+    def sort_hand(self, x):
         if type(x) == int:
             return x
         elif type(x) == str:
@@ -65,10 +65,12 @@ class BlackjackHand:
                 return 13
             elif x == "A":
                 return 14
+            elif x == card_char:
+                return 99
 
     def tally_hand(self):
         self.total = 0
-        self.hand.sort(key = sort_hand)
+        self.hand.sort(key = self.sort_hand)
         for card in self.hand:
             if type(card) == int:
                 self.total += card
