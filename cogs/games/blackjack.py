@@ -127,6 +127,7 @@ class BlackjackCommands(commands.Cog):
         self.player = None
         self.dealer = None
         self.message_string = ""
+        self.move_history = ""
         self.current_message = None
 
     def current_move_string(self, result=""):
