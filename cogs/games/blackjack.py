@@ -13,7 +13,6 @@ orig = deck.copy()
 card_char = "🃏"
 
 
-
 class NoGamePlayingError(Exception):
     pass
 
@@ -55,7 +54,7 @@ class BlackjackHand:
         self.count += 1
         self.hand.append(deck[dealt])
         del deck[dealt]
-        
+
     def sort_hand(self, x):
         if type(x) == int:
             return x
@@ -73,7 +72,7 @@ class BlackjackHand:
 
     def tally_hand(self):
         self.total = 0
-        self.hand.sort(key = self.sort_hand)
+        self.hand.sort(key=self.sort_hand)
         for card in self.hand:
             if type(card) == int:
                 self.total += card
@@ -198,15 +197,19 @@ class BlackjackCommands(commands.Cog):
         await self.current_message.delete()
         self.current_message = await ctx.send(embed=self.current_move_string())
         await self.check_bust(ctx, self.player)
-        
+
     @blackjack.command(aliases=["sit", ])
     async def stand(self, ctx):
         while self.dealer.total < 17:
             self.dealer.hit_me("cpu")
             self.dealer.tally_hand()
-            await self.check_bust(ctx, self.dealer)
-        if self.busted == False:
-            if self.player.total > self.dealer.total:
+
+        if not self.player.busted:
+            if self.dealer.total > hand_val_max:
+                await self.current_message.delete()
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))
+                self.restart_game()
+            elif self.player.total > self.dealer.total:
                 await self.current_message.delete()
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Winner!"))
                 self.restart_game()
