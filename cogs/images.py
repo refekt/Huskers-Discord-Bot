@@ -260,6 +260,11 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ Jojo """
         await ctx.send(embed=build_image_embed(title="Jojo Domann", image=random.choice(["https://i.imgur.com/WAj4hl7.gif", "https://i.imgur.com/ZvYEpwz.gif", "https://i.imgur.com/oNhYQUo.gif", "https://i.imgur.com/0zUPXEw.gif"])))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def redname(self, ctx):
+        """ Hi Redname """
+        await ctx.send(embed=build_image_embed(title="Hi Redname", image="https://gph.is/2pLAfqc"))
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
