@@ -13,7 +13,6 @@ orig = deck.copy()
 card_char = "🃏"
 
 
-
 class NoGamePlayingError(Exception):
     pass
 
@@ -55,7 +54,7 @@ class BlackjackHand:
         self.count += 1
         self.hand.append(deck[dealt])
         del deck[dealt]
-        
+
     def sort_hand(self, x):
         if type(x) == int:
             return x
@@ -73,7 +72,7 @@ class BlackjackHand:
 
     def tally_hand(self):
         self.total = 0
-        self.hand.sort(key = self.sort_hand)
+        self.hand.sort(key=self.sort_hand)
         for card in self.hand:
             if type(card) == int:
                 self.total += card
@@ -95,6 +94,7 @@ class BlackjackCommands(commands.Cog):
         self.player = None
         self.dealer = None
         self.message_string = ""
+        self.move_history = ""
         self.current_message = None
         self.convert_hand = {
             2: "2️⃣",
@@ -127,6 +127,7 @@ class BlackjackCommands(commands.Cog):
         self.player = None
         self.dealer = None
         self.message_string = ""
+        self.move_history = ""
         self.current_message = None
 
     def current_move_string(self, result=""):
@@ -136,6 +137,7 @@ class BlackjackCommands(commands.Cog):
             fields=[
                 ["Player Hand:", " ".join(self.convert_hand[elem] for elem in self.player.hand) + f"  ({self.player.total})"],
                 ["Dealer Hand:", " ".join(self.convert_hand[elem] for elem in self.dealer.hand) + f"  ({self.dealer.total})"],
+                ["History", self.move_history]
             ],
             inline=False
         )
@@ -146,7 +148,7 @@ class BlackjackCommands(commands.Cog):
     async def check_bust(self, ctx, hand):
         if hand.total > hand_val_max:
             await self.current_message.delete()
-            slef.busted = True
+            hand.busted = True
             if hand.user.bot:
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))
                 self.restart_game()
@@ -156,6 +158,14 @@ class BlackjackCommands(commands.Cog):
 
     def set_current_message(self, msg: discord.Message):
         self.current_message = msg
+
+    def add_history(self, who: str, what: str = "", result: str = ""):
+        _nl = "\n"
+        if result:
+            self.move_history += f"{self.move_history.count(_nl) + 1}: {who}: {result}\n"
+        else:
+            self.move_history += f"{self.move_history.count(_nl) + 1}: {who} drew {what}. "
+            self.move_history += _nl
 
     @commands.group(aliases=["bj", ])
     async def blackjack(self, ctx):
@@ -186,8 +196,12 @@ class BlackjackCommands(commands.Cog):
         self.player.deal_hand("player")
         self.player.tally_hand()
 
+        self.add_history(self.player.user.mention, " ".join([str(elem) for elem in self.player.hand]))
+
         self.dealer.deal_hand("cpu")
         self.dealer.tally_hand()
+
+        self.add_history(self.dealer.user.mention, " ".join([str(elem) for elem in self.dealer.hand]))
 
         self.current_message = await ctx.send(embed=self.current_move_string())
 
@@ -195,27 +209,39 @@ class BlackjackCommands(commands.Cog):
     async def hit(self, ctx):
         self.player.hit_me("player")
         self.player.tally_hand()
+
+        self.add_history(self.player.user.mention, " ".join([str(elem) for elem in self.player.hand]))
+
         await self.current_message.delete()
         self.current_message = await ctx.send(embed=self.current_move_string())
         await self.check_bust(ctx, self.player)
-        
+
     @blackjack.command(aliases=["sit", ])
     async def stand(self, ctx):
         while self.dealer.total < 17:
             self.dealer.hit_me("cpu")
             self.dealer.tally_hand()
-            await self.check_bust(ctx, self.dealer)
-        if self.busted == False:
-            if self.player.total > self.dealer.total:
+            self.add_history(self.dealer.user.mention, " ".join([str(elem) for elem in self.dealer.hand]))
+
+        if not self.player.busted:
+            if self.dealer.total > hand_val_max:
                 await self.current_message.delete()
+                self.add_history(self.player.user.mention, result="Winner! Dealer bust.")
+                self.current_message = await ctx.send(embed=self.current_move_string(result="Winner! Dealer bust."))
+                self.restart_game()
+            elif self.player.total > self.dealer.total:
+                await self.current_message.delete()
+                self.add_history(self.player.user.mention, result="Winner!")
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Winner!"))
                 self.restart_game()
             elif self.player.total == self.dealer.total:
                 await self.current_message.delete()
+                self.add_history(self.player.user.mention, result="Draw.")
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Draw!"))
                 self.restart_game()
             else:
                 await self.current_message.delete()
+                self.add_history(self.player.user.mention, result="Loser")
                 self.current_message = await ctx.send(embed=self.current_move_string(result="Loser!"))
                 self.restart_game()
 
