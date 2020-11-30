@@ -124,7 +124,7 @@ class HuskerDotComSchedule:
 
 
 def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
-    if team is None:
+    if sport is None:
         r = requests.get(url=f"https://huskers.com/sports/football/schedule/{year}", headers=HEADERS)
     else:
         r = requests.get(url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS)
