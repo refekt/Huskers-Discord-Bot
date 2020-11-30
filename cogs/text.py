@@ -206,7 +206,7 @@ class CompareWinsipedia:
 class TextCommands(commands.Cog):
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def countdown(self, ctx, *, team=None):
+    async def countdown(self, ctx, *, team=None, sport: str):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
         now_cst = datetime.now().astimezone(tz=TZ)
@@ -227,7 +227,7 @@ class TextCommands(commands.Cog):
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
                                             f" {datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
 
-        games, stats = HuskerSchedule(year=now_cst.year)
+        games, stats = HuskerSchedule(sport, year=now_cst.year)
 
         if not games:
             return await edit_msg.edit(content="No games found!")
