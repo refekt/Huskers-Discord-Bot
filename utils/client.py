@@ -364,7 +364,7 @@ class BotFrostClient(commands.Bot):
                     embed = build_embed(
                         title=f"🏆🏆🏆 Hall of Fame Message 🏆🏆🏆",
                         fields=[
-                            [f"{reaction.message.author[0].mention} said...", f"{reaction.message.content}"],
+                            [f"{reaction.message.author.mention} said...", f"{reaction.message.content}"],
                             ["HOF Reaction", reaction],
                             ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
                         ],
