@@ -126,8 +126,6 @@ class HuskerDotComSchedule:
 
 def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
 
-
-
     r = requests.get(url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS)
 
     if not r.status_code == 200:
