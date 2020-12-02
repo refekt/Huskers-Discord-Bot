@@ -206,10 +206,24 @@ class CompareWinsipedia:
 class TextCommands(commands.Cog):
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def countdown(self, ctx, sport: str=None, *, team=None):
+    async def countdown(self, ctx, *, team=None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
         now_cst = datetime.now().astimezone(tz=TZ)
+
+        sports_names = ["mbb", "vb", "soccer", "baseball", "football"]
+
+        sport = ""
+
+        if team:
+            if team[0] in sports_names:
+                sport = team[0]
+                team = team[1]
+            else:
+                sport = "football"
+                team = team[0]
+        else:
+            sport = "football"
 
         def convert_seconds(n):
             secs = n % (24 * 3600)
@@ -227,7 +241,17 @@ class TextCommands(commands.Cog):
                 await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
                                             f" {datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
 
-        games, stats = HuskerSchedule(sport, year=now_cst.year)
+        def switch_names(names):
+            switcher = {
+                "mbb": "mens-basketball",
+                "vb": "volleyball",
+                "cbb": "baseball"
+            }
+
+            return switcher.get(names, "football")
+
+        sport = switch_names(sport)
+        games, stats = HuskerSchedule(sport=sport, year=now_cst.year)
 
         if not games:
             return await edit_msg.edit(content="No games found!")
@@ -240,8 +264,7 @@ class TextCommands(commands.Cog):
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
                     break
         else:
-            team = str(team)
-
+            # team = str(team)
             for game in games:
                 if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
