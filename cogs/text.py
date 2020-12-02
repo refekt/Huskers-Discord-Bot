@@ -114,7 +114,8 @@ class TeamStatsWinsipediaTeam:
                     nfl_picks[1].contents[5].contents[1].text
                 )
             except:
-                return "UNK", "UNK"
+                return ("UNK", "UNK")
+
 
         def weeks_ap_poll():
             ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})
@@ -209,7 +210,7 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def countdown(self, ctx, *, team=None):
+    async def countdown(self, ctx, sport: str=None, *, team=None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
         now_cst = datetime.now().astimezone(tz=TZ)
@@ -251,7 +252,7 @@ class TextCommands(commands.Cog):
             else:
                 await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ] played at [ {location} ].")
 
-        games, stats = HuskerSchedule(year=now_cst.year)
+        games, stats = HuskerSchedule(sport, year=now_cst.year)
 
         if not games:
             return await edit_msg.edit(content="No games found!")
