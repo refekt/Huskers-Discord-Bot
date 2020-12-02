@@ -7,34 +7,34 @@ from datetime import datetime, timedelta
 import discord
 import markovify
 import requests
+from bs4 import BeautifulSoup
 from discord.ext import commands
 
-from bs4 import BeautifulSoup
-
-from utils.client import client
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
+from utils.consts import HEADERS
 from utils.consts import TZ
 from utils.embed import build_embed
 from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 from utils.thread import send_reminder
-from utils.consts import HEADERS
+from cfbd import BettingApi, ApiClient
+from cfbd.rest import ApiException
 
 
-class TeamStatsWinsipediaTeam():
+class TeamStatsWinsipediaTeam:
 
     def __init__(self, *, team_name: str):
 
         def all_time_record():
             atr = soup.find_all(attrs={"class": "ranking span2 item2"})
             try:
-                    return (
+                return (
                     atr[0].contents[1].contents[3].contents[1].text,
                     atr[0].contents[3].contents[1].text.strip()
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def championships():
             champs = soup.find_all(attrs={"class": "ranking span2 item3"})
@@ -44,7 +44,7 @@ class TeamStatsWinsipediaTeam():
                     champs[0].contents[5].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def conf_championships():
             conf = soup.find_all(attrs={"class": "ranking span2 item4h"})
@@ -54,7 +54,7 @@ class TeamStatsWinsipediaTeam():
                     conf[0].contents[5].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def bowl_games():
             bowl = soup.find_all(attrs={"class": "ranking span2 item5h"})
@@ -64,7 +64,7 @@ class TeamStatsWinsipediaTeam():
                     bowl[0].contents[3].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def all_time_wins():
             atw = soup.find_all(attrs={"class": "ranking span2 item1"})
@@ -74,17 +74,17 @@ class TeamStatsWinsipediaTeam():
                     atw[0].contents[3].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def bowl_record():
             bowl = soup.find_all(attrs={"class": "ranking span2 item2"})
             try:
                 return (
-                    bowl[1].contents[1].contents[3].contents[1].text,  #\n and \t
+                    bowl[1].contents[1].contents[3].contents[1].text,  # \n and \t
                     bowl[1].contents[3].contents[1].text.strip()
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def consensus_all_americans():
             caa = soup.find_all(attrs={"class": "ranking span2 item3"})
@@ -94,7 +94,7 @@ class TeamStatsWinsipediaTeam():
                     caa[1].contents[3].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def heisman_winners():
             hw = soup.find_all(attrs={"class": "ranking span2 item4"})
@@ -104,7 +104,7 @@ class TeamStatsWinsipediaTeam():
                     hw[1].contents[5].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def nfl_draft_picks():
             nfl_picks = soup.find_all(attrs={"class": "ranking span2 item5"})
@@ -116,6 +116,7 @@ class TeamStatsWinsipediaTeam():
             except:
                 return ("UNK", "UNK")
 
+
         def weeks_ap_poll():
             ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})
             try:
@@ -124,7 +125,7 @@ class TeamStatsWinsipediaTeam():
                     ap_poll[0].contents[5].contents[1].text
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         self.team_name = team_name.replace(" ", "-").replace("&", "")
         self.url = f"http://www.winsipedia.com/{self.team_name}"
@@ -204,6 +205,9 @@ class CompareWinsipedia:
 
 
 class TextCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def countdown(self, ctx, *, team=None):
@@ -233,13 +237,34 @@ class TextCommands(commands.Cog):
 
             return hour, mins
 
-        async def send_countdown(days: int, hours: int, minutes: int, opponent, datetime: datetime):
-            if datetime.hour == 21 and datetime.minute == 58:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
-                                            f" {datetime.strftime('%B %d, %Y')} ]__")
+        def get_consensus_line(check_game):
+            cfb_api = BettingApi(ApiClient())
+            team = "nebraska"
+            conference = "B1G"
+            season = "both"
+            year = datetime.now().year
+            try:
+                api_response = cfb_api.get_lines(team=team, year=year, conference=conference)
+            except ApiException:
+                return None
+
+            check_lines = [
+                entries for entries in api_response  # for lines in entries.lines
+                if entries.home_team.lower() == game.opponent.name.lower() or entries.away_team.lower() == game.opponent.name.lower()
+            ]
+
+            try:
+                consensus_line = check_lines[0].lines[0].formatted_spread
+            except IndexError:
+                consensus_line = None
+
+            return consensus_line
+
+        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus, location):
+            if "TBA" in opponent.date_time:
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y')} ] played at [ {location} ].")
             else:
-                await edit_msg.edit(content=f"📢 📅:There are __[ {days} days, {hours} hours, {minutes} minutes ]__ until the __[ {opponent.name} ]__ game at __["
-                                            f" {datetime.strftime('%B %d, %Y %I:%M %p %Z')} ]__")
+                await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ] played at [ {location} ].")
 
         def switch_names(names):
             switcher = {
@@ -261,7 +286,7 @@ class TextCommands(commands.Cog):
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
+                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
         else:
             # team = str(team)
@@ -269,7 +294,7 @@ class TextCommands(commands.Cog):
                 if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
-                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time)
+                    await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
 
     @commands.command(aliases=["mkv"])
@@ -289,7 +314,7 @@ class TextCommands(commands.Cog):
                 return re.sub(r'[^\x00-\x7f]', r'', f.read())
             else:
 
-                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in client.all_commands.keys() if (ele in msg.content)]:
+                if not auth.bot and msg.channel.id not in CHAN_BANNED and not [ele for ele in self.bot.all_commands.keys() if (ele in msg.content)]:
                     msg_content = str(msg.content.capitalize())
                     return "\n" + msg_content
 
@@ -448,38 +473,6 @@ class TextCommands(commands.Cog):
                 except IndexError:
                     await ctx.send("The season is over! No upcoming games found.")
                     return
-
-    # @commands.command()
-    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    # async def whenjoined(self, ctx, who: discord.Member):
-    #     """ When did you join the server? """
-    #     from utils.client import client
-    #
-    #     def sort_second(val):
-    #         return val[1]
-    #
-    #     users = client.get_all_members()
-    #     users_sorted = []
-    #
-    #     for user in users:
-    #         users_sorted.append([user.name, user.joined_at])
-    #
-    #     users_sorted.sort(key=sort_second)
-    #
-    #     count = 10
-    #
-    #     if not who:
-    #         earliest = "```\n"
-    #         for index, user in enumerate(users_sorted):
-    #             if index < count:
-    #                 earliest += f"#{index + 1:2} - {user[1]}: {user[0]}\n"
-    #         earliest += "```"
-    #         await ctx.send(earliest)
-    #     else:
-    #         for user in users_sorted:
-    #             if user[0] == who.display_name:
-    #                 await ctx.send(f"`{who.display_name} joined at {user[1]}`")
-    #                 return
 
     @commands.command(aliases=["8b", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)

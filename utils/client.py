@@ -12,10 +12,12 @@ from discord.ext import commands
 
 import utils.consts as consts
 from cogs.images import build_quote
-from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BANNED, CHAN_STATS_BANNED, CHAN_GENERAL, CHAN_IOWA, CHAN_RULES
+from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BANNED, CHAN_STATS_BANNED, \
+    CHAN_GENERAL, CHAN_IOWA, CHAN_RULES
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
-from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
+from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, \
+    ROLE_MINECRAFT, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_TIME_OUT
 from utils.consts import TWITTER_BOT_MEMBER
 from utils.embed import build_embed
 from utils.misc import on_prod_server
@@ -46,9 +48,12 @@ class BotFrostClient(commands.Bot):
                      "https://66.media.tumblr.com/102d761d769840a541443da82e0b211a/tumblr_oywc87sfsP1w8f7y5o5_500.gif",
                      "https://66.media.tumblr.com/252fd1a689f0f64cb466b4eced502af7/tumblr_oywc87sfsP1w8f7y5o2_500.gif",
                      "https://66.media.tumblr.com/83eb614389b1621be0ce9890b1998644/tumblr_oywc87sfsP1w8f7y5o4_500.gif",
-                     "https://66.media.tumblr.com/f833da26820867601cd7ad3a7c2d96a5/tumblr_oywc87sfsP1w8f7y5o6_500.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo1_250.gif",
-                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo2_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo3_250.gif",
-                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo4_250.gif", "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo6_250.gif")
+                     "https://66.media.tumblr.com/f833da26820867601cd7ad3a7c2d96a5/tumblr_oywc87sfsP1w8f7y5o6_500.gif",
+                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo1_250.gif",
+                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo2_250.gif",
+                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo3_250.gif",
+                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo4_250.gif",
+                     "https://66.media.tumblr.com/tumblr_m7e2ahFFDo1qcuoflo6_250.gif")
             embed = None
 
             if re.search(r"fuck (you|u) bot", message.content, re.IGNORECASE):
@@ -131,10 +136,16 @@ class BotFrostClient(commands.Bot):
             print(f"~~~ !!! Unknown error!", sys.exc_info()[0])
 
     async def change_my_nickname(self):
-        nicks = ("Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot", "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
-                 "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
-                 "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto", "economybot",
-                 "NotaBot_Human", "psybot", "2020: the year of the bot", "bottech129", "deerebot129")
+        nicks = (
+            "Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot",
+            "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
+            "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando",
+            "Shawn Botson",
+            "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
+            "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom",
+            "Ameer Botdullah",
+            "Botinic Raiola", "Vince Ferraboto", "economybot",
+            "NotaBot_Human", "psybot", "2020: the year of the bot", "bottech129", "deerebot129")
 
         try:
             print("~~~ Attempting to change nickname...")
@@ -282,9 +293,9 @@ class BotFrostClient(commands.Bot):
                 c = client.get_channel(CHAN_SCOTT)
                 await send_tweet(c)
 
-            elif emoji.name == self.tweet_reactions[2]:  # Web = Reddit
-                await user.send(f"Here is your post URL!\n"
-                                f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
+            # elif emoji.name == self.tweet_reactions[2]:  # Web = Reddit
+            #     await user.send(f"Here is your post URL!\n"
+            #                     f"https://www.reddit.com/r/huskers/submit?title=&text={message.embeds[0].fields[1].value}")
 
         async def quote_reacts():
             quote_emoji = "📝"
@@ -308,9 +319,9 @@ class BotFrostClient(commands.Bot):
             await twitter_reacts()
 
     async def role_reactions(self, action, message: discord.Message, member: discord.User, emoji: discord.Emoji):
-        roles_title = "Huskers' Discord Roles"
+        roles_title = ("Huskers' Discord Roles", "Nebraska Football Hype Squad 📈 ⚠ ⛔")
         try:
-            if message.embeds[0].title == roles_title:
+            if message.embeds[0].title in roles_title:
                 guild = self.current_guild()
                 member = guild.get_member(member.id)
 
@@ -332,10 +343,14 @@ class BotFrostClient(commands.Bot):
                 if emoji.name not in [emoji for emoji in roles.keys()]:
                     return
 
+                print(
+                    type(roles[emoji.name])
+                )
+
                 if action == "add":
-                    await member.add_roles(roles[emoji.name], reason=roles_title)
+                    await member.add_roles(roles[emoji.name], reason="User added a role from #rules")
                 elif action == "remove":
-                    await member.remove_roles(roles[emoji.name], reason=roles_title)
+                    await member.remove_roles(roles[emoji.name], reason="User removed a role from #rules")
         except IndexError:
             pass
 
@@ -348,6 +363,7 @@ class BotFrostClient(commands.Bot):
         duplicate = False
         server_member_count = len(client.users)
         threshold = int(0.0047 * server_member_count)
+        message_history_raw = None
 
         for reaction in reactions:
             if reaction.count >= threshold and reaction.message.channel.id != hof_channel.id and ".addvotes" not in reaction.message.content:
@@ -364,7 +380,7 @@ class BotFrostClient(commands.Bot):
                     embed = build_embed(
                         title=f"🏆🏆🏆 Hall of Fame Message 🏆🏆🏆",
                         fields=[
-                            [f"{reaction.message.author.mention} said...", f"{reaction.message.content}"],
+                            [f"{reaction.message.author} said...", f"{reaction.message.content}"],
                             ["HOF Reaction", reaction],
                             ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
                         ],
@@ -394,7 +410,7 @@ class BotFrostClient(commands.Bot):
         for reaction in self.tweet_reactions:
             await message.add_reaction(reaction)
 
-    if on_prod_server():
+    if on_prod_server() or True:
         async def on_command_error(self, ctx, error):
             if ctx.message.content.startswith(f"{client.command_prefix}secret"):
                 try:
@@ -442,6 +458,8 @@ class BotFrostClient(commands.Bot):
                 return
             elif error == TypeError:
                 return
+            elif type(error) == discord.ext.commands.CommandNotFound:
+                await self.process_error(ctx, error)
             else:
                 # get data from exception
                 etype = type(error)
@@ -458,10 +476,10 @@ class BotFrostClient(commands.Bot):
                 traceback_text = ''.join(lines)
 
                 # now we can send it to the user
-                # it would probably be best to wrap this in a codeblock via e.g. a Paginator
+                # it would probably be best to wrap this in a code block via e.g. a Paginator
                 print(traceback_text)
 
-                await self.process_error(ctx, error)
+                await self.process_error(ctx, error.original)
 
     async def on_connect(self):
         appinfo = await self.application_info()
@@ -499,18 +517,21 @@ class BotFrostClient(commands.Bot):
         payload = await self.split_payload(payload)
 
         if payload["message"].channel.id == CHAN_RULES:
-            await self.role_reactions(action="add", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+            await self.role_reactions(action="add", message=payload["message"], member=payload["user_id"],
+                                      emoji=payload["emoji"])
 
         if payload["message"].channel.id not in CHAN_BANNED and not payload["user_id"].bot:
             await self.hall_of_fame_messages(payload["message"].reactions)
 
-        await self.monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"], message=payload["message"])
+        await self.monitor_reactions(channel=payload["channel_id"], emoji=payload["emoji"], user=payload["user_id"],
+                                     message=payload["message"])
 
     async def on_raw_reaction_remove(self, payload):
         payload = await self.split_payload(payload)
 
         if payload["message"].channel.id == CHAN_RULES:
-            await self.role_reactions(action="remove", message=payload["message"], member=payload["user_id"], emoji=payload["emoji"])
+            await self.role_reactions(action="remove", message=payload["message"], member=payload["user_id"],
+                                      emoji=payload["emoji"])
 
     async def on_member_join(self, member):
         if not self.is_iowegian(member):
@@ -537,7 +558,7 @@ class BotFrostClient(commands.Bot):
     # async def on_raw_message_edit(self, payload):
     # async def on_reaction_add(reaction, user):
     # async def on_reaction_remove(reaction, user):
-    # async def on_reaction_clear(self, message, reactions):
+    # async def on_reaction_clear(self, message, reactions):lea
     # async def on_raw_reaction_clear(self, payload):
     # async def on_member_remove(self, member):
     # async def on_member_update(self, before, after):
@@ -546,16 +567,21 @@ class BotFrostClient(commands.Bot):
     # async def on_member_unban(self, guild, user):
 
 
-if on_prod_server():
-    command_prefix = "$"
-else:
-    command_prefix = "%"
+# if on_prod_server():
+#     command_prefix = "$"
+# else:
+#     command_prefix = "%"
+
+command_prefix = "$"
+
+client_intents = discord.Intents().all()
 
 client = BotFrostClient(
     command_prefix=command_prefix,
     case_insensitive=True,
     description="Husker Discord Bot: Bot Frost",
-    owner_id=189554873778307073
+    owner_id=189554873778307073,
+    intents=client_intents
 )
 
 extensions = (
@@ -570,11 +596,12 @@ extensions = (
     "cogs.games.minecraft",
     "cogs.games.tcg.tcg",
     "cogs.betting",
-    "cogs.music",
+    "cogs.music_test",
     "cogs.reddit",
     "cogs.message_history",
     "cogs.deepfry",
-    "cogs.fap"
+    "cogs.fap",
+    "cogs.games.blackjack"
 )
 
 for extension in extensions:
@@ -591,6 +618,7 @@ if len(sys.argv) > 0:
         token = consts.TEST_TOKEN
 
     print("### Starting the bot...")
+
     client.run(token)
 else:
     print("No arguments provided!")

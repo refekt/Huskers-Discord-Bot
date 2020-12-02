@@ -17,6 +17,9 @@ def is_me(ctx):
 
 
 class RedditCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(hidden=True)
     @commands.check(is_me)
     async def nsd(self, ctx, recruit: str, source: str = None):

@@ -20,6 +20,9 @@ class Card:
 
 
 class TCGCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group()
     async def tcg(self, ctx):
         '''Husker Discord TCG commands'''
@@ -30,8 +33,7 @@ class TCGCommands(commands.Cog):
 
     @tcg.group()
     async def shop(self, ctx):
-        from utils.client import client
-        embed_title = f"Buy a Booster Pack with the command `{client.command_prefix}buy [id]`"
+        embed_title = f"Buy a Booster Pack with the command `{self.bot.command_prefix}buy [id]`"
         embed_description = "The available booster packs are below:"
         embed = discord.Embed(title=embed_title, description=embed_description)
         embed.add_field(name="Shop", value="Pack ID - Pack Name\ni69420 - 90's Huskers")
@@ -39,10 +41,9 @@ class TCGCommands(commands.Cog):
 
     @tcg.command()
     async def buy(self, ctx, pack_id: str = None):
-        from utils.client import client
         player = Player(ctx.author)
         if pack_id is None:
-            await ctx.send(f"You need to include the ID of the pack you'd like to buy, **{ctx.author.display_name}**. You can call `{client.command_prefix}tcg shop` to get the "
+            await ctx.send(f"You need to include the ID of the pack you'd like to buy, **{ctx.author.display_name}**. You can call `{self.bot.command_prefix}tcg shop` to get the "
                            "list of available packs and their IDs.")
         else:
             await ctx.send(f"1 `standing name` bought for 69 Verduzcoins")
