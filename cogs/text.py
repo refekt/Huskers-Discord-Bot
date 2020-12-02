@@ -115,7 +115,7 @@ class TeamStatsWinsipediaTeam():
                 )
             except:
                 return ("UNK", "UNK")
-        
+
         def weeks_ap_poll():
             ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})
             try:
@@ -206,7 +206,7 @@ class CompareWinsipedia:
 class TextCommands(commands.Cog):
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def countdown(self, ctx, *, team=None, sport: str):
+    async def countdown(self, ctx, sport: str=None, *, team=None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
         now_cst = datetime.now().astimezone(tz=TZ)

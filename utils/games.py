@@ -124,10 +124,15 @@ class HuskerDotComSchedule:
 
 
 def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
+
+    if sport == "mbb":
+        sport = "mens-basketball"
+
     if sport is None:
         r = requests.get(url=f"https://huskers.com/sports/football/schedule/{year}", headers=HEADERS)
     else:
         r = requests.get(url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS)
+
     if not r.status_code == 200:
         raise ConnectionError("Unable to retrieve schedule from Huskers.com.")
 
