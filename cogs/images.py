@@ -12,7 +12,6 @@ from utils.embed import build_image_embed
 
 
 def build_quote(quote: str, author):
-
     max_len = 125
     if len(quote) > max_len:
         quote = quote[0:max_len] + "..."
@@ -62,6 +61,9 @@ def build_quote(quote: str, author):
 
 
 class ImageCommands(commands.Cog, name="Fun Image Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def quote(self, ctx, *, quote: str, author=None):
@@ -80,11 +82,11 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def possum(self, ctx):
         """ Possums are love; possums are life """
         possum_list = (
-            "https://cdn.discordapp.com/attachments/442047437561921548/631876712841347117/e3l21wsflor31.jpg",
+            "https://i.imgur.com/o382u6Y.jpeg",
             "https://i.imgur.com/UI3l2Xu.jpg",
-            "https://cdn.discordapp.com/attachments/442047437561921548/631580916342325258/image0.gif",
-            "https://thumbs.gfycat.com/WideEcstaticImperialeagle-size_restricted.gif",
-            "https://thumbs.gfycat.com/AlienatedNaturalChuckwalla-size_restricted.gif"
+            "https://i.imgur.com/nKIxqWh.gif",
+            "https://i.imgur.com/rOj4HH8.gif",
+            "https://i.imgur.com/Oc2j3Mz.gif"
         )
         await ctx.send(embed=build_image_embed(title="Possum Paradise 🌴✈", image=random.choice(possum_list)))
 
@@ -92,7 +94,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def crabfrost(self, ctx):
         """ 🦀 🦀 🦀 """
-        await ctx.send(embed=build_image_embed(title="🦀D🦀A🦀N🦀C🦀E🦀P🦀A🦀R🦀T🦀Y🦀", image="https://thumbs.gfycat.com/FalseTestyDotterel-size_restricted.gif"))
+        await ctx.send(embed=build_image_embed(title="🦀D🦀A🦀N🦀C🦀E🦀P🦀A🦀R🦀T🦀Y🦀", image="https://i.imgur.com/DscOMNF.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -104,7 +106,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def danceparty(self, ctx):
         """ 💃🕺👯‍️👯‍️"""
-        dances = ("https://thumbs.gfycat.com/FriendlyUnrulyCottonmouth-size_restricted.gif", "https://thumbs.gfycat.com/GiddyOldfashionedBluebreastedkookaburra-size_restricted.gif")
+        dances = ("https://i.imgur.com/Ke1YEKD.gif", "https://i.imgur.com/KCSb1hp.gif")
         await ctx.send(embed=build_image_embed(title="🕺💃👯‍♂️👯‍♀️", image=random.choice(dances)))
 
     @commands.command()
@@ -122,13 +124,13 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def fuckiowa(self, ctx):
         """ FUCK IOWA """
-        await ctx.send(embed=build_image_embed(title="FUCK IOWA", image="https://thumbs.gfycat.com/CanineEssentialGelding-size_restricted.gif"))
+        await ctx.send(embed=build_image_embed(title="FUCK IOWA", image="https://i.imgur.com/mmLTSzI.gif"))
 
     @commands.command(aliases=["fuckminn"])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def fuckminnesota(self, ctx):
         """ FUCK MINNESOTA """
-        await ctx.send(embed=build_image_embed(title="SINK THE BOAT", image="https://thumbs.gfycat.com/SadClearcutGalapagosalbatross-size_restricted.gif"))
+        await ctx.send(embed=build_image_embed(title="SINK THE BOAT", image="https://i.imgur.com/k3j86qq.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -141,7 +143,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.has_role(ROLE_POTATO)
     async def potatoes(self, ctx):
         """ Po-tay-toes! """
-        await ctx.send(embed=build_image_embed(title="Po-Tay-Toes", image="https://media1.tenor.com/images/9e7881b55627ba4a2b2cbce5649372a3/tenor.gif?itemid=11409033"))
+        await ctx.send(embed=build_image_embed(title="Po-Tay-Toes", image="https://media1.tenor.com/images/9e7881b55627ba4a2b2cbce5649372a3/tenor.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -192,23 +194,23 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ Excuse me, what! """
         await ctx.send(embed=build_image_embed(title="What did you just say?!", image="https://i.imgur.com/XpFWJp9.gif"))
 
-    @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def strut(self, ctx):
-        """ Ooohhh yeah """
-        await ctx.send(embed=build_image_embed(title="Dat Strut", image="https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif"))
+    # @commands.command()
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # async def strut(self, ctx):
+    #     """ Ooohhh yeah """
+    #     await ctx.send(embed=build_image_embed(title="Dat Strut", image="https://media.giphy.com/media/iFrlakPVXLIj8bAqCc/giphy.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def bones(self, ctx):
         """ ☠☠☠☠ """
-        await ctx.send(embed=build_image_embed(title="☠ Bones ☠", image="https://i.imgur.com/0gcawNo.jpg"))
+        await ctx.send(embed=build_image_embed(title="☠ Bones ☠", image="https://i.imgur.com/EXDmUhS.gif"))
 
-    @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def theflip(self, ctx):
-        """ Just goofin' 🤠 """
-        await ctx.send(embed=build_image_embed(title="Too Cool", image="https://media.giphy.com/media/lllup6g803SaeRUwiM/giphy.gif"))
+    # @commands.command()
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # async def theflip(self, ctx):
+    #     """ Just goofin' 🤠 """
+    #     await ctx.send(embed=build_image_embed(title="Too Cool", image="https://media.giphy.com/media/lllup6g803SaeRUwiM/giphy.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -220,17 +222,57 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def nicoleistall(self, ctx):
         """ I AM A TALL BOY """
-        await ctx.send(embed=build_image_embed(title="Big Boye", image="https://media1.tenor.com/images/99972fba7f9f38377b56d5d56e4b6052/tenor.gif"))
+        await ctx.send(embed=build_image_embed(title="Big Boye", image="https://i.imgur.com/nHG9xxP.gif"))
+
+    # @commands.command()
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # async def maxhype(self, ctx):
+    #     """ I AM A TALL BOY """
+    #     await ctx.send(embed=build_image_embed(title="HYPE", image="https://giant.gfycat.com/ImpishSevereAfricanfisheagle.gif"))
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def maxhype(self, ctx):
-        """ I AM A TALL BOY """
-        await ctx.send(embed=build_image_embed(title="HYPE", image="https://giant.gfycat.com/ImpishSevereAfricanfisheagle.gif"))
+    async def siryacht(self, ctx):
+        """ SirYacht was never wrong! """
+        await ctx.send(embed=build_image_embed(title="I am the captain now", image="https://i.imgur.com/0CoT3Jg.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def deeretroll(self, ctx):
+        """ His pessimism knows no bounds """
+        await ctx.send(embed=build_image_embed(title="Whomp, whomp", image="https://i.imgur.com/4Gwlpap.jpg"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def study(self, ctx):
+        """ Study for else! """
+        await ctx.send(embed=build_image_embed(title="Marty finally contributing to the server", image="https://i.imgur.com/2jNrzeK.gif"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def dodgeball(self, ctx):
+        """ Ben is issuing the pain! """
+        await ctx.send(embed=build_image_embed(title="Ben is issuing the pain!", image="https://i.imgur.com/y3Na18c.gif"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def jojo(self, ctx):
+        """ Jojo """
+        await ctx.send(embed=build_image_embed(title="Jojo Domann", image=random.choice(["https://i.imgur.com/WAj4hl7.gif", "https://i.imgur.com/ZvYEpwz.gif", "https://i.imgur.com/oNhYQUo.gif", "https://i.imgur.com/0zUPXEw.gif"])))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def redname(self, ctx):
+        """ Hi Redname """
+        await ctx.send(embed=build_image_embed(title="Hi Redname", image="https://i.imgur.com/XFPqoT5.gif"))
+        
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def bigmacksack(self, ctx):
+        """ Big Mac Sack """
+        await ctx.send(embed=build_image_embed(title="BigMacSack", image="https://i.imgur.com/XUdlxBe.gif"))
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
 
 # print("### Image Commands loaded! ###")
-

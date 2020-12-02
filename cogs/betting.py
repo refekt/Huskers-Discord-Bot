@@ -4,14 +4,18 @@ import typing
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import BucketType
 
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.consts import CURRENCY_NAME
 from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
 from utils.embed import build_embed
-from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
+from utils.mysql import process_MySQL, sqlUpdateCurrency, sqlSetCurrency, sqlCheckCurrencyInit, \
+    sqlRetrieveCurrencyLeaderboard, sqlRetrieveCurrencyUser
 from utils.mysql import sqlInsertCustomLinesBets, sqlRetrieveOneCustomLinesKeywords, sqlRetrieveAllCustomLinesKeywords
-from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult
+from utils.mysql import sqlRetrieveAllOpenCustomLines, sqlRetrieveOneOpenCustomLine, sqlInsertCustomLines, \
+    sqlUpdateCustomLinesBets, sqlUpdateCustomLinesResult, sqlRetreiveCustomLinesForAgainst
+from utils.consts import GUILD_PROD, GUILD_TEST
 
 PITY_CAP = 10
 RLT_FLOOR = 1
@@ -20,6 +24,8 @@ BET_RANGE_CHAR = ":"
 
 
 class BetCommands(commands.Cog, name="Betting Commands"):
+    def __init__(self, bot):
+        self.bot = bot
 
     def pity_value(self):
         return 15000
@@ -194,6 +200,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             return int(bet_amount * RLT_CEILING) - bet_amount
 
     @commands.command(aliases=["rlt", ])
+    @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     async def roulette(self, ctx, bet_amount: typing.Union[int, str], *, bet: typing.Union[int, str]):
         """ Win or lose some server currency playing roulette
         $roulette 10 red -- Bet a color
@@ -236,7 +243,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     bet_range = self.convert_bet_range(bet)
 
                     if not self.validate_bet_range(bet_range):
-                        raise AttributeError(f"Error in your bet format. Please review `$help roulette` for more information.")
+                        raise AttributeError(
+                            f"Error in your bet format. Please review `$help roulette` for more information.")
 
                     result = self.roll_single_int()
 
@@ -278,27 +286,50 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 raise AttributeError(f"You can only play a number from {RLT_FLOOR} to {RLT_CEILING}. Try again!")
 
         if win:
-            await edit_msg.edit(content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt", wheel_spin=result,
-                                                           bet=bet if not BET_RANGE_CHAR in bet and bet_color else f"{bet_color} {bet}"))
+            await edit_msg.edit(
+                content=self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rlt",
+                                           wheel_spin=result,
+                                           bet=bet if not BET_RANGE_CHAR and type(bet) == str in bet and bet_color else f"{bet_color} {bet}"))
         else:
-            await edit_msg.edit(content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt", wheel_spin=result, bet=bet))
+            await edit_msg.edit(
+                content=self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rlt",
+                                           wheel_spin=result, bet=bet))
 
     @commands.command(aliases=["arlt", ])
+    @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     # @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     # @commands.cooldown(rate=2, per=86400, type=discord.ext.commands.BucketType.user)
-    async def autoroulette(self, ctx, goal: int, bet_multiplier: float, cycles: int = 10000, strat: str = '2*x+z'):
+    async def autoroulette(self, ctx, goal: typing.Union[str, int], bet_multiplier: float, floor: typing.Union[int, str] = 0, cycles: int = 10000, strat: str = '2*x+z'):
         """
         Spin the roulette wheel automatically up to 10,000 times!
-
         :param goal: Your target ending balance.
         :param bet_multiplier: The proportion of your current balance as a decimal you'd like to bet on each spin.
         :param cycles: How many spins?
         :param strat: Voodoo magic. I don't understand it.
+        :param floor: The lowest arlt will allow your ending balance to go.
         """
         balance = self.get_balance(ctx.message.author)
 
+        try:
+            if "%" in goal:
+                goal = int((float(goal.split("%")[0]) / 100) * balance)
+            else:
+                goal = int(goal)
+        except:
+            raise AttributeError("Incorrect goal format! The goal must be a proper percent or integer. Try again.")
+
         if balance > goal:
-            raise AttributeError(f"You must be more than your current balance of [ {balance:,} ].")
+            raise AttributeError(f"Your goal cannot be less than your current balance of [ {balance:,} ].")
+
+        if type(floor) == str:
+            try:
+                if "%" in floor:
+                    floor = int((float(floor.split("%")[0]) / 100) * balance)
+            except:
+                raise AttributeError("Incorrect floor format! The goal must be a proper percent or integer. Try again.")
+
+        if floor > balance:
+            raise AttributeError(f"Your floor must be less than your current balance of [ {balance:,} ].")
 
         pities = 0
         pity_cap = 1000
@@ -317,15 +348,16 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         wins_current = -1
         wins_max = 0
         balance_max = balance
+        floor = max(floor, 0)
 
         strat = strat.replace('x', 'bet2')
         strat = strat.replace('z', 'bet1')
-        
+
         eval(strat)
 
         self.adjust_currency(ctx.message.author, -balance)
 
-        while i < cycles and balance < goal:
+        while i < cycles and goal > balance >= floor:
             # await edit_msg.edit(content=edit_msg.content + " New wheel spin! ")
             if ran >= 0.5:
                 wins_current += 1
@@ -333,7 +365,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 losses_current = 0
                 balance = balance + bet2
                 bet1 = max(int(bet_multiplier * balance), 1)
-                bet2 = min(bet1, balance)
+                bet2 = min(bet1, balance - floor)
                 balance_max = max(balance, balance_max)
             else:
                 losses_current += 1
@@ -344,23 +376,26 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 if balance <= 0:
                     if pities >= pity_cap:
                         # raise AttributeError("Pity is on cooldown! Auto Roulette has stopped.")
-                        return await edit_msg.edit(content=edit_msg.content + f" You suck and used up all the pities and you now have [ {balance:,}. ] {CURRENCY_NAME}")
+                        return await edit_msg.edit(
+                            content=edit_msg.content + f" You suck and used up all the pities and you now have [ {balance:,}. ] {CURRENCY_NAME}")
                     else:
                         # await edit_msg.edit(content=edit_msg.content + f" Pity #{pities + 1}! ")
 
-                        pities += 1 #git
+                        pities += 1  # git
                         balance = pity_money
                         bet1 = max(int(bet_multiplier * balance), 1)
                         bet2 = 0
-                bet2 = int(min(max(eval(strat), 1), balance))
+                bet2 = int(min(max(eval(strat), 1), balance - floor))
             ran = random.random()
             i += 1
 
         self.adjust_currency(ctx.message.author, balance)
 
-        await edit_msg.edit(content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
+        await edit_msg.edit(
+            content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
 
     @commands.command(aliases=["rps", ])
+    @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
     async def rockpaperscissors(self, ctx, bet_amount: typing.Union[int, str], choice: str):
         """ Play Rock Paper Scissors for server currency. Choices are 'rock', 'paper', or 'scissors' """
         self.validate_bet_amount_syntax(bet_amount)
@@ -403,9 +438,13 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                     win = True
 
             if win:
-                return await ctx.send(self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
+                return await ctx.send(
+                    self.result_string(result="win", who=ctx.message.author, amount=bet_amount, game="rps", mbr_throw=choice,
+                                       cpu_throw=throw))
             else:
-                return await ctx.send(self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps", mbr_throw=choice, cpu_throw=throw))
+                return await ctx.send(
+                    self.result_string(result="lose", who=ctx.message.author, amount=-bet_amount, game="rps",
+                                       mbr_throw=choice, cpu_throw=throw))
 
     @commands.group(aliases=["m", ])
     async def money(self, ctx):
@@ -421,9 +460,11 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         if not self.check_author_initialized(ctx.message.author):
             starter_money = 15000
             self.initiate_user(ctx, starter_money)
-            await ctx.send(f"Congratulations {ctx.message.author.mention}! You now have [ {starter_money:,} ] {CURRENCY_NAME}. Use it wisely!")
+            await ctx.send(
+                f"Congratulations {ctx.message.author.mention}! You now have [ {starter_money:,} ] {CURRENCY_NAME}. Use it wisely!")
         else:
-            return await ctx.send(f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
+            return await ctx.send(
+                f"{ctx.message.author.mention}: 🔔🔔🔔 SHAME, SHAME! You can only initialize your account once! 🔔🔔🔔")
 
     @money.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -450,7 +491,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         if balance == 0:
             self.adjust_currency(ctx.message.author, self.pity_value())
-            return await ctx.send(content=f"Pity on you. You have been awarded [ {self.pity_value():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
+            return await ctx.send(
+                content=f"Pity on you. You have been awarded [ {self.pity_value():,} ] {CURRENCY_NAME}. Try not to suck so much next time!")
         else:
             return await ctx.send(f"You cannot use this command when your {CURRENCY_NAME} balance is greater than 0.")
 
@@ -504,7 +546,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             self.adjust_currency(user, value)
             return await ctx.send(f"You have sent [ {value:,} ] {CURRENCY_NAME} to {user.mention}!")
         else:
-            raise AttributeError(f"You do not have [ {value:,} ] {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
+            raise AttributeError(
+                f"You do not have [ {value:,} ] {CURRENCY_NAME} to send! Please review `$money balance` and try again.")
 
     @money.command()
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -530,32 +573,34 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             fetch="all"
         )
 
-        lb = ""
+        lb = "```html\n"
         for index, person in enumerate(leaderboard):
             if index > 9:
                 break
 
-            member = person["username"][:13]
-            spacer = "." * (35 - len(f"`🥇: {member}{person['balance']:,}`"))
+            member = person["username"]
+            spacer = "." * (50 - len(f"🥇: {member}{person['balance']:,}"))
 
             if member is not None:
                 if index == 0:
-                    lb += f"`🥇: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🥇: {member}{spacer}{person['balance']:,}\n"
                 elif index == 1:
-                    lb += f"`🥈: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🥈: {member}{spacer}{person['balance']:,}\n"
                 elif index == 2:
-                    lb += f"`🥉: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🥉: {member}{spacer}{person['balance']:,}\n"
                 else:
-                    lb += f"`🏅: {member}{spacer}{person['balance']:,}`\n"
+                    lb += f"🏅: {member}{spacer}{person['balance']:,}\n"
 
-        await ctx.send(
-            embed=build_embed(
-                title=f"Husker Discord Currency Leaderboard",
-                fields=[
-                    [f"Top 10 {CURRENCY_NAME} Leaderboard", lb]
-                ]
-            )
-        )
+        # await ctx.send(
+        #     embed=build_embed(
+        #         title=f"Husker Discord Currency Leaderboard",
+        #         fields=[
+        #             [f"Top 10 {CURRENCY_NAME} Leaderboard", lb]
+        #         ]
+        #     )
+        # )
+
+        await ctx.send(lb + "\n```")
 
     def retrieve_one_bet_keyword_custom_line(self, ctx: discord.ext.commands.Context, keyword):
         try:
@@ -567,7 +612,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         except:
             return None
 
-    def retrieve_all_bet_keyword_custom_line(self, ctx: discord.ext.commands.Context, keyword):
+    def retrieve_all_bet_keyword_custom_line(self, keyword):
         try:
             return process_MySQL(
                 query=sqlRetrieveAllCustomLinesKeywords,
@@ -699,6 +744,23 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                 fetch="one"
             )
 
+    def retrieve_custom_lines_bets(self, keyword):
+        """
+        Return all bets placed against keyword.
+
+        :param keyword:
+        :return:
+        """
+
+        if keyword:
+            return process_MySQL(
+                query=sqlRetreiveCustomLinesForAgainst,
+                values=keyword,
+                fetch="all"
+            )
+
+        return None
+
     def convert_author(self, ctx: discord.ext.commands.Context, author):
         # Attempt to created a `discord.Member` object.
         author = ctx.guild.get_member(author)
@@ -793,22 +855,37 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             ))
         else:
             # Retrieve single bet (line).
-            bets = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
+            single_bet = self.retrieve_one_bet_keyword_custom_line(ctx, keyword)
+            placed_bets = self.retrieve_custom_lines_bets(keyword)
 
             # Raise error if no bet (line) was found.
-            if bets is None:
+            if single_bet is None:
                 raise AttributeError(f"No bet found with the keyword [ {keyword} ]. Please try again!")
 
             # Attempt to created a `discord.Member` object.
-            author = self.convert_author(ctx, bets["author"])
+            author = self.convert_author(ctx, single_bet["author"])
+
+            guild = self.bot.get_guild(GUILD_PROD)
+            bets_detail = {"for": [], "against": []}
+            for bet in placed_bets:
+                member = guild.get_member(bet["author"])
+
+                if bet["_for"]:
+                    bets_detail["for"].append(f"{member.mention}: {bet['value']:,} {CURRENCY_NAME}")
+                elif bet["against"]:
+                    bets_detail["against"].append(f"{member.mention}: {bet['value']:,} {CURRENCY_NAME}")
+                else:
+                    ...
 
             return await ctx.send(embed=build_embed(
                 title="All Open Bets",
                 fields=[
                     [
-                        f"Keyword: {bets['keyword']}",
+                        f"Keyword: {single_bet['keyword']}",
                         f"Author: {author.mention if type(author) == discord.Member else author}\n"
-                        f"Description: {str(bets['description']).capitalize()}\n"
+                        f"Description: {str(single_bet['description']).capitalize()}\n"
+                        f"Bets For: {bets_detail['for']}\n"
+                        f"Bets Against: {bets_detail['against']}\n"
                     ]
                 ],
                 inline=False
@@ -857,22 +934,27 @@ class BetCommands(commands.Cog, name="Betting Commands"):
 
         result = result.lower()
 
-        if not (result == "for" or result == "against"):
+        if not result in ("for", "against", "wash"):
             raise AttributeError(f"The result must be `for` or `against`. Not [ {result} ]. Try again!")
 
         author = ctx.guild.get_member(original_bet["author"])
 
-        if not original_bet["author"] == ctx.message.author.id:
+        ctx_roles = [role.id for role in ctx.message.author.roles]
+        admin = ROLE_ADMIN_PROD in ctx_roles
+
+        if not admin and not original_bet["author"] == ctx.message.author.id:
             raise AttributeError(f"You cannot update a bet you did not create! The original author for [ {keyword} ] is [ {author.mention} ]. ")
 
         try:
+            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(keyword)
+
+            if keyword_bet_uers is None:
+                raise AttributeError(f"No bets were placed against [ {keyword} ].")
 
             process_MySQL(
                 query=sqlUpdateCustomLinesResult,
                 values=(result, keyword)
             )
-
-            keyword_bet_uers = self.retrieve_all_bet_keyword_custom_line(ctx, keyword)
 
             winners = []
             losers = []
@@ -880,7 +962,9 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             for user in keyword_bet_uers:
                 member = ctx.guild.get_member(user["author"])
 
-                if user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
+                if result == "wash":
+                    self.adjust_currency(member, user["value"])
+                elif user["_for"] == 1 and result == "for" or user["against"] == 1 and result == "against":
                     try:
                         self.adjust_currency(member, user["value"] * 2)
                         winners.append(member.mention)

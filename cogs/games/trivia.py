@@ -5,15 +5,11 @@ import time
 import typing
 from datetime import datetime
 
-from utils.consts import CURRENCY_NAME
-
-
 import discord
 import requests
 from discord.ext import commands
 from discord.ext.commands import TextChannelConverter
 
-from utils.client import client
 from utils.embed import build_embed
 from utils.misc import bot_latency
 from utils.mysql import process_MySQL, sqlClearTriviaScore, sqlRetrieveTriviaScores, sqlInsertTriviaScore, sqlRetrieveTriviaQuestions
@@ -164,6 +160,8 @@ async def loop_questions(ctx):
         if game.current_question >= len(game.questions):
             await quit_game(ctx)
 
+        from utils.client import client
+
         try:
             reaction, user = await client.wait_for("reaction_add", check=check_reaction)
         except asyncio.TimeoutError:
@@ -295,11 +293,14 @@ game = TriviaGame(channel=None)
 
 
 class Trivia(commands.Cog, name="Husker Trivia"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group()
     async def trivia(self, ctx):
         """Husker trivia"""
         if not ctx.invoked_subcommand:
-            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
+            raise discord.ext.commands.CommandError(f"Missing a subcommand. Review '{self.bot.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
         pass
 
     @trivia.command(aliases=["s", ])
@@ -363,7 +364,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await client.wait_for("message", check=check_channel)
+                msg = await self.bot.wait_for("message", check=check_channel)
                 if msg:
                     setup_chan = await TextChannelConverter().convert(ctx, msg.content)
             except TimeoutError:
@@ -380,7 +381,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await client.wait_for("message", check=check_timer_and_questions)
+                msg = await self.bot.wait_for("message", check=check_timer_and_questions)
                 if msg:
                     setup_timer = abs(int(msg.content))
             except TimeoutError:
@@ -397,7 +398,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await client.wait_for("message", check=check_timer_and_questions)
+                msg = await self.bot.wait_for("message", check=check_timer_and_questions)
                 if not msg == "N/A":
                     setup_question_length = abs(int(msg.content))
             except TimeoutError:
@@ -414,7 +415,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             game.message_collection.append(sent_msg)
 
             try:
-                msg = await client.wait_for("message", check=check_category)
+                msg = await self.bot.wait_for("message", check=check_category)
                 if msg:
                     setup_category = trivia_cats[msg.clean_content]
             except TimeoutError:
@@ -444,7 +445,7 @@ class Trivia(commands.Cog, name="Husker Trivia"):
             return u == game.trivia_master and str(r.emoji) == "🆗"
 
         try:
-            reaction, user = await client.wait_for("reaction_add", check=check_reaction)
+            reaction, user = await self.bot.wait_for("reaction_add", check=check_reaction)
         except asyncio.TimeoutError:
             await ctx.send("ur dumb lol")
         else:

@@ -4,16 +4,16 @@ import datetime
 import discord
 from discord.ext import commands
 
-from utils.client import client
+import cogs.fap as FAP
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
 from utils.embed import build_embed, build_recruit_embed
 from utils.recruit import FootballRecruit
-from utils.consts import FOOTER_BOT
-
-import cogs.fap as FAP
 
 
 class RecruitCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command(aliases=["cb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def crootboot(self, ctx, year: int, *name):
@@ -36,22 +36,22 @@ class RecruitCommands(commands.Cog):
         if type(search) == commands.UserInputError:
             await edit_msg.edit(content=search)
             return
-        
+
         async def final_send_embed_fap_loop(target_recruit, embed_msg):
             embed = build_recruit_embed(target_recruit)
             await embed_msg.edit(content="", embed=embed)
             if (target_recruit.committed.lower() if target_recruit.committed is not None else None) not in ['signed', 'enrolled']:
                 await embed_msg.add_reaction('🔮')
-            if ((FAP.get_croot_predictions(target_recruit)) is not None):
+            if (FAP.get_croot_predictions(target_recruit)) is not None:
                 await embed_msg.add_reaction('📜')
             fap_wait = True
             indie_preds_clicked = False
-            while(fap_wait):
+            while fap_wait:
                 try:
-                    reaction, user = await client.wait_for('reaction_add', 
-                                                       check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📜')),
-                                                       timeout = 127800) #Putting a timeout of 2 days just in case the event loop gets too busy after a while, not sure if that's
-                                                                         #actually possible though
+                    reaction, user = await self.bot.wait_for('reaction_add',
+                                                             check=lambda reaction, user: (not user.bot and (reaction.emoji == '🔮' or reaction.emoji == '📜')),
+                                                             timeout=127800)  # Putting a timeout of 2 days just in case the event loop gets too busy after a while, not sure if that's
+                    # actually possible though
                 except asyncio.TimeoutError:
                     return
                 else:
@@ -61,7 +61,7 @@ class RecruitCommands(commands.Cog):
                                 await embed_msg.remove_reaction('🔮', user)
                             except:
                                 pass
-                            await FAP.initiate_fap(user, target_recruit, client) 
+                            await FAP.initiate_fap(user, target_recruit, self.bot)
                         if reaction.emoji == '📜' and indie_preds_clicked == False:
                             try:
                                 await reaction.clear()
@@ -69,7 +69,7 @@ class RecruitCommands(commands.Cog):
                                 pass
                             await FAP.individual_predictions(target_recruit, ctx)
                             indie_preds_clicked = True
-        
+
         if len(search) == 1:
             await final_send_embed_fap_loop(search[0], edit_msg)
             return
@@ -100,28 +100,24 @@ class RecruitCommands(commands.Cog):
         search_result_player = None
 
         try:
-            reaction, user = await client.wait_for("reaction_add", check=checking_reaction)
+            reaction, user = await self.bot.wait_for("reaction_add", check=checking_reaction)
         except asyncio.TimeoutError:
             pass
         else:
             search_result_player = search[search_reactions[reaction.emoji]]
-        
+
         try:
             await edit_msg.clear_reactions()
         except discord.HTTPException:
             print("Removing reactions from the message failed.")
         except discord.ClientException:
             print("Unable to remove reactions due to lack of permissions.")
-            
+
         await final_send_embed_fap_loop(search_result_player, edit_msg)
-        #embed = build_recruit_embed(search_result_player)
-        #await edit_msg.edit(content="", embed=embed)
-        #await edit_msg.add_reaction('🔮')
-
-
+        # embed = build_recruit_embed(search_result_player)
+        # await edit_msg.edit(content="", embed=embed)
+        # await edit_msg.add_reaction('🔮')
 
 
 def setup(bot):
     bot.add_cog(RecruitCommands(bot))
-
-# print("### Recruit Commands loaded! ###")

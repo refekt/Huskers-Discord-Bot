@@ -3,13 +3,15 @@ import datetime
 import discord
 from discord.ext import commands
 
-from utils.client import client
 from utils.consts import CHAN_RULES, CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS, CHAN_IOWA
 from utils.consts import EMBED_TITLE_HYPE
 from utils.consts import GUILD_PROD
 from utils.consts import REACITON_HYPE_SQUAD
-from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, ROLE_TIME_OUT
+from utils.consts import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_HYPE_MAX, ROLE_MOD_PROD, \
+    ROLE_TIME_OUT
+from utils.consts import TZ
 from utils.embed import build_embed as build_embed
+from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
 
@@ -18,6 +20,63 @@ def not_botlogs(chan: discord.TextChannel):
 
 
 class AdminCommands(commands.Cog, name="Admin Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(aliases=["gd", ])
+    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
+    async def gameday(self, ctx, toggle: str):
+        toggle_options = ("on", "off")
+
+        if not toggle.lower() in toggle_options:
+            raise AttributeError("Invalid toggle! Options are \"on\" or \"off\".")
+
+        # _now = datetime.datetime.now().astimezone(tz=TZ)
+        # games, stats = HuskerSchedule(year=_now.year)
+        # del stats
+        #
+        # for game in games:
+        #     if game.game_date_time > _now:
+        #         diff = game.game_date_time - _now
+        #         _hour = 60 * 60
+        #         if diff.seconds >= _hour:
+        #             raise AttributeError("This command can only be turned on 1 hour before the schedule game start!")
+        #         elif game.game_date_time > _now and diff.seconds <= -(_hour * 5):
+        #             raise AttributeError("This command can only be turned off after 5 hours from kick off!")
+
+        ROLE_EVERYONE_ID = 440632686185414677
+        ROLE_EVERYONE = ctx.guild.get_role(ROLE_EVERYONE_ID)
+
+        if ROLE_EVERYONE is None:
+            raise AttributeError("Unable to find `@everyone` role!")
+
+        GAMEDAY_CATEGORY_ID = 768828439636606996
+        GAMEDAY_CATEGORY = self.bot.get_channel(GAMEDAY_CATEGORY_ID)
+
+        perms = discord.PermissionOverwrite()
+
+        GENERAL_ID = 440868279150444544
+        GENERAL_CHANNEL = self.bot.get_channel(GENERAL_ID)
+
+        if toggle.lower() == "on":
+            perms.send_messages = True
+            perms.read_messages = True
+            perms.view_channel = True
+            perms.connect = True
+            perms.speak = True
+
+            await GENERAL_CHANNEL.send(f"🚨 ❗ Game day mode is now {toggle} for the server! Live TV text and voice channels are for users who are watching live. Streaming text and voice channels are for users who are streaming the game. All game chat belongs in these channels during the game. ❗ 🚨")
+        elif toggle.lower() == "off":
+            perms.send_messages = False
+            perms.read_messages = False
+            perms.view_channel = False
+            perms.connect = False
+            perms.speak = False
+
+            await GENERAL_CHANNEL.send(f"🚨 ❗ Game day mode is now {toggle} for the server! Normal server discussion may resume! ❗ 🚨")
+
+        await GAMEDAY_CATEGORY.set_permissions(ROLE_EVERYONE, overwrite=perms)
+
     @commands.command()
     async def about(self, ctx):
         """ All about Bot Frost """
@@ -31,11 +90,13 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                     ["History",
                      "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!"],
                     ["Source Code", "[GitHub](https://www.github.com/refekt/Husker-Bot)"],
-                    ["Hosting Location", f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
+                    ["Hosting Location",
+                     f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
                     ["Hosting Status", "https://status.hyperexpert.com/"],
-                    ["Latency", f"{client.latency * 1000:.2f} ms"],
-                    ["Username", client.user.mention],
-                    ["Feeling generous?", f"Check out `{client.command_prefix}donate` to help out the production and upkeep of the bot."]
+                    ["Latency", f"{self.bot.latency * 1000:.2f} ms"],
+                    ["Username", self.bot.user.mention],
+                    ["Feeling generous?",
+                     f"Check out `{self.bot.command_prefix}donate` to help out the production and upkeep of the bot."]
                 ]
             )
         )
@@ -50,15 +111,17 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                 inline=False,
                 thumbnail="https://i.imgur.com/53GeCvm.png",
                 fields=[
-                    ["About", "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware "
-                              "performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs."],
+                    ["About",
+                     "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware "
+                     "performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs."],
                     ["Terms", "(1) Final discretion of donation usage is up to the creator(s). "
                               "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
                               "(3) No refunds. "
                               "(4) Monthly subscriptions can be terminated by either party at any time. "
                               "(5) These terms can be changed at any time. Please read before each donation. "
                               "(6) Clicking the donation link signifies your agreement to these terms."],
-                    ["Donation Link", "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
+                    ["Donation Link",
+                     "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
                 ]
             )
         )
@@ -66,7 +129,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @donate.after_invoke
     async def after_donate(self, ctx):
         from utils.mysql import process_MySQL, sqlLogUser
-        process_MySQL(query=sqlLogUser, values=(f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "after_donate", "N/A"))
+        process_MySQL(query=sqlLogUser,
+                      values=(f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "after_donate", "N/A"))
 
     @commands.group(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -80,7 +144,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         msgs = []
         try:
-            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
+            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23,
+                                                                   minutes=59)  # Discord only lets you delete 14 day old messages
             async for message in ctx.message.channel.history(limit=100):
                 if message.created_at >= max_age and message.author.bot:
                     msgs.append(message)
@@ -110,7 +175,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         msgs = []
         try:
-            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
+            max_age = datetime.datetime.now() - datetime.timedelta(days=13, hours=23,
+                                                                   minutes=59)  # Discord only lets you delete 14 day old messages
             async for message in ctx.message.channel.history(limit=100):
                 if message.created_at >= max_age:
                     msgs.append(message)
@@ -128,12 +194,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     async def quit(self, ctx):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
-        await client.logout()
+        await self.bot.logout()
 
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def rules(self, ctx):
-        unmodded = client.get_channel(id=CHAN_NORTH_BOTTTOMS)
+        unmodded = self.bot.get_channel(id=CHAN_NORTH_BOTTTOMS)
         text = \
             f"""
         1️⃣ Be respectful\n
@@ -146,12 +212,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         8️⃣ Fuck Iowa, Colorado, Texas, Florida\n
         9️⃣ All NSFW Images must be spoiler tagged
         """
-        rules_channel = client.get_channel(CHAN_RULES)
+        rules_channel = self.bot.get_channel(CHAN_RULES)
         rules_title = "Huskers' Discord Rules"
         messages = await rules_channel.history().flatten()
 
         for message in messages:
-            if message.author == client.user and message.embeds[0].title == rules_title:
+            if message.author == self.bot.user and message.embeds[0].title == rules_title:
                 new_embed = message.embeds[0]
                 new_embed.clear_fields()
                 new_embed.add_field(name="Rules", value=text)
@@ -185,12 +251,12 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         """
         roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧", "🪓")
 
-        rules_channel = client.get_channel(CHAN_RULES)
+        rules_channel = self.bot.get_channel(CHAN_RULES)
         messages = await rules_channel.history().flatten()
         roles_title = "Huskers' Discord Roles"
 
         for message in messages:
-            if message.author == client.user and message.embeds[0].title == roles_title:
+            if message.author == self.bot.user and message.embeds[0].title == roles_title:
                 new_embed = message.embeds[0]
                 new_embed.clear_fields()
                 new_embed.add_field(name="Rules", value=roles)
@@ -216,8 +282,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD)
     async def hypesquad(self, ctx):
-        chan_rules = client.get_channel(id=CHAN_RULES)
-        guild = client.get_guild(GUILD_PROD)
+        chan_rules = self.bot.get_channel(id=CHAN_RULES)
+        guild = self.bot.get_guild(GUILD_PROD)
 
         role_max = guild.get_role(ROLE_HYPE_MAX)
         role_some = guild.get_role(ROLE_HYPE_SOME)
@@ -231,7 +297,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
         rule_messages = await chan_rules.history().flatten()
         for hist in rule_messages:
-            if hist.author == client.user and hist.embeds[0].title == EMBED_TITLE_HYPE:
+            if hist.author == self.bot.user and hist.embeds[0].title == EMBED_TITLE_HYPE:
                 new_embed = hist.embeds[0]
                 new_embed.clear_fields()
                 new_embed.add_field(
@@ -259,7 +325,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
     async def repeat(self, ctx, *, message=""):
         if ctx.channel.type == discord.ChannelType.private:
-            channels_list = [channel for channel in client.get_all_channels() if channel.type == discord.ChannelType.text]
+            channels_list = [channel for channel in self.bot.get_all_channels() if channel.type == discord.ChannelType.text]
 
             nl = "\n"
 
@@ -273,7 +339,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
 
                 return False
 
-            msg = await client.wait_for("message", check=check_chan)
+            msg = await self.bot.wait_for("message", check=check_chan)
 
             if msg:
                 repeat_channel = None
@@ -290,7 +356,7 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
                         if m.channel.type == discord.ChannelType.private:
                             return m.content
 
-                    output = await client.wait_for("message", check=check_message)
+                    output = await self.bot.wait_for("message", check=check_message)
                     await repeat_channel.send(output.content)
                 else:
                     print("wat")
@@ -373,7 +439,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         )
 
         await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
-        await ctx.send(f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
+        await ctx.send(
+            f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
         await who.send(f"You have been moved to [ {iowa.mention} ] for the following reason: {reason}.")
 
     @commands.command(hidden=True)
@@ -418,7 +485,8 @@ class AdminCommands(commands.Cog, name="Admin Commands"):
         await ctx.send(embed=build_embed(
             title=f"Bug Reporter",
             fields=[
-                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
+                ["Report Bugs",
+                 "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
             ]
         ))
 

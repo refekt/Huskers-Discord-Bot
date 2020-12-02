@@ -25,40 +25,41 @@ leagueDict = {
     'independent': 18
 }
 cfbWeeks = [
-    datetime(2019, 1, 1),
-    datetime(2019, 9, 2),
-    datetime(2019, 9, 9),
-    datetime(2019, 9, 16),
-    datetime(2019, 9, 23),
-    datetime(2019, 9, 30),
-    datetime(2019, 10, 7),
-    datetime(2019, 10, 14),
-    datetime(2019, 10, 21),
-    datetime(2019, 10, 28),
-    datetime(2019, 11, 4),
-    datetime(2019, 11, 11),
-    datetime(2019, 11, 18),
-    datetime(2019, 11, 25),
-    datetime(2019, 12, 2)
+    datetime(datetime.now().year, 9, 5),
+    datetime(datetime.now().year, 9, 12),
+    datetime(datetime.now().year, 9, 19),
+    datetime(datetime.now().year, 9, 26),
+    datetime(datetime.now().year, 10, 3),
+    datetime(datetime.now().year, 10, 10),
+    datetime(datetime.now().year, 10, 17),
+    datetime(datetime.now().year, 10, 24),
+    datetime(datetime.now().year, 10, 31),
+    datetime(datetime.now().year, 11, 7),
+    datetime(datetime.now().year, 11, 14),
+    datetime(datetime.now().year, 11, 21),
+    datetime(datetime.now().year, 11, 28),
+    datetime(datetime.now().year, 12, 5),
+    datetime(datetime.now().year, 12, 12),
+    datetime(datetime.now().year, 12, 19)
 ]
 nflWeeks = [
-    datetime(2019, 1, 1),
-    datetime(2019, 9, 11),
-    datetime(2019, 9, 18),
-    datetime(2019, 9, 25),
-    datetime(2019, 10, 2),
-    datetime(2019, 10, 9),
-    datetime(2019, 10, 16),
-    datetime(2019, 10, 23),
-    datetime(2019, 10, 30),
-    datetime(2019, 10, 6),
-    datetime(2019, 11, 13),
-    datetime(2019, 11, 20),
-    datetime(2019, 11, 27),
-    datetime(2019, 12, 4),
-    datetime(2019, 12, 11),
-    datetime(2019, 12, 18),
-    datetime(2019, 12, 25)
+    datetime(datetime.now().year, 9, 13),
+    datetime(datetime.now().year, 9, 20),
+    datetime(datetime.now().year, 9, 27),
+    datetime(datetime.now().year, 10, 4),
+    datetime(datetime.now().year, 10, 11),
+    datetime(datetime.now().year, 10, 18),
+    datetime(datetime.now().year, 10, 25),
+    datetime(datetime.now().year, 11, 1),
+    datetime(datetime.now().year, 11, 8),
+    datetime(datetime.now().year, 11, 15),
+    datetime(datetime.now().year, 11, 22),
+    datetime(datetime.now().year, 11, 29),
+    datetime(datetime.now().year, 12, 6),
+    datetime(datetime.now().year, 12, 13),
+    datetime(datetime.now().year, 12, 20),
+    datetime(datetime.now().year, 12, 27),
+    datetime(datetime.now().year + 1, 1, 3)
 ]
 
 
@@ -74,13 +75,15 @@ def hex_to_rgb(_hex):
 
 
 class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group(aliases=["sched"])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def schedule(self, ctx):
         """ [year|week] Nebraska's football schedule """
         if not ctx.invoked_subcommand:
-            from utils.client import client
-            raise AttributeError(f"Missing a subcommand. Review '{client.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
+            raise AttributeError(f"Missing a subcommand. Review '{self.bot.command_prefix}help {ctx.command.qualified_name}' to view subcommands.")
 
     @schedule.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -134,8 +137,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
         if week == -1:
             week = self.getCurrentWeek(nflWeeks)
 
-        url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" \
-              f"?lang=en&region=us&calendartype=blacklist&limit=100&dates={year}&seasontype=2&week={week}"
+        url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?lang=en&region=us&calendartype=blacklist&limit=100&dates={year}&seasontype=2&week={week}"
 
         try:
             r = requests.get(url)
@@ -170,7 +172,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
                 if current_date != "":
                     response += "\n"
                 current_date = event_day
-                response += "\n{event_day} - {date.strftime('%#m/%#d')}"
+                response += f"\n{event_day} - {date.strftime('%#m/%#d')}"
                 response += "\n-------------------------------------------------"
 
             game = event["competitions"][0]
@@ -189,7 +191,7 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
                 status = f"{away['score']:>3}-{home['score']:<3}{status_txt:<12}"
             elif date.hour != 0:
                 # ESPN sets their TBD games to midnight Eastern.
-                status = "{date_central.strftime('%#I:%M %p %Z'):>12}"
+                status = f"{date_central.strftime('%#I:%M %p %Z'):>12}"
 
             response += f"\n{network:<8}{away['name']:>10} @ {home['name']:<10} {status:<7}"
 

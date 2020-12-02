@@ -255,8 +255,7 @@ sqlRetreiveCustomLinesForAgainst = "SELECT author, _for, against, value FROM cus
 
 sqlRetrieveOneOpenCustomLine = "SELECT * FROM custom_lines WHERE keyword = %s and result = 'tbd'"
 
-sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for, against, value) " \
-                           "VALUES (%s, %s, %s, %s, %s)"
+sqlInsertCustomLinesBets = "INSERT INTO custom_lines_bets (author, keyword, _for, against, value) VALUES (%s, %s, %s, %s, %s)"
 
 sqlUpdateCustomLinesBets = "UPDATE custom_lines_bets " \
                            "SET `_for`=%s, against=%s, value=%s " \
@@ -328,4 +327,3 @@ def process_MySQL(query: str, **kwargs):
 
         if result:
             return result
-
