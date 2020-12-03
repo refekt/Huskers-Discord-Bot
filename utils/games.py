@@ -137,8 +137,11 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
             icon = "https://huskers.com" + g.contents[1].contents[1].contents[1].attrs["data-src"]
             _date = g.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
             _time = g.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
+
+            if ":" not in _time:
+                _time = _time.replace(" ", ":00 ")
             date_time = f"{_date[0:6]} {year} {_time}"
-            if "Noon" in date_time: # I blame Iowa
+            if "Noon" in date_time:  # I blame Iowa
                 date_time = date_time.replace("Noon", "12:00 P.M.")
             conference = g.contents[1].contents[3].contents[1].contents[3]
             if len(conference.contents) > 1:
