@@ -216,8 +216,6 @@ class TextCommands(commands.Cog):
 
         sports_names = ["mbb", "vb", "soccer", "baseball", "football"]
 
-        sport = ""
-
         if team:
             if " " in team:
                 sport = team.split()[0]
