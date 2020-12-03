@@ -162,7 +162,8 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
     soup = BeautifulSoup(r.content, "html.parser")
 
     games_raw = soup.find_all(attrs={"class": "sidearm-schedule-games-container"})
-    games_raw = [game for game in games_raw[0].contents if not type(game) == NavigableString]
+
+    games_raw = [game for game in games_raw[0].contents if not type(game) == NavigableString and len(game.attrs)]
 
     games = []
     season_stats = SeasonStats()
