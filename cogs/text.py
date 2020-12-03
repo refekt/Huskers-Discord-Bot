@@ -219,12 +219,15 @@ class TextCommands(commands.Cog):
         sport = ""
 
         if team:
-            if team.lower() in sports_names:
-                sport = team.lower()
-                # team = team[1]
+            if " " in team:
+                sport = team.split()[0]
+                team = team.split()[1]
             else:
-                sport = "football"
-                team = team  # [0]
+                if team.lower() in sports_names:
+                    sport = team.lower()
+                else:
+                    sport = "football"
+                    team = team
         else:
             sport = "football"
 
@@ -280,7 +283,7 @@ class TextCommands(commands.Cog):
         if not games:
             return await edit_msg.edit(content="No games found!")
 
-        if team is None:
+        if team is None or team in sports_names:
             for game in games:
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst

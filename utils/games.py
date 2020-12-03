@@ -138,6 +138,9 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
             _date = g.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
             _time = g.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
 
+            if "(" in _time:
+                _time = "TBA"
+
             if ":" not in _time:
                 _time = _time.replace(" ", ":00 ")
             date_time = f"{_date[0:6]} {year} {_time}"
