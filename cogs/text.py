@@ -209,7 +209,6 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-
     async def countdown(self, ctx, *, team: str = None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
@@ -220,12 +219,12 @@ class TextCommands(commands.Cog):
         sport = ""
 
         if team:
-            if team[0] in sports_names:
-                sport = team[0]
-                team = team[1]
+            if team.lower() in sports_names:
+                sport = team.lower()
+                # team = team[1]
             else:
                 sport = "football"
-                team = team[0]
+                team = team  # [0]
         else:
             sport = "football"
 
