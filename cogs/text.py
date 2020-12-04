@@ -210,7 +210,6 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-
     async def countdown(self, ctx, *, team: str = None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
@@ -218,15 +217,16 @@ class TextCommands(commands.Cog):
 
         sports_names = ["mbb", "vb", "soccer", "baseball", "football"]
 
-        sport = ""
-
         if team:
-            if team[0] in sports_names:
-                sport = team[0]
-                team = team[1]
+            if " " in team:
+                sport = team.split()[0]
+                team = team.split()[1]
             else:
-                sport = "football"
-                team = team[0]
+                if team.lower() in sports_names:
+                    sport = team.lower()
+                else:
+                    sport = "football"
+                    team = team
         else:
             sport = "football"
 
@@ -283,7 +283,8 @@ class TextCommands(commands.Cog):
             return await edit_msg.edit(content="No games found!")
 
 
-        if team is None:
+        if team is None or team in sports_names:
+                                    
             for game in games:
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
