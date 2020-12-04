@@ -281,11 +281,28 @@ class TextCommands(commands.Cog):
         if not games:
             return await edit_msg.edit(content="No games found!")
 
+        def leap_year(y):
+            if y % 400 == 0:
+                return True
+            if y % 100 == 0:
+                return False
+            if y % 4 == 0:
+                return True
+            else:
+                return False
+
         if team is None or team in sports_names:
+                                    
             for game in games:
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
+                    if diff.days < 0:
+                        if leap_year(datetime.date().year) is None:
+                            year_days = 365
+                        else:
+                            year_days = 366
+                        await send_countdown(diff.days + year_days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
         else:
@@ -294,6 +311,12 @@ class TextCommands(commands.Cog):
                 if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
+                    if diff.days < 0:
+                        if leap_year(datetime.date().year) is None:
+                            year_days = 365
+                        else:
+                            year_days = 366
+                        await send_countdown(diff.days + year_days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
 
