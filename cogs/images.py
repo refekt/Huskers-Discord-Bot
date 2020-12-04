@@ -268,9 +268,16 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def bigmacksack(self, ctx):
+    async def bigmacsack(self, ctx):
         """ Big Mac Sack """
         await ctx.send(embed=build_image_embed(title="BigMacSack", image="https://i.imgur.com/XUdlxBe.gif"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def thatsracist(self, ctx):
+        """ Thats Racist """
+        await ctx.send(embed=build_image_embed(title="ThatsRacist", image="https://user-images.githubusercontent.com/38467524/96499696-5e421600-1213-11eb-8ebc-fa9cf02a0610.gif"))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
