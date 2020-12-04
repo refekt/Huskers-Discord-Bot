@@ -282,9 +282,8 @@ class TextCommands(commands.Cog):
         if not games:
             return await edit_msg.edit(content="No games found!")
 
-
         if team is None or team in sports_names:
-                                    
+
             for game in games:
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
@@ -467,27 +466,23 @@ class TextCommands(commands.Cog):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
         """ You have 24 hours to cheer or moam about the game """
-        games = HuskerSchedule(year=datetime.now().year)
+        games, stats = HuskerSchedule(sport="football")
 
         for index, game in enumerate(reversed(games)):
-            game_dt_cst = game.game_date_time.astimezone(tz=TZ)
             now_cst = datetime.now().astimezone(tz=TZ)
-            _24hourspassed = game_dt_cst + timedelta(days=1)
-            _24hourspassed = _24hourspassed.astimezone(tz=TZ)
+            _24hourspassed = game.game_date_time + timedelta(days=1)
 
-            if now_cst > game_dt_cst:
+            if now_cst > game.game_date_time:
                 try:
                     i = len(games) - (index + 1) if index < len(games) else len(games) - index
-                    next_opponent = games[i + 1].opponent  # Should avoid out of bounds
 
                     if now_cst < _24hourspassed:
-                        await ctx.send(f"You have 24 hours to #moaming the __[ {game.opponent} ]__ game! That ends in __[ {_24hourspassed - now_cst} ]__!")
+                        await ctx.send(f"You have 24 hours to #moaming the __[ {game.opponent.name} ]__ game! That ends in __[ {_24hourspassed - game.game_date_time} ]__!")
                     else:
-                        await ctx.send(f"The 24 hours are up! No more #moaming. Time to focus on the __[ {next_opponent} ]__ game!")
+                        await ctx.send(f"24 hours have passed since the __[ {game.opponent.name} ]__ game! No more moaming. Time to focus on the __[ {games[i + 1].opponent.name} ]__ game!")
                     break
                 except IndexError:
-                    await ctx.send("The season is over! No upcoming games found.")
-                    return
+                    return await ctx.send("The season is over! No upcoming games found.")
 
     @commands.command(aliases=["8b", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
