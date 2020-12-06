@@ -397,71 +397,6 @@ class TextCommands(commands.Cog):
             sentence += random.choice(punctuation)
             await edit_msg.edit(content=sentence)
 
-    # @commands.group()
-    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    # async def weather(self, ctx):
-    #     """ Current weather for the next game day location """
-    #
-    #     if ctx.invoked_subcommand:
-    #         return
-    #
-    #     venues = Venue()
-    #     embed = None
-    #     edit_msg = None
-    #     _venue_name = None
-    #     _weather = None
-    #     _x = None
-    #     _y = None
-    #     _opponent = None
-    #
-    #     edit_msg = await ctx.send("Loading...")
-    #
-    #     season, season_stats = HuskerSchedule(year=datetime.now().year)
-    #     # season = reversed(season)
-    #
-    #     for game in season:
-    #         now_cst = datetime.now().astimezone(tz=TZ)
-    #
-    #         if now_cst < game.game_date_time.astimezone(tz=TZ):
-    #             if game.location == "Memorial Stadium":
-    #                 _venue_name = venues[207]["name"]
-    #                 _x = venues[207]["location"]["x"]
-    #                 _y = venues[207]["location"]["y"]
-    #             else:
-    #                 for venue in venues:
-    #                     if venue["city"].lower() == game.location[0].lower() and venue["state"].lower() == game.location[1].lower():
-    #                         _venue_name = venue['name']
-    #                         _x = venue['location']['x']
-    #                         _y = venue['location']['y']
-    #                         break
-    #
-    #             r = requests.get(url=f"https://api.weatherbit.io/v2.0/current?key={'39b7915267f04d5f88fa5fe6be6290e6'}&lang=en&units=I&lat={_x}&lon={_y}")
-    #             _weather = r.json()
-    #
-    #             embed = discord.Embed(
-    #                 title=f"Weather Forecast for the __[ {game.opponent} ]__ in __[ {_venue_name} / {_weather['data'][0]['city_name']}, {_weather['data'][0]['state_code']} ]__",
-    #                 color=0xFF0000)  # ,
-    #             # description=f"Nebraska's next opponent is __[ {game.opponent} ]__")
-    #
-    #             break
-    #
-    #     if embed is None:
-    #         await ctx.send("The season is over! No upcoming games found.")
-    #         return
-    #
-    #     embed.set_thumbnail(url=f"https://www.weatherbit.io/static/img/icons/{_weather['data'][0]['weather']['icon']}.png")
-    #     embed.set_footer(text="There is a daily 500 call limit to the API used for this command. Do not abuse it.")
-    #     embed.add_field(name="Temperature", value=f"{_weather['data'][0]['temp']} F", inline=False)
-    #     embed.add_field(name="Cloud Coverage", value=f"{_weather['data'][0]['clouds']}%", inline=False)
-    #     embed.add_field(name="Wind Speed", value=f"{_weather['data'][0]['wind_spd']} MPH / {_weather['data'][0]['wind_cdir']}", inline=False)
-    #     embed.add_field(name="Snow Chance", value=f"{_weather['data'][0]['snow']:.2f}%", inline=False)
-    #     embed.add_field(name="Precipitation Chance", value=f"{_weather['data'][0]['precip'] * 100:.2f}%", inline=False)
-    #
-    #     if edit_msg is not None:
-    #         await edit_msg.edit(content="", embed=embed)
-    #     else:
-    #         await ctx.send(embed=embed)
-
     @commands.command(name="24hours", aliases=["24", "24hrs", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
@@ -688,6 +623,10 @@ class TextCommands(commands.Cog):
             ],
             inline=False
         ))
+
+    @commands.command()
+    async def flag(self, ctx, who: discord.Member, *, what: str):
+        await ctx.send(f":flag: {who.mention} has been flagged by {ctx.message.author.mention} for {what.lower()}! :flag:")
 
 
 def setup(bot):
