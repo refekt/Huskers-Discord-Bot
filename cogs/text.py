@@ -627,7 +627,7 @@ class TextCommands(commands.Cog):
     @commands.command()
     async def flag(self, ctx, who: discord.Member, *, what: str):
         emoji_flag = "<:flag:508388732777398287>"
-        await ctx.send(f"{emoji_flag} {who.mention} has been flagged by {ctx.message.author.mention} for {what.lower()}! {emoji_flag}")
+        await ctx.send(f"{emoji_flag} [ {who.mention} ] has been flagged by [ {ctx.message.author.mention} ] for [ {what.lower()} ]! {emoji_flag}")
 
 
 def setup(bot):
