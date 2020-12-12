@@ -143,4 +143,4 @@ FOOTER_SECRET = "These messages are anonymous and there is no way to verify mess
 FOOTER_BOT = "Created by Bot Frost"
 
 # Currency
-CURRENCY_NAME = "Verduzcoins"
+CURRENCY_NAME = "Husker Coins"
