@@ -368,7 +368,7 @@ class TextCommands(commands.Cog):
             for source in sources:
                 if type(source) == discord.Member:
                     if source.bot:
-                        continue
+                        source_data += check_message(auth=self.bot, bot_provided=True)
                     else:
                         try:
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
