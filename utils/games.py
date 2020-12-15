@@ -124,8 +124,9 @@ class HuskerDotComSchedule:
         self.game_date_time_dt = game_date_time_dt
 
 
-def HuskerSchedule(year=datetime.datetime.now().year):
-    r = requests.get(url=f"https://huskers.com/sports/football/schedule/{year}", headers=HEADERS)
+def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
+
+    r = requests.get(url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS)
 
     if not r.status_code == 200:
         raise ConnectionError("Unable to retrieve schedule from Huskers.com.")
@@ -136,8 +137,14 @@ def HuskerSchedule(year=datetime.datetime.now().year):
             icon = "https://huskers.com" + g.contents[1].contents[1].contents[1].attrs["data-src"]
             _date = g.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
             _time = g.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
+
+            if "(" in _time:
+                _time = "TBA"
+
+            if ":" not in _time:
+                _time = _time.replace(" ", ":00 ")
             date_time = f"{_date[0:6]} {year} {_time}"
-            if "Noon" in date_time: # I blame Iowa
+            if "Noon" in date_time:  # I blame Iowa
                 date_time = date_time.replace("Noon", "12:00 P.M.")
             conference = g.contents[1].contents[3].contents[1].contents[3]
             if len(conference.contents) > 1:
@@ -158,7 +165,8 @@ def HuskerSchedule(year=datetime.datetime.now().year):
     soup = BeautifulSoup(r.content, "html.parser")
 
     games_raw = soup.find_all(attrs={"class": "sidearm-schedule-games-container"})
-    games_raw = [game for game in games_raw[0].contents if not type(game) == NavigableString]
+
+    games_raw = [game for game in games_raw[0].contents if not type(game) == NavigableString and len(game.attrs)]
 
     games = []
     season_stats = SeasonStats()

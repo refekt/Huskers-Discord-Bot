@@ -3,6 +3,7 @@ import random
 import re
 import typing
 from datetime import datetime, timedelta
+import calendar
 
 import discord
 import markovify
@@ -114,7 +115,7 @@ class TeamStatsWinsipediaTeam:
                     nfl_picks[1].contents[5].contents[1].text
                 )
             except:
-                return "UNK", "UNK"
+                return ("UNK", "UNK")
 
         def weeks_ap_poll():
             ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})
@@ -209,10 +210,25 @@ class TextCommands(commands.Cog):
 
     @commands.command(aliases=["cd", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def countdown(self, ctx, *, team=None):
+    async def countdown(self, ctx, *, team: str = None):
         """ Countdown to the most current or specific Husker game """
         edit_msg = await ctx.send("Loading...")
         now_cst = datetime.now().astimezone(tz=TZ)
+
+        sports_names = ["mbb", "vb", "soccer", "baseball", "football"]
+
+        if team:
+            if " " in team:
+                sport = team.split()[0]
+                team = team.split()[1]
+            else:
+                if team.lower() in sports_names:
+                    sport = team.lower()
+                else:
+                    sport = "football"
+                    team = team
+        else:
+            sport = "football"
 
         def convert_seconds(n):
             secs = n % (24 * 3600)
@@ -251,25 +267,47 @@ class TextCommands(commands.Cog):
             else:
                 await edit_msg.edit(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent.name} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime('%B %d, %Y %I:%M %p %Z')} ] played at [ {location} ].")
 
-        games, stats = HuskerSchedule(year=now_cst.year)
+        def switch_names(names):
+            switcher = {
+                "mbb": "mens-basketball",
+                "vb": "volleyball",
+                "cbb": "baseball"
+            }
+
+            return switcher.get(names, "football")
+
+        sport = switch_names(sport)
+        games, stats = HuskerSchedule(sport=sport, year=now_cst.year)
 
         if not games:
             return await edit_msg.edit(content="No games found!")
 
-        if team is None:
+        if team is None or team in sports_names:
+
             for game in games:
                 if game.game_date_time > now_cst:
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
+                    if diff.days < 0:
+                        if calendar.isleap(now_cst.year):
+                            year_days = 366
+                        else:
+                            year_days = 365
+                        await send_countdown(diff.days + year_days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
         else:
-            team = str(team)
-
+            # team = str(team)
             for game in games:
                 if team.lower() == game.opponent.name.lower():
                     diff = game.game_date_time - now_cst
                     diff_cd = convert_seconds(diff.seconds)
+                    if diff.days < 0:
+                        if calendar.isleap(now_cst.year):
+                            year_days = 366
+                        else:
+                            year_days = 365
+                        await send_countdown(diff.days + year_days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
                     break
 
@@ -330,7 +368,7 @@ class TextCommands(commands.Cog):
             for source in sources:
                 if type(source) == discord.Member:
                     if source.bot:
-                        continue
+                        source_data += check_message(auth=self.bot, bot_provided=True)
                     else:
                         try:
                             messages = await ctx.message.channel.history(limit=CHAN_HIST_LIMIT).flatten()
@@ -359,96 +397,27 @@ class TextCommands(commands.Cog):
             sentence += random.choice(punctuation)
             await edit_msg.edit(content=sentence)
 
-    # @commands.group()
-    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    # async def weather(self, ctx):
-    #     """ Current weather for the next game day location """
-    #
-    #     if ctx.invoked_subcommand:
-    #         return
-    #
-    #     venues = Venue()
-    #     embed = None
-    #     edit_msg = None
-    #     _venue_name = None
-    #     _weather = None
-    #     _x = None
-    #     _y = None
-    #     _opponent = None
-    #
-    #     edit_msg = await ctx.send("Loading...")
-    #
-    #     season, season_stats = HuskerSchedule(year=datetime.now().year)
-    #     # season = reversed(season)
-    #
-    #     for game in season:
-    #         now_cst = datetime.now().astimezone(tz=TZ)
-    #
-    #         if now_cst < game.game_date_time.astimezone(tz=TZ):
-    #             if game.location == "Memorial Stadium":
-    #                 _venue_name = venues[207]["name"]
-    #                 _x = venues[207]["location"]["x"]
-    #                 _y = venues[207]["location"]["y"]
-    #             else:
-    #                 for venue in venues:
-    #                     if venue["city"].lower() == game.location[0].lower() and venue["state"].lower() == game.location[1].lower():
-    #                         _venue_name = venue['name']
-    #                         _x = venue['location']['x']
-    #                         _y = venue['location']['y']
-    #                         break
-    #
-    #             r = requests.get(url=f"https://api.weatherbit.io/v2.0/current?key={'39b7915267f04d5f88fa5fe6be6290e6'}&lang=en&units=I&lat={_x}&lon={_y}")
-    #             _weather = r.json()
-    #
-    #             embed = discord.Embed(
-    #                 title=f"Weather Forecast for the __[ {game.opponent} ]__ in __[ {_venue_name} / {_weather['data'][0]['city_name']}, {_weather['data'][0]['state_code']} ]__",
-    #                 color=0xFF0000)  # ,
-    #             # description=f"Nebraska's next opponent is __[ {game.opponent} ]__")
-    #
-    #             break
-    #
-    #     if embed is None:
-    #         await ctx.send("The season is over! No upcoming games found.")
-    #         return
-    #
-    #     embed.set_thumbnail(url=f"https://www.weatherbit.io/static/img/icons/{_weather['data'][0]['weather']['icon']}.png")
-    #     embed.set_footer(text="There is a daily 500 call limit to the API used for this command. Do not abuse it.")
-    #     embed.add_field(name="Temperature", value=f"{_weather['data'][0]['temp']} F", inline=False)
-    #     embed.add_field(name="Cloud Coverage", value=f"{_weather['data'][0]['clouds']}%", inline=False)
-    #     embed.add_field(name="Wind Speed", value=f"{_weather['data'][0]['wind_spd']} MPH / {_weather['data'][0]['wind_cdir']}", inline=False)
-    #     embed.add_field(name="Snow Chance", value=f"{_weather['data'][0]['snow']:.2f}%", inline=False)
-    #     embed.add_field(name="Precipitation Chance", value=f"{_weather['data'][0]['precip'] * 100:.2f}%", inline=False)
-    #
-    #     if edit_msg is not None:
-    #         await edit_msg.edit(content="", embed=embed)
-    #     else:
-    #         await ctx.send(embed=embed)
-
     @commands.command(name="24hours", aliases=["24", "24hrs", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def _24hours(self, ctx):
         """ You have 24 hours to cheer or moam about the game """
-        games = HuskerSchedule(year=datetime.now().year)
+        games, stats = HuskerSchedule(sport="football")
 
         for index, game in enumerate(reversed(games)):
-            game_dt_cst = game.game_date_time.astimezone(tz=TZ)
             now_cst = datetime.now().astimezone(tz=TZ)
-            _24hourspassed = game_dt_cst + timedelta(days=1)
-            _24hourspassed = _24hourspassed.astimezone(tz=TZ)
+            _24hourspassed = game.game_date_time + timedelta(days=1)
 
-            if now_cst > game_dt_cst:
+            if now_cst > game.game_date_time:
                 try:
                     i = len(games) - (index + 1) if index < len(games) else len(games) - index
-                    next_opponent = games[i + 1].opponent  # Should avoid out of bounds
 
                     if now_cst < _24hourspassed:
-                        await ctx.send(f"You have 24 hours to #moaming the __[ {game.opponent} ]__ game! That ends in __[ {_24hourspassed - now_cst} ]__!")
+                        await ctx.send(f"You have 24 hours to #moaming the __[ {game.opponent.name} ]__ game! That ends in __[ {_24hourspassed - game.game_date_time} ]__!")
                     else:
-                        await ctx.send(f"The 24 hours are up! No more #moaming. Time to focus on the __[ {next_opponent} ]__ game!")
+                        await ctx.send(f"24 hours have passed since the __[ {game.opponent.name} ]__ game! No more moaming. Time to focus on the __[ {games[i + 1].opponent.name} ]__ game!")
                     break
                 except IndexError:
-                    await ctx.send("The season is over! No upcoming games found.")
-                    return
+                    return await ctx.send("The season is over! No upcoming games found.")
 
     @commands.command(aliases=["8b", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
@@ -654,6 +623,11 @@ class TextCommands(commands.Cog):
             ],
             inline=False
         ))
+
+    @commands.command()
+    async def flag(self, ctx, who: discord.Member, *, what: str):
+        emoji_flag = "<:flag:508388732777398287>"
+        await ctx.send(f"{emoji_flag} [ {who.mention} ] has been flagged by [ {ctx.message.author.mention} ] for [ {what.lower()} ]! {emoji_flag}")
 
 
 def setup(bot):
