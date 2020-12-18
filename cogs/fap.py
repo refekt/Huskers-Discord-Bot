@@ -296,11 +296,13 @@ class fapCommands(commands.Cog):
         await ctx.send(embed=embed_msg)
 
     @fap.command()
-    async def stats(self, ctx, target_member: discord.Member = None):
+    async def stats(self, ctx, target_member: discord.Member = None, year: int = None):
         """Get the number of predictions and percent correct for a user for all-time and the current recruiting class. If no user is given, it will return the results
            for the user that calls it."""
         if target_member is None:
             target_member = ctx.author
+        if year is None:
+            year = CURRENT_CLASS
         embed_title = f"FAP Stats for {target_member.display_name}"
         get_stats_query = f'''SELECT * FROM fap_predictions WHERE user_id = {target_member.id}'''
         faps = process_MySQL(query=get_stats_query, fetch='all')
@@ -310,13 +312,13 @@ class fapCommands(commands.Cog):
 
         faps_df = pd.DataFrame(faps)
         overall_pct = faps_df['correct'].mean() * 100
-        current_pct = faps_df.loc[faps_df['recruit_class'] == CURRENT_CLASS, 'correct'].mean() * 100
+        current_pct = faps_df.loc[faps_df['recruit_class'] == year, 'correct'].mean() * 100
         overall_count = len(faps_df.index)
-        current_count = len(faps_df[faps_df['recruit_class'] == CURRENT_CLASS].index)
+        current_count = len(faps_df[faps_df['recruit_class'] == year].index)
         overall_correct_count = len(faps_df[faps_df['correct'] == 1].index)
-        current_correct_count = len(faps_df[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS)])
+        current_correct_count = len(faps_df[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year)])
         overall_wrong_count = len(faps_df[faps_df['correct'] == 0].index)
-        current_wrong_count = len(faps_df[(faps_df['correct'] == 0) & (faps_df['recruit_class'] == CURRENT_CLASS)])
+        current_wrong_count = len(faps_df[(faps_df['correct'] == 0) & (faps_df['recruit_class'] == year)])
 
         avg_days_overall_str = ''
         avg_days_current_str = ''
@@ -325,10 +327,10 @@ class fapCommands(commands.Cog):
             avg_days_overall = float(sum(timedeltas_correct_overall) / len(timedeltas_correct_overall)) / 86400000000000
             if avg_days_overall > 0:
                 avg_days_overall_str = f"\nAvg Days Correct: {avg_days_overall:.1f}"
-        if ((faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'decision_date'].notna() *
-             faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'prediction_date'].notna()).sum() > 0):
-            timedeltas_correct_current = (faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'decision_date'] -
-                                          faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'prediction_date']).values
+        if ((faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'decision_date'].notna() *
+             faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'prediction_date'].notna()).sum() > 0):
+            timedeltas_correct_current = (faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'decision_date'] -
+                                          faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'prediction_date']).values
             avg_days_current = float(sum(timedeltas_correct_current) / len(timedeltas_correct_current)) / 86400000000000
             if avg_days_current > 0:
                 avg_days_current_str = f"\nAvg Days Correct: {avg_days_current:.1f}"
@@ -352,11 +354,11 @@ class fapCommands(commands.Cog):
                                 inline=False)
         if np.isnan(current_pct):
             current_pct = "N/A"
-            embed_msg.add_field(name=f'**{CURRENT_CLASS} Class**',
+            embed_msg.add_field(name=f'**{year} Class**',
                                 value=f'Predictions: {current_count}\nPercent Correct: {current_pct}% ({current_ratio_str})' + avg_days_current_str,
                                 inline=False)
         else:
-            embed_msg.add_field(name=f'**{CURRENT_CLASS} Class**',
+            embed_msg.add_field(name=f'**{year} Class**',
                                 value=f'Predictions: {current_count}\nPercent Correct: {current_pct:.0f}% ({current_ratio_str})' + avg_days_current_str,
                                 inline=False)
 
