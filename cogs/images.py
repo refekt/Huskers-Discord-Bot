@@ -265,7 +265,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def redname(self, ctx):
         """ Hi Redname """
         await ctx.send(embed=build_image_embed(title="Hi Redname", image="https://i.imgur.com/XFPqoT5.gif"))
-        
+
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def bigmacsack(self, ctx):
@@ -277,6 +277,16 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def thatsracist(self, ctx):
         """ Thats Racist """
         await ctx.send(embed=build_image_embed(title="ThatsRacist", image="https://user-images.githubusercontent.com/38467524/96499696-5e421600-1213-11eb-8ebc-fa9cf02a0610.gif"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def suh(self, ctx):
+        """ SUUUUUUUUUUUUUUUUUUUUUUUUUUUUHHH """
+        await ctx.send(embed=build_image_embed(title="SSUUUUUUHHHH",
+                                               image=random.choice([
+                                                   "https://i.imgur.com/U3tKWUJ.gif",
+                                                   "https://i.imgur.com/IGuc8kb.gif"
+                                               ])))
 
 
 def setup(bot):
