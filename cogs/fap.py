@@ -263,12 +263,17 @@ class fapCommands(commands.Cog):
             faps_user = faps_nn[faps_nn['user_id'] == u].copy()
             leaderboard.loc[leaderboard['user_id'] == u, 'correct_pct'] = faps_user['correct'].mean() * 100
             faps_user['correct'] = faps_user['correct'].replace(0.0, -1.0)
-            faps_user['points'] = faps_user['correct'] * faps_user['confidence']
+            ## does -1*confidence for incorrect, confidence*(days_correct/10) for correct less than 10 days correct, and confidence+(days_correct-10)*0.1 for correct over 10 days correct
+            faps_user.loc[faps_user['correct'] == 1, 'time_delta'] = (faps_user.loc[faps_user['correct'] == 1, 'decision_date'] - faps_user.loc[faps_user['correct'] == 1, 'prediction_date'])
+            faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000, 'points'] = (faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000, 'correct'] 
+                                                                                    * faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000, 'confidence'] 
+                                                                                    * (faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000 ,'time_delta'].dt.total_seconds() / 864000))
+            faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000,'points'] = (faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000, 'correct'] 
+                                                                                    * faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000, 'confidence'] 
+                                                                                    + (((faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000,'time_delta'].dt.total_seconds() / 86400)-10)*0.1))
+            faps_user.loc[faps_user['correct'] == -1.0, 'points'] = faps_user.loc[faps_user['correct'] == -1.0, 'confidence'] * -1
 
-            pred_time_deltas = (faps_user.loc[faps_user['correct'] == 1, 'decision_date'] - faps_user.loc[faps_user['correct'] == 1, 'prediction_date']).values
-            pred_time_delta_sum = float(sum(pred_time_deltas))
-            pred_time_bonus = (pred_time_delta_sum / 86400000000000) * 0.1
-            leaderboard.loc[leaderboard['user_id'] == u, 'points'] = faps_user['points'].sum() + pred_time_bonus
+            leaderboard.loc[leaderboard['user_id'] == u, 'points'] = faps_user['points'].sum()
         leaderboard = leaderboard.sort_values('points', ascending=False)
 
         embed_string = 'User: Points (Pct Correct)'
