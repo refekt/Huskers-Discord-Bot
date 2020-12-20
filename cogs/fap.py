@@ -388,7 +388,7 @@ class fapCommands(commands.Cog):
 
         correct_amount = 0
         incorrect_amount = 0
-        ##make new embed after description reaches 1978 chars or so
+        #make new embed after current embed has 25 fields, then iterate over each embed and send it to the channel
         for i, p in enumerate(user_preds):
             field_title = ''
             field_value = ''
@@ -416,6 +416,7 @@ class fapCommands(commands.Cog):
         embed_list.append(embed)
         del embed
         
+        #send multiple dms if multiple embeds if in DM, otherwise just send one and inform the user in the footer that they can DM to get all the results
         embed_footer_text = '✅ = Correct, ❌ = Wrong, ⌛ = TBD'
         if not isinstance(ctx.channel, discord.DMChannel) and len(embed_list) > 1:
             embed_list = [embed_list[0]]
