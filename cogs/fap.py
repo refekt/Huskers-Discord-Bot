@@ -373,7 +373,7 @@ class fapCommands(commands.Cog):
             year = CURRENT_CLASS
         get_user_preds_query = '''SELECT * FROM fap_predictions 
                                   WHERE user_id = %s AND recruit_class = %s
-                                  ORDER BY prediction_date ASC'''
+                                  ORDER BY prediction_date DESC'''
         user_preds = process_MySQL(query=get_user_preds_query, values=(target_member.id, year,), fetch='all')
         if user_preds is None:
             if target_member.id == ctx.author.id:
@@ -407,6 +407,13 @@ class fapCommands(commands.Cog):
             if isinstance(pred_date, str):
                 pred_date = datetime.datetime.strptime(p['prediction_date'], DATETIME_FORMAT)
             field_value = f"{p['team']} ({p['confidence']}) - {pred_date.month}/{pred_date.day}/{pred_date.year} \[[247 Profile]({p['recruit_profile']})\]"
+            
+            commit_date = p['decision_date']
+            if p['correct'] == 1:
+                days_correct = (commit_date - pred_date).total_seconds() / 86400
+                #spaces_added = int((len(f"{p['team']} ({p['confidence']}) ")/2)) * '\u2800'
+                field_value = f"--- {days_correct:.1f} Days Correct ---\n" + field_value
+            
             embed.add_field(name=field_title, value=field_value, inline=False)
             
             if len(embed.fields) == 25:
