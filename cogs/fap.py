@@ -383,7 +383,7 @@ class fapCommands(commands.Cog):
             return
 
         embed_title = f"{target_member.display_name}'s {year} Predictions"
-        embed = discord.Embed(title=embed_title)
+        embed = discord.Embed(title=embed_title, color=0xD00000)
         embed_list = []
 
         correct_amount = 0
@@ -418,7 +418,7 @@ class fapCommands(commands.Cog):
             
             if len(embed.fields) == 25:
                 embed_list.append(embed)
-                embed = discord.Embed(title=embed_title)
+                embed = discord.Embed(title=embed_title, color=0xD00000)
             
         embed_list.append(embed)
         del embed
