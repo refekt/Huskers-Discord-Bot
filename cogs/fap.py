@@ -384,9 +384,11 @@ class fapCommands(commands.Cog):
 
         embed_title = f"{target_member.display_name}'s {year} Predictions"
         embed = discord.Embed(title=embed_title)
+        embed_list = []
 
         correct_amount = 0
         incorrect_amount = 0
+        #make new embed after current embed has 25 fields, then iterate over each embed and send it to the channel
         for i, p in enumerate(user_preds):
             field_title = ''
             field_value = ''
@@ -406,15 +408,30 @@ class fapCommands(commands.Cog):
                 pred_date = datetime.datetime.strptime(p['prediction_date'], DATETIME_FORMAT)
             field_value = f"{p['team']} ({p['confidence']}) - {pred_date.month}/{pred_date.day}/{pred_date.year} \[[247 Profile]({p['recruit_profile']})\]"
             embed.add_field(name=field_title, value=field_value, inline=False)
-
-        embed_description = ''
-        if correct_amount + incorrect_amount > 0:
-            embed_description = f"""Total {year} Predictions: {len(user_preds)}\nPercent Correct: {(correct_amount / (correct_amount + incorrect_amount)) * 100:.0f}% ({correct_amount}/{correct_amount + incorrect_amount})\n\n"""
-        else:
-            embed_description = f"""Total {year} Predictions: {len(user_preds)}\n\n"""
-        embed.description = embed_description
-        embed.set_footer(text='✅ = Correct, ❌ = Wrong, ⌛ = TBD')
-        await ctx.send(embed=embed)
+            
+            if len(embed.fields) == 25:
+                embed_list.append(embed)
+                embed = discord.Embed(title=embed_title)
+            
+        embed_list.append(embed)
+        del embed
+        
+        #send multiple dms if multiple embeds if in DM, otherwise just send one and inform the user in the footer that they can DM to get all the results
+        embed_footer_text = '✅ = Correct, ❌ = Wrong, ⌛ = TBD'
+        if not isinstance(ctx.channel, discord.DMChannel) and len(embed_list) > 1:
+            embed_list = [embed_list[0]]
+            embed_footer_text += f'\nOnly showing first 25 results. To view all {len(user_preds)} predictions, DM the bot instead.'
+        for i, embed in enumerate(embed_list):
+            if len(embed_list) > 1:
+                embed.title += f" ({i+1}/{len(embed_list)})"
+            embed_description = ''
+            if correct_amount + incorrect_amount > 0:
+                embed_description = f"""Total {year} Predictions: {len(user_preds)}\nPercent Correct: {(correct_amount / (correct_amount + incorrect_amount)) * 100:.0f}% ({correct_amount}/{correct_amount + incorrect_amount})\n\n"""
+            else:
+                embed_description = f"""Total {year} Predictions: {len(user_preds)}\n\n"""
+            embed.description = embed_description
+            embed.set_footer(text=embed_footer_text)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
