@@ -288,6 +288,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
                                                    "https://i.imgur.com/IGuc8kb.gif"
                                                ])))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    async def ctb(self, ctx):
+        """ CTB Denial """
+        await ctx.send(embed=build_image_embed(title="Cam Juice Baybee", image="https://i.imgur.com/i2vnzwl.gif"))
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
