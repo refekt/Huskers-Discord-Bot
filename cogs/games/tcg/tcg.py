@@ -3,6 +3,25 @@ import discord
 
 from utils.mysql import process_MySQL
 
+CREATE_USER_TABLE_SQL = '''CREATE TABLE IF NOT EXISTS tcg_users
+                           (
+                           id INT NOT NULL AUTO_INCREMENT,
+                           discord_id BIGINT NOT NULL,
+                           opted_in DATETIME,
+                           tokens INT,
+                           PRIMARY KEY ( id )
+                           )
+                        '''
+CHECK_PLAYER_EXISTS_SQL = ''' SELECT * FROM tcg_users
+                              WHERE discord_id=%s
+                          '''
+OPT_IN_SQL = '''INSERT INTO tcg_users (discord_id, opted_in, tokens)
+                VALUES (%s, NOW(), 0)
+             '''
+CHECK_DAILY_MESSAGE_SQL = '''SELECT * FROM stats
+                             WHERE author = %s
+                             AND created_at >= TIMESTAMP(CURDATE())
+                          '''
 
 class Player:
     def __init__(self, user: discord.Member):
@@ -30,7 +49,17 @@ class TCGCommands(commands.Cog):
             return
         else:
             raise AttributeError(f"A subcommand must be used. Review $help.")
-
+    
+    @tcg.command()
+    async def opt_in(self, ctx):
+        user_id = ctx.author.id
+        create_table_sql = process_MySQL(query=CREATE_USER_TABLE_SQL)
+        check_exists_response = process_MySQL(query=CHECK_PLAYER_EXISTS_SQL, values=(user_id,), fetch='all')
+        if check_exists_response is not None:
+            await ctx.send("You've already opted in!")
+        else:
+            process_MySQL(query=OPT_IN_SQL, values=(user_id,))
+            
     @tcg.group()
     async def shop(self, ctx):
         embed_title = f"Buy a Booster Pack with the command `{self.bot.command_prefix}buy [id]`"
@@ -53,6 +82,13 @@ class TCGCommands(commands.Cog):
         player = Player(ctx.author)
         await ctx.send("You called the sell card command")
 
-
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        check_daily_message_response = process_MySQL(query=CHECK_DAILY_MESSAGE_SQL, values=(message.author.name+'#'+message.author.discriminator,), fetch='one')
+        if check_daily_message_response is None:
+            pass
+        else:
+            pass
+    
 def setup(bot):
     bot.add_cog(TCGCommands(bot))
