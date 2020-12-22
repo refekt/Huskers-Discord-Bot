@@ -22,6 +22,9 @@ CHECK_DAILY_MESSAGE_SQL = '''SELECT * FROM stats
                              WHERE author = %s
                              AND created_at >= TIMESTAMP(CURDATE())
                           '''
+USER_INFO_SQL = '''SELECT * FROM tcg_users
+                     WHERE discord_id = %s
+                  '''
 
 class Player:
     def __init__(self, user: discord.Member):
@@ -69,13 +72,19 @@ class TCGCommands(commands.Cog):
         await ctx.send(embed=embed)
 
     @tcg.command()
-    async def buy(self, ctx, pack_id: str = None):
+    async def buy(self, ctx, pack_name: str = None):
         player = Player(ctx.author)
-        if pack_id is None:
-            await ctx.send(f"You need to include the ID of the pack you'd like to buy, **{ctx.author.display_name}**. You can call `{self.bot.command_prefix}tcg shop` to get the "
+        if pack_name is None:
+            await ctx.send(f"You need to include the name of the pack you'd like to buy, **{ctx.author.display_name}**. You can call `{self.bot.command_prefix}tcg shop` to get the "
                            "list of available packs and their IDs.")
         else:
-            await ctx.send(f"1 `standing name` bought for 69 Verduzcoins")
+            #await ctx.send(f"1 `standing name` bought for 69 Verduzcoins")
+            user_info = process_MySQL(query=USER_INFO_SQL, values=(ctx.author.id,), fetch='one')
+            print(user_info)
+            if user_info['tokens']==0:
+                await ctx.send("Sorry, you don't have any tokens to spend on a pack at the moment")
+            elif user_info['tokens']>0:
+                await ctx.send(f"Purchasing a {pack_name} pack... (Not really, just a test)")
 
     @tcg.command()
     async def sell(self, ctx, card_id: str = None):
