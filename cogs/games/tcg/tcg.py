@@ -97,16 +97,22 @@ class TCGCommands(commands.Cog):
                 if pack_cards is None:
                     await ctx.send(f"There is no pack named {pack_name}, pick something real")
                 else:
-                    await ctx.send(f"Purchasing a {pack_name} pack... (Not really, just a test)")
+                    sent_message = await ctx.send(f"Purchasing a {pack_name} pack...")
                     process_MySQL(query=REDUCE_USER_TOKEN_SQL, values=(ctx.author.id,))                
                     pack_cards = pd.DataFrame(pack_cards)
                     choices = (pack_cards['id'].sample(n=2, weights=pack_cards['weight'])).tolist()
                     ADD_CARD_ADDON = '('
+                    cards_received_message = 'You received the following cards:\n'
                     for i, c in enumerate(choices):
+                        card_name = pack_cards.loc[pack_cards['id']==c,'name'].iloc[0]
+                        card_position = pack_cards.loc[pack_cards['id']==c,'position'].iloc[0]
                         if i+1 < len(choices):
                             ADD_CARD_ADDON += f'{c}, '
+                            cards_received_message += f"{card_position} {card_name}\n"
                         elif i+1 == len(choices):
                             ADD_CARD_ADDON += f'{c}) '
+                            cards_received_message += f"{card_position} {card_name}"
+                        
                     ADD_CARDS_INVENTORY_SQL= f'''INSERT INTO tcg_inventory (card_id, user_id, count)
                                                 SELECT * 
                                                 FROM (
@@ -125,8 +131,8 @@ class TCGCommands(commands.Cog):
                                                 AND card_id IN {ADD_CARD_ADDON};'''.replace('\n','')
                     process_MySQL(ADD_CARDS_INVENTORY_SQL)
                     process_MySQL(UPDATE_CARD_COUNT_SQL)
-                
-                
+                    #await ctx.send(cards_received_message)
+                    await sent_message.edit(content=cards_received_message)
 
     @tcg.command()
     async def sell(self, ctx, card_id: str = None):
