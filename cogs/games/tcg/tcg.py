@@ -88,18 +88,43 @@ class TCGCommands(commands.Cog):
             await ctx.send(f"You need to include the name of the pack you'd like to buy, **{ctx.author.display_name}**. You can call `{self.bot.command_prefix}tcg shop` to get the "
                            "list of available packs and their IDs.")
         else:
-            #await ctx.send(f"1 `standing name` bought for 69 Verduzcoins")
             user_info = process_MySQL(query=USER_INFO_SQL, values=(ctx.author.id,), fetch='one')
             print(user_info)
             if user_info['tokens']==0:
                 await ctx.send("Sorry, you don't have any tokens to spend on a pack at the moment")
             elif user_info['tokens']>0:
-                await ctx.send(f"Purchasing a {pack_name} pack... (Not really, just a test)")
-                process_MySQL(query=REDUCE_USER_TOKEN_SQL, values=(ctx.author.id,))
                 pack_cards = process_MySQL(query=PACK_CARDS_SQL,values=(pack_name,),fetch='all')
-                pack_cards = pd.DataFrame(pack_cards)
-                choices = pack_cards['id'].sample(n=2, weights=pack_cards['weight'])
-                print(choices)
+                if pack_cards is None:
+                    await ctx.send(f"There is no pack named {pack_name}, pick something real")
+                else:
+                    await ctx.send(f"Purchasing a {pack_name} pack... (Not really, just a test)")
+                    process_MySQL(query=REDUCE_USER_TOKEN_SQL, values=(ctx.author.id,))                
+                    pack_cards = pd.DataFrame(pack_cards)
+                    choices = (pack_cards['id'].sample(n=2, weights=pack_cards['weight'])).tolist()
+                    ADD_CARD_ADDON = '('
+                    for i, c in enumerate(choices):
+                        if i+1 < len(choices):
+                            ADD_CARD_ADDON += f'{c}, '
+                        elif i+1 == len(choices):
+                            ADD_CARD_ADDON += f'{c}) '
+                    ADD_CARDS_INVENTORY_SQL= f'''INSERT INTO tcg_inventory (card_id, user_id, count)
+                                                SELECT * 
+                                                FROM (
+                                                        SELECT id as 'card_id', (SELECT id FROM tcg_users WHERE discord_id={ctx.author.id}) as 'user_id', 0 
+                                                        FROM tcg_card
+                                                        WHERE id IN {ADD_CARD_ADDON}
+                                                        ) AS tmp
+                                                WHERE tmp.card_id NOT IN (
+                                                    SELECT card_id FROM tcg_inventory 
+                                                    WHERE user_id=(SELECT id FROM tcg_users WHERE discord_id={ctx.author.id})
+                                                    AND card_id IN {ADD_CARD_ADDON}
+                                                );'''.replace('\n','')
+                    UPDATE_CARD_COUNT_SQL = f'''UPDATE tcg_inventory
+                                                SET count = count + 1
+                                                WHERE user_id=(SELECT id FROM tcg_users WHERE discord_id={ctx.author.id})
+                                                AND card_id IN {ADD_CARD_ADDON};'''.replace('\n','')
+                    process_MySQL(ADD_CARDS_INVENTORY_SQL)
+                    process_MySQL(UPDATE_CARD_COUNT_SQL)
                 
                 
 
