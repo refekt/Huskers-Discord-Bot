@@ -34,7 +34,11 @@ PACK_CARDS_SQL = '''SELECT c.* FROM tcg_card as c
                     JOIN tcg_card_to_pack ctp on c.id=ctp.card_id
                     JOIN tcg_pack p on ctp.pack_id=p.id
                     WHERE p.name=%s
+                    AND p.enabled = 1
                  '''
+AVAILABLE_PACKS_SQL = '''SELECT * from tcg_pack
+                         WHERE enabled=1
+                      '''
 
 class Player:
     def __init__(self, user: discord.Member):
@@ -75,10 +79,20 @@ class TCGCommands(commands.Cog):
             
     @tcg.group()
     async def shop(self, ctx):
-        embed_title = f"Buy a Booster Pack with the command `{self.bot.command_prefix}buy [id]`"
-        embed_description = "The available booster packs are below:"
+        available_packs = process_MySQL(query=AVAILABLE_PACKS_SQL, fetch='all')
+        if available_packs is None:
+            await ctx.send("There are currently no packs available!")
+            return
+        embed_title = f"Buy a Booster Pack with the command `{self.bot.command_prefix}buy [name]`"
+        embed_description = "The available booster packs are below:\n\n**name: description**\n"
+        shop_string = ''
+        for i, p in enumerate(available_packs):
+            if i+1<=len(available_packs):
+                shop_string += f"{p['name']}: {p['description']}\n"
+            elif i+1==len(available_packs):
+                shop_string += f"{p['name']}: {p['description']}"
+        embed_description += shop_string
         embed = discord.Embed(title=embed_title, description=embed_description)
-        embed.add_field(name="Shop", value="Pack ID - Pack Name\ni69420 - 90's Huskers")
         await ctx.send(embed=embed)
 
     @tcg.command()
