@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord
+import pandas as pd
 
 from utils.mysql import process_MySQL
 
@@ -23,8 +24,17 @@ CHECK_DAILY_MESSAGE_SQL = '''SELECT * FROM stats
                              AND created_at >= TIMESTAMP(CURDATE())
                           '''
 USER_INFO_SQL = '''SELECT * FROM tcg_users
-                     WHERE discord_id = %s
-                  '''
+                   WHERE discord_id = %s
+                '''
+REDUCE_USER_TOKEN_SQL = '''UPDATE tcg_users
+                           SET tokens = tokens - 1
+                           WHERE discord_id = %s
+                        '''
+PACK_CARDS_SQL = '''SELECT c.* FROM tcg_card as c
+                    JOIN tcg_card_to_pack ctp on c.id=ctp.card_id
+                    JOIN tcg_pack p on ctp.pack_id=p.id
+                    WHERE p.name=%s
+                 '''
 
 class Player:
     def __init__(self, user: discord.Member):
@@ -85,6 +95,13 @@ class TCGCommands(commands.Cog):
                 await ctx.send("Sorry, you don't have any tokens to spend on a pack at the moment")
             elif user_info['tokens']>0:
                 await ctx.send(f"Purchasing a {pack_name} pack... (Not really, just a test)")
+                process_MySQL(query=REDUCE_USER_TOKEN_SQL, values=(ctx.author.id,))
+                pack_cards = process_MySQL(query=PACK_CARDS_SQL,values=(pack_name,),fetch='all')
+                pack_cards = pd.DataFrame(pack_cards)
+                choices = pack_cards['id'].sample(n=2, weights=pack_cards['weight'])
+                print(choices)
+                
+                
 
     @tcg.command()
     async def sell(self, ctx, card_id: str = None):
