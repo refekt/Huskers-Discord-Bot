@@ -116,6 +116,23 @@ async def makeMD5():
 
     print(mammals)
 
+#Takes a string and delimeter and returns a list of values between the delimiters
+def seperArgs(arg,delimeter):
+    finalArgs = []
+    toAppend = ''
+    index = 0
+    for i in arg:
+        if(i == delimeter):
+            finalArgs.append(toAppend.strip())
+            toAppend = ''
+        else:
+            toAppend += i
+        if(index == len(arg) - 1):
+            finalArgs.append(toAppend.strip())
+            toAppend = ''
+        index += 1
+    return finalArgs
+
 # async def send_message(when, who: typing.Union[discord.Member, discord.TextChannel], what, extra=None):
 #     print("send message, sleeping")
 #     await asyncio.sleep(when)
