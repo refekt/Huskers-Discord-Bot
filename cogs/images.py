@@ -298,7 +298,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
     async def hypejail(self, ctx):
         """ Hyping shall be punished swiftly and with prejudice """
-        await ctx.send(embed=build_image_embed(title="Go To Hype Jail Bonk", image="https://i.imgur.com/t5TQrx9.gif"))
+        await ctx.send("https://i.imgur.com/t5TQrx9.gif")
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
