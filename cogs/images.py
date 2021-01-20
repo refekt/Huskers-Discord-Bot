@@ -299,6 +299,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def hypejail(self, ctx):
         """ Hyping shall be punished swiftly and with prejudice """
         await ctx.send("https://i.imgur.com/t5TQrx9.gif")
+        
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    async def nohype(self, ctx):
+        """ REEEEEEE """
+        await ctx.send("https://i.imgur.com/6RUysy6.gif")
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
