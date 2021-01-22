@@ -601,7 +601,8 @@ extensions = (
     "cogs.message_history",
     "cogs.deepfry",
     "cogs.fap",
-    "cogs.games.blackjack"
+    "cogs.games.blackjack",
+    "cogs.info"
 )
 
 for extension in extensions:

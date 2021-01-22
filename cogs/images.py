@@ -265,7 +265,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     async def redname(self, ctx):
         """ Hi Redname """
         await ctx.send(embed=build_image_embed(title="Hi Redname", image="https://i.imgur.com/XFPqoT5.gif"))
-        
+
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def bigmacsack(self, ctx):
@@ -278,6 +278,33 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ Thats Racist """
         await ctx.send(embed=build_image_embed(title="ThatsRacist", image="https://user-images.githubusercontent.com/38467524/96499696-5e421600-1213-11eb-8ebc-fa9cf02a0610.gif"))
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def suh(self, ctx):
+        """ SUUUUUUUUUUUUUUUUUUUUUUUUUUUUHHH """
+        await ctx.send(embed=build_image_embed(title="SSUUUUUUHHHH",
+                                               image=random.choice([
+                                                   "https://i.imgur.com/U3tKWUJ.gif",
+                                                   "https://i.imgur.com/IGuc8kb.gif"
+                                               ])))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    async def ctb(self, ctx):
+        """ CTB Denial """
+        await ctx.send(embed=build_image_embed(title="Cam Juice Baybee", image="https://i.imgur.com/i2vnzwl.gif"))
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    async def hypejail(self, ctx):
+        """ Hyping shall be punished swiftly and with prejudice """
+        await ctx.send("https://i.imgur.com/t5TQrx9.gif")
+        
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    async def nohype(self, ctx):
+        """ REEEEEEE """
+        await ctx.send("https://i.imgur.com/6RUysy6.gif")
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))

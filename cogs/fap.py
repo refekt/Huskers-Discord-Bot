@@ -263,12 +263,17 @@ class fapCommands(commands.Cog):
             faps_user = faps_nn[faps_nn['user_id'] == u].copy()
             leaderboard.loc[leaderboard['user_id'] == u, 'correct_pct'] = faps_user['correct'].mean() * 100
             faps_user['correct'] = faps_user['correct'].replace(0.0, -1.0)
-            faps_user['points'] = faps_user['correct'] * faps_user['confidence']
+            ## does -1*confidence for incorrect, confidence*(days_correct/10) for correct less than 10 days correct, and confidence+(days_correct-10)*0.1 for correct over 10 days correct
+            faps_user.loc[faps_user['correct'] == 1, 'time_delta'] = (faps_user.loc[faps_user['correct'] == 1, 'decision_date'] - faps_user.loc[faps_user['correct'] == 1, 'prediction_date'])
+            faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000, 'points'] = (faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000, 'correct'] 
+                                                                                    * faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000, 'confidence'] 
+                                                                                    * (faps_user.loc[faps_user['time_delta'].dt.total_seconds() <= 864000 ,'time_delta'].dt.total_seconds() / 864000))
+            faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000,'points'] = (faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000, 'correct'] 
+                                                                                    * faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000, 'confidence'] 
+                                                                                    + (((faps_user.loc[faps_user['time_delta'].dt.total_seconds() > 864000,'time_delta'].dt.total_seconds() / 86400)-10)*0.1))
+            faps_user.loc[faps_user['correct'] == -1.0, 'points'] = faps_user.loc[faps_user['correct'] == -1.0, 'confidence'] * -1
 
-            pred_time_deltas = (faps_user.loc[faps_user['correct'] == 1, 'decision_date'] - faps_user.loc[faps_user['correct'] == 1, 'prediction_date']).values
-            pred_time_delta_sum = float(sum(pred_time_deltas))
-            pred_time_bonus = (pred_time_delta_sum / 86400000000000) * 0.1
-            leaderboard.loc[leaderboard['user_id'] == u, 'points'] = faps_user['points'].sum() + pred_time_bonus
+            leaderboard.loc[leaderboard['user_id'] == u, 'points'] = faps_user['points'].sum()
         leaderboard = leaderboard.sort_values('points', ascending=False)
 
         embed_string = 'User: Points (Pct Correct)'
@@ -291,11 +296,13 @@ class fapCommands(commands.Cog):
         await ctx.send(embed=embed_msg)
 
     @fap.command()
-    async def stats(self, ctx, target_member: discord.Member = None):
+    async def stats(self, ctx, target_member: discord.Member = None, year: int = None):
         """Get the number of predictions and percent correct for a user for all-time and the current recruiting class. If no user is given, it will return the results
            for the user that calls it."""
         if target_member is None:
             target_member = ctx.author
+        if year is None:
+            year = CURRENT_CLASS
         embed_title = f"FAP Stats for {target_member.display_name}"
         get_stats_query = f'''SELECT * FROM fap_predictions WHERE user_id = {target_member.id}'''
         faps = process_MySQL(query=get_stats_query, fetch='all')
@@ -305,13 +312,13 @@ class fapCommands(commands.Cog):
 
         faps_df = pd.DataFrame(faps)
         overall_pct = faps_df['correct'].mean() * 100
-        current_pct = faps_df.loc[faps_df['recruit_class'] == CURRENT_CLASS, 'correct'].mean() * 100
+        current_pct = faps_df.loc[faps_df['recruit_class'] == year, 'correct'].mean() * 100
         overall_count = len(faps_df.index)
-        current_count = len(faps_df[faps_df['recruit_class'] == CURRENT_CLASS].index)
+        current_count = len(faps_df[faps_df['recruit_class'] == year].index)
         overall_correct_count = len(faps_df[faps_df['correct'] == 1].index)
-        current_correct_count = len(faps_df[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS)])
+        current_correct_count = len(faps_df[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year)])
         overall_wrong_count = len(faps_df[faps_df['correct'] == 0].index)
-        current_wrong_count = len(faps_df[(faps_df['correct'] == 0) & (faps_df['recruit_class'] == CURRENT_CLASS)])
+        current_wrong_count = len(faps_df[(faps_df['correct'] == 0) & (faps_df['recruit_class'] == year)])
 
         avg_days_overall_str = ''
         avg_days_current_str = ''
@@ -320,10 +327,10 @@ class fapCommands(commands.Cog):
             avg_days_overall = float(sum(timedeltas_correct_overall) / len(timedeltas_correct_overall)) / 86400000000000
             if avg_days_overall > 0:
                 avg_days_overall_str = f"\nAvg Days Correct: {avg_days_overall:.1f}"
-        if ((faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'decision_date'].notna() *
-             faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'prediction_date'].notna()).sum() > 0):
-            timedeltas_correct_current = (faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'decision_date'] -
-                                          faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == CURRENT_CLASS), 'prediction_date']).values
+        if ((faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'decision_date'].notna() *
+             faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'prediction_date'].notna()).sum() > 0):
+            timedeltas_correct_current = (faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'decision_date'] -
+                                          faps_df.loc[(faps_df['correct'] == 1) & (faps_df['recruit_class'] == year), 'prediction_date']).values
             avg_days_current = float(sum(timedeltas_correct_current) / len(timedeltas_correct_current)) / 86400000000000
             if avg_days_current > 0:
                 avg_days_current_str = f"\nAvg Days Correct: {avg_days_current:.1f}"
@@ -347,11 +354,11 @@ class fapCommands(commands.Cog):
                                 inline=False)
         if np.isnan(current_pct):
             current_pct = "N/A"
-            embed_msg.add_field(name=f'**{CURRENT_CLASS} Class**',
+            embed_msg.add_field(name=f'**{year} Class**',
                                 value=f'Predictions: {current_count}\nPercent Correct: {current_pct}% ({current_ratio_str})' + avg_days_current_str,
                                 inline=False)
         else:
-            embed_msg.add_field(name=f'**{CURRENT_CLASS} Class**',
+            embed_msg.add_field(name=f'**{year} Class**',
                                 value=f'Predictions: {current_count}\nPercent Correct: {current_pct:.0f}% ({current_ratio_str})' + avg_days_current_str,
                                 inline=False)
 
@@ -366,7 +373,7 @@ class fapCommands(commands.Cog):
             year = CURRENT_CLASS
         get_user_preds_query = '''SELECT * FROM fap_predictions 
                                   WHERE user_id = %s AND recruit_class = %s
-                                  ORDER BY prediction_date ASC'''
+                                  ORDER BY prediction_date DESC'''
         user_preds = process_MySQL(query=get_user_preds_query, values=(target_member.id, year,), fetch='all')
         if user_preds is None:
             if target_member.id == ctx.author.id:
@@ -376,10 +383,12 @@ class fapCommands(commands.Cog):
             return
 
         embed_title = f"{target_member.display_name}'s {year} Predictions"
-        embed = discord.Embed(title=embed_title)
+        embed = discord.Embed(title=embed_title, color=0xD00000)
+        embed_list = []
 
         correct_amount = 0
         incorrect_amount = 0
+        #make new embed after current embed has 25 fields, then iterate over each embed and send it to the channel
         for i, p in enumerate(user_preds):
             field_title = ''
             field_value = ''
@@ -398,16 +407,38 @@ class fapCommands(commands.Cog):
             if isinstance(pred_date, str):
                 pred_date = datetime.datetime.strptime(p['prediction_date'], DATETIME_FORMAT)
             field_value = f"{p['team']} ({p['confidence']}) - {pred_date.month}/{pred_date.day}/{pred_date.year} \[[247 Profile]({p['recruit_profile']})\]"
+            
+            commit_date = p['decision_date']
+            if p['correct'] == 1:
+                days_correct = (commit_date - pred_date).total_seconds() / 86400
+                #spaces_added = int((len(f"{p['team']} ({p['confidence']}) ")/2)) * '\u2800'
+                field_value = f"--- {days_correct:.1f} Days Correct ---\n" + field_value
+            
             embed.add_field(name=field_title, value=field_value, inline=False)
-
-        embed_description = ''
-        if correct_amount + incorrect_amount > 0:
-            embed_description = f"""Total {year} Predictions: {len(user_preds)}\nPercent Correct: {(correct_amount / (correct_amount + incorrect_amount)) * 100:.0f}% ({correct_amount}/{correct_amount + incorrect_amount})\n\n"""
-        else:
-            embed_description = f"""Total {year} Predictions: {len(user_preds)}\n\n"""
-        embed.description = embed_description
-        embed.set_footer(text='✅ = Correct, ❌ = Wrong, ⌛ = TBD')
-        await ctx.send(embed=embed)
+            
+            if len(embed.fields) == 25:
+                embed_list.append(embed)
+                embed = discord.Embed(title=embed_title, color=0xD00000)
+            
+        embed_list.append(embed)
+        del embed
+        
+        #send multiple dms if multiple embeds if in DM, otherwise just send one and inform the user in the footer that they can DM to get all the results
+        embed_footer_text = '✅ = Correct, ❌ = Wrong, ⌛ = TBD'
+        if not isinstance(ctx.channel, discord.DMChannel) and len(embed_list) > 1:
+            embed_list = [embed_list[0]]
+            embed_footer_text += f'\nOnly showing first 25 results. To view all {len(user_preds)} predictions, DM the bot instead.'
+        for i, embed in enumerate(embed_list):
+            if len(embed_list) > 1:
+                embed.title += f" ({i+1}/{len(embed_list)})"
+            embed_description = ''
+            if correct_amount + incorrect_amount > 0:
+                embed_description = f"""Total {year} Predictions: {len(user_preds)}\nPercent Correct: {(correct_amount / (correct_amount + incorrect_amount)) * 100:.0f}% ({correct_amount}/{correct_amount + incorrect_amount})\n\n"""
+            else:
+                embed_description = f"""Total {year} Predictions: {len(user_preds)}\n\n"""
+            embed.description = embed_description
+            embed.set_footer(text=embed_footer_text)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

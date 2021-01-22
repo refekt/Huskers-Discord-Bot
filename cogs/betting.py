@@ -866,16 +866,20 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             author = self.convert_author(ctx, single_bet["author"])
 
             guild = self.bot.get_guild(GUILD_PROD)
-            bets_detail = {"for": [], "against": []}
+            bets_detail = {"for": "", "against": ""}
             for bet in placed_bets:
                 member = guild.get_member(bet["author"])
 
                 if bet["_for"]:
-                    bets_detail["for"].append(f"{member.mention}: {bet['value']:,} {CURRENCY_NAME}")
+                    # bets_detail["for"].append(f"{member.mention}: {bet['value']:,}")
+                    bets_detail["for"] += f"{member.mention}: {bet['value']:,}\n"
                 elif bet["against"]:
-                    bets_detail["against"].append(f"{member.mention}: {bet['value']:,} {CURRENCY_NAME}")
+                    # bets_detail["against"].append(f"{member.mention}: {bet['value']:,}")
+                    bets_detail["against"] += f"{member.mention}: {bet['value']:,}\n"
                 else:
                     ...
+
+            _nl = "\n"
 
             return await ctx.send(embed=build_embed(
                 title="All Open Bets",
@@ -884,8 +888,8 @@ class BetCommands(commands.Cog, name="Betting Commands"):
                         f"Keyword: {single_bet['keyword']}",
                         f"Author: {author.mention if type(author) == discord.Member else author}\n"
                         f"Description: {str(single_bet['description']).capitalize()}\n"
-                        f"Bets For: {bets_detail['for']}\n"
-                        f"Bets Against: {bets_detail['against']}\n"
+                        f"Bets For:{_nl}{bets_detail['for']}\n"
+                        f"Bets Against:{_nl}{bets_detail['against']}\n"
                     ]
                 ],
                 inline=False
