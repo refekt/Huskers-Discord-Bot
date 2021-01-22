@@ -392,7 +392,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         self.adjust_currency(ctx.message.author, balance)
 
         await edit_msg.edit(
-            content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
+            content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there! Your most consecutive wins was [ {wins_max} ] and your most consecutive losses was [ {losses_max} ] .")
 
     @commands.command(aliases=["rps", ])
     @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
