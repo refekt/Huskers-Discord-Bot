@@ -332,7 +332,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
             raise AttributeError(f"Your floor must be less than your current balance of [ {balance:,} ].")
 
         pities = 0
-        pity_cap = 1000
+        pity_cap = 1000000
 
         edit_msg = await ctx.send(f"Spinning the wheel [ {cycles:,} ] times to reach [ {goal:,} ] {CURRENCY_NAME}!")
 
@@ -392,7 +392,7 @@ class BetCommands(commands.Cog, name="Betting Commands"):
         self.adjust_currency(ctx.message.author, balance)
 
         await edit_msg.edit(
-            content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there!")
+            content=edit_msg.content + f" Done! Your new balance is [ {balance:,} ] {CURRENCY_NAME}. It took [ {i:,} ] spins and [ {pities} ] pities to get there! Your most consecutive wins was [ {wins_max} ] and your most consecutive losses was [ {losses_max} ] .")
 
     @commands.command(aliases=["rps", ])
     @commands.max_concurrency(number=1, per=BucketType.user, wait=True)
