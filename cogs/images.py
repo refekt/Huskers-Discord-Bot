@@ -322,13 +322,13 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def elmo(self, ctx):
         """ Haters gonna hate """
-        await ctx.send("https://i.imgur.com/UYreSmx.gif")
+        await ctx.send("https://i.imgur.com/RTV9maT.gifv")
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def haters(self, ctx):
         """ Elmo go potty """
-        await ctx.send("https://i.imgur.com/RTV9maT.gifv")
+        await ctx.send("https://i.imgur.com/UYreSmx.gif")
 
 
 def setup(bot):
