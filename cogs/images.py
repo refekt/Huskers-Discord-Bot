@@ -326,7 +326,7 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
 
     @commands.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def elmo(self, ctx):
+    async def haters(self, ctx):
         """ Elmo go potty """
         await ctx.send("https://i.imgur.com/RTV9maT.gifv")
 
