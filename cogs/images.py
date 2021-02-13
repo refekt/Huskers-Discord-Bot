@@ -289,22 +289,35 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
                                                ])))
 
     @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def ctb(self, ctx):
         """ CTB Denial """
         await ctx.send(embed=build_image_embed(title="Cam Juice Baybee", image="https://i.imgur.com/i2vnzwl.gif"))
 
     @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def hypejail(self, ctx):
         """ Hyping shall be punished swiftly and with prejudice """
         await ctx.send("https://i.imgur.com/t5TQrx9.gif")
-        
+
     @commands.command()
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)                                               
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
     async def nohype(self, ctx):
         """ REEEEEEE """
         await ctx.send("https://i.imgur.com/6RUysy6.gif")
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def bartrage(self, ctx):
+        """ BART MAD """
+        await ctx.send("https://i.imgur.com/v1QMfil.gif")
+
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def bartban(self, ctx):
+        """ BART BAN """
+        await ctx.send("https://i.imgur.com/5T6KZhZ.gif")
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
