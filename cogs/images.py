@@ -318,6 +318,12 @@ class ImageCommands(commands.Cog, name="Fun Image Commands"):
         """ BART BAN """
         await ctx.send("https://i.imgur.com/5T6KZhZ.gif")
 
+    @commands.command()
+    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    async def elmo(self, ctx):
+        """ Elmo go potty """
+        await ctx.send("https://i.imgur.com/RTV9maT.gifv")
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
