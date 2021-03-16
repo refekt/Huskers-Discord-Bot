@@ -214,7 +214,7 @@ class BotFrostClient(commands.Bot):
                     who=member_or_chan,
                     message=task["message"],
                     author=task["author"],
-                    flag=task["send_when"])
+                    alert_when=task["send_when"])
                 continue
 
             task_repo.append(
@@ -225,7 +225,7 @@ class BotFrostClient(commands.Bot):
                         who=member_or_chan,
                         message=task["message"],
                         author=task["author"],
-                        flag=task["send_when"]
+                        alert_when=task["send_when"]
                     )
                 )
             )
