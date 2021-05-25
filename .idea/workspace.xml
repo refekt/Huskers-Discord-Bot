@@ -2,18 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b96ec3fc-b56d-4efd-9fa4-5c5c83288ff5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/consts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/objs/game.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/objs/recruit.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/objs/schedule.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/objs/team.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/objs/thread.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/embed.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/mysql.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/security.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Bot Frost.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Bot Frost.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TODO" beforeDir="false" afterPath="$PROJECT_DIR$/TODO" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -560,6 +553,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="499" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1621906973546" />
+    <state x="277" y="57" key="SettingsEditor" timestamp="1621908100864">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="277" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1621908100864" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
