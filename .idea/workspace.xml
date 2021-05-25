@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="b96ec3fc-b56d-4efd-9fa4-5c5c83288ff5" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Unit Test" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1Vnr9Ik1Qw8szCS9oVFpmAxdtcR" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Aaron\Desktop\Bot Frost\cogs" />
+      <recent name="C:\Users\Aaron\Desktop\Bot Frost\cogs\games" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.prod">
+    <configuration name="blackjack" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Bot Frost" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cogs/games" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cogs/games/blackjack.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="prod" type="PythonConfigurationType" factoryName="Python">
+      <module name="Bot Frost" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="prod" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python">
+      <module name="Bot Frost" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="test" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.prod" />
+      <item itemvalue="Python.test" />
+      <item itemvalue="Python.blackjack" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.blackjack" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b96ec3fc-b56d-4efd-9fa4-5c5c83288ff5" name="Default Changelist" comment="" />
+      <created>1577899546239</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1577899546239</updated>
+    </task>
+    <task id="LOCAL-00559" summary="Fixed $nfl command">
+      <created>1603632490600</created>
+      <option name="number" value="00559" />
+      <option name="presentableId" value="LOCAL-00559" />
+      <option name="project" value="LOCAL" />
+      <updated>1603632490601</updated>
+    </task>
+    <task id="LOCAL-00560" summary="Fixed $cfb command">
+      <created>1603632698633</created>
+      <option name="number" value="00560" />
+      <option name="presentableId" value="LOCAL-00560" />
+      <option name="project" value="LOCAL" />
+      <updated>1603632698633</updated>
+    </task>
+    <task id="LOCAL-00561" summary="Bug fixing resolve">
+      <created>1603820247306</created>
+      <option name="number" value="00561" />
+      <option name="presentableId" value="LOCAL-00561" />
+      <option name="project" value="LOCAL" />
+      <updated>1603820247306</updated>
+    </task>
+    <task id="LOCAL-00562" summary="Bug fix in betting winning string">
+      <created>1604015732522</created>
+      <option name="number" value="00562" />
+      <option name="presentableId" value="LOCAL-00562" />
+      <option name="project" value="LOCAL" />
+      <updated>1604015732523</updated>
+    </task>
+    <task id="LOCAL-00563" summary="Added $study">
+      <created>1604099559157</created>
+      <option name="number" value="00563" />
+      <option name="presentableId" value="LOCAL-00563" />
+      <option name="project" value="LOCAL" />
+      <updated>1604099559158</updated>
+    </task>
+    <task id="LOCAL-00564" summary="Updated $bet resolve to accept admin roles">
+      <created>1604426337974</created>
+      <option name="number" value="00564" />
+      <option name="presentableId" value="LOCAL-00564" />
+      <option name="project" value="LOCAL" />
+      <updated>1604426337975</updated>
+    </task>
+    <task id="LOCAL-00565" summary="Fixed resolved">
+      <created>1604784196260</created>
+      <option name="number" value="00565" />
+      <option name="presentableId" value="LOCAL-00565" />
+      <option name="project" value="LOCAL" />
+      <updated>1604784196260</updated>
+    </task>
+    <task id="LOCAL-00566" summary="Added a wash option for resolve">
+      <created>1604784491544</created>
+      <option name="number" value="00566" />
+      <option name="presentableId" value="LOCAL-00566" />
+      <option name="project" value="LOCAL" />
+      <updated>1604784491544</updated>
+    </task>
+    <task id="LOCAL-00567" summary="Integrated lines to countdown">
+      <created>1604954427727</created>
+      <option name="number" value="00567" />
+      <option name="presentableId" value="LOCAL-00567" />
+      <option name="project" value="LOCAL" />
+      <updated>1604954427727</updated>
+    </task>
+    <task id="LOCAL-00568" summary="Removed discord formatting">
+      <created>1604954457520</created>
+      <option name="number" value="00568" />
+      <option name="presentableId" value="LOCAL-00568" />
+      <option name="project" value="LOCAL" />
+      <updated>1604954457520</updated>
+    </task>
+    <task id="LOCAL-00569" summary="Bug fix">
+      <created>1604970663213</created>
+      <option name="number" value="00569" />
+      <option name="presentableId" value="LOCAL-00569" />
+      <option name="project" value="LOCAL" />
+      <updated>1604970663213</updated>
+    </task>
+    <task id="LOCAL-00570" summary="Bug fix for resolve">
+      <created>1605398507322</created>
+      <option name="number" value="00570" />
+      <option name="presentableId" value="LOCAL-00570" />
+      <option name="project" value="LOCAL" />
+      <updated>1605398507322</updated>
+    </task>
+    <task id="LOCAL-00571" summary="added new image command">
+      <created>1605398516744</created>
+      <option name="number" value="00571" />
+      <option name="presentableId" value="LOCAL-00571" />
+      <option name="project" value="LOCAL" />
+      <updated>1605398516744</updated>
+    </task>
+    <task id="LOCAL-00572" summary="Updated bet show to show who placed bets">
+      <created>1605573249296</created>
+      <option name="number" value="00572" />
+      <option name="presentableId" value="LOCAL-00572" />
+      <option name="project" value="LOCAL" />
+      <updated>1605573249297</updated>
+    </task>
+    <task id="LOCAL-00573" summary="Updated bet show to show who placed bets">
+      <created>1605573284012</created>
+      <option name="number" value="00573" />
+      <option name="presentableId" value="LOCAL-00573" />
+      <option name="project" value="LOCAL" />
+      <updated>1605573284012</updated>
+    </task>
+    <task id="LOCAL-00574" summary="Added $jojo">
+      <created>1605917198585</created>
+      <option name="number" value="00574" />
+      <option name="presentableId" value="LOCAL-00574" />
+      <option name="project" value="LOCAL" />
+      <updated>1605917198585</updated>
+    </task>
+    <task id="LOCAL-00575" summary="Added location to countdown">
+      <created>1605973340595</created>
+      <option name="number" value="00575" />
+      <option name="presentableId" value="LOCAL-00575" />
+      <option name="project" value="LOCAL" />
+      <updated>1605973340596</updated>
+    </task>
+    <task id="LOCAL-00576" summary="Changed wording">
+      <created>1605973380222</created>
+      <option name="number" value="00576" />
+      <option name="presentableId" value="LOCAL-00576" />
+      <option name="project" value="LOCAL" />
+      <updated>1605973380223</updated>
+    </task>
+    <task id="LOCAL-00577" summary="Updated error handling to remove multiple error messages">
+      <created>1606069345796</created>
+      <option name="number" value="00577" />
+      <option name="presentableId" value="LOCAL-00577" />
+      <option name="project" value="LOCAL" />
+      <updated>1606069345796</updated>
+    </task>
+    <task id="LOCAL-00578" summary="Updated error handling to remove multiple error messages">
+      <created>1606069556414</created>
+      <option name="number" value="00578" />
+      <option name="presentableId" value="LOCAL-00578" />
+      <option name="project" value="LOCAL" />
+      <updated>1606069556414</updated>
+    </task>
+    <task id="LOCAL-00579" summary="Implementing blackjack">
+      <created>1606096226891</created>
+      <option name="number" value="00579" />
+      <option name="presentableId" value="LOCAL-00579" />
+      <option name="project" value="LOCAL" />
+      <updated>1606096226891</updated>
+    </task>
+    <task id="LOCAL-00580" summary="Implementing blackjack">
+      <created>1606129680599</created>
+      <option name="number" value="00580" />
+      <option name="presentableId" value="LOCAL-00580" />
+      <option name="project" value="LOCAL" />
+      <updated>1606129680599</updated>
+    </task>
+    <task id="LOCAL-00581" summary="Almost bug free">
+      <created>1606181095555</created>
+      <option name="number" value="00581" />
+      <option name="presentableId" value="LOCAL-00581" />
+      <option name="project" value="LOCAL" />
+      <updated>1606181095556</updated>
+    </task>
+    <task id="LOCAL-00582" summary="Almost bug free">
+      <created>1606273482677</created>
+      <option name="number" value="00582" />
+      <option name="presentableId" value="LOCAL-00582" />
+      <option name="project" value="LOCAL" />
+      <updated>1606273482678</updated>
+    </task>
+    <task id="LOCAL-00583" summary="Removed bug when the dealer would bust and delete the player and dealer hand.">
+      <created>1606350494308</created>
+      <option name="number" value="00583" />
+      <option name="presentableId" value="LOCAL-00583" />
+      <option name="project" value="LOCAL" />
+      <updated>1606350494308</updated>
+    </task>
+    <task id="LOCAL-00584" summary="Added history to blackjack">
+      <created>1606351217833</created>
+      <option name="number" value="00584" />
+      <option name="presentableId" value="LOCAL-00584" />
+      <option name="project" value="LOCAL" />
+      <updated>1606351217833</updated>
+    </task>
+    <task id="LOCAL-00585" summary="Added history to blackjack">
+      <created>1606351944317</created>
+      <option name="number" value="00585" />
+      <option name="presentableId" value="LOCAL-00585" />
+      <option name="project" value="LOCAL" />
+      <updated>1606351944318</updated>
+    </task>
+    <task id="LOCAL-00586" summary="Updated minecraft commands">
+      <created>1606434398462</created>
+      <option name="number" value="00586" />
+      <option name="presentableId" value="LOCAL-00586" />
+      <option name="project" value="LOCAL" />
+      <updated>1606434398462</updated>
+    </task>
+    <task id="LOCAL-00587" summary="Bug fix">
+      <created>1606579131297</created>
+      <option name="number" value="00587" />
+      <option name="presentableId" value="LOCAL-00587" />
+      <option name="project" value="LOCAL" />
+      <updated>1606579131298</updated>
+    </task>
+    <task id="LOCAL-00588" summary="Reverting countdown command">
+      <created>1606941627557</created>
+      <option name="number" value="00588" />
+      <option name="presentableId" value="LOCAL-00588" />
+      <option name="project" value="LOCAL" />
+      <updated>1606941627557</updated>
+    </task>
+    <task id="LOCAL-00589" summary="Reverting countdown command">
+      <created>1606957574256</created>
+      <option name="number" value="00589" />
+      <option name="presentableId" value="LOCAL-00589" />
+      <option name="project" value="LOCAL" />
+      <updated>1606957574256</updated>
+    </task>
+    <task id="LOCAL-00590" summary="Fixed countdown with banners">
+      <created>1606998686268</created>
+      <option name="number" value="00590" />
+      <option name="presentableId" value="LOCAL-00590" />
+      <option name="project" value="LOCAL" />
+      <updated>1606998686269</updated>
+    </task>
+    <task id="LOCAL-00591" summary="Fixed coutndown">
+      <created>1606999293319</created>
+      <option name="number" value="00591" />
+      <option name="presentableId" value="LOCAL-00591" />
+      <option name="project" value="LOCAL" />
+      <updated>1606999293319</updated>
+    </task>
+    <task id="LOCAL-00592" summary="Updated the `24` command">
+      <created>1607122096674</created>
+      <option name="number" value="00592" />
+      <option name="presentableId" value="LOCAL-00592" />
+      <option name="project" value="LOCAL" />
+      <updated>1607122096674</updated>
+    </task>
+    <task id="LOCAL-00593" summary="added flag command">
+      <created>1607268817959</created>
+      <option name="number" value="00593" />
+      <option name="presentableId" value="LOCAL-00593" />
+      <option name="project" value="LOCAL" />
+      <updated>1607268817959</updated>
+    </task>
+    <task id="LOCAL-00594" summary="added flag command">
+      <created>1607268936744</created>
+      <option name="number" value="00594" />
+      <option name="presentableId" value="LOCAL-00594" />
+      <option name="project" value="LOCAL" />
+      <updated>1607268936745</updated>
+    </task>
+    <task id="LOCAL-00595" summary="added flag command">
+      <created>1607269090211</created>
+      <option name="number" value="00595" />
+      <option name="presentableId" value="LOCAL-00595" />
+      <option name="project" value="LOCAL" />
+      <updated>1607269090211</updated>
+    </task>
+    <task id="LOCAL-00596" summary="added flag command">
+      <created>1607269130493</created>
+      <option name="number" value="00596" />
+      <option name="presentableId" value="LOCAL-00596" />
+      <option name="project" value="LOCAL" />
+      <updated>1607269130493</updated>
+    </task>
+    <task id="LOCAL-00597" summary="Updated Scott Frost quotes">
+      <created>1607809244210</created>
+      <option name="number" value="00597" />
+      <option name="presentableId" value="LOCAL-00597" />
+      <option name="project" value="LOCAL" />
+      <updated>1607809244210</updated>
+    </task>
+    <task id="LOCAL-00598" summary="Re-adding bot messages to markov">
+      <created>1607809478977</created>
+      <option name="number" value="00598" />
+      <option name="presentableId" value="LOCAL-00598" />
+      <option name="project" value="LOCAL" />
+      <updated>1607809478977</updated>
+    </task>
+    <task id="LOCAL-00599" summary="Changing server currency name">
+      <created>1607810042955</created>
+      <option name="number" value="00599" />
+      <option name="presentableId" value="LOCAL-00599" />
+      <option name="project" value="LOCAL" />
+      <updated>1607810042955</updated>
+    </task>
+    <task id="LOCAL-00600" summary="Updated display for `bet show`">
+      <created>1608219101069</created>
+      <option name="number" value="00600" />
+      <option name="presentableId" value="LOCAL-00600" />
+      <option name="project" value="LOCAL" />
+      <updated>1608219101069</updated>
+    </task>
+    <task id="LOCAL-00601" summary="Added suh command">
+      <created>1608253270225</created>
+      <option name="number" value="00601" />
+      <option name="presentableId" value="LOCAL-00601" />
+      <option name="project" value="LOCAL" />
+      <updated>1608253270225</updated>
+    </task>
+    <task id="LOCAL-00602" summary="Added new Bart image commands">
+      <created>1613246644053</created>
+      <option name="number" value="00602" />
+      <option name="presentableId" value="LOCAL-00602" />
+      <option name="project" value="LOCAL" />
+      <updated>1613246644053</updated>
+    </task>
+    <task id="LOCAL-00603" summary="New image commands">
+      <created>1613246778413</created>
+      <option name="number" value="00603" />
+      <option name="presentableId" value="LOCAL-00603" />
+      <option name="project" value="LOCAL" />
+      <updated>1613246778413</updated>
+    </task>
+    <task id="LOCAL-00604" summary="New image commands">
+      <created>1613246837824</created>
+      <option name="number" value="00604" />
+      <option name="presentableId" value="LOCAL-00604" />
+      <option name="project" value="LOCAL" />
+      <updated>1613246837824</updated>
+    </task>
+    <task id="LOCAL-00605" summary="New image commands">
+      <created>1613246949867</created>
+      <option name="number" value="00605" />
+      <option name="presentableId" value="LOCAL-00605" />
+      <option name="project" value="LOCAL" />
+      <updated>1613246949867</updated>
+    </task>
+    <task id="LOCAL-00606" summary="New image commands">
+      <created>1613247208849</created>
+      <option name="number" value="00606" />
+      <option name="presentableId" value="LOCAL-00606" />
+      <option name="project" value="LOCAL" />
+      <updated>1613247208849</updated>
+    </task>
+    <task id="LOCAL-00607" summary="Fixed reminders">
+      <created>1613247972426</created>
+      <option name="number" value="00607" />
+      <option name="presentableId" value="LOCAL-00607" />
+      <option name="project" value="LOCAL" />
+      <updated>1613247972426</updated>
+    </task>
+    <option name="localTasksCounter" value="608" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_NEW_TODO" value="false" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/ChatterBot" />
+    </ignored-roots>
+    <MESSAGE value="added new image command" />
+    <MESSAGE value="Updated bet show to show who placed bets" />
+    <MESSAGE value="Added $jojo" />
+    <MESSAGE value="Added location to countdown" />
+    <MESSAGE value="Changed wording" />
+    <MESSAGE value="Updated error handling to remove multiple error messages" />
+    <MESSAGE value="Implementing blackjack" />
+    <MESSAGE value="Almost bug free" />
+    <MESSAGE value="Removed bug when the dealer would bust and delete the player and dealer hand." />
+    <MESSAGE value="Added history to blackjack" />
+    <MESSAGE value="Updated minecraft commands" />
+    <MESSAGE value="Bug fix" />
+    <MESSAGE value="Reverting countdown command" />
+    <MESSAGE value="Fixed countdown with banners" />
+    <MESSAGE value="Fixed coutndown" />
+    <MESSAGE value="Updated the `24` command" />
+    <MESSAGE value="added flag command" />
+    <MESSAGE value="Updated Scott Frost quotes" />
+    <MESSAGE value="Re-adding bot messages to markov" />
+    <MESSAGE value="Changing server currency name" />
+    <MESSAGE value="Updated display for `bet show`" />
+    <MESSAGE value="Added suh command" />
+    <MESSAGE value="Added new Bart image commands" />
+    <MESSAGE value="New image commands" />
+    <MESSAGE value="Fixed reminders" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed reminders" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1245" y="76" width="781" height="1040" key="#xdebugger.XInspectDialog" timestamp="1606998429526">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1245" y="76" width="614" height="882" key="#xdebugger.XInspectDialog/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1606998429526" />
+    <state x="448" y="178" width="810" height="687" key="CommitChangelistDialog2" timestamp="1613247972019">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1052" y="0" width="904" height="1040" key="CommitChangelistDialog2/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219100595" />
+    <state x="448" y="178" width="810" height="687" key="CommitChangelistDialog2/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613247972019" />
+    <state width="1125" height="466" key="DebuggerActiveHint" timestamp="1606058099515">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1125" height="466" key="DebuggerActiveHint/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1606058099515" />
+    <state x="768" y="115" width="440" height="784" key="FileChooserDialogImpl" timestamp="1606686263914">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="768" y="115" width="440" height="784" key="FileChooserDialogImpl/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1606686263914" />
+    <state width="712" height="912" key="GridCell.Tab.0.bottom" timestamp="1613248033318">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="800" height="912" key="GridCell.Tab.0.bottom/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182497" />
+    <state width="712" height="912" key="GridCell.Tab.0.bottom/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033318" />
+    <state width="712" height="912" key="GridCell.Tab.0.center" timestamp="1613248033318">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="800" height="912" key="GridCell.Tab.0.center/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182496" />
+    <state width="712" height="912" key="GridCell.Tab.0.center/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033318" />
+    <state width="712" height="912" key="GridCell.Tab.0.left" timestamp="1613248033318">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="800" height="912" key="GridCell.Tab.0.left/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182496" />
+    <state width="712" height="912" key="GridCell.Tab.0.left/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033318" />
+    <state width="712" height="912" key="GridCell.Tab.0.right" timestamp="1613248033318">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="800" height="912" key="GridCell.Tab.0.right/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182496" />
+    <state width="712" height="912" key="GridCell.Tab.0.right/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033318" />
+    <state x="727" y="0" width="698" height="912" key="GridCell.Tab.1.bottom" timestamp="1613248033308">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="727" y="0" width="800" height="912" key="GridCell.Tab.1.bottom/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182497" />
+    <state width="698" height="912" key="GridCell.Tab.1.bottom/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033308" />
+    <state x="727" y="0" width="698" height="912" key="GridCell.Tab.1.center" timestamp="1613248033308">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="727" y="0" width="800" height="912" key="GridCell.Tab.1.center/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182497" />
+    <state width="698" height="912" key="GridCell.Tab.1.center/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033308" />
+    <state x="727" y="0" width="698" height="912" key="GridCell.Tab.1.left" timestamp="1613248033308">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="727" y="0" width="800" height="912" key="GridCell.Tab.1.left/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182497" />
+    <state width="698" height="912" key="GridCell.Tab.1.left/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033308" />
+    <state x="727" y="0" width="698" height="912" key="GridCell.Tab.1.right" timestamp="1613248033308">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="727" y="0" width="800" height="912" key="GridCell.Tab.1.right/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1608219182497" />
+    <state width="698" height="912" key="GridCell.Tab.1.right/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613248033308" />
+    <state x="403" y="0" width="914" height="824" key="SettingsEditor" timestamp="1605973161485">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="403" y="0" width="998" height="1040" key="SettingsEditor/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1605973161485" />
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1606095883032">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1606095883032" />
+    <state x="1113" y="31" width="607" height="838" key="find.popup" timestamp="1613247075973">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-957" y="145" width="787" height="596" key="find.popup/0.0.1920.1040/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1606073693026" />
+    <state x="1113" y="31" width="607" height="838" key="find.popup/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1613247075973" />
+    <state x="623" y="225" width="672" height="160" key="search.everywhere.popup" timestamp="1606350745052">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="160" key="search.everywhere.popup/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1606350745052" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/AppData/Roaming/Python/Python37/site-packages/youtube_dl/YoutubeDL.py</url>
+          <line>343</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cogs/admin.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cogs/betting.py</url>
+          <line>949</line>
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/utils/consts.py</url>
+          <line>58</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cogs/betting.py</url>
+          <line>459</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cogs/betting.py</url>
+          <line>54</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="client.all_commands" />
+        <watch expression="timestamp.tzinfo" />
+        <watch expression="expert.contents[1]" />
+        <watch expression="messages" />
+        <watch expression="alert" />
+        <watch expression="data" language="Python" />
+        <watch expression="rank.0" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>
