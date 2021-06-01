@@ -22,7 +22,8 @@ def position_abbr(position):
     long_positions = {'PRO': 'Pro-Style Quarterback', 'DUAL': 'Dual-Threat Quarterback', 'APB': 'All-Purpose Back', 'RB': 'Running Back', 'FB': 'Fullback', 'WR': 'Wide Receiver', 'TE': 'Tight End',
                       'OT': 'Offensive Tackle', 'OG': 'Offensive Guard', 'OC': 'Center', 'SDE': 'Strong-Side Defensive End', 'WDE': 'Weak-Side Defensive End', 'DT': 'Defensive Tackle',
                       'ILB': 'Inside Linebacker', 'OLB': 'Outside Linebacker', 'CB': 'Cornerback', 'S': 'Safety', 'ATH': 'Athlete', 'K': 'Kicker', 'P': 'Punter', 'LS': 'Long Snapper',
-                      'RET': 'Returner'}
+                      'RET': 'Returner', 'QB' : 'Quarterback', 'IOL' : 'Interior Offensive Lineman', 'EDGE' : 'Edege', 'LB' : 'Linebacker',
+                      'DL': 'Defensive Lineman'}
     return long_positions[position]
 
 
