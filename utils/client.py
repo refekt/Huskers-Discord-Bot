@@ -435,6 +435,8 @@ class BotFrostClient(commands.Bot):
                         channel = client.get_channel(CHAN_WAR_ROOM)
                     elif context[2].lower() == "scott":
                         channel = client.get_channel(CHAN_SCOTT)
+                    elif context[2].lower() == "general":
+                        channel = client.get_channel(CHAN_GENERAL)
                     else:
                         return await ctx.message.author.send(error_message)
 
