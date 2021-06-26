@@ -421,7 +421,7 @@ class BotFrostClient(commands.Bot):
                     if not context[1].isalpha() and not context[2].isalpha():
                         return await ctx.message.author.send(error_message)
 
-                    if context[2].lower() != "war" and context[2].lower() != "scott":
+                    if not context[2].lower() in ("war", "scott", "general"): #context[2].lower() != "war" and context[2].lower() != "scott":
                         return await ctx.message.author.send(error_message)
 
                     f = open('mammals.json', 'r')
