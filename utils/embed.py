@@ -156,7 +156,7 @@ def build_recruit_embed(rec):  # rec == recruit
 
 
 def build_schedule_embed(year, **kwargs):
-    scheduled_games, season_stats = HuskerSchedule(year=year)
+    scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
 
     ARROW = "» "
     _NL = "\n"

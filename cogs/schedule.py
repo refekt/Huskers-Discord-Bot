@@ -87,10 +87,10 @@ class ScheduleCommands(commands.Cog, name="Scheduling Commands"):
 
     @schedule.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def year(self, ctx, year=datetime.now().year):
+    async def year(self, ctx, year=datetime.now().year, sport="football"):
         """ Specific year of Nebraska's football schedule """
         edit_msg = await ctx.send("Loading...")
-        await edit_msg.edit(content="", embed=build_schedule_embed(year))
+        await edit_msg.edit(content="", embed=build_schedule_embed(year=year, sport=sport))
 
     @schedule.command()
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
