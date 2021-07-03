@@ -13,7 +13,7 @@ from discord.ext import commands
 import utils.consts as consts
 from cogs.images import build_quote
 from utils.consts import CHAN_HOF_PROD, CHAN_HOF_TEST, CHAN_WAR_ROOM, CHAN_SCOTT, CHAN_BANNED, CHAN_STATS_BANNED, \
-    CHAN_GENERAL, CHAN_IOWA, CHAN_RULES
+    CHAN_GENERAL, CHAN_IOWA, CHAN_RULES, CHAN_SLOW
 from utils.consts import FOOTER_SECRET
 from utils.consts import GUILD_TEST, GUILD_PROD
 from utils.consts import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_AIRPOD, ROLE_ISMS, ROLE_MEME, ROLE_PACKER, ROLE_PIXEL, ROLE_RUNZA, \
@@ -354,7 +354,8 @@ class BotFrostClient(commands.Bot):
 
     async def hall_of_fame_messages(self, reactions: list):
         hof_channel = client.get_channel(id=CHAN_HOF_PROD)
-
+        slow_channel = client.get_channel(id=CHAN_SLOW)
+        
         if hof_channel is None:
             hof_channel = client.get_channel(id=CHAN_HOF_TEST)
 
@@ -364,8 +365,10 @@ class BotFrostClient(commands.Bot):
         message_history_raw = None
 
         for reaction in reactions:
-            if reaction.count >= threshold and reaction.message.channel.id != hof_channel.id and ".addvotes" not in reaction.message.content:
-                message_history_raw = await hof_channel.history(limit=5000).flatten()
+            if reaction.count >= threshold and reaction.message.channel.id != hof_channel.id and reaction.message.channel.id != slow_channel.idand ".addvotes" not in reaction.message.content:
+                if reaction.emoji = <:slowpoke:758361250048245770>:
+                      message_history_raw = await slow_channel.history(limit=5000).flatten()
+                else: message_history_raw = await hof_channel.history(limit=5000).flatten()
 
                 # Check for duplicate HOF messages. Message ID is stored in the footer for comparison.
                 for message_raw in message_history_raw:
@@ -375,17 +378,30 @@ class BotFrostClient(commands.Bot):
                             break
 
                 if not duplicate:
-                    embed = build_embed(
-                        title=f"🏆🏆🏆 Hall of Fame Message 🏆🏆🏆",
-                        fields=[
-                            [f"{reaction.message.author} said...", f"{reaction.message.content}"],
-                            ["HOF Reaction", reaction],
-                            ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
-                        ],
-                        inline=False,
-                        footer=f"Hall of Fame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')} | Message ID: {reaction.message.id}"
-                    )
-                    return await hof_channel.send(embed=embed)
+                    if reaction.emoji = <:slowpoke:758361250048245770>:
+                        embed = build_embed(
+                            title=f"<:slowpoke:758361250048245770><:slowpoke:758361250048245770><:slowpoke:758361250048245770> Hall of Shame Message <:slowpoke:758361250048245770><:slowpoke:758361250048245770><:slowpoke:758361250048245770>",
+                            fields=[
+                                [f"{reaction.message.author} said...", f"{reaction.message.content}"],
+                                ["HOS Reaction", reaction],
+                                ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
+                            ],
+                            inline=False,
+                            footer=f"Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')} | Message ID: {reaction.message.id}"
+                        )
+                        return await slow_channel.send(embed=embed)
+                    else:
+                        embed = build_embed(
+                            title=f"🏆🏆🏆 Hall of Fame Message 🏆🏆🏆",
+                            fields=[
+                                [f"{reaction.message.author} said...", f"{reaction.message.content}"],
+                                ["HOF Reaction", reaction],
+                                ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
+                            ],
+                            inline=False,
+                            footer=f"Hall of Fame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')} | Message ID: {reaction.message.id}"
+                        )
+                        return await hof_channel.send(embed=embed)
 
         del message_history_raw, duplicate, server_member_count
 
