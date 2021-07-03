@@ -137,15 +137,13 @@ class BotFrostClient(commands.Bot):
 
     async def change_my_nickname(self):
         nicks = (
-            "Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini", "Devine Ozigbot",
-            "Mo Botty", "Bot Moos", "Luke McBotfry", "Bot Diaco", "Rahmir Botson",
-            "I.M. Bott", "Linux Phillips", "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando",
-            "Shawn Botson",
-            "Zavier Botts", "Jimari Botler", "Bot Gunnerson", "Nash Botmacher",
-            "Botger Craig", "Dave RAMington", "MarLAN Lucky", "Rex Bothead", "Nbotukong Suh", "Grant Bostrom",
-            "Ameer Botdullah",
-            "Botinic Raiola", "Vince Ferraboto", "economybot",
-            "NotaBot_Human", "psybot", "2020: the year of the bot", "bottech129", "deerebot129")
+            "Bot Frost", "Mario Verbotzco", "Adrian Botinez", "Bot Devaney", "Mike Rilbot", "Robo Pelini",
+            "Devine Ozigbot", "Mo Botty", "Bot Moos", "Bot Diaco", "Rahmir Botson", "I.M. Bott", "Linux Phillips",
+            "Dicaprio Bottle", "Bryce Botheart", "Jobot Chamberlain", "Bot Bando", "Shawn Botson", "Zavier Botts",
+            "Jimari Botler", "Bot Gunnerson", "Nash Botmacher", "Botger Craig", "Dave RAMington", "MarLAN Lucky",
+            "Rex Bothead", "Nbotukong Suh", "Grant Bostrom", "Ameer Botdullah", "Botinic Raiola", "Vince Ferraboto",
+            "economybot", "NotaBot_Human", "psybot", "2020: the year of the bot", "bottech129", "deerebot129"
+        )
 
         try:
             print("~~~ Attempting to change nickname...")
@@ -423,7 +421,7 @@ class BotFrostClient(commands.Bot):
                     if not context[1].isalpha() and not context[2].isalpha():
                         return await ctx.message.author.send(error_message)
 
-                    if context[2].lower() != "war" and context[2].lower() != "scott":
+                    if not context[2].lower() in ("war", "scott", "general"): #context[2].lower() != "war" and context[2].lower() != "scott":
                         return await ctx.message.author.send(error_message)
 
                     f = open('mammals.json', 'r')
@@ -437,6 +435,8 @@ class BotFrostClient(commands.Bot):
                         channel = client.get_channel(CHAN_WAR_ROOM)
                     elif context[2].lower() == "scott":
                         channel = client.get_channel(CHAN_SCOTT)
+                    elif context[2].lower() == "general":
+                        channel = client.get_channel(CHAN_GENERAL)
                     else:
                         return await ctx.message.author.send(error_message)
 
