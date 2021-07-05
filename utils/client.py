@@ -365,15 +365,15 @@ class BotFrostClient(commands.Bot):
             shame_channel = client.get_channel(id=CHAN_SHAME)
 
         duplicate = False
-        message_history_raw = None
 
         server_member_count = len(client.users)
         threshold = int(0.0047 * server_member_count)
 
         for reaction in reactions:
             if reaction.count >= threshold and (reaction.message.channel.id != hof_channel.id or reaction.message.channel.id != shame_channel.id) and ".addvotes" not in reaction.message.content:
+                # message_history_raw = None
 
-                if reaction.emoji == slowpoke:
+                if str(reaction.emoji) == slowpoke:
                     message_history_raw = await shame_channel.history(limit=5000).flatten()
                 else:
                     message_history_raw = await hof_channel.history(limit=5000).flatten()
@@ -384,6 +384,8 @@ class BotFrostClient(commands.Bot):
                         if str(reaction.message.id) in message_raw.embeds[0].footer.text:
                             duplicate = True
                             break
+
+                del message_history_raw
 
                 if not duplicate:
                     if str(reaction.emoji) == slowpoke:
@@ -410,8 +412,6 @@ class BotFrostClient(commands.Bot):
                             footer=f"Hall of Fame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')} | Message ID: {reaction.message.id}"
                         )
                         return await hof_channel.send(embed=embed)
-
-            del message_history_raw, duplicate, server_member_count
 
     async def split_payload(self, payload):
         guild = client.get_guild(payload.guild_id)
