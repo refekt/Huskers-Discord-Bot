@@ -25,6 +25,9 @@ from utils.mysql import process_MySQL, sqlRecordStats, sqlRetrieveTasks, sqlRetr
 from utils.thread import send_reminder
 
 
+# Testing new git install
+
+
 class BotFrostClient(commands.Bot):
     tweet_reactions = ("🎈", "🌽")
 
