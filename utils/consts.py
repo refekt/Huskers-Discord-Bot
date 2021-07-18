@@ -32,7 +32,7 @@ key = load_key()
 # decrypt(env_file, key)
 # encrypt(env_file, key)
 
-env_vars = decrypt_return_data(env_file, key)
+env_vars = decrypt_return_data(env_file, key) #small fixes
 
 # Cooldown rates for commands
 CD_GLOBAL_RATE = env_vars["global_rate"]
