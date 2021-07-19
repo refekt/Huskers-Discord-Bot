@@ -5,7 +5,7 @@ import pytz
 import re
 import requests
 from bs4 import BeautifulSoup
-from bs4.element import NavigableString
+from bs4.element import NavigableString, Tag
 
 from utils.consts import HEADERS
 
@@ -125,7 +125,6 @@ class HuskerDotComSchedule:
 
 
 def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
-
     r = requests.get(url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS)
 
     if not r.status_code == 200:
@@ -165,8 +164,11 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
     soup = BeautifulSoup(r.content, "html.parser")
 
     games_raw = soup.find_all(attrs={"class": "sidearm-schedule-games-container"})
+    games_raw = [game for game in games_raw[0].contents if type(game) == Tag]  # Remove all NavigableStrings from the list
 
-    games_raw = [game for game in games_raw[0].contents if not type(game) == NavigableString and len(game.attrs)]
+    for index, game in enumerate(games_raw):
+        if len(game.attrs) == 0:
+            games_raw[index] = game.contents[1].contents[3].contents[1]
 
     games = []
     season_stats = SeasonStats()
