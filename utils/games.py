@@ -210,7 +210,7 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
             game_date_time += datetime.timedelta(hours=1)
 
         if "Linux" in platform.platform():
-            offset = 6
+            offset = 0
             game_date_time += datetime.timedelta(hours=offset)
 
         games.append(
