@@ -1,6 +1,5 @@
 discord
 pytz
-pyhton-dotenv
 cffi
 unidecode
 Pillow
@@ -15,4 +14,6 @@ opencv-python-headless
 cfbd
 youtube_dl
 ffmpeg
+cryptography
+# pyhton-dotenv  # manual install?
 # Verified 5-July-2021
