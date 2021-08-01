@@ -70,5 +70,4 @@ if len(sys.argv) > 0:
 # Load "cogs"?
 client.load_extension("commands.croot_bot")
 
-# client.run("ODcxMDc1NjAyNTgzNjU4NjA3.YQWCXw.KH34T89I1yzj7yeNoUgKRiJtXKc")
 client.run(token)
