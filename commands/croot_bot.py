@@ -59,7 +59,7 @@ async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
 
 
 def checking_reaction(search_reactions, reaction_used, user_initiated):
-    if not user_initiated.bot:ed
+    if not user_initiated.bot:
         return reaction_used.emoji in search_reactions
 
 
