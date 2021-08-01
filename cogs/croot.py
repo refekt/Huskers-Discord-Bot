@@ -3,6 +3,10 @@ import datetime
 
 import discord
 from discord.ext import commands
+# from discord_slash.utils.manage_commands import create_option
+# from discord_slash.model import SlashCommandOptionType
+# from utils.consts import GUILD_TEST, GUILD_PROD
+# from utils.client import slash
 
 import cogs.fap as FAP
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE
@@ -16,7 +20,27 @@ class RecruitCommands(commands.Cog):
 
     @commands.command(aliases=["cb", ])
     @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
-    async def crootboot(self, ctx, year: int, *name):
+    # @slash.slash(name="cb", description="Tag someone on the server!", guild_ids=[GUILD_TEST],
+    #              options=
+    #              [
+    #                  create_option(
+    #                      name="ctx",
+    #                      description="Discord Context"
+    #                  ),
+    #                  create_option(
+    #                      name="year",
+    #                      description="The year to search",
+    #                      option_type=SlashCommandOptionType.INTEGER,
+    #                      required=True
+    #                  ),
+    #                  create_option(
+    #                      name="name",
+    #                      description="The name of theh recruit to search",
+    #                      option_type=SlashCommandOptionType.STRING,
+    #                      required=True
+    #                  )
+    #              ])
+    async def _cb(self, ctx, year: int, name: str):
         """ Retreive information about a recruit """
         if len(name) == 0:
             raise discord.ext.commands.UserInputError("A player's first and/or last name is required.")

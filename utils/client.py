@@ -9,6 +9,7 @@ from datetime import datetime
 
 import discord
 from discord.ext import commands
+from discord_slash import SlashCommand
 
 import utils.consts as consts
 from cogs.images import build_quote
@@ -610,6 +611,8 @@ client = BotFrostClient(
     owner_id=189554873778307073,
     intents=client_intents
 )
+
+slash = SlashCommand(client, sync_commands=True)  # Declares slash commands through the client.
 
 extensions = (
     "cogs.admin",

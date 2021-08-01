@@ -22,6 +22,9 @@ from utils.thread import send_reminder
 from cfbd import BettingApi, ApiClient
 from cfbd.rest import ApiException
 
+from utils.client import slash
+from utils.consts import GUILD_TEST
+
 
 class TeamStatsWinsipediaTeam:
 
@@ -419,8 +422,16 @@ class TextCommands(commands.Cog):
                 except IndexError:
                     return await ctx.send("The season is over! No upcoming games found.")
 
-    @commands.command(aliases=["8b", ])
-    @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    # @commands.command(aliases=["8b", ])
+    # @commands.cooldown(rate=CD_GLOBAL_RATE, per=CD_GLOBAL_PER, type=CD_GLOBAL_TYPE)
+    @slash.slash(
+        name="e8",
+        description="Ask a Magic 8-Ball a question",
+        guild_ids=[GUILD_TEST],
+        options=[
+
+        ]
+    )
     async def eightball(self, ctx):
         """ Ask a Magic 8-Ball a question. """
         eight_ball = [
