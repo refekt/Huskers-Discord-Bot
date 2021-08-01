@@ -141,20 +141,6 @@ class RecruitCog(Cog):
 
         await final_send_embed_fap_loop(ctx=ctx, target_recruit=search[button_to_index[button_context.custom_id]], bot=self.bot)
 
-    # This may work but not having the `search` and `target_recruit` etc. variables persit makes it difficult
-    # @commands.Cog.listener()
-    # async def on_component(self, ctx: ComponentContext):
-    #     if ctx.component_type == 1:  # Blue, searching
-    #         button_to_index = {"result_1": 1, "result_2": 2, "result_3": 3, "result_4": 4, "result_5": 5}
-    #
-    #         await final_send_embed_fap_loop(ctx=ctx, target_recruit=search[button_to_index[button_context.custom_id]], bot=self.bot)
-    #     elif ctx.component_type == 2:  # Gray, FAP
-    #         if ctx.custom_id == "crystal_ball":
-    #             await initiate_fap(ctx.author, target_recruit, bot)
-    #
-    #         elif ctx.custom_id == "scroll":
-    #             await individual_predictions(ctx=ctx, recruit=target_recruit)
-
 
 def setup(bot):
     bot.add_cog(RecruitCog(bot))
