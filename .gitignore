@@ -1,0 +1,4 @@
+.gitignore
+
+/key.key
+/variables.json
