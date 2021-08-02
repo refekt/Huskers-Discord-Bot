@@ -67,7 +67,12 @@ if len(sys.argv) > 0:
     else:
         token = TEST_TOKEN
 
-# Load "cogs"?
-client.load_extension("commands.croot_bot")
+extensions = [
+    "commands.croot_bot",
+    "commands.admin"
+]
+for extension in extensions:
+    print(f"### ~~~ Loading extension: {extension} ###")
+    client.load_extension(extension)
 
 client.run(token)

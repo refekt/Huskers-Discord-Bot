@@ -9,15 +9,9 @@ from discord_slash.utils.manage_components import wait_for_component
 from objects.FAP import initiate_fap, individual_predictions
 from objects.Recruit import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
-from utilities.constants import GUILD_PROD, GUILD_TEST
 from utilities.constants import user_error
 from utilities.embed import build_embed, build_recruit_embed
-from utilities.server_detection import production_server
-
-if production_server():
-    current_guild = [GUILD_PROD]
-else:
-    current_guild = [GUILD_TEST]
+from utilities.server_detection import which_guid
 
 
 async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
@@ -67,8 +61,12 @@ class RecruitCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="cb", description="Retreive information about a recruit", guild_ids=current_guild)
-    async def _cb(self, ctx: SlashContext, year: int, name: str):
+    @cog_ext.cog_slash(
+        name="crootbot",
+        description="Retreive information about a recruit",
+        guild_ids=[which_guid()]
+    )
+    async def _crootbot(self, ctx: SlashContext, year: int, name: str):
         if len(name) == 0:
             raise user_error("A player's first and/or last name is required.")
 

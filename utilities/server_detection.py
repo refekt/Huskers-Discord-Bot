@@ -1,5 +1,7 @@
 import sys
 
+from utilities.constants import GUILD_PROD, GUILD_TEST
+
 
 def production_server():
     try:
@@ -11,3 +13,10 @@ def production_server():
             return None
     except IndexError:
         return None
+
+
+def which_guid():
+    if production_server():
+        return GUILD_PROD
+    else:
+        return GUILD_TEST
