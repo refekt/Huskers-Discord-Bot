@@ -4,14 +4,13 @@ import discord
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand
 
-from utilities.constants import \
-    TEST_TOKEN, PROD_TOKEN
+from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.server_detection import production_server
 
 client = Bot(
     command_prefix="$",
     case_insensitive=True,
-    help_command=None,
+    # help_command=None,
     description="Bot Frost version 3.0! Now with Slash Commands",
     intents=discord.Intents.all()
 )
@@ -25,7 +24,7 @@ async def on_ready():
         f"### Bot Frost version 3.0 ###\n"
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
-        f"### The bot is ready! ###\n"
+        f"### The bot is ready! ###"
     )
 
 
@@ -69,7 +68,9 @@ if len(sys.argv) > 0:
 
 extensions = [
     "commands.croot_bot",
-    "commands.admin"
+    "commands.admin",
+    "commands.text"
+    # "commands.testing"
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension} ###")

@@ -2,9 +2,8 @@ import platform
 from datetime import datetime, timedelta
 
 import discord
-from discord.ext.commands import Cog
-from discord_slash import ButtonStyle
-from discord_slash import cog_ext
+from discord.ext import commands
+from discord_slash import ButtonStyle, cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import create_permission
@@ -16,7 +15,7 @@ from utilities.embed import build_embed as build_embed
 from utilities.server_detection import which_guid
 
 
-class AdminCommands(Cog):
+class AdminCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -212,6 +212,7 @@ UPDATE custom_lines SET result = %s WHERE keyword = %s
 
 
 def Process_MySQL(query: str, **kwargs):
+    print("### Starting an MySQL query ###")
     try:
         sqlConnection = pymysql.connect(
             host=SQL_HOST,
@@ -222,8 +223,8 @@ def Process_MySQL(query: str, **kwargs):
             cursorclass=pymysql.cursors.DictCursor
         )
         if not query == sqlRecordStats:
-            print(f"%%% Connected to the MySQL Database! %%%\n"
-                  f"%%% Preparing to execute [`{repr(query)}`{'] and [`' + repr(kwargs) + '`' if kwargs else ''}]")
+            print(f"### %%% Connected to the MySQL Database! ###\n"
+                  f"### %%% Preparing to execute [`{repr(query)}`{'] and [`' + repr(kwargs) + '`' if kwargs else ''}] ###")
     except:
         print(f"Unable to connect to the `{SQL_DB}` database.")
         return
@@ -266,11 +267,12 @@ def Process_MySQL(query: str, **kwargs):
         sqlConnection.commit()
 
     except:
-        raise ConnectionError("Error occurred opening the MySQL database.")
+        raise ConnectionError("### Error occurred opening the MySQL database.")
     finally:
         if not query == sqlRecordStats:
-            print(f"%%% Closing connection to the MySQL Database! %%%")
+            print(f"### Closing connection to the MySQL Database!")
         sqlConnection.close()
 
         if result:
+            print("### MySQL query finished")
             return result

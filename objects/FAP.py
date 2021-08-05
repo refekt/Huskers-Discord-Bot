@@ -57,6 +57,7 @@ def get_croot_predictions(recruit):
 
 
 async def initiate_fap(user, recruit, client):
+    # 3 August 2021: Want convert this to a SlashMessage and have it be hidden.
     valid_teams = await get_teams()
     team_prediction = None
     prediction_confidence = None
