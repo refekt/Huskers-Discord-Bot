@@ -1,17 +1,20 @@
 import asyncio
+import calendar
 import random
 import re
 import typing
 from datetime import datetime, timedelta
-import calendar
 
 import discord
 import markovify
 import requests
 from bs4 import BeautifulSoup
+from cfbd import BettingApi, ApiClient, Configuration
+from cfbd.rest import ApiException
 from discord.ext import commands
 
 from utils.consts import CD_GLOBAL_RATE, CD_GLOBAL_PER, CD_GLOBAL_TYPE, CHAN_BANNED
+from utils.consts import CFBD_KEY
 from utils.consts import HEADERS
 from utils.consts import TZ
 from utils.embed import build_embed
@@ -19,8 +22,6 @@ from utils.games import HuskerSchedule
 from utils.mysql import process_MySQL
 from utils.mysql import sqlRecordTasks
 from utils.thread import send_reminder
-from cfbd import BettingApi, ApiClient
-from cfbd.rest import ApiException
 
 
 class TeamStatsWinsipediaTeam:
@@ -239,23 +240,35 @@ class TextCommands(commands.Cog):
             return hour, mins
 
         def get_consensus_line(check_game):
-            cfb_api = BettingApi(ApiClient())
-            team = "nebraska"
-            conference = "B1G"
-            season = "both"
+            configuration = Configuration()
+            configuration.api_key["Authorization"] = CFBD_KEY
+            configuration.api_key_prefix["Authorization"] = "Bearer"
+
+            cfb_api = BettingApi(ApiClient(configuration))
+
+            team = "Nebraska"
             year = datetime.now().year
+
+            if check_game.location == "Lincoln, NE":
+                home_team = "Nebraska"
+                away_team = check_game.opponent.name
+            else:
+                home_team = check_game.opponent.name
+                away_team = "Nebraska"
+
             try:
-                api_response = cfb_api.get_lines(team=team, year=year, conference=conference)
+                api_response = cfb_api.get_lines(team=team, year=year, away=away_team, home=home_team)
             except ApiException:
                 return None
 
-            check_lines = [
-                entries for entries in api_response  # for lines in entries.lines
-                if entries.home_team.lower() == game.opponent.name.lower() or entries.away_team.lower() == game.opponent.name.lower()
-            ]
+            # check_lines = [
+            #     entries for entries in api_response  # for lines in entries.lines
+            #     if entries.home_team.lower() == game.opponent.name.lower() or entries.away_team.lower() == game.opponent.name.lower()
+            # ]
 
             try:
-                consensus_line = check_lines[0].lines[0].formatted_spread
+                # consensus_line = check_lines[0].lines[0].formatted_spread
+                consensus_line = api_response[0].lines[0]["formattedSpread"]
             except IndexError:
                 consensus_line = None
 

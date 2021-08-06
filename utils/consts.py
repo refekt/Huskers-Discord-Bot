@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 from utils.misc import load_key, decrypt_return_data
 from utils.misc import on_prod_server
 
-from utils.misc import decrypt, encrypt
-
 print(f"### Platform == {platform.platform()} ###")
 
 if "Windows" in platform.platform():
@@ -54,6 +52,9 @@ SQL_DB = env_vars["sqlDb"]
 REDDIT_CLIENT_ID = env_vars["reddit_client_id"]
 REDDIT_SECRET = env_vars["reddit_secret"]
 REDDIT_PW = env_vars["reddit_pw"]
+
+# CFBD API Key
+CFBD_KEY = env_vars["cfbd_api"]
 
 # SSH Information
 # SSH_HOST = env_vars["ssh_host"]
