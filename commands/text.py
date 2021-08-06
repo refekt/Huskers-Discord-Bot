@@ -159,6 +159,8 @@ class TextCommands(commands.Cog):
 
     @cog_ext.cog_component(components=buttons_voting)
     async def process_voting_buttons(self, ctx: ComponentContext):
+        # await ctx.defer()
+
         voters = ctx.origin_message.embeds[0].fields[3].value
         if str(ctx.author) in voters:
             return

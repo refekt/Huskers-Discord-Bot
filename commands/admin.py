@@ -4,15 +4,110 @@ from datetime import datetime, timedelta
 import discord
 from discord.ext import commands
 from discord_slash import ButtonStyle, cog_ext
-from discord_slash.context import SlashContext
+from discord_slash.context import SlashContext, ComponentContext
 from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import create_permission
-from discord_slash.utils.manage_components import create_button, create_actionrow
+from discord_slash.utils.manage_components import create_button, create_actionrow, spread_to_rows, create_select_option, create_select
 
 from utilities.constants import CHAN_BANNED
-from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD
+from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
+from utilities.constants import command_error
 from utilities.embed import build_embed as build_embed
 from utilities.server_detection import which_guid
+
+buttons_roles_hype = [
+    create_button(
+        style=ButtonStyle.gray,
+        label="Max",
+        custom_id="role_hype_max",
+        emoji="📈"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Some",
+        custom_id="role_hype_some",
+        emoji="⚠"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="No",
+        custom_id="role_hype_no",
+        emoji="⛔"
+    )
+]
+
+select_roles_food = create_select(
+    options=[
+        create_select_option(
+            label="Potato Gang",
+            value="Potato Gang",
+            emoji="🥔",
+        ),
+        create_select_option(
+            label="Asparagang",
+            value="Asparagang",
+            emoji="💚",
+        ),
+        create_select_option(
+            label="Runza",
+            value="Runza",
+            emoji="🥪",
+        ),
+        create_select_option(
+            label="Qdoba's Witness",
+            value="Qdoba's Witness",
+            emoji="🌯",
+        ),
+        create_select_option(
+            label="Aldi's Nuts",
+            value="Aldi's Nuts",
+            emoji="🥜",
+        )
+    ],
+    placeholder="Choose your food roles",
+    min_values=1,
+    max_values=5,
+    custom_id="select_roles_food"
+)
+
+buttons_roles_culture = [
+    create_button(
+        style=ButtonStyle.gray,
+        label="Meme Team",
+        emoji="😹",
+        custom_id="role_culture_meme"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="He Man Isms Hater Club",
+        emoji="♣",
+        custom_id="role_culture_isms"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Packer Backer",
+        emoji="🧀",
+        custom_id="role_culture_packer"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Pixel Gang",
+        emoji="☎",
+        custom_id="role_culture_pixel"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Airpod Gang",
+        emoji="🎧",
+        custom_id="role_culture_airpod"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Minecraft",
+        emoji="🪓",
+        custom_id="role_culture_minecraft"
+    )
+]
 
 
 class AdminCommands(commands.Cog):
@@ -24,7 +119,7 @@ class AdminCommands(commands.Cog):
         description="All about Bot Frost!",
         guild_ids=[which_guid()]
     )
-    async def _about(self, ctx):
+    async def _about(self, ctx: SlashContext):
         """ All about Bot Frost """
         await ctx.send(
             embed=build_embed(
@@ -54,7 +149,7 @@ class AdminCommands(commands.Cog):
             ]
         }
     )
-    async def _uit(self, ctx):
+    async def _uit(self, ctx: SlashContext):
         await ctx.send("Good bye world! 😭")
         print(f"User `{ctx.author}` turned off the bot.")
         await self.bot.logout()
@@ -64,7 +159,7 @@ class AdminCommands(commands.Cog):
         description="Donate to the cause!",
         guild_ids=[which_guid()]
     )
-    async def _donate(self, ctx):
+    async def _donate(self, ctx: SlashContext):
         """ Donate to the cause """
 
         await ctx.send(
@@ -149,33 +244,29 @@ class AdminCommands(commands.Cog):
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
 
     @cog_ext.cog_slash(
-        name="hypesquad",
-        description="Which hype are you?",
+        name="bug",
+        description="Submit a bug report for the bot",
         guild_ids=[which_guid()]
     )
-    async def hypesquad(self, ctx):
-        hype_buttons = [
-            create_button(
-                style=ButtonStyle.green,
-                label="Max Hype",
-                custom_id="max_hype",
-                emoji="📈"
-            ),
-            create_button(
-                style=ButtonStyle.gray,
-                label="Some Hype",
-                custom_id="some_hype",
-                emoji="⚠"
-            ),
-            create_button(
-                style=ButtonStyle.red,
-                label="No Hype",
-                custom_id="no_hype",
-                emoji="⛔"
-            )
-        ]
+    async def _bug(self, ctx: SlashContext):
+        embed = build_embed(
+            title=f"Bug Reporter",
+            fields=[
+                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
+            ]
+        )
+        await ctx.send(embed=embed)
 
-        hype_action_row = create_actionrow(*hype_buttons)
+    @cog_ext.cog_subcommand(
+        base="roles",
+        name="hype",
+        description="Assign hype roles",
+        guild_ids=[which_guid()]
+    )
+    async def _roles_hype(self, ctx: SlashContext):
+        print("### Roles: Hype Squad ###")
+
+        hype_action_row = create_actionrow(*buttons_roles_hype)
 
         embed = build_embed(
             title="Which Nebraska hype squad do you belong to?",
@@ -188,21 +279,127 @@ class AdminCommands(commands.Cog):
             ]
         )
 
-        await ctx.send(embed=embed, components=[hype_action_row])
+        await ctx.send(embed=embed, hidden=True, components=[hype_action_row])
 
-    @cog_ext.cog_slash(
-        name="bug",
-        description="Submit a bug report for the bot",
+    @cog_ext.cog_component(components=buttons_roles_hype)
+    async def process_roles_hype(self, ctx: ComponentContext):
+        await ctx.defer()
+
+        print("### ~~~ Gathering roles ###")
+
+        hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
+        hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
+        hype_no = ctx.guild.get_role(ROLE_HYPE_NO)
+
+        if any([hype_max, hype_some, hype_no]) is None:
+            raise command_error("Unable to locate role!")
+
+        if ctx.custom_id == "role_hype_max":
+            await ctx.author.add_roles(hype_max, reason="Hype squad")
+            await ctx.author.remove_roles(hype_some, hype_no, reason="Hype squad")
+
+            await ctx.send(f"{ctx.author.mention} is now on team Max Hype!")
+        elif ctx.custom_id == "role_hype_some":
+            await ctx.author.add_roles(hype_some, reason="Hype squad")
+            await ctx.author.remove_roles(hype_max, hype_no, reason="Hype squad")
+
+            await ctx.send(f"{ctx.author.mention} is now on team Some Hype!")
+        elif ctx.custom_id == "role_hype_no":
+            await ctx.author.add_roles(hype_no, reason="Hype squad")
+            await ctx.author.remove_roles(hype_some, hype_max, reason="Hype squad")
+
+            await ctx.send(f"{ctx.author.mention} is now on team No Hype!")
+        else:
+            return
+
+        print("### Roles: Hype Squad")
+
+    @cog_ext.cog_component(components=buttons_roles_hype)
+    async def process_roles_hype(self, ctx: ComponentContext):
+        await ctx.defer()
+
+        print("### ~~~ Gathering roles ###")
+
+        hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
+        hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
+        hype_no = ctx.guild.get_role(ROLE_HYPE_NO)
+
+        if any([hype_max, hype_some, hype_no]) is None:
+            raise command_error("Unable to locate role!")
+
+        if ctx.custom_id == "role_hype_max":
+            await ctx.author.add_roles(hype_max, reason="Hype squad")
+            await ctx.author.remove_roles(hype_some, hype_no, reason="Hype squad")
+
+            await ctx.send(f"{ctx.author.mention} is now on team Max Hype!")
+        elif ctx.custom_id == "role_hype_some":
+            await ctx.author.add_roles(hype_some, reason="Hype squad")
+            await ctx.author.remove_roles(hype_max, hype_no, reason="Hype squad")
+
+            await ctx.send(f"{ctx.author.mention} is now on team Some Hype!")
+        elif ctx.custom_id == "role_hype_no":
+            await ctx.author.add_roles(hype_no, reason="Hype squad")
+            await ctx.author.remove_roles(hype_some, hype_max, reason="Hype squad")
+
+            await ctx.send(f"{ctx.author.mention} is now on team No Hype!")
+        else:
+            return
+
+        print("### Roles: Hype Squad")
+
+    @cog_ext.cog_subcommand(
+        base="roles",
+        name="culture",
+        description="Assign culture roles",
         guild_ids=[which_guid()]
     )
-    async def _bug(self, ctx):
+    async def _roles_culture(self, ctx: SlashContext):
+        print("### Roles: Culture ###")
+
         embed = build_embed(
-            title=f"Bug Reporter",
+            title="Which Nebraska hype squad do you belong to?",
+            description="Selecting a squad assigns you a role",
+            inline=False,
             fields=[
-                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
+                ["🥔 Potato Gang", "Info"],
+                ["💚 Asparagang", "Info"],
+                ["🥪 Runza", "Info"],
+                ["🌯 Qdoba's Witness", "Info"],
+                ["🥜 Aldi's Nuts", "Info"],
             ]
         )
-        await ctx.send(embed=embed)
+
+        await ctx.send(embed=embed, hidden=True, components=spread_to_rows(*buttons_roles_food, max_in_row=3))
+
+    @cog_ext.cog_subcommand(
+        base="roles",
+        name="food",
+        description="Assign food roles",
+        guild_ids=[which_guid()]
+    )
+    async def _roles_food(self, ctx: SlashContext):
+        print("### Roles: Food ###")
+
+        embed = build_embed(
+            title="Which Nebraska hype squad do you belong to?",
+            description="Selecting a squad assigns you a role",
+            inline=False,
+            fields=[
+                ["🥔 Potato Gang", "Info"],
+                ["💚 Asparagang", "Info"],
+                ["🥪 Runza", "Info"],
+                ["🌯 Qdoba's Witness", "Info"],
+                ["🥜 Aldi's Nuts", "Info"],
+            ]
+        )
+
+        food_action_row = create_actionrow(select_roles_food)
+
+        await ctx.send(embed=embed, hidden=True, components=[food_action_row])
+
+
+def setup(bot):
+    bot.add_cog(AdminCommands(bot))
 
     # @commands.command(hidden=True)
     # @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
@@ -284,7 +481,3 @@ class AdminCommands(commands.Cog):
     #
     #     await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
     #     await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
-
-
-def setup(bot):
-    bot.add_cog(AdminCommands(bot))

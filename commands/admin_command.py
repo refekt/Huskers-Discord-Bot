@@ -1,16 +1,12 @@
-import datetime
-
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
 from utilities.constants import CHAN_BOTLOGS, CHAN_NORTH_BOTTTOMS, CHAN_RULES, CHAN_IOWA
-from utilities.constants import GUILD_PROD
-from utilities.constants import REACITON_HYPE_SQUAD
 from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST
-from utilities.constants import ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, EMBED_TITLE_HYPE, ROLE_MOD_PROD, ROLE_TIME_OUT
+from utilities.constants import ROLE_MOD_PROD, ROLE_TIME_OUT
 from utilities.embed import build_embed as build_embed
-from utilities.mysql import Process_MySQL, sqlLogUser, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
+from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
 
 def not_botlogs(chan: discord.TextChannel):
@@ -74,7 +70,6 @@ class AdminCommands(Cog):
     #         await GENERAL_CHANNEL.send(f"🚨 ❗ Game day mode is now {toggle} for the server! Normal server discussion may resume! ❗ 🚨")
     #
     #     await GAMEDAY_CATEGORY.set_permissions(ROLE_EVERYONE, overwrite=perms)
-
 
     @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
@@ -240,15 +235,15 @@ class AdminCommands(Cog):
         await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
         await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
 
-    @commands.command()
-    async def bug(self, ctx):
-        await ctx.send(embed=build_embed(
-            title=f"Bug Reporter",
-            fields=[
-                ["Report Bugs",
-                 "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
-            ]
-        ))
+    # @commands.command()
+    # async def bug(self, ctx):
+    #     await ctx.send(embed=build_embed(
+    #         title=f"Bug Reporter",
+    #         fields=[
+    #             ["Report Bugs",
+    #              "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
+    #         ]
+    #     ))
 
 
 def setup(bot):

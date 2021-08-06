@@ -155,11 +155,11 @@ CROOT_SEARCH_LIMIT = 5
 
 
 # Global Errors
-def command_error(*message: str):
+def command_error(message: str):
     return CommandError(message=message)
 
 
-def user_error(*message: str):
+def user_error(message: str):
     return UserInputError(message=message)
 
 
