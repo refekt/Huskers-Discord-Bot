@@ -162,7 +162,7 @@ class TextCommands(commands.Cog):
         # await ctx.defer()
 
         voters = ctx.origin_message.embeds[0].fields[3].value
-        if str(ctx.author) in voters:
+        if str(ctx.author.mention) in voters:
             return
 
         query = ctx.origin_message.embeds[0].fields[0].value
@@ -172,7 +172,7 @@ class TextCommands(commands.Cog):
         if voters == "_":
             voters = ""
 
-        voters += f" {str(ctx.author)} "
+        voters += f" {str(ctx.author.mention)} "
 
         if ctx.custom_id == "vote_up":
             try:
