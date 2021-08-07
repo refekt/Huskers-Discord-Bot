@@ -308,23 +308,33 @@ class AdminCommands(commands.Cog):
         if any([hype_max, hype_some, hype_no]) is None:
             raise command_error("Unable to locate role!")
 
+        chosen_hype = ""
+
         if ctx.custom_id == "role_hype_max":
             await ctx.author.add_roles(hype_max, reason="Hype squad")
             await ctx.author.remove_roles(hype_some, hype_no, reason="Hype squad")
-
-            await ctx.send(f"{ctx.author.mention} is now on team Max Hype!")
+            chosen_hype = hype_max.mention
         elif ctx.custom_id == "role_hype_some":
             await ctx.author.add_roles(hype_some, reason="Hype squad")
             await ctx.author.remove_roles(hype_max, hype_no, reason="Hype squad")
-
-            await ctx.send(f"{ctx.author.mention} is now on team Some Hype!")
+            chosen_hype = hype_some.mention
         elif ctx.custom_id == "role_hype_no":
             await ctx.author.add_roles(hype_no, reason="Hype squad")
             await ctx.author.remove_roles(hype_some, hype_max, reason="Hype squad")
-
-            await ctx.send(f"{ctx.author.mention} is now on team No Hype!")
+            chosen_hype = hype_no.mention
         else:
             return
+
+        embed = build_embed(
+            title="Food Roles",
+            inline=False,
+            fields=[
+                ["Welcome!", f"[{ctx.author.mention}] has joined the following food roles"],
+                ["Roles", chosen_hype]
+            ]
+        )
+
+        await ctx.send(embed=embed)
 
         print("### Roles: Hype Squad")
 
