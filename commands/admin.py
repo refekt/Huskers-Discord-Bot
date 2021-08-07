@@ -349,10 +349,7 @@ class AdminCommands(commands.Cog):
 
         # Remove old food roles
         for role in roles_food:
-            # try:
             await ctx.author.remove_roles(roles_food[role], reason="Food roles")
-            # except:
-            #     continue
 
         # Add selected roles
         joined_roles = ""
