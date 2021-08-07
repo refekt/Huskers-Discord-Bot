@@ -7,10 +7,11 @@ from discord_slash import ButtonStyle, cog_ext
 from discord_slash.context import SlashContext, ComponentContext
 from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import create_permission
-from discord_slash.utils.manage_components import create_button, create_actionrow, spread_to_rows, create_select_option, create_select
+from discord_slash.utils.manage_components import create_button, create_actionrow, create_select_option, create_select
 
 from utilities.constants import CHAN_BANNED
 from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
+from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA
 from utilities.constants import command_error
 from utilities.embed import build_embed as build_embed
 from utilities.server_detection import which_guid
@@ -40,27 +41,27 @@ select_roles_food = create_select(
     options=[
         create_select_option(
             label="Potato Gang",
-            value="Potato Gang",
+            value=str(ROLE_POTATO),
             emoji="🥔",
         ),
         create_select_option(
             label="Asparagang",
-            value="Asparagang",
+            value=str(ROLE_ASPARAGUS),
             emoji="💚",
         ),
         create_select_option(
             label="Runza",
-            value="Runza",
+            value=str(ROLE_RUNZA),
             emoji="🥪",
         ),
         create_select_option(
             label="Qdoba's Witness",
-            value="Qdoba's Witness",
+            value=str(ROLE_QDOBA),
             emoji="🌯",
         ),
         create_select_option(
             label="Aldi's Nuts",
-            value="Aldi's Nuts",
+            value=str(ROLE_ALDIS),
             emoji="🥜",
         )
     ],
@@ -314,63 +315,6 @@ class AdminCommands(commands.Cog):
 
         print("### Roles: Hype Squad")
 
-    @cog_ext.cog_component(components=buttons_roles_hype)
-    async def process_roles_hype(self, ctx: ComponentContext):
-        await ctx.defer()
-
-        print("### ~~~ Gathering roles ###")
-
-        hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
-        hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
-        hype_no = ctx.guild.get_role(ROLE_HYPE_NO)
-
-        if any([hype_max, hype_some, hype_no]) is None:
-            raise command_error("Unable to locate role!")
-
-        if ctx.custom_id == "role_hype_max":
-            await ctx.author.add_roles(hype_max, reason="Hype squad")
-            await ctx.author.remove_roles(hype_some, hype_no, reason="Hype squad")
-
-            await ctx.send(f"{ctx.author.mention} is now on team Max Hype!")
-        elif ctx.custom_id == "role_hype_some":
-            await ctx.author.add_roles(hype_some, reason="Hype squad")
-            await ctx.author.remove_roles(hype_max, hype_no, reason="Hype squad")
-
-            await ctx.send(f"{ctx.author.mention} is now on team Some Hype!")
-        elif ctx.custom_id == "role_hype_no":
-            await ctx.author.add_roles(hype_no, reason="Hype squad")
-            await ctx.author.remove_roles(hype_some, hype_max, reason="Hype squad")
-
-            await ctx.send(f"{ctx.author.mention} is now on team No Hype!")
-        else:
-            return
-
-        print("### Roles: Hype Squad")
-
-    @cog_ext.cog_subcommand(
-        base="roles",
-        name="culture",
-        description="Assign culture roles",
-        guild_ids=[which_guid()]
-    )
-    async def _roles_culture(self, ctx: SlashContext):
-        print("### Roles: Culture ###")
-
-        embed = build_embed(
-            title="Which Nebraska hype squad do you belong to?",
-            description="Selecting a squad assigns you a role",
-            inline=False,
-            fields=[
-                ["🥔 Potato Gang", "Info"],
-                ["💚 Asparagang", "Info"],
-                ["🥪 Runza", "Info"],
-                ["🌯 Qdoba's Witness", "Info"],
-                ["🥜 Aldi's Nuts", "Info"],
-            ]
-        )
-
-        await ctx.send(embed=embed, hidden=True, components=spread_to_rows(*buttons_roles_food, max_in_row=3))
-
     @cog_ext.cog_subcommand(
         base="roles",
         name="food",
@@ -396,6 +340,43 @@ class AdminCommands(commands.Cog):
         food_action_row = create_actionrow(select_roles_food)
 
         await ctx.send(embed=embed, hidden=True, components=[food_action_row])
+
+    @cog_ext.cog_component(components=select_roles_food)
+    async def process_roles_food(self, ctx: ComponentContext):
+        roles_food = {}
+        for selection in select_roles_food["options"]:
+            roles_food[selection["value"]] = ctx.guild.get_role(role_id=int(selection["value"]))
+
+        # Remove old food roles
+        for role in roles_food:
+            # try:
+            await ctx.author.remove_roles(roles_food[role], reason="Food roles")
+            # except:
+            #     continue
+
+        # Add selected roles
+        joined_roles = ""
+
+        for selected in ctx.selected_options:
+            try:
+                await ctx.author.add_roles(roles_food[selected], reason="Food roles")
+
+                joined_roles += roles_food[selected].name + "\n"
+            except:
+                continue
+
+        if joined_roles == "":
+            raise command_error("Unable to join any of the selected roles!")
+
+        embed = build_embed(
+            title="Food Roles",
+            inline=False,
+            fields=[
+                ["Welcome!", f"[{ctx.author.mention}] has joined the following food roles"],
+                ["Roles", joined_roles]
+            ]
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
