@@ -15,7 +15,7 @@ def production_server():
         return None
 
 
-def which_guid():
+def which_guild():
     if production_server():
         return GUILD_PROD
     else:

@@ -11,10 +11,10 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 
 from utilities.constants import CHAN_BANNED
 from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_MEME, ROLE_ISMS, ROLE_PACKER, ROLE_PIXEL
-from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA
+from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA, CAT_GAMEDAY, ROLE_EVERYONE_PROD
 from utilities.constants import command_error
 from utilities.embed import build_embed as build_embed
-from utilities.server_detection import which_guid
+from utilities.server_detection import which_guild
 
 buttons_roles_hype = [
     create_button(
@@ -106,6 +106,24 @@ select_roles_culture = create_select(
 )
 
 
+async def process_gameday(mode: bool, guild: discord.Guild):
+    gameday_category = guild.get_channel(CAT_GAMEDAY)
+    everyone = guild.get_role(ROLE_EVERYONE_PROD)
+
+    perms = discord.PermissionOverwrite()
+    perms.send_messages = mode
+    perms.read_messages = mode
+    perms.view_channel = mode
+    perms.connect = mode
+    perms.speak = mode
+
+    for channel in gameday_category:
+        try:
+            await channel.set_permissions(everyone, overwrite=perms)
+        except:
+            continue
+
+
 class AdminCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -113,7 +131,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="about",
         description="All about Bot Frost!",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _about(self, ctx: SlashContext):
         """ All about Bot Frost """
@@ -136,9 +154,9 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="quit",
         description="Admin only: Turn off the bot",
-        guild_ids=[which_guid()],
+        guild_ids=[which_guild()],
         permissions={
-            which_guid(): [
+            which_guild(): [
                 create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
                 create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True),
                 create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, False)
@@ -153,7 +171,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="donate",
         description="Donate to the cause!",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _donate(self, ctx: SlashContext):
         """ Donate to the cause """
@@ -180,9 +198,9 @@ class AdminCommands(commands.Cog):
         base="purge",
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
-        guild_ids=[which_guid()],
+        guild_ids=[which_guild()],
         base_permissions={
-            which_guid(): [
+            which_guild(): [
                 create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
                 create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
             ]
@@ -210,9 +228,9 @@ class AdminCommands(commands.Cog):
         base="purge",
         name="bot",
         description="Admin only: Deletes previous bot messages",
-        guild_ids=[which_guid()],
+        guild_ids=[which_guild()],
         base_permissions={
-            which_guid(): [
+            which_guild(): [
                 create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
                 create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
             ]
@@ -242,7 +260,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="bug",
         description="Submit a bug report for the bot",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _bug(self, ctx: SlashContext):
         embed = build_embed(
@@ -257,7 +275,7 @@ class AdminCommands(commands.Cog):
         base="roles",
         name="hype",
         description="Assign hype roles",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _roles_hype(self, ctx: SlashContext):
         print("### Roles: Hype Squad ###")
@@ -314,7 +332,7 @@ class AdminCommands(commands.Cog):
         base="roles",
         name="food",
         description="Assign food roles",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _roles_food(self, ctx: SlashContext):
         print("### Roles: Food ###")
@@ -374,9 +392,9 @@ class AdminCommands(commands.Cog):
         base="roles",
         name="culture",
         description="Assign culture roles",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
-    async def _roles_food(self, ctx: SlashContext):
+    async def _roles_culture(self, ctx: SlashContext):
         print("### Roles: Culture ###")
 
         embed = build_embed(
@@ -430,87 +448,117 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @cog_ext.cog_subcommand(
+        base="gameday",
+        name="on",
+        description="Turn game day mode on",
+        guild_ids=[which_guild()],
+        base_permissions={
+            which_guild(): [
+                create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+                create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
+            ]
+        }
+    )
+    async def _gameday_on(self, ctx: SlashContext):
+        await process_gameday(True, ctx.guild)
+
+    @cog_ext.cog_subcommand(
+        base="gameday",
+        name="off",
+        description="Turn game day mode off",
+        guild_ids=[which_guild()],
+        base_permissions={
+            which_guild(): [
+                create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+                create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
+            ]
+        }
+    )
+    async def _gameday_off(self, ctx: SlashContext):
+        await process_gameday(False, ctx.guild)
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
 
-    # @commands.command(hidden=True)
-    # @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
-    # async def iowa(self, ctx, who: discord.Member, *, reason: str):
-    #     """ Removes all roles from a user, applies the @Time Out role, and records the user's ID to prevent leaving and rejoining to remove @Time Out """
-    #     if not who:
-    #         raise AttributeError("You must include a user!")
-    #
-    #     if not reason:
-    #         raise AttributeError("You must include a reason why!")
-    #
-    #     timeout = ctx.guild.get_role(ROLE_TIME_OUT)
-    #     iowa = ctx.guild.get_channel(CHAN_IOWA)
-    #     added_reason = f"Time Out by {ctx.message.author}: "
-    #
-    #     roles = who.roles
-    #     previous_roles = [str(role.id) for role in who.roles[1:]]
-    #     if previous_roles:
-    #         previous_roles = ",".join(previous_roles)
-    #
-    #     for role in roles:
-    #         try:
-    #             await who.remove_roles(role, reason=added_reason + reason)
-    #         except discord.Forbidden:
-    #             pass
-    #         except discord.HTTPException:
-    #             pass
-    #
-    #     try:
-    #         await who.add_roles(timeout, reason=added_reason + reason)
-    #     except discord.Forbidden:
-    #         pass
-    #     except discord.HTTPException:
-    #         pass
-    #
-    #     Process_MySQL(
-    #         query=sqlInsertIowa,
-    #         values=(who.id, added_reason + reason, previous_roles)
-    #     )
-    #
-    #     await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
-    #     await ctx.send(
-    #         f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
-    #     await who.send(f"You have been moved to [ {iowa.mention} ] for the following reason: {reason}.")
-    #
-    # @commands.command(hidden=True)
-    # @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
-    # async def nebraska(self, ctx, who: discord.Member):
-    #     if not who:
-    #         raise AttributeError("You must include a user!")
-    #
-    #     timeout = ctx.guild.get_role(ROLE_TIME_OUT)
-    #     await who.remove_roles(timeout)
-    #
-    #     previous_roles_raw = Process_MySQL(
-    #         query=sqlRetrieveIowa,
-    #         values=who.id,
-    #         fetch="all"
-    #     )
-    #
-    #     previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-    #
-    #     try:
-    #         if previous_roles:
-    #             for role in previous_roles:
-    #                 new_role = ctx.guild.get_role(int(role))
-    #                 await who.add_roles(new_role, reason="Returning from Iowa")
-    #     except discord.Forbidden:
-    #         pass
-    #     except discord.HTTPException:
-    #         pass
-    #
-    #     Process_MySQL(
-    #         query=sqlRemoveIowa,
-    #         values=who.id
-    #     )
-    #
-    #     iowa = ctx.guild.get_channel(CHAN_IOWA)
-    #
-    #     await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
-    #     await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
+# @commands.command(hidden=True)
+# @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
+# async def iowa(self, ctx, who: discord.Member, *, reason: str):
+#     """ Removes all roles from a user, applies the @Time Out role, and records the user's ID to prevent leaving and rejoining to remove @Time Out """
+#     if not who:
+#         raise AttributeError("You must include a user!")
+#
+#     if not reason:
+#         raise AttributeError("You must include a reason why!")
+#
+#     timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+#     iowa = ctx.guild.get_channel(CHAN_IOWA)
+#     added_reason = f"Time Out by {ctx.message.author}: "
+#
+#     roles = who.roles
+#     previous_roles = [str(role.id) for role in who.roles[1:]]
+#     if previous_roles:
+#         previous_roles = ",".join(previous_roles)
+#
+#     for role in roles:
+#         try:
+#             await who.remove_roles(role, reason=added_reason + reason)
+#         except discord.Forbidden:
+#             pass
+#         except discord.HTTPException:
+#             pass
+#
+#     try:
+#         await who.add_roles(timeout, reason=added_reason + reason)
+#     except discord.Forbidden:
+#         pass
+#     except discord.HTTPException:
+#         pass
+#
+#     Process_MySQL(
+#         query=sqlInsertIowa,
+#         values=(who.id, added_reason + reason, previous_roles)
+#     )
+#
+#     await iowa.send(f"[ {who.mention} ] has been sent to {iowa.mention}.")
+#     await ctx.send(
+#         f"[ {who} ] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {timeout.mention} will be reapplied on rejoining the server.")
+#     await who.send(f"You have been moved to [ {iowa.mention} ] for the following reason: {reason}.")
+#
+# @commands.command(hidden=True)
+# @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
+# async def nebraska(self, ctx, who: discord.Member):
+#     if not who:
+#         raise AttributeError("You must include a user!")
+#
+#     timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+#     await who.remove_roles(timeout)
+#
+#     previous_roles_raw = Process_MySQL(
+#         query=sqlRetrieveIowa,
+#         values=who.id,
+#         fetch="all"
+#     )
+#
+#     previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+#
+#     try:
+#         if previous_roles:
+#             for role in previous_roles:
+#                 new_role = ctx.guild.get_role(int(role))
+#                 await who.add_roles(new_role, reason="Returning from Iowa")
+#     except discord.Forbidden:
+#         pass
+#     except discord.HTTPException:
+#         pass
+#
+#     Process_MySQL(
+#         query=sqlRemoveIowa,
+#         values=who.id
+#     )
+#
+#     iowa = ctx.guild.get_channel(CHAN_IOWA)
+#
+#     await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
+#     await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")

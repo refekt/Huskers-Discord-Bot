@@ -10,7 +10,7 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 
 from utilities.constants import command_error
 from utilities.embed import build_embed
-from utilities.server_detection import which_guid
+from utilities.server_detection import which_guild
 
 buttons_ud = [
     create_button(
@@ -70,7 +70,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="urbanddictionary",
         description="Look up a word on Urban Dictionary",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _urbandictionary(self, ctx: SlashContext, *, word: str):
         r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
@@ -141,7 +141,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="vote",
         description="Ask the community for their opinion in votes",
-        guild_ids=[which_guid()]
+        guild_ids=[which_guild()]
     )
     async def _vote(self, ctx: SlashContext, *, query: str):
         embed = build_embed(
