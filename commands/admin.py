@@ -10,7 +10,7 @@ from discord_slash.utils.manage_commands import create_permission
 from discord_slash.utils.manage_components import create_button, create_actionrow, create_select_option, create_select
 
 from utilities.constants import CHAN_BANNED
-from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO
+from utilities.constants import ROLE_ADMIN_PROD, ROLE_ADMIN_TEST, ROLE_MOD_PROD, ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_MEME, ROLE_ISMS, ROLE_PACKER, ROLE_PIXEL
 from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA
 from utilities.constants import command_error
 from utilities.embed import build_embed as build_embed
@@ -71,44 +71,39 @@ select_roles_food = create_select(
     custom_id="select_roles_food"
 )
 
-buttons_roles_culture = [
-    create_button(
-        style=ButtonStyle.gray,
-        label="Meme Team",
-        emoji="😹",
-        custom_id="role_culture_meme"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="He Man Isms Hater Club",
-        emoji="♣",
-        custom_id="role_culture_isms"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Packer Backer",
-        emoji="🧀",
-        custom_id="role_culture_packer"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Pixel Gang",
-        emoji="☎",
-        custom_id="role_culture_pixel"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Airpod Gang",
-        emoji="🎧",
-        custom_id="role_culture_airpod"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Minecraft",
-        emoji="🪓",
-        custom_id="role_culture_minecraft"
-    )
-]
+select_roles_culture = create_select(
+    options=[
+        create_select_option(
+            label="Meme Team",
+            value=str(ROLE_MEME),
+            emoji="😹",
+        ),
+        create_select_option(
+            label="He Man Isms Hater Club",
+            value=str(ROLE_ISMS),
+            emoji="♣",
+        ),
+        create_select_option(
+            label="Packer Backer",
+            value=str(ROLE_PACKER),
+            emoji="🧀",
+        ),
+        create_select_option(
+            label="Pixel Gang",
+            value=str(ROLE_PIXEL),
+            emoji="📱",
+        ),
+        create_select_option(
+            label="Airpod Gang",
+            value=str(ROLE_ALDIS),
+            emoji="🎧",
+        )
+    ],
+    placeholder="Choose your culture roles",
+    min_values=1,
+    max_values=5,
+    custom_id="select_roles_culture"
+)
 
 
 class AdminCommands(commands.Cog):
@@ -325,8 +320,8 @@ class AdminCommands(commands.Cog):
         print("### Roles: Food ###")
 
         embed = build_embed(
-            title="Which Nebraska hype squad do you belong to?",
-            description="Selecting a squad assigns you a role",
+            title="Which food roles do you want?",
+            description="Assign yourself a role",
             inline=False,
             fields=[
                 ["🥔 Potato Gang", "Info"],
@@ -358,7 +353,7 @@ class AdminCommands(commands.Cog):
             try:
                 await ctx.author.add_roles(roles_food[selected], reason="Food roles")
 
-                joined_roles += roles_food[selected].name + "\n"
+                joined_roles += roles_food[selected].mention + "\n"
             except:
                 continue
 
@@ -370,6 +365,66 @@ class AdminCommands(commands.Cog):
             inline=False,
             fields=[
                 ["Welcome!", f"[{ctx.author.mention}] has joined the following food roles"],
+                ["Roles", joined_roles]
+            ]
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_subcommand(
+        base="roles",
+        name="culture",
+        description="Assign culture roles",
+        guild_ids=[which_guid()]
+    )
+    async def _roles_food(self, ctx: SlashContext):
+        print("### Roles: Culture ###")
+
+        embed = build_embed(
+            title="Which culture roles do you want?",
+            description="Assign yourself a role",
+            inline=False,
+            fields=[
+                ["😹 Meme team", "Info"],
+                ["♣ He Man Isms Hater Club", "Info"],
+                ["🧀 Packer Backer", "Info"],
+                ["📱 Pixel Gang", "Info"],
+                ["🎧 Airpod Gang", "Info"],
+            ]
+        )
+
+        culture_action_row = create_actionrow(select_roles_culture)
+
+        await ctx.send(embed=embed, hidden=True, components=[culture_action_row])
+
+    @cog_ext.cog_component(components=select_roles_culture)
+    async def process_roles_culture(self, ctx: ComponentContext):
+        roles_culture = {}
+        for selection in select_roles_culture["options"]:
+            roles_culture[selection["value"]] = ctx.guild.get_role(role_id=int(selection["value"]))
+
+        # Remove old food roles
+        for role in roles_culture:
+            await ctx.author.remove_roles(roles_culture[role], reason="Culture roles")
+
+        # Add selected roles
+        joined_roles = ""
+
+        for selected in ctx.selected_options:
+            try:
+                await ctx.author.add_roles(roles_culture[selected], reason="Culture roles")
+
+                joined_roles += roles_culture[selected].mention + "\n"
+            except:
+                continue
+
+        if joined_roles == "":
+            raise command_error("Unable to join any of the selected roles!")
+
+        embed = build_embed(
+            title="Food Roles",
+            inline=False,
+            fields=[
+                ["Welcome!", f"[{ctx.author.mention}] has joined the following culture roles"],
                 ["Roles", joined_roles]
             ]
         )
