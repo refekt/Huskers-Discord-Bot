@@ -5,8 +5,9 @@ from discord_slash.context import SlashContext
 from utilities.constants import command_error
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
-from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand
+from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand, sqlSelectAllImageCommand
 from utilities.server_detection import which_guild
+from utilities.constants import DT_OBJ_FORMAT
 
 
 def create_img(author: int, image_name: str, image_url: str):
@@ -37,6 +38,16 @@ def retrieve_img(image_name: str):
         )
     except:
         raise command_error(f"Unable to locate an image command named [{image_name}].")
+
+
+def retrieve_all_img():
+    try:
+        return Process_MySQL(
+            query=sqlSelectAllImageCommand,
+            fetch="all"
+        )
+    except:
+        raise command_error(f"Unable to retrieve image commands.")
 
 
 class ImageCommands(commands.Cog):
@@ -79,6 +90,33 @@ class ImageCommands(commands.Cog):
             fields=[
                 ["Deleted", f"You have deleted the image command [{image_name}]."]
             ]
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="imglist",
+        description="Show a list of all available image commands",
+        guild_ids=[which_guild()]
+    )
+    async def _imglist(self, ctx: SlashContext):
+        all_imgs = retrieve_all_img()
+        fields = []
+
+        for img in all_imgs:
+            try:
+                author = ctx.guild.get_member(user_id=int(img['author'])).mention
+            except:
+                author = "N/A"
+
+            created_at = img['created_at']
+            fields.append([img["img_name"], f"Image URL: {img['img_url']}\n"
+                                            f"Author: {author}\n"
+                                            f"Created At: {created_at.strftime(DT_OBJ_FORMAT)}"])
+
+        embed = build_embed(
+            title="List of Image Commands",
+            inline=False,
+            fields=fields
         )
         await ctx.send(embed=embed)
 

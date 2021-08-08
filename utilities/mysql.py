@@ -10,6 +10,10 @@ sqlSelectImageCommand = """
 SELECT img_name, img_url, author FROM img_cmd_db WHERE img_name = %s
 """
 
+sqlSelectAllImageCommand = """
+SELECT img_name , img_url , author , created_at FROM img_cmd_db 
+"""
+
 sqlDeleteImageCommand = """
 DELETE FROM img_cmd_db WHERE img_name = %s AND author = %s
 """

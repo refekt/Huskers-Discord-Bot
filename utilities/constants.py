@@ -159,6 +159,9 @@ BOT_FOOTER_BOT = "Created by Bot Frost"
 #
 CROOT_SEARCH_LIMIT = 5
 
+# DateTime format
+DT_OBJ_FORMAT = "%d %b %y %I:%M %p %Z"
+
 
 # Global Errors
 def command_error(message: str):
