@@ -110,18 +110,35 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     gameday_category = guild.get_channel(CAT_GAMEDAY)
     everyone = guild.get_role(ROLE_EVERYONE_PROD)
 
-    perms = discord.PermissionOverwrite()
-    perms.send_messages = mode
-    perms.read_messages = mode
-    perms.view_channel = mode
-    perms.connect = mode
-    perms.speak = mode
+    print(f"### ~~~ Creating permissions to be [{mode}] ###")
 
-    for channel in gameday_category:
+    perms_text = discord.PermissionOverwrite()
+    perms_text.view_channel = mode
+    perms_text.send_messages = mode
+    perms_text.read_messages = mode
+
+    perms_voice = discord.PermissionOverwrite()
+    perms_voice.connect = mode
+    perms_voice.speak = mode
+
+    print("### ~~~ Permissions created")
+
+    for channel in gameday_category.channels:
         try:
-            await channel.set_permissions(everyone, overwrite=perms)
+            print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{mode}] ###")
+            if channel.type == discord.ChannelType.text:
+                await channel.set_permissions(everyone, overwrite=perms_text)
+            elif channel.type == discord.ChannelType.voice:
+                await channel.set_permissions(everyone, overwrite=perms_voice)
+            else:
+                continue
+            print(f"### ~~~ Changed permissions for [{channel}] to [{mode}] ###")
+        except discord.errors.Forbidden:
+            raise command_error("The bot does not have access to change permissions!")
         except:
             continue
+
+    print("### ~~~ All permisisons changes applied ###")
 
 
 class AdminCommands(commands.Cog):
@@ -471,7 +488,18 @@ class AdminCommands(commands.Cog):
         }
     )
     async def _gameday_on(self, ctx: SlashContext):
+        print("### Game Day: On ###")
         await process_gameday(True, ctx.guild)
+        embed = build_embed(
+            title="Game Day Mode",
+            description="Game day mode is now on for the server! ",
+            fields=[
+                ["Live TV", "Live TV text and voice channels are for users who are watching live."],
+                ["Streaming", "Streaming text and voice channels are for users who are streaming the game."],
+                ["Info", "All game chat belongs in these channels until Game Day mode is turned off."]
+            ]
+        )
+        await ctx.send(embed=embed)
 
     @cog_ext.cog_subcommand(
         base="gameday",
@@ -486,7 +514,16 @@ class AdminCommands(commands.Cog):
         }
     )
     async def _gameday_off(self, ctx: SlashContext):
+        print("### Game Day: Off ###")
         await process_gameday(False, ctx.guild)
+        embed = build_embed(
+            title="Game Day Mode",
+            description="Game day mode is now off for the server! ",
+            fields=[
+                ["Info", "Normal discussion may resume outside game day channels."]
+            ]
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
