@@ -118,6 +118,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     perms_text.read_messages = mode
 
     perms_voice = discord.PermissionOverwrite()
+    perms_text.view_channel = mode
     perms_voice.connect = mode
     perms_voice.speak = mode
 
@@ -126,6 +127,9 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     for channel in gameday_category.channels:
         try:
             print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{mode}] ###")
+
+            print(channel.permissions_synced)
+
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text)
             elif channel.type == discord.ChannelType.voice:
