@@ -5,7 +5,7 @@ from discord_slash.context import SlashContext
 from utilities.constants import command_error
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
-from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand
+from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand
 from utilities.server_detection import which_guild
 
 
@@ -56,6 +56,28 @@ class ImageCommands(commands.Cog):
             image=image_url,
             fields=[
                 ["Image Created!", f"Congratulations, [{ctx.author.mention}] created the [{image_name}] command!"]
+            ]
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="imgdelete",
+        description="Delete image commands you've created",
+        guild_ids=[which_guild()]
+    )
+    async def _imgdelete(self, ctx: SlashContext, image_name: str):
+        try:
+            Process_MySQL(
+                query=sqlDeleteImageCommand,
+                values=[image_name, ctx.author_id]
+            )
+        except:
+            raise command_error("Unable to delete this image command!")
+
+        embed = build_embed(
+            title="Delete Image Command",
+            fields=[
+                ["Deleted", f"You have deleted the image command [{image_name}]."]
             ]
         )
         await ctx.send(embed=embed)

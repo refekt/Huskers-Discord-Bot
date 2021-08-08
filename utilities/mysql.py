@@ -10,6 +10,10 @@ sqlSelectImageCommand = """
 SELECT img_name, img_url, author FROM img_cmd_db WHERE img_name = %s
 """
 
+sqlDeleteImageCommand = """
+DELETE FROM img_cmd_db WHERE img_name = %s AND author = %s
+"""
+
 sqlDatabaseTimestamp = """
 INSERT INTO bot_connections (user, connected, timestamp) VALUES (%s, %s, %s)
 """
