@@ -4,7 +4,7 @@ import json
 
 def write_key():
     """
-    Generates a key and save it into a file
+    Generates a image_name and save it into a file
     """
     key = Fernet.generate_key()
     with open("key.key", "wb") as key_file:
@@ -13,14 +13,14 @@ def write_key():
 
 def load_key():
     """
-    Loads the key from the current directory named `key.key`
+    Loads the image_name from the current directory named `image_name.image_name`
     """
     return open("key.key", "rb").read()
 
 
 def encrypt(filename, key):
     """
-    Given a filename (str) and key (bytes), it encrypts the file and write it
+    Given a filename (str) and image_name (bytes), it encrypts the file and write it
     """
     f = Fernet(key)
     with open(filename, "rb") as file:
@@ -35,7 +35,7 @@ def encrypt(filename, key):
 
 def decrypt_return_data(filename, key):
     """
-    Given a filename (str) and key (bytes), it decrypts the file and write it
+    Given a filename (str) and image_name (bytes), it decrypts the file and write it
     """
     f = Fernet(key)
     with open(filename, "rb") as file:
@@ -50,7 +50,7 @@ def decrypt_return_data(filename, key):
 
 def decrypt(filename, key):
     """
-    Given a filename (str) and key (bytes), it decrypts the file and write it
+    Given a filename (str) and image_name (bytes), it decrypts the file and write it
     """
     f = Fernet(key)
     with open(filename, "rb") as file:

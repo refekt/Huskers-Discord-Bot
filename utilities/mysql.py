@@ -2,6 +2,14 @@ import pymysql.cursors
 
 from utilities.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
 
+sqlCreateImageCommand = """
+INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
+"""
+
+sqlSelectImageCommand = """
+SELECT image_name, img_url FROM img_cmd_db WHERE image_name = %s
+"""
+
 sqlDatabaseTimestamp = """
 INSERT INTO bot_connections (user, connected, timestamp) VALUES (%s, %s, %s)
 """

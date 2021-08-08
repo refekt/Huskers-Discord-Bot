@@ -15,5 +15,6 @@ cfbd
 youtube_dl
 ffmpeg
 cryptography
+validators
 # pyhton-dotenv  # manual install?
 # Verified 5-July-2021

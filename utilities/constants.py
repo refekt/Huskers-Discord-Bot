@@ -29,8 +29,8 @@ env_file = variables
 key = load_key()
 
 # Save decrypted file
-# decrypt(env_file, key)
-# encrypt(env_file, key)
+# decrypt(env_file, image_name)
+# encrypt(env_file, image_name)
 
 env_vars = decrypt_return_data(env_file, key)
 

@@ -71,88 +71,7 @@ class AdminCommands(Cog):
     #
     #     await GAMEDAY_CATEGORY.set_permissions(ROLE_EVERYONE, overwrite=perms)
 
-    @commands.command(hidden=True)
-    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
-    async def rules(self, ctx):
-        unmodded = self.bot.get_channel(id=CHAN_NORTH_BOTTTOMS)
-        text = \
-            f"""
-        1️⃣ Be respectful\n
-        2️⃣ Sending or linking any harmful material such as viruses, IP grabbers, etc. results in an immediate and permanent ban.\n
-        3️⃣ Abusing mentions to @everyone, the admins, the moderators (Frost Approved) or a specific person without proper reason is prohibited.\n
-        4️⃣ Act civil in all chats. {unmodded.mention} is the only unmoderated channel (with the exception of illegal activity).\n
-        5️⃣ Post content in the correct channels.\n
-        6️⃣ Absolutely no posting of personal information of others (doxxing).\n
-        7️⃣ Do not post graphic text or pictures of minors (<18yo)\n
-        8️⃣ Fuck Iowa, Colorado, Texas, Florida\n
-        9️⃣ All NSFW Images must be spoiler tagged
-        """
-        rules_channel = self.bot.get_channel(CHAN_RULES)
-        rules_title = "Huskers' Discord Rules"
-        messages = await rules_channel.history().flatten()
 
-        for message in messages:
-            if message.author == self.bot.user and message.embeds[0].title == rules_title:
-                new_embed = message.embeds[0]
-                new_embed.clear_fields()
-                new_embed.add_field(name="Rules", value=text)
-                await message.edit(content="", embed=new_embed)
-
-                return
-
-        del messages
-
-        await ctx.send(
-            embed=build_embed(
-                title=rules_title,
-                fields=[["Rules", text]]
-            )
-        )
-
-    @commands.command(hidden=True)
-    @commands.has_any_role(ROLE_ADMIN_PROD, ROLE_ADMIN_TEST)
-    async def roles(self, ctx):
-        roles = """
-        Below are a list of vanity roles you can add or remove whenever you like by reacting to this message:\n
-        Potato Gang (🥔)\n
-        Asparagang (💚)\n
-        /r/unza (🥪)\n
-        Meme Team (😹)\n
-        He Man, Isms Hater Club (♣)\n
-        Packer Backer (🧀)\n
-        Pixel Gang (☎)\n
-        Airpod Gang (🎧)\n
-        Minecraft (🪓)
-        """
-        roles_emojis = ("🥔", "💚", "🥪", "😹", "♣", "🧀", "☎", "🎧", "🪓")
-
-        rules_channel = self.bot.get_channel(CHAN_RULES)
-        messages = await rules_channel.history().flatten()
-        roles_title = "Huskers' Discord Roles"
-
-        for message in messages:
-            if message.author == self.bot.user and message.embeds[0].title == roles_title:
-                new_embed = message.embeds[0]
-                new_embed.clear_fields()
-                new_embed.add_field(name="Rules", value=roles)
-                await message.edit(content="", embed=new_embed)
-                await message.clear_reactions()
-                for emoji in roles_emojis:
-                    await message.add_reaction(emoji)
-
-                return
-
-        del messages
-
-        rules_message = await rules_channel.send(
-            embed=build_embed(
-                title=roles_title,
-                fields=[["Roles", roles]]
-            )
-        )
-
-        for emoji in roles_emojis:
-            await rules_message.add_reaction(emoji)
 
     # @commands.command(hidden=True)
     @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
@@ -235,15 +154,6 @@ class AdminCommands(Cog):
         await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
         await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
 
-    # @commands.command()
-    # async def bug(self, ctx):
-    #     await ctx.send(embed=build_embed(
-    #         title=f"Bug Reporter",
-    #         fields=[
-    #             ["Report Bugs",
-    #              "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
-    #         ]
-    #     ))
 
 
 def setup(bot):

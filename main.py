@@ -69,7 +69,8 @@ if len(sys.argv) > 0:
 extensions = [
     "commands.croot_bot",
     "commands.admin",
-    "commands.text"
+    "commands.text",
+    "commands.image"
     # "commands.testing"
 ]
 for extension in extensions:
