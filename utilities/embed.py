@@ -5,6 +5,7 @@ import discord
 import objects.FAP as FAP
 from objects.Schedule import HuskerSchedule
 from utilities.constants import BOT_FOOTER_BOT
+from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT
 from utilities.constants import TZ, BOT_DISPLAY_NAME, BOT_GITHUB_URL, BOT_ICON_URL, BOT_THUMBNAIL_URL
 
 
@@ -50,6 +51,33 @@ def build_embed(title, **kwargs):
         pass
 
     return embed
+
+
+def build_countdown_embed(days: int, hours: int, minutes: int, opponent, date_time: datetime, consensus, location):
+    if date_time.hour == DT_TBA_HR and date_time.minute == DT_TBA_MIN:  # Place holder hour and minute to signify TBA games
+        return build_embed(
+            title="Countdown until...",
+            inline=False,
+            fields=[
+                ["Opponent", opponent],
+                ["Scheduled Time", date_time.strftime(DT_OBJ_FORMAT_TBA)],
+                ["Location", location],
+                ["Time Remaining", f"{days}"],
+                ["Consensus Line", consensus if consensus else 'Line TBD']
+            ]
+        )
+    else:
+        return build_embed(
+            title="Countdown until...",
+            inline=False,
+            fields=[
+                ["Opponent", opponent],
+                ["Scheduled Time", date_time.strftime(DT_OBJ_FORMAT)],
+                ["Location", location],
+                ["Time Remaining", f"{days} days, {hours} hours, and {minutes} minutes"],
+                ["Consensus Line", consensus if consensus else 'Line TBD']
+            ]
+        )
 
 
 def build_recruit_embed(recruit):
@@ -144,40 +172,40 @@ def build_recruit_embed(recruit):
     return embed
 
 
-def build_schedule_embed(year, **kwargs):
-    scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
-
-    arrow = "» "
-    _nl = "\n"
-
-    embed = build_embed(
-        title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
-    )
-
-    if "week" in kwargs:
-        game = scheduled_games[int(kwargs["week"]) - 1]
-
-        value_string = f"{arrow + ' ' + game.outcome + _nl if not game.outcome == '' else ''}" \
-                       f"{arrow}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_nl}" \
-                       f"{arrow}{game.opponent.date_time}{_nl}" \
-                       f"{arrow}{game.location}"
-
-        embed.add_field(
-            name=f"**#{game.week}: {game.opponent.name}**",
-            value=value_string
-        )
-
-        embed.set_image(url=game.opponent.icon)
-    else:
-        for index, game in enumerate(scheduled_games):
-            value_string = f"{arrow + ' ' + game.outcome + _nl if not game.outcome == '' else ''}" \
-                           f"{arrow}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_nl}" \
-                           f"{arrow}{game.opponent.date_time}{_nl}" \
-                           f"{arrow}{game.location}"
-
-            embed.add_field(
-                name=f"**#{game.week}: {game.opponent.name}**",
-                value=value_string
-            )
-
-    return embed
+# def build_schedule_embed(year, **kwargs):
+#     scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
+#
+#     arrow = "» "
+#     _nl = "\n"
+#
+#     embed = build_embed(
+#         title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
+#     )
+#
+#     if "week" in kwargs:
+#         game = scheduled_games[int(kwargs["week"]) - 1]
+#
+#         value_string = f"{arrow + ' ' + game.outcome + _nl if not game.outcome == '' else ''}" \
+#                        f"{arrow}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_nl}" \
+#                        f"{arrow}{game.opponent.date_time}{_nl}" \
+#                        f"{arrow}{game.location}"
+#
+#         embed.add_field(
+#             name=f"**#{game.week}: {game.opponent.name}**",
+#             value=value_string
+#         )
+#
+#         embed.set_image(url=game.opponent.icon)
+#     else:
+#         for index, game in enumerate(scheduled_games):
+#             value_string = f"{arrow + ' ' + game.outcome + _nl if not game.outcome == '' else ''}" \
+#                            f"{arrow}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_nl}" \
+#                            f"{arrow}{game.opponent.date_time}{_nl}" \
+#                            f"{arrow}{game.location}"
+#
+#             embed.add_field(
+#                 name=f"**#{game.week}: {game.opponent.name}**",
+#                 value=value_string
+#             )
+#
+#     return embed

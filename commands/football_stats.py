@@ -1,12 +1,14 @@
-from discord.ext import commands
+import calendar
 from datetime import datetime
-from utilities.constants import TZ, CFBD_KEY
+
 from cfbd import BettingApi, ApiClient, Configuration
 from cfbd.rest import ApiException
-from objects.Schedule import HuskerSchedule
-import calendar
+from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT
+
+from objects.Schedule import HuskerSchedule
+from utilities.constants import TZ, CFBD_KEY
+from utilities.embed import build_countdown_embed
 from utilities.server_detection import which_guild
 
 
@@ -56,12 +58,6 @@ class FootballStatsCommands(commands.Cog):
 
             return consensus_line
 
-        async def send_countdown(days: int, hours: int, minutes: int, opponent, _datetime: datetime, consensus, location):
-            if _datetime.hour == DT_TBA_HR and _datetime.minute == DT_TBA_MIN:
-                await ctx.send(content=f"📢 📅:There are [ {days} days ] until the [ {opponent} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime(DT_OBJ_FORMAT_TBA)} ] played at [ {location} ].")
-            else:
-                await ctx.send(content=f"📢 📅:There are [ {days} days, {hours} hours, {minutes} minutes ] until the [ {opponent} {f'({consensus})' if consensus else '(Line TBD)'} ] game at [ {_datetime.strftime(DT_OBJ_FORMAT)} ] played at [ {location} ].")
-
         now_cst = datetime.now().astimezone(tz=TZ)
 
         games, stats = HuskerSchedule(sport=sport, year=now_cst.year)
@@ -69,50 +65,38 @@ class FootballStatsCommands(commands.Cog):
         if not games:
             return await ctx.send(content="No games found!")
 
+        game_compared = None
+
         for game in games:
-            if game.game_date_time > now_cst:  # If the game's date time is in the future
-                dt_game_time_diff = game.game_date_time - now_cst
-                diff_hours_minutes = convert_seconds(dt_game_time_diff.seconds)  # datetime object does not have hours or minutes
+            if team:  # Specific team
+                if game.opponent.lower() == team.lower():
+                    game_compared = game
+                    break
+            elif game.game_date_time > now_cst:  # Next future game
+                game_compared = game
+                break
 
-                if dt_game_time_diff.days < 0:
-                    if calendar.isleap(now_cst.year):
-                        year_days = 366
-                    else:
-                        year_days = 365
+        dt_game_time_diff = game_compared.game_date_time - now_cst
+        diff_hours_minutes = convert_seconds(dt_game_time_diff.seconds)  # datetime object does not have hours or minutes
 
-                    return await send_countdown(
-                        days=dt_game_time_diff.days + year_days,
-                        hours=diff_hours_minutes[0],
-                        minutes=diff_hours_minutes[1],
-                        opponent=game.opponent,
-                        _datetime=game.game_date_time,
-                        consensus=get_consensus_line(game),
-                        location=game.location
-                    )
+        year_days = 0
 
-                return await send_countdown(
-                    days=dt_game_time_diff.days,
-                    hours=diff_hours_minutes[0],
-                    minutes=diff_hours_minutes[1],
-                    opponent=game.opponent,
-                    _datetime=game.game_date_time,
-                    consensus=get_consensus_line(game),
-                    location=game.location
-                )
+        if dt_game_time_diff.days < 0:
+            if calendar.isleap(now_cst.year):
+                year_days = 366
+            else:
+                year_days = 365
 
-        # else:
-        #     for game in games:
-        #         if team.lower() == game.opponent.name.lower():
-        #             diff = game.game_date_time - now_cst
-        #             diff_cd = convert_seconds(diff.seconds)
-        #             if diff.days < 0:
-        #                 if calendar.isleap(now_cst.year):
-        #                     year_days = 366
-        #                 else:
-        #                     year_days = 365
-        #                 await send_countdown(diff.days + year_days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
-        #             await send_countdown(diff.days, diff_cd[0], diff_cd[1], game.opponent, game.game_date_time, get_consensus_line(game), game.location)
-        #             break
+        embed = build_countdown_embed(
+            days=dt_game_time_diff.days + year_days,
+            hours=diff_hours_minutes[0],
+            minutes=diff_hours_minutes[1],
+            opponent=game_compared.opponent,
+            date_time=game_compared.game_date_time,
+            consensus=get_consensus_line(game_compared),
+            location=game_compared.location
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

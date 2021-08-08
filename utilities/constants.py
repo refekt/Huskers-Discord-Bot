@@ -163,8 +163,8 @@ BOT_FOOTER_BOT = "Created by Bot Frost"
 CROOT_SEARCH_LIMIT = 5
 
 # DateTime format
-DT_OBJ_FORMAT = "%d %b %y %I:%M %p %Z"
-DT_OBJ_FORMAT_TBA = "%d %b %y"
+DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
+DT_OBJ_FORMAT_TBA = "%d %b %Y"
 DT_STR_FORMAT = "%b %d %Y %I:%M %p"
 DT_TBA_TIME = "10:58 PM"
 DT_TBA_HR = 10
