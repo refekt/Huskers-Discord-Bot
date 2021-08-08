@@ -76,6 +76,8 @@ class FootballStatsCommands(commands.Cog):
                 game_compared = game
                 break
 
+        del games, sport, team, game, stats
+
         dt_game_time_diff = game_compared.game_date_time - now_cst
         diff_hours_minutes = convert_seconds(dt_game_time_diff.seconds)  # datetime object does not have hours or minutes
 
@@ -92,6 +94,7 @@ class FootballStatsCommands(commands.Cog):
             hours=diff_hours_minutes[0],
             minutes=diff_hours_minutes[1],
             opponent=game_compared.opponent,
+            thumbnail=game_compared.icon,
             date_time=game_compared.game_date_time,
             consensus=get_consensus_line(game_compared),
             location=game_compared.location

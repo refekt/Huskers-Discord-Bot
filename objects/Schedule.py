@@ -30,10 +30,11 @@ class HuskerOpponent:
 
 
 class HuskerDotComSchedule:
-    def __init__(self, bets, location, opponent, outcome, ranking, week, game_date_time):
+    def __init__(self, bets, location, opponent, icon, outcome, ranking, week, game_date_time):
         self.bets = GameBetInfo
         self.location = location
         self.opponent = opponent
+        self.icon = icon
         self.outcome = outcome
         self.ranking = ranking
         self.week = week
@@ -153,6 +154,7 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
                 location=opponent.location,
                 opponent=opponent.name,
                 outcome=opponent.outcome,
+                icon=opponent.icon,
                 ranking=opponent.ranking,
                 week=opponent.week,
                 game_date_time=opponent.date_time

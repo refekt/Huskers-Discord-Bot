@@ -53,11 +53,12 @@ def build_embed(title, **kwargs):
     return embed
 
 
-def build_countdown_embed(days: int, hours: int, minutes: int, opponent, date_time: datetime, consensus, location):
+def build_countdown_embed(days: int, hours: int, minutes: int, opponent, thumbnail, date_time: datetime, consensus, location):
     if date_time.hour == DT_TBA_HR and date_time.minute == DT_TBA_MIN:  # Place holder hour and minute to signify TBA games
         return build_embed(
             title="Countdown until...",
             inline=False,
+            thumbnail=thumbnail,
             fields=[
                 ["Opponent", opponent],
                 ["Scheduled Time", date_time.strftime(DT_OBJ_FORMAT_TBA)],
@@ -70,6 +71,7 @@ def build_countdown_embed(days: int, hours: int, minutes: int, opponent, date_ti
         return build_embed(
             title="Countdown until...",
             inline=False,
+            thumbnail=thumbnail,
             fields=[
                 ["Opponent", opponent],
                 ["Scheduled Time", date_time.strftime(DT_OBJ_FORMAT)],
