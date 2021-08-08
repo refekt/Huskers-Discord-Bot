@@ -525,6 +525,28 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @cog_ext.cog_slash(
+        name="commands",
+        description="Show all slash commands",
+        guild_ids=[which_guild()]
+    )
+    async def _commands(self, ctx: SlashContext):
+        all_commands = []
+        for command in self.bot.slash.commands:
+            if self.bot.slash.commands[command].description is not None:
+                all_commands.append([
+                    self.bot.slash.commands[command].name,
+                    self.bot.slash.commands[command].description
+                ])
+
+        embed = build_embed(
+            title="Slash Commands",
+            inline=False,
+            description="List of slash commands and options for the server.",
+            fields=all_commands
+        )
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
