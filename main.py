@@ -70,7 +70,8 @@ extensions = [
     "commands.croot_bot",
     "commands.admin",
     "commands.text",
-    "commands.image"
+    "commands.image",
+    "commands.football_stats"
     # "commands.testing"
 ]
 for extension in extensions:

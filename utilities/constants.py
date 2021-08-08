@@ -55,6 +55,9 @@ REDDIT_CLIENT_ID = env_vars["reddit_client_id"]
 REDDIT_SECRET = env_vars["reddit_secret"]
 REDDIT_PW = env_vars["reddit_pw"]
 
+# CFBD API Key
+CFBD_KEY = env_vars["cfbd_api"]
+
 # SSH Information
 # SSH_HOST = env_vars["ssh_host"]
 # SSH_USER = env_vars["ssh_user"]
@@ -161,6 +164,11 @@ CROOT_SEARCH_LIMIT = 5
 
 # DateTime format
 DT_OBJ_FORMAT = "%d %b %y %I:%M %p %Z"
+DT_OBJ_FORMAT_TBA = "%d %b %y"
+DT_STR_FORMAT = "%b %d %Y %I:%M %p"
+DT_TBA_TIME = "10:58 PM"
+DT_TBA_HR = 10
+DT_TBA_MIN = 58
 
 
 # Global Errors
@@ -170,5 +178,3 @@ def command_error(message: str):
 
 def user_error(message: str):
     return UserInputError(message=message)
-
-
