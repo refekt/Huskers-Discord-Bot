@@ -7,7 +7,7 @@ INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
 """
 
 sqlSelectImageCommand = """
-SELECT image_name, img_url FROM img_cmd_db WHERE image_name = %s
+SELECT img_name, img_url, author FROM img_cmd_db WHERE img_name = %s
 """
 
 sqlDatabaseTimestamp = """

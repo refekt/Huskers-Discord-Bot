@@ -30,15 +30,13 @@ def create_img(author: int, image_name: str, image_url: str):
 
 def retrieve_img(image_name: str):
     try:
-        image = Process_MySQL(
+        return Process_MySQL(
             query=sqlSelectImageCommand,
-            fetch="one",
-            values=[image_name]
+            values=image_name,
+            fetch="one"
         )
     except:
         raise command_error(f"Unable to locate an image command named [{image_name}].")
-
-    return image
 
 
 class ImageCommands(commands.Cog):
@@ -69,7 +67,15 @@ class ImageCommands(commands.Cog):
     )
     async def _img(self, ctx: SlashContext, image_name: str):
         image = retrieve_img(image_name)
-        print()
+
+        author = ctx.guild.get_member(user_id=int(image["author"]))
+
+        embed = build_embed(
+            title=image["img_name"],
+            image=image["img_url"],
+            description=f"This command was created by [{author.mention}]."
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
