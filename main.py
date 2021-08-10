@@ -67,7 +67,7 @@ async def on_slash_command_error(ctx, ex):
             ["Description", ex]
         ]
     )
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, hidden=True)
 
 
 token = None
