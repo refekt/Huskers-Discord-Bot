@@ -172,8 +172,26 @@ DT_TBA_TIME = "10:58 PM"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58
 
-# Slash command permissions
+def production_server():
+    try:
+        if sys.argv[1] == "prod":
+            return True
+        elif sys.argv[1] == "test":
+            return False
+        else:
+            return None
+    except IndexError:
+        return None
 
+
+def which_guild():
+    if production_server():
+        return GUILD_PROD
+    else:
+        return GUILD_TEST
+
+
+# Slash command permissions
 admin_mod_perms = {
     which_guild(): [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
@@ -197,22 +215,3 @@ def command_error(message: str):
 
 def user_error(message: str):
     return UserInputError(message=message)
-
-
-def production_server():
-    try:
-        if sys.argv[1] == "prod":
-            return True
-        elif sys.argv[1] == "test":
-            return False
-        else:
-            return None
-    except IndexError:
-        return None
-
-
-def which_guild():
-    if production_server():
-        return GUILD_PROD
-    else:
-        return GUILD_TEST

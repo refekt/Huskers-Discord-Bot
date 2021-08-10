@@ -119,7 +119,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     perms_text.read_messages = mode
 
     perms_voice = discord.PermissionOverwrite()
-    perms_text.view_channel = mode
+    perms_voice.view_channel = mode
     perms_voice.connect = mode
     perms_voice.speak = mode
 
@@ -543,7 +543,7 @@ class AdminCommands(commands.Cog):
 
         role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         channel_iowa = ctx.guild.get_channel(CHAN_IOWA)
-        reason = f"Time Out by {ctx.message.author}: "
+        full_reason = f"Time Out by {ctx.author}: " + reason
 
         previous_roles = [str(role.id) for role in who.roles[1:]]
         if previous_roles:
@@ -552,18 +552,18 @@ class AdminCommands(commands.Cog):
         roles = who.roles
         for role in roles:
             try:
-                await who.remove_roles(role, reason=reason + reason)
+                await who.remove_roles(role, reason=full_reason)
             except (discord.Forbidden, discord.HTTPException):
                 pass
 
         try:
-            await who.add_roles(role_timeout, reason=reason + reason)
+            await who.add_roles(role_timeout, reason=full_reason)
         except (discord.Forbidden, discord.HTTPException):
             pass
 
         Process_MySQL(
             query=sqlInsertIowa,
-            values=(who.id, reason + reason, previous_roles)
+            values=(who.id, full_reason, previous_roles)
         )
 
         await channel_iowa.send(f"[ {who.mention} ] has been sent to {channel_iowa.mention}.")
@@ -573,7 +573,7 @@ class AdminCommands(commands.Cog):
             inline=False,
             fields=[
                 ["Statement", f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."],
-                ["Reason", reason]
+                ["Reason", full_reason]
             ]
         )
         await ctx.send(embed=embed)
