@@ -14,7 +14,7 @@ from utilities.constants import ROLE_TIME_OUT, CHAN_IOWA
 from utilities.constants import admin_mod_perms, admin_perms
 from utilities.constants import command_error
 from utilities.embed import build_embed as build_embed
-from utilities.mysql import Process_MySQL, sqlInsertIowa
+from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 from utilities.constants import which_guild
 
 buttons_roles_hype = [
@@ -586,51 +586,48 @@ class AdminCommands(commands.Cog):
         permissions=admin_mod_perms
     )
     async def _nebraska(self, ctx: SlashContext, who: discord.Member):
-        pass
+        await ctx.defer()
+
+        if not who:
+            raise command_error("You must include a user!")
+
+        role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+        await who.remove_roles(role_timeout)
+
+        previous_roles_raw = Process_MySQL(
+            query=sqlRetrieveIowa,
+            values=who.id,
+            fetch="all"
+        )
+
+        previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+
+        try:
+            if previous_roles:
+                for role in previous_roles:
+                    new_role = ctx.guild.get_role(int(role))
+                    await who.add_roles(new_role, reason="Returning from Iowa")
+        except (discord.Forbidden, discord.HTTPException):
+            pass
+
+        Process_MySQL(
+            query=sqlRemoveIowa,
+            values=who.id
+        )
+
+        iowa = ctx.guild.get_channel(CHAN_IOWA)
+
+        embed = build_embed(
+            title="Return to Nebraska",
+            inline=False,
+            fields=[
+                ["Welcome back!", f"[{who.mention}] is welcomed back to Nebraska!"],
+                ["Welcomed by", ctx.author.mention]
+            ]
+        )
+
+        await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
 
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))
-
-# @commands.command(hidden=True)
-# @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
-# async def iowa(self, ctx, who: discord.Member, *, reason: str):
-#     """ Removes all roles from a user, applies the @Time Out role, and records the user's ID to prevent leaving and rejoining to remove @Time Out """
-
-#
-# @commands.command(hidden=True)
-# @commands.has_any_role(ROLE_ADMIN_TEST, ROLE_ADMIN_PROD, ROLE_MOD_PROD)
-# async def nebraska(self, ctx, who: discord.Member):
-#     if not who:
-#         raise AttributeError("You must include a user!")
-#
-#     timeout = ctx.guild.get_role(ROLE_TIME_OUT)
-#     await who.remove_roles(timeout)
-#
-#     previous_roles_raw = Process_MySQL(
-#         query=sqlRetrieveIowa,
-#         values=who.id,
-#         fetch="all"
-#     )
-#
-#     previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-#
-#     try:
-#         if previous_roles:
-#             for role in previous_roles:
-#                 new_role = ctx.guild.get_role(int(role))
-#                 await who.add_roles(new_role, reason="Returning from Iowa")
-#     except discord.Forbidden:
-#         pass
-#     except discord.HTTPException:
-#         pass
-#
-#     Process_MySQL(
-#         query=sqlRemoveIowa,
-#         values=who.id
-#     )
-#
-#     iowa = ctx.guild.get_channel(CHAN_IOWA)
-#
-#     await ctx.send(f"[ {who} ] is welcome back to Nebraska.")
-#     await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
