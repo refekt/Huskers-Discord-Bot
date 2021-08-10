@@ -128,8 +128,6 @@ async def process_gameday(mode: bool, guild: discord.Guild):
         try:
             print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{mode}] ###")
 
-            print(channel.permissions_synced)
-
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text)
             elif channel.type == discord.ChannelType.voice:
@@ -496,6 +494,7 @@ class AdminCommands(commands.Cog):
         await process_gameday(True, ctx.guild)
         embed = build_embed(
             title="Game Day Mode",
+            inline=False,
             description="Game day mode is now on for the server! ",
             fields=[
                 ["Live TV", "Live TV text and voice channels are for users who are watching live."],
@@ -522,6 +521,7 @@ class AdminCommands(commands.Cog):
         await process_gameday(False, ctx.guild)
         embed = build_embed(
             title="Game Day Mode",
+            inline=False,
             description="Game day mode is now off for the server! ",
             fields=[
                 ["Info", "Normal discussion may resume outside game day channels."]
