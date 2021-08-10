@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-
+from discord_slash.utils.manage_commands import create_option
 from utilities.constants import command_error
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
@@ -48,6 +48,18 @@ def retrieve_all_img():
         )
     except:
         raise command_error(f"Unable to retrieve image commands.")
+
+
+image_options = []
+for img in retrieve_all_img():
+    image_options.append(
+        create_option(
+            name=img["img_name"],
+            description="Image command",
+            required=False,
+            option_type=1
+        )
+    )
 
 
 class ImageCommands(commands.Cog):
@@ -99,6 +111,7 @@ class ImageCommands(commands.Cog):
         guild_ids=[which_guild()]
     )
     async def _imglist(self, ctx: SlashContext):
+
         all_imgs = retrieve_all_img()
         fields = []
 
@@ -125,7 +138,7 @@ class ImageCommands(commands.Cog):
         description="Use an image command",
         guild_ids=[which_guild()]
     )
-    async def _img(self, ctx: SlashContext, image_name: str):
+    async def _doesitmatter(self, ctx: SlashContext, image_name: str):
         image = retrieve_img(image_name)
 
         author = ctx.guild.get_member(user_id=int(image["author"]))
@@ -136,6 +149,11 @@ class ImageCommands(commands.Cog):
             description=f"This command was created by [{author.mention}]."
         )
         await ctx.send(embed=embed)
+
+    # Testing dynamically created sub commands
+    # @commands.Cog.listener()
+    # async def on_slash_command(self, ctx: SlashContext):
+    #     print("somethingsdfasfas")
 
 
 def setup(bot):
