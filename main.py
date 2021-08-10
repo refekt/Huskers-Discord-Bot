@@ -6,6 +6,7 @@ from discord_slash import SlashCommand
 
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.server_detection import production_server
+from utilities.embed import build_embed
 
 client = Bot(
     command_prefix="$",
@@ -56,6 +57,17 @@ async def on_member_join(member):
 @client.event
 async def on_error(event, *args, **kwargs):
     print(event, args, kwargs)
+
+
+@client.event
+async def on_slash_command_error(ctx, ex):
+    embed = build_embed(
+        title="Slash Command Error",
+        fields=[
+            ["Description", ex]
+        ]
+    )
+    await ctx.send(embed=embed)
 
 
 token = None
