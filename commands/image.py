@@ -2,12 +2,14 @@ from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.utils.manage_commands import create_option
+
+from utilities.constants import DT_OBJ_FORMAT
+from utilities.constants import ROLE_ADMIN_PROD
 from utilities.constants import command_error
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
 from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand, sqlSelectAllImageCommand
 from utilities.server_detection import which_guild
-from utilities.constants import DT_OBJ_FORMAT
 
 
 def create_img(author: int, image_name: str, image_url: str):
@@ -18,7 +20,7 @@ def create_img(author: int, image_name: str, image_url: str):
     image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv")
 
     if not any(sub_str in image_url for sub_str in image_formats):
-        raise command_error(f"Invalid image URL fomrat. The URL must end with a [{', '.join(image_formats)}] extension.")
+        raise command_error(f"Invalid image URL format. The URL must end with a [{', '.join(image_formats)}] extension.")
 
     try:
         Process_MySQL(
@@ -83,6 +85,12 @@ class ImageCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    def is_valid(self, image):
+        if image is None:
+            return False
+        else:
+            return True
+
     @cog_ext.cog_slash(
         name="imgdelete",
         description="Delete image commands you've created",
@@ -90,9 +98,20 @@ class ImageCommands(commands.Cog):
     )
     async def _imgdelete(self, ctx: SlashContext, image_name: str):
         try:
+            img_author = int(retrieve_img(image_name)["author"])
+        except TypeError:
+            raise command_error(f"Unable to locate image [{image_name}]")
+
+        admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
+        if admin in ctx.author.roles:
+            pass
+        elif not ctx.author_id == img_author:
+            raise command_error(f"This command was created by [{ctx.guild.get_member(img_author).mention}] and can only be deleted by them")
+
+        try:
             Process_MySQL(
                 query=sqlDeleteImageCommand,
-                values=[image_name, ctx.author_id]
+                values=[image_name, str(ctx.author_id)]
             )
         except:
             raise command_error("Unable to delete this image command!")
@@ -111,7 +130,6 @@ class ImageCommands(commands.Cog):
         guild_ids=[which_guild()]
     )
     async def _imglist(self, ctx: SlashContext):
-
         all_imgs = retrieve_all_img()
         fields = []
 
@@ -138,8 +156,11 @@ class ImageCommands(commands.Cog):
         description="Use an image command",
         guild_ids=[which_guild()]
     )
-    async def _doesitmatter(self, ctx: SlashContext, image_name: str):
+    async def _img(self, ctx: SlashContext, image_name: str):
         image = retrieve_img(image_name)
+
+        if not self.is_valid(image):
+            await ctx.send(f"Unable to find an image command [{image_name}]")
 
         author = ctx.guild.get_member(user_id=int(image["author"]))
 
