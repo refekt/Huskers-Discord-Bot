@@ -103,16 +103,23 @@ class ImageCommands(commands.Cog):
             raise command_error(f"Unable to locate image [{image_name}]")
 
         admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
+        admin_delete = False
         if admin in ctx.author.roles:
-            pass
+            admin_delete = True
         elif not ctx.author_id == img_author:
             raise command_error(f"This command was created by [{ctx.guild.get_member(img_author).mention}] and can only be deleted by them")
 
         try:
-            Process_MySQL(
-                query=sqlDeleteImageCommand,
-                values=[image_name, str(ctx.author_id)]
-            )
+            if admin_delete:
+                Process_MySQL(
+                    query=sqlDeleteImageCommand,
+                    values=[image_name, str(img_author)]
+                )
+            else:
+                Process_MySQL(
+                    query=sqlDeleteImageCommand,
+                    values=[image_name, str(ctx.author_id)]
+                )
         except:
             raise command_error("Unable to delete this image command!")
 
