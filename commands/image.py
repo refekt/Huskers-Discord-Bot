@@ -10,6 +10,7 @@ from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
 from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand, sqlSelectAllImageCommand
 from utilities.server_detection import which_guild
+import discord
 
 
 def create_img(author: int, image_name: str, image_url: str):
@@ -170,11 +171,13 @@ class ImageCommands(commands.Cog):
             await ctx.send(f"Unable to find an image command [{image_name}]")
 
         author = ctx.guild.get_member(user_id=int(image["author"]))
+        if author is None:
+            author = "Unknown"
 
         embed = build_embed(
             title=image["img_name"],
             image=image["img_url"],
-            description=f"This command was created by [{author.mention}]."
+            description=f"This command was created by [{author.mention if type(author) == discord.Member else author}]."
         )
         await ctx.send(embed=embed)
 
