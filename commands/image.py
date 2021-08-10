@@ -9,7 +9,7 @@ from utilities.constants import command_error
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
 from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand, sqlSelectAllImageCommand
-from utilities.server_detection import which_guild
+from utilities.constants import which_guild
 import discord
 
 

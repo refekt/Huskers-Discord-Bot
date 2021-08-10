@@ -9,7 +9,7 @@ from discord_slash import cog_ext, SlashContext
 from objects.Schedule import HuskerSchedule
 from utilities.constants import TZ, CFBD_KEY
 from utilities.embed import build_countdown_embed
-from utilities.server_detection import which_guild
+from utilities.constants import which_guild
 
 
 class FootballStatsCommands(commands.Cog):

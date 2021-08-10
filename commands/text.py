@@ -16,7 +16,7 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 from utilities.constants import CHAN_BANNED
 from utilities.constants import command_error
 from utilities.embed import build_embed
-from utilities.server_detection import which_guild
+from utilities.constants import which_guild
 
 buttons_ud = [
     create_button(

@@ -10,7 +10,7 @@ from objects.Recruit import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import user_error
 from utilities.embed import build_embed, build_recruit_embed
-from utilities.server_detection import which_guild
+from utilities.constants import which_guild
 
 
 async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):

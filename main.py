@@ -5,7 +5,7 @@ from discord.ext.commands import Bot
 from discord_slash import SlashCommand
 
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
-from utilities.server_detection import production_server
+from utilities.constants import production_server
 from utilities.embed import build_embed
 
 client = Bot(
