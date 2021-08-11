@@ -314,18 +314,22 @@ class TextCommands(commands.Cog):
             await ctx.send(markov_output)
 
     @cog_ext.cog_slash(
-        name="possomdroppings",
+        name="possumdroppings",
         description="Only the most secret and trustworthy drops",
         guild_ids=[which_guild()]
     )
-    async def _possomdroppings(self, ctx: SlashContext, message: str):
+    async def _possumdroppings(self, ctx: SlashContext, message: str):
+        await ctx.defer()
+
         if not ctx.channel_id == CHAN_POSSUMS:
             raise command_error(f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]")
 
+        temp_msg = await ctx.send("Thinking...", delete_after=0)
+
         embed = build_embed(
-            title="Possom Droppings",
+            title="Possum Droppings",
             inline=False,
-            thumbnail="https://static.boredpanda.com/blog/wp-content/uploads/2016/01/cute-possums-341__700.jpg",
+            thumbnail="https://cdn.discordapp.com/attachments/593984711706279937/875162041818693632/unknown.jpeg",
             footer="Created by a possom",
             fields=[
                 ["Droppings", message]

@@ -7,6 +7,7 @@ from discord_slash import SlashCommand
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
 from utilities.embed import build_embed
+import validators
 
 client = Bot(
     command_prefix="$",
@@ -17,6 +18,32 @@ client = Bot(
 )
 
 slash = SlashCommand(client, sync_commands=True)  # Sync required
+
+
+class SocialMediaURLType:
+    instagram = 1
+    tiktok = 2
+    facebook = 3
+
+
+def _validateURL(url: str, url_type: SocialMediaURLType):
+    pass
+
+
+def _hasInstagramURL(message: discord.Message):
+    pass
+
+
+def _hasTikTokURL(message: discord.Message):
+    pass
+
+
+def _hasFacebookURL(message: discord.Message):
+    pass
+
+
+def _hasSocialMediaURL(message: discord.Message):
+    pass
 
 
 @client.event
@@ -56,7 +83,8 @@ async def on_member_join(member):
 
 @client.event
 async def on_error(event, *args, **kwargs):
-    print(event, args, kwargs)
+    # print(event, args, kwargs)
+    pass
 
 
 @client.event
