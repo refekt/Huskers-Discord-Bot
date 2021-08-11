@@ -13,7 +13,7 @@ from discord_slash.context import SlashContext
 from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import create_button, create_actionrow
 
-from utilities.constants import CHAN_BANNED
+from utilities.constants import CHAN_BANNED, CHAN_POSSUMS
 from utilities.constants import command_error
 from utilities.embed import build_embed
 from utilities.constants import which_guild
@@ -312,6 +312,26 @@ class TextCommands(commands.Cog):
             punctuation = ("!", ".", "?", "...")
             markov_output += random.choice(punctuation)
             await ctx.send(markov_output)
+
+    @cog_ext.cog_slash(
+        name="possomdroppings",
+        description="Only the most secret and trustworthy drops",
+        guild_ids=[which_guild()]
+    )
+    async def _possomdroppings(self, ctx: SlashContext, message: str):
+        if not ctx.channel_id == CHAN_POSSUMS:
+            raise command_error(f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]")
+
+        embed = build_embed(
+            title="Possom Droppings",
+            inline=False,
+            thumbnail="https://static.boredpanda.com/blog/wp-content/uploads/2016/01/cute-possums-341__700.jpg",
+            footer="Created by a possom",
+            fields=[
+                ["Droppings", message]
+            ]
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
