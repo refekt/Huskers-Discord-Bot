@@ -1,3 +1,4 @@
+import asyncio
 import platform
 from datetime import datetime, timedelta
 
@@ -7,15 +8,16 @@ from discord_slash import ButtonStyle, cog_ext
 from discord_slash.context import SlashContext, ComponentContext
 from discord_slash.utils.manage_components import create_button, create_actionrow, create_select_option, create_select
 
-from utilities.constants import CHAN_BANNED
+from utilities.constants import BOT_FOOTER_SECRET
+from utilities.constants import CHAN_BANNED, CHAN_GENERAL, CHAN_WAR_ROOM, CHAN_SCOTT
 from utilities.constants import ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_MEME, ROLE_ISMS, ROLE_PACKER, ROLE_PIXEL
 from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA, CAT_GAMEDAY, ROLE_EVERYONE_PROD
 from utilities.constants import ROLE_TIME_OUT, CHAN_IOWA
 from utilities.constants import admin_mod_perms, admin_perms
 from utilities.constants import command_error
+from utilities.constants import which_guild
 from utilities.embed import build_embed as build_embed
 from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
-from utilities.constants import which_guild
 
 buttons_roles_hype = [
     create_button(
@@ -37,6 +39,36 @@ buttons_roles_hype = [
         emoji="⛔"
     )
 ]
+
+console_buttons = [
+    create_button(
+        style=ButtonStyle.primary,
+        label="SMMS",
+        emoji="🦝",
+        custom_id="SMMS"
+    )
+]
+
+console_chan_select = create_select(
+    options=[
+        create_select_option(
+            label="General",
+            value="SMMS_general"
+        ),
+        create_select_option(
+            label="Recruiting",
+            value="SMMS_recruiting"
+        ),
+        create_select_option(
+            label="War Room",
+            value="SMMS_war"
+        )
+    ],
+    custom_id="SMMS_select",
+    min_values=1,
+    max_values=1,
+    placeholder="What channel do you want to send to?"
+)
 
 select_roles_food = create_select(
     options=[
@@ -625,8 +657,66 @@ class AdminCommands(commands.Cog):
                 ["Welcomed by", ctx.author.mention]
             ]
         )
-
+        await ctx.send(embed=embed)
         await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
+
+    @cog_ext.cog_slash(
+        name="console",
+        description="Admin only",
+        guild_ids=[which_guild()],
+        # permissions=admin_mod_perms
+    )
+    async def _console(self, ctx: SlashContext):
+
+        console_actionrow = create_actionrow(*console_buttons)
+        await ctx.send(content="Shh..", hidden=True)
+        await ctx.send(content="Shh...", components=[console_actionrow], hidden=True)
+
+    @cog_ext.cog_component(components=console_buttons)
+    async def process_console(self, ctx: ComponentContext):
+        if ctx.custom_id == "SMMS":
+            chan_select_actionrow = create_actionrow(console_chan_select)
+            await ctx.send("Choose a channel.", hidden=True, components=[chan_select_actionrow])
+
+    @cog_ext.cog_component(components=console_chan_select)
+    async def process_console_channel(self, ctx: ComponentContext):
+        await ctx.send("What is your message?", hidden=True)
+        try:
+            def validate(messsage):
+                if messsage.channel.id == ctx.channel_id and messsage.author.id == ctx.author_id:
+                    return True
+                else:
+                    return False
+
+            user_input = await self.bot.wait_for("message", check=validate)
+            user_msg = user_input.clean_content
+            await user_input.delete()
+            del user_input
+        except asyncio.TimeoutError:
+            return
+
+        embed = build_embed(
+            title="Secret Mammal Message System (SMMS)",
+            thumbnail="https://i.imgur.com/EGC1qNt.jpg",
+            footer=BOT_FOOTER_SECRET,
+            fields=[
+                ["Back Channel Communication", user_msg]
+            ]
+        )
+
+        chan = None
+
+        if ctx.values[0] == "SMMS_general":
+            chan = ctx.guild.get_channel(CHAN_GENERAL)
+        elif ctx.values[0] == "SMMS_recruiting":
+            chan = ctx.guild.get_channel(CHAN_SCOTT)
+        elif ctx.values[0] == "SMMS_war":
+            chan = ctx.guild.get_channel(CHAN_WAR_ROOM)
+
+        if chan is not None:
+            await chan.send(embed=embed)
+        else:
+            await ctx.send("Hiccup!", hidden=True)
 
 
 def setup(bot):
