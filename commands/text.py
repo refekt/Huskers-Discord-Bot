@@ -324,13 +324,13 @@ class TextCommands(commands.Cog):
         if not ctx.channel_id == CHAN_POSSUMS:
             raise command_error(f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]")
 
-        temp_msg = await ctx.send("Thinking...", delete_after=0)
+        await ctx.send("Thinking...", delete_after=0)
 
         embed = build_embed(
             title="Possum Droppings",
             inline=False,
             thumbnail="https://cdn.discordapp.com/attachments/593984711706279937/875162041818693632/unknown.jpeg",
-            footer="Created by a possom",
+            footer="Created by a possum",
             fields=[
                 ["Droppings", message]
             ]

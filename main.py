@@ -7,12 +7,10 @@ from discord_slash import SlashCommand
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
 from utilities.embed import build_embed
-import validators
 
 client = Bot(
     command_prefix="$",
     case_insensitive=True,
-    # help_command=None,
     description="Bot Frost version 3.0! Now with Slash Commands",
     intents=discord.Intents.all()
 )
@@ -20,30 +18,40 @@ client = Bot(
 slash = SlashCommand(client, sync_commands=True)  # Sync required
 
 
-class SocialMediaURLType:
-    instagram = 1
-    tiktok = 2
-    facebook = 3
-
-
-def _validateURL(url: str, url_type: SocialMediaURLType):
-    pass
-
-
-def _hasInstagramURL(message: discord.Message):
-    pass
-
-
-def _hasTikTokURL(message: discord.Message):
-    pass
-
-
-def _hasFacebookURL(message: discord.Message):
-    pass
-
-
-def _hasSocialMediaURL(message: discord.Message):
-    pass
+# Tried, but there's no easy way to extract direct links to share.
+# class SocialMediaURLType:
+#     tiktok = "tiktok.com"
+#     facebook = "facebook.com"
+#     none = None
+#     search_string = r"(vm\.tiktok\.com\/.{0,}\/|facebook\.com\/\d{0,}\/videos\/\d{0,})"
+#
+#
+# def SocialMediaURL(message: discord.Message) -> list:
+#     matches = re.findall(SocialMediaURLType.search_string, message.clean_content)
+#
+#     for match in matches:
+#         if not matches:
+#             return SocialMediaURLType.none
+#         elif SocialMediaURLType.tiktok in match:
+#             url = f"https://{match}"
+#             shortened_req = requests.get(url, headers=HEADERS)
+#             redirected_req = requests.get(shortened_req.url, headers=HEADERS)
+#             video_regex = r"https:\/\/.{0,}\.tiktok\.com\/video\/.{0,}vr\="
+#             soup = BeautifulSoup(redirected_req.content, "html.parser")
+#             url_find = re.findall(video_regex, soup.text)
+#
+#             embed_image = soup.find_all(text=re.compile(video_regex))
+#         elif SocialMediaURLType.facebook in match:
+#             pass
+#
+#
+# def _hasSocialMediaEmbed(message: discord.Message) -> bool:
+#     matches = re.findall(SocialMediaURLType.search_string, message.clean_content)
+#
+#     if matches:
+#         return True
+#     else:
+#         return False
 
 
 @client.event
@@ -58,11 +66,6 @@ async def on_ready():
 
 @client.event
 async def on_connect():
-    pass
-
-
-@client.event
-async def on_message(message):
     pass
 
 
@@ -84,6 +87,19 @@ async def on_member_join(member):
 @client.event
 async def on_error(event, *args, **kwargs):
     # print(event, args, kwargs)
+    pass
+
+
+@client.event
+async def on_message(message):
+    # if message.author.bot:
+    #     return
+    #
+    # if len(message.embeds) > 0:
+    #     return
+    #
+    # if _hasSocialMediaEmbed(message):
+    #     sm_url = SocialMediaURL(message)
     pass
 
 
