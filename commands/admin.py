@@ -664,7 +664,7 @@ class AdminCommands(commands.Cog):
         name="console",
         description="Admin only",
         guild_ids=[which_guild()],
-        # permissions=admin_mod_perms
+        permissions=admin_mod_perms
     )
     async def _console(self, ctx: SlashContext):
 
