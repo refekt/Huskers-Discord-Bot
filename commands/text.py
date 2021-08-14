@@ -383,6 +383,36 @@ class TextCommands(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @cog_ext.cog_slash(
+        name="police",
+        description="You are under arrest!",
+        guild_ids=[which_guild()]
+    )
+    async def _police(self, ctx: SlashContext, arestee: discord.Member):
+        message = f"**" \
+                  f"🚨 NANI 🚨\n" \
+                  f"..🚨 THE 🚨\n" \
+                  f"...🚨 FUCK 🚨\n" \
+                  f"....🚨 DID 🚨\n" \
+                  f".....🚨 YOU 🚨\n" \
+                  f"....🚨 JUST 🚨\n" \
+                  f"...🚨 SAY 🚨\n" \
+                  f"..🚨 {arestee.mention} 🚨\n" \
+                  f"🏃‍♀️💨 🔫🚓🔫🚓🔫🚓\n" \
+                  f"\n" \
+                  f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 " \
+                  f"🙅‍♀️Thanks for your cooperation. 😍🤩😘" \
+                  f"**"
+
+        embed = build_embed(
+            title="Wee woo wee woo!",
+            inline=False,
+            fields=[
+                ["Halt!", message]
+            ]
+        )
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))
