@@ -3,6 +3,8 @@ import sys
 import discord
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand
+from discord_slash.context import ComponentContext
+from discord_slash.model import CallbackObject
 
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
@@ -52,7 +54,45 @@ slash = SlashCommand(client, sync_commands=True)  # Sync required
 #         return True
 #     else:
 #         return False
-
+#
+#
+# @client.event
+# async def on_connect():
+#     pass
+#
+#
+# @client.event
+# async def on_raw_reaction_add(payload):
+#     pass
+#
+#
+# @client.event
+# async def on_raw_reaction_remove(payload):
+#     pass
+#
+#
+# @client.event
+# async def on_member_join(member):
+#     pass
+#
+#
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     # print(event, args, kwargs)
+#     pass
+#
+#
+# @client.event
+# async def on_message(message):
+# if message.author.bot:
+#     return
+#
+# if len(message.embeds) > 0:
+#     return
+#
+# if _hasSocialMediaEmbed(message):
+#     sm_url = SocialMediaURL(message)
+# pass
 
 @client.event
 async def on_ready():
@@ -65,53 +105,25 @@ async def on_ready():
 
 
 @client.event
-async def on_connect():
+async def on_slash_command_error(ctx, ex):
+    embed = build_embed(
+        title="Slash Command Error",
+        fields=[
+            ["Description", ex]
+        ]
+    )
+    await ctx.send(embed=embed, hidden=True)
+
+
+@client.event
+async def on_component(ctx: ComponentContext):
+    """ Called when a component is triggered. """
     pass
 
 
 @client.event
-async def on_raw_reaction_add(payload):
+async def on_component_callback(ctx: ComponentContext, callback: CallbackObject):
     pass
-
-
-@client.event
-async def on_raw_reaction_remove(payload):
-    pass
-
-
-@client.event
-async def on_member_join(member):
-    pass
-
-
-@client.event
-async def on_error(event, *args, **kwargs):
-    # print(event, args, kwargs)
-    pass
-
-
-@client.event
-async def on_message(message):
-    # if message.author.bot:
-    #     return
-    #
-    # if len(message.embeds) > 0:
-    #     return
-    #
-    # if _hasSocialMediaEmbed(message):
-    #     sm_url = SocialMediaURL(message)
-    pass
-
-
-# @client.event
-# async def on_slash_command_error(ctx, ex):
-#     embed = build_embed(
-#         title="Slash Command Error",
-#         fields=[
-#             ["Description", ex]
-#         ]
-#     )
-#     await ctx.send(embed=embed, hidden=True)
 
 
 token = None
@@ -127,7 +139,7 @@ extensions = [
     "commands.admin",
     "commands.text",
     "commands.image",
-    "commands.football_stats"
+    "commands.football_stats",
     # "commands.testing"
 ]
 for extension in extensions:
