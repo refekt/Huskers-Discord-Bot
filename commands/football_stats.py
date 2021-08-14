@@ -7,9 +7,10 @@ from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 
 from objects.Schedule import HuskerSchedule
+from objects.Winsipedia import CompareWinsipedia
 from utilities.constants import TZ, CFBD_KEY
-from utilities.embed import build_countdown_embed
 from utilities.constants import which_guild
+from utilities.embed import build_countdown_embed, build_embed
 
 
 class FootballStatsCommands(commands.Cog):
@@ -98,6 +99,35 @@ class FootballStatsCommands(commands.Cog):
             date_time=game_compared.game_date_time,
             consensus=get_consensus_line(game_compared),
             location=game_compared.location
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="compare",
+        description="Compare two teams stats",
+        guild_ids=[which_guild()]
+    )
+    async def _compare(self, ctx: SlashContext, comparison_team: str, comparison_against: str):
+        comparison_team = comparison_team.replace(" ", "-")
+        comparison_against = comparison_against.replace(" ", "-")
+
+        comparison = CompareWinsipedia(
+            compare=comparison_team,
+            against=comparison_against
+        )
+        embed = build_embed(
+            title=f"Historical records for [{comparison_team.title()}] vs. [{comparison_against.title()}]",
+            inline=False,
+            fields=[
+                ["Links", f"[All Games ]({comparison.full_games_url}) | "
+                          f"[{comparison_team.title()}'s Games]({'http://www.winsipedia.com/' + comparison_team.lower()}) |     "
+                          f"[{comparison_against.title()}'s Games]({'http://www.winsipedia.com/' + comparison_against.lower()})"],
+                [f"{comparison_team.title()}'s Recoard vs. {comparison_against.title()}", comparison.all_time_record],
+                [f"{comparison_team.title()}'s Largest MOV", f"{comparison.compare.largest_mov} ({comparison.compare.largest_mov_date})"],
+                [f"{comparison_team.title()}'s Longest Win Streak", f"{comparison.compare.longest_win_streak} ({comparison.compare.largest_win_streak_date})"],
+                [f"{comparison_against.title()}'s Largest MOV", f"{comparison.against.largest_mov} ({comparison.against.largest_mov_date})"],
+                [f"{comparison_against.title()}'s Longest Win Streak", f"{comparison.against.longest_win_streak} ({comparison.against.largest_win_streak_date})"]
+            ]
         )
         await ctx.send(embed=embed)
 
