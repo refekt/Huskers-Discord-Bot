@@ -173,14 +173,14 @@ def FootballRecruit(year, name):
     search_result_players = []
 
     def correct_commit_string():
-        if player['HighestRecruitInterestEventType'] == "HardCommit":
+        if search_player['HighestRecruitInterestEventType'] == "HardCommit":
             return "Hard Commit"
-        elif player['HighestRecruitInterestEventType'] == "OfficialVisit":
+        elif search_player['HighestRecruitInterestEventType'] == "OfficialVisit":
             return None
-        elif player['HighestRecruitInterestEventType'] == "0":
+        elif search_player['HighestRecruitInterestEventType'] == "0":
             return None
         else:
-            return player['HighestRecruitInterestEventType'].strip()
+            return search_player['HighestRecruitInterestEventType'].strip()
 
     def institution():
         insitution_type = soup.find_all(attrs={"data-js": "institution-selector"})
@@ -192,7 +192,7 @@ def FootballRecruit(year, name):
             return "High School"
 
     def _247_highlights():
-        return player['Player']['Url'] + 'Videos/'
+        return search_player['Player']['Url'] + 'Videos/'
 
     def early_enrolee():
         icon = soup.find_all(attrs={"class": "icon-time"})
@@ -372,9 +372,9 @@ def FootballRecruit(year, name):
         else:
             return False
 
-    # def rivals_profile(player):
-    #     # query = f"site:rivals.com/content/prospects/{player['Year']}+{player['Player']['FullName'].replace(' ', '+')}"
-    #     query = f"rivals.com {player['Year']} {player['Player']['FullName']}"
+    # def rivals_profile(search_player):
+    #     # query = f"site:rivals.com/content/prospects/{search_player['Year']}+{search_player['Player']['FullName'].replace(' ', '+')}"
+    #     query = f"rivals.com {search_player['Year']} {search_player['Player']['FullName']}"
     #     results = search(
     #         query=query,
     #         tld="com",
@@ -397,7 +397,7 @@ def FootballRecruit(year, name):
     #     return f"https://n.rivals.com/content/prospects/{ID}/featured/videos"
 
     def recruit_interests():
-        reqs = requests.get(url=player["RecruitInterestsUrl"], headers=HEADERS)
+        reqs = requests.get(url=search_player["RecruitInterestsUrl"], headers=HEADERS)
         interests_soup = BeautifulSoup(reqs.content, "html.parser")
         interests = interests_soup.find('ul', attrs={'class': "recruit-interest-index_lst"}).find_all('li', recursive=False)
         all_interests = []
@@ -418,31 +418,35 @@ def FootballRecruit(year, name):
 
         return all_interests
 
-    for index, player in enumerate(search_results):
-        p = player['Player']
+    for index, search_player in enumerate(search_results):
+        player = search_player['Player']
 
-        r = requests.get(url=player['Player']['Url'], headers=HEADERS)
+        r = requests.get(url=search_player['Player']['Url'], headers=HEADERS)
         soup = BeautifulSoup(r.content, "html.parser")
 
         team_id = 0
-        if player['CommitedInstitutionTeamImage'] is not None:
-            team_id = int(player['CommitedInstitutionTeamImage'].split('/')[-1].split('_')[-1].split('.')[0])  # Thank you Psy
+        if search_player['CommitedInstitutionTeamImage'] is not None:
+            team_id = int(search_player['CommitedInstitutionTeamImage'].split('/')[-1].split('_')[-1].split('.')[0])  # Thank you Psy
 
         schooltype = institution()
-        p_year = player['Year']
+        p_year = search_player['Year']
 
-        ranks = collect_ranks(player['Player']['Url'])
-        p['NationalRank'] = ranks["natl"]
-        p['StateRank'] = ranks["state"]
-        p['PositionRank'] = ranks["pos"]
+        ranks = collect_ranks(search_player['Player']['Url'])
+        player['NationalRank'] = ranks["natl"]
+        player['StateRank'] = ranks["state"]
+        player['PositionRank'] = ranks["pos"]
 
-        # rivals_prof = rivals_profile(player)
+        thumbnail = player["DefaultAssetUrl"]
+        if thumbnail == "/.":
+            thumbnail = None
+
+        # rivals_prof = rivals_profile(search_player)
         # rivals_id = rivals_ID(rivals_prof)
 
         try:
-            recruit_state = states[p['Hometown']['State']]
+            recruit_state = states[player['Hometown']['State']]
         except KeyError:
-            recruit_state = p['Hometown']['State']
+            recruit_state = player['Hometown']['State']
 
         try:
             recruit_committed_school = team_ids[str(team_id)] if team_id > 0 else None
@@ -451,31 +455,31 @@ def FootballRecruit(year, name):
 
         search_result_players.append(
             Recruit(
-                key=p['Key'],
-                name=p['FullName'],
-                city=p['Hometown']['City'] if p['Hometown']['City'] else 'N/A',
-                state=p['Hometown']['State'] if p['Hometown']['State'] else 'N/A',
+                key=player['Key'],
+                name=player['FullName'],
+                city=player['Hometown']['City'] if player['Hometown']['City'] else 'N/A',
+                state=player['Hometown']['State'] if player['Hometown']['State'] else 'N/A',
                 state_abbr=recruit_state,
-                height=p['Height'],
-                weight=p['Weight'],
-                bio=p['Bio'],
-                scout_evaluation=p['ScoutEvaluation'],
-                x247_profile=p['Url'],
+                height=player['Height'],
+                weight=player['Weight'],
+                bio=player['Bio'],
+                scout_evaluation=player['ScoutEvaluation'],
+                x247_profile=player['Url'],
                 x247_highlights=_247_highlights(),
-                school=p['PlayerHighSchool']['Name'],
+                school=player['PlayerHighSchool']['Name'],
                 school_type=schooltype,
-                position=p['PrimaryPlayerPosition']['Abbreviation'],
-                thumbnail=p['DefaultAssetUrl'],
-                rating_numerical=p['CompositeRating'],
-                rating_stars=p['CompositeStarRating'],
-                national_ranking=p['NationalRank'],
-                state_ranking=p['StateRank'],
-                position_ranking=p['PositionRank'],
+                position=player['PrimaryPlayerPosition']['Abbreviation'],
+                thumbnail=thumbnail,
+                rating_numerical=player['CompositeRating'],
+                rating_stars=player['CompositeStarRating'],
+                national_ranking=player['NationalRank'],
+                state_ranking=player['StateRank'],
+                position_ranking=player['PositionRank'],
                 committed=correct_commit_string(),
                 committed_school=recruit_committed_school,
-                commitment_date=player['AnnouncementDate'],
+                commitment_date=search_player['AnnouncementDate'],
                 recruit_interests=recruit_interests(),
-                recruit_interests_url=player["RecruitInterestsUrl"],
+                recruit_interests_url=search_player["RecruitInterestsUrl"],
                 year=p_year,
                 early_enrollee=early_enrolee(),
                 early_signee=early_signee(),
