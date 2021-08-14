@@ -137,7 +137,7 @@ class FootballStatsCommands(commands.Cog):
         guild_ids=[which_guild()]
     )
     async def _schedule(self, ctx: SlashContext, year: int = datetime.now().year, sport: str = "football"):
-        await ctx.defer()
+        # await ctx.defer()
         embed = build_schedule_embed(
             year=year,
             sport=sport

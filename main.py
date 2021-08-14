@@ -103,15 +103,15 @@ async def on_message(message):
     pass
 
 
-@client.event
-async def on_slash_command_error(ctx, ex):
-    embed = build_embed(
-        title="Slash Command Error",
-        fields=[
-            ["Description", ex]
-        ]
-    )
-    await ctx.send(embed=embed, hidden=True)
+# @client.event
+# async def on_slash_command_error(ctx, ex):
+#     embed = build_embed(
+#         title="Slash Command Error",
+#         fields=[
+#             ["Description", ex]
+#         ]
+#     )
+#     await ctx.send(embed=embed, hidden=True)
 
 
 token = None

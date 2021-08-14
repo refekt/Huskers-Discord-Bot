@@ -186,7 +186,7 @@ def build_schedule_embed(year, **kwargs):
                       f"{arrow}{game.game_date_time.strftime(DT_OBJ_FORMAT) if not game.game_date_time.hour == 21 else game.game_date_time.strftime(DT_OBJ_FORMAT_TBA)}{new_line_char}" \
                       f"{arrow}{game.location}"
 
-        fields.append([f"**Week {game.week}: {game.opponent}**", field_value])
+        fields.append([f"**Week {game.week}: {game.opponent} ({'Home' if game.home else 'Away'}) **", field_value])
 
     embed = build_embed(
         title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
