@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 
 from objects.Schedule import HuskerSchedule
-from objects.Winsipedia import CompareWinsipedia
+from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY
 from utilities.constants import which_guild
 from utilities.embed import build_countdown_embed, build_embed, build_schedule_embed
@@ -108,6 +108,8 @@ class FootballStatsCommands(commands.Cog):
         guild_ids=[which_guild()]
     )
     async def _compare(self, ctx: SlashContext, comparison_team: str, comparison_against: str):
+        await ctx.defer()
+
         comparison_team = comparison_team.replace(" ", "-")
         comparison_against = comparison_against.replace(" ", "-")
 
@@ -137,10 +139,39 @@ class FootballStatsCommands(commands.Cog):
         guild_ids=[which_guild()]
     )
     async def _schedule(self, ctx: SlashContext, year: int = datetime.now().year, sport: str = "football"):
-        # await ctx.defer()
+        await ctx.defer()
+
         embed = build_schedule_embed(
             year=year,
             sport=sport
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="teamstats",
+        description="Historical stats for a team",
+        guild_ids=[which_guild()]
+    )
+    async def _teamstats(self, ctx: SlashContext, team_name: str):
+        await ctx.defer()
+
+        team = TeamStatsWinsipediaTeam(team_name=team_name)
+
+        embed = build_embed(
+            title=f"{team_name.title()} Historical Stats",
+            fields=[
+                ["All Time Record", f"{team.all_time_record} ({team.all_time_record_rank})"],
+                ["All Time Wins", f"{team.all_time_wins} ({team.all_time_wins_rank})"],
+                ["Bowl Games", f"{team.bowl_games} ({team.bowl_games_rank})"],
+                ["Bowl Record", f"{team.bowl_record} ({team.bowl_record_rank})"],
+                ["Championships", f"{team.championships} ({team.championships_rank})"],
+                ["Conference Championships", f"{team.conf_championships} ({team.conf_championships_rank})"],
+                ["Consensus All American", f"{team.conf_championships} ({team.conf_championships_rank})"],
+                ["Heisman Winners", f"{team.heisman_winners} ({team.heisman_winners_rank})"],
+                ["NFL Draft Picks", f"{team.nfl_draft_picks} ({team.nfl_draft_picks_rank})"],
+                ["Weeks in AP Poll", f"{team.week_in_ap_poll} ({team.week_in_ap_poll_rank})"]
+            ],
+            inline=False
         )
         await ctx.send(embed=embed)
 
