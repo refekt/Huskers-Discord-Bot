@@ -16,5 +16,7 @@ youtube_dl
 ffmpeg
 cryptography
 validators
+nest-asyncio
+dinteractions-Paginator
 # pyhton-dotenv  # manual install?
 # Verified 5-July-2021
