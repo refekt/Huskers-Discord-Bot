@@ -337,6 +337,52 @@ class TextCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @cog_ext.cog_slash(
+        name="eightball",
+        description="Ask the magic 8-ball a qusetion",
+        guild_ids=[which_guild()]
+    )
+    async def _eightball(self, ctx: SlashContext, question: str):
+        eight_ball = [
+            'As I see it, yes.',
+            'Ask again later.',
+            'Better not tell you now.',
+            'Cannot predict now.',
+            'Coach V\'s cigar would like this!',
+            'Concentrate and ask again.',
+            'Definitely yes!',
+            'Don’t count on it...',
+            'Frosty!',
+            'Fuck Iowa!',
+            'It is certain.',
+            'It is decidedly so.',
+            'Most likely...',
+            'My reply is no.',
+            'My sources say no.',
+            'Outlook not so good and reply hazy',
+            'Scott Frost approves!',
+            'These are the affirmative answers.',
+            'Try again...',
+            'Without a doubt.',
+            'Yes – definitely!',
+            'You may rely on it.'
+        ]
+
+        random.shuffle(eight_ball)
+
+        embed = build_embed(
+            title="BotFrost Magic 8-Ball :8ball: says...",
+            description="These are all 100% accurate. No exceptions! Unless an answer says anyone other than Nebraska is good.",
+            inline=False,
+            fields=[
+                ["Question", question.capitalize()],
+                ["Response", random.choice(eight_ball)]
+            ],
+            thumbnail="https://i.imgur.com/L5Gpu0z.png"
+        )
+
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))
