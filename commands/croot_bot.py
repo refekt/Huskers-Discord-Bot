@@ -1,4 +1,5 @@
 import datetime
+
 from discord.ext import commands
 from discord_slash import ButtonStyle, ComponentContext
 from discord_slash import cog_ext, SlashContext
@@ -9,8 +10,8 @@ from objects.FAP import initiate_fap, individual_predictions
 from objects.Recruit import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import user_error
-from utilities.embed import build_embed, build_recruit_embed
 from utilities.constants import which_guild
+from utilities.embed import build_embed, build_recruit_embed
 
 
 async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
@@ -66,7 +67,7 @@ def checking_reaction(search_reactions, reaction_used, user_initiated):
 
 search = None
 
-buttons = [
+croot_buttons = [
     create_button(
         style=ButtonStyle.blue,
         label="1",
@@ -104,11 +105,11 @@ class RecruitCog(commands.Cog):
         description="Retreive information about a recruit",
         guild_ids=[which_guild()]
     )
-    async def _crootbot(self, ctx: SlashContext, year: int, name: str):
+    async def _crootbot(self, ctx: SlashContext, year: int, search_name: str):
         print(f"### Crootbot ###")
 
-        if len(name) == 0:
-            raise user_error("A player's first and/or last name is required.")
+        if len(search_name) == 0:
+            raise user_error("A player's first and/or last search_name is required.")
 
         if len(str(year)) == 2:
             year += 2000
@@ -123,14 +124,14 @@ class RecruitCog(commands.Cog):
 
         await ctx.defer()  # Similiar to sending a message with a loading screen to edit later on
 
-        print(f"### ~~~ Searching for [{year} {name.capitalize()}] ###")
+        print(f"### ~~~ Searching for [{year} {search_name.capitalize()}] ###")
 
-        global search
-        search = FootballRecruit(year, name)
+        global search, paginator_msg
+        search = FootballRecruit(year, search_name)
 
         print(f"### ~~~ Found [{len(search)}] results ###")
 
-        action_row = create_actionrow(*buttons)
+        action_row = create_actionrow(*croot_buttons)
 
         if len(search) == 1:
             await final_send_embed_fap_loop(ctx=ctx, target_recruit=search[0], bot=self.bot)
@@ -139,21 +140,26 @@ class RecruitCog(commands.Cog):
         result_info = ""
         search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4}
 
-        for index, result in enumerate(search):
+        for index, recruit in enumerate(search):
             if index < CROOT_SEARCH_LIMIT:
-                result_info += f"{list(search_reactions.keys())[index]}: {result.year} - {'⭐' * result.rating_stars}{' - ' + result.position if result.rating_stars > 0 else result.position} - {result.name}\n"
+                result_info += f"{list(search_reactions.keys())[index]}: " \
+                               f"{recruit.year} - " \
+                               f"{'⭐' * recruit.rating_stars if recruit.rating_stars else 'N/R'} - " \
+                               f"{recruit.position} - " \
+                               f"{recruit.name}\n"
 
         embed = build_embed(
-            title=f"Search Results for [{year} {name.capitalize()}]",
+            title=f"Search Results for [{year} {search_name.capitalize()}]",
             fields=[["Search Results", result_info]]
         )
 
         await ctx.send(embed=embed, components=[action_row])
 
-        print(f"### ~~~ Sent search results for [{year} {name.capitalize()}] ###")
+        print(f"### ~~~ Sent search results for [{year} {search_name.capitalize()}] ###")
 
-    @cog_ext.cog_component(components=buttons)
+    @cog_ext.cog_component(components=croot_buttons)
     async def process_searches(self, ctx: ComponentContext):
+        print(ctx.custom_id)
         button_to_index = {"result_1": 0, "result_2": 1, "result_3": 2, "result_4": 3, "result_5": 4}
         print(f"### ~~~ Button [{ctx.custom_id}] was pressed ###")
         global search

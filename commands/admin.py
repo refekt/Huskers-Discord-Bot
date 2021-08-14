@@ -552,7 +552,7 @@ class AdminCommands(commands.Cog):
 
         embed = build_embed(
             title="Slash Commands",
-            inline=False,
+            inline=True,
             description="List of slash commands and options for the server.",
             fields=all_commands
         )
