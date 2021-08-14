@@ -37,7 +37,10 @@ def build_embed(title, **kwargs):
         embed.set_image(url=kwargs["image"])
 
     if "thumbnail" in kwargs.keys():
-        embed.set_thumbnail(url=kwargs["thumbnail"])
+        if kwargs["thumbnail"] is not None:
+            embed.set_thumbnail(url=kwargs["thumbnail"])
+        else:
+            embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
     else:
         embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
 
