@@ -174,40 +174,24 @@ def build_recruit_embed(recruit):
     return embed
 
 
-# def build_schedule_embed(year, **kwargs):
-#     scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
-#
-#     arrow = "» "
-#     _nl = "\n"
-#
-#     embed = build_embed(
-#         title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
-#     )
-#
-#     if "week" in kwargs:
-#         game = scheduled_games[int(kwargs["week"]) - 1]
-#
-#         value_string = f"{arrow + ' ' + game.outcome + _nl if not game.outcome == '' else ''}" \
-#                        f"{arrow}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_nl}" \
-#                        f"{arrow}{game.opponent.date_time}{_nl}" \
-#                        f"{arrow}{game.location}"
-#
-#         embed.add_field(
-#             name=f"**#{game.week}: {game.opponent.name}**",
-#             value=value_string
-#         )
-#
-#         embed.set_image(url=game.opponent.icon)
-#     else:
-#         for index, game in enumerate(scheduled_games):
-#             value_string = f"{arrow + ' ' + game.outcome + _nl if not game.outcome == '' else ''}" \
-#                            f"{arrow}{'B1G Game' if game.opponent.conference == 'Big Ten' else 'Non-Con Game'}{_nl}" \
-#                            f"{arrow}{game.opponent.date_time}{_nl}" \
-#                            f"{arrow}{game.location}"
-#
-#             embed.add_field(
-#                 name=f"**#{game.week}: {game.opponent.name}**",
-#                 value=value_string
-#             )
-#
-#     return embed
+def build_schedule_embed(year, **kwargs):
+    scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
+
+    arrow = "» "
+    new_line_char = "\n"
+    fields = []
+
+    for game in scheduled_games:
+        field_value = f"{arrow + game.outcome + new_line_char if not game.outcome == '' else ''}" \
+                      f"{arrow}{game.game_date_time.strftime(DT_OBJ_FORMAT) if not game.game_date_time.hour == 21 else game.game_date_time.strftime(DT_OBJ_FORMAT_TBA)}{new_line_char}" \
+                      f"{arrow}{game.location}"
+
+        fields.append([f"**Week {game.week}: {game.opponent}**", field_value])
+
+    embed = build_embed(
+        title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
+        inline=False,
+        fields=fields
+    )
+
+    return embed

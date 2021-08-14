@@ -121,18 +121,6 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
     for game in games_raw:
         week += 1
 
-        # Don't include scrimages and other "games" in the week count
-        # if any(g in game.text for g in exempt_games):
-        #     week -= 1
-        #     continue
-
-        # 31 July 2021: Removed this because I think it's redundant. Taken care of earlier by removing box.
-        # if any(g in game.text for g in special_games):
-        #     g = game.contents[1].contents[3].contents[1].contents[1]
-        # else:
-        #     g = game.contents[1]
-
-        # location = game.contents[1].contents[3].contents[1].text.strip()
         opponent = collect_opponent(game, year, week)
 
         if "TBA" in opponent.date_time:
@@ -143,10 +131,6 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
             opponent.date_time = datetime.datetime.strptime(opponent.date_time.replace("A.M.", "AM").replace("P.M.", "PM"), DT_STR_FORMAT).astimezone(tz=TZ)
             opponent.date_time += datetime.timedelta(hours=1)
 
-        # 31 July 2021: May be no longer needed. Was used to offset time zones
-        # if "Linux" in platform.platform():
-        #     offset = 0
-        #     game_date_time += datetime.timedelta(hours=offset)
 
         games.append(
             HuskerDotComSchedule(

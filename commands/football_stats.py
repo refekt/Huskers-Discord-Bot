@@ -10,7 +10,7 @@ from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia
 from utilities.constants import TZ, CFBD_KEY
 from utilities.constants import which_guild
-from utilities.embed import build_countdown_embed, build_embed
+from utilities.embed import build_countdown_embed, build_embed, build_schedule_embed
 
 
 class FootballStatsCommands(commands.Cog):
@@ -128,6 +128,19 @@ class FootballStatsCommands(commands.Cog):
                 [f"{comparison_against.title()}'s Largest MOV", f"{comparison.against.largest_mov} ({comparison.against.largest_mov_date})"],
                 [f"{comparison_against.title()}'s Longest Win Streak", f"{comparison.against.longest_win_streak} ({comparison.against.largest_win_streak_date})"]
             ]
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="schedule",
+        description="Husker schedule",
+        guild_ids=[which_guild()]
+    )
+    async def _schedule(self, ctx: SlashContext, year: int = datetime.now().year, sport: str = "football"):
+        await ctx.defer()
+        embed = build_schedule_embed(
+            year=year,
+            sport=sport
         )
         await ctx.send(embed=embed)
 
