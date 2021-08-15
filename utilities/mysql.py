@@ -7,11 +7,11 @@ INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
 """
 
 sqlSelectImageCommand = """
-SELECT img_name, img_url, author FROM img_cmd_db WHERE img_name = %s
+SELECT author, img_name, img_url FROM img_cmd_db WHERE img_name = %s
 """
 
 sqlSelectAllImageCommand = """
-SELECT img_name , img_url , author , created_at FROM img_cmd_db 
+SELECT author, img_name, img_url, created_at FROM img_cmd_db 
 """
 
 sqlDeleteImageCommand = """
@@ -135,11 +135,11 @@ SELECT id, name FROM team_ids ORDER BY name ASC
 """
 
 sqlRecordStats = """
-INSERT INTO stats (author, channel) VALUES (%s, %s)
+INSERT INTO stats (source, channel) VALUES (%s, %s)
 """
 
 sqlRecordStatsManual = """
-INSERT INTO stats (author, channel, created_at) VALUES (%s, %s, %s)
+INSERT INTO stats (source, channel, created_at) VALUES (%s, %s, %s)
 """
 
 sqlRetrieveStats = """
@@ -151,11 +151,11 @@ SELECT * FROM tasks_repo WHERE is_open = 1
 """
 
 sqlRecordTasks = """
-INSERT INTO tasks_repo (send_to, message, send_when, is_open, author) VALUES (%s, %s, %s, %s, %s)
+INSERT INTO tasks_repo (send_to, message, send_when, is_open, source) VALUES (%s, %s, %s, %s, %s)
 """
 
 sqlUpdateTasks = """
-UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
+UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND send_when = %s AND source = %s
 """
 
 sqlRetrieveCurrencyLeaderboard = """
@@ -191,15 +191,15 @@ DELETE FROM iowa WHERE user_id = %s
 """
 
 sqlRetrieveAllCustomLinesKeywords = """
-SELECT clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author, cl.result FROM custom_lines_bets clb INNER JOIN custom_lines cl ON (cl.keyword = clb.keyword ) WHERE clb.keyword = %s
+SELECT clb.source, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.source as orig_author, cl.result FROM custom_lines_bets clb INNER JOIN custom_lines cl ON (cl.keyword = clb.keyword ) WHERE clb.keyword = %s
 """
 
 sqlRetrieveOneCustomLinesKeywords = """
-SELECT clb.author, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.author as orig_author, cl.result FROM custom_lines_bets clb INNER JOIN custom_lines cl ON (cl.keyword = clb.keyword ) WHERE clb.keyword = %s AND clb.author = %s
+SELECT clb.source, cl.keyword, cl.description, clb.value, clb._for, clb.against, cl.source as orig_author, cl.result FROM custom_lines_bets clb INNER JOIN custom_lines cl ON (cl.keyword = clb.keyword ) WHERE clb.keyword = %s AND clb.source = %s
 """
 
 sqlInsertCustomLines = """
-INSERT INTO custom_lines (author, keyword, description, result) VALUES (%s, %s, %s, 'tbd')
+INSERT INTO custom_lines (source, keyword, description, result) VALUES (%s, %s, %s, 'tbd')
 """
 
 sqlRetrieveAllOpenCustomLines = """
@@ -207,7 +207,7 @@ SELECT * FROM custom_lines WHERE result = 'tbd'
 """
 
 sqlRetreiveCustomLinesForAgainst = """
-SELECT author, _for, against, value FROM custom_lines_bets WHERE keyword = %s
+SELECT source, _for, against, value FROM custom_lines_bets WHERE keyword = %s
 """
 
 sqlRetrieveOneOpenCustomLine = """
@@ -215,11 +215,11 @@ SELECT * FROM custom_lines WHERE keyword = %s and result = 'tbd'
 """
 
 sqlInsertCustomLinesBets = """
-INSERT INTO custom_lines_bets (author, keyword, _for, against, value) VALUES (%s, %s, %s, %s, %s)
+INSERT INTO custom_lines_bets (source, keyword, _for, against, value) VALUES (%s, %s, %s, %s, %s)
 """
 
 sqlUpdateCustomLinesBets = """
-UPDATE custom_lines_bets SET `_for`=%s, against=%s, value=%s WHERE author=%s AND keyword=%s
+UPDATE custom_lines_bets SET `_for`=%s, against=%s, value=%s WHERE source=%s AND keyword=%s
 """
 
 sqlUpdateCustomLinesResult = """
