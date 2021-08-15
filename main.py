@@ -1,8 +1,9 @@
 import asyncio
+import pathlib
 import random
 import sys
 from datetime import datetime, timedelta
-import pathlib
+
 import discord
 import requests
 from PIL import Image
@@ -15,10 +16,10 @@ from imgurpython import ImgurClient
 from objects.Thread import send_reminder
 from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS
 from utilities.constants import DT_TASK_FORMAT
+from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
 from utilities.constants import which_guild
-from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks
 
