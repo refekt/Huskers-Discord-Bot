@@ -143,7 +143,7 @@ class ImageCommands(commands.Cog):
 
         for img in all_imgs:
             try:
-                author = ctx.guild.get_member(user_id=int(img['source'])).mention
+                author = ctx.guild.get_member(user_id=int(img['author'])).mention
             except:
                 author = "N/A"
 
@@ -180,11 +180,6 @@ class ImageCommands(commands.Cog):
             description=f"This command was created by [{author.mention if type(author) == discord.Member else author}]."
         )
         await ctx.send(embed=embed)
-
-    # Testing dynamically created sub commands
-    # @commands.Cog.listener()
-    # async def on_slash_command(self, ctx: SlashContext):
-    #     print("somethingsdfasfas")
 
 
 def setup(bot):
