@@ -153,7 +153,7 @@ class ReminderCommands(commands.Cog):
             send_reminder(
                 thread=1,
                 num_seconds=duration.total_seconds(),
-                destination=who,
+                destination=who if who else channel if channel else None,
                 message=message,
                 source=ctx.author,
                 alert_when=str(send_when)
