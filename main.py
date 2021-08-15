@@ -13,7 +13,7 @@ from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import send_reminder
-from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME
+from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS
 from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
@@ -288,6 +288,16 @@ async def on_ready():
         f"### ~~~ ID: {client.user.id}\n"
         f"### The bot is ready! ###"
     )
+
+    bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
+    embed = build_embed(
+        title="Bot Frost Online",
+        description=f"I'm online as {client.user.mention}",
+        fields=[
+            ["Info", "I was restarted, but now I'm back!"]
+        ]
+    )
+    await bot_spam.send(embed=embed)
 
 
 @client.event

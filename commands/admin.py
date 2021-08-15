@@ -198,6 +198,7 @@ class AdminCommands(commands.Cog):
                     ["Hosting Status", "https://status.hyperexpert.com/"],
                     ["Latency", f"{self.bot.latency * 1000:.2f} ms"],
                     ["Username", self.bot.user.mention],
+                    ["Birthday", f"I was born on {self.bot.user.created_at}"],
                     ["Feeling generous?", f"Check out `{self.bot.command_prefix}donate` to help out the production and upkeep of the bot."]
                 ]
             )
@@ -556,7 +557,7 @@ class AdminCommands(commands.Cog):
             description="List of slash commands and options for the server.",
             fields=all_commands
         )
-        await ctx.send(embed=embed,hidden=True)
+        await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(
         name="iowa",
