@@ -10,6 +10,7 @@ from discord_slash.context import ComponentContext
 from discord_slash.model import CallbackObject
 
 from objects.Thread import send_reminder
+from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME
 from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
@@ -183,6 +184,60 @@ async def load_tasks():
 
     for index, task in enumerate(task_repo):
         await task
+
+
+async def hall_of_fame_messages(reactions: list):
+    for reaction in reactions:
+        if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):
+            continue
+
+        slowpoke_emoji = "<:slowpoke:758361250048245770>"
+        server_member_count = len(client.users)
+        reaction_threshold = 1  # int(0.0047 * server_member_count)
+        hos_channel = hof_channel = None
+        print(f"### ~~~ Reaction threshold for HOF and HOS messages set to [{reaction_threshold}]")
+
+        if reaction.count >= reaction_threshold:
+            print(f"### ~~~ Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] reactions")
+            if str(reaction.emoji) == slowpoke_emoji:
+                hof = False
+                hos_channel = client.get_channel(id=CHAN_SHAME)
+                raw_message_history = await hos_channel.history(limit=5000).flatten()
+            else:
+                hof = True
+                hof_channel = client.get_channel(id=CHAN_HOF_PROD)
+                raw_message_history = await hof_channel.history(limit=5000).flatten()
+
+            duplicate = False
+            for raw_message in raw_message_history:
+                if len(raw_message.embeds) > 0:
+                    if str(reaction.message.id) in raw_message.embeds[0].footer.text:
+                        duplicate = True
+                        break
+            del raw_message_history
+
+            if not duplicate:
+                if hof:
+                    embed_title = f"{slowpoke_emoji * 3} Hall of Shame Message {slowpoke_emoji * 3}"
+                    embed_description = "Messages so shameful they had to be memorialized forever!"
+                    channel = hos_channel
+                else:
+                    embed_title = f"{'🏆' * 3} Hall of Shame Message {'🏆' * 3}"
+                    embed_description = "Messages so amazing they had to be memorialized forever!"
+                    channel = hof_channel
+
+                embed = build_embed(
+                    title=embed_title,
+                    description=embed_description,
+                    fields=[
+                        ["Author", reaction.message.author.mention],
+                        ["Message", reaction.message],
+                        ["Message Link", f"(Click to view message)[{reaction.message.jump_url}]"]
+                    ],
+                    footer=f"Message ID: {reaction.message.id} | Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')}",
+                    thumbnail=reaction.message.author.default_avatar_url
+                )
+                await channel.send(embed=embed)
 
 
 @client.event
