@@ -1,0 +1,23 @@
+discord
+pytz
+cffi
+unidecode
+Pillow
+beautifulsoup4
+numpy
+pandas
+pymysql
+markovify
+praw
+opencv-python-headless
+opencv-python-headless
+cfbd
+youtube_dl
+ffmpeg
+cryptography
+validators
+nest-asyncio
+dinteractions-Paginator
+imgurpython
+# pyhton-dotenv  # manual install?
+# Verified 5-July-2021
