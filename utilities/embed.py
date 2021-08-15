@@ -25,7 +25,7 @@ def build_embed(**kwargs):
     fields_limit = 25
     value_limit = 1024
     footer_limit = 2048
-    embed_limit = 6000
+    # embed_limit = 6000
 
     if kwargs.get("color", False):
         embed = discord.Embed(
@@ -84,7 +84,7 @@ def build_embed(**kwargs):
             if kwargs.get("inline", False):
                 embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit], inline=kwargs["inline"])
             else:
-                embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit])
+                embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit], inline=False)
 
     return embed
 
