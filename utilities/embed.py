@@ -242,7 +242,7 @@ def return_schedule_embeds(year, **kwargs):
 
     for game in scheduled_games:
         embeds.append(build_embed(
-            title=f"Week {game.week}: {game.opponent.title()}",
+            title=f"{game.opponent.title()}",
             inline=False,
             thumbnail=game.icon,
             fields=[

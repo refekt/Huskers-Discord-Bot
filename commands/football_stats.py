@@ -3,15 +3,15 @@ from datetime import datetime
 
 from cfbd import BettingApi, ApiClient, Configuration
 from cfbd.rest import ApiException
+from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-
+from discord_slash.model import ButtonStyle
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY
 from utilities.constants import which_guild
-from utilities.embed import build_countdown_embed, build_embed, build_schedule_embed, return_schedule_embeds
-from dinteractions_Paginator import Paginator
+from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
 
 
 class FootballStatsCommands(commands.Cog):
@@ -147,7 +147,11 @@ class FootballStatsCommands(commands.Cog):
             bot=ctx.bot,
             ctx=ctx,
             pages=pages,
-            useIndexButton=True
+            useIndexButton=True,
+            firstStyle=ButtonStyle.gray,
+            nextStyle=ButtonStyle.gray,
+            prevStyle=ButtonStyle.gray,
+            lastStyle=ButtonStyle.gray
         )
 
     @cog_ext.cog_slash(

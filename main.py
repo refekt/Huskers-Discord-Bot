@@ -187,16 +187,16 @@ async def load_tasks():
 
 @client.event
 async def on_ready():
+    await change_my_status()
+    await change_my_nickname()
+    await load_tasks()
+
     print(
         f"### Bot Frost version 3.0 ###\n"
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
         f"### The bot is ready! ###"
     )
-
-    await change_my_status()
-    await change_my_nickname()
-    await load_tasks()
 
 
 @client.event
