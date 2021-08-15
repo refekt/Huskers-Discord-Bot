@@ -544,6 +544,7 @@ class AdminCommands(commands.Cog):
     )
     async def _commands(self, ctx: SlashContext):
         all_commands = []
+        print(ctx)
         for command in self.bot.slash.commands:
             if self.bot.slash.commands[command].description is not None:
                 all_commands.append([
