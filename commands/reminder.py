@@ -1,6 +1,7 @@
+import asyncio
+import re
 from datetime import datetime, timedelta
 
-import asyncio
 import discord
 import nest_asyncio
 from discord.ext import commands
@@ -8,12 +9,13 @@ from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.utils.manage_commands import create_option
 
+from objects.Thread import send_reminder
 from utilities.constants import CHAN_BANNED
 from utilities.constants import command_error
 from utilities.constants import which_guild
-from utilities.mysql import Process_MySQL, sqlRecordTasks
-from objects.Thread import send_reminder
+from utilities.constants import DT_OBJ_FORMAT
 from utilities.embed import build_embed
+from utilities.mysql import Process_MySQL, sqlRecordTasks
 
 
 class DateTimeStrings:
@@ -42,7 +44,7 @@ class ReminderCommands(commands.Cog):
                 required=True
             ),
             create_option(
-                name="destination",
+                name="who",
                 description="Who to send the reminder to",
                 option_type=6,
                 required=False
@@ -68,7 +70,6 @@ class ReminderCommands(commands.Cog):
         today = datetime.today()  # .astimezone(tz=TZ)
 
         def get_value(dt_item: str, from_when: str):
-            import re
 
             if dt_item in from_when:
                 raw = from_when.split(dt_item)[0]
@@ -88,15 +89,15 @@ class ReminderCommands(commands.Cog):
         minutes = get_value(DateTimeStrings.minute, remind_when)
         seconds = get_value(DateTimeStrings.seconds, remind_when)
 
-        delta = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
+        time_diff = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
-        min_timer_allowed = 60 * 5
+        min_timer_allowed = 5  # 60 * 5
 
-        if delta.total_seconds() < min_timer_allowed:
+        if time_diff.total_seconds() < min_timer_allowed:
             raise command_error(f"The num_seconds entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
 
         try:
-            raw_when = today + delta
+            raw_when = today + time_diff
         except ValueError:
             raise command_error("The num_seconds entered is too large!")
 
@@ -146,6 +147,16 @@ class ReminderCommands(commands.Cog):
                 alert_when=str(alert_when)
             )
         )
+        embed = build_embed(
+            title="Bot Frost Reminder",
+            inline=False,
+            fields=[
+                ["Reminder created!", f"Reminder will be sent {alert_when.strftime(DT_OBJ_FORMAT)}"],
+                ["Destination", who.mention if who else channel.mention if channel else "N/A"],
+                ["Message", message]
+            ]
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
