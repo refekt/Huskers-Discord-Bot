@@ -153,7 +153,7 @@ class ReminderCommands(commands.Cog):
             send_reminder(
                 thread=1,
                 num_seconds=duration.total_seconds(),
-                destination=who if who else channel if channel else None,
+                destination=who if who else channel if channel else ctx.author,
                 message=message,
                 source=ctx.author,
                 alert_when=str(send_when)
@@ -164,7 +164,7 @@ class ReminderCommands(commands.Cog):
             inline=False,
             fields=[
                 ["Reminder created!", f"Reminder will be sent {send_when.strftime(DT_OBJ_FORMAT)}"],
-                ["Destination", who.mention if who else channel.mention if channel else "N/A"],
+                ["Destination", who.mention if who else channel.mention if channel else ctx.author.mention],
                 ["Message", message]
             ]
         )
