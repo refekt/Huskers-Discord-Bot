@@ -28,7 +28,6 @@ else:
 
 # Decrypt Env file
 env_file = variables
-print(env_file)
 key = load_key()
 
 # Save decrypted file

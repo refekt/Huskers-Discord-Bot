@@ -4,3 +4,4 @@ key.key
 mammals.json
 variables.json
 *.pyc
+__pycache__

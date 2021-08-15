@@ -114,6 +114,12 @@ async def load_tasks():
     tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
     guild = client.get_guild(which_guild())
 
+    print(f"############# guild == {guild}")
+
+    if guild is None:
+        print("### ~~~ Load tasks guild is none")
+        return
+
     if tasks is None:
         return
 
@@ -276,8 +282,8 @@ async def hall_of_fame_messages(reactions: list):
 
 @client.event
 async def on_connect():
-    await change_my_status()
-    await change_my_nickname()
+    # await change_my_status()
+    # await change_my_nickname()
     await load_tasks()
 
 
@@ -345,12 +351,12 @@ if len(sys.argv) > 0:
         token = TEST_TOKEN
 
 extensions = [
-    "commands.croot_bot",
-    "commands.admin",
-    "commands.text",
-    "commands.image",
-    "commands.football_stats",
-    "commands.reminder",
+    # "commands.croot_bot",
+    # "commands.admin",
+    # "commands.text",
+    # "commands.image",
+    # "commands.football_stats",
+    # "commands.reminder",
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension} ###")
