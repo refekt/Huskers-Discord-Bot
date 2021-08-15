@@ -102,39 +102,51 @@ class ReminderCommands(commands.Cog):
             raise command_error("The num_seconds entered is too large!")
 
         duration = raw_when - today
-        alert_when = today + duration
+        send_when = today + duration
         author = f"{ctx.author.name}#{ctx.author.discriminator}"
+        is_open = 1
 
         if who:
+            try:
+                Process_MySQL(sqlRecordTasks, values=(str(who.id), message, str(send_when), is_open, author))
+            except:
+                raise command_error("Error submitting MySQL")
+
             embed = build_embed(
                 title="Bot Frost Reminders",
                 inline=False,
                 fields=[
-                    ["Reminder created!", f"Setting a timer for [{who.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert_when.strftime('%x %X')}]."]
+                    ["Reminder created!", f"Setting a timer for [{who.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{send_when.strftime('%x %X')}]."]
                 ]
             )
-            await ctx.send(embed=embed)
-            Process_MySQL(sqlRecordTasks, values=(who.id, message, str(alert_when), 1, author))
         elif channel:
+            try:
+                Process_MySQL(sqlRecordTasks, values=(str(channel.id), message, str(send_when), is_open, author))
+            except:
+                raise command_error("Error submitting MySQL")
+
             embed = build_embed(
                 title="Bot Frost Reminders",
                 inline=False,
                 fields=[
-                    ["Reminder created!", f"Setting a timer for [{channel.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert_when.strftime('%x %X')}]."]
+                    ["Reminder created!", f"Setting a timer for [{channel.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{send_when.strftime('%x %X')}]."]
                 ]
             )
-            await ctx.send(embed=embed)
-            Process_MySQL(sqlRecordTasks, values=(channel.id, message, str(alert_when), 1, author))
         else:
+            try:
+                Process_MySQL(sqlRecordTasks, values=(str(ctx.channel_id), message, str(send_when), is_open, author))
+            except:
+                raise command_error("Error submitting MySQL")
+
             embed = build_embed(
                 title="Bot Frost Reminders",
                 inline=False,
                 fields=[
-                    ["Reminder created!", f"Setting a timer for [{ctx.channel.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{alert_when.strftime('%x %X')}]."]
+                    ["Reminder created!", f"Setting a timer for [{ctx.channel.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{send_when.strftime('%x %X')}]."]
                 ]
             )
-            await ctx.send(embed=embed)
-            Process_MySQL(sqlRecordTasks, values=(ctx.channel.id, message, str(alert_when), 1, author))
+
+        await ctx.send(embed=embed)
 
         nest_asyncio.apply()
         asyncio.create_task(
@@ -144,14 +156,14 @@ class ReminderCommands(commands.Cog):
                 destination=who,
                 message=message,
                 source=ctx.author,
-                alert_when=str(alert_when)
+                alert_when=str(send_when)
             )
         )
         embed = build_embed(
             title="Bot Frost Reminder",
             inline=False,
             fields=[
-                ["Reminder created!", f"Reminder will be sent {alert_when.strftime(DT_OBJ_FORMAT)}"],
+                ["Reminder created!", f"Reminder will be sent {send_when.strftime(DT_OBJ_FORMAT)}"],
                 ["Destination", who.mention if who else channel.mention if channel else "N/A"],
                 ["Message", message]
             ]
