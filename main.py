@@ -84,7 +84,7 @@ slash = SlashCommand(client, sync_commands=True)  # Sync required
 #
 # @client.event
 # async def on_message(message):
-# if message.author.bot:
+# if message.source.bot:
 #     return
 #
 # if len(message.embeds) > 0:
@@ -140,7 +140,8 @@ extensions = [
     "commands.text",
     "commands.image",
     "commands.football_stats",
-    # "commands.testing"
+    "commands.reminder",
+    "commands.testing"
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension} ###")
