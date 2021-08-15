@@ -1,11 +1,8 @@
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-import nest_asyncio
-import asyncio
+
 from utilities.constants import which_guild
-from objects.Thread import send_reminder
-from datetime import datetime, timedelta
 from utilities.embed import build_embed
 
 

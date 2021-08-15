@@ -7,6 +7,7 @@ from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import ButtonStyle
+
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY

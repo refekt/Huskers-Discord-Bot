@@ -1,5 +1,6 @@
-from cryptography.fernet import Fernet
 import json
+
+from cryptography.fernet import Fernet
 
 
 def write_key():

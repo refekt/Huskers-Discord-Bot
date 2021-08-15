@@ -1,11 +1,9 @@
 import asyncio
 import threading
 import typing
-from datetime import datetime
 
 import discord
 
-from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import pretty_time_delta
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlUpdateTasks

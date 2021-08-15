@@ -1,6 +1,7 @@
 import requests
-from utilities.constants import HEADERS
 from bs4 import BeautifulSoup
+
+from utilities.constants import HEADERS
 
 
 class TeamStatsWinsipediaTeam:
