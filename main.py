@@ -219,6 +219,8 @@ def make_slowking(avatar_url):
     paste_pos = (262, 262)
     base_img.paste(avatar_img, paste_pos, avatar_img)
     base_img.save("resources/images/new_slowking.png", "PNG")
+
+
 #
 #
 async def hall_of_fame_messages(reactions: list):
@@ -348,22 +350,16 @@ async def on_component_callback(ctx: ComponentContext, callback: CallbackObject)
 
 token = PROD_TOKEN
 
-# if len(sys.argv) > 0:
-#     if production_server():
-#         token = PROD_TOKEN
-#     else:
-#         token = TEST_TOKEN
-
-# extensions = [
-#     "commands.croot_bot",
-#     "commands.admin",
-#     "commands.text",
-#     "commands.image",
-#     "commands.football_stats",
-#     "commands.reminder",
-# ]
-# for extension in extensions:
-#     print(f"### ~~~ Loading extension: {extension} ###")
-#     client.load_extension(extension)
+extensions = [
+    "commands.croot_bot",
+    "commands.admin",
+    "commands.text",
+    "commands.image",
+    "commands.football_stats",
+    "commands.reminder",
+]
+for extension in extensions:
+    print(f"### ~~~ Loading extension: {extension} ###")
+    client.load_extension(extension)
 
 client.run(token)
