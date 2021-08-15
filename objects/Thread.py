@@ -4,7 +4,9 @@ import typing
 from datetime import datetime
 
 import discord
-from utilities.constants import DT_OBJ_FORMAT
+
+from utilities.constants import DT_TASK_FORMAT
+from utilities.constants import pretty_time_delta
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlUpdateTasks
 
@@ -19,10 +21,10 @@ async def send_reminder(thread, num_seconds, destination: typing.Union[discord.M
     if exitFlag:
         thread.exit()
 
-    print(f"### ;;; Starting [{thread}] thread for [{num_seconds}] seconds. Send_When == [{alert_when}].")
+    print(f"### ;;; Starting [{str(thread)}] thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].")
 
     if num_seconds > 0:
-        print(f"### ;;; Creating a task for [{num_seconds}] seconds. [{destination}] [{message[:15] + '...'}]")
+        print(f"### ;;; Creating a task for [{pretty_time_delta(num_seconds)}] seconds. [{destination}] [{message[:15] + '...'}]")
         await asyncio.sleep(num_seconds)
         embed = build_embed(
             title="Bot Frost Reminder",
@@ -33,16 +35,16 @@ async def send_reminder(thread, num_seconds, destination: typing.Union[discord.M
             ]
         )
     else:
-        imported_datetime = datetime.strptime(alert_when, DT_OBJ_FORMAT)  # "%Y-%m-%d %H:%M:%S.%f")
         embed = build_embed(
             title="Bot Frost Reminder",
             inline=False,
+            destination="Missed reminder!",
             fields=[
-                [f"Missed reminder from [{source.mention}] for [{destination.mention}]", remove_mentions(message)],
-                ["Original Reminder Date Time", imported_datetime.strftime("%x %X")]
+                ["Destination", destination.mention],
+                ["Message", remove_mentions(message)],
+                ["Original Reminder Date Time", datetime.strptime(alert_when, DT_TASK_FORMAT)]
             ]
         )
-
     await destination.send(embed=embed)
 
     Process_MySQL(sqlUpdateTasks, values=(0, destination.id, message, alert_when, str(source)))

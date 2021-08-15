@@ -171,6 +171,8 @@ DT_STR_FORMAT = "%b %d %Y %I:%M %p"
 DT_TBA_TIME = "10:58 PM"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58
+DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+
 
 def production_server():
     try:
@@ -215,3 +217,18 @@ def command_error(message: str):
 
 def user_error(message: str):
     return UserInputError(message=message)
+
+
+def pretty_time_delta(seconds):
+    seconds = int(seconds)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if days > 0:
+        return f"{days}d, {hours}h, {minutes}m, and {seconds}s"
+    elif hours > 0:
+        return f"{hours}h, {minutes}m, and {seconds} s"
+    elif minutes > 0:
+        return f"{minutes}m and {seconds}s"
+    else:
+        return f"{seconds}s"
