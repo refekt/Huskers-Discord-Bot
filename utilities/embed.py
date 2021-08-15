@@ -198,3 +198,27 @@ def build_schedule_embed(year, **kwargs):
     )
 
     return embed
+
+
+def return_schedule_embeds(year, **kwargs):
+    scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
+
+    arrow = "» "
+    new_line_char = "\n"
+    embeds = []
+
+    for game in scheduled_games:
+        embeds.append(build_embed(
+            title=f"{year}, Week {game.week}",
+            inline=False,
+            thumbnail=game.icon,
+            fields=[
+                ["Opponent", f"{game.ranking + ' ' if game.ranking else ''}{game.opponent}"],
+                ["Conference Game", "Yes" if game.conference else "No"],
+                ["Date/Time", f"{game.game_date_time.strftime(DT_OBJ_FORMAT) if not game.game_date_time.hour == 21 else game.game_date_time.strftime(DT_OBJ_FORMAT_TBA)}{new_line_char}"],
+                ["Location", game.location],
+                ["Outcome", game.outcome if game.outcome else "TBD"],
+            ]
+        ))
+
+    return embeds

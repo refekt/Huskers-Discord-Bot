@@ -10,7 +10,8 @@ from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY
 from utilities.constants import which_guild
-from utilities.embed import build_countdown_embed, build_embed, build_schedule_embed
+from utilities.embed import build_countdown_embed, build_embed, build_schedule_embed, return_schedule_embeds
+from dinteractions_Paginator import Paginator
 
 
 class FootballStatsCommands(commands.Cog):
@@ -141,11 +142,13 @@ class FootballStatsCommands(commands.Cog):
     async def _schedule(self, ctx: SlashContext, year: int = datetime.now().year, sport: str = "football"):
         await ctx.defer()
 
-        embed = build_schedule_embed(
-            year=year,
-            sport=sport
+        pages = return_schedule_embeds(year, sport=sport)
+        await Paginator(
+            bot=ctx.bot,
+            ctx=ctx,
+            pages=pages,
+            useIndexButton=True
         )
-        await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(
         name="teamstats",
