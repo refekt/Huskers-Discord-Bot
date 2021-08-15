@@ -9,7 +9,7 @@ from discord_slash.utils.manage_commands import create_option
 from utilities.constants import DT_OBJ_FORMAT
 from utilities.constants import ROLE_ADMIN_PROD
 from utilities.constants import command_error
-from utilities.constants import which_guild
+from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
 from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand, sqlSelectAllImageCommand
@@ -74,7 +74,7 @@ class ImageCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="imgcreate",
         description="Create an image command",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _imgcreate(self, ctx: SlashContext, image_name: str, image_url: str):
         create_img(ctx.author_id, image_name, image_url)
@@ -97,7 +97,7 @@ class ImageCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="imgdelete",
         description="Delete image commands you've created",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _imgdelete(self, ctx: SlashContext, image_name: str):
         try:
@@ -137,7 +137,7 @@ class ImageCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="imglist",
         description="Show a list of all available image commands",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _imglist(self, ctx: SlashContext):
         all_imgs = retrieve_all_img()
@@ -178,7 +178,7 @@ class ImageCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="img",
         description="Use an image command",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _img(self, ctx: SlashContext, image_name: str):
         image = retrieve_img(image_name)

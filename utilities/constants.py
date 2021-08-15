@@ -184,30 +184,31 @@ DT_TBA_MIN = 58
 DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 
-def production_server():
-    try:
-        if sys.argv[1] == "prod":
-            print("### ~~~ Bot being run on production server")
-            return True
-        elif sys.argv[1] == "test":
-            print("### ~~~ Bot being run on test server")
-            return False
-        else:
-            return None
-    except IndexError:
-        return None
+# def production_server():
+#     try:
+#         if sys.argv[1] == "prod":
+#             print("### ~~~ Bot being run on production server")
+#             return True
+#         elif sys.argv[1] == "test":
+#             print("### ~~~ Bot being run on test server")
+#             return False
+#         else:
+#             return None
+#     except IndexError:
+#         return None
 
 
-def which_guild():
-    if production_server():
-        return GUILD_PROD
-    else:
-        return GUILD_TEST
+def guild_id_list() -> list:
+    return [GUILD_PROD]
+    # if production_server():
+    #     return GUILD_PROD
+    # else:
+    #     return GUILD_TEST
 
 
 # Slash command permissions
 admin_mod_perms = {
-    which_guild(): [
+    GUILD_PROD: [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
         create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
         create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
@@ -215,7 +216,7 @@ admin_mod_perms = {
 }
 
 admin_perms = {
-    which_guild(): [
+    GUILD_PROD: [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
         create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
     ]

@@ -11,7 +11,7 @@ from discord_slash.model import ButtonStyle
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY
-from utilities.constants import which_guild
+from utilities.constants import guild_id_list
 from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
 
 
@@ -19,7 +19,7 @@ class FootballStatsCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="countdown",
         description="Countdown to the most current or specific Husker game",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _countdown(self, ctx: SlashContext, team: str = None, sport: str = "football"):
         await ctx.defer()
@@ -107,7 +107,7 @@ class FootballStatsCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="compare",
         description="Compare two teams stats",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _compare(self, ctx: SlashContext, comparison_team: str, comparison_against: str):
         await ctx.defer()
@@ -138,7 +138,7 @@ class FootballStatsCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="schedule",
         description="Husker schedule",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _schedule(self, ctx: SlashContext, year: int = datetime.now().year, sport: str = "football"):
         await ctx.defer()
@@ -159,7 +159,7 @@ class FootballStatsCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="teamstats",
         description="Historical stats for a team",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _teamstats(self, ctx: SlashContext, team_name: str):
         await ctx.defer()

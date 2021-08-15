@@ -15,7 +15,7 @@ from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_AL
 from utilities.constants import ROLE_TIME_OUT, CHAN_IOWA
 from utilities.constants import admin_mod_perms, admin_perms
 from utilities.constants import command_error
-from utilities.constants import which_guild
+from utilities.constants import guild_id_list
 from utilities.embed import build_embed as build_embed
 from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 
@@ -183,7 +183,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="about",
         description="All about Bot Frost!",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _about(self, ctx: SlashContext):
         """ All about Bot Frost """
@@ -207,7 +207,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="quit",
         description="Admin only: Turn off the bot",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
     async def _uit(self, ctx: SlashContext):
@@ -218,7 +218,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="donate",
         description="Donate to the cause!",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _donate(self, ctx: SlashContext):
         """ Donate to the cause """
@@ -245,7 +245,7 @@ class AdminCommands(commands.Cog):
         base="purge",
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         base_permissions=admin_perms
     )
     async def _everything(self, ctx: SlashContext):
@@ -270,7 +270,7 @@ class AdminCommands(commands.Cog):
         base="purge",
         name="bot",
         description="Admin only: Deletes previous bot messages",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         base_permissions=admin_perms
     )
     async def _bot(self, ctx: SlashContext):
@@ -297,7 +297,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="bug",
         description="Submit a bug report for the bot",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _bug(self, ctx: SlashContext):
         embed = build_embed(
@@ -312,7 +312,7 @@ class AdminCommands(commands.Cog):
         base="roles",
         name="hype",
         description="Assign hype roles",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _roles_hype(self, ctx: SlashContext):
         print("### Roles: Hype Squad ###")
@@ -379,7 +379,7 @@ class AdminCommands(commands.Cog):
         base="roles",
         name="food",
         description="Assign food roles",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _roles_food(self, ctx: SlashContext):
         print("### Roles: Food ###")
@@ -439,7 +439,7 @@ class AdminCommands(commands.Cog):
         base="roles",
         name="culture",
         description="Assign culture roles",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _roles_culture(self, ctx: SlashContext):
         print("### Roles: Culture ###")
@@ -499,7 +499,7 @@ class AdminCommands(commands.Cog):
         base="gameday",
         name="on",
         description="Turn game day mode on",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         base_permissions=admin_perms
     )
     async def _gameday_on(self, ctx: SlashContext):
@@ -521,7 +521,7 @@ class AdminCommands(commands.Cog):
         base="gameday",
         name="off",
         description="Turn game day mode off",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         base_permissions=admin_perms
     )
     async def _gameday_off(self, ctx: SlashContext):
@@ -540,7 +540,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="commands",
         description="Show all slash commands",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _commands(self, ctx: SlashContext):
         all_commands = []
@@ -563,7 +563,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="iowa",
         description="Admin and Mod only: Sends members to Iowa",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
     async def _iowa(self, ctx: SlashContext, who: discord.Member, reason: str):
@@ -616,7 +616,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="nebraska",
         description="Admin and Mod only: Bring a member back from Iowa",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
     async def _nebraska(self, ctx: SlashContext, who: discord.Member):
@@ -665,7 +665,7 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="console",
         description="Admin only",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
     async def _console(self, ctx: SlashContext):

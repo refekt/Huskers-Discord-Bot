@@ -14,7 +14,7 @@ from utilities.constants import CHAN_BANNED
 from utilities.constants import DT_OBJ_FORMAT
 from utilities.constants import command_error
 from utilities.constants import pretty_time_delta
-from utilities.constants import which_guild
+from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRecordTasks
 
@@ -30,7 +30,7 @@ class ReminderCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="remindme",
         description="Set a reminder",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         options=[
             create_option(
                 name="remind_when",

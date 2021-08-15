@@ -17,7 +17,7 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 
 from utilities.constants import CHAN_BANNED, CHAN_POSSUMS
 from utilities.constants import command_error
-from utilities.constants import which_guild
+from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 
 buttons_ud = [
@@ -75,7 +75,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="urbanddictionary",
         description="Look up a word on Urban Dictionary",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _urbandictionary(self, ctx: SlashContext, *, word: str):
         r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
@@ -125,7 +125,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="vote",
         description="Ask the community for their opinion in votes",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _vote(self, ctx: SlashContext, *, query: str):
         embed = build_embed(
@@ -228,7 +228,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="markov",
         description="Attempts to create a meaningful sentence from old messages",
-        guild_ids=[which_guild()],
+        guild_ids=guild_id_list(),
         options=[
             create_option(
                 name="channel",
@@ -294,7 +294,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="possumdroppings",
         description="Only the most secret and trustworthy drops",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _possumdroppings(self, ctx: SlashContext, message: str):
         await ctx.defer()
@@ -318,7 +318,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="eightball",
         description="Ask the magic 8-ball a qusetion",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _eightball(self, ctx: SlashContext, question: str):
         eight_ball = [
@@ -364,7 +364,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="police",
         description="You are under arrest!",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _police(self, ctx: SlashContext, arestee: discord.Member):
         message = f"**" \

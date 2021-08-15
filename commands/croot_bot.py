@@ -10,7 +10,7 @@ from objects.FAPing import initiate_fap, individual_predictions
 from objects.Recruits import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import user_error
-from utilities.constants import which_guild
+from utilities.constants import guild_id_list
 from utilities.embed import build_embed, build_recruit_embed
 
 
@@ -103,7 +103,7 @@ class RecruitCog(commands.Cog):
     @cog_ext.cog_slash(
         name="crootbot",
         description="Retreive information about a recruit",
-        guild_ids=[which_guild()]
+        guild_ids=guild_id_list()
     )
     async def _crootbot(self, ctx: SlashContext, year: int, search_name: str):
         print(f"### Crootbot ###")

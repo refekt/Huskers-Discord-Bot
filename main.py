@@ -14,12 +14,10 @@ from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import send_reminder
-from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS
+from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS, GUILD_PROD
 from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
-from utilities.constants import TEST_TOKEN, PROD_TOKEN
-from utilities.constants import production_server
-from utilities.constants import which_guild
+from utilities.constants import PROD_TOKEN, TEST_TOKEN
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks
 
@@ -112,11 +110,17 @@ async def change_my_nickname():
 
 async def load_tasks():
     tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
-    guild = client.get_guild(which_guild())
+
+    guild = None
+    for g in client.guilds:
+        if g.id == GUILD_PROD:
+            guild = g
 
     if guild is None:
         print("### ~~~ Load tasks guild is none")
         return
+    else:
+        print(f"### ~~~ Guild == {guild}")
 
     if tasks is None:
         return
@@ -340,13 +344,13 @@ async def on_component_callback(ctx: ComponentContext, callback: CallbackObject)
     pass
 
 
-token = None
+token = TEST_TOKEN
 
-if len(sys.argv) > 0:
-    if production_server():
-        token = PROD_TOKEN
-    else:
-        token = TEST_TOKEN
+# if len(sys.argv) > 0:
+#     if production_server():
+#         token = PROD_TOKEN
+#     else:
+#         token = TEST_TOKEN
 
 extensions = [
     # "commands.croot_bot",
