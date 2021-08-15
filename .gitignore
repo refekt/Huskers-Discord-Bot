@@ -1,9 +1,0 @@
-.gitignore
-.idea/*
-.idea
-key.key
-variables.json
-*.pyc
-.git
-mammals.json
-commands/testing.py
