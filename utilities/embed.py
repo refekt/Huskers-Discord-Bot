@@ -67,7 +67,7 @@ def build_embed(**kwargs):
     if kwargs.get("image", False) and validators.url(kwargs.get("image")):
         embed.set_image(url=kwargs["image"])
 
-    if kwargs.get("thumbnail", False) and validators.url(kwargs.get("thumbnail")):
+    if kwargs.get("thumbnail", False):  # and validators.url(kwargs.get("thumbnail")):
         embed.set_thumbnail(
             url=kwargs.get("thumbnail")
         )

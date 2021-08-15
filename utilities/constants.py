@@ -7,7 +7,7 @@ from discord.ext.commands import BucketType, CommandError, UserInputError
 from discord_slash.utils.manage_commands import SlashCommandPermissionType, create_permission
 from dotenv import load_dotenv
 
-from encryption import load_key, decrypt_return_data
+from encryption import load_key, decrypt_return_data, decrypt, encrypt
 
 print(f"### Platform == {platform.platform()} ###")
 
@@ -31,10 +31,16 @@ env_file = variables
 key = load_key()
 
 # Save decrypted file
-# decrypt(env_file, image_name)
-# encrypt(env_file, image_name)
+run = False
+if run:
+    decrypt(env_file, key)
+    encrypt(env_file, key)
 
 env_vars = decrypt_return_data(env_file, key)
+
+# Imgur
+IMGUR_CLIENT = env_vars["imgur_client"]
+IMGUR_SECRET = env_vars["imgur_secret"]
 
 # Cooldown rates for commands
 CD_GLOBAL_RATE = env_vars["global_rate"]

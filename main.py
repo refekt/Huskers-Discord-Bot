@@ -2,12 +2,15 @@ import asyncio
 import random
 import sys
 from datetime import datetime, timedelta
-
+import pathlib
 import discord
+import requests
+from PIL import Image
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand
 from discord_slash.context import ComponentContext
 from discord_slash.model import CallbackObject
+from imgurpython import ImgurClient
 
 from objects.Thread import send_reminder
 from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME
@@ -15,6 +18,7 @@ from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import TEST_TOKEN, PROD_TOKEN
 from utilities.constants import production_server
 from utilities.constants import which_guild
+from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks
 
@@ -186,9 +190,31 @@ async def load_tasks():
         await task
 
 
+def upload_picture(path: str) -> str:
+    imgur_client = ImgurClient(IMGUR_CLIENT, IMGUR_SECRET)
+    url = imgur_client.upload_from_path(
+        path=path,
+        config=None,
+        anon=True
+    )
+
+    return url.get("link", None)
+
+
+def make_slowking(avatar_url):
+    avatar_img = Image.open(requests.get(avatar_url, stream=True).raw)
+
+    base_img_path = "resources/images/slowking.png"
+    base_img = Image.open(base_img_path)
+
+    paste_pos = (262, 262)
+    base_img.paste(avatar_img, paste_pos, avatar_img)
+    base_img.save("resources/images/new_slowking.png", "PNG")
+
+
 async def hall_of_fame_messages(reactions: list):
     for reaction in reactions:
-        if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):
+        if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):  # Stay out of HOF and HOS
             continue
 
         slowpoke_emoji = "<:slowpoke:758361250048245770>"
@@ -217,7 +243,7 @@ async def hall_of_fame_messages(reactions: list):
             del raw_message_history
 
             if not duplicate:
-                if hof:
+                if not hof:
                     embed_title = f"{slowpoke_emoji * 3} Hall of Shame Message {slowpoke_emoji * 3}"
                     embed_description = "Messages so shameful they had to be memorialized forever!"
                     channel = hos_channel
@@ -226,16 +252,23 @@ async def hall_of_fame_messages(reactions: list):
                     embed_description = "Messages so amazing they had to be memorialized forever!"
                     channel = hof_channel
 
+                avatar_url = str(reaction.message.author.avatar_url).split("?")[0].replace("webp", "png")
+
+                make_slowking(avatar_url)
+
+                slowking_path = f"{pathlib.Path(__file__).parent.resolve()}\\resources\\images\\new_slowking.png"
+                slowking_path = upload_picture(slowking_path)
+
                 embed = build_embed(
                     title=embed_title,
                     description=embed_description,
+                    thumbnail=slowking_path if not None else None,
                     fields=[
                         ["Author", reaction.message.author.mention],
-                        ["Message", reaction.message],
-                        ["Message Link", f"(Click to view message)[{reaction.message.jump_url}]"]
+                        ["Message", reaction.message.content],
+                        ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
                     ],
-                    footer=f"Message ID: {reaction.message.id} | Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')}",
-                    thumbnail=reaction.message.author.default_avatar_url
+                    footer=f"Message ID: {reaction.message.id} | Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')}"
                 )
                 await channel.send(embed=embed)
 
@@ -255,6 +288,17 @@ async def on_ready():
         f"### ~~~ ID: {client.user.id}\n"
         f"### The bot is ready! ###"
     )
+
+
+@client.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    if not payload.member.id == 189554873778307073:
+        return
+
+    channel = client.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+
+    await hall_of_fame_messages(message.reactions)
 
 
 @client.event
@@ -288,13 +332,13 @@ if len(sys.argv) > 0:
         token = TEST_TOKEN
 
 extensions = [
-    "commands.croot_bot",
-    "commands.admin",
-    "commands.text",
-    "commands.image",
-    "commands.football_stats",
-    "commands.reminder",
-    "commands.testing"
+    # "commands.croot_bot",
+    # "commands.admin",
+    # "commands.text",
+    # "commands.image",
+    # "commands.football_stats",
+    # "commands.reminder",
+    # "commands.testing"
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension} ###")
