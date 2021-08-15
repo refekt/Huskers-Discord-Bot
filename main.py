@@ -219,8 +219,8 @@ def make_slowking(avatar_url):
     paste_pos = (262, 262)
     base_img.paste(avatar_img, paste_pos, avatar_img)
     base_img.save("resources/images/new_slowking.png", "PNG")
-
-
+#
+#
 async def hall_of_fame_messages(reactions: list):
     for reaction in reactions:
         if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):  # Stay out of HOF and HOS
@@ -284,8 +284,8 @@ async def hall_of_fame_messages(reactions: list):
 
 @client.event
 async def on_connect():
-    # await change_my_status()
-    # await change_my_nickname()
+    await change_my_status()
+    await change_my_nickname()
     await load_tasks()
 
 
@@ -295,6 +295,7 @@ async def on_ready():
         f"### Bot Frost version 3.0 ###\n"
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
+        f"### ~~~ Guild: {client.guilds[0]}\n"
         f"### The bot is ready! ###"
     )
 
@@ -307,7 +308,8 @@ async def on_ready():
             ["Info", "I was restarted, but now I'm back!"]
         ]
     )
-    await bot_spam.send(embed=embed)
+    # await bot_spam.send(embed=embed)
+    print("Ready!")
 
 
 @client.event
@@ -344,7 +346,7 @@ async def on_component_callback(ctx: ComponentContext, callback: CallbackObject)
     pass
 
 
-token = TEST_TOKEN
+token = PROD_TOKEN
 
 # if len(sys.argv) > 0:
 #     if production_server():
@@ -352,16 +354,16 @@ token = TEST_TOKEN
 #     else:
 #         token = TEST_TOKEN
 
-extensions = [
-    # "commands.croot_bot",
-    # "commands.admin",
-    # "commands.text",
-    # "commands.image",
-    # "commands.football_stats",
-    # "commands.reminder",
-]
-for extension in extensions:
-    print(f"### ~~~ Loading extension: {extension} ###")
-    client.load_extension(extension)
+# extensions = [
+#     "commands.croot_bot",
+#     "commands.admin",
+#     "commands.text",
+#     "commands.image",
+#     "commands.football_stats",
+#     "commands.reminder",
+# ]
+# for extension in extensions:
+#     print(f"### ~~~ Loading extension: {extension} ###")
+#     client.load_extension(extension)
 
 client.run(token)
