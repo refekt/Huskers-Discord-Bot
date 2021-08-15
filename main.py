@@ -156,21 +156,22 @@ async def load_tasks():
         if task["author"] is None:
             task["author"] = "N/A"
 
-        if send_when is None:
+        if send_when == timedelta(seconds=0):
             print(f"### ;;; Alert time already passed! {task['send_when']}")
             await send_reminder(
-                thread=None,
-                num_seconds=-1,
+                thread_name=None,
+                num_seconds=0,
                 destination=member_or_chan,
                 message=task["message"],
                 source=task["author"],
-                alert_when=task["send_when"])
+                alert_when=task["send_when"]
+            )
             continue
 
         task_repo.append(
             asyncio.create_task(
                 send_reminder(
-                    thread=member_or_chan.id + send_when.total_seconds(),
+                    thread_name=str(member_or_chan.id + send_when.total_seconds()),
                     num_seconds=send_when.total_seconds(),
                     destination=member_or_chan,
                     message=task["message"],

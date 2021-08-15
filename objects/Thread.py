@@ -17,11 +17,11 @@ def remove_mentions(message):
     return str(message).replace("<", "[").replace("@!", "").replace(">", "]")
 
 
-async def send_reminder(thread, num_seconds, destination: typing.Union[discord.Member, discord.TextChannel], message: str, source: typing.Union[discord.Member, discord.TextChannel], alert_when=None):
-    if exitFlag:
-        thread.exit()
+async def send_reminder(thread_name, num_seconds, destination: typing.Union[discord.Member, discord.TextChannel], message: str, source: typing.Union[discord.Member, discord.TextChannel], flag=False, alert_when=None):
+    if flag:
+        thread_name.exit()
 
-    print(f"### ;;; Starting [{str(thread)}] thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].")
+    print(f"### ;;; Starting [{str(thread_name)}] thread_name for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].")
 
     if num_seconds > 0:
         print(f"### ;;; Creating a task for [{pretty_time_delta(num_seconds)}] seconds. [{destination}] [{message[:15] + '...'}]")
@@ -30,7 +30,7 @@ async def send_reminder(thread, num_seconds, destination: typing.Union[discord.M
             title="Bot Frost Reminder",
             inline=False,
             fields=[
-                [f"Reminder!", remove_mentions(message)],
+                [f"Reminder!", message],
                 ["Author", source.mention]
             ]
         )
@@ -41,26 +41,36 @@ async def send_reminder(thread, num_seconds, destination: typing.Union[discord.M
             destination="Missed reminder!",
             fields=[
                 ["Destination", destination.mention],
-                ["Message", remove_mentions(message)],
-                ["Original Reminder Date Time", datetime.strptime(alert_when, DT_TASK_FORMAT)]
+                ["Message", message],
+                ["Original Reminder Date Time", alert_when]
             ]
         )
     await destination.send(embed=embed)
 
-    Process_MySQL(sqlUpdateTasks, values=(0, destination.id, message, alert_when, str(source)))
+    Process_MySQL(sqlUpdateTasks, values=(0, str(destination.id), message, alert_when, str(source)))
 
-    print(f"### ;;; Thread [{thread}] completed successfully!")
+    print(f"### ;;; Thread [{str(thread_name)}] completed successfully!")
 
 
 class TaskThread(threading.Thread):
-    def __init__(self, threadID, name, duration, who: typing.Union[discord.Member, discord.User], message: str, flag):
+    def __init__(self, threadID, thread_name, num_seconds, destination: typing.Union[discord.Member, discord.User], message: str, source, flag, alert_when):
         threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.duration = duration
-        self.who = who
+        # self.threadID = threadID
+        self.thread_name = thread_name
+        self.num_seconds = num_seconds
+        self.destination = destination
         self.message = message
+        self.source = source
         self.flag = flag
+        self.alert_when = alert_when
 
     async def run(self):
-        await send_reminder(self.name, self.duration, self.who, self.message, self.flag)
+        await send_reminder(
+            thread_name=self.thread_name,
+            num_seconds=self.num_seconds,
+            destination=self.destination,
+            message=self.message,
+            source=self.source,
+            flag=self.flag,
+            alert_when=self.alert_when
+        )

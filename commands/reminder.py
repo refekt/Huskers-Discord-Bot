@@ -16,6 +16,7 @@ from utilities.constants import which_guild
 from utilities.constants import DT_OBJ_FORMAT
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRecordTasks
+from utilities.constants import pretty_time_delta
 
 
 class DateTimeStrings:
@@ -116,7 +117,7 @@ class ReminderCommands(commands.Cog):
                 title="Bot Frost Reminders",
                 inline=False,
                 fields=[
-                    ["Reminder created!", f"Setting a timer for [{who.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{send_when.strftime('%x %X')}]."]
+                    ["Reminder created!", f"Setting a timer for [{who.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}]."]
                 ]
             )
         elif channel:
@@ -129,7 +130,7 @@ class ReminderCommands(commands.Cog):
                 title="Bot Frost Reminders",
                 inline=False,
                 fields=[
-                    ["Reminder created!", f"Setting a timer for [{channel.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{send_when.strftime('%x %X')}]."]
+                    ["Reminder created!", f"Setting a timer for [{channel.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}]."]
                 ]
             )
         else:
@@ -142,7 +143,7 @@ class ReminderCommands(commands.Cog):
                 title="Bot Frost Reminders",
                 inline=False,
                 fields=[
-                    ["Reminder created!", f"Setting a timer for [{ctx.channel.mention}] in [{duration.total_seconds()}] seconds. The timer will go off at [{send_when.strftime('%x %X')}]."]
+                    ["Reminder created!", f"Setting a timer for [{ctx.channel.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}]."]
                 ]
             )
 
@@ -151,7 +152,7 @@ class ReminderCommands(commands.Cog):
         nest_asyncio.apply()
         asyncio.create_task(
             send_reminder(
-                thread=1,
+                thread_name=str(who.id if who else channel.id if channel else ctx.author_id + duration.total_seconds()),
                 num_seconds=duration.total_seconds(),
                 destination=who if who else channel if channel else ctx.author,
                 message=message,
