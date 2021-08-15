@@ -18,7 +18,7 @@ def create_img(author: int, image_name: str, image_url: str):
     if not validators.url(image_url):
         raise command_error("Invalid iamge URL format. The URL must begin with 'http' or 'https'.")
 
-    image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv")
+    image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
     if not any(sub_str in image_url for sub_str in image_formats):
         raise command_error(f"Invalid image URL format. The URL must end with a [{', '.join(image_formats)}] extension.")
@@ -99,7 +99,7 @@ class ImageCommands(commands.Cog):
     )
     async def _imgdelete(self, ctx: SlashContext, image_name: str):
         try:
-            img_author = int(retrieve_img(image_name)["author"])
+            img_author = int(retrieve_img(image_name)["source"])
         except TypeError:
             raise command_error(f"Unable to locate image [{image_name}]")
 
@@ -143,7 +143,7 @@ class ImageCommands(commands.Cog):
 
         for img in all_imgs:
             try:
-                author = ctx.guild.get_member(user_id=int(img['author'])).mention
+                author = ctx.guild.get_member(user_id=int(img['source'])).mention
             except:
                 author = "N/A"
 
