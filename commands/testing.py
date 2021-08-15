@@ -6,6 +6,7 @@ import asyncio
 from utilities.constants import which_guild
 from objects.Thread import send_reminder
 from datetime import datetime, timedelta
+from utilities.embed import build_embed
 
 
 class TestCommand(commands.Cog):
@@ -15,22 +16,12 @@ class TestCommand(commands.Cog):
         guild_ids=[which_guild()]
     )
     async def _test(self, ctx: SlashContext):
-        await ctx.defer()
-        nest_asyncio.apply()
-
-        alert = datetime.now() + timedelta(seconds=10)
-        asyncio.create_task(
-            send_reminder(
-                thread=1,
-                destination=ctx.author,
-                num_seconds=3,
-                message="Testing",
-                alert_when=alert,
-                source=ctx.author
-            )
+        embed = build_embed(
+            # title="test",
+            # description="test",
+            # footer="sdfdsafsadfasfasfsafasdfasf"
         )
-        await ctx.send("Test started")
-
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
