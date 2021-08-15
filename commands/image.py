@@ -1,16 +1,18 @@
+import discord
+from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
+from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 
 from utilities.constants import DT_OBJ_FORMAT
 from utilities.constants import ROLE_ADMIN_PROD
 from utilities.constants import command_error
+from utilities.constants import which_guild
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
 from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDeleteImageCommand, sqlSelectAllImageCommand
-from utilities.constants import which_guild
-import discord
 
 
 def create_img(author: int, image_name: str, image_url: str):
@@ -139,25 +141,39 @@ class ImageCommands(commands.Cog):
     )
     async def _imglist(self, ctx: SlashContext):
         all_imgs = retrieve_all_img()
-        fields = []
+        pages = []
 
-        for img in all_imgs:
+        for image in all_imgs:
             try:
-                author = ctx.guild.get_member(user_id=int(img['author'])).mention
+                author = ctx.guild.get_member(user_id=int(image['author'])).mention
             except:
                 author = "N/A"
 
-            created_at = img['created_at']
-            fields.append([img["img_name"], f"Image URL: [URL]({img['img_url']})\n"
-                                            f"Author: {author}\n"
-                                            f"Created At: {created_at.strftime(DT_OBJ_FORMAT)}"])
+            created_at = image['created_at']
 
-        embed = build_embed(
-            title="List of Image Commands",
-            inline=False,
-            fields=fields
+            pages.append(build_embed(
+                title=f"Image: {image['img_name']}",
+                inline=False,
+                image=image["img_url"],
+                fields=[
+                    ["Command Name", f"`/img img_name:{image['img_name']}`"],
+                    ["Image URL", f"[URL]({image['img_url']})"],
+                    ["Author", f"{author}"],
+                    ["Created At", f"{created_at.strftime(DT_OBJ_FORMAT)}"]
+                ]
+            ))
+
+        await Paginator(
+            bot=ctx.bot,
+            ctx=ctx,
+            pages=pages,
+            useIndexButton=True,
+            firstStyle=ButtonStyle.gray,
+            nextStyle=ButtonStyle.gray,
+            prevStyle=ButtonStyle.gray,
+            lastStyle=ButtonStyle.gray,
+            indexStyle=ButtonStyle.gray
         )
-        await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(
         name="img",

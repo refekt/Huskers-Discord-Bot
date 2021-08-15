@@ -151,7 +151,8 @@ class FootballStatsCommands(commands.Cog):
             firstStyle=ButtonStyle.gray,
             nextStyle=ButtonStyle.gray,
             prevStyle=ButtonStyle.gray,
-            lastStyle=ButtonStyle.gray
+            lastStyle=ButtonStyle.gray,
+            indexStyle=ButtonStyle.gray
         )
 
     @cog_ext.cog_slash(
