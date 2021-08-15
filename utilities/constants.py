@@ -225,7 +225,7 @@ def pretty_time_delta(seconds):
     hours, seconds = divmod(seconds, 3600)
     minutes, seconds = divmod(seconds, 60)
     if days > 0:
-        return f"{days}d, {hours}h, {minutes}m, and {seconds}s"
+        return f"{days:,}d, {hours}h, {minutes}m, and {seconds}s"
     elif hours > 0:
         return f"{hours}h, {minutes}m, and {seconds} s"
     elif minutes > 0:
