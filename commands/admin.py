@@ -556,7 +556,7 @@ class AdminCommands(commands.Cog):
             description="List of slash commands and options for the server.",
             fields=all_commands
         )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed,hidden=True)
 
     @cog_ext.cog_slash(
         name="iowa",
