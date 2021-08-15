@@ -15,6 +15,10 @@ win_vars = "./variables.json"
 
 variables = ""
 
+print(f"### ~~~ argv[0]: {sys.argv[0]}")
+print(f"### ~~~ argv[1]: {sys.argv[1]}")
+
+
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set ###")
     variables = os.getcwd() + "\\variables.json"
@@ -183,8 +187,10 @@ DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 def production_server():
     try:
         if sys.argv[1] == "prod":
+            print("### ~~~ Bot being run on production server")
             return True
         elif sys.argv[1] == "test":
+            print("### ~~~ Bot being run on test server")
             return False
         else:
             return None
