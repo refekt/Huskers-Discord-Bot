@@ -1,2 +1,5 @@
-
+.idea
 *.xml
+key.key
+mammals.json
+variables.json
