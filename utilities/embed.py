@@ -7,51 +7,84 @@ from objects.Schedule import HuskerSchedule
 from utilities.constants import BOT_FOOTER_BOT
 from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT
 from utilities.constants import TZ, BOT_DISPLAY_NAME, BOT_GITHUB_URL, BOT_ICON_URL, BOT_THUMBNAIL_URL
+import validators
 
 
-def build_embed(title, **kwargs):
-    timestamp = datetime.now().astimezone(tz=TZ)
+class EmbedType:
+    rich = "rich"
+    image = "image"
+    video = "video"
+    gifv = "gifv"
+    article = "article"
+    link = "link"
 
-    if "color" in kwargs.keys():
-        if "description" in kwargs.keys():
-            embed = discord.Embed(title=title, description=kwargs["description"], color=kwargs["color"], timestamp=timestamp)
-        else:
-            embed = discord.Embed(title=title, color=kwargs["color"], timestamp=timestamp)
+
+def build_embed(**kwargs):
+    title_limit = name_limit = 256
+    desc_limit = 4096
+    fields_limit = 25
+    value_limit = 1024
+    footer_limit = 2048
+    embed_limit = 6000
+
+    if kwargs.get("color", False):
+        embed = discord.Embed(
+            timestamp=datetime.now().astimezone(tz=TZ),
+            color=kwargs.get("color")
+        )
     else:
-        if "description" in kwargs.keys():
-            embed = discord.Embed(title=title, description=kwargs["description"], color=0xD00000)
-        else:
-            embed = discord.Embed(title=title, color=0xD00000)
+        embed = discord.Embed(
+            timestamp=datetime.now().astimezone(tz=TZ),
+            color=0xD00000
+        )
 
-    embed.set_author(name=BOT_DISPLAY_NAME, url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL)
+    embed.set_author(
+        name=BOT_DISPLAY_NAME,
+        url=BOT_GITHUB_URL,
+        icon_url=BOT_ICON_URL
+    )
 
-    if "footer" in kwargs.keys():
-        embed.set_footer(text=kwargs["footer"])
+    if kwargs.get("description", False):
+        embed.description = kwargs.get("description")[:desc_limit]
+
+    if kwargs.get("title", False):
+        embed.title = kwargs.get("title")[:title_limit]
+
+    if kwargs.get("url", False) and validators.url(kwargs.get("url")):
+        embed.url = kwargs.get("url")
+
+    if kwargs.get("type", False):
+        embed.type = kwargs.get("type")
     else:
-        embed.set_footer(text=BOT_FOOTER_BOT)
+        embed.type = EmbedType.rich
 
-    if "url" in kwargs.keys():
-        embed.url = kwargs["url"]
+    if kwargs.get("footer", False):
+        embed.set_footer(
+            text=kwargs.get("footer")[:footer_limit],
+            icon_url=BOT_ICON_URL
+        )
 
-    if "image" in kwargs.keys():
+    if kwargs.get("image", False) and validators.url(kwargs.get("image")):
         embed.set_image(url=kwargs["image"])
 
-    if "thumbnail" in kwargs.keys():
-        if kwargs["thumbnail"] is not None:
-            embed.set_thumbnail(url=kwargs["thumbnail"])
-        else:
-            embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
+    if kwargs.get("thumbnail", False) and validators.url(kwargs.get("thumbnail")):
+        embed.set_thumbnail(
+            url=kwargs.get("thumbnail")
+        )
     else:
-        embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
+        embed.set_thumbnail(
+            url=BOT_THUMBNAIL_URL
+        )
 
-    try:
-        for field in kwargs["fields"]:
-            if "inline" in kwargs:
-                embed.add_field(name=field[0], value=field[1], inline=kwargs["inline"])
+    if kwargs.get("fields", False):
+        for index, field in enumerate(kwargs["fields"]):
+            if index >= fields_limit:
+                break
+
+            if kwargs.get("inline", False):
+                embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit], inline=kwargs["inline"])
             else:
-                embed.add_field(name=field[0], value=field[1])
-    except KeyError:
-        pass
+                embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit])
 
     return embed
 
@@ -209,7 +242,7 @@ def return_schedule_embeds(year, **kwargs):
 
     for game in scheduled_games:
         embeds.append(build_embed(
-            title=f"{year}, Week {game.week}",
+            title=f"Week {game.week}: {game.opponent.title()}",
             inline=False,
             thumbnail=game.icon,
             fields=[
