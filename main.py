@@ -114,8 +114,6 @@ async def load_tasks():
     tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
     guild = client.get_guild(which_guild())
 
-    print(f"############# guild == {guild}")
-
     if guild is None:
         print("### ~~~ Load tasks guild is none")
         return
