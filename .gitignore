@@ -6,3 +6,4 @@ variables.json
 *.pyc
 .git
 mammals.json
+testing.py
