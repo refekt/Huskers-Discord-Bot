@@ -219,7 +219,7 @@ async def hall_of_fame_messages(reactions: list):
 
         slowpoke_emoji = "<:slowpoke:758361250048245770>"
         server_member_count = len(client.users)
-        reaction_threshold = 1  # int(0.0047 * server_member_count)
+        reaction_threshold = int(0.0047 * server_member_count)
         hos_channel = hof_channel = None
         print(f"### ~~~ Reaction threshold for HOF and HOS messages set to [{reaction_threshold}]")
 
@@ -302,8 +302,9 @@ async def on_ready():
 
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-    if not payload.member.id == 189554873778307073:
-        return
+    # Testing purposes only
+    # if not payload.member.id == 189554873778307073:
+    #     return
 
     channel = client.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id)
