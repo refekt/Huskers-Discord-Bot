@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from discord.ext import commands
 
-from objects.Recruit import FootballRecruit
+from objects.Recruits import FootballRecruit
 from utilities.mysql import Process_MySQL
 
 CURRENT_CLASS = datetime.datetime.now().year

@@ -3,7 +3,7 @@ from datetime import datetime
 import discord
 import validators
 
-import objects.FAP as FAP
+import objects.FAPing as FAP
 from objects.Schedule import HuskerSchedule
 from utilities.constants import BOT_FOOTER_BOT
 from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT

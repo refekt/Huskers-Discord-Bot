@@ -6,8 +6,8 @@ from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_components import create_button, create_actionrow
 from discord_slash.utils.manage_components import wait_for_component
 
-from objects.FAP import initiate_fap, individual_predictions
-from objects.Recruit import FootballRecruit
+from objects.FAPing import initiate_fap, individual_predictions
+from objects.Recruits import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import user_error
 from utilities.constants import which_guild
