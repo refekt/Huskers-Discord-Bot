@@ -148,7 +148,7 @@ class ImageCommands(commands.Cog):
                 author = "N/A"
 
             created_at = img['created_at']
-            fields.append([img["img_name"], f"Image URL: {img['img_url']}\n"
+            fields.append([img["img_name"], f"Image URL: [URL]({img['img_url']})\n"
                                             f"Author: {author}\n"
                                             f"Created At: {created_at.strftime(DT_OBJ_FORMAT)}"])
 
@@ -157,7 +157,7 @@ class ImageCommands(commands.Cog):
             inline=False,
             fields=fields
         )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(
         name="img",
