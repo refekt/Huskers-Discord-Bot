@@ -344,13 +344,12 @@ if len(sys.argv) > 0:
         token = TEST_TOKEN
 
 extensions = [
-    # "commands.croot_bot",
-    # "commands.admin",
-    # "commands.text",
-    # "commands.image",
-    # "commands.football_stats",
-    # "commands.reminder",
-    # "commands.testing"
+    "commands.croot_bot",
+    "commands.admin",
+    "commands.text",
+    "commands.image",
+    "commands.football_stats",
+    "commands.reminder",
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension} ###")
