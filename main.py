@@ -303,15 +303,14 @@ async def on_ready():
 
     bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
 
-    # embed = build_embed(
-    #     title="Bot Frost Online",
-    #     description=f"I'm online as {client.user.mention}",
-    #     fields=[
-    #         ["Info", "I was restarted, but now I'm back!"]
-    #     ]
-    # )
-    # await bot_spam.send(embed=embed)
-    print("Ready!")
+    embed = build_embed(
+        title="Bot Frost Online",
+        description=f"I'm online as {client.user.mention}",
+        fields=[
+            ["Info", "I was restarted, but now I'm back!"]
+        ]
+    )
+    await bot_spam.send(embed=embed)
 
 
 @client.event
@@ -326,15 +325,15 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     await hall_of_fame_messages(message.reactions)
 
 
-# @client.event
-# async def on_slash_command_error(ctx, ex):
-#     embed = build_embed(
-#         title="Slash Command Error",
-#         fields=[
-#             ["Description", str(ex)]
-#         ]
-#     )
-#     await ctx.send(embed=embed, hidden=True)
+@client.event
+async def on_slash_command_error(ctx, ex):
+    embed = build_embed(
+        title="Slash Command Error",
+        fields=[
+            ["Description", str(ex)]
+        ]
+    )
+    await ctx.send(embed=embed, hidden=True)
 
 
 @client.event
