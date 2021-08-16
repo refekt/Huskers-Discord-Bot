@@ -18,6 +18,7 @@ from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS, GUI
 from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
 from utilities.constants import PROD_TOKEN, TEST_TOKEN
+from utilities.constants import debugging
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks
 
@@ -315,18 +316,20 @@ async def on_ready():
 
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-    # Testing purposes only
-    # if not payload.member.id == 189554873778307073:
-    #     return
-
-    channel = client.get_channel(payload.channel_id)
-    message = await channel.fetch_message(payload.message_id)
+    if debugging() and not payload.member.id == 189554873778307073:
+        return
+    else:
+        channel = client.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
 
     await hall_of_fame_messages(message.reactions)
 
 
 @client.event
 async def on_slash_command_error(ctx, ex):
+    if debugging():
+        return
+
     embed = build_embed(
         title="Slash Command Error",
         fields=[
@@ -347,7 +350,10 @@ async def on_component_callback(ctx: ComponentContext, callback: CallbackObject)
     pass
 
 
-token = PROD_TOKEN
+if debugging():
+    token = TEST_TOKEN
+else:
+    token = PROD_TOKEN
 
 extensions = [
     "commands.croot_bot",

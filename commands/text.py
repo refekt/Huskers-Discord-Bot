@@ -125,16 +125,39 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="vote",
         description="Ask the community for their opinion in votes",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="query",
+                description="What to vote on",
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name="option_a",
+                description="Option A to vote on",
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name="option_b",
+                description="Option b to vote on",
+                option_type=3,
+                required=True
+            )
+        ]
     )
-    async def _vote(self, ctx: SlashContext, *, query: str):
+    async def _vote(self, ctx: SlashContext, query: str, option_a: str = None, option_b: str = None):
+        if not option_a and option_b:
+            raise command_error("You must provide both options!")
+
         embed = build_embed(
             title="Vote",
             inline=False,
             fields=[
                 ["Question", query.capitalize()],
-                ["Up Votes", "0"],
-                ["Down Votes", "0"],
+                ["Up Votes" if option_a is None else option_a.title(), "0"],
+                ["Down Votes" if option_b is None else option_b.title(), "0"],
                 ["Voters", "_"]
             ]
         )
