@@ -302,8 +302,10 @@ async def on_ready():
         f"### The bot is ready! ###"
     )
 
-    bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
+    if debugging():
+        return
 
+    bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
     embed = build_embed(
         title="Bot Frost Online",
         description=f"I'm online as {client.user.mention}",
