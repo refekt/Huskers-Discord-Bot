@@ -243,6 +243,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="purge",
+        base_description="Delete messages",
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
         guild_ids=guild_id_list(),
@@ -268,6 +269,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="purge",
+        base_description="Delete messages",
         name="bot",
         description="Admin only: Deletes previous bot messages",
         guild_ids=guild_id_list(),
@@ -310,6 +312,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="roles",
+        base_description="Manage your roles",
         name="hype",
         description="Assign hype roles",
         guild_ids=guild_id_list()
@@ -377,6 +380,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="roles",
+        base_description="Manage your roles",
         name="food",
         description="Assign food roles",
         guild_ids=guild_id_list()
@@ -437,6 +441,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="roles",
+        base_description="Manage your roles",
         name="culture",
         description="Assign culture roles",
         guild_ids=guild_id_list()
@@ -497,6 +502,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="gameday",
+        base_description="Admin only: turn game day mode on or off",
         name="on",
         description="Turn game day mode on",
         guild_ids=guild_id_list(),
@@ -519,6 +525,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="gameday",
+        base_description="Admin only: turn game day mode on or off",
         name="off",
         description="Turn game day mode off",
         guild_ids=guild_id_list(),
@@ -544,21 +551,35 @@ class AdminCommands(commands.Cog):
     )
     async def _commands(self, ctx: SlashContext):
         all_commands = []
-        print(ctx)
-        for command in self.bot.slash.commands:
-            if self.bot.slash.commands[command].description is not None:
-                all_commands.append([
-                    self.bot.slash.commands[command].name,
-                    self.bot.slash.commands[command].description
-                ])
+
+        for command in ctx.slash.commands:
+            if not type(ctx.slash.commands[command]) == dict:
+                n = ctx.slash.commands[command].name
+                d = ctx.slash.commands[command].description
+
+                if d is None:
+                    print(f"!!! n == {n}")
+
+                all_commands.append([n, d])
+
+        fields_limit = 24
 
         embed = build_embed(
             title="Slash Commands",
             inline=True,
             description="List of slash commands and options for the server.",
-            fields=all_commands
+            fields=all_commands[0:fields_limit]
         )
         await ctx.send(embed=embed, hidden=True)
+
+        if len(all_commands) > fields_limit:
+            embed = build_embed(
+                title="Slash Commands",
+                inline=True,
+                description="List of slash commands and options for the server.",
+                fields=all_commands[fields_limit + 1:]
+            )
+            await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(
         name="iowa",
