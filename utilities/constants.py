@@ -195,17 +195,6 @@ except IndexError:
 
 
 def debugging() -> bool:
-    # try:
-    #     server = sys.argv[1]
-    # except IndexError:
-    #     return False
-    #
-    # if server == "prod":
-    #     print("### ~~~ Bot starting on the production server")
-    #     return False
-    # elif server == "test":
-    #     print("### ~~~ Bot starting on the test server")
-    #     return True
     return True if _is_debugging else False
 
 
