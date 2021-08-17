@@ -13,29 +13,28 @@ from utilities.constants import user_error
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed, build_recruit_embed
 
+fap_buttons = [
+    create_button(
+        style=ButtonStyle.gray,
+        label="🔮",
+        custom_id="crystal_ball",
+        disabled=True
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="📜",
+        custom_id="scroll",
+        disabled=False
+    )
+]
+fap_action_row = create_actionrow(*fap_buttons)
+
 
 async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
     embed = build_recruit_embed(target_recruit)
 
-    fap_buttons = [
-        create_button(
-            style=ButtonStyle.gray,
-            label="🔮",
-            custom_id="crystal_ball",
-            disabled=True
-        ),
-        create_button(
-            style=ButtonStyle.gray,
-            label="📜",
-            custom_id="scroll",
-            disabled=False
-        )
-    ]
-
     if not target_recruit.committed == "Enrolled":
         fap_buttons[0]["disabled"] = False
-
-    fap_action_row = create_actionrow(*fap_buttons)
 
     if edit:
         print("### ~~~ Editing message")
@@ -51,7 +50,7 @@ async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
 
     if button_contenxt.custom_id == "crystal_ball":
         print(f"### ~~~ Crystal ball pressed for [{target_recruit.name.capitalize()}]")
-        await initiate_fap(ctx.author, target_recruit, bot)
+        await initiate_fap(ctx=ctx, user=ctx.author, recruit=target_recruit, client=bot)
         return
 
     elif button_contenxt.custom_id == "scroll":

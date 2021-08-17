@@ -154,7 +154,7 @@ def build_recruit_embed(recruit):
 
     nl = "\n"
     embed = build_embed(
-        title=f"{recruit.name}, {str(recruit.rating_stars) + '⭐ ' if recruit.rating_stars else ''}{recruit.year} {recruit.position}",
+        title=f"{str(recruit.rating_stars) + '⭐ ' if recruit.rating_stars else ''}{recruit.year} {recruit.position}, {recruit.name}",
         description=f"{recruit.committed if recruit.committed is not None else ''}{': ' + recruit.committed_school if recruit.committed_school is not None else ''} {': ' + str(recruit.commitment_date.strftime('%b %d, %Y')) if recruit.commitment_date is not None else ''}",
         fields=[
             ["**Biography**", f"{recruit.city}, {recruit.state}\n"

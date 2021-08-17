@@ -322,21 +322,21 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 
 @client.event
 async def on_slash_command(ctx):
-    print(ctx)
+    pass
 
 
-@client.event
-async def on_slash_command_error(ctx, ex):
-    if debugging():
-        return
-
-    embed = build_embed(
-        title="Slash Command Error",
-        fields=[
-            ["Description", str(ex)]
-        ]
-    )
-    await ctx.send(embed=embed, hidden=True)
+    # @client.event
+    # async def on_slash_command_error(ctx, ex):
+    #     if debugging():
+    #         return
+    #
+    #     embed = build_embed(
+    #         title="Slash Command Error",
+    #         fields=[
+    #             ["Description", str(ex)]
+    #         ]
+    #     )
+    #     await ctx.send(embed=embed, hidden=True)
 
 
 @client.event
@@ -356,13 +356,13 @@ else:
     token = PROD_TOKEN
 
 extensions = [
-    # "commands.croot_bot",
-    # "commands.admin",
-    # "commands.text",
-    # "commands.image",
-    # "commands.football_stats",
-    # "commands.reminder",
-    "commands.testing"
+    "commands.croot_bot",
+    "commands.admin",
+    "commands.text",
+    "commands.image",
+    "commands.football_stats",
+    "commands.reminder",
+    # "commands.testing"
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension}")
