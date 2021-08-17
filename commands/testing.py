@@ -5,6 +5,8 @@ from discord_slash.context import SlashContext
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 
+print(f"Guild ID List: {type(guild_id_list())} {guild_id_list()}")
+
 
 class TestCommand(commands.Cog):
     @cog_ext.cog_slash(

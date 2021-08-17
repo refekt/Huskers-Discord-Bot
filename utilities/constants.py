@@ -200,9 +200,9 @@ def debugging() -> bool:
 
 def guild_id_list() -> list:
     if debugging():
-        return [GUILD_PROD]
-    else:
         return [GUILD_TEST]
+    else:
+        return [GUILD_PROD]
 
 
 # Slash command permissions
