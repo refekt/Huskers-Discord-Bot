@@ -560,16 +560,16 @@ class AdminCommands(commands.Cog):
         ]
     )
     async def _commands(self, ctx: SlashContext, command_name: str = None):
-        def command_embed(cname: str) -> discord.Embed:
-            new_line = "\n"
-            slash_commands = ctx.slash.commands[cname]
-            opts = [cc["name"] if len(slash_commands.options) > 0 else "N/A" for cc in slash_commands.options]
+        def command_embed(cur_cmd, cur_options) -> discord.Embed:
+            opts = ""
+            for copt in cur_options:
+                opts += f"» {copt['name']} ({'Required' if copt['required'] else 'Not Required'}): {copt['description']}\n"
             return build_embed(
                 title="Bot Frost Commands",
                 fields=[
-                    ["Command Name", slash_commands.name],
-                    ["Descrip   tion", slash_commands.description],
-                    ["Options", f"{new_line}".join(opts) if len(opts) > 0 else "N/A"]
+                    ["Command Name", cur_cmd.name],
+                    ["Description", cur_cmd.description],
+                    ["Options", opts]
                 ]
             )
 
@@ -578,7 +578,10 @@ class AdminCommands(commands.Cog):
             for command in ctx.slash.commands:
                 if not type(ctx.slash.commands[command]) == dict:
                     pages.append(
-                        command_embed(command)
+                        command_embed(
+                            ctx.slash.commands[command],
+                            ctx.slash.commands[command].options
+                        )
                     )
             await Paginator(
                 bot=ctx.bot,
@@ -593,7 +596,10 @@ class AdminCommands(commands.Cog):
                 bot=ctx.bot,
                 ctx=ctx,
                 pages=[
-                    command_embed(command_name)
+                    command_embed(
+                        ctx.slash.commands[command_name],
+                        ctx.slash.commands[command_name].options
+                    )
                 ],
                 useSelect=False,
                 useIndexButton=False,
