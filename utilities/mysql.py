@@ -131,7 +131,7 @@ TRUNCATE TABLE trivia_scores
 """
 
 sqlTeamIDs = """
-SELECT id, name FROM team_ids ORDER BY name ASC
+SELECT id, school from botfrost.team_ids
 """
 
 sqlRecordStats = """
@@ -285,8 +285,7 @@ def Process_MySQL(query: str, **kwargs):
     except:
         raise ConnectionError("### Error occurred opening the MySQL database.")
     finally:
-        if not query == sqlRecordStats:
-            print(f"### ~~~ Closing connection to the MySQL Database")
+        print(f"### ~~~ Closing connection to the MySQL Database")
         sqlConnection.close()
 
         if result:

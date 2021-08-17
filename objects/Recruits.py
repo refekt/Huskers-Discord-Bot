@@ -9,7 +9,7 @@ from utilities.constants import CROOT_SEARCH_LIMIT
 # from google import search
 from utilities.constants import HEADERS
 from utilities.constants import user_error
-from utilities.mysql import Process_MySQL, sqlTeamIDs as TeamIDs
+from utilities.mysql import Process_MySQL, sqlTeamIDs
 
 states = {
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
@@ -136,13 +136,14 @@ class Recruit:
 
 def FootballRecruit(year, name):
     # search_results = x247_search = None
-    team_ids_raw = Process_MySQL(fetch="all", query=TeamIDs)
-    team_ids = dict()
-
-    for team_id in team_ids_raw:
-        team_ids.update({str(team_id['id']): team_id['name']})
-
-    del team_id
+    team_ids = Process_MySQL(fetch="all", query=sqlTeamIDs)
+    # team_ids_raw = Process_MySQL(fetch="all", query=sqlTeamIDs)
+    #
+    # team_ids = dict
+    # for team_id in team_ids_raw:
+    #     team_ids.update({team_id['id']: team_id['name']})
+    #
+    # del team_id
 
     name = name.split(" ")
 

@@ -4,13 +4,12 @@ import datetime
 import discord
 import numpy as np
 import pandas as pd
+from discord import client as discord_client
 from discord.ext import commands
 from discord_slash.context import SlashContext
-from discord_slash.utils.manage_components import wait_for_component
+
 from objects.Recruits import FootballRecruit
-from utilities.mysql import Process_MySQL
-from discord_slash.model import SlashMessage
-from discord import client as discord_client
+from utilities.mysql import Process_MySQL, sqlTeamIDs
 
 CURRENT_CLASS = datetime.datetime.now().year
 NO_MORE_PREDS = datetime.datetime.now().year
@@ -18,11 +17,8 @@ DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 async def get_teams():
-    get_teams_query = """
-    SELECT name FROM team_ids;
-    """
-    sql_teams = Process_MySQL(query=get_teams_query, fetch='all')
-    teams_list = [t['name'] for t in sql_teams]
+    sql_teams = Process_MySQL(query=sqlTeamIDs, fetch='all')
+    teams_list = [t['school'] for t in sql_teams]
     return teams_list
 
 
@@ -60,58 +56,51 @@ def get_croot_predictions(recruit):
 
 
 async def initiate_fap(ctx: SlashContext, user, recruit, client: discord_client):
-    valid_teams = await get_teams()
-    team_prediction = None
-    prediction_confidence = None
-
     await ctx.send("Initiating FAP!", hidden=True)
 
     if (recruit.committed.lower() if recruit.committed is not None else None) in ['signed', 'enrolled']:
         return await ctx.send("You cannot make predictions on recruits that have been signed or have enrolled in their school.", hidden=True)
 
     if recruit.year < NO_MORE_PREDS:
-        return await ctx.send(f"You cannot make predictions on recruits from before the {NO_MORE_PREDS} class. {recruit.name} was in the {recruit.year} recruiting class.", hidden=True)
+        return await ctx.send(f"You cannot make predictions on recruits from before the [{NO_MORE_PREDS}] class. [{recruit.name}] was in the [{recruit.year}] recruiting class.", hidden=True)
 
     previous_prediction = await get_prediction(user, recruit)
+    team_prediction = None
+    prediction_confidence = None
 
     first_msg = ""
     if previous_prediction is not None:
-        first_msg = f"It appears that you've previously predicted {recruit.name} to {previous_prediction['team']} with confidence {previous_prediction['confidence']}. You can answer the prompts to update your prediction.\n"
-    first_msg += f"Please predict which team you think {recruit.name} will commit to. [247Sports Profile]({recruit.x247_profile})"
+        first_msg = f"It appears that you've previously predicted [{recruit.name}] to [{previous_prediction['team']}] with confidence [{previous_prediction['confidence']}]. You can answer the prompts to update your prediction.\n"
+    first_msg += f"Please predict which team you think [{recruit.name}] will commit to. [247Sports Profile]({recruit.x247_profile}])"
     await ctx.send(first_msg, hidden=True)
 
     while team_prediction is None:
         try:
-            async def check_msg(message):
-                if message.author == user and message.channel == ctx.channel:
-                    await message.delete()
-                    return True
-                else:
-                    return False
-
-            prediction_response_msg = await client.wait_for('message', check=check_msg, timeout=30)  # check=lambda message: message.author == user and message.channel == ctx.channel, timeout=30)
+            prediction_response_msg: discord.Message = await client.wait_for('message', check=lambda message: message.author == user and message.channel == ctx.channel, timeout=30)
             prediction_response = prediction_response_msg.content.lower()
-            # await prediction_response_msg.delete()
+            await prediction_response_msg.delete()
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message or using the $predict command.", hidden=True)
 
             return
         else:
+            valid_teams = await get_teams()
+
             if prediction_response in [t.lower() for t in valid_teams]:
                 team_index = [t.lower() for t in valid_teams].index(prediction_response)
                 team_prediction = valid_teams[team_index]
                 if recruit.committed_school == team_prediction:
-                    await ctx.send(f"{recruit.name} is already ccommitted to {recruit.committed_school}. Nice try.", hidden=True)
+                    await ctx.send(f"{recruit.name}] is already ccommitted to [{recruit.committed_school}]. Nice try.", hidden=True)
 
                     return
-                await ctx.send(f"You've selected {team_prediction} as your prediction, what is your confidence in that pick from 1 to 10?", hidden=True)
+                await ctx.send(f"You've selected [{team_prediction}] as your prediction, what is your confidence in that pick from 1 to 10?", hidden=True)
 
             else:
                 await ctx.send("That isn't a valid team. Please try again or ask my creators to add that as a valid team.", hidden=True)
 
     while prediction_confidence is None:
         try:
-            confidence_response_msg = await client.wait_for('message', check=lambda message: message.author == user and message.channel == ctx.channel, timeout=30)
+            confidence_response_msg: discord.Message = await client.wait_for('message', check=lambda message: message.author == user and message.channel == ctx.channel, timeout=30)
             confidence_response = confidence_response_msg.content
             await confidence_response_msg.delete()
         except asyncio.TimeoutError:
@@ -126,14 +115,14 @@ async def initiate_fap(ctx: SlashContext, user, recruit, client: discord_client)
 
             else:
                 if 1 <= confidence <= 10:
-                    await ctx.send(f"You've selected {confidence} as your confidence level.", hidden=True)
+                    await ctx.send(f"You've selected [{confidence}] as your confidence level.", hidden=True)
 
                     prediction_confidence = int(confidence_response)
                 else:
-                    await ctx.send(f"{confidence} is not between 1 and 10. Try again.", hidden=True)
+                    await ctx.send(f"{confidence}] is not between 1 and 10. Try again.", hidden=True)
 
     await insert_prediction(user, recruit, team_prediction, prediction_confidence, previous_prediction)
-    await ctx.send(f"Your prediction of {recruit.name} to {team_prediction} has been logged!", hidden=True)
+    await ctx.send(f"Your prediction of [{recruit.name}] to {team_prediction}] has been logged!", hidden=True)
 
 
 def get_faps(recruit):

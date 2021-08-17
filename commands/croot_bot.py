@@ -9,8 +9,8 @@ from discord_slash.utils.manage_components import wait_for_component
 from objects.FAPing import initiate_fap, individual_predictions
 from objects.Recruits import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
-from utilities.constants import user_error
 from utilities.constants import guild_id_list
+from utilities.constants import user_error
 from utilities.embed import build_embed, build_recruit_embed
 
 fap_buttons = [
