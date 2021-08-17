@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from encryption import load_key, decrypt_return_data, decrypt, encrypt
 
-print(f"### Platform == {platform.platform()} ###")
+print(f"### Platform == {platform.platform()}")
 
 win_vars = "./variables.json"
 
@@ -19,15 +19,15 @@ print(f"### ~~~ argv[0]: {sys.argv[0]}")
 print(f"### ~~~ argv[1]: {sys.argv[1]}")
 
 if "Windows" in platform.platform():
-    print("### ~~~ Windows environment set ###")
+    print("### ~~~ Windows environment set")
     variables = os.getcwd() + "\\variables.json"
     load_dotenv(dotenv_path=variables)
 elif "Linux" in platform.platform():
-    print("### ~~~ Linux environment set ###")
+    print("### ~~~ Linux environment set")
     variables = "/home/botfrost/bot/variables.json"
     load_dotenv(dotenv_path=variables)
 else:
-    print(f"### ~~~ Unknown Platform: {platform.platform()} ###")
+    print(f"### ~~~ Unknown Platform: {platform.platform()}")
 
 # Decrypt Env file
 env_file = variables
@@ -182,27 +182,38 @@ DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
-
-def debugging() -> bool:
-    try:
-        server = sys.argv[1]
-    except IndexError:
-        return False
-
+_is_debugging = False
+try:
+    server = sys.argv[1]
     if server == "prod":
         print("### ~~~ Bot starting on the production server")
-        return False
     elif server == "test":
         print("### ~~~ Bot starting on the test server")
-        return True
+        _is_debugging = True
+except IndexError:
+    pass
+
+
+def debugging() -> bool:
+    # try:
+    #     server = sys.argv[1]
+    # except IndexError:
+    #     return False
+    #
+    # if server == "prod":
+    #     print("### ~~~ Bot starting on the production server")
+    #     return False
+    # elif server == "test":
+    #     print("### ~~~ Bot starting on the test server")
+    #     return True
+    return True if _is_debugging else False
 
 
 def guild_id_list() -> list:
-    return [GUILD_PROD]
-    # if production_server():
-    #     return GUILD_PROD
-    # else:
-    #     return GUILD_TEST
+    if debugging():
+        return [GUILD_PROD]
+    else:
+        return [GUILD_TEST]
 
 
 # Slash command permissions

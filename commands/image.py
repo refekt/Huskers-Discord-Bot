@@ -190,9 +190,15 @@ class ImageCommands(commands.Cog):
         if author is None:
             author = "Unknown"
 
+        if ".gifv" in image["img_url"]:
+            gifv = True
+        else:
+            gifv = False
+
         embed = build_embed(
             title=image["img_name"],
             image=image["img_url"],
+            type="gifv" if gifv else "image",
             description=f"This command was created by [{author.mention if type(author) == discord.Member else author}]."
         )
         await ctx.send(embed=embed)

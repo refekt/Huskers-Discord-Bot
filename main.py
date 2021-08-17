@@ -110,22 +110,6 @@ async def change_my_nickname():
 
 
 async def load_tasks():
-    tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
-
-    guild = None
-    for g in client.guilds:
-        if g.id == GUILD_PROD:
-            guild = g
-
-    if guild is None:
-        print("### ~~~ Load tasks guild is none")
-        return
-    else:
-        print(f"### ~~~ Guild == {guild}")
-
-    if tasks is None:
-        return
-
     def convert_duration(value: str):
         imported_datetime = datetime.strptime(value, DT_TASK_FORMAT)
         now = datetime.now()
@@ -153,6 +137,15 @@ async def load_tasks():
 
         return None
 
+    tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
+    guild = client.guilds[0]
+
+    if guild is None:
+        print("### ~~~ Load tasks guild is none")
+        return
+    else:
+        print(f"### ~~~ Guild == {guild}")
+
     if tasks is None:
         return print("### ;;; No tasks were loaded")
 
@@ -165,7 +158,7 @@ async def load_tasks():
         member_or_chan = await convert_destination(task["send_to"])
 
         if member_or_chan is None:
-            print(f"### ;;; Skipping task because [{member_or_chan}] is None.")
+            print(f"### ;;; Skipping task because destination is None.")
             continue
 
         if task["author"] is None:
@@ -222,8 +215,6 @@ def make_slowking(avatar_url):
     base_img.save("resources/images/new_slowking.png", "PNG")
 
 
-#
-#
 async def hall_of_fame_messages(reactions: list):
     for reaction in reactions:
         if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):  # Stay out of HOF and HOS
@@ -299,7 +290,7 @@ async def on_ready():
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
         f"### ~~~ Guild: {client.guilds[0]}\n"
-        f"### The bot is ready! ###"
+        f"### The bot is ready!"
     )
 
     if debugging():
@@ -358,15 +349,16 @@ else:
     token = PROD_TOKEN
 
 extensions = [
-    "commands.croot_bot",
-    "commands.admin",
-    "commands.text",
-    "commands.image",
-    "commands.football_stats",
-    "commands.reminder",
+    # "commands.croot_bot",
+    # "commands.admin",
+    # "commands.text",
+    # "commands.image",
+    # "commands.football_stats",
+    # "commands.reminder",
+    "commands.testing"
 ]
 for extension in extensions:
-    print(f"### ~~~ Loading extension: {extension} ###")
+    print(f"### ~~~ Loading extension: {extension}")
     client.load_extension(extension)
 
 client.run(token)

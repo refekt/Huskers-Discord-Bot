@@ -143,7 +143,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     gameday_category = guild.get_channel(CAT_GAMEDAY)
     everyone = guild.get_role(ROLE_EVERYONE_PROD)
 
-    print(f"### ~~~ Creating permissions to be [{mode}] ###")
+    print(f"### ~~~ Creating permissions to be [{mode}]")
 
     perms_text = discord.PermissionOverwrite()
     perms_text.view_channel = mode
@@ -159,7 +159,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
 
     for channel in gameday_category.channels:
         try:
-            print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{mode}] ###")
+            print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{mode}]")
 
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text)
@@ -167,13 +167,13 @@ async def process_gameday(mode: bool, guild: discord.Guild):
                 await channel.set_permissions(everyone, overwrite=perms_voice)
             else:
                 continue
-            print(f"### ~~~ Changed permissions for [{channel}] to [{mode}] ###")
+            print(f"### ~~~ Changed permissions for [{channel}] to [{mode}]")
         except discord.errors.Forbidden:
             raise command_error("The bot does not have access to change permissions!")
         except:
             continue
 
-    print("### ~~~ All permisisons changes applied ###")
+    print("### ~~~ All permisisons changes applied")
 
 
 class AdminCommands(commands.Cog):
@@ -318,7 +318,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _roles_hype(self, ctx: SlashContext):
-        print("### Roles: Hype Squad ###")
+        print("### Roles: Hype Squad")
 
         hype_action_row = create_actionrow(*buttons_roles_hype)
 
@@ -339,7 +339,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_hype(self, ctx: ComponentContext):
         await ctx.defer()
 
-        print("### ~~~ Gathering roles ###")
+        print("### ~~~ Gathering roles")
 
         hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
         hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
@@ -386,7 +386,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _roles_food(self, ctx: SlashContext):
-        print("### Roles: Food ###")
+        print("### Roles: Food")
 
         embed = build_embed(
             title="Which food roles do you want?",
@@ -447,7 +447,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _roles_culture(self, ctx: SlashContext):
-        print("### Roles: Culture ###")
+        print("### Roles: Culture")
 
         embed = build_embed(
             title="Which culture roles do you want?",
@@ -509,7 +509,7 @@ class AdminCommands(commands.Cog):
         base_permissions=admin_perms
     )
     async def _gameday_on(self, ctx: SlashContext):
-        print("### Game Day: On ###")
+        print("### Game Day: On")
         await process_gameday(True, ctx.guild)
         embed = build_embed(
             title="Game Day Mode",
@@ -532,7 +532,7 @@ class AdminCommands(commands.Cog):
         base_permissions=admin_perms
     )
     async def _gameday_off(self, ctx: SlashContext):
-        print("### Game Day: Off ###")
+        print("### Game Day: Off")
         await process_gameday(False, ctx.guild)
         embed = build_embed(
             title="Game Day Mode",

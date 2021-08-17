@@ -38,7 +38,7 @@ async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
     fap_action_row = create_actionrow(*fap_buttons)
 
     if edit:
-        print("### ~~~ Editing message ###")
+        print("### ~~~ Editing message")
 
         await ctx.edit_origin(content="", embed=embed, components=[fap_action_row])
     else:
@@ -106,7 +106,7 @@ class RecruitCog(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _crootbot(self, ctx: SlashContext, year: int, search_name: str):
-        print(f"### Crootbot ###")
+        print(f"### Crootbot")
 
         if len(search_name) == 0:
             raise user_error("A player's first and/or last search_name is required.")
@@ -124,12 +124,12 @@ class RecruitCog(commands.Cog):
 
         await ctx.defer()  # Similiar to sending a message with a loading screen to edit later on
 
-        print(f"### ~~~ Searching for [{year} {search_name.capitalize()}] ###")
+        print(f"### ~~~ Searching for [{year} {search_name.capitalize()}]")
 
         global search, paginator_msg
         search = FootballRecruit(year, search_name)
 
-        print(f"### ~~~ Found [{len(search)}] results ###")
+        print(f"### ~~~ Found [{len(search)}] results")
 
         action_row = create_actionrow(*croot_buttons)
 
@@ -155,13 +155,13 @@ class RecruitCog(commands.Cog):
 
         await ctx.send(embed=embed, components=[action_row])
 
-        print(f"### ~~~ Sent search results for [{year} {search_name.capitalize()}] ###")
+        print(f"### ~~~ Sent search results for [{year} {search_name.capitalize()}]")
 
     @cog_ext.cog_component(components=croot_buttons)
     async def process_searches(self, ctx: ComponentContext):
         print(ctx.custom_id)
         button_to_index = {"result_1": 0, "result_2": 1, "result_3": 2, "result_4": 3, "result_5": 4}
-        print(f"### ~~~ Button [{ctx.custom_id}] was pressed ###")
+        print(f"### ~~~ Button [{ctx.custom_id}] was pressed")
         global search
         await final_send_embed_fap_loop(ctx=ctx, target_recruit=search[button_to_index[ctx.custom_id]], bot=self.bot, edit=True)
 
