@@ -56,7 +56,7 @@ def get_croot_predictions(recruit):
 
 
 async def initiate_fap(ctx: SlashContext, user, recruit, client: discord_client):
-    await ctx.send("Initiating FAP!", hidden=True)
+    await ctx.send("Initiating FAP! Your inputs will be delete, but may appear to remain on the screen. They will disappear on reloading of Discord (Ctrl + R).", hidden=True)
 
     if (recruit.committed.lower() if recruit.committed is not None else None) in ['signed', 'enrolled']:
         return await ctx.send("You cannot make predictions on recruits that have been signed or have enrolled in their school.", hidden=True)
@@ -78,12 +78,12 @@ async def initiate_fap(ctx: SlashContext, user, recruit, client: discord_client)
         try:
             prediction_response_msg: discord.Message = await client.wait_for('message', check=lambda message: message.author == user and message.channel == ctx.channel, timeout=30)
             prediction_response = prediction_response_msg.content.lower()
-            await prediction_response_msg.delete()
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message or using the $predict command.", hidden=True)
 
             return
         else:
+            await prediction_response_msg.delete()
             valid_teams = await get_teams()
 
             if prediction_response in [t.lower() for t in valid_teams]:
@@ -102,12 +102,13 @@ async def initiate_fap(ctx: SlashContext, user, recruit, client: discord_client)
         try:
             confidence_response_msg: discord.Message = await client.wait_for('message', check=lambda message: message.author == user and message.channel == ctx.channel, timeout=30)
             confidence_response = confidence_response_msg.content
-            await confidence_response_msg.delete()
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you ran out of time. You'll have to initiate the FAP process again by clicking the crystal ball emoji on the crootbot message or using the $predict command.", hidden=True)
 
             return
         else:
+            await confidence_response_msg.delete()
+
             try:
                 confidence = int(confidence_response)
             except:
