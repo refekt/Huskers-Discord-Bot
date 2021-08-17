@@ -31,6 +31,8 @@ client = Bot(
 
 slash = SlashCommand(client, sync_commands=True)  # Sync required
 
+client_percent = 0.0047
+
 
 async def change_my_status():
     statuses = (
@@ -222,9 +224,8 @@ async def hall_of_fame_messages(reactions: list):
 
         slowpoke_emoji = "<:slowpoke:758361250048245770>"
         server_member_count = len(client.users)
-        reaction_threshold = int(0.0047 * server_member_count)
+        reaction_threshold = int(client_percent * server_member_count)
         hos_channel = hof_channel = None
-        print(f"### ~~~ Reaction threshold for HOF and HOS messages set to [{reaction_threshold}]")
 
         if reaction.count >= reaction_threshold:
             print(f"### ~~~ Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] reactions")
@@ -290,6 +291,7 @@ async def on_ready():
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
         f"### ~~~ Guild: {client.guilds[0]}\n"
+        f"### ~~~ HOF/HOS Reaction Threshold: {len(client.users) * client_percent}\n"
         f"### The bot is ready!"
     )
 
