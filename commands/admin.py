@@ -3,9 +3,11 @@ import platform
 from datetime import datetime, timedelta
 
 import discord
+from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import ButtonStyle, cog_ext
 from discord_slash.context import SlashContext, ComponentContext
+from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import create_button, create_actionrow, create_select_option, create_select
 
 from utilities.constants import BOT_FOOTER_SECRET
@@ -547,39 +549,87 @@ class AdminCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="commands",
         description="Show all slash commands",
-        guild_ids=guild_id_list()
-    )
-    async def _commands(self, ctx: SlashContext):
-        all_commands = []
-
-        for command in ctx.slash.commands:
-            if not type(ctx.slash.commands[command]) == dict:
-                n = ctx.slash.commands[command].name
-                d = ctx.slash.commands[command].description
-
-                if d is None:
-                    print(f"!!! n == {n}")
-
-                all_commands.append([n, d])
-
-        fields_limit = 24
-
-        embed = build_embed(
-            title="Slash Commands",
-            inline=True,
-            description="List of slash commands and options for the server.",
-            fields=all_commands[0:fields_limit]
-        )
-        await ctx.send(embed=embed, hidden=True)
-
-        if len(all_commands) > fields_limit:
-            embed = build_embed(
-                title="Slash Commands",
-                inline=True,
-                description="List of slash commands and options for the server.",
-                fields=all_commands[fields_limit + 1:]
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="command_name",
+                description="Name of the command you want to view",
+                option_type=3,
+                required=False
             )
-            await ctx.send(embed=embed, hidden=True)
+        ]
+    )
+    async def _commands(self, ctx: SlashContext, command_name: str = None):
+        def command_embed(cname: str) -> discord.Embed:
+            new_line = "\n"
+            slash_commands = ctx.slash.commands[cname]
+            opts = [cc["name"] if len(slash_commands.options) > 0 else "N/A" for cc in slash_commands.options]
+            return build_embed(
+                title="Bot Frost Commands",
+                fields=[
+                    ["Command Name", slash_commands.name],
+                    ["Descrip   tion", slash_commands.description],
+                    ["Options", f"{new_line}".join(opts) if len(opts) > 0 else "N/A"]
+                ]
+            )
+
+        if not command_name:
+            pages = []
+            for command in ctx.slash.commands:
+                if not type(ctx.slash.commands[command]) == dict:
+                    pages.append(
+                        command_embed(command)
+                    )
+            await Paginator(
+                bot=ctx.bot,
+                ctx=ctx,
+                pages=pages,
+                useSelect=False,
+                useIndexButton=True
+            )
+        else:
+            command_name = command_name.lower()
+            await Paginator(
+                bot=ctx.bot,
+                ctx=ctx,
+                pages=[
+                    command_embed(command_name)
+                ],
+                useSelect=False,
+                useIndexButton=False,
+                useButtons=False
+            )
+
+    # all_commands = []
+    #
+    # for command in ctx.slash.commands:
+    #     if not type(ctx.slash.commands[command]) == dict:
+    #         n = ctx.slash.commands[command].name
+    #         d = ctx.slash.commands[command].description
+    #
+    #         if d is None:
+    #             print(f"!!! n == {n}")
+    #
+    #         all_commands.append([n, d])
+    #
+    # fields_limit = 24
+    #
+    # embed = build_embed(
+    #     title="Slash Commands",
+    #     inline=True,
+    #     description="List of slash commands and options for the server.",
+    #     fields=all_commands[0:fields_limit]
+    # )
+    # await ctx.send(embed=embed, hidden=True)
+    #
+    # if len(all_commands) > fields_limit:
+    #     embed = build_embed(
+    #         title="Slash Commands",
+    #         inline=True,
+    #         description="List of slash commands and options for the server.",
+    #         fields=all_commands[fields_limit + 1:]
+    #     )
+    #     await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(
         name="iowa",
