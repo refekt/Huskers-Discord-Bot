@@ -291,7 +291,7 @@ async def on_ready():
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
         f"### ~~~ Guild: {client.guilds[0]}\n"
-        f"### ~~~ HOF/HOS Reaction Threshold: {len(client.users) * client_percent}\n"
+        f"### ~~~ HOF/HOS Reaction Threshold: {int(len(client.users) * client_percent)}\n"
         f"### The bot is ready!"
     )
 
