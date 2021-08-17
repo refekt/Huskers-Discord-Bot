@@ -218,7 +218,11 @@ def make_slowking(avatar_url):
 
 
 async def hall_of_fame_messages(reactions: list):
+    multiple_threshold = False
     for reaction in reactions:
+        if multiple_threshold:  # Rare instance where a message has multiple reactions that break the threshold
+            break
+
         if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):  # Stay out of HOF and HOS
             continue
 
@@ -228,6 +232,7 @@ async def hall_of_fame_messages(reactions: list):
         hos_channel = hof_channel = None
 
         if reaction.count >= reaction_threshold:
+            multiple_threshold = True
             print(f"### ~~~ Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] reactions")
             if str(reaction.emoji) == slowpoke_emoji:
                 hof = False
@@ -247,21 +252,21 @@ async def hall_of_fame_messages(reactions: list):
             del raw_message_history
 
             if not duplicate:
+                slowking_path = None
+
                 if not hof:
                     embed_title = f"{slowpoke_emoji * 3} Hall of Shame Message {slowpoke_emoji * 3}"
                     embed_description = "Messages so shameful they had to be memorialized forever!"
                     channel = hos_channel
+
+                    avatar_url = str(reaction.message.author.avatar_url).split("?")[0].replace("webp", "png")
+                    make_slowking(avatar_url)
+                    slowking_path = f"{pathlib.Path(__file__).parent.resolve()}\\resources\\images\\new_slowking.png"
+                    slowking_path = upload_picture(slowking_path)
                 else:
-                    embed_title = f"{'🏆' * 3} Hall of Shame Message {'🏆' * 3}"
+                    embed_title = f"{'🏆' * 3} Hall of Fame Message {'🏆' * 3}"
                     embed_description = "Messages so amazing they had to be memorialized forever!"
                     channel = hof_channel
-
-                avatar_url = str(reaction.message.author.avatar_url).split("?")[0].replace("webp", "png")
-
-                make_slowking(avatar_url)
-
-                slowking_path = f"{pathlib.Path(__file__).parent.resolve()}\\resources\\images\\new_slowking.png"
-                slowking_path = upload_picture(slowking_path)
 
                 embed = build_embed(
                     title=embed_title,
@@ -323,7 +328,6 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 @client.event
 async def on_slash_command(ctx):
     pass
-
 
     # @client.event
     # async def on_slash_command_error(ctx, ex):
