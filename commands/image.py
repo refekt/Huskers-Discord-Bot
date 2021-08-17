@@ -168,6 +168,7 @@ class ImageCommands(commands.Cog):
             ctx=ctx,
             pages=pages,
             useIndexButton=True,
+            useSelect=False,
             firstStyle=ButtonStyle.gray,
             nextStyle=ButtonStyle.gray,
             prevStyle=ButtonStyle.gray,
