@@ -60,7 +60,7 @@ for img in retrieve_all_img():
     image_options.append(
         create_option(
             name=img["img_name"],
-            description="Image command",
+            description="Custom image command",
             required=False,
             option_type=1
         )

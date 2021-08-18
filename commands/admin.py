@@ -245,7 +245,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="purge",
-        base_description="Delete messages",
+        base_description="Admin only: Delete messages",
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
         guild_ids=guild_id_list(),
@@ -271,7 +271,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="purge",
-        base_description="Delete messages",
+        base_description="Admin only: Delete messages",
         name="bot",
         description="Admin only: Deletes previous bot messages",
         guild_ids=guild_id_list(),
@@ -504,7 +504,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="gameday",
-        base_description="Admin only: turn game day mode on or off",
+        base_description="Admin only: Turn game day mode on or off",
         name="on",
         description="Turn game day mode on",
         guild_ids=guild_id_list(),
@@ -527,7 +527,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="gameday",
-        base_description="Admin only: turn game day mode on or off",
+        base_description="Admin only: Turn game day mode on or off",
         name="off",
         description="Turn game day mode off",
         guild_ids=guild_id_list(),
@@ -548,7 +548,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_slash(
         name="commands",
-        description="Show all slash commands",
+        description="Show all slash commands. This replaced $help",
         guild_ids=guild_id_list(),
         options=[
             create_option(
@@ -569,7 +569,7 @@ class AdminCommands(commands.Cog):
                 fields=[
                     ["Command Name", cur_cmd.name],
                     ["Description", cur_cmd.description],
-                    ["Options", opts]
+                    ["Options", opts if opts != "" else "N/A"]
                 ]
             )
 
@@ -605,37 +605,6 @@ class AdminCommands(commands.Cog):
                 useIndexButton=False,
                 useButtons=False
             )
-
-    # all_commands = []
-    #
-    # for command in ctx.slash.commands:
-    #     if not type(ctx.slash.commands[command]) == dict:
-    #         n = ctx.slash.commands[command].name
-    #         d = ctx.slash.commands[command].description
-    #
-    #         if d is None:
-    #             print(f"!!! n == {n}")
-    #
-    #         all_commands.append([n, d])
-    #
-    # fields_limit = 24
-    #
-    # embed = build_embed(
-    #     title="Slash Commands",
-    #     inline=True,
-    #     description="List of slash commands and options for the server.",
-    #     fields=all_commands[0:fields_limit]
-    # )
-    # await ctx.send(embed=embed, hidden=True)
-    #
-    # if len(all_commands) > fields_limit:
-    #     embed = build_embed(
-    #         title="Slash Commands",
-    #         inline=True,
-    #         description="List of slash commands and options for the server.",
-    #         fields=all_commands[fields_limit + 1:]
-    #     )
-    #     await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(
         name="iowa",
@@ -741,7 +710,7 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_slash(
         name="console",
-        description="Admin only",
+        description="Admin or Mod only",
         guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
