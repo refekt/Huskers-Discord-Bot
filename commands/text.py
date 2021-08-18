@@ -61,6 +61,42 @@ def ud_embed(embed_word, embed_meaning, embed_example, embed_contributor):
     )
 
 
+def check_channel_or_message(check_member: discord.Member, check_message: discord.Message = None):
+    if check_message.content == "":
+        return ""
+
+    if check_message.channel.id in CHAN_BANNED:
+        return ""
+
+    if check_member.bot:
+        return ""
+
+    return "\n" + str(check_message.content.capitalize())
+
+
+def cleanup_source_data(source_data: str):
+    regex_strings = [
+        r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
+        r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"  # All URLs
+    ]
+
+    new_source_data = source_data
+
+    for regex in regex_strings:
+        new_source_data = re.sub(regex, "", new_source_data, flags=re.IGNORECASE)
+
+    regex_new_line = r"(\r\n|\r|\n){1,}"  # All new lines
+    new_source_data = re.sub(regex_new_line, "\n", new_source_data, flags=re.IGNORECASE)
+
+    regex_front_new_line = r"^\n"
+    new_source_data = re.sub(regex_front_new_line, "", new_source_data, flags=re.IGNORECASE)
+
+    regex_multiple_whitespace = r"\s{2,}"
+    new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
+
+    return new_source_data
+
+
 class TextCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -137,19 +173,25 @@ class TextCommands(commands.Cog):
                 name="option_a",
                 description="Option A to vote on",
                 option_type=3,
-                required=True
+                required=False
             ),
             create_option(
                 name="option_b",
                 description="Option b to vote on",
                 option_type=3,
-                required=True
+                required=False
             )
         ]
     )
     async def _vote(self, ctx: SlashContext, query: str, option_a: str = None, option_b: str = None):
-        if not option_a and option_b:
+        if (option_a is not None and option_b is None) or (option_b is not None and option_a is None):
             raise command_error("You must provide both options!")
+
+        if option_a is not None and option_b is not None:
+            buttons_voting[0]['label'] = option_a
+            buttons_voting[0]['style'] = ButtonStyle.gray
+            buttons_voting[1]['label'] = option_b
+            buttons_voting[1]['style'] = ButtonStyle.gray
 
         embed = build_embed(
             title="Vote",
@@ -166,15 +208,15 @@ class TextCommands(commands.Cog):
 
     @cog_ext.cog_component(components=buttons_voting)
     async def process_voting_buttons(self, ctx: ComponentContext):
-        # await ctx.defer()
-
         voters = ctx.origin_message.embeds[0].fields[3].value
         if str(ctx.author.mention) in voters:
             return
 
         query = ctx.origin_message.embeds[0].fields[0].value
         up_vote_count = int(ctx.origin_message.embeds[0].fields[1].value)
+        up_vote_label = ctx.origin_message.components[0]["components"][0]["label"]
         down_vote_count = int(ctx.origin_message.embeds[0].fields[2].value)
+        down_vote_label = ctx.origin_message.components[0]["components"][1]["label"]
 
         if voters == "_":
             voters = ""
@@ -184,69 +226,25 @@ class TextCommands(commands.Cog):
         if ctx.custom_id == "vote_up":
             try:
                 up_vote_count += 1
-                embed = build_embed(
-                    title="Vote",
-                    inline=False,
-                    fields=[
-                        ["Question", query.capitalize()],
-                        ["Up Votes", up_vote_count],
-                        ["Down Votes", down_vote_count],
-                        ["Voters", voters]
-                    ]
-                )
-                await ctx.edit_origin(content="", embed=embed, components=[create_actionrow(*buttons_voting)])
             except KeyError:
-                raise command_error("Error modifying Up Votes")
+                raise command_error(f"Error modifying [{up_vote_label}]")
         elif ctx.custom_id == "vote_down":
             try:
                 down_vote_count += 1
-                embed = build_embed(
-                    title="Vote",
-                    inline=False,
-                    fields=[
-                        ["Question", query.capitalize()],
-                        ["Up Votes", up_vote_count],
-                        ["Down Votes", down_vote_count],
-                        ["Voters", voters]
-                    ]
-                )
-                await ctx.edit_origin(content="", embed=embed, components=[create_actionrow(*buttons_voting)])
             except KeyError:
-                raise command_error("Error modifying Down Votes")
+                raise command_error(f"Error modifying [{down_vote_label}]")
 
-    def check_channel_or_message(self, check_member: discord.Member, check_message: discord.Message = None):
-        if check_message.content == "":
-            return ""
-
-        if check_message.channel.id in CHAN_BANNED:
-            return ""
-
-        if check_member.bot:
-            return ""
-
-        return "\n" + str(check_message.content.capitalize())
-
-    def cleanup_source_data(self, source_data: str):
-        regex_strings = [
-            r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
-            r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"  # All URLs
-        ]
-
-        new_source_data = source_data
-
-        for regex in regex_strings:
-            new_source_data = re.sub(regex, "", new_source_data, flags=re.IGNORECASE)
-
-        regex_new_line = r"(\r\n|\r|\n){1,}"  # All new lines
-        new_source_data = re.sub(regex_new_line, "\n", new_source_data, flags=re.IGNORECASE)
-
-        regex_front_new_line = r"^\n"
-        new_source_data = re.sub(regex_front_new_line, "", new_source_data, flags=re.IGNORECASE)
-
-        regex_multiple_whitespace = r"\s{2,}"
-        new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
-
-        return new_source_data
+        embed = build_embed(
+            title="Vote",
+            inline=False,
+            fields=[
+                ["Question", query.capitalize()],
+                [up_vote_label, str(up_vote_count)],
+                [down_vote_label, str(down_vote_count)],
+                ["Voters", voters]
+            ]
+        )
+        await ctx.edit_origin(content="", embed=embed, components=[create_actionrow(*buttons_voting)])
 
     @cog_ext.cog_slash(
         name="markov",
@@ -286,21 +284,21 @@ class TextCommands(commands.Cog):
         if not sources:  # Uses current channel for source data
             compiled_message_history = await ctx.channel.history(limit=CHAN_HIST_LIMIT).flatten()  # potential discord vs discord_slash issue
             for message in compiled_message_history:
-                source_data += self.check_channel_or_message(ctx.author, message)
+                source_data += check_channel_or_message(ctx.author, message)
         else:
             for source in sources:
                 if type(source) == discord.Member:  # Use current channel and source Discord Member
                     compiled_message_history = await ctx.channel.history(limit=CHAN_HIST_LIMIT).flatten()
                     for message in compiled_message_history:
                         if message.author == source:
-                            source_data += self.check_channel_or_message(message.author, message)
+                            source_data += check_channel_or_message(message.author, message)
                 elif type(source) == discord.TextChannel:
                     compiled_message_history = await source.history(limit=CHAN_HIST_LIMIT).flatten()
                     for message in compiled_message_history:
-                        source_data += self.check_channel_or_message(message.author, message)
+                        source_data += check_channel_or_message(message.author, message)
 
         if not source_data == "":
-            source_data = self.cleanup_source_data(source_data)
+            source_data = cleanup_source_data(source_data)
         else:
             await ctx.send(f"There was not enough information available to make a Markov chain.")
 
