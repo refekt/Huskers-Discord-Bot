@@ -563,7 +563,7 @@ class AdminCommands(commands.Cog):
         def command_embed(cur_cmd, cur_options) -> discord.Embed:
             opts = ""
             for copt in cur_options:
-                opts += f"» {copt['name']} ({'Required' if copt['required'] else 'Not Required'}): {copt['description']}\n"
+                opts += f"» {copt['name']} ({'Required' if copt['required'] else 'Optional'}): {copt['description']}\n"
             return build_embed(
                 title="Bot Frost Commands",
                 fields=[
