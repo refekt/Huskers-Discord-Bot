@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 from discord import client as discord_client
 from discord.ext import commands
-from discord_slash.context import SlashContext
-
+from discord_slash.context import SlashContext, ComponentContext
+from typing import Union, Optional
 from objects.Recruits import FootballRecruit
 from utilities.mysql import Process_MySQL, sqlTeamIDs
 
@@ -55,7 +55,7 @@ def get_croot_predictions(recruit):
     return get_croot_preds_response
 
 
-async def initiate_fap(ctx: SlashContext, user, recruit, client: discord_client):
+async def initiate_fap(ctx: Union[SlashContext, ComponentContext], user, recruit, client: discord_client):
     await ctx.send("Initiating FAP! Your inputs will be delete, but may appear to remain on the screen. They will disappear on reloading of Discord (Ctrl + R).", hidden=True)
 
     if (recruit.committed.lower() if recruit.committed is not None else None) in ['signed', 'enrolled']:
