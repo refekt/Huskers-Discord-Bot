@@ -8,7 +8,7 @@ from discord import client as discord_client
 from discord.ext import commands
 from discord_slash.context import SlashContext, ComponentContext
 from typing import Union, Optional
-from objects.Recruits_old import FootballRecruit
+from objects.Recruits import FootballRecruit
 from utilities.mysql import Process_MySQL, sqlTeamIDs
 
 CURRENT_CLASS = datetime.datetime.now().year
