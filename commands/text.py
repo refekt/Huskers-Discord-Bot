@@ -412,6 +412,16 @@ class TextCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @cog_ext.cog_slash(
+        name="weather",
+        description="Shows the weather for Husker games",
+        guild_ids=guild_id_list()
+    )
+    async def _weather(self, ctx: SlashContext):
+        await ctx.defer()
+        if ctx.author_id == 232291321551912962:
+            await ctx.send("Made you look")
+
 
 def setup(bot):
     bot.add_cog(TextCommands(bot))
