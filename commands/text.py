@@ -109,7 +109,7 @@ class TextCommands(commands.Cog):
             self.contributor = contributor
 
     @cog_ext.cog_slash(
-        name="urbanddictionary",
+        name="urbandictionary",
         description="Look up a word on Urban Dictionary",
         guild_ids=guild_id_list()
     )
