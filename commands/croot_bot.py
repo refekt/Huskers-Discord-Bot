@@ -7,7 +7,7 @@ from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 
 from objects.FAPing import initiate_fap, individual_predictions
-from objects.Recruits_beta import FootballRecruit
+from objects.Recruits import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import guild_id_list
 from utilities.constants import user_error
