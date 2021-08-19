@@ -340,6 +340,13 @@ def all_time_ranking(soup):
         return False
 
 
+def reformat_composite_rating(cur_player):
+    if cur_player.get("CompositeRating", None) is None:
+        return "0"
+    else:
+        return f"{cur_player['CompositeRating']:0.4f}"
+
+
 def get_recruit_interests(search_player):
     reqs = requests.get(url=search_player["RecruitInterestsUrl"], headers=HEADERS)
     interests_soup = BeautifulSoup(reqs.content, "html.parser")
@@ -464,7 +471,7 @@ def FootballRecruit(year, name):
         ranking_national = cur_player.get("NationalRank", None)
         ranking_position = cur_player.get("PositionRank", None)
         ranking_state = cur_player.get("StateRank", None)
-        rating_numerical = f"{cur_player.get('CompositeRating', None):4f}"
+        rating_numerical = reformat_composite_rating(cur_player)
         rating_stars = cur_player.get("CompositeStarRating", None)
         recruit_interests = get_recruit_interests(search_player)
         recruit_interests_url = cur_player.get("RecruitInterestsUrl", None)
