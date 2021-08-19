@@ -26,7 +26,7 @@ async def get_prediction(user, recruit):
     get_prediction_query = """
     SELECT * FROM fap_predictions WHERE user_id = %s AND recruit_profile = %s;
     """
-    sql_response = Process_MySQL(query=get_prediction_query, values=(user.id, recruit.x247_profile), fetch='one')
+    sql_response = Process_MySQL(query=get_prediction_query, values=(user.id, recruit._247_profile), fetch='one')
     return sql_response
 
 
@@ -35,7 +35,7 @@ async def insert_prediction(user, recruit, team_prediction, prediction_confidenc
         insert_prediction_query = """
         INSERT INTO fap_predictions (user, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW());
         """
-        Process_MySQL(query=insert_prediction_query, values=(user.name, user.id, recruit.name, recruit.x247_profile, recruit.year, team_prediction, prediction_confidence))
+        Process_MySQL(query=insert_prediction_query, values=(user.name, user.id, recruit.name, recruit._247_profile, recruit.year, team_prediction, prediction_confidence))
     else:
         update_prediction_query = """
         UPDATE fap_predictions SET team = %s, confidence = %s, prediction_date = NOW() WHERE user_id = %s and recruit_profile = %s;
@@ -44,14 +44,14 @@ async def insert_prediction(user, recruit, team_prediction, prediction_confidenc
             update_prediction_query = """
             UPDATE fap_predictions SET team = %s, confidence = %s WHERE user_id = %s and recruit_profile = %s;
             """
-        Process_MySQL(query=update_prediction_query, values=(team_prediction, prediction_confidence, user.id, recruit.x247_profile))
+        Process_MySQL(query=update_prediction_query, values=(team_prediction, prediction_confidence, user.id, recruit._247_profile))
 
 
 def get_croot_predictions(recruit):
     get_croot_preds_query = """
     SELECT f.recruit_name, f.team, avg(f.confidence) as 'confidence', (count(f.team) / t.sumr) * 100 as 'percent', t.sumr as 'total' FROM fap_predictions as f JOIN (SELECT recruit_profile, COUNT(recruit_profile) as sumr FROM fap_predictions GROUP BY recruit_profile) as t on t.recruit_profile = f.recruit_profile WHERE f.recruit_profile = %s GROUP BY f.recruit_profile, f.recruit_name, f.team ORDER BY percent DESC;
     """
-    get_croot_preds_response = Process_MySQL(query=get_croot_preds_query, values=recruit.x247_profile, fetch='all')
+    get_croot_preds_response = Process_MySQL(query=get_croot_preds_query, values=recruit._247_profile, fetch='all')
     return get_croot_preds_response
 
 
@@ -71,7 +71,7 @@ async def initiate_fap(ctx: Union[SlashContext, ComponentContext], user, recruit
     first_msg = ""
     if previous_prediction is not None:
         first_msg = f"It appears that you've previously predicted [{recruit.name}] to [{previous_prediction['team']}] with confidence [{previous_prediction['confidence']}]. You can answer the prompts to update your prediction.\n"
-    first_msg += f"Please predict which team you think [{recruit.name}] will commit to. [247Sports Profile]({recruit.x247_profile}])"
+    first_msg += f"Please predict which team you think [{recruit.name}] will commit to. [247Sports Profile]({recruit._247_profile}])"
     await ctx.send(first_msg, hidden=True)
 
     while team_prediction is None:
@@ -133,7 +133,7 @@ def get_faps(recruit):
 
 async def individual_predictions(ctx, recruit):
     get_individual_preds_query = 'SELECT * FROM fap_predictions WHERE recruit_profile = %s ORDER BY prediction_date ASC'
-    individual_preds = Process_MySQL(query=get_individual_preds_query, fetch='all', values=(recruit.x247_profile,))
+    individual_preds = Process_MySQL(query=get_individual_preds_query, fetch='all', values=(recruit._247_profile,))
     if individual_preds is None:
         await ctx.send('This recruit has no predictions.')
         return

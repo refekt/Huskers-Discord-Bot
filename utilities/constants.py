@@ -177,6 +177,7 @@ CROOT_SEARCH_LIMIT = 5
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
 DT_OBJ_FORMAT_TBA = "%d %b %Y"
 DT_STR_FORMAT = "%b %d %Y %I:%M %p"
+DT_STR_RECRUIT = "%m/%d/%Y %I:%M:%S %p"
 DT_TBA_TIME = "10:58 PM"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58

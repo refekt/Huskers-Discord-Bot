@@ -338,6 +338,9 @@ def FootballRecruit(year, name):
         ranks_soup = BeautifulSoup(ranks_requests_raw.content, "html.parser")
         ranks_modified = ranks_soup.find_all(attrs={"class": "ranks-list"})
 
+        if len(ranks_modified) == 0:
+            return
+
         search_rank = ranks_modified[0]
 
         del ranks_requests_raw, ranks_soup, ranks_modified
@@ -433,9 +436,14 @@ def FootballRecruit(year, name):
         p_year = search_player['Year']
 
         ranks = collect_ranks(search_player['Player']['Url'])
-        player['NationalRank'] = ranks["natl"]
-        player['StateRank'] = ranks["state"]
-        player['PositionRank'] = ranks["pos"]
+        if ranks is not None:
+            player['NationalRank'] = ranks["natl"]
+            player['StateRank'] = ranks["state"]
+            player['PositionRank'] = ranks["pos"]
+        else:
+            player['NationalRank'] = "N/A"
+            player['StateRank'] = "N/A"
+            player['PositionRank'] = "N/A"
 
         thumbnail = player["DefaultAssetUrl"]
         if thumbnail == "/.":
@@ -449,10 +457,11 @@ def FootballRecruit(year, name):
         except KeyError:
             recruit_state = player['Hometown']['State']
 
-        try:
-            recruit_committed_school = team_ids[str(team_id)] if team_id > 0 else None
-        except KeyError:
-            recruit_committed_school = None
+        # try:
+        #     recruit_committed_school = team_ids[str(team_id)] if team_id > 0 else None
+        # except KeyError:
+        #     recruit_committed_school = None
+        recruit_committed_school = None
 
         search_result_players.append(
             Recruit(

@@ -6,7 +6,7 @@ import validators
 import objects.FAPing as FAP
 from objects.Schedule import HuskerSchedule
 from utilities.constants import BOT_FOOTER_BOT
-from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT
+from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT, DT_STR_RECRUIT
 from utilities.constants import TZ, BOT_DISPLAY_NAME, BOT_GITHUB_URL, BOT_ICON_URL, BOT_THUMBNAIL_URL
 
 
@@ -121,13 +121,13 @@ def build_countdown_embed(days: int, hours: int, minutes: int, opponent, thumbna
 def build_recruit_embed(recruit):
     def prettify_predictions():
         pretty = ""
-        for item in recruit.predictions:
+        for item in recruit.cb_predictions:
             pretty += f"{item}\n"
         return pretty
 
     def prettify_experts():
         pretty = ""
-        for item in recruit.experts:
+        for item in recruit.cb_experts:
             pretty += f"{item}\n"
         return pretty
 
@@ -155,7 +155,9 @@ def build_recruit_embed(recruit):
     nl = "\n"
     embed = build_embed(
         title=f"{str(recruit.rating_stars) + '⭐ ' if recruit.rating_stars else ''}{recruit.year} {recruit.position}, {recruit.name}",
-        description=f"{recruit.committed if recruit.committed is not None else ''}{': ' + recruit.committed_school if recruit.committed_school is not None else ''} {': ' + str(recruit.commitment_date.strftime('%b %d, %Y')) if recruit.commitment_date is not None else ''}",
+        description=f"{recruit.committed if recruit.committed is not None else ''}"
+                    f"{': ' + recruit.committed_school if recruit.committed_school is not None else ''} "
+                    f"{': ' + str(datetime.strptime(recruit.commitment_date, DT_STR_RECRUIT)) if recruit.commitment_date is not None else ''}",
         fields=[
             ["**Biography**", f"{recruit.city}, {recruit.state}\n"
                               f"School: {recruit.school}\n"
@@ -165,27 +167,24 @@ def build_recruit_embed(recruit):
 
             ["**Social Media**", f"{'[@' + recruit.twitter + '](' + 'https://twitter.com/' + recruit.twitter + ')' if not recruit.twitter == 'N/A' else 'N/A'}"],
 
-            ["**Highlights**", f"{'[247Sports](' + recruit.x247_highlights + ')' if recruit.x247_highlights else '247Sports N/A'}\n"
-                               f"{'[Rivals](' + recruit.rivals_highlights + ')' if recruit.rivals_highlights else 'Rivals N/A'}\n"],
+            ["**Highlights**", f"{'[247Sports](' + recruit._247_highlights + ')' if recruit._247_highlights else '247Sports N/A'}"],
 
-            ["**Recruit Info**", f"[247Sports Profile]({recruit.x247_profile})\n"
-                                 f"[Rivals Profile]({recruit.rivals_profile})\n"
+            ["**Recruit Info**", f"[247Sports Profile]({recruit._247_profile})\n"
                                  f"Comp. Rating: {recruit.rating_numerical if recruit.rating_numerical else 'N/A'} \n"
-                                 f"Nat. Ranking: [{recruit.national_ranking:,}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup"
+                                 f"Nat. Ranking: [{recruit.ranking_national:,}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup"
                                  f"={recruit.school_type.replace(' ', '')})\n"
-                                 f"State Ranking: [{recruit.state_ranking}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup={recruit.school_type.replace(' ', '')}&State"
+                                 f"State Ranking: [{recruit.ranking_state}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup={recruit.school_type.replace(' ', '')}&State"
                                  f"={recruit.state_abbr})\n"
-                                 f"Pos. Ranking: [{recruit.position_ranking}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup="
-                                 f"{recruit.school_type.replace(' ', '')}&Position"
-                                 f"={recruit.pos_abbr})\n"
-                                 f"{'All Time Ranking: [' + recruit.all_time_ranking + '](https://247sports.com/Sport/Football/AllTimeRecruitRankings/)' + nl if recruit.all_time_ranking else ''}"
+                                 f"Pos. Ranking: [{recruit.ranking_position}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup="
+                                 f"{recruit.school_type.replace(' ', '')}&Position={recruit.position})\n"
+                                 f"{'All Time Ranking: [' + recruit.ranking_all_time + '](https://247sports.com/Sport/Football/AllTimeRecruitRankings/)' + nl if recruit.ranking_all_time else ''}"
                                  f"{'Early Enrollee' + nl if recruit.early_enrollee else ''}"
                                  f"{'Early Signee' + nl if recruit.early_signee else ''}"
                                  f"{'Walk-On' + nl if recruit.walk_on else ''}"],
 
-            ["**Expert Averages**", f"{prettify_predictions() if recruit.predictions else 'N/A'}"],
+            ["**Expert Averages**", f"{prettify_predictions() if recruit.cb_predictions else 'N/A'}"],
 
-            ["**Lead Expert Picks**", f"{prettify_experts() if recruit.experts else 'N/A'}"],
+            ["**Lead Expert Picks**", f"{prettify_experts() if recruit.cb_experts else 'N/A'}"],
 
             ["**Offers**", f"{prettify_offers() if recruit.recruit_interests else 'N/A'}"],
 
