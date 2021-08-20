@@ -70,7 +70,18 @@ class FootballStatsCommands(commands.Cog):
                 return None
 
             try:
-                consensus_line = api_response[0].lines[0]["formattedSpread"]
+                lines = api_response[0].lines[0]
+                formattedSpread = spreadOpen = overUnder = overUnderOpen = ""
+                if lines.get("formattedSpread", None):
+                    formattedSpread = lines.get("formattedSpread")
+                if lines.get("spreadOpen", None):
+                    spreadOpen = lines.get("spreadOpen")
+                if lines.get("overUnder", None):
+                    overUnder = lines.get("overUnder")
+                if lines.get("overUnderOpen", None):
+                    overUnderOpen = lines.get("overUnderOpen")
+                new_line = "\n"
+                consensus_line = f"{formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}{'Over Under ' + overUnder + ' (Opened: ' + overUnderOpen + ')' if overUnder else ''}"
             except IndexError:
                 consensus_line = None
 
