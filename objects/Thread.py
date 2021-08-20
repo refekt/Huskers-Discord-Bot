@@ -72,3 +72,6 @@ class TaskThread(threading.Thread):
             flag=self.flag,
             alert_when=self.alert_when
         )
+
+    async def twitter(self):
+        pass
