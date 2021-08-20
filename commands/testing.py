@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-
+from discord_slash.model import SlashMessage
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 
@@ -15,12 +15,12 @@ class TestCommand(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _test(self, ctx: SlashContext):
+        await ctx.defer(hidden=True)
         embed = build_embed(
-            # title="test",
-            # description="test",
-            # footer="sdfdsafsadfasfasfsafasdfasf"
+            title="test",
+            description="test",
+            footer="sdfdsafsadfasfasfsafasdfasf"
         )
-        await ctx.send(embed=embed)
 
 
 def setup(bot):

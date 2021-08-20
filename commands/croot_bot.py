@@ -10,7 +10,7 @@ from objects.FAPing import initiate_fap, individual_predictions
 from objects.Recruits import FootballRecruit
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import guild_id_list
-from utilities.constants import user_error
+from utilities.constants import UserError
 from utilities.embed import build_embed, build_recruit_embed
 
 fap_buttons = [
@@ -119,18 +119,18 @@ class RecruitCog(commands.Cog):
         print(f"### Crootbot")
 
         if len(search_name) == 0:
-            raise user_error("A player's first and/or last search_name is required.")
+            raise UserError("A player's first and/or last search_name is required.")
 
         if len(str(year)) == 2:
             year += 2000
         elif len(str(year)) == 1 or len(str(year)) == 3:
-            raise user_error("The search year must be two or four digits long.")
+            raise UserError("The search year must be two or four digits long.")
 
         if year > datetime.datetime.now().year + 5:
-            raise user_error("The search year must be within five years of the current class.")
+            raise UserError("The search year must be within five years of the current class.")
 
         if year < 1869:
-            raise user_error("The search year must be after the first season of college football--1869.")
+            raise UserError("The search year must be after the first season of college football--1869.")
 
         await ctx.defer()  # Similiar to sending a message with a loading screen to edit later on
 
@@ -186,10 +186,10 @@ class RecruitCog(commands.Cog):
             year += 2000
 
         if year > datetime.datetime.now().year + 5:
-            raise user_error("The search year must be within five years of the current class.")
+            raise UserError("The search year must be within five years of the current class.")
 
         if year < 1869:
-            raise user_error("The search year must be after the first season of college football--1869.")
+            raise UserError("The search year must be after the first season of college football--1869.")
 
         await ctx.defer(hidden=True)
 

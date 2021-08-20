@@ -16,7 +16,7 @@ from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import create_button, create_actionrow
 
 from utilities.constants import CHAN_BANNED, CHAN_POSSUMS
-from utilities.constants import command_error
+from utilities.constants import CommandError, UserError
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 
@@ -120,7 +120,7 @@ class TextCommands(commands.Cog):
         try:
             definitions = soup.find_all(name="div", attrs={"class": "def-panel"})
         except AttributeError:
-            raise command_error(f"Unable to find [{word}] in Urban Dictionary.")
+            raise UserError(f"Unable to find [{word}] in Urban Dictionary.")
 
         del r, soup, definitions[1]  # Word of the day
 
@@ -185,7 +185,7 @@ class TextCommands(commands.Cog):
     )
     async def _vote(self, ctx: SlashContext, query: str, option_a: str = None, option_b: str = None):
         if (option_a is not None and option_b is None) or (option_b is not None and option_a is None):
-            raise command_error("You must provide both options!")
+            raise UserError("You must provide both options!")
 
         if option_a is not None and option_b is not None:
             buttons_voting[0]['label'] = option_a
@@ -227,12 +227,12 @@ class TextCommands(commands.Cog):
             try:
                 up_vote_count += 1
             except KeyError:
-                raise command_error(f"Error modifying [{up_vote_label}]")
+                raise CommandError(f"Error modifying [{up_vote_label}]")
         elif ctx.custom_id == "vote_down":
             try:
                 down_vote_count += 1
             except KeyError:
-                raise command_error(f"Error modifying [{down_vote_label}]")
+                raise CommandError(f"Error modifying [{down_vote_label}]")
 
         embed = build_embed(
             title="Vote",
@@ -321,7 +321,7 @@ class TextCommands(commands.Cog):
         await ctx.defer()
 
         if not ctx.channel_id == CHAN_POSSUMS:
-            raise command_error(f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]")
+            raise UserError(f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]")
 
         await ctx.send("Thinking...", delete_after=0)
 

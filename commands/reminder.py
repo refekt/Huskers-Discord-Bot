@@ -12,7 +12,7 @@ from discord_slash.utils.manage_commands import create_option
 from objects.Thread import send_reminder
 from utilities.constants import CHAN_BANNED
 from utilities.constants import DT_OBJ_FORMAT
-from utilities.constants import command_error
+from utilities.constants import CommandError, UserError
 from utilities.constants import pretty_time_delta
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
@@ -60,9 +60,9 @@ class ReminderCommands(commands.Cog):
     )
     async def _remindme(self, ctx: SlashContext, remind_when: str, message: str, who: discord.member = None, channel: discord.TextChannel = None):
         if who and channel:
-            raise command_error("You cannot input both a member and channel to remind.")
+            raise UserError("You cannot input both a member and channel to remind.")
         elif who and not ctx.author == who:
-            raise command_error("You cannot set reminders for anyone other than yourself!")
+            raise UserError("You cannot set reminders for anyone other than yourself!")
         elif channel in CHAN_BANNED:
             raise ValueError(f"Setting reminders in {channel.mention} is banned!")
 
@@ -95,12 +95,12 @@ class ReminderCommands(commands.Cog):
         min_timer_allowed = 5  # 60 * 5
 
         if time_diff.total_seconds() < min_timer_allowed:
-            raise command_error(f"The num_seconds entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
+            raise UserError(f"The num_seconds entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
 
         try:
             raw_when = today + time_diff
         except ValueError:
-            raise command_error("The num_seconds entered is too large!")
+            raise UserError("The num_seconds entered is too large!")
 
         duration = raw_when - today
         send_when = today + duration
@@ -111,7 +111,7 @@ class ReminderCommands(commands.Cog):
             try:
                 Process_MySQL(sqlRecordTasks, values=(str(who.id), message, str(send_when), is_open, author))
             except:
-                raise command_error("Error submitting MySQL")
+                raise CommandError("Error submitting MySQL")
 
             embed = build_embed(
                 title="Bot Frost Reminders",
@@ -124,7 +124,7 @@ class ReminderCommands(commands.Cog):
             try:
                 Process_MySQL(sqlRecordTasks, values=(str(channel.id), message, str(send_when), is_open, author))
             except:
-                raise command_error("Error submitting MySQL")
+                raise CommandError("Error submitting MySQL")
 
             embed = build_embed(
                 title="Bot Frost Reminders",
@@ -137,7 +137,7 @@ class ReminderCommands(commands.Cog):
             try:
                 Process_MySQL(sqlRecordTasks, values=(str(ctx.channel_id), message, str(send_when), is_open, author))
             except:
-                raise command_error("Error submitting MySQL")
+                raise CommandError("Error submitting MySQL")
 
             embed = build_embed(
                 title="Bot Frost Reminders",

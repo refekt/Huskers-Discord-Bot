@@ -16,7 +16,7 @@ from utilities.constants import ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROL
 from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA, CAT_GAMEDAY, ROLE_EVERYONE_PROD
 from utilities.constants import ROLE_TIME_OUT, CHAN_IOWA
 from utilities.constants import admin_mod_perms, admin_perms
-from utilities.constants import command_error
+from utilities.constants import CommandError, UserError
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed as build_embed
 from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
@@ -171,7 +171,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
                 continue
             print(f"### ~~~ Changed permissions for [{channel}] to [{mode}]")
         except discord.errors.Forbidden:
-            raise command_error("The bot does not have access to change permissions!")
+            raise CommandError("The bot does not have access to change permissions!")
         except:
             continue
 
@@ -348,7 +348,7 @@ class AdminCommands(commands.Cog):
         hype_no = ctx.guild.get_role(ROLE_HYPE_NO)
 
         if any([hype_max, hype_some, hype_no]) is None:
-            raise command_error("Unable to locate role!")
+            raise CommandError("Unable to locate role!")
 
         chosen_hype = ""
 
@@ -429,7 +429,7 @@ class AdminCommands(commands.Cog):
                 continue
 
         if joined_roles == "":
-            raise command_error("Unable to join any of the selected roles!")
+            raise CommandError("Unable to join any of the selected roles!")
 
         embed = build_embed(
             title="Food Roles",
@@ -490,7 +490,7 @@ class AdminCommands(commands.Cog):
                 continue
 
         if joined_roles == "":
-            raise command_error("Unable to join any of the selected roles!")
+            raise CommandError("Unable to join any of the selected roles!")
 
         embed = build_embed(
             title="Food Roles",
@@ -616,10 +616,10 @@ class AdminCommands(commands.Cog):
         await ctx.defer()
 
         if not who:
-            raise command_error("You must include a user!")
+            raise UserError("You must include a user!")
 
         if not reason:
-            raise command_error("You must include a reason why!")
+            raise UserError("You must include a reason why!")
 
         role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         channel_iowa = ctx.guild.get_channel(CHAN_IOWA)
@@ -669,7 +669,7 @@ class AdminCommands(commands.Cog):
         await ctx.defer()
 
         if not who:
-            raise command_error("You must include a user!")
+            raise UserError("You must include a user!")
 
         role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         await who.remove_roles(role_timeout)

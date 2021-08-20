@@ -158,6 +158,7 @@ GUILD_TEST = 595705205069185045
 TEST_BOT_MEMBER = 595705663997476887
 PROD_BOT_MEMBER = 593949013443608596
 TWITTER_BOT_MEMBER = 755193317997674607
+GEE_USER = 189554873778307073
 
 # Currency
 CURRENCY_NAME = "Husker Coins"
@@ -224,12 +225,14 @@ admin_perms = {
 
 
 # Global Errors
-def command_error(message: str):
-    return CommandError(message=message)
+class CommandError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
-def user_error(message: str):
-    return UserInputError(message=message)
+class UserError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 def pretty_time_delta(seconds):

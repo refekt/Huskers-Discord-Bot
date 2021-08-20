@@ -2,6 +2,7 @@ import asyncio
 import pathlib
 import random
 import sys
+import traceback
 from datetime import datetime, timedelta
 
 import discord
@@ -9,15 +10,17 @@ import requests
 from PIL import Image
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand
-from discord_slash.context import ComponentContext
+from discord_slash.context import ComponentContext, SlashContext
 from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import send_reminder
-from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS, GUILD_PROD
+from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS
 from utilities.constants import DT_TASK_FORMAT
+from utilities.constants import GEE_USER
 from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
 from utilities.constants import PROD_TOKEN, TEST_TOKEN
+from utilities.constants import UserError, CommandError
 from utilities.constants import debugging
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks
@@ -329,18 +332,47 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 async def on_slash_command(ctx):
     pass
 
-    # @client.event
-    # async def on_slash_command_error(ctx, ex):
-    #     if debugging():
-    #         return
-    #
-    #     embed = build_embed(
-    #         title="Slash Command Error",
-    #         fields=[
-    #             ["Description", str(ex)]
-    #         ]
-    #     )
-    #     await ctx.send(embed=embed, hidden=True)
+
+@client.event
+async def on_slash_command_error(ctx: SlashContext, ex: Exception):
+    def format_traceback(tback: list):
+        return "".join(tback).replace("Aaron", "Secret")
+
+    if debugging():
+        return
+
+    if isinstance(ex, UserError):
+        embed = build_embed(
+            title="Husker Bot User Error",
+            description="An error occured with user input",
+            fields=[
+                ["Error Message", ex.message]
+            ]
+        )
+    elif isinstance(ex, CommandError):
+        embed = build_embed(
+            title="Husker Bot Command Error",
+            description="An error occured with command processing",
+            fields=[
+                ["Error Message", ex.message]
+            ]
+        )
+
+    await ctx.send(embed=embed)
+
+    traceback_raw = traceback.format_exception(
+        etype=type(ex),
+        value=ex,
+        tb=ex.__traceback__
+    )
+
+    tback = format_traceback(traceback_raw)
+    message = f"{ctx.author.mention} received an unknown error has occured with `{ctx.command}`!\n```\n{tback}\n```"
+    try:
+        gee = client.get_user(id=GEE_USER)
+        await gee.send(content=message)
+    except:
+        await ctx.send(content=f"<@{GEE_USER}>\n{message}")
 
 
 @client.event
@@ -366,7 +398,7 @@ extensions = [
     "commands.image",
     "commands.football_stats",
     "commands.reminder",
-    # "commands.testing"
+    "commands.testing"
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension}")

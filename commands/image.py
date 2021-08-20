@@ -8,7 +8,7 @@ from discord_slash.utils.manage_commands import create_option
 
 from utilities.constants import DT_OBJ_FORMAT
 from utilities.constants import ROLE_ADMIN_PROD
-from utilities.constants import command_error
+from utilities.constants import CommandError, UserError
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
@@ -18,12 +18,12 @@ from utilities.mysql import sqlCreateImageCommand, sqlSelectImageCommand, sqlDel
 def create_img(author: int, image_name: str, image_url: str):
     import validators
     if not validators.url(image_url):
-        raise command_error("Invalid iamge URL format. The URL must begin with 'http' or 'https'.")
+        raise UserError("Invalid iamge URL format. The URL must begin with 'http' or 'https'.")
 
     image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
     if not any(sub_str in image_url for sub_str in image_formats):
-        raise command_error(f"Invalid image URL format. The URL must end with a [{', '.join(image_formats)}] extension.")
+        raise UserError(f"Invalid image URL format. The URL must end with a [{', '.join(image_formats)}] extension.")
 
     try:
         Process_MySQL(
@@ -31,7 +31,7 @@ def create_img(author: int, image_name: str, image_url: str):
             values=[author, image_name, image_url]
         )
     except:
-        raise command_error("Unable to create image command in MySQL database!")
+        raise CommandError("Unable to create image command in MySQL database!")
 
 
 def retrieve_img(image_name: str):
@@ -42,7 +42,7 @@ def retrieve_img(image_name: str):
             fetch="one"
         )
     except:
-        raise command_error(f"Unable to locate an image command named [{image_name}].")
+        raise UserError(f"Unable to locate an image command named [{image_name}].")
 
 
 def retrieve_all_img():
@@ -52,7 +52,7 @@ def retrieve_all_img():
             fetch="all"
         )
     except:
-        raise command_error(f"Unable to retrieve image commands.")
+        raise CommandError(f"Unable to retrieve image commands.")
 
 
 image_options = []
@@ -103,14 +103,14 @@ class ImageCommands(commands.Cog):
         try:
             img_author = int(retrieve_img(image_name)["source"])
         except TypeError:
-            raise command_error(f"Unable to locate image [{image_name}]")
+            raise UserError(f"Unable to locate image [{image_name}]")
 
         admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
         admin_delete = False
         if admin in ctx.author.roles:
             admin_delete = True
         elif not ctx.author_id == img_author:
-            raise command_error(f"This command was created by [{ctx.guild.get_member(img_author).mention}] and can only be deleted by them")
+            raise UserError(f"This command was created by [{ctx.guild.get_member(img_author).mention}] and can only be deleted by them")
 
         try:
             if admin_delete:
@@ -124,7 +124,7 @@ class ImageCommands(commands.Cog):
                     values=[image_name, str(ctx.author_id)]
                 )
         except:
-            raise command_error("Unable to delete this image command!")
+            raise CommandError("Unable to delete this image command!")
 
         embed = build_embed(
             title="Delete Image Command",

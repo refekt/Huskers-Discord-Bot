@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 from utilities.constants import CROOT_SEARCH_LIMIT
 from utilities.constants import HEADERS
-from utilities.constants import user_error
+from utilities.constants import UserError
 from utilities.mysql import Process_MySQL, sqlTeamIDs
 
 
@@ -437,10 +437,10 @@ def FootballRecruit(year, name):
         search_results = requests.get(url=_247_search, headers=HEADERS)
         search_results = json.loads(search_results.text)
     else:
-        raise user_error(f"Error occurred attempting to create 247sports search URL.")
+        raise UserError(f"Error occurred attempting to create 247sports search URL.")
 
     if not search_results:
-        raise user_error(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
+        raise UserError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
 
     search_result_players = []
 
