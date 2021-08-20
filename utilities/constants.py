@@ -75,11 +75,11 @@ CFBD_KEY = env_vars["cfbd_api"]
 # SSH_PW = env_vars["ssh_pw"]
 
 # Twitter variables
-# TWITTER_CONSUMER_KEY = env_vars["twitter_consumer_key"]
-# TWITTER_CONSUMER_SECRET = env_vars["twitter_consumer_secret"]
-# TWITTER_TOKEN_KEY = env_vars["twitter_token_key"]
-# TWITTER_TOKEN_SECRET = env_vars["twitter_token_secret"]
-# TWITTER_WEBHOOK_ENV = "dev"
+TWITTER_KEY = env_vars["twitter_key"]
+TWITTER_SECRET_KEY = env_vars["twitter_secret_key"]
+TWITTER_BEARER = env_vars["twitter_bearer"]
+TWITTER_TOKEN = env_vars["twitter_token"]
+TWITTER_TOKEN_SECRET = env_vars["twitter_token_secret"]
 
 del env_vars, env_file, key
 
