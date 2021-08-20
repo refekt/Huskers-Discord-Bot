@@ -341,6 +341,7 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     if debugging():
         return
 
+    embed = None
     if isinstance(ex, UserError):
         embed = build_embed(
             title="Husker Bot User Error",
@@ -355,6 +356,14 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
             description="An error occured with command processing",
             fields=[
                 ["Error Message", ex.message]
+            ]
+        )
+    else:
+        embed = build_embed(
+            title="Husker Bot Command Error",
+            description="An error occured with command processing",
+            fields=[
+                ["Error Message", ex.args[0]]
             ]
         )
 
