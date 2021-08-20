@@ -258,6 +258,8 @@ class AdminCommands(commands.Cog):
         if ctx.channel.id in CHAN_BANNED:
             return
 
+        await ctx.defer(hidden=True)
+
         try:
             max_age = datetime.now() - timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True)
@@ -268,6 +270,8 @@ class AdminCommands(commands.Cog):
             print("Missing permissions.")
         except discord.HTTPException:
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
+
+        await ctx.send(hidden=True, content="Done!")
 
     @cog_ext.cog_subcommand(
         base="purge",
@@ -284,6 +288,8 @@ class AdminCommands(commands.Cog):
         if ctx.channel.id in CHAN_BANNED:
             return
 
+        await ctx.defer(hidden=True)
+
         try:
             def is_bot(message: discord.Message):
                 return message.author.bot
@@ -297,6 +303,9 @@ class AdminCommands(commands.Cog):
             print("Missing permissions.")
         except discord.HTTPException:
             print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
+
+        await ctx.send(hidden=True, content="Done!")
+
 
     @cog_ext.cog_slash(
         name="bug",
