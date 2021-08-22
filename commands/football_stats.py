@@ -7,13 +7,65 @@ from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.model import ButtonStyle
+from discord_slash.utils.manage_commands import create_option
 
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY
 from utilities.constants import guild_id_list
 from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
-from discord_slash.utils.manage_commands import create_option
+
+
+def convert_seconds(n):
+    secs = n % (24 * 3600)
+    hour = secs // 3600
+    secs %= 3600
+    mins = secs // 60
+
+    return hour, mins
+
+
+def get_consensus_line(check_game):
+    configuration = Configuration()
+    configuration.api_key["Authorization"] = CFBD_KEY
+    configuration.api_key_prefix["Authorization"] = "Bearer"
+
+    cfb_api = BettingApi(ApiClient(configuration))
+
+    nebraska_team = "Nebraska"
+    year = datetime.now().year
+
+    if check_game.location == "Lincoln, NE":
+        home_team = "Nebraska"
+        away_team = check_game.opponent
+    else:
+        home_team = check_game.opponent
+        away_team = "Nebraska"
+
+    try:
+        api_response = cfb_api.get_lines(team=nebraska_team, year=year, away=away_team, home=home_team)
+    except ApiException:
+        return None
+
+    try:
+        lines = api_response[0].lines[0]
+        formattedSpread = spreadOpen = overUnder = overUnderOpen = ""
+        if lines.get("formattedSpread", None):
+            formattedSpread = lines.get("formattedSpread")
+        if lines.get("spreadOpen", None):
+            # Assumption that the spread doesn't swing from one team to another
+            # Uses the current favored team
+            spreadOpen = f"{formattedSpread.split('.')[0][:-1]}{lines.get('spreadOpen')}"
+        if lines.get("overUnder", None):
+            overUnder = lines.get("overUnder")
+        if lines.get("overUnderOpen", None):
+            overUnderOpen = lines.get("overUnderOpen")
+        new_line = "\n"
+        consensus_line = f"{formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}{'Over Under ' + overUnder + ' (Opened: ' + overUnderOpen + ')' if overUnder else ''}"
+    except IndexError:
+        consensus_line = None
+
+    return consensus_line
 
 
 class FootballStatsCommands(commands.Cog):
@@ -38,54 +90,6 @@ class FootballStatsCommands(commands.Cog):
     )
     async def _countdown(self, ctx: SlashContext, team: str = None, sport: str = "football"):
         await ctx.defer()
-
-        def convert_seconds(n):
-            secs = n % (24 * 3600)
-            hour = secs // 3600
-            secs %= 3600
-            mins = secs // 60
-
-            return hour, mins
-
-        def get_consensus_line(check_game):
-            configuration = Configuration()
-            configuration.api_key["Authorization"] = CFBD_KEY
-            configuration.api_key_prefix["Authorization"] = "Bearer"
-
-            cfb_api = BettingApi(ApiClient(configuration))
-
-            nebraska_team = "Nebraska"
-            year = datetime.now().year
-
-            if check_game.location == "Lincoln, NE":
-                home_team = "Nebraska"
-                away_team = check_game.opponent
-            else:
-                home_team = check_game.opponent
-                away_team = "Nebraska"
-
-            try:
-                api_response = cfb_api.get_lines(team=nebraska_team, year=year, away=away_team, home=home_team)
-            except ApiException:
-                return None
-
-            try:
-                lines = api_response[0].lines[0]
-                formattedSpread = spreadOpen = overUnder = overUnderOpen = ""
-                if lines.get("formattedSpread", None):
-                    formattedSpread = lines.get("formattedSpread")
-                if lines.get("spreadOpen", None):
-                    spreadOpen = lines.get("spreadOpen")
-                if lines.get("overUnder", None):
-                    overUnder = lines.get("overUnder")
-                if lines.get("overUnderOpen", None):
-                    overUnderOpen = lines.get("overUnderOpen")
-                new_line = "\n"
-                consensus_line = f"{formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}{'Over Under ' + overUnder + ' (Opened: ' + overUnderOpen + ')' if overUnder else ''}"
-            except IndexError:
-                consensus_line = None
-
-            return consensus_line
 
         now_cst = datetime.now().astimezone(tz=TZ)
 
