@@ -80,9 +80,9 @@ async def start_twitter_stream():
 
     tweet_listener = TwitterStreamer()
     tweet_stream = tweepy.Stream(auth=twitter_api.auth, listener=tweet_listener)
-    tweet_stream.filter(
-        track=husker_list_members
-    )
+    # tweet_stream.filter(+
+    #     track=husker_list_members
+    # )
 
 
 class TaskThread(threading.Thread):
