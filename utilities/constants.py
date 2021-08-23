@@ -3,7 +3,7 @@ import platform
 import sys
 
 import pytz
-from discord.ext.commands import BucketType, CommandError, UserInputError
+from discord.ext.commands import BucketType
 from discord_slash.utils.manage_commands import SlashCommandPermissionType, create_permission
 from dotenv import load_dotenv
 
@@ -11,15 +11,12 @@ from encryption import load_key, decrypt_return_data, decrypt, encrypt
 
 print(f"### Platform == {platform.platform()}")
 
+# Setting variables location
 win_vars = "./variables.json"
-
 variables = ""
-
-print(f"### ~~~ argv[0]: {sys.argv[0]}")
-print(f"### ~~~ argv[1]: {sys.argv[1]}")
-
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set")
+    _is_debugging = True
     variables = os.getcwd() + "\\variables.json"
     load_dotenv(dotenv_path=variables)
 elif "Linux" in platform.platform():
@@ -184,21 +181,6 @@ DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
-_is_debugging = False
-try:
-    server = sys.argv[1]
-    if server == "prod":
-        print("### ~~~ Bot starting on the production server")
-    elif server == "test":
-        print("### ~~~ Bot starting on the test server")
-        _is_debugging = True
-except IndexError:
-    pass
-
-
-def debugging() -> bool:
-    return True if _is_debugging else False
-
 
 def guild_id_list() -> list:
     if debugging():
@@ -248,3 +230,22 @@ def pretty_time_delta(seconds):
         return f"{minutes}m and {seconds}s"
     else:
         return f"{seconds}s"
+
+
+def debugging() -> bool:
+    return True if _is_debugging else False
+
+
+print(f"### ~~~ argv[0]: {sys.argv[0]}")
+print(f"### ~~~ argv[1]: {sys.argv[1]}")
+
+_is_debugging = False
+
+try:
+    server = sys.argv[1]
+    if server == "prod":
+        print("### ~~~ Bot starting on the production server")
+    elif server == "test":
+        print("### ~~~ Bot starting on the test server")
+except IndexError:
+    pass

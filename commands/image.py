@@ -55,8 +55,10 @@ def retrieve_all_img():
         raise CommandError(f"Unable to retrieve image commands.")
 
 
+all_imgs = retrieve_all_img()
+
 image_options = []
-for img in retrieve_all_img():
+for img in all_imgs:
     image_options.append(
         create_option(
             name=img["img_name"],

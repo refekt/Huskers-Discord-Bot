@@ -4,7 +4,7 @@ from discord_slash.context import SlashContext
 from discord_slash.model import SlashMessage
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
-from objects.Thread import start_twitter_stream, TaskThread
+# from objects.Thread import start_twitter_stream, TaskThread
 
 print(f"Guild ID List: {type(guild_id_list())} {guild_id_list()}")
 

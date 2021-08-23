@@ -1,9 +1,9 @@
 import asyncio
 import threading
 import typing
-import tweepy
+# import tweepy
 import discord
-from utilities.constants import TWITTER_BEARER, TWITTER_KEY, TWITTER_BOT_MEMBER, TWITTER_TOKEN, TWITTER_SECRET_KEY, TWITTER_TOKEN_SECRET
+# from utilities.constants import TWITTER_BEARER, TWITTER_KEY, TWITTER_BOT_MEMBER, TWITTER_TOKEN, TWITTER_SECRET_KEY, TWITTER_TOKEN_SECRET
 from utilities.constants import pretty_time_delta
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlUpdateTasks
@@ -52,37 +52,37 @@ async def send_reminder(thread_name, num_seconds, destination: typing.Union[disc
     print(f"### ;;; Thread [{str(thread_name)}] completed successfully!")
 
 
-class TwitterStreamer(tweepy.StreamListener):
-    def on_connect(self):
-        print("### Twitter stream listener has started")
+# class TwitterStreamer(tweepy.StreamListener):
+#     def on_connect(self):
+#         print("### Twitter stream listener has started")
+#
+#     def on_disconnect(self, notice):
+#         print(f"### Twitter stream listener has ended:\n{notice}")
+#
+#     def on_data(self, raw_data):
+#         data = json.loads(raw_data)
+#         print(data)
 
-    def on_disconnect(self, notice):
-        print(f"### Twitter stream listener has ended:\n{notice}")
 
-    def on_data(self, raw_data):
-        data = json.loads(raw_data)
-        print(data)
-
-
-async def start_twitter_stream():
-    twitter_auth = tweepy.OAuthHandler(
-        consumer_key=TWITTER_KEY,
-        consumer_secret=TWITTER_SECRET_KEY
-    )
-    twitter_api = tweepy.API(twitter_auth)
-
-    husker_list = twitter_api.get_list(
-        list_id=1307680291285278720
-    )
-    husker_list_members = twitter_api.list_members(
-        list_id=1307680291285278720
-    )
-
-    tweet_listener = TwitterStreamer()
-    tweet_stream = tweepy.Stream(auth=twitter_api.auth, listener=tweet_listener)
-    # tweet_stream.filter(+
-    #     track=husker_list_members
-    # )
+# async def start_twitter_stream():
+#     twitter_auth = tweepy.OAuthHandler(
+#         consumer_key=TWITTER_KEY,
+#         consumer_secret=TWITTER_SECRET_KEY
+#     )
+#     twitter_api = tweepy.API(twitter_auth)
+#
+#     husker_list = twitter_api.get_list(
+#         list_id=1307680291285278720
+#     )
+#     husker_list_members = twitter_api.list_members(
+#         list_id=1307680291285278720
+#     )
+#
+#     tweet_listener = TwitterStreamer()
+#     tweet_stream = tweepy.Stream(auth=twitter_api.auth, listener=tweet_listener)
+#     # tweet_stream.filter(+
+#     #     track=husker_list_members
+#     # )
 
 
 class TaskThread(threading.Thread):
@@ -108,5 +108,5 @@ class TaskThread(threading.Thread):
                 flag=self.flag,
                 alert_when=self.alert_when
             )
-        elif which == "twitter":
-            await start_twitter_stream()
+        # elif which == "twitter":
+        #     await start_twitter_stream()
