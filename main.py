@@ -363,7 +363,7 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
             title="Husker Bot Command Error",
             description="An error occured with command processing",
             fields=[
-                ["Error Message", ex.args[0]]
+                ["Error Message", f"{ex.args[0]}\n."]
             ]
         )
 
