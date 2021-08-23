@@ -11,6 +11,7 @@ from discord_slash.utils.manage_commands import create_option
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import TZ, CFBD_KEY
+from utilities.constants import CommandError
 from utilities.constants import guild_id_list
 from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
 
@@ -44,33 +45,40 @@ def get_current_week() -> int:
             return game.week
 
 
-def get_consensus_line(check_game):
+def get_consensus_line(team_name: str, year: int = datetime.now().year, week: int = None):
     cfb_api = BettingApi(ApiClient(cfbd_config))
 
-    nebraska_team = "Nebraska"
-    year = datetime.now().year
-
-    if check_game.location == "Lincoln, NE":
-        home_team = "Nebraska"
-        away_team = check_game.opponent
-    else:
-        home_team = check_game.opponent
-        away_team = "Nebraska"
+    if week is None:
+        week = get_current_week()
 
     try:
-        api_response = cfb_api.get_lines(team=nebraska_team, year=year, away=away_team, home=home_team)
+        api_response = cfb_api.get_lines(team=team_name, year=year, week=week)
     except ApiException:
         return None
 
     try:
-        lines = api_response[0].lines[0]
+        # Hard code Week 0
+        lines = None
+        if len(api_response) > 1:
+            for resp in api_response:
+                if resp.away_team == "Nebraska":
+                    lines = resp.lines[0]
+                    break
+        else:
+            lines = api_response[0].lines[0]
+
+        if lines is None:
+            return None
+
         formattedSpread = spreadOpen = overUnder = overUnderOpen = ""
+
         if lines.get("formattedSpread", None):
             formattedSpread = lines.get("formattedSpread")
         if lines.get("spreadOpen", None):
             # Assumption that the spread doesn't swing from one team to another
             # Uses the current favored team
             spreadOpen = f"{formattedSpread.split('.')[0][:-1]}{lines.get('spreadOpen')}"
+            spreadOpen = spreadOpen.replace("--", "-")
         if lines.get("overUnder", None):
             overUnder = lines.get("overUnder")
         if lines.get("overUnderOpen", None):
@@ -109,16 +117,28 @@ class FootballStatsCommands(commands.Cog):
             )
         ]
     )
-    async def _lines(self, ctx: SlashContext, team_name: str = "Nebraska", week: int = get_current_week(), year: int = datetime.now().year):
+    async def _lines(self, ctx: SlashContext, week: int = None, team_name: str = "Nebraska", year: int = datetime.now().year):
         games, stats = HuskerSchedule(sport="football", year=year)
         del stats
 
         lines = None
+
+        if week is None:
+            week = get_current_week()
+
         for game in games:
             if game.week == week:
-                lines = get_consensus_line(game)
+                lines = get_consensus_line(team_name=team_name, year=year, week=week)
                 break
-        await ctx.send(lines)
+
+        embed = build_embed(
+            title=f"Line info for the upcoming [{team_name.title()}] game",
+            description=f"Year: {year}, Week: {week}",
+            fields=[
+                ["Line Info", lines]
+            ]
+        )
+        await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(
         name="countdown",
@@ -180,7 +200,7 @@ class FootballStatsCommands(commands.Cog):
             opponent=game_compared.opponent,
             thumbnail=game_compared.icon,
             date_time=game_compared.game_date_time,
-            consensus=get_consensus_line(game_compared),
+            consensus=get_consensus_line(game_compared.opponent),
             location=game_compared.location
         )
         await ctx.send(embed=embed)
