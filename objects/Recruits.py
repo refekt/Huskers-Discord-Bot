@@ -326,7 +326,7 @@ def get_cb_predictions(soup):
     return crystal_balls
 
 
-def all_time_ranking(soup):
+def get_all_time_ranking(soup):
     recruit_rank = soup.find_all(attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"})
 
     try:
@@ -335,9 +335,30 @@ def all_time_ranking(soup):
         if len(recruit_rank) > 1:
             return ranking
         else:
-            return False
+            return 0
     except IndexError:
-        return False
+        return 0
+
+
+def get_national_ranking(cur_player):
+    if cur_player['NationalRank'] is not None:
+        return cur_player['NationalRank']
+    else:
+        return 0
+
+
+def get_position_ranking(cur_player):
+    if cur_player['PositionRank'] is not None:
+        return cur_player['PositionRank']
+    else:
+        return 0
+
+
+def get_state_ranking(cur_player):
+    if cur_player['StateRank'] is not None:
+        return cur_player['StateRank']
+    else:
+        return 0
 
 
 def reformat_composite_rating(cur_player):
@@ -467,10 +488,10 @@ def FootballRecruit(year, name):
         key = cur_player.get("Key", None)
         name = cur_player.get("FullName", None)
         position = cur_player["PrimaryPlayerPosition"].get("Abbreviation", None)
-        ranking_all_time = all_time_ranking(soup)
-        ranking_national = cur_player.get("NationalRank", None)
-        ranking_position = cur_player.get("PositionRank", None)
-        ranking_state = cur_player.get("StateRank", None)
+        ranking_all_time = get_all_time_ranking(soup)
+        ranking_national = get_national_ranking(cur_player)
+        ranking_position = get_position_ranking(cur_player)
+        ranking_state = get_state_ranking(cur_player)
         rating_numerical = reformat_composite_rating(cur_player)
         rating_stars = cur_player.get("CompositeStarRating", None)
         recruit_interests = get_recruit_interests(search_player)
