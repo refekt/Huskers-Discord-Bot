@@ -15,7 +15,7 @@ from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import send_reminder
-from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS
+from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS, CHAN_RULES
 from utilities.constants import DT_TASK_FORMAT
 from utilities.constants import GEE_USER
 from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
@@ -285,6 +285,23 @@ async def hall_of_fame_messages(reactions: list):
                 await channel.send(embed=embed)
 
 
+async def send_welcome_message(who: discord.Member):
+    chan_rules = client.get_channel(CHAN_RULES)
+
+    embed = build_embed(
+        title="Welcome to the server!",
+        description="The official Husker football discord server",
+        thumbnail="https://cdn.discordapp.com/icons/440632686185414677/a_061e9e57e43a5803e1d399c55f1ad1a4.gif",
+        fields=[
+            ["Rules", f"Please be sure to check out {chan_rules.mention if chan_rules is not None else 'the rules channel'} to catch up on server rules."],
+            ["Commands", f"View the list of commands with the `/commands` command. Note: commands only work while in the server."],
+            ["Roles", "You can assign yourself come flair by using the `/roles` command."]
+        ]
+    )
+
+    await who.send(embed=embed)
+
+
 @client.event
 async def on_connect():
     await change_my_status()
@@ -393,6 +410,12 @@ async def on_component(ctx: ComponentContext):
 @client.event
 async def on_component_callback(ctx: ComponentContext, callback: CallbackObject):
     pass
+
+
+@client.event
+async def on_member_join(member: discord.Member):
+    print(f"### New Member: {member.display_name}")
+    await send_welcome_message(member)
 
 
 if debugging():

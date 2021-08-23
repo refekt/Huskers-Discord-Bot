@@ -16,7 +16,7 @@ class TestCommand(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _test(self, ctx: SlashContext):
-        await TaskThread.run(hich="twitter")
+        pass
 
 
 def setup(bot):
