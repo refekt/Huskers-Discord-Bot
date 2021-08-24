@@ -375,8 +375,8 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     def format_traceback(tback: list):
         return "".join(tback).replace("Aaron", "Secret")
 
-    if debugging():
-        return
+    # if debugging():
+    #     return
 
     embed = None
     if isinstance(ex, UserError):
@@ -413,7 +413,18 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     )
 
     tback = format_traceback(traceback_raw)
-    message = f"{ctx.author.mention} received an unknown error has occured with `{ctx.command}`!\n```\n{tback}\n```"
+    cmd = ctx.command
+    sub_cmd = ""
+    if ctx.subcommand_name is not None:
+        sub_cmd = ctx.subcommand_name
+    input = []
+    for item in ctx.data["options"]:
+        input.append(f"{item['name']} = {item['value']}")
+
+    message = f"{ctx.author.mention} ({ctx.author.display_name}) received an unknown error!\n" \
+              f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {input}`" \
+              f"```\n{tback}\n```"
+
     try:
         gee = client.get_user(id=GEE_USER)
         await gee.send(content=message)
