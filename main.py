@@ -353,55 +353,55 @@ async def on_slash_command(ctx):
     pass
 
 
-# @client.event
-# async def on_slash_command_error(ctx: SlashContext, ex: Exception):
-#     def format_traceback(tback: list):
-#         return "".join(tback).replace("Aaron", "Secret")
-#
-#     if debugging():
-#         return
-#
-#     embed = None
-#     if isinstance(ex, UserError):
-#         embed = build_embed(
-#             title="Husker Bot User Error",
-#             description="An error occured with user input",
-#             fields=[
-#                 ["Error Message", ex.message]
-#             ]
-#         )
-#     elif isinstance(ex, CommandError):
-#         embed = build_embed(
-#             title="Husker Bot Command Error",
-#             description="An error occured with command processing",
-#             fields=[
-#                 ["Error Message", ex.message]
-#             ]
-#         )
-#     else:
-#         embed = build_embed(
-#             title="Husker Bot Command Error",
-#             description="An error occured with command processing",
-#             fields=[
-#                 ["Error Message", f"{ex.args[0]}\n."]
-#             ]
-#         )
-#
-#     await ctx.send(embed=embed)
-#
-#     traceback_raw = traceback.format_exception(
-#         etype=type(ex),
-#         value=ex,
-#         tb=ex.__traceback__
-#     )
-#
-#     tback = format_traceback(traceback_raw)
-#     message = f"{ctx.author.mention} received an unknown error has occured with `{ctx.command}`!\n```\n{tback}\n```"
-#     try:
-#         gee = client.get_user(id=GEE_USER)
-#         await gee.send(content=message)
-#     except:
-#         await ctx.send(content=f"<@{GEE_USER}>\n{message}")
+@client.event
+async def on_slash_command_error(ctx: SlashContext, ex: Exception):
+    def format_traceback(tback: list):
+        return "".join(tback).replace("Aaron", "Secret")
+
+    if debugging():
+        return
+
+    embed = None
+    if isinstance(ex, UserError):
+        embed = build_embed(
+            title="Husker Bot User Error",
+            description="An error occured with user input",
+            fields=[
+                ["Error Message", ex.message]
+            ]
+        )
+    elif isinstance(ex, CommandError):
+        embed = build_embed(
+            title="Husker Bot Command Error",
+            description="An error occured with command processing",
+            fields=[
+                ["Error Message", ex.message]
+            ]
+        )
+    else:
+        embed = build_embed(
+            title="Husker Bot Command Error",
+            description="An error occured with command processing",
+            fields=[
+                ["Error Message", f"{ex.args[0]}\n."]
+            ]
+        )
+
+    await ctx.send(embed=embed)
+
+    traceback_raw = traceback.format_exception(
+        etype=type(ex),
+        value=ex,
+        tb=ex.__traceback__
+    )
+
+    tback = format_traceback(traceback_raw)
+    message = f"{ctx.author.mention} received an unknown error has occured with `{ctx.command}`!\n```\n{tback}\n```"
+    try:
+        gee = client.get_user(id=GEE_USER)
+        await gee.send(content=message)
+    except:
+        await ctx.send(content=f"<@{GEE_USER}>\n{message}")
 
 
 @client.event
