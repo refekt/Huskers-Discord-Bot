@@ -1,3 +1,6 @@
+from datetime import datetime, timezone
+
+
 class WeatherHour:
     def __init__(self, dictionary):
         for key, value in dictionary.items():
@@ -31,7 +34,12 @@ class WeatherSys:
 
     def __init__(self, dictionary):
         for key, value in dictionary.items():
-            setattr(self, key, value)
+            if key == "sunrise":
+                self.sunrise = datetime.utcfromtimestamp(value).astimezone(tz=timezone.utc)
+            elif key == "sunset":
+                self.sunset = datetime.utcfromtimestamp(value).astimezone(tz=timezone.utc)
+            else:
+                setattr(self, key, value)
         self._data_len = len(dictionary)
 
     def __len__(self):
@@ -116,4 +124,9 @@ class WeatherResponse:
             elif key == "snow":
                 self.snow = WeatherSnow(value)
             else:
-                setattr(self, key, value)
+                if key == "dt":
+                    self.dt = datetime.utcfromtimestamp(value).astimezone(tz=timezone.utc)
+                # elif key == "timezone":
+                #     self.timezone = datetime.utcfromtimestamp(value)
+                else:
+                    setattr(self, key, value)

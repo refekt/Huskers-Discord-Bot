@@ -354,6 +354,23 @@ async def on_slash_command(ctx):
 
 
 @client.event
+async def on_component(ctx: ComponentContext):
+    """ Called when a component is triggered. """
+    pass
+
+
+@client.event
+async def on_component_callback(ctx: ComponentContext, callback: CallbackObject):
+    pass
+
+
+@client.event
+async def on_member_join(member: discord.Member):
+    print(f"### New Member: {member.display_name}")
+    await send_welcome_message(member)
+
+
+@client.event
 async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     def format_traceback(tback: list):
         return "".join(tback).replace("Aaron", "Secret")
@@ -402,23 +419,6 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
         await gee.send(content=message)
     except:
         await ctx.send(content=f"<@{GEE_USER}>\n{message}")
-
-
-@client.event
-async def on_component(ctx: ComponentContext):
-    """ Called when a component is triggered. """
-    pass
-
-
-@client.event
-async def on_component_callback(ctx: ComponentContext, callback: CallbackObject):
-    pass
-
-
-@client.event
-async def on_member_join(member: discord.Member):
-    print(f"### New Member: {member.display_name}")
-    await send_welcome_message(member)
 
 
 if debugging():

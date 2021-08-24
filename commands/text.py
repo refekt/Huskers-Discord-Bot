@@ -1,3 +1,4 @@
+import json
 import random
 import re
 from urllib import parse
@@ -15,14 +16,12 @@ from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import create_button, create_actionrow
 
+from objects.Weather import WeatherResponse, WeatherHour
 from utilities.constants import CHAN_BANNED, CHAN_POSSUMS, WEATHER_API_KEY, HEADERS, US_STATES
-from utilities.constants import CommandError, UserError
+from utilities.constants import CommandError, UserError, TZ, DT_OPENWEATHER_UTC
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
-
-from objects.Weather import WeatherResponse, WeatherHour
-
-import json
+from datetime import timedelta
 
 buttons_ud = [
     create_button(
@@ -432,10 +431,19 @@ class TextCommands(commands.Cog):
                 description="State to search. Format is two letter state code. AL, AK, AS, etc.",
                 option_type=3,
                 required=True
+            ),
+            create_option(
+                name="country",
+                description="Country coude",
+                option_type=3,
+                required=False
             )
         ]
     )
-    async def _weather(self, ctx: SlashContext, city: str, state: str):
+    async def _weather(self, ctx: SlashContext, city: str, state: str, country: str = "US"):
+        def shift_utc_tz(dt, shift):
+            return dt + timedelta(seconds=shift)
+
         if not len(state) == 2:
             raise UserError("State input must be the two-digit state code.")
 
@@ -445,12 +453,15 @@ class TextCommands(commands.Cog):
                 found = True
                 break
         if not found:
-            raise UserError(f"Unable to find {state.upper()}. Please try again!")
+            raise UserError(f"Unable to find the state {state.upper()}. Please try again!")
 
-        weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{state},US"
+        weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{state},{country}"
         response = requests.get(weather_url, headers=HEADERS)
         j = json.loads(response.content)
+
         weather = WeatherResponse(j)
+        if weather.cod == "404":
+            raise UserError(f"Unable to find {city.title()}, {state.upper()}. Try again!")
 
         temp_str = f"Temperature: {weather.main.temp}℉\n" \
                    f"Feels Like: {weather.main.feels_like}℉\n" \
@@ -487,6 +498,12 @@ class TextCommands(commands.Cog):
                 hour_temp_str += f"{hour.temp}℉"
                 hour_wind_str += f"{hour.wind_speed} MPH"
 
+        sunrise = shift_utc_tz(weather.sys.sunrise, weather.timezone)
+        sunset = shift_utc_tz(weather.sys.sunset, weather.timezone)
+
+        sun_str = f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n" \
+                  f"Sunset: {sunset.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}"
+
         embed = build_embed(
             title=f"Weather conditions for {city.title()}, {state.upper()}",
             description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state.upper()} is located at {weather.coord.lat}, {weather.coord.lon}.",
@@ -495,7 +512,8 @@ class TextCommands(commands.Cog):
                 ["Clouds", f"Coverage: {weather.clouds.all}%"],
                 ["Wind", wind_str],
                 ["Temp Next 4 Hours", hour_temp_str],
-                ["Wind Next 4 Hours", hour_wind_str]
+                ["Wind Next 4 Hours", hour_wind_str],
+                ["Sun", sun_str]
 
             ],
             inline=False,

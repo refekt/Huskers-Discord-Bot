@@ -183,6 +183,7 @@ DT_TBA_TIME = "10:58 PM"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
 
 # States
 US_STATES = [
