@@ -15,10 +15,14 @@ from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import create_button, create_actionrow
 
-from utilities.constants import CHAN_BANNED, CHAN_POSSUMS
+from utilities.constants import CHAN_BANNED, CHAN_POSSUMS, WEATHER_API_KEY, HEADERS, US_STATES
 from utilities.constants import CommandError, UserError
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
+
+from objects.Weather import WeatherResponse, WeatherHour
+
+import json
 
 buttons_ud = [
     create_button(
@@ -415,12 +419,90 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="weather",
         description="Shows the weather for Husker games",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="city",
+                description="City to search for",
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name="state",
+                description="State to search. Format is two letter state code. AL, AK, AS, etc.",
+                option_type=3,
+                required=True
+            )
+        ]
     )
-    async def _weather(self, ctx: SlashContext):
-        await ctx.defer()
-        if ctx.author_id == 232291321551912962:
-            await ctx.send("Made you look")
+    async def _weather(self, ctx: SlashContext, city: str, state: str):
+        if not len(state) == 2:
+            raise UserError("State input must be the two-digit state code.")
+
+        found = False
+        for item in US_STATES:
+            if item.get("Code") == state.upper():
+                found = True
+                break
+        if not found:
+            raise UserError(f"Unable to find {state.upper()}. Please try again!")
+
+        weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{state},US"
+        response = requests.get(weather_url, headers=HEADERS)
+        j = json.loads(response.content)
+        weather = WeatherResponse(j)
+
+        temp_str = f"Temperature: {weather.main.temp}℉\n" \
+                   f"Feels Like: {weather.main.feels_like}℉\n" \
+                   f"Humidty: {weather.main.humidity}℉\n" \
+                   f"Max: {weather.main.temp_max}℉\n" \
+                   f"Min: {weather.main.temp_min}℉"
+
+        if len(weather.wind) == 2:
+            wind_str = f"Speed: {weather.wind.speed} MPH\n" \
+                       f"Direction: {weather.wind.deg} °"
+        elif len(weather.wind) == 3:
+            wind_str = f"Speed: {weather.wind.speed} MPH\n" \
+                       f"Gusts: {weather.wind.gust} MPH\n" \
+                       f"Direction: {weather.wind.deg} °"
+        else:
+            wind_str = f"Speed: {weather.wind.speed} MPH"
+
+        hourly_url = f"https://api.openweathermap.org/data/2.5/onecall?lat={weather.coord.lat}&lon={weather.coord.lon}&appid={WEATHER_API_KEY}&units=imperial"
+        response = requests.get(hourly_url, headers=HEADERS)
+        j = json.loads(response.content)
+        hours = []
+        for index, item in enumerate(j["hourly"]):
+            hours.append(WeatherHour(item))
+            if index == 3:
+                break
+
+        hour_temp_str = ""
+        hour_wind_str = ""
+        for index, hour in enumerate(hours):
+            if index < len(hours) - 1:
+                hour_temp_str += f"{hour.temp}℉ » "
+                hour_wind_str += f"{hour.wind_speed} MPH » "
+            else:
+                hour_temp_str += f"{hour.temp}℉"
+                hour_wind_str += f"{hour.wind_speed} MPH"
+
+        embed = build_embed(
+            title=f"Weather conditions for {city.title()}, {state.upper()}",
+            description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state.upper()} is located at {weather.coord.lat}, {weather.coord.lon}.",
+            fields=[
+                ["Temperature", temp_str],
+                ["Clouds", f"Coverage: {weather.clouds.all}%"],
+                ["Wind", wind_str],
+                ["Temp Next 4 Hours", hour_temp_str],
+                ["Wind Next 4 Hours", hour_wind_str]
+
+            ],
+            inline=False,
+            thumbnail=f"https://openweathermap.org/img/wn/{weather.weather[0].icon}@4x.png"
+        )
+
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
