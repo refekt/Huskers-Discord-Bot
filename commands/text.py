@@ -123,9 +123,14 @@ class TextCommands(commands.Cog):
         try:
             definitions = soup.find_all(name="div", attrs={"class": "def-panel"})
         except AttributeError:
-            raise UserError(f"Unable to find [{word}] in Urban Dictionary.")
+            raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
 
-        del r, soup, definitions[1]  # Word of the day
+        del r, soup
+
+        if len(definitions) == 0:
+            raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
+
+        del definitions[1]  # Word of the day
 
         results = []
         for definition in definitions:
