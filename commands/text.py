@@ -503,7 +503,7 @@ class TextCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
-        try:# Avoid listening to events that don't apply to the vote command
+        try:  # Avoid listening to events that don't apply to the vote command
             if "Question" not in ctx.origin_message.embeds[0].title:
                 return
         except:

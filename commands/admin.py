@@ -597,8 +597,7 @@ class AdminCommands(commands.Cog):
                 pages=pages,
                 useSelect=False,
                 useIndexButton=True,
-                hidden=True,
-                dm=True
+                hidden=True
             ).run()
         else:
             command_name = command_name.lower()
@@ -613,7 +612,8 @@ class AdminCommands(commands.Cog):
                 ],
                 useSelect=False,
                 useIndexButton=False,
-                useButtons=False
+                useButtons=False,
+                hidden=True
             ).run()
 
     @cog_ext.cog_slash(

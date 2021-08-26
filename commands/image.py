@@ -180,7 +180,8 @@ class ImageCommands(commands.Cog):
             nextStyle=ButtonStyle.gray,
             prevStyle=ButtonStyle.gray,
             lastStyle=ButtonStyle.gray,
-            indexStyle=ButtonStyle.gray
+            indexStyle=ButtonStyle.gray,
+            hidden=True
         ).run()
 
     @cog_ext.cog_slash(
