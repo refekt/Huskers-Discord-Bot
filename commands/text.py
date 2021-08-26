@@ -1,6 +1,8 @@
 import json
 import random
 import re
+import string
+from datetime import timedelta
 from urllib import parse
 
 import discord
@@ -21,7 +23,6 @@ from utilities.constants import CHAN_BANNED, CHAN_POSSUMS, WEATHER_API_KEY, HEAD
 from utilities.constants import CommandError, UserError, TZ, DT_OPENWEATHER_UTC
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
-from datetime import timedelta
 
 buttons_ud = [
     create_button(
@@ -34,19 +35,6 @@ buttons_ud = [
         style=ButtonStyle.gray,
         label="Next",
         custom_id="ud_next"
-    )
-]
-
-buttons_voting = [
-    create_button(
-        style=ButtonStyle.green,
-        label="Up Vote",
-        custom_id="vote_up"
-    ),
-    create_button(
-        style=ButtonStyle.red,
-        label="Down Vote",
-        custom_id="vote_down"
     )
 ]
 
@@ -98,6 +86,10 @@ def cleanup_source_data(source_data: str):
     new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
 
     return new_source_data
+
+
+def set_component_key() -> str:
+    return "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 class TextCommands(commands.Cog):
@@ -191,68 +183,50 @@ class TextCommands(commands.Cog):
             )
         ]
     )
-    async def _vote(self, ctx: SlashContext, query: str, option_a: str = None, option_b: str = None):
+    async def _vote(self, ctx: SlashContext, query: str, option_a: str = "UP VOTE", option_b: str = "DOWN VOTE"):
         if (option_a is not None and option_b is None) or (option_b is not None and option_a is None):
             raise UserError("You must provide both options!")
 
-        if option_a is not None and option_b is not None:
-            buttons_voting[0]['label'] = option_a
-            buttons_voting[0]['style'] = ButtonStyle.gray
-            buttons_voting[1]['label'] = option_b
-            buttons_voting[1]['style'] = ButtonStyle.gray
+        option_a = str(option_a).upper()
+        option_b = str(option_b).upper()
+
+        but_a = ButtonStyle.green
+        but_b = ButtonStyle.red
+
+        key = set_component_key()
+        buttons_voting = []
+
+        if option_a != "UP VOTE" and option_b != "DOWN VOTE":  # Non-standard vote
+            but_a = but_b = ButtonStyle.gray
+
+        buttons_voting.append(
+            create_button(
+                custom_id=f"{key}_a",
+                label=option_a,
+                style=but_a
+            )
+        )
+        buttons_voting.append(
+            create_button(
+                custom_id=f"{key}_b",
+                label=option_b,
+                style=but_b
+            )
+        )
 
         embed = build_embed(
-            title="Vote",
+            title=f"Question: {query.capitalize()}",
+            description="Times out after 60 seconds.",
             inline=False,
             fields=[
-                ["Question", query.capitalize()],
-                ["Up Votes" if option_a is None else option_a.title(), "0"],
-                ["Down Votes" if option_b is None else option_b.title(), "0"],
+                [buttons_voting[-2]["label"], "0"],
+                [buttons_voting[-1]["label"], "0"],
                 ["Voters", "_"]
-            ]
+            ],
+            footer=key
         )
-        vote_actionrow = create_actionrow(*buttons_voting)
-        await ctx.send(content="", embed=embed, components=[vote_actionrow])
 
-    @cog_ext.cog_component(components=buttons_voting)
-    async def process_voting_buttons(self, ctx: ComponentContext):
-        voters = ctx.origin_message.embeds[0].fields[3].value
-        if str(ctx.author.mention) in voters:
-            return
-
-        query = ctx.origin_message.embeds[0].fields[0].value
-        up_vote_count = int(ctx.origin_message.embeds[0].fields[1].value)
-        up_vote_label = ctx.origin_message.components[0]["components"][0]["label"]
-        down_vote_count = int(ctx.origin_message.embeds[0].fields[2].value)
-        down_vote_label = ctx.origin_message.components[0]["components"][1]["label"]
-
-        if voters == "_":
-            voters = ""
-
-        voters += f" {str(ctx.author.mention)} "
-
-        if ctx.custom_id == "vote_up":
-            try:
-                up_vote_count += 1
-            except KeyError:
-                raise CommandError(f"Error modifying [{up_vote_label}]")
-        elif ctx.custom_id == "vote_down":
-            try:
-                down_vote_count += 1
-            except KeyError:
-                raise CommandError(f"Error modifying [{down_vote_label}]")
-
-        embed = build_embed(
-            title="Vote",
-            inline=False,
-            fields=[
-                ["Question", query.capitalize()],
-                [up_vote_label, str(up_vote_count)],
-                [down_vote_label, str(down_vote_count)],
-                ["Voters", voters]
-            ]
-        )
-        await ctx.edit_origin(content="", embed=embed, components=[create_actionrow(*buttons_voting)])
+        await ctx.send(content="", embed=embed, components=[create_actionrow(*buttons_voting)])
 
     @cog_ext.cog_slash(
         name="markov",
@@ -526,6 +500,57 @@ class TextCommands(commands.Cog):
         )
 
         await ctx.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_component(self, ctx: ComponentContext):
+        embed = ctx.origin_message.embeds[0]
+        voters = embed.fields[2].value
+        voter_name = f"{ctx.author.name}#{ctx.author.discriminator}"
+
+        key = embed.footer.text
+        if key not in ctx.component_id:  # Avoid over writing other votes
+            return
+
+        if voter_name in voters:
+            await ctx.send("You cannot vote mor than once!", hidden=True)
+            return
+
+        query = embed.title.split(": ")[1]
+        up_vote_count = int(embed.fields[0].value)
+        up_vote_label = ctx.origin_message.components[0]["components"][0]["label"]
+        down_vote_count = int(embed.fields[1].value)
+        down_vote_label = ctx.origin_message.components[0]["components"][1]["label"]
+
+        if voters == "_":
+            voters = voter_name
+        else:
+            voters += f", {voter_name}"
+
+        if ctx.component_id == f"{key}_a":
+            try:
+                up_vote_count += 1
+            except KeyError:
+                raise CommandError(f"Error modifying [{up_vote_label}]")
+        elif ctx.component_id == f"{key}_a":
+            try:
+                down_vote_count += 1
+            except KeyError:
+                raise CommandError(f"Error modifying [{down_vote_label}]")
+
+        embed = build_embed(
+            title=f"Question: {query.capitalize()}",
+            description="Times out after 60 seconds.",
+            inline=False,
+            fields=[
+                [up_vote_label, str(up_vote_count)],
+                [down_vote_label, str(down_vote_count)],
+                ["Voters", voters]
+            ],
+            footer=key
+        )
+        new_buttons = ctx.origin_message.components[0]["components"]
+
+        await ctx.edit_origin(content="", embed=embed, components=[create_actionrow(*new_buttons)])
 
 
 def setup(bot):
