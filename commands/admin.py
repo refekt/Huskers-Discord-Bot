@@ -601,20 +601,13 @@ class AdminCommands(commands.Cog):
             ).run()
         else:
             command_name = command_name.lower()
-            await Paginator(
-                bot=ctx.bot,
-                ctx=ctx,
-                pages=[
-                    command_embed(
-                        ctx.slash.commands[command_name],
-                        ctx.slash.commands[command_name].options
-                    )
-                ],
-                useSelect=False,
-                useIndexButton=False,
-                useButtons=False,
+            await ctx.send(
+                embed=command_embed(
+                    ctx.slash.commands[command_name],
+                    ctx.slash.commands[command_name].options
+                ),
                 hidden=True
-            ).run()
+            )
 
     @cog_ext.cog_slash(
         name="iowa",
