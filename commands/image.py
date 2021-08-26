@@ -181,7 +181,7 @@ class ImageCommands(commands.Cog):
             prevStyle=ButtonStyle.gray,
             lastStyle=ButtonStyle.gray,
             indexStyle=ButtonStyle.gray
-        )
+        ).run()
 
     @cog_ext.cog_slash(
         name="img",

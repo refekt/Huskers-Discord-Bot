@@ -418,8 +418,10 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     if ctx.subcommand_name is not None:
         sub_cmd = ctx.subcommand_name
     input = []
-    for item in ctx.data["options"]:
-        input.append(f"{item['name']} = {item['value']}")
+    # for item in ctx.data["options"]:
+    #     input.append(f"{item['name']} = {item['value']}")
+    for key, value in ctx.data.items():
+        input.append(f"{key} = {value}")
 
     message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
               f"\n" \

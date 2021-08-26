@@ -306,7 +306,6 @@ class AdminCommands(commands.Cog):
 
         await ctx.send(hidden=True, content="Done!")
 
-
     @cog_ext.cog_slash(
         name="bug",
         description="Submit a bug report for the bot",
@@ -597,8 +596,10 @@ class AdminCommands(commands.Cog):
                 ctx=ctx,
                 pages=pages,
                 useSelect=False,
-                useIndexButton=True
-            )
+                useIndexButton=True,
+                hidden=True,
+                dm=True
+            ).run()
         else:
             command_name = command_name.lower()
             await Paginator(
@@ -613,7 +614,7 @@ class AdminCommands(commands.Cog):
                 useSelect=False,
                 useIndexButton=False,
                 useButtons=False
-            )
+            ).run()
 
     @cog_ext.cog_slash(
         name="iowa",

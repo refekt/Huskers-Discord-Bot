@@ -156,7 +156,7 @@ class TextCommands(commands.Cog):
             prevStyle=ButtonStyle.gray,
             lastStyle=ButtonStyle.gray,
             indexStyle=ButtonStyle.gray
-        )
+        ).run()
 
     @cog_ext.cog_slash(
         name="vote",
@@ -503,6 +503,12 @@ class TextCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
+        try:# Avoid listening to events that don't apply to the vote command
+            if "Question" not in ctx.origin_message.embeds[0].title:
+                return
+        except:
+            return
+
         embed = ctx.origin_message.embeds[0]
         voters = embed.fields[2].value
         voter_name = f"{ctx.author.name}#{ctx.author.discriminator}"

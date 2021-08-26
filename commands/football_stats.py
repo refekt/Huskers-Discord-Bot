@@ -283,7 +283,7 @@ class FootballStatsCommands(commands.Cog):
             prevStyle=ButtonStyle.gray,
             lastStyle=ButtonStyle.gray,
             indexStyle=ButtonStyle.gray
-        )
+        ).run()
 
     @cog_ext.cog_slash(
         name="teamstats",
