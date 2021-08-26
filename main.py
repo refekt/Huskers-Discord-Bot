@@ -398,9 +398,9 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     else:
         embed = build_embed(
             title="Husker Bot Command Error",
-            description="An error occured with command processing",
+            description="An unknown error occured",
             fields=[
-                ["Error Message", f"{ex.args[0]}\n."]
+                ["Error Message", f"{ex.__class__}: {ex}"]
             ]
         )
 
@@ -421,8 +421,10 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
     for item in ctx.data["options"]:
         input.append(f"{item['name']} = {item['value']}")
 
-    message = f"{ctx.author.mention} ({ctx.author.display_name}) received an unknown error!\n" \
+    message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
+              f"\n" \
               f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {input}`\n" \
+              f"\n" \
               f"```\n{tback}\n```"
 
     try:
