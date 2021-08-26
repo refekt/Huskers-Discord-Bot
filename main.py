@@ -422,7 +422,7 @@ async def on_slash_command_error(ctx: SlashContext, ex: Exception):
         input.append(f"{item['name']} = {item['value']}")
 
     message = f"{ctx.author.mention} ({ctx.author.display_name}) received an unknown error!\n" \
-              f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {input}`" \
+              f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {input}`\n" \
               f"```\n{tback}\n```"
 
     try:
