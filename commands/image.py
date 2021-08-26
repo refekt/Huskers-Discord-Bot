@@ -112,6 +112,7 @@ class ImageCommands(commands.Cog):
 
         admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
         admin_delete = False
+
         if admin in ctx.author.roles:
             admin_delete = True
         elif not ctx.author_id == img_author:
