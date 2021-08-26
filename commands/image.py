@@ -103,8 +103,11 @@ class ImageCommands(commands.Cog):
     )
     async def _imgdelete(self, ctx: SlashContext, image_name: str):
         try:
-            img_author = int(retrieve_img(image_name)["source"])
+            img_author = int(retrieve_img(image_name)["author"])
         except TypeError:
+            raise UserError(f"Unable to locate image [{image_name}]")
+
+        if img_author is None:
             raise UserError(f"Unable to locate image [{image_name}]")
 
         admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
@@ -142,6 +145,7 @@ class ImageCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _imglist(self, ctx: SlashContext):
+        global all_imgs
         all_imgs = retrieve_all_img()
         pages = []
 
