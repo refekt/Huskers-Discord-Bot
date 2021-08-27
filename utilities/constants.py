@@ -12,21 +12,14 @@ from utilities.encryption import load_key, decrypt_return_data, decrypt, encrypt
 print(f"### Platform == {platform.platform()}")
 
 # Setting variables location
-# win_vars = "./variables.json"
-# variables = ""
-variables_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
-
+variables_path = None
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set")
     _is_debugging = True
-    # variables = os.getcwd() + "\\variables.json"
-    # load_dotenv(dotenv_path=variables)
+    variables_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
 elif "Linux" in platform.platform():
     print("### ~~~ Linux environment set")
-    # variables = "/home/botfrost/bot/variables.json"
-    # load_dotenv(dotenv_path=variables)
-else:
-    print(f"### ~~~ Unknown Platform: {platform.platform()}")
+    variables_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
 
 load_dotenv(dotenv_path=variables_path)
 

@@ -1,9 +1,15 @@
 import json
 import pathlib
-
+import platform
 from cryptography.fernet import Fernet
 
-key_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key")
+if "Windows" in platform.platform():
+    print("### ~~~ Windows encrption key set")
+    _is_debugging = True
+    key_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key")
+elif "Linux" in platform.platform():
+    print("### ~~~ Windows encrption key set")
+    key_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key")
 
 
 def write_key():
