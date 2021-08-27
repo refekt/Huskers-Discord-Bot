@@ -329,15 +329,18 @@ async def on_ready():
 
     changelog = open("changelog.md", "r")
     lines = changelog.readlines()
+    lines_str = ""
+
+    for line in lines:
+        lines_str += f"* {str(line)}"
 
     bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
     embed = build_embed(
         title="Husker Discord Bot",
-        description=f"I'm now online as {client.user.mention}! Check out /commands.",
         fields=[
-            ["Info", "I was restarted, but now I'm back!"],
+            ["Info", f"I was restarted, but now I'm back! I'm now online as {client.user.mention}! Check out /commands."],
             ["HOF/HOS Reaction Threshold", f"{threshold}"],
-            ["Changelog", "\n".join(lines)]
+            ["Changelog", lines_str]
         ]
     )
     await bot_spam.send(embed=embed)
