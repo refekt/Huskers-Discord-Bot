@@ -325,8 +325,6 @@ async def on_ready():
         f"### The bot is ready!"
     )
 
-
-
     if debugging():
         return
 
