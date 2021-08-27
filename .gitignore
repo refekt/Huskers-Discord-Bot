@@ -1,7 +1,8 @@
 .idea
 *.xml
-key.key
-mammals.json
-variables.json
+resources/key.key
+resources/mammals.json
+resources/variables.json
 *.pyc
 __pycache__
+.gitignore
