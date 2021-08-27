@@ -201,7 +201,7 @@ class ImageCommands(commands.Cog):
         image = retrieve_img(image_name)
 
         if not is_valid(image):
-            await ctx.send(f"Unable to find an image command [{image_name}]", hidden=True)
+            raise UserError(f"Unable to locate an image command named [{image_name}].")
 
         author = ctx.guild.get_member(user_id=int(image["author"]))
         if author is None:
