@@ -7,7 +7,7 @@ from discord.ext.commands import BucketType
 from discord_slash.utils.manage_commands import SlashCommandPermissionType, create_permission
 from dotenv import load_dotenv
 
-from encryption import load_key, decrypt_return_data, decrypt, encrypt
+from utilities.encryption import load_key, decrypt_return_data, decrypt, encrypt
 
 print(f"### Platform == {platform.platform()}")
 

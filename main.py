@@ -325,10 +325,7 @@ async def on_ready():
         f"### The bot is ready!"
     )
 
-    changelog = gitchangelog.changelog(
-        repository="https://github.com/refekt/Bot-Frost",
-        tag=None
-    )
+
 
     if debugging():
         return

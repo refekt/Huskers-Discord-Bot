@@ -8,7 +8,7 @@ def write_key():
     Generates a image_name and save it into a file
     """
     key = Fernet.generate_key()
-    with open("key.key", "wb") as key_file:
+    with open("../resources/key.key", "wb") as key_file:
         key_file.write(key)
 
 
@@ -16,7 +16,7 @@ def load_key():
     """
     Loads the image_name from the current directory named `image_name.image_name`
     """
-    return open("key.key", "rb").read()
+    return open("../resources/key.key", "rb").read()
 
 
 def encrypt(filename, key):
