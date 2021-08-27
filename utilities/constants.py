@@ -1,7 +1,7 @@
 import os
 import platform
 import sys
-
+import pathlib
 import pytz
 from discord.ext.commands import BucketType
 from discord_slash.utils.manage_commands import SlashCommandPermissionType, create_permission
@@ -12,22 +12,27 @@ from utilities.encryption import load_key, decrypt_return_data, decrypt, encrypt
 print(f"### Platform == {platform.platform()}")
 
 # Setting variables location
-win_vars = "./variables.json"
-variables = ""
+# win_vars = "./variables.json"
+# variables = ""
+variables_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
+
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set")
     _is_debugging = True
-    variables = os.getcwd() + "\\variables.json"
-    load_dotenv(dotenv_path=variables)
+    # variables = os.getcwd() + "\\variables.json"
+    # load_dotenv(dotenv_path=variables)
 elif "Linux" in platform.platform():
     print("### ~~~ Linux environment set")
-    variables = "/home/botfrost/bot/variables.json"
-    load_dotenv(dotenv_path=variables)
+    # variables = "/home/botfrost/bot/variables.json"
+    # load_dotenv(dotenv_path=variables)
 else:
     print(f"### ~~~ Unknown Platform: {platform.platform()}")
 
+load_dotenv(dotenv_path=variables_path)
+
 # Decrypt Env file
-env_file = variables
+# env_file = variables
+env_file = variables_path
 key = load_key()
 
 # Save decrypted file
@@ -195,7 +200,7 @@ US_STATES = [
     {"State": "New Mexico", "Abbrev": "N.M.", "Code": "NM"}, {"State": "New York", "Abbrev": "N.Y.", "Code": "NY"}, {"State": "North Carolina", "Abbrev": "N.C.", "Code": "NC"}, {"State": "North Dakota", "Abbrev": "N.D.", "Code": "ND"}, {"State": "Ohio", "Abbrev": "Ohio", "Code": "OH"}, {"State": "Oklahoma", "Abbrev": "Okla.", "Code": "OK"},
     {"State": "Oregon", "Abbrev": "Ore.", "Code": "OR"}, {"State": "Pennsylvania", "Abbrev": "Pa.", "Code": "PA"}, {"State": "Rhode Island", "Abbrev": "R.I.", "Code": "RI"}, {"State": "South Carolina", "Abbrev": "S.C.", "Code": "SC"}, {"State": "South Dakota", "Abbrev": "S.D.", "Code": "SD"}, {"State": "Tennessee", "Abbrev": "Tenn.", "Code": "TN"},
     {"State": "Texas", "Abbrev": "Tex.", "Code": "TX"}, {"State": "Utah", "Abbrev": "Utah", "Code": "UT"}, {"State": "Vermont", "Abbrev": "Vt.", "Code": "VT"}, {"State": "Virginia", "Abbrev": "Va.", "Code": "VA"}, {"State": "Washington", "Abbrev": "Wash.", "Code": "WA"}, {"State": "West Virginia", "Abbrev": "W.Va.", "Code": "WV"}, {"State": "Wisconsin", "Abbrev": "Wis.", "Code": "WI"},
-    {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},{"State": "Puerto Rico", "Code": "PR"}
+    {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"}, {"State": "Puerto Rico", "Code": "PR"}
 ]
 
 

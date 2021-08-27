@@ -1,6 +1,9 @@
 import json
+import pathlib
 
 from cryptography.fernet import Fernet
+
+key_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key")
 
 
 def write_key():
@@ -8,7 +11,7 @@ def write_key():
     Generates a image_name and save it into a file
     """
     key = Fernet.generate_key()
-    with open("../resources/key.key", "wb") as key_file:
+    with open(key_path, "wb") as key_file:
         key_file.write(key)
 
 
@@ -16,7 +19,7 @@ def load_key():
     """
     Loads the image_name from the current directory named `image_name.image_name`
     """
-    return open("../resources/key.key", "rb").read()
+    return open(key_path, "rb").read()
 
 
 def encrypt(filename, key):

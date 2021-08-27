@@ -1,4 +1,3 @@
-from gitchangelog import gitchangelog
 import asyncio
 import pathlib
 import random
@@ -328,6 +327,9 @@ async def on_ready():
     if debugging():
         return
 
+    changelog = open("changelog.md", "r")
+    lines = changelog.readlines()
+
     bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
     embed = build_embed(
         title="Husker Discord Bot",
@@ -335,7 +337,7 @@ async def on_ready():
         fields=[
             ["Info", "I was restarted, but now I'm back!"],
             ["HOF/HOS Reaction Threshold", f"{threshold}"],
-            ["Changelog", "TBD"]
+            ["Changelog", "\n".join(lines)]
         ]
     )
     await bot_spam.send(embed=embed)
