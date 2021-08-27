@@ -6,9 +6,9 @@ from discord_slash.context import SlashContext
 from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 
+from utilities.constants import CommandError, UserError
 from utilities.constants import DT_OBJ_FORMAT
 from utilities.constants import ROLE_ADMIN_PROD
-from utilities.constants import CommandError, UserError
 from utilities.constants import guild_id_list
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL
@@ -69,6 +69,13 @@ for img in all_imgs:
     )
 
 
+def is_valid(image):
+    if image is None:
+        return False
+    else:
+        return True
+
+
 class ImageCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -79,6 +86,11 @@ class ImageCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _imgcreate(self, ctx: SlashContext, image_name: str, image_url: str):
+        if is_valid(retrieve_img(image_name)):
+            raise UserError("An image with that name already exists. Try again!")
+
+        image_name = image_name.replace(" ", "")
+
         create_img(ctx.author_id, image_name, image_url)
 
         embed = build_embed(
@@ -89,12 +101,6 @@ class ImageCommands(commands.Cog):
             ]
         )
         await ctx.send(embed=embed)
-
-    def is_valid(self, image):
-        if image is None:
-            return False
-        else:
-            return True
 
     @cog_ext.cog_slash(
         name="imgdelete",
@@ -107,7 +113,7 @@ class ImageCommands(commands.Cog):
         except TypeError:
             raise UserError(f"Unable to locate image [{image_name}]")
 
-        if img_author is None:
+        if not is_valid(img_author):
             raise UserError(f"Unable to locate image [{image_name}]")
 
         admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
@@ -190,27 +196,20 @@ class ImageCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _img(self, ctx: SlashContext, image_name: str):
+        # TODO Attempt to download image files upon creation in a way that Discord plays nicely
+
         image = retrieve_img(image_name)
 
-        if not self.is_valid(image):
+        if not is_valid(image):
             await ctx.send(f"Unable to find an image command [{image_name}]", hidden=True)
 
         author = ctx.guild.get_member(user_id=int(image["author"]))
         if author is None:
             author = "Unknown"
 
-        if ".gifv" in image["img_url"]:
-            gifv = True
-        else:
-            gifv = False
-
-        embed = build_embed(
-            title=image["img_name"],
-            image=image["img_url"],
-            type="gifv" if gifv else "image",
-            description=f"This command was created by [{author.mention if type(author) == discord.Member else author}]."
+        await ctx.send(
+            content=f"{image['img_url']}"
         )
-        await ctx.send(embed=embed)
 
 
 def setup(bot):
