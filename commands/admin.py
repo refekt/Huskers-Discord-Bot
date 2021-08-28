@@ -376,7 +376,7 @@ class AdminCommands(commands.Cog):
             return
 
         embed = build_embed(
-            title="Food Roles",
+            title="Hype Roles",
             inline=False,
             fields=[
                 ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
@@ -501,7 +501,7 @@ class AdminCommands(commands.Cog):
             raise CommandError("Unable to join any of the selected roles!")
 
         embed = build_embed(
-            title="Food Roles",
+            title="Culture Roles",
             inline=False,
             fields=[
                 ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
