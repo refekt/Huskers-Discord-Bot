@@ -384,6 +384,9 @@ class AdminCommands(commands.Cog):
             ]
         )
 
+        temp = await ctx.send(content="...")
+        await temp.delete()
+
         await ctx.send(embed=embed, hidden=True)
 
         print("### Roles: Hype Squad")
@@ -447,6 +450,10 @@ class AdminCommands(commands.Cog):
                 ["Roles", joined_roles]
             ]
         )
+
+        temp = await ctx.send(content="...")
+        await temp.delete()
+
         await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_subcommand(
@@ -508,6 +515,10 @@ class AdminCommands(commands.Cog):
                 ["Roles", joined_roles]
             ]
         )
+
+        temp = await ctx.send(content="...")
+        await temp.delete()
+
         await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_subcommand(
