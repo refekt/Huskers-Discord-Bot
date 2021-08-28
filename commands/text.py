@@ -518,7 +518,7 @@ class TextCommands(commands.Cog):
             return
 
         if voter_name in voters:
-            await ctx.send("You cannot vote mor than once!", hidden=True)
+            await ctx.send("You cannot vote more than once!", hidden=True)
             return
 
         query = embed.title.split(": ")[1]
@@ -537,7 +537,7 @@ class TextCommands(commands.Cog):
                 up_vote_count += 1
             except KeyError:
                 raise CommandError(f"Error modifying [{up_vote_label}]")
-        elif ctx.component_id == f"{key}_a":
+        elif ctx.component_id == f"{key}_b":
             try:
                 down_vote_count += 1
             except KeyError:
