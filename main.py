@@ -1,5 +1,6 @@
 import asyncio
 import pathlib
+import platform
 import random
 import sys
 import traceback
@@ -327,12 +328,24 @@ async def on_ready():
     if debugging():
         return
 
-    changelog = open("changelog.md", "r")
-    lines = changelog.readlines()
-    lines_str = ""
+    try:
+        changelog_path = None
 
-    for line in lines:
-        lines_str += f"* {str(line)}"
+        if "Windows" in platform.platform():
+            print("### ~~~ Windows changelog")
+            changelog_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
+        elif "Linux" in platform.platform():
+            print("### ~~~ Linux changelog")
+            changelog_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
+
+        changelog = open(changelog_path, "r")
+        lines = changelog.readlines()
+        lines_str = ""
+
+        for line in lines:
+            lines_str += f"* {str(line)}"
+    except OSError:
+        lines_str = "Error loading changelog."
 
     bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
     embed = build_embed(
