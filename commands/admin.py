@@ -337,13 +337,13 @@ class AdminCommands(commands.Cog):
             description="Selecting a squad assigns you a role",
             inline=False,
             fields=[
-                ["📈 Max Hype", "Squad info"],
-                ["⚠ Some Hype", "Squad info"],
-                ["⛔ No Hype", "Squad info"]
+                ["📈 Max Hype", "Believe Nebraska will be great always"],
+                ["⚠ Some Hype", "Little hype or uncertain of Nebraska's performance"],
+                ["⛔ No Hype", "Nebraska will not be good and I expect this"]
             ]
         )
 
-        await ctx.send(embed=embed, hidden=True, components=[hype_action_row])
+        await ctx.send(embed=embed, components=[hype_action_row])
 
     @cog_ext.cog_component(components=buttons_roles_hype)
     async def process_roles_hype(self, ctx: ComponentContext):
@@ -379,12 +379,12 @@ class AdminCommands(commands.Cog):
             title="Food Roles",
             inline=False,
             fields=[
-                ["Welcome!", f"[{ctx.author.mention}] has joined the following food roles"],
+                ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
                 ["Roles", chosen_hype]
             ]
         )
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=True)
 
         print("### Roles: Hype Squad")
 
@@ -403,17 +403,17 @@ class AdminCommands(commands.Cog):
             description="Assign yourself a role",
             inline=False,
             fields=[
-                ["🥔 Potato Gang", "Info"],
-                ["💚 Asparagang", "Info"],
-                ["🥪 Runza", "Info"],
-                ["🌯 Qdoba's Witness", "Info"],
-                ["🥜 Aldi's Nuts", "Info"],
+                ["🥔 Potato Gang", "Potatoes are better than asparagus"],
+                ["💚 Asparagang", "Asparagus are better than potatoes"],
+                ["🥪 Runza", "r/unza"],
+                ["🌯 Qdoba's Witness", "Qdoba is better than Chipotle"],
+                ["🥜 Aldi's Nuts", "Aldi Super Fan"],
             ]
         )
 
         food_action_row = create_actionrow(select_roles_food)
 
-        await ctx.send(embed=embed, hidden=True, components=[food_action_row])
+        await ctx.send(embed=embed, components=[food_action_row])
 
     @cog_ext.cog_component(components=select_roles_food)
     async def process_roles_food(self, ctx: ComponentContext):
@@ -443,11 +443,11 @@ class AdminCommands(commands.Cog):
             title="Food Roles",
             inline=False,
             fields=[
-                ["Welcome!", f"[{ctx.author.mention}] has joined the following food roles"],
+                ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
                 ["Roles", joined_roles]
             ]
         )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_subcommand(
         base="roles",
@@ -464,17 +464,17 @@ class AdminCommands(commands.Cog):
             description="Assign yourself a role",
             inline=False,
             fields=[
-                ["😹 Meme team", "Info"],
-                ["♣ He Man Isms Hater Club", "Info"],
-                ["🧀 Packer Backer", "Info"],
-                ["📱 Pixel Gang", "Info"],
-                ["🎧 Airpod Gang", "Info"],
+                ["😹 Meme team", "Memes are life"],
+                ["♣ He Man Isms Hater Club", "Idontbelieveinisms sucks"],
+                ["🧀 Packer Backer", "Green Bay fan"],
+                ["📱 Pixel Gang", "Android fan"],
+                ["🎧 Airpod Gang", "Apple fan"],
             ]
         )
 
         culture_action_row = create_actionrow(select_roles_culture)
 
-        await ctx.send(embed=embed, hidden=True, components=[culture_action_row])
+        await ctx.send(embed=embed, components=[culture_action_row])
 
     @cog_ext.cog_component(components=select_roles_culture)
     async def process_roles_culture(self, ctx: ComponentContext):
@@ -504,11 +504,11 @@ class AdminCommands(commands.Cog):
             title="Food Roles",
             inline=False,
             fields=[
-                ["Welcome!", f"[{ctx.author.mention}] has joined the following culture roles"],
+                ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
                 ["Roles", joined_roles]
             ]
         )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_subcommand(
         base="gameday",
