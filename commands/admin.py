@@ -24,6 +24,7 @@ from utilities.constants import (
     CAT_GENERAL,
     CHAN_BANNED,
     CHAN_GENERAL,
+    CHAN_HYPE_GROUP,
     CHAN_IOWA,
     CHAN_SCOTT,
     CHAN_WAR_ROOM,
@@ -177,6 +178,7 @@ select_roles_culture = create_select(
 
 async def process_gameday(mode: bool, guild: discord.Guild):
     gameday_category = guild.get_channel(CAT_GAMEDAY)
+    general_category = guild.get_channel(CAT_GENERAL)
     everyone = guild.get_role(ROLE_EVERYONE_PROD)
 
     print(f"### ~~~ Creating permissions to be [{mode}]")
@@ -186,12 +188,30 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     perms_text.send_messages = mode
     perms_text.read_messages = mode
 
+    perms_text_opposite = discord.PermissionOverwrite()
+    perms_text_opposite.send_messages = not mode
+
     perms_voice = discord.PermissionOverwrite()
     perms_voice.view_channel = mode
     perms_voice.connect = mode
     perms_voice.speak = mode
 
     print("### ~~~ Permissions created")
+
+    for channel in general_category.channels:
+
+        if channel.id in CHAN_HYPE_GROUP:
+            continue
+
+        try:
+            print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{not mode}]")
+
+            if channel.type == discord.ChannelType.text:
+                await channel.set_permissions(everyone, overwrite=perms_text_opposite)
+                print(f"### ~~~ Changed permissions for [{channel}] to [{not mode}]")
+        except:
+            print(f"### ~~~ Unable to change permissions for [{channel}] to [{not mode}]")
+            continue
 
     for channel in gameday_category.channels:
         try:
@@ -202,6 +222,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
             elif channel.type == discord.ChannelType.voice:
                 await channel.set_permissions(everyone, overwrite=perms_voice)
             else:
+                print(f"### ~~~ Unable to change permissions for [{channel}] to [{mode}]")
                 continue
             print(f"### ~~~ Changed permissions for [{channel}] to [{mode}]")
         except discord.errors.Forbidden:
