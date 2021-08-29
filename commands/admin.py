@@ -1,6 +1,9 @@
 import asyncio
 import platform
-from datetime import datetime, timedelta
+from datetime import (
+    datetime,
+    timedelta
+)
 
 import discord
 from dinteractions_Paginator import Paginator
@@ -8,18 +11,49 @@ from discord.ext import commands
 from discord_slash import ButtonStyle, cog_ext
 from discord_slash.context import SlashContext, ComponentContext
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils.manage_components import create_button, create_actionrow, create_select_option, create_select
+from discord_slash.utils.manage_components import (
+    create_actionrow,
+    create_button,
+    create_select,
+    create_select_option
+)
 
-from utilities.constants import BOT_FOOTER_SECRET
-from utilities.constants import CHAN_BANNED, CHAN_GENERAL, CHAN_WAR_ROOM, CHAN_SCOTT
-from utilities.constants import ROLE_HYPE_MAX, ROLE_HYPE_SOME, ROLE_HYPE_NO, ROLE_MEME, ROLE_ISMS, ROLE_PACKER, ROLE_PIXEL
-from utilities.constants import ROLE_POTATO, ROLE_ASPARAGUS, ROLE_RUNZA, ROLE_ALDIS, ROLE_QDOBA, CAT_GAMEDAY, ROLE_EVERYONE_PROD
-from utilities.constants import ROLE_TIME_OUT, CHAN_IOWA
-from utilities.constants import admin_mod_perms, admin_perms
-from utilities.constants import CommandError, UserError
-from utilities.constants import guild_id_list
+from utilities.constants import (
+    BOT_FOOTER_SECRET,
+    CAT_GAMEDAY,
+    CAT_GENERAL,
+    CHAN_BANNED,
+    CHAN_GENERAL,
+    CHAN_IOWA,
+    CHAN_SCOTT,
+    CHAN_WAR_ROOM,
+    CommandError,
+    ROLE_ALDIS,
+    ROLE_ASPARAGUS,
+    ROLE_EVERYONE_PROD,
+    ROLE_HYPE_MAX,
+    ROLE_HYPE_NO,
+    ROLE_HYPE_SOME,
+    ROLE_ISMS,
+    ROLE_MEME,
+    ROLE_PACKER,
+    ROLE_PIXEL,
+    ROLE_POTATO,
+    ROLE_QDOBA,
+    ROLE_RUNZA,
+    ROLE_TIME_OUT,
+    UserError,
+    admin_mod_perms,
+    admin_perms,
+    guild_id_list
+)
 from utilities.embed import build_embed as build_embed
-from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
+from utilities.mysql import (
+    Process_MySQL,
+    sqlInsertIowa,
+    sqlRemoveIowa,
+    sqlRetrieveIowa
+)
 
 buttons_roles_hype = [
     create_button(
@@ -201,7 +235,7 @@ class AdminCommands(commands.Cog):
                     ["Latency", f"{self.bot.latency * 1000:.2f} ms"],
                     ["Username", self.bot.user.mention],
                     ["Birthday", f"I was born on {self.bot.user.created_at}"],
-                    ["Feeling generous?", f"Check out `{self.bot.command_prefix}donate` to help out the production and upkeep of the bot."]
+                    ["Feeling generous?", f"Check out `/donate` to help out the production and upkeep of the bot."]
                 ]
             )
         )
@@ -607,8 +641,7 @@ class AdminCommands(commands.Cog):
                 ctx=ctx,
                 pages=pages,
                 useSelect=False,
-                useIndexButton=True,
-                hidden=True
+                useIndexButton=True
             ).run()
         else:
             command_name = command_name.lower()
