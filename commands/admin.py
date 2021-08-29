@@ -234,7 +234,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
 
 
 class AdminCommands(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: discord.Client):
         self.bot = bot
 
     @cog_ext.cog_slash(
@@ -263,13 +263,12 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_slash(
         name="quit",
-        description="Admin only: Turn off the bot",
+        description="Admin or mod only: Turn off the bot",
         guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
     async def _uit(self, ctx: SlashContext):
-        await ctx.send("Good bye world! 😭")
-        print(f"User `{ctx.author}` turned off the bot.")
+        await ctx.send(f"Good bye world! 😭 I was turned off by [{ctx.author}].")
         await self.bot.logout()
 
     @cog_ext.cog_slash(
@@ -370,7 +369,21 @@ class AdminCommands(commands.Cog):
         embed = build_embed(
             title=f"Bug Reporter",
             fields=[
-                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=&labels=bug&template=bug_report.md&title="]
+                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=bug&template=bug_report.md&title=%5BBUG%5D+"]
+            ]
+        )
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="request",
+        description="Submit a feature request report for the bot",
+        guild_ids=guild_id_list()
+    )
+    async def _bug(self, ctx: SlashContext):
+        embed = build_embed(
+            title=f"Feature Request",
+            fields=[
+                ["Request new features", "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=request&template=feature_request.md&title=%5BREQUEST%5D+"]
             ]
         )
         await ctx.send(embed=embed)

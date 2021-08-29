@@ -4,14 +4,26 @@ from discord.ext import commands
 from discord_slash import ButtonStyle, ComponentContext
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
+from discord_slash.utils.manage_components import (
+    create_actionrow,
+    create_button,
+    wait_for_component
+)
 
-from objects.FAPing import initiate_fap, individual_predictions
+from objects.FAPing import (
+    individual_predictions,
+    initiate_fap
+)
 from objects.Recruits import FootballRecruit
-from utilities.constants import CROOT_SEARCH_LIMIT
-from utilities.constants import guild_id_list
-from utilities.constants import UserError
-from utilities.embed import build_embed, build_recruit_embed
+from utilities.constants import (
+    CROOT_SEARCH_LIMIT,
+    UserError,
+    guild_id_list
+)
+from utilities.embed import (
+    build_embed,
+    build_recruit_embed
+)
 
 fap_buttons = [
     create_button(
@@ -29,8 +41,8 @@ fap_buttons = [
 ]
 fap_action_row = create_actionrow(*fap_buttons)
 
-croot_search = None
-fap_search = None
+croot_search = []
+fap_search = []
 search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4}
 
 search_buttons = [
@@ -74,7 +86,7 @@ def search_result_info(new_search) -> str:
     return result_info
 
 
-async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit=False):
+async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit: bool = False):
     embed = build_recruit_embed(target_recruit)
 
     if not target_recruit.committed == "Enrolled":
@@ -220,6 +232,17 @@ class RecruitCog(commands.Cog):
 
         await ctx.send(embed=embed, components=[action_row], hidden=True)
 
+    @cog_ext.cog_subcommand(
+        name="leaderboard",
+        description="The FAP leaderboard",
+        base="fap",
+        base_description="Frost approved predictions",
+        guild_ids=guild_id_list(),
+    )
+    async def _fap_leaderboard(self, ctx: SlashContext):
+        # TODO All of this.
+        await ctx.send("Work in progress!", hidden=True)
+
     @cog_ext.cog_component(components=search_buttons)
     async def process_croot_bot(self, ctx: ComponentContext):
         button_to_index = {"result_1": 0, "result_2": 1, "result_3": 2, "result_4": 3, "result_5": 4}
@@ -244,18 +267,6 @@ class RecruitCog(commands.Cog):
             )
 
             del fap_search
-
-    # @cog_ext.cog_component(components=fap_searchbuttons)
-    # async def process_fap_predict(self, ctx: ComponentContext):
-    #     button_to_index = {"result_1": 0, "result_2": 1, "result_3": 2, "result_4": 3, "result_5": 4}
-    #     print(f"### ~~~ Button [{ctx.custom_id}] was pressed")
-    #     global croot_search
-    #     await final_send_embed_fap_loop(
-    #         ctx=ctx,
-    #         target_recruit=fap_search[button_to_index[ctx.custom_id]],
-    #         bot=self.bot,
-    #         edit=True
-    #     )
 
 
 def setup(bot):
