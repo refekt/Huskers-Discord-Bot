@@ -146,6 +146,11 @@ select_roles_food = create_select(
             label="Aldi's Nuts",
             value=str(ROLE_ALDIS),
             emoji="🥜",
+        ),
+        create_select_option(
+            label="Remove Food Roles",
+            value="roles_food_remove",
+            emoji="🕳"
         )
     ],
     placeholder="Choose your food roles",
@@ -180,6 +185,11 @@ select_roles_culture = create_select(
             label="Airpod Gang",
             value=str(ROLE_ALDIS),
             emoji="🎧",
+        ),
+        create_select_option(
+            label="Remove Food Roles",
+            value="roles_culture_remove",
+            emoji="🕳"
         )
     ],
     placeholder="Choose your culture roles",
@@ -510,6 +520,7 @@ class AdminCommands(commands.Cog):
                 ["🥪 Runza", "r/unza"],
                 ["🌯 Qdoba's Witness", "Qdoba is better than Chipotle"],
                 ["🥜 Aldi's Nuts", "Aldi Super Fan"],
+                ["🕳 None", "Remove food roles"]
             ]
         )
 
@@ -521,19 +532,29 @@ class AdminCommands(commands.Cog):
     async def process_roles_food(self, ctx: ComponentContext):
         roles_food = {}
         for selection in select_roles_food["options"]:
+            if selection["value"] == "roles_food_remove":
+                continue
+
             roles_food[selection["value"]] = ctx.guild.get_role(role_id=int(selection["value"]))
 
         # Remove old food roles
         for role in roles_food:
             await ctx.author.remove_roles(roles_food[role], reason="Food roles")
 
-        # Add selected roles
+        if "roles_food_remove" in ctx.selected_options:
+            embed = build_embed(
+                title="Food Roles",
+                description="You have removed all food roles."
+            )
+            await ctx.send(embed=embed, hidden=True)
+            return
+
         joined_roles = ""
 
         for selected in ctx.selected_options:
             try:
+                # Add selected roles
                 await ctx.author.add_roles(roles_food[selected], reason="Food roles")
-
                 joined_roles += roles_food[selected].mention + "\n"
             except:
                 continue
@@ -575,6 +596,7 @@ class AdminCommands(commands.Cog):
                 ["🧀 Packer Backer", "Green Bay fan"],
                 ["📱 Pixel Gang", "Android fan"],
                 ["🎧 Airpod Gang", "Apple fan"],
+                ["🕳 None", "Remove food roles"]
             ]
         )
 
@@ -586,11 +608,22 @@ class AdminCommands(commands.Cog):
     async def process_roles_culture(self, ctx: ComponentContext):
         roles_culture = {}
         for selection in select_roles_culture["options"]:
+
+            if selection["value"] == "roles_culture_remove":
+                continue
             roles_culture[selection["value"]] = ctx.guild.get_role(role_id=int(selection["value"]))
 
         # Remove old food roles
         for role in roles_culture:
             await ctx.author.remove_roles(roles_culture[role], reason="Culture roles")
+
+        if "roles_culture_remove" in ctx.selected_options:
+            embed = build_embed(
+                title="Culture Roles",
+                description="You have removed all culture roles."
+            )
+            await ctx.send(embed=embed, hidden=True)
+            return
 
         # Add selected roles
         joined_roles = ""
