@@ -42,6 +42,7 @@ from utilities.constants import (
     ROLE_POTATO,
     ROLE_QDOBA,
     ROLE_RUNZA,
+    ROLE_TARMAC,
     ROLE_TIME_OUT,
     UserError,
     admin_mod_perms,
@@ -74,6 +75,12 @@ buttons_roles_hype = [
         label="No",
         custom_id="role_hype_no",
         emoji="⛔"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="No",
+        custom_id="role_hype_tarmac",
+        emoji="🛫"
     )
 ]
 
@@ -407,7 +414,8 @@ class AdminCommands(commands.Cog):
             fields=[
                 ["📈 Max Hype", "Believe Nebraska will be great always"],
                 ["⚠ Some Hype", "Little hype or uncertain of Nebraska's performance"],
-                ["⛔ No Hype", "Nebraska will not be good and I expect this"]
+                ["⛔ No Hype", "Nebraska will not be good and I expect this"],
+                ["🛫 Tarmac Gang", "FROST MUST BE LEFT ON THE TARMAC"]
             ]
         )
 
@@ -422,6 +430,7 @@ class AdminCommands(commands.Cog):
         hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
         hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
         hype_no = ctx.guild.get_role(ROLE_HYPE_NO)
+        hype_tarmac = ctx.guild.get_role(ROLE_TARMAC)
 
         if any([hype_max, hype_some, hype_no]) is None:
             raise CommandError("Unable to locate role!")
@@ -440,6 +449,10 @@ class AdminCommands(commands.Cog):
             await ctx.author.add_roles(hype_no, reason="Hype squad")
             await ctx.author.remove_roles(hype_some, hype_max, reason="Hype squad")
             chosen_hype = hype_no.mention
+        elif ctx.custom_id == "role_hype_tarmac":
+            await ctx.author.add_roles(hype_tarmac, reason="Hype squad")
+            await ctx.author.remove_roles(hype_no, hype_some, hype_max, reason="Hype squad")
+            chosen_hype = hype_tarmac.mention
         else:
             return
 
