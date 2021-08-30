@@ -81,6 +81,12 @@ buttons_roles_hype = [
         label="Tarmac",
         custom_id="role_hype_tarmac",
         emoji="🛫"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Remove",
+        custom_id="role_hype_none",
+        emoji="🕳"
     )
 ]
 
@@ -415,7 +421,8 @@ class AdminCommands(commands.Cog):
                 ["📈 Max Hype", "Believe Nebraska will be great always"],
                 ["⚠ Some Hype", "Little hype or uncertain of Nebraska's performance"],
                 ["⛔ No Hype", "Nebraska will not be good and I expect this"],
-                ["🛫 Tarmac Gang", "FROST MUST BE LEFT ON THE TARMAC"]
+                ["🛫 Tarmac Gang", "FROST MUST BE LEFT ON THE TARMAC"],
+                ["🕳 None", "Remove hype roles"]
             ]
         )
 
@@ -453,6 +460,17 @@ class AdminCommands(commands.Cog):
             await ctx.author.add_roles(hype_tarmac, reason="Hype squad")
             await ctx.author.remove_roles(hype_no, hype_some, hype_max, reason="Hype squad")
             chosen_hype = hype_tarmac.mention
+        elif ctx.custom_id == "role_hype_none":
+            temp = await ctx.send(content="...")
+            await temp.delete()
+
+            await ctx.author.remove_roles(hype_tarmac, hype_no, hype_some, hype_max, reason="Hype squad")
+            embed = build_embed(
+                title="Hype Roles",
+                description=f"You have removed all hype roles."
+            )
+            await ctx.send(embed=embed, hidden=True)
+            return
         else:
             return
 
