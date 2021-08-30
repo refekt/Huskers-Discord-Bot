@@ -78,7 +78,7 @@ buttons_roles_hype = [
     ),
     create_button(
         style=ButtonStyle.gray,
-        label="No",
+        label="Tarmac",
         custom_id="role_hype_tarmac",
         emoji="🛫"
     )
