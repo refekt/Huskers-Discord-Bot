@@ -1,19 +1,37 @@
 import calendar
 from datetime import datetime
-from cfbd import BettingApi, ApiClient, Configuration, GamesApi
+
+from cfbd import (
+    ApiClient,
+    BettingApi,
+    Configuration,
+    GamesApi
+)
 from cfbd.rest import ApiException
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+from discord_slash import (
+    cog_ext,
+    SlashContext
+)
 from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 
 from objects.Schedule import HuskerSchedule
-from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
-from utilities.constants import TZ, CFBD_KEY
-from utilities.constants import CommandError
-from utilities.constants import guild_id_list
-from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
+from objects.Winsipedia import (
+    CompareWinsipedia,
+    TeamStatsWinsipediaTeam
+)
+from utilities.constants import (
+    CFBD_KEY,
+    TZ,
+    guild_id_list
+)
+from utilities.embed import (
+    build_countdown_embed,
+    build_embed,
+    return_schedule_embeds
+)
 
 cfbd_config = Configuration()
 cfbd_config.api_key['Authorization'] = CFBD_KEY
