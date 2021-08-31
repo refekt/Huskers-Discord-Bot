@@ -292,7 +292,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list(),
         permissions=admin_mod_perms
     )
-    async def _uit(self, ctx: SlashContext):
+    async def _quit(self, ctx: SlashContext):
         await ctx.send(f"Good bye world! 😭 I was turned off by [{ctx.author}].")
         await self.bot.logout()
 
