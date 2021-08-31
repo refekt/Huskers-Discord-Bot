@@ -386,30 +386,56 @@ class AdminCommands(commands.Cog):
         await ctx.send(hidden=True, content="Done!")
 
     @cog_ext.cog_slash(
+        name="submit",
+        description="Report something on GitHub",
+        guild_ids=guild_id_list(),
+        # options=[
+        #     create_option(
+        #         name="bug",
+        #         description="Submit a bug report",
+        #         option_type=1,
+        #         required=False
+        #     ),
+        #     create_option(
+        #         name="feature",
+        #         description="Submit feature request",
+        #         option_type=1,
+        #         required=False
+        #     )
+        # ]
+    )
+    async def _submit(self, ctx: SlashContext):
+        pass
+
+    @cog_ext.cog_subcommand(
+        base="submit",
         name="bug",
-        description="Submit a bug report for the bot",
+        description="Submit a bug report",
         guild_ids=guild_id_list()
     )
-    async def _bug(self, ctx: SlashContext):
+    async def _submit_bug(self, ctx: SlashContext):
         embed = build_embed(
             title=f"Bug Reporter",
-            fields=[
-                ["Report Bugs", "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=bug&template=bug_report.md&title=%5BBUG%5D+"]
-            ]
+            description="[Submit a bug report here](https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=bug&template=bug_report.md&title=%5BBUG%5D+)",
+            author=None,
+            image=None,
+            thumbnail=None
         )
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(
-        name="request",
-        description="Submit a feature request report for the bot",
+    @cog_ext.cog_subcommand(
+        base="submit",
+        name="feature",
+        description="Submit feature request",
         guild_ids=guild_id_list()
     )
-    async def _bug(self, ctx: SlashContext):
+    async def _submit_feature(self, ctx: SlashContext):
         embed = build_embed(
             title=f"Feature Request",
-            fields=[
-                ["Request new features", "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=request&template=feature_request.md&title=%5BREQUEST%5D+"]
-            ]
+            description="[Submit a feature request here](https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=request&template=feature_request.md&title=%5BREQUEST%5D+)",
+            author=None,
+            image=None,
+            thumbnail=None
         )
         await ctx.send(embed=embed)
 
