@@ -38,11 +38,12 @@ def build_embed(**kwargs):
             color=0xD00000
         )
 
-    embed.set_author(
-        name=BOT_DISPLAY_NAME,
-        url=BOT_GITHUB_URL,
-        icon_url=BOT_ICON_URL
-    )
+    if kwargs.get("author", False) is not None:
+        embed.set_author(
+            name=BOT_DISPLAY_NAME,
+            url=BOT_GITHUB_URL,
+            icon_url=BOT_ICON_URL
+        )
 
     if kwargs.get("description", False):
         embed.description = kwargs.get("description")[:desc_limit]
@@ -65,16 +66,18 @@ def build_embed(**kwargs):
         )
 
     if kwargs.get("image", False) and validators.url(kwargs.get("image")):
-        embed.set_image(url=kwargs["image"])
+        if kwargs.get("image") is not None:
+            embed.set_image(url=kwargs["image"])
 
-    if kwargs.get("thumbnail", False):  # and validators.url(kwargs.get("thumbnail")):
+    if kwargs.get("thumbnail", False):
         embed.set_thumbnail(
             url=kwargs.get("thumbnail")
         )
     else:
-        embed.set_thumbnail(
-            url=BOT_THUMBNAIL_URL
-        )
+        if kwargs.get("thumbnail") is not None:
+            embed.set_thumbnail(
+                url=BOT_THUMBNAIL_URL
+            )
 
     if kwargs.get("fields", False):
         for index, field in enumerate(kwargs["fields"]):

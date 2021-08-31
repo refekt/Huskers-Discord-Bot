@@ -15,7 +15,8 @@ from discord_slash.utils.manage_components import (
     create_actionrow,
     create_button,
     create_select,
-    create_select_option
+    create_select_option,
+    spread_to_rows
 )
 
 from utilities.constants import (
@@ -30,6 +31,7 @@ from utilities.constants import (
     CHAN_WAR_ROOM,
     CommandError,
     ROLE_ALDIS,
+    ROLE_AIRPOD,
     ROLE_ASPARAGUS,
     ROLE_EVERYONE_PROD,
     ROLE_HYPE_MAX,
@@ -56,39 +58,6 @@ from utilities.mysql import (
     sqlRemoveIowa,
     sqlRetrieveIowa
 )
-
-buttons_roles_hype = [
-    create_button(
-        style=ButtonStyle.gray,
-        label="Max",
-        custom_id="role_hype_max",
-        emoji="📈"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Some",
-        custom_id="role_hype_some",
-        emoji="⚠"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="No",
-        custom_id="role_hype_no",
-        emoji="⛔"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Tarmac",
-        custom_id="role_hype_tarmac",
-        emoji="🛫"
-    ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Remove",
-        custom_id="role_hype_none",
-        emoji="🕳"
-    )
-]
 
 console_buttons = [
     create_button(
@@ -120,83 +89,116 @@ console_chan_select = create_select(
     placeholder="What channel do you want to send to?"
 )
 
-select_roles_food = create_select(
-    options=[
-        create_select_option(
-            label="Potato Gang",
-            value=str(ROLE_POTATO),
-            emoji="🥔",
-        ),
-        create_select_option(
-            label="Asparagang",
-            value=str(ROLE_ASPARAGUS),
-            emoji="💚",
-        ),
-        create_select_option(
-            label="Runza",
-            value=str(ROLE_RUNZA),
-            emoji="🥪",
-        ),
-        create_select_option(
-            label="Qdoba's Witness",
-            value=str(ROLE_QDOBA),
-            emoji="🌯",
-        ),
-        create_select_option(
-            label="Aldi's Nuts",
-            value=str(ROLE_ALDIS),
-            emoji="🥜",
-        ),
-        create_select_option(
-            label="Remove Food Roles",
-            value="roles_food_remove",
-            emoji="🕳"
-        )
-    ],
-    placeholder="Choose your food roles",
-    min_values=1,
-    max_values=5,
-    custom_id="select_roles_food"
-)
+buttons_roles_hype = [
+    create_button(
+        style=ButtonStyle.gray,
+        label="Max",
+        custom_id="role_hype_max",
+        emoji="📈"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Some",
+        custom_id="role_hype_some",
+        emoji="⚠"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="No",
+        custom_id="role_hype_no",
+        emoji="⛔"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Tarmac",
+        custom_id="role_hype_tarmac",
+        emoji="🛫"
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Remove Hype Roles",
+        custom_id="role_hype_none",
+        emoji="🕳"
+    )
+]
 
-select_roles_culture = create_select(
-    options=[
-        create_select_option(
-            label="Meme Team",
-            value=str(ROLE_MEME),
-            emoji="😹",
-        ),
-        create_select_option(
-            label="He Man Isms Hater Club",
-            value=str(ROLE_ISMS),
-            emoji="♣",
-        ),
-        create_select_option(
-            label="Packer Backer",
-            value=str(ROLE_PACKER),
-            emoji="🧀",
-        ),
-        create_select_option(
-            label="Pixel Gang",
-            value=str(ROLE_PIXEL),
-            emoji="📱",
-        ),
-        create_select_option(
-            label="Airpod Gang",
-            value=str(ROLE_ALDIS),
-            emoji="🎧",
-        ),
-        create_select_option(
-            label="Remove Food Roles",
-            value="roles_culture_remove",
-            emoji="🕳"
-        )
-    ],
-    placeholder="Choose your culture roles",
-    min_values=1,
-    max_values=5,
-    custom_id="select_roles_culture"
-)
+buttons_roles_food = [
+    create_button(
+        style=ButtonStyle.gray,
+        label="Potato Gang",
+        custom_id="role_food_potato",
+        emoji="🥔",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Asparagang",
+        custom_id="role_food_asparagang",
+        emoji="💚",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Runza",
+        custom_id="role_food_runza",
+        emoji="🥪",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Qdoba's Witness",
+        custom_id="role_food_qdoba",
+        emoji="🌯",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Aldi's Nuts",
+        custom_id="role_food_aldi",
+        emoji="🥜",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Remove Food Roles",
+        custom_id="roles_food_remove",
+        emoji="🕳"
+    )
+]
+
+buttons_roles_culture = [
+    create_button(
+        style=ButtonStyle.gray,
+        label="Meme Team",
+        custom_id="role_culture_meme",
+        emoji="😹",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="He Man Isms Hater Club",
+        custom_id="role_culture_isms",
+        emoji="♣",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Packer Backer",
+        custom_id="role_culture_packer",
+        emoji="🧀",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Pixel Gang",
+        custom_id="role_culture_pixel",
+        emoji="📱",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Airpod Gang",
+        custom_id="role_culture_airpod",
+        emoji="🎧",
+    ),
+    create_button(
+        style=ButtonStyle.gray,
+        label="Remove Culture Roles",
+        custom_id="roles_culture_remove",
+        emoji="🕳"
+    )
+]
 
 
 async def process_gameday(mode: bool, guild: discord.Guild):
@@ -452,51 +454,44 @@ class AdminCommands(commands.Cog):
         if any([hype_max, hype_some, hype_no]) is None:
             raise CommandError("Unable to locate role!")
 
-        chosen_hype = ""
-
         if ctx.custom_id == "role_hype_max":
             await ctx.author.add_roles(hype_max, reason="Hype squad")
-            await ctx.author.remove_roles(hype_some, hype_no, reason="Hype squad")
+            await ctx.author.remove_roles(hype_tarmac, hype_some, hype_no, reason="Hype squad")
             chosen_hype = hype_max.mention
         elif ctx.custom_id == "role_hype_some":
             await ctx.author.add_roles(hype_some, reason="Hype squad")
-            await ctx.author.remove_roles(hype_max, hype_no, reason="Hype squad")
+            await ctx.author.remove_roles(hype_tarmac, hype_max, hype_no, reason="Hype squad")
             chosen_hype = hype_some.mention
         elif ctx.custom_id == "role_hype_no":
             await ctx.author.add_roles(hype_no, reason="Hype squad")
-            await ctx.author.remove_roles(hype_some, hype_max, reason="Hype squad")
+            await ctx.author.remove_roles(hype_tarmac, hype_some, hype_max, reason="Hype squad")
             chosen_hype = hype_no.mention
         elif ctx.custom_id == "role_hype_tarmac":
             await ctx.author.add_roles(hype_tarmac, reason="Hype squad")
             await ctx.author.remove_roles(hype_no, hype_some, hype_max, reason="Hype squad")
             chosen_hype = hype_tarmac.mention
         elif ctx.custom_id == "role_hype_none":
-            temp = await ctx.send(content="...")
-            await temp.delete()
-
             await ctx.author.remove_roles(hype_tarmac, hype_no, hype_some, hype_max, reason="Hype squad")
             embed = build_embed(
-                title="Hype Roles",
-                description=f"You have removed all hype roles."
+                description=f"{ctx.author.mention} has left all hype roles.",
+                image=None,
+                thumbnail=None,
+                author=None,
+                footer="This message will disappear after 10 seconds."
             )
-            await ctx.send(embed=embed, hidden=True)
+            await ctx.send(embed=embed, delete_after=10)
             return
         else:
             return
 
         embed = build_embed(
-            title="Hype Roles",
-            inline=False,
-            fields=[
-                ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
-                ["Roles", chosen_hype]
-            ]
+            description=f"{ctx.author.mention} has joined: {chosen_hype}.",
+            image=None,
+            thumbnail=None,
+            author=None,
+            footer="This message will disappear after 10 seconds."
         )
-
-        temp = await ctx.send(content="...")
-        await temp.delete()
-
-        await ctx.send(embed=embed, hidden=True)
+        await ctx.send(embed=embed, delete_after=10)
 
         print("### Roles: Hype Squad")
 
@@ -524,57 +519,64 @@ class AdminCommands(commands.Cog):
             ]
         )
 
-        food_action_row = create_actionrow(select_roles_food)
+        food_action_row = spread_to_rows(*buttons_roles_food, max_in_row=3)
 
-        await ctx.send(embed=embed, components=[food_action_row])
+        await ctx.send(embed=embed, components=food_action_row)
 
-    @cog_ext.cog_component(components=select_roles_food)
+    @cog_ext.cog_component(components=buttons_roles_food)
     async def process_roles_food(self, ctx: ComponentContext):
-        roles_food = {}
-        for selection in select_roles_food["options"]:
-            if selection["value"] == "roles_food_remove":
-                continue
+        await ctx.defer()
 
-            roles_food[selection["value"]] = ctx.guild.get_role(role_id=int(selection["value"]))
+        print("### ~~~ Gathering roles")
 
-        # Remove old food roles
-        for role in roles_food:
-            await ctx.author.remove_roles(roles_food[role], reason="Food roles")
+        food_potato = ctx.guild.get_role(ROLE_POTATO)
+        food_asparagus = ctx.guild.get_role(ROLE_ASPARAGUS)
+        food_runza = ctx.guild.get_role(ROLE_RUNZA)
+        food_qdoba = ctx.guild.get_role(ROLE_QDOBA)
+        food_aldi = ctx.guild.get_role(ROLE_ALDIS)
 
-        if "roles_food_remove" in ctx.selected_options:
+        if any([food_potato, food_asparagus, food_runza, food_qdoba, food_aldi]) is None:
+            raise CommandError("Unable to locate role!")
+
+        if ctx.custom_id == "role_food_potato":
+            await ctx.author.add_roles(food_potato, reason="Hype squad")
+            chosen_food = food_potato.mention
+        elif ctx.custom_id == "role_food_asparagang":
+            await ctx.author.add_roles(food_asparagus, reason="Hype squad")
+            chosen_food = food_asparagus.mention
+        elif ctx.custom_id == "role_food_runza":
+            await ctx.author.add_roles(food_runza, reason="Hype squad")
+            chosen_food = food_runza.mention
+        elif ctx.custom_id == "role_food_qdoba":
+            await ctx.author.add_roles(food_qdoba, reason="Hype squad")
+            chosen_food = food_qdoba.mention
+        elif ctx.custom_id == "role_food_aldi":
+            await ctx.author.add_roles(food_aldi, reason="Hype squad")
+            chosen_food = food_aldi.mention
+        elif ctx.custom_id == "roles_food_remove":
+            await ctx.author.remove_roles(food_potato, food_asparagus, food_runza, food_qdoba, food_aldi, reason="Hype squad")
             embed = build_embed(
-                title="Food Roles",
-                description="You have removed all food roles."
+                description=f"{ctx.author.mention} has left all food roles.",
+                image=None,
+                thumbnail=None,
+                author=None,
+                footer="This message will disappear after 10 seconds."
             )
-            await ctx.send(embed=embed, hidden=True)
+            await ctx.send(embed=embed, delete_after=10)
+            return
+        else:
             return
 
-        joined_roles = ""
-
-        for selected in ctx.selected_options:
-            try:
-                # Add selected roles
-                await ctx.author.add_roles(roles_food[selected], reason="Food roles")
-                joined_roles += roles_food[selected].mention + "\n"
-            except:
-                continue
-
-        if joined_roles == "":
-            raise CommandError("Unable to join any of the selected roles!")
-
         embed = build_embed(
-            title="Food Roles",
-            inline=False,
-            fields=[
-                ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
-                ["Roles", joined_roles]
-            ]
+            description=f"{ctx.author.mention} has joined: {chosen_food}.",
+            image=None,
+            thumbnail=None,
+            author=None,
+            footer="This message will disappear after 10 seconds."
         )
+        await ctx.send(embed=embed, delete_after=10)
 
-        temp = await ctx.send(content="...")
-        await temp.delete()
-
-        await ctx.send(embed=embed, hidden=True)
+        print("### Roles: Food")
 
     @cog_ext.cog_subcommand(
         base="roles",
@@ -600,58 +602,64 @@ class AdminCommands(commands.Cog):
             ]
         )
 
-        culture_action_row = create_actionrow(select_roles_culture)
+        culture_action_row = spread_to_rows(*buttons_roles_culture, max_in_row=3)
 
-        await ctx.send(embed=embed, components=[culture_action_row])
+        await ctx.send(embed=embed, components=culture_action_row)
 
-    @cog_ext.cog_component(components=select_roles_culture)
+    @cog_ext.cog_component(components=buttons_roles_culture)
     async def process_roles_culture(self, ctx: ComponentContext):
-        roles_culture = {}
-        for selection in select_roles_culture["options"]:
+        await ctx.defer()
 
-            if selection["value"] == "roles_culture_remove":
-                continue
-            roles_culture[selection["value"]] = ctx.guild.get_role(role_id=int(selection["value"]))
+        print("### ~~~ Gathering roles")
 
-        # Remove old food roles
-        for role in roles_culture:
-            await ctx.author.remove_roles(roles_culture[role], reason="Culture roles")
+        culture_meme = ctx.guild.get_role(ROLE_MEME)
+        culture_isms = ctx.guild.get_role(ROLE_ISMS)
+        culiture_packer = ctx.guild.get_role(ROLE_PACKER)
+        culture_pixel = ctx.guild.get_role(ROLE_PIXEL)
+        culture_airpod = ctx.guild.get_role(ROLE_AIRPOD)
 
-        if "roles_culture_remove" in ctx.selected_options:
+        if any([culture_meme, culture_isms, culiture_packer, culture_pixel, culture_airpod]) is None:
+            raise CommandError("Unable to locate role!")
+
+        if ctx.custom_id == "role_culture_meme":
+            await ctx.author.add_roles(culture_meme, reason="Hype squad")
+            chosen_food = culture_meme.mention
+        elif ctx.custom_id == "role_culture_isms":
+            await ctx.author.add_roles(culture_isms, reason="Hype squad")
+            chosen_food = culture_isms.mention
+        elif ctx.custom_id == "role_culture_packer":
+            await ctx.author.add_roles(culiture_packer, reason="Hype squad")
+            chosen_food = culiture_packer.mention
+        elif ctx.custom_id == "role_culture_pixel":
+            await ctx.author.add_roles(culture_pixel, reason="Hype squad")
+            chosen_food = culture_pixel.mention
+        elif ctx.custom_id == "role_culture_airpod":
+            await ctx.author.add_roles(culture_airpod, reason="Hype squad")
+            chosen_food = culture_airpod.mention
+        elif ctx.custom_id == "roles_culture_remove":
+            await ctx.author.remove_roles(culture_meme, culture_isms, culiture_packer, culture_pixel, culture_airpod, reason="Hype squad")
             embed = build_embed(
-                title="Culture Roles",
-                description="You have removed all culture roles."
+                description=f"{ctx.author.mention} has left all culture roles.",
+                image=None,
+                thumbnail=None,
+                author=None,
+                footer="This message will disappear after 10 seconds."
             )
-            await ctx.send(embed=embed, hidden=True)
+            await ctx.send(embed=embed, delete_after=10)
+            return
+        else:
             return
 
-        # Add selected roles
-        joined_roles = ""
-
-        for selected in ctx.selected_options:
-            try:
-                await ctx.author.add_roles(roles_culture[selected], reason="Culture roles")
-
-                joined_roles += roles_culture[selected].mention + "\n"
-            except:
-                continue
-
-        if joined_roles == "":
-            raise CommandError("Unable to join any of the selected roles!")
-
         embed = build_embed(
-            title="Culture Roles",
-            inline=False,
-            fields=[
-                ["Welcome!", f"[{ctx.author.mention}] has joined the following roles"],
-                ["Roles", joined_roles]
-            ]
+            description=f"{ctx.author.mention} has joined: {chosen_food}.",
+            image=None,
+            thumbnail=None,
+            author=None,
+            footer="This message will disappear after 10 seconds."
         )
+        await ctx.send(embed=embed, delete_after=10)
 
-        temp = await ctx.send(content="...")
-        await temp.delete()
-
-        await ctx.send(embed=embed, hidden=True)
+        print("### Roles: Culture")
 
     @cog_ext.cog_subcommand(
         base="gameday",
