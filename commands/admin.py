@@ -519,7 +519,7 @@ class AdminCommands(commands.Cog):
             ]
         )
 
-        food_action_row = spread_to_rows(*buttons_roles_food, max_in_row=3)
+        food_action_row = spread_to_rows(*buttons_roles_food, max_in_row=2)
 
         await ctx.send(embed=embed, components=food_action_row)
 
@@ -602,7 +602,7 @@ class AdminCommands(commands.Cog):
             ]
         )
 
-        culture_action_row = spread_to_rows(*buttons_roles_culture, max_in_row=3)
+        culture_action_row = spread_to_rows(*buttons_roles_culture, max_in_row=2)
 
         await ctx.send(embed=embed, components=culture_action_row)
 
