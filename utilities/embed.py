@@ -5,9 +5,19 @@ import validators
 
 import objects.FAPing as FAP
 from objects.Schedule import HuskerSchedule
-from utilities.constants import BOT_FOOTER_BOT
-from utilities.constants import DT_TBA_HR, DT_TBA_MIN, DT_OBJ_FORMAT_TBA, DT_OBJ_FORMAT, DT_STR_RECRUIT
-from utilities.constants import TZ, BOT_DISPLAY_NAME, BOT_GITHUB_URL, BOT_ICON_URL, BOT_THUMBNAIL_URL
+from utilities.constants import (
+    BOT_DISPLAY_NAME,
+    BOT_FOOTER_BOT,
+    BOT_GITHUB_URL,
+    BOT_ICON_URL,
+    BOT_THUMBNAIL_URL,
+    DT_OBJ_FORMAT,
+    DT_OBJ_FORMAT_TBA,
+    DT_STR_RECRUIT,
+    DT_TBA_HR,
+    DT_TBA_MIN,
+    TZ
+)
 
 
 class EmbedType:

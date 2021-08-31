@@ -1,14 +1,24 @@
 import asyncio
 import threading
 import typing
+
 # import tweepy
 import discord
-# from utilities.constants import TWITTER_BEARER, TWITTER_KEY, TWITTER_BOT_MEMBER, TWITTER_TOKEN, TWITTER_SECRET_KEY, TWITTER_TOKEN_SECRET
+
+# from utilities.constants import (
+#     TWITTER_BEARER,
+#     TWITTER_BOT_MEMBER,
+#     TWITTER_KEY,
+#     TWITTER_SECRET_KEY,
+#     TWITTER_TOKEN,
+#     TWITTER_TOKEN_SECRET
+# )
 from utilities.constants import pretty_time_delta
 from utilities.embed import build_embed
-from utilities.mysql import Process_MySQL, sqlUpdateTasks
-from utilities.constants import CommandError
-import json
+from utilities.mysql import (
+    Process_MySQL,
+    sqlUpdateTasks
+)
 
 exitFlag = 0
 

@@ -4,27 +4,44 @@ import platform
 import random
 import sys
 import traceback
-from datetime import datetime, timedelta
+from datetime import (
+    datetime,
+    timedelta
+)
 
 import discord
 import requests
 from PIL import Image
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand
-from discord_slash.context import ComponentContext, SlashContext
+from discord_slash.context import (
+    ComponentContext,
+    SlashContext
+)
 from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import send_reminder
-from utilities.constants import CHAN_HOF_PROD, CHAN_SHAME, CHAN_SCOTTS_BOTS, CHAN_RULES
-from utilities.constants import DT_TASK_FORMAT
-from utilities.constants import GEE_USER
-from utilities.constants import IMGUR_CLIENT, IMGUR_SECRET
-from utilities.constants import PROD_TOKEN, TEST_TOKEN
-from utilities.constants import UserError, CommandError
-from utilities.constants import debugging
+from utilities.constants import (
+    CHAN_HOF_PROD,
+    CHAN_RULES,
+    CHAN_SCOTTS_BOTS,
+    CHAN_SHAME,
+    CommandError,
+    DT_TASK_FORMAT,
+    GEE_USER,
+    IMGUR_CLIENT,
+    IMGUR_SECRET,
+    PROD_TOKEN,
+    TEST_TOKEN,
+    UserError,
+    debugging
+)
 from utilities.embed import build_embed
-from utilities.mysql import Process_MySQL, sqlRetrieveTasks
+from utilities.mysql import (
+    Process_MySQL,
+    sqlRetrieveTasks
+)
 
 client = Bot(
     command_prefix="$",

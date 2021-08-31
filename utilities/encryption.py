@@ -1,6 +1,7 @@
 import json
 import pathlib
 import platform
+
 from cryptography.fernet import Fernet
 
 if "Windows" in platform.platform():

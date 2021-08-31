@@ -1,6 +1,11 @@
 import pymysql.cursors
 
-from utilities.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
+from utilities.constants import (
+    SQL_HOST,
+    SQL_PASSWD,
+    SQL_DB,
+    SQL_USER
+)
 
 sqlCreateImageCommand = """
 INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)

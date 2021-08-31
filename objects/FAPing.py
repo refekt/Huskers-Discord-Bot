@@ -1,15 +1,22 @@
 import asyncio
 import datetime
+from typing import Union
 
 import discord
 import numpy as np
 import pandas as pd
 from discord import client as discord_client
 from discord.ext import commands
-from discord_slash.context import SlashContext, ComponentContext
-from typing import Union, Optional
+from discord_slash.context import (
+    ComponentContext,
+    SlashContext
+)
+
 from objects.Recruits import FootballRecruit
-from utilities.mysql import Process_MySQL, sqlTeamIDs
+from utilities.mysql import (
+    Process_MySQL,
+    sqlTeamIDs
+)
 
 CURRENT_CLASS = datetime.datetime.now().year
 NO_MORE_PREDS = datetime.datetime.now().year

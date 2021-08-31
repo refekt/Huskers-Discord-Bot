@@ -4,10 +4,15 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from utilities.constants import CROOT_SEARCH_LIMIT
-from utilities.constants import HEADERS
-from utilities.constants import UserError
-from utilities.mysql import Process_MySQL, sqlTeamIDs
+from utilities.constants import (
+    CROOT_SEARCH_LIMIT,
+    HEADERS,
+    UserError
+)
+from utilities.mysql import (
+    Process_MySQL,
+    sqlTeamIDs
+)
 
 
 class RecruitInterest:

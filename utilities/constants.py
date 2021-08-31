@@ -4,10 +4,18 @@ import sys
 
 import pytz
 from discord.ext.commands import BucketType
-from discord_slash.utils.manage_commands import SlashCommandPermissionType, create_permission
+from discord_slash.utils.manage_commands import (
+    SlashCommandPermissionType,
+    create_permission
+)
 from dotenv import load_dotenv
 
-from utilities.encryption import load_key, decrypt_return_data, decrypt, encrypt
+from utilities.encryption import (
+    decrypt,
+    decrypt_return_data,
+    encrypt,
+    load_key
+)
 
 # from typing import (
 #     Any,

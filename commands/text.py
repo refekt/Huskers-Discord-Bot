@@ -11,17 +11,34 @@ import requests
 from bs4 import BeautifulSoup
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
-from discord_slash import ComponentContext
-from discord_slash import cog_ext
+from discord_slash import (
+    ComponentContext,
+    cog_ext
+)
 from discord_slash.context import SlashContext
 from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils.manage_components import create_button, create_actionrow
+from discord_slash.utils.manage_components import (
+    create_actionrow,
+    create_button
+)
 
-from objects.Weather import WeatherResponse, WeatherHour
-from utilities.constants import CHAN_BANNED, CHAN_POSSUMS, WEATHER_API_KEY, HEADERS, US_STATES
-from utilities.constants import CommandError, UserError, TZ, DT_OPENWEATHER_UTC
-from utilities.constants import guild_id_list
+from objects.Weather import (
+    WeatherHour,
+    WeatherResponse
+)
+from utilities.constants import (
+    CHAN_BANNED,
+    CHAN_POSSUMS,
+    CommandError,
+    DT_OPENWEATHER_UTC,
+    HEADERS,
+    TZ,
+    US_STATES,
+    UserError,
+    WEATHER_API_KEY,
+    guild_id_list
+)
 from utilities.embed import build_embed
 
 buttons_ud = [
