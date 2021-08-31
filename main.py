@@ -370,7 +370,8 @@ async def on_ready():
         fields=[
             ["Info", f"I was restarted, but now I'm back! I'm now online as {client.user.mention}! Check out /commands."],
             ["HOF/HOS Reaction Threshold", f"{threshold}"],
-            ["Changelog", lines_str]
+            ["Changelog", lines_str],
+            ["More Changelog", f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)"]
         ]
     )
     await bot_spam.send(embed=embed)
@@ -487,7 +488,7 @@ extensions = [
     "commands.image",
     "commands.football_stats",
     "commands.reminder",
-    "commands.testing"
+    # "commands.testing"
 ]
 for extension in extensions:
     print(f"### ~~~ Loading extension: {extension}")
