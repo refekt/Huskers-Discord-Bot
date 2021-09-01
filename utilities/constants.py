@@ -17,14 +17,56 @@ from utilities.encryption import (
     load_key
 )
 
-# from typing import (
-#     Any,
-#     Optional,
-#     Optional,
-#     Union
-# )
+
+# Global Errors
+class CommandError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class UserError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+def guild_id_list() -> list:
+    if debugging():
+        return [GUILD_TEST]
+    else:
+        return [GUILD_PROD]
+
+
+def pretty_time_delta(seconds):
+    seconds = int(seconds)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if days > 0:
+        return f"{days:,}d, {hours}h, {minutes}m, and {seconds}s"
+    elif hours > 0:
+        return f"{hours}h, {minutes}m, and {seconds} s"
+    elif minutes > 0:
+        return f"{minutes}m and {seconds}s"
+    else:
+        return f"{seconds}s"
+
+
+def debugging() -> bool:
+    return True if _is_debugging else False
+
+
+try:
+    server = sys.argv[1]
+    if server == "prod":
+        print("### ~~~ Bot starting on the production server")
+    elif server == "test":
+        print("### ~~~ Bot starting on the test server")
+except IndexError:
+    pass
 
 print(f"### Platform == {platform.platform()}")
+print(f"### ~~~ argv[0]: {sys.argv[0]}")
+print(f"### ~~~ argv[1]: {sys.argv[1]}")
 
 # Setting variables location
 variables_path = None
@@ -41,7 +83,6 @@ elif "Linux" in platform.platform():
 load_dotenv(dotenv_path=variables_path)
 
 # Decrypt Env file
-# env_file = variables
 env_file = variables_path
 key = load_key()
 
@@ -220,14 +261,6 @@ US_STATES = [
     {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"}, {"State": "Puerto Rico", "Code": "PR"}
 ]
 
-
-def guild_id_list() -> list:
-    if debugging():
-        return [GUILD_TEST]
-    else:
-        return [GUILD_PROD]
-
-
 # Slash command permissions
 admin_mod_perms = {
     GUILD_PROD: [
@@ -243,46 +276,3 @@ admin_perms = {
         create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
     ]
 }
-
-
-# Global Errors
-class CommandError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-class UserError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-def pretty_time_delta(seconds):
-    seconds = int(seconds)
-    days, seconds = divmod(seconds, 86400)
-    hours, seconds = divmod(seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    if days > 0:
-        return f"{days:,}d, {hours}h, {minutes}m, and {seconds}s"
-    elif hours > 0:
-        return f"{hours}h, {minutes}m, and {seconds} s"
-    elif minutes > 0:
-        return f"{minutes}m and {seconds}s"
-    else:
-        return f"{seconds}s"
-
-
-def debugging() -> bool:
-    return True if _is_debugging else False
-
-
-print(f"### ~~~ argv[0]: {sys.argv[0]}")
-print(f"### ~~~ argv[1]: {sys.argv[1]}")
-
-try:
-    server = sys.argv[1]
-    if server == "prod":
-        print("### ~~~ Bot starting on the production server")
-    elif server == "test":
-        print("### ~~~ Bot starting on the test server")
-except IndexError:
-    pass
