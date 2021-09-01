@@ -15,7 +15,7 @@ class TestCommand(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _test(self, ctx: SlashContext):
-        pass
+        await ctx.send(content=str([guild.name for guild in ctx.bot.guilds]))
 
 
 def setup(bot):

@@ -276,3 +276,57 @@ admin_perms = {
         create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
     ]
 }
+
+# Retired code
+# async def change_my_nickname():
+#     nicks = (
+#         "Bot Frost",
+#         "Mario Verbotzco",
+#         "Adrian Botinez",
+#         "Bot Devaney",
+#         "Mike Rilbot",
+#         "Robo Pelini",
+#         "Devine Ozigbot",
+#         "Mo Botty",
+#         "Bot Moos",
+#         "Bot Diaco",
+#         "Rahmir Botson",
+#         "I.M. Bott",
+#         "Linux Phillips",
+#         "Dicaprio Bottle",
+#         "Bryce Botheart",
+#         "Jobot Chamberlain",
+#         "Bot Bando",
+#         "Shawn Botson",
+#         "Zavier Botts",
+#         "Jimari Botler",
+#         "Bot Gunnerson",
+#         "Nash Botmacher",
+#         "Botger Craig",
+#         "Dave RAMington",
+#         "MarLAN Lucky",
+#         "Rex Bothead",
+#         "Nbotukong Suh",
+#         "Grant Bostrom",
+#         "Ameer Botdullah",
+#         "Botinic Raiola",
+#         "Vince Ferraboto",
+#         "economybot",
+#         "NotaBot_Human",
+#         "psybot",
+#         "2020: the year of the bot",
+#         "bottech129",
+#         "deerebot129"
+#     )
+#
+#     try:
+#         print("### Attempting to change nickname...")
+#         await client.user.edit(
+#             username=random.choice(nicks)
+#         )
+#         print(f"### ~~~ Successfully changed display name")
+#     except discord.HTTPException as err:
+#         err_msg = "### ~~~ Unable to change display name: " + str(err).replace("\n", " ")
+#         print(err_msg)
+#     except:
+#         print(f"### ~~~ Unknown error!", sys.exc_info()[0])
