@@ -28,6 +28,8 @@ print(f"### Platform == {platform.platform()}")
 
 # Setting variables location
 variables_path = None
+_is_debugging = False
+
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set")
     _is_debugging = True
@@ -275,8 +277,6 @@ def debugging() -> bool:
 
 print(f"### ~~~ argv[0]: {sys.argv[0]}")
 print(f"### ~~~ argv[1]: {sys.argv[1]}")
-
-_is_debugging = False
 
 try:
     server = sys.argv[1]

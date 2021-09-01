@@ -4,11 +4,11 @@ import platform
 import random
 import sys
 import traceback
+import typing
 from datetime import (
     datetime,
     timedelta
 )
-from threading import Thread
 
 import discord
 import requests
@@ -23,7 +23,6 @@ from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import (
-    callback_function,
     send_reminder
 )
 from utilities.constants import (
@@ -55,8 +54,20 @@ client = Bot(
 )
 
 slash = SlashCommand(client, sync_commands=True)  # Sync required
-
 client_percent = 0.0047
+
+
+def current_guild() -> typing.Union[discord.Guild, None]:
+    if len(client.guilds) == 0:
+        return None
+    else:
+        return client.guilds[0]
+
+
+if current_guild() is None:
+    print("### Unable to find any guilds! Exiting...")
+    print(f"### ~~~ {client.guilds}")
+    exit(0)
 
 
 async def change_my_status():
@@ -146,17 +157,17 @@ async def load_tasks():
             return duration
         return timedelta(seconds=0)
 
-    async def convert_destination(destination_id: int):
+    async def convert_destination(cur_guild, destination_id: int):
         destination_id = int(destination_id)
         try:
-            member = guild.get_member(destination_id)
+            member = cur_guild.get_member(destination_id)
             if member is not None:
                 return member
         except:
             pass
 
         try:
-            channel = guild.get_channel(destination_id)
+            channel = cur_guild.get_channel(destination_id)
             if channel is not None:
                 return channel
         except:
@@ -166,16 +177,14 @@ async def load_tasks():
 
     tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
 
-    try:
-        guild = client.guilds[0]
-    except IndexError:
+    cur_guild = current_guild()
+    if cur_guild is None:
+        loop = asyncio.get_event_loop()
+        loop.stop()
         await client.close()
-        raise Exception("Unable to find guilds")
-
-    if guild is None:
-        return print("### ~~~ Load tasks guild is none")
+        return print("### ~~~ Unable to find any guilds. Exiting...")
     else:
-        print(f"### ~~~ Guild == {guild}")
+        print(f"### ~~~ Guild == {cur_guild}")
 
     if tasks is None:
         return print("### ;;; No tasks were loaded")
@@ -188,7 +197,7 @@ async def load_tasks():
 
     for task in tasks:
         send_when = convert_duration(task["send_when"])
-        destination = await convert_destination(task["send_to"])
+        destination = await convert_destination(cur_guild, task["send_to"])
 
         if destination is None:
             print(f"### ;;; Skipping task because destination is None.")
@@ -210,19 +219,6 @@ async def load_tasks():
             continue
 
         task_repo.append(
-            # Thread(
-            #     target=asyncio.run,
-            #     args=(
-            #         send_reminder(
-            #             num_seconds=send_when.total_seconds(),
-            #             destination=destination,
-            #             message=task["message"],
-            #             source=task["author"],
-            #             alert_when=task["send_when"]
-            #         ),  # Blank tuple?
-            #     ),
-            #     name=f"reminder_{send_when.total_seconds()}_{task['send_when']}"
-            # )
             asyncio.create_task(
                 send_reminder(
                     num_seconds=send_when.total_seconds(),
@@ -233,9 +229,6 @@ async def load_tasks():
                 )
             )
         )
-
-    # for task in task_repo:
-    #     task.start()
 
     for index, task in enumerate(task_repo):
         await task
@@ -359,7 +352,7 @@ async def on_ready():
         f"### Bot Frost version 3.0 ###\n"
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
-        f"### ~~~ Guild: {client.guilds[0]}\n"
+        f"### ~~~ Guild: {current_guild()}\n"
         f"### ~~~ HOF/HOS Reaction Threshold: {threshold}\n"
         f"### The bot is ready!"
     )
@@ -432,70 +425,70 @@ async def on_member_join(member: discord.Member):
     await send_welcome_message(member)
 
 
-# @client.event
-# async def on_slash_command_error(ctx: SlashContext, ex: Exception):
-#     def format_traceback(tback: list):
-#         return "".join(tback).replace("Aaron", "Secret")
-#
-#     if debugging():
-#         return
-#
-#     embed = None
-#     if isinstance(ex, UserError):
-#         embed = build_embed(
-#             title="Husker Bot User Error",
-#             description="An error occured with user input",
-#             fields=[
-#                 ["Error Message", ex.message]
-#             ]
-#         )
-#     elif isinstance(ex, CommandError):
-#         embed = build_embed(
-#             title="Husker Bot Command Error",
-#             description="An error occured with command processing",
-#             fields=[
-#                 ["Error Message", ex.message]
-#             ]
-#         )
-#     else:
-#         embed = build_embed(
-#             title="Husker Bot Command Error",
-#             description="An unknown error occured",
-#             fields=[
-#                 ["Error Message", f"{ex.__class__}: {ex}"]
-#             ]
-#         )
-#
-#     await ctx.send(embed=embed)
-#
-#     traceback_raw = traceback.format_exception(
-#         etype=type(ex),
-#         value=ex,
-#         tb=ex.__traceback__
-#     )
-#
-#     tback = format_traceback(traceback_raw)
-#     cmd = ctx.command
-#     sub_cmd = ""
-#     if ctx.subcommand_name is not None:
-#         sub_cmd = ctx.subcommand_name
-#
-#     inputs = []
-#
-#     for key, value in ctx.data.items():
-#         inputs.append(f"{key} = {value}")
-#
-#     message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
-#               f"\n" \
-#               f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
-#               f"\n" \
-#               f"```\n{tback}\n```"
-#
-#     try:
-#         gee = client.get_user(id=GEE_USER)
-#         await gee.send(content=message)
-#     except:
-#         await ctx.send(content=f"<@{GEE_USER}>\n{message}")
+@client.event
+async def on_slash_command_error(ctx: SlashContext, ex: Exception):
+    def format_traceback(tback: list):
+        return "".join(tback).replace("Aaron", "Secret")
+
+    if debugging():
+        return
+
+    embed = None
+    if isinstance(ex, UserError):
+        embed = build_embed(
+            title="Husker Bot User Error",
+            description="An error occured with user input",
+            fields=[
+                ["Error Message", ex.message]
+            ]
+        )
+    elif isinstance(ex, CommandError):
+        embed = build_embed(
+            title="Husker Bot Command Error",
+            description="An error occured with command processing",
+            fields=[
+                ["Error Message", ex.message]
+            ]
+        )
+    else:
+        embed = build_embed(
+            title="Husker Bot Command Error",
+            description="An unknown error occured",
+            fields=[
+                ["Error Message", f"{ex.__class__}: {ex}"]
+            ]
+        )
+
+    await ctx.send(embed=embed)
+
+    traceback_raw = traceback.format_exception(
+        etype=type(ex),
+        value=ex,
+        tb=ex.__traceback__
+    )
+
+    tback = format_traceback(traceback_raw)
+    cmd = ctx.command
+    sub_cmd = ""
+    if ctx.subcommand_name is not None:
+        sub_cmd = ctx.subcommand_name
+
+    inputs = []
+
+    for key, value in ctx.data.items():
+        inputs.append(f"{key} = {value}")
+
+    message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
+              f"\n" \
+              f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
+              f"\n" \
+              f"```\n{tback}\n```"
+
+    try:
+        gee = client.get_user(id=GEE_USER)
+        await gee.send(content=message)
+    except:
+        await ctx.send(content=f"<@{GEE_USER}>\n{message}")
 
 
 if debugging():
