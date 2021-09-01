@@ -57,17 +57,17 @@ slash = SlashCommand(client, sync_commands=True)  # Sync required
 client_percent = 0.0047
 
 
-def current_guild() -> typing.Union[discord.Guild, None]:
-    if len(client.guilds) == 0:
-        return None
-    else:
-        return client.guilds[0]
-
-
-if current_guild() is None:
-    print("### Unable to find any guilds! Exiting...")
-    print(f"### ~~~ {client.guilds}")
-    exit(0)
+# def current_guild() -> typing.Union[discord.Guild, None]:
+#     if len(client.guilds) == 0:
+#         return None
+#     else:
+#         return client.guilds[0]
+#
+#
+# if current_guild() is None:
+#     print("### Unable to find any guilds! Exiting...")
+#     print(f"### ~~~ {client.guilds}")
+#     exit(0)
 
 
 async def change_my_status():
@@ -147,91 +147,91 @@ async def change_my_nickname():
         print(f"### ~~~ Unknown error!", sys.exc_info()[0])
 
 
-async def load_tasks():
-    def convert_duration(value: str):
-        imported_datetime = datetime.strptime(value, DT_TASK_FORMAT)
-        now = datetime.now()
-
-        if imported_datetime > now:
-            duration = imported_datetime - now
-            return duration
-        return timedelta(seconds=0)
-
-    async def convert_destination(cur_guild, destination_id: int):
-        destination_id = int(destination_id)
-        try:
-            member = cur_guild.get_member(destination_id)
-            if member is not None:
-                return member
-        except:
-            pass
-
-        try:
-            channel = cur_guild.get_channel(destination_id)
-            if channel is not None:
-                return channel
-        except:
-            pass
-
-        return None
-
-    tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
-
-    cur_guild = current_guild()
-    if cur_guild is None:
-        loop = asyncio.get_event_loop()
-        loop.stop()
-        await client.close()
-        return print("### ~~~ Unable to find any guilds. Exiting...")
-    else:
-        print(f"### ~~~ Guild == {cur_guild}")
-
-    if tasks is None:
-        return print("### ;;; No tasks were loaded")
-
-    print(f"### There are {len(tasks)} to be loaded")
-
-    task_repo = []
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    for task in tasks:
-        send_when = convert_duration(task["send_when"])
-        destination = await convert_destination(cur_guild, task["send_to"])
-
-        if destination is None:
-            print(f"### ;;; Skipping task because destination is None.")
-            continue
-
-        if task["author"] is None:
-            task["author"] = "N/A"
-
-        if send_when == timedelta(seconds=0):
-            print(f"### ;;; Alert time already passed! {task['send_when']}")
-            await send_reminder(
-                num_seconds=0,
-                destination=destination,
-                message=task["message"],
-                source=task["author"],
-                alert_when=task["send_when"],
-                missed=True
-            )
-            continue
-
-        task_repo.append(
-            asyncio.create_task(
-                send_reminder(
-                    num_seconds=send_when.total_seconds(),
-                    destination=destination,
-                    message=task["message"],
-                    source=task["author"],
-                    alert_when=task["send_when"]
-                )
-            )
-        )
-
-    for index, task in enumerate(task_repo):
-        await task
+# async def load_tasks():
+#     def convert_duration(value: str):
+#         imported_datetime = datetime.strptime(value, DT_TASK_FORMAT)
+#         now = datetime.now()
+#
+#         if imported_datetime > now:
+#             duration = imported_datetime - now
+#             return duration
+#         return timedelta(seconds=0)
+#
+#     async def convert_destination(cur_guild, destination_id: int):
+#         destination_id = int(destination_id)
+#         try:
+#             member = cur_guild.get_member(destination_id)
+#             if member is not None:
+#                 return member
+#         except:
+#             pass
+#
+#         try:
+#             channel = cur_guild.get_channel(destination_id)
+#             if channel is not None:
+#                 return channel
+#         except:
+#             pass
+#
+#         return None
+#
+#     tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
+#
+#     cur_guild = current_guild()
+#     if cur_guild is None:
+#         loop = asyncio.get_event_loop()
+#         loop.stop()
+#         await client.close()
+#         return print("### ~~~ Unable to find any guilds. Exiting...")
+#     else:
+#         print(f"### ~~~ Guild == {cur_guild}")
+#
+#     if tasks is None:
+#         return print("### ;;; No tasks were loaded")
+#
+#     print(f"### There are {len(tasks)} to be loaded")
+#
+#     task_repo = []
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#
+#     for task in tasks:
+#         send_when = convert_duration(task["send_when"])
+#         destination = await convert_destination(cur_guild, task["send_to"])
+#
+#         if destination is None:
+#             print(f"### ;;; Skipping task because destination is None.")
+#             continue
+#
+#         if task["author"] is None:
+#             task["author"] = "N/A"
+#
+#         if send_when == timedelta(seconds=0):
+#             print(f"### ;;; Alert time already passed! {task['send_when']}")
+#             await send_reminder(
+#                 num_seconds=0,
+#                 destination=destination,
+#                 message=task["message"],
+#                 source=task["author"],
+#                 alert_when=task["send_when"],
+#                 missed=True
+#             )
+#             continue
+#
+#         task_repo.append(
+#             asyncio.create_task(
+#                 send_reminder(
+#                     num_seconds=send_when.total_seconds(),
+#                     destination=destination,
+#                     message=task["message"],
+#                     source=task["author"],
+#                     alert_when=task["send_when"]
+#                 )
+#             )
+#         )
+#
+#     for index, task in enumerate(task_repo):
+#         await task
 
 
 def upload_picture(path: str) -> str:
@@ -341,8 +341,8 @@ async def send_welcome_message(who: discord.Member):
 @client.event
 async def on_connect():
     await change_my_status()
-    await change_my_nickname()
-    await load_tasks()
+    # await change_my_nickname()
+    # await load_tasks()
 
 
 @client.event
@@ -352,7 +352,7 @@ async def on_ready():
         f"### Bot Frost version 3.0 ###\n"
         f"### ~~~ Name: {client.user}\n"
         f"### ~~~ ID: {client.user.id}\n"
-        f"### ~~~ Guild: {current_guild()}\n"
+        # f"### ~~~ Guild: {current_guild()}\n"
         f"### ~~~ HOF/HOS Reaction Threshold: {threshold}\n"
         f"### The bot is ready!"
     )
@@ -404,19 +404,10 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 
 
 @client.event
-async def on_slash_command(ctx):
-    pass
-
-
-@client.event
 async def on_component(ctx: ComponentContext):
     """ Called when a component is triggered. """
     pass
 
-
-@client.event
-async def on_component_callback(ctx: ComponentContext, callback: CallbackObject):
-    pass
 
 
 @client.event

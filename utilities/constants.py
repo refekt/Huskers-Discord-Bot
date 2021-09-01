@@ -29,13 +29,6 @@ class UserError(Exception):
         self.message = message
 
 
-def guild_id_list() -> list:
-    if debugging():
-        return [GUILD_TEST]
-    else:
-        return [GUILD_PROD]
-
-
 def pretty_time_delta(seconds):
     seconds = int(seconds)
     days, seconds = divmod(seconds, 86400)
@@ -49,10 +42,6 @@ def pretty_time_delta(seconds):
         return f"{minutes}m and {seconds}s"
     else:
         return f"{seconds}s"
-
-
-def debugging() -> bool:
-    return True if _is_debugging else False
 
 
 try:
@@ -70,8 +59,6 @@ print(f"### ~~~ argv[1]: {sys.argv[1]}")
 
 # Setting variables location
 variables_path = None
-_is_debugging = False
-
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set")
     _is_debugging = True
@@ -79,6 +66,20 @@ if "Windows" in platform.platform():
 elif "Linux" in platform.platform():
     print("### ~~~ Linux environment set")
     variables_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
+
+_is_debugging = False
+
+
+def debugging() -> bool:
+    return True if _is_debugging else False
+
+
+def guild_id_list() -> list:
+    if debugging():
+        return [GUILD_TEST]
+    else:
+        return [GUILD_PROD]
+
 
 load_dotenv(dotenv_path=variables_path)
 
