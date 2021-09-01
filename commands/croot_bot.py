@@ -18,8 +18,7 @@ from objects.Recruits import FootballRecruit
 from utilities.constants import (
     CROOT_SEARCH_LIMIT,
     UserError,
-    guild_id_list,
-    PSY_USER
+    guild_id_list
 )
 from utilities.embed import (
     build_embed,
@@ -242,7 +241,7 @@ class RecruitCog(commands.Cog):
     )
     async def _fap_leaderboard(self, ctx: SlashContext):
         # TODO All of this.
-        await ctx.send(f"Work in progress! Maybe ask <@{PSY_USER}> about it 😏", hidden=True)
+        await ctx.send("Work in progress!", hidden=True)
 
     @cog_ext.cog_component(components=search_buttons)
     async def process_croot_bot(self, ctx: ComponentContext):
