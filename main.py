@@ -8,6 +8,7 @@ from datetime import (
     datetime,
     timedelta
 )
+from threading import Thread
 
 import discord
 import requests
@@ -21,7 +22,10 @@ from discord_slash.context import (
 from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
-from objects.Thread import send_reminder
+from objects.Thread import (
+    callback_function,
+    send_reminder
+)
 from utilities.constants import (
     CHAN_HOF_PROD,
     CHAN_RULES,
@@ -161,14 +165,15 @@ async def load_tasks():
         return None
 
     tasks = Process_MySQL(sqlRetrieveTasks, fetch="all")
+
     try:
         guild = client.guilds[0]
     except IndexError:
         await client.close()
         raise Exception("Unable to find guilds")
+
     if guild is None:
-        print("### ~~~ Load tasks guild is none")
-        return
+        return print("### ~~~ Load tasks guild is none")
     else:
         print(f"### ~~~ Guild == {guild}")
 
@@ -178,12 +183,14 @@ async def load_tasks():
     print(f"### There are {len(tasks)} to be loaded")
 
     task_repo = []
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     for task in tasks:
         send_when = convert_duration(task["send_when"])
-        member_or_chan = await convert_destination(task["send_to"])
+        destination = await convert_destination(task["send_to"])
 
-        if member_or_chan is None:
+        if destination is None:
             print(f"### ;;; Skipping task because destination is None.")
             continue
 
@@ -193,27 +200,42 @@ async def load_tasks():
         if send_when == timedelta(seconds=0):
             print(f"### ;;; Alert time already passed! {task['send_when']}")
             await send_reminder(
-                thread_name=None,
                 num_seconds=0,
-                destination=member_or_chan,
+                destination=destination,
                 message=task["message"],
                 source=task["author"],
-                alert_when=task["send_when"]
+                alert_when=task["send_when"],
+                missed=True
             )
             continue
 
         task_repo.append(
+            # Thread(
+            #     target=asyncio.run,
+            #     args=(
+            #         send_reminder(
+            #             num_seconds=send_when.total_seconds(),
+            #             destination=destination,
+            #             message=task["message"],
+            #             source=task["author"],
+            #             alert_when=task["send_when"]
+            #         ),  # Blank tuple?
+            #     ),
+            #     name=f"reminder_{send_when.total_seconds()}_{task['send_when']}"
+            # )
             asyncio.create_task(
                 send_reminder(
-                    thread_name=str(member_or_chan.id + send_when.total_seconds()),
                     num_seconds=send_when.total_seconds(),
-                    destination=member_or_chan,
+                    destination=destination,
                     message=task["message"],
                     source=task["author"],
                     alert_when=task["send_when"]
                 )
             )
         )
+
+    # for task in task_repo:
+    #     task.start()
 
     for index, task in enumerate(task_repo):
         await task
@@ -410,70 +432,70 @@ async def on_member_join(member: discord.Member):
     await send_welcome_message(member)
 
 
-@client.event
-async def on_slash_command_error(ctx: SlashContext, ex: Exception):
-    def format_traceback(tback: list):
-        return "".join(tback).replace("Aaron", "Secret")
-
-    if debugging():
-        return
-
-    embed = None
-    if isinstance(ex, UserError):
-        embed = build_embed(
-            title="Husker Bot User Error",
-            description="An error occured with user input",
-            fields=[
-                ["Error Message", ex.message]
-            ]
-        )
-    elif isinstance(ex, CommandError):
-        embed = build_embed(
-            title="Husker Bot Command Error",
-            description="An error occured with command processing",
-            fields=[
-                ["Error Message", ex.message]
-            ]
-        )
-    else:
-        embed = build_embed(
-            title="Husker Bot Command Error",
-            description="An unknown error occured",
-            fields=[
-                ["Error Message", f"{ex.__class__}: {ex}"]
-            ]
-        )
-
-    await ctx.send(embed=embed)
-
-    traceback_raw = traceback.format_exception(
-        etype=type(ex),
-        value=ex,
-        tb=ex.__traceback__
-    )
-
-    tback = format_traceback(traceback_raw)
-    cmd = ctx.command
-    sub_cmd = ""
-    if ctx.subcommand_name is not None:
-        sub_cmd = ctx.subcommand_name
-
-    inputs = []
-
-    for key, value in ctx.data.items():
-        inputs.append(f"{key} = {value}")
-
-    message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
-              f"\n" \
-              f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
-              f"\n" \
-              f"```\n{tback}\n```"
-
-    try:
-        gee = client.get_user(id=GEE_USER)
-        await gee.send(content=message)
-    except:
-        await ctx.send(content=f"<@{GEE_USER}>\n{message}")
+# @client.event
+# async def on_slash_command_error(ctx: SlashContext, ex: Exception):
+#     def format_traceback(tback: list):
+#         return "".join(tback).replace("Aaron", "Secret")
+#
+#     if debugging():
+#         return
+#
+#     embed = None
+#     if isinstance(ex, UserError):
+#         embed = build_embed(
+#             title="Husker Bot User Error",
+#             description="An error occured with user input",
+#             fields=[
+#                 ["Error Message", ex.message]
+#             ]
+#         )
+#     elif isinstance(ex, CommandError):
+#         embed = build_embed(
+#             title="Husker Bot Command Error",
+#             description="An error occured with command processing",
+#             fields=[
+#                 ["Error Message", ex.message]
+#             ]
+#         )
+#     else:
+#         embed = build_embed(
+#             title="Husker Bot Command Error",
+#             description="An unknown error occured",
+#             fields=[
+#                 ["Error Message", f"{ex.__class__}: {ex}"]
+#             ]
+#         )
+#
+#     await ctx.send(embed=embed)
+#
+#     traceback_raw = traceback.format_exception(
+#         etype=type(ex),
+#         value=ex,
+#         tb=ex.__traceback__
+#     )
+#
+#     tback = format_traceback(traceback_raw)
+#     cmd = ctx.command
+#     sub_cmd = ""
+#     if ctx.subcommand_name is not None:
+#         sub_cmd = ctx.subcommand_name
+#
+#     inputs = []
+#
+#     for key, value in ctx.data.items():
+#         inputs.append(f"{key} = {value}")
+#
+#     message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
+#               f"\n" \
+#               f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
+#               f"\n" \
+#               f"```\n{tback}\n```"
+#
+#     try:
+#         gee = client.get_user(id=GEE_USER)
+#         await gee.send(content=message)
+#     except:
+#         await ctx.send(content=f"<@{GEE_USER}>\n{message}")
 
 
 if debugging():

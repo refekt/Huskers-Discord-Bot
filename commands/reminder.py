@@ -16,7 +16,6 @@ from objects.Thread import send_reminder
 from utilities.constants import (
     CHAN_BANNED,
     CommandError,
-    DT_OBJ_FORMAT,
     UserError,
     guild_id_list,
     pretty_time_delta
@@ -77,9 +76,9 @@ class ReminderCommands(commands.Cog):
 
         await ctx.defer()
 
-        today = datetime.today()  # .astimezone(tz=TZ)
+        today = datetime.today()
 
-        def get_value(dt_item: str, from_when: str):
+        def convert_dt_value(dt_item: str, from_when: str):
 
             if dt_item in from_when:
                 raw = from_when.split(dt_item)[0]
@@ -94,10 +93,10 @@ class ReminderCommands(commands.Cog):
             else:
                 return 0
 
-        days = get_value(DateTimeStrings.day, remind_when)
-        hours = get_value(DateTimeStrings.hour, remind_when)
-        minutes = get_value(DateTimeStrings.minute, remind_when)
-        seconds = get_value(DateTimeStrings.seconds, remind_when)
+        days = convert_dt_value(DateTimeStrings.day, remind_when)
+        hours = convert_dt_value(DateTimeStrings.hour, remind_when)
+        minutes = convert_dt_value(DateTimeStrings.minute, remind_when)
+        seconds = convert_dt_value(DateTimeStrings.seconds, remind_when)
 
         time_diff = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
@@ -113,68 +112,39 @@ class ReminderCommands(commands.Cog):
 
         duration = raw_when - today
         send_when = today + duration
-        author = f"{ctx.author.name}#{ctx.author.discriminator}"
+        mysql_author = f"{ctx.author.name}#{ctx.author.discriminator}"
         is_open = 1
 
         if who:
-            try:
-                Process_MySQL(sqlRecordTasks, values=(str(who.id), message, str(send_when), is_open, author))
-            except:
-                raise CommandError("Error submitting MySQL")
-
-            embed = build_embed(
-                title="Bot Frost Reminders",
-                inline=False,
-                fields=[
-                    ["Reminder created!", f"Setting a timer for [{who.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}]."]
-                ]
-            )
+            destination = who
         elif channel:
-            try:
-                Process_MySQL(sqlRecordTasks, values=(str(channel.id), message, str(send_when), is_open, author))
-            except:
-                raise CommandError("Error submitting MySQL")
-
-            embed = build_embed(
-                title="Bot Frost Reminders",
-                inline=False,
-                fields=[
-                    ["Reminder created!", f"Setting a timer for [{channel.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}]."]
-                ]
-            )
+            destination = channel
         else:
-            try:
-                Process_MySQL(sqlRecordTasks, values=(str(ctx.channel_id), message, str(send_when), is_open, author))
-            except:
-                raise CommandError("Error submitting MySQL")
+            destination = ctx.channel
 
-            embed = build_embed(
-                title="Bot Frost Reminders",
-                inline=False,
-                fields=[
-                    ["Reminder created!", f"Setting a timer for [{ctx.channel.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}]."]
-                ]
-            )
-
-        await ctx.send(embed=embed)
+        try:
+            Process_MySQL(sqlRecordTasks, values=(str(destination.id), message, str(send_when), is_open, mysql_author))
+            destination = ctx.channel
+        except:
+            raise CommandError("Error submitting MySQL")
 
         nest_asyncio.apply()
         asyncio.create_task(
             send_reminder(
-                thread_name=str(who.id if who else channel.id if channel else ctx.author_id + duration.total_seconds()),
                 num_seconds=duration.total_seconds(),
-                destination=who if who else channel if channel else ctx.author,
+                destination=destination,
                 message=message,
                 source=ctx.author,
                 alert_when=str(send_when)
             )
         )
+
         embed = build_embed(
-            title="Bot Frost Reminder",
+            title="Bot Frost Reminders",
+            description=f"Setting a timer for [{destination.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}].",
             inline=False,
             fields=[
-                ["Reminder created!", f"Reminder will be sent {send_when.strftime(DT_OBJ_FORMAT)}"],
-                ["Destination", who.mention if who else channel.mention if channel else ctx.author.mention],
+                ["Author", ctx.author.mention],
                 ["Message", message]
             ]
         )
