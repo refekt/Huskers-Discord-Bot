@@ -181,14 +181,6 @@ async def load_tasks():
         await task
 
 
-# def tweet_wrapper(tweet, loop):
-#     future = asyncio.run_coroutine_threadsafe(
-#         send_tweet(tweet),
-#         loop
-#     )
-#     future.result()
-
-
 async def send_tweet(tweet):
     url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
     embed = build_embed(
@@ -225,10 +217,13 @@ def start_twitter_stream():
         auth=api.auth,
         listener=listener
     )
-    husker_list_members = [user.id_str for user in api.list_members(list_id=TWITTER_HUSKER_MEDIA_LIST_ID)]
+    follow = []
+    if "Windows" in platform.platform():
+        follow = ["15899943"]
+    else:
+        follow = [user.id_str for user in api.list_members(list_id=TWITTER_HUSKER_MEDIA_LIST_ID)]
     stream.filter(
-        # follow=husker_list_members,  # ["15899943"]
-        follow=["15899943"],
+        follow=follow,
         is_async=True
     )
 
