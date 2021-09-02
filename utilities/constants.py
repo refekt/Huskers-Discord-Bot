@@ -44,41 +44,32 @@ def pretty_time_delta(seconds):
         return f"{seconds}s"
 
 
-try:
-    server = sys.argv[1]
-    if server == "prod":
-        print("### ~~~ Bot starting on the production server")
-    elif server == "test":
-        print("### ~~~ Bot starting on the test server")
-except IndexError:
-    pass
+# try:
+#     server = sys.argv[1]
+#     if server == "prod":
+#         print("### ~~~ Bot starting on the production server")
+#     elif server == "test":
+#         print("### ~~~ Bot starting on the test server")
+# except IndexError:
+#     pass
 
 print(f"### Platform == {platform.platform()}")
-print(f"### ~~~ argv[0]: {sys.argv[0]}")
-print(f"### ~~~ argv[1]: {sys.argv[1]}")
+# print(f"### ~~~ argv[0]: {sys.argv[0]}")
+# print(f"### ~~~ argv[1]: {sys.argv[1]}")
 
 # Setting variables location
 variables_path = None
+
 if "Windows" in platform.platform():
     print("### ~~~ Windows environment set")
-    _is_debugging = True
     variables_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
 elif "Linux" in platform.platform():
     print("### ~~~ Linux environment set")
     variables_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
 
-_is_debugging = False
-
-
-def debugging() -> bool:
-    return True if _is_debugging else False
-
 
 def guild_id_list() -> list:
-    if debugging():
-        return [GUILD_TEST]
-    else:
-        return [GUILD_PROD]
+    return [GUILD_PROD]
 
 
 load_dotenv(dotenv_path=variables_path)
@@ -134,6 +125,7 @@ TWITTER_SECRET_KEY = env_vars["twitter_secret_key"]
 TWITTER_BEARER = env_vars["twitter_bearer"]
 TWITTER_TOKEN = env_vars["twitter_token"]
 TWITTER_TOKEN_SECRET = env_vars["twitter_token_secret"]
+TWITTER_HUSKER_MEDIA_LIST_ID = 1307680291285278720
 
 # Weather API
 WEATHER_API_KEY = env_vars["openweather_key"]
@@ -246,6 +238,7 @@ DT_TBA_TIME = "10:58 PM"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+DT_TWEET_FORMAT = "%Y-%m-%d %H:%M:%S"
 DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
 
 # States

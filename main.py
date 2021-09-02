@@ -12,33 +12,38 @@ from datetime import (
 
 import discord
 import requests
+import tweepy
 from PIL import Image
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand
 from discord_slash.context import (
-    ComponentContext,
     SlashContext
 )
-from discord_slash.model import CallbackObject
 from imgurpython import ImgurClient
 
 from objects.Thread import (
-    send_reminder
+    send_reminder,
+    TwitterStreamListener
 )
 from utilities.constants import (
     CHAN_HOF_PROD,
     CHAN_RULES,
     CHAN_SCOTTS_BOTS,
     CHAN_SHAME,
+    CHAN_TWITTERVERSE,
     CommandError,
     DT_TASK_FORMAT,
+    DT_TWEET_FORMAT,
     GEE_USER,
     IMGUR_CLIENT,
     IMGUR_SECRET,
     PROD_TOKEN,
-    TEST_TOKEN,
-    UserError,
-    debugging
+    TWITTER_HUSKER_MEDIA_LIST_ID,
+    TWITTER_KEY,
+    TWITTER_SECRET_KEY,
+    TWITTER_TOKEN,
+    TWITTER_TOKEN_SECRET,
+    UserError
 )
 from utilities.embed import build_embed
 from utilities.mysql import (
@@ -176,6 +181,49 @@ async def load_tasks():
         await task
 
 
+async def send_tweet(tweet):
+    url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
+    embed = build_embed(
+        url="https://twitter.com/i/lists/1307680291285278720",
+        fields=[
+            [f"{tweet.author.name} (@{tweet.author.screen_name}) said", tweet.text],
+            ["Tweet Link", f"[Link]({url})"],
+            ["Husker Media List", f"[Link](https://twitter.com/i/lists/1307680291285278720)"]
+        ],
+        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}"
+    )
+    embed.set_author(
+        name=f"{tweet.author.name} (@{tweet.author.screen_name}) via {tweet.source}",
+        url=url,
+        icon_url=tweet.author.profile_image_url_https
+    )
+
+    chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
+    await chan_twitter.send(embed=embed)
+
+
+def start_twitter_stream():
+    listener = TwitterStreamListener(send_tweet, client.loop)
+    auth = tweepy.OAuthHandler(
+        consumer_key=TWITTER_KEY,
+        consumer_secret=TWITTER_SECRET_KEY
+    )
+    auth.set_access_token(
+        key=TWITTER_TOKEN,
+        secret=TWITTER_TOKEN_SECRET
+    )
+    api = tweepy.API(auth_handler=auth)
+    stream = tweepy.Stream(
+        auth=api.auth,
+        listener=listener
+    )
+    husker_list_members = [user.id_str for user in api.list_members(list_id=TWITTER_HUSKER_MEDIA_LIST_ID)]
+    stream.filter(
+        follow=husker_list_members,  # ["15899943"]
+        is_async=True
+    )
+
+
 def upload_picture(path: str) -> str:
     imgur_client = ImgurClient(IMGUR_CLIENT, IMGUR_SECRET)
     url = imgur_client.upload_from_path(
@@ -281,6 +329,11 @@ async def send_welcome_message(who: discord.Member):
 
 
 @client.event
+async def on_connect():
+    start_twitter_stream()
+
+
+@client.event
 async def on_ready():
     threshold = int(len(client.users) * client_percent)
     print(
@@ -292,8 +345,8 @@ async def on_ready():
         f"### The bot is ready!"
     )
 
-    if debugging():
-        return
+    await change_my_status()
+    await load_tasks()
 
     try:
         changelog_path = None
@@ -326,17 +379,11 @@ async def on_ready():
     )
     await bot_spam.send(embed=embed)
 
-    await change_my_status()
-    await load_tasks()
-
 
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-    if debugging() and not payload.member.id == 189554873778307073:
-        return
-    else:
-        channel = client.get_channel(payload.channel_id)
-        message = await channel.fetch_message(payload.message_id)
+    channel = client.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
 
     await hall_of_fame_messages(message.reactions)
 
@@ -347,76 +394,68 @@ async def on_member_join(member: discord.Member):
     await send_welcome_message(member)
 
 
-@client.event
-async def on_slash_command_error(ctx: SlashContext, ex: Exception):
-    def format_traceback(tback: list):
-        return "".join(tback).replace("Aaron", "Secret")
+if "Windows" not in platform.platform():
+    @client.event
+    async def on_slash_command_error(ctx: SlashContext, ex: Exception):
+        def format_traceback(tback: list):
+            return "".join(tback).replace("Aaron", "Secret")
 
-    if debugging():
-        return
+        embed = None
+        if isinstance(ex, UserError):
+            embed = build_embed(
+                title="Husker Bot User Error",
+                description="An error occured with user input",
+                fields=[
+                    ["Error Message", ex.message]
+                ]
+            )
+        elif isinstance(ex, CommandError):
+            embed = build_embed(
+                title="Husker Bot Command Error",
+                description="An error occured with command processing",
+                fields=[
+                    ["Error Message", ex.message]
+                ]
+            )
+        else:
+            embed = build_embed(
+                title="Husker Bot Command Error",
+                description="An unknown error occured",
+                fields=[
+                    ["Error Message", f"{ex.__class__}: {ex}"]
+                ]
+            )
 
-    embed = None
-    if isinstance(ex, UserError):
-        embed = build_embed(
-            title="Husker Bot User Error",
-            description="An error occured with user input",
-            fields=[
-                ["Error Message", ex.message]
-            ]
+        await ctx.send(embed=embed)
+
+        traceback_raw = traceback.format_exception(
+            etype=type(ex),
+            value=ex,
+            tb=ex.__traceback__
         )
-    elif isinstance(ex, CommandError):
-        embed = build_embed(
-            title="Husker Bot Command Error",
-            description="An error occured with command processing",
-            fields=[
-                ["Error Message", ex.message]
-            ]
-        )
-    else:
-        embed = build_embed(
-            title="Husker Bot Command Error",
-            description="An unknown error occured",
-            fields=[
-                ["Error Message", f"{ex.__class__}: {ex}"]
-            ]
-        )
 
-    await ctx.send(embed=embed)
+        tback = format_traceback(traceback_raw)
+        cmd = ctx.command
+        sub_cmd = ""
+        if ctx.subcommand_name is not None:
+            sub_cmd = ctx.subcommand_name
 
-    traceback_raw = traceback.format_exception(
-        etype=type(ex),
-        value=ex,
-        tb=ex.__traceback__
-    )
+        inputs = []
 
-    tback = format_traceback(traceback_raw)
-    cmd = ctx.command
-    sub_cmd = ""
-    if ctx.subcommand_name is not None:
-        sub_cmd = ctx.subcommand_name
+        for key, value in ctx.data.items():
+            inputs.append(f"{key} = {value}")
 
-    inputs = []
+        message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
+                  f"\n" \
+                  f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
+                  f"\n" \
+                  f"```\n{tback}\n```"
 
-    for key, value in ctx.data.items():
-        inputs.append(f"{key} = {value}")
-
-    message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
-              f"\n" \
-              f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
-              f"\n" \
-              f"```\n{tback}\n```"
-
-    try:
-        gee = client.get_user(id=GEE_USER)
-        await gee.send(content=message)
-    except:
-        await ctx.send(content=f"<@{GEE_USER}>\n{message}")
-
-
-if debugging():
-    token = TEST_TOKEN
-else:
-    token = PROD_TOKEN
+        try:
+            gee = client.get_user(id=GEE_USER)
+            await gee.send(content=message)
+        except:
+            await ctx.send(content=f"<@{GEE_USER}>\n{message}")
 
 extensions = [
     "commands.croot_bot",
@@ -431,4 +470,4 @@ for extension in extensions:
     print(f"### ~~~ Loading extension: {extension}")
     client.load_extension(extension)
 
-client.run(token)
+client.run(PROD_TOKEN)

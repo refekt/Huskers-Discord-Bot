@@ -1,12 +1,10 @@
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-from discord_slash.model import SlashMessage
+
+from objects.Thread import twitter_stream
 from utilities.constants import guild_id_list
-from utilities.embed import build_embed
 
-
-# from objects.Thread import start_twitter_stream, TaskThread
 
 class TestCommand(commands.Cog):
     @cog_ext.cog_slash(
@@ -15,7 +13,7 @@ class TestCommand(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _test(self, ctx: SlashContext):
-        await ctx.send(content=str([guild.name for guild in ctx.bot.guilds]))
+        await twitter_stream(ctx.channel)
 
 
 def setup(bot):
