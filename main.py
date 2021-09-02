@@ -345,9 +345,6 @@ async def on_ready():
         f"### The bot is ready!"
     )
 
-    await change_my_status()
-    await load_tasks()
-
     try:
         changelog_path = None
 
@@ -378,6 +375,9 @@ async def on_ready():
         ]
     )
     await bot_spam.send(embed=embed)
+
+    await change_my_status()
+    await load_tasks()
 
 
 @client.event
