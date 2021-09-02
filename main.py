@@ -186,7 +186,7 @@ async def send_tweet(tweet):
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
         fields=[
-            [f"{tweet.author.name} (@{tweet.author.screen_name}) said", tweet.text],
+            # [f"{tweet.author.name} (@{tweet.author.screen_name}) said", tweet.full_text],
             ["Tweet Link", f"[Link]({url})"],
             ["Husker Media List", f"[Link](https://twitter.com/i/lists/1307680291285278720)"]
         ],

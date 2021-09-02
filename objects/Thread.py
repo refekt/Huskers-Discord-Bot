@@ -1,21 +1,11 @@
 import asyncio
 import typing
 
-import tweepy
 import discord
-import threading
+import tweepy
+
 from utilities.constants import (
-    TWITTER_BEARER,
-    TWITTER_BOT_MEMBER,
-    TWITTER_KEY,
-    TWITTER_SECRET_KEY,
-    TWITTER_TOKEN,
-    TWITTER_TOKEN_SECRET
-)
-from utilities.constants import (
-    pretty_time_delta,
-    CHAN_TWITTERVERSE,
-    TWITTER_HUSKER_MEDIA_LIST_ID
+    pretty_time_delta
 )
 from utilities.embed import build_embed
 from utilities.mysql import (
