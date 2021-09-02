@@ -40,11 +40,7 @@ class TwitterStreamListener(tweepy.StreamListener):
         print("### Twitter Stream Listening has connected.")
 
     def on_status(self, status):
-        if status.retweeted:
-            pass
-        elif status.in_reply_to_status_id is not None:
-            pass
-        else:
+        if not status.retweeted and status.in_reply_to_status_id is None and not hasattr(status, "retweeted_status"):
             self.send_message(status)
 
     def on_warning(self, notice):
