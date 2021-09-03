@@ -481,7 +481,7 @@ async def on_component(ctx: ComponentContext):
                     twitter_url = str(field.value)[7:-1]
                     break
 
-        await chan.send(twitter_url)
+        await chan.send(f"{ctx.author.mention} forwarded: {twitter_url}")
 
 
 if "Windows" not in platform.platform():
