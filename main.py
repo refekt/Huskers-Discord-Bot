@@ -482,7 +482,7 @@ async def on_component(ctx: ComponentContext):
                     break
 
         await chan.send(f"{ctx.author.mention} forwarded: {twitter_url}")
-
+        await ctx.send(f"Sent to {chan.mention}!", hidden=True)
 
 if "Windows" not in platform.platform():
     @client.event
