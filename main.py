@@ -202,6 +202,17 @@ async def load_tasks():
         await task
 
 
+async def send_tweet_alert(message: str):
+    log(f"Receiving Twitter alert", 0)
+    log(f"Twttier Alert: {message}", 1)
+    chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
+
+    embed = build_embed(
+        fields=["Twitter Stream Listener Alert", message]
+    )
+    await chan_twitter.send(embed=embed)
+
+
 async def send_tweet(tweet):
     if tweet.author.id_str not in [member["id_str"] for member in list_members]:
         return
@@ -269,7 +280,7 @@ async def send_tweet(tweet):
 
 
 def start_twitter_stream():
-    listener = TwitterStreamListener(send_tweet, client.loop)
+    listener = TwitterStreamListener(send_tweet, send_tweet_alert, client.loop)
     auth = tweepy.OAuthHandler(
         consumer_key=TWITTER_KEY,
         consumer_secret=TWITTER_SECRET_KEY

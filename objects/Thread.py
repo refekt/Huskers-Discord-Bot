@@ -26,13 +26,19 @@ def log(message: str, level: int):
 
 
 class TwitterStreamListener(tweepy.StreamListener):
-    def __init__(self, message_func, loop):
+    def __init__(self, message_func, alert_func, loop):
         super().__init__()
         self.message_func = message_func
+        self.alert_func = alert_func
         self.loop = loop
+        self.cooldown = 1
 
     def send_message(self, tweet):
         future = asyncio.run_coroutine_threadsafe(self.message_func(tweet), self.loop)
+        future.result()
+
+    def send_alert(self, message):
+        future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
         future.result()
 
     def on_connect(self):
@@ -50,6 +56,13 @@ class TwitterStreamListener(tweepy.StreamListener):
 
     def on_error(self, status_code):
         log(f"Twitter Stream Listener Error: {status_code}", 1)
+        if status_code == 420:
+            log(f"Pausing for {self.cooldown} seconds", 1)
+            asyncio.sleep(self.cooldown)
+            self.cooldown *= 2
+            log(f"Pause complete. New timer is {self.cooldown} seconds.", 1)
+            self.send_alert(f"Twitter Stream Listener Error: {status_code}")
+            return True  # Reconnect
 
     def on_disconnect(self, notice):
         log(f"Twitter Stream Listening has disconnected. Notice: {notice}", 1)
