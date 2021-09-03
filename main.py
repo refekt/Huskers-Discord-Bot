@@ -15,9 +15,17 @@ import requests
 import tweepy
 from PIL import Image
 from discord.ext.commands import Bot
-from discord_slash import SlashCommand
+from discord_slash import (
+    ButtonStyle,
+    ComponentContext,
+    SlashCommand
+)
 from discord_slash.context import (
     SlashContext
+)
+from discord_slash.utils.manage_components import (
+    create_actionrow,
+    create_button
 )
 from imgurpython import ImgurClient
 
@@ -26,7 +34,9 @@ from objects.Thread import (
     TwitterStreamListener
 )
 from utilities.constants import (
+    CHAN_GENERAL,
     CHAN_HOF_PROD,
+    CHAN_RECRUITING,
     CHAN_RULES,
     CHAN_SCOTTS_BOTS,
     CHAN_SHAME,
@@ -43,7 +53,8 @@ from utilities.constants import (
     TWITTER_SECRET_KEY,
     TWITTER_TOKEN,
     TWITTER_TOKEN_SECRET,
-    UserError
+    UserError,
+    set_component_key
 )
 from utilities.embed import build_embed
 from utilities.mysql import (
@@ -227,7 +238,22 @@ async def send_tweet(tweet):
 
     print(f"### ~~~ Sending tweeit from @{tweet.author.screen_name}")
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
-    await chan_twitter.send(embed=embed)
+
+    buttons = [
+        create_button(
+            style=ButtonStyle.gray,
+            custom_id=f"{set_component_key()}_send_to_general",
+            label="Send to General"
+        ),
+        create_button(
+            style=ButtonStyle.gray,
+            custom_id="{set_component_key()}_send_to_recruiting",
+            label="Send to Recruiting"
+        )
+    ]
+    actionrow = create_actionrow(*buttons)
+    # noinspection PyArgumentList
+    await chan_twitter.send(embed=embed, components=[actionrow])
 
 
 def start_twitter_stream():
@@ -437,6 +463,25 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 async def on_member_join(member: discord.Member):
     print(f"### New Member: {member.display_name}")
     await send_welcome_message(member)
+
+
+@client.event
+async def on_component(ctx: ComponentContext):
+    if ("send_to_general" in ctx.custom_id) or ("send_to_recruiting" in ctx.custom_id):
+        await ctx.defer(hidden=True)
+        chan: typing.Union[discord.TextChannel, None] = None
+        if "send_to_general" in ctx.custom_id:
+            chan = ctx.bot.get_channel(id=CHAN_GENERAL)
+        elif "send_to_recruiting" in ctx.custom_id:
+            chan = ctx.bot.get_channel(id=CHAN_RECRUITING)
+        twitter_url = ""
+        if chan is not None:
+            for field in ctx.origin_message.embeds[0].fields:
+                if field.name == "Tweet Link":
+                    twitter_url = str(field.value)[7:-1]
+                    break
+
+        await chan.send(twitter_url)
 
 
 if "Windows" not in platform.platform():

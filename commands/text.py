@@ -1,7 +1,6 @@
 import json
 import random
 import re
-import string
 from datetime import timedelta
 from urllib import parse
 
@@ -37,7 +36,8 @@ from utilities.constants import (
     US_STATES,
     UserError,
     WEATHER_API_KEY,
-    guild_id_list
+    guild_id_list,
+    set_component_key
 )
 from utilities.embed import build_embed
 
@@ -103,10 +103,6 @@ def cleanup_source_data(source_data: str):
     new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
 
     return new_source_data
-
-
-def set_component_key() -> str:
-    return "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 class TextCommands(commands.Cog):

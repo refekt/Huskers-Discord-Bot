@@ -27,7 +27,7 @@ from utilities.constants import (
     CHAN_GENERAL,
     CHAN_HYPE_GROUP,
     CHAN_IOWA,
-    CHAN_SCOTT,
+    CHAN_RECRUITING,
     CHAN_WAR_ROOM,
     CommandError,
     ROLE_ALDIS,
@@ -936,7 +936,7 @@ class AdminCommands(commands.Cog):
         if ctx.values[0] == "SMMS_general":
             chan = ctx.guild.get_channel(CHAN_GENERAL)
         elif ctx.values[0] == "SMMS_recruiting":
-            chan = ctx.guild.get_channel(CHAN_SCOTT)
+            chan = ctx.guild.get_channel(CHAN_RECRUITING)
         elif ctx.values[0] == "SMMS_war":
             chan = ctx.guild.get_channel(CHAN_WAR_ROOM)
 

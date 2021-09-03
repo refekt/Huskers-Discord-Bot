@@ -1,6 +1,7 @@
 import pathlib
 import platform
-import sys
+import random
+import string
 
 import pytz
 from discord.ext.commands import BucketType
@@ -44,18 +45,7 @@ def pretty_time_delta(seconds):
         return f"{seconds}s"
 
 
-# try:
-#     server = sys.argv[1]
-#     if server == "prod":
-#         print("### ~~~ Bot starting on the production server")
-#     elif server == "test":
-#         print("### ~~~ Bot starting on the test server")
-# except IndexError:
-#     pass
-
 print(f"### Platform == {platform.platform()}")
-# print(f"### ~~~ argv[0]: {sys.argv[0]}")
-# print(f"### ~~~ argv[1]: {sys.argv[1]}")
 
 # Setting variables location
 variables_path = None
@@ -70,6 +60,10 @@ elif "Linux" in platform.platform():
 
 def guild_id_list() -> list:
     return [GUILD_PROD]
+
+
+def set_component_key() -> str:
+    return "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 load_dotenv(dotenv_path=variables_path)
@@ -180,7 +174,7 @@ CHAN_POSSUMS = 873645025878233099
 CHAN_RADIO_PROD = 660610967733796902
 CHAN_RADIO_TEST = 595705205069185050
 CHAN_RULES = 651523695214329887
-CHAN_SCOTT = 507520543096832001
+CHAN_RECRUITING = 507520543096832001
 CHAN_SCOTTS_BOTS = 593984711706279937
 CHAN_SHAME = 860686057850798090
 CHAN_TEST_SPAM = 595705205069185047
