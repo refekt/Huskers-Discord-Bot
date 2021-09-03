@@ -19,6 +19,19 @@ from utilities.encryption import (
 )
 
 
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
+# Consistent timezone
+TZ = pytz.timezone("US/Central")
+
+
 # Global Errors
 class CommandError(Exception):
     def __init__(self, message):
@@ -45,16 +58,16 @@ def pretty_time_delta(seconds):
         return f"{seconds}s"
 
 
-print(f"### Platform == {platform.platform()}")
+log(f"Platform == {platform.platform()}", 0)
 
 # Setting variables location
 variables_path = None
 
 if "Windows" in platform.platform():
-    print("### ~~~ Windows environment set")
+    log(f"Windows environment set", 0)
     variables_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
 elif "Linux" in platform.platform():
-    print("### ~~~ Linux environment set")
+    log(f"Linux environment set", 0)
     variables_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
 
 
@@ -131,9 +144,6 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gec
 
 # Embed titles
 EMBED_TITLE_HYPE = "Nebraska Football Hype Squad 📈 ⚠ ⛔"
-
-# Consistent timezone
-TZ = pytz.timezone("US/Central")
 
 # Discord Roles
 ROLE_ADMIN_PROD = 440639061191950336
@@ -307,13 +317,13 @@ admin_perms = {
 #     )
 #
 #     try:
-#         print("### Attempting to change nickname...")
+#         log(f"Attempting to change nickname...")
 #         await client.user.edit(
 #             username=random.choice(nicks)
 #         )
-#         print(f"### ~~~ Successfully changed display name")
+#         log(f"Successfully changed display name")
 #     except discord.HTTPException as err:
-#         err_msg = "### ~~~ Unable to change display name: " + str(err).replace("\n", " ")
+#         err_msg = "### Unable to change display name: " + str(err).replace("\n", " ")
 #         print(err_msg)
 #     except:
-#         print(f"### ~~~ Unknown error!", sys.exc_info()[0])
+#         log(f"Unknown error!", sys.exc_info()[0])

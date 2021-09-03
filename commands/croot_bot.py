@@ -21,6 +21,7 @@ from objects.FAPing import (
 from objects.Recruits import FootballRecruit
 from utilities.constants import (
     CROOT_SEARCH_LIMIT,
+    TZ,
     UserError,
     guild_id_list
 )
@@ -28,6 +29,16 @@ from utilities.embed import (
     build_embed,
     build_recruit_embed
 )
+
+
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
 
 fap_buttons = [
     create_button(
@@ -97,22 +108,22 @@ async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit: bool = False
         fap_buttons[0]["disabled"] = False
 
     if edit:
-        print("### ~~~ Editing message")
+        log(f"Editing message", 1)
         await ctx.edit_origin(content="", embed=embed, components=[fap_action_row])
     else:
-        print("### ~~~ Sending message")
+        log(f"Sending message", 1)
         embed = build_recruit_embed(target_recruit)
         await ctx.send(embed=embed, components=[fap_action_row])
 
     button_contenxt: ComponentContext = await wait_for_component(bot, components=fap_action_row)
 
     if button_contenxt.custom_id == "crystal_ball":
-        print(f"### ~~~ Crystal ball pressed for [{target_recruit.name.capitalize()}]")
+        log(f"Crystal ball pressed for [{target_recruit.name.capitalize()}]", 0)
         await initiate_fap(ctx=ctx, user=ctx.author, recruit=target_recruit, client=bot)
         return
 
     elif button_contenxt.custom_id == "scroll":
-        print(f"### ~~~ Scroll pressed for [{target_recruit.name.capitalize()}]")
+        log(f"Scroll pressed for [{target_recruit.name.capitalize()}]", 0)
         await individual_predictions(ctx=ctx, recruit=target_recruit)
         return
 
@@ -132,7 +143,7 @@ class RecruitCog(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _crootbot(self, ctx: SlashContext, year: int, search_name: str):
-        print(f"### Crootbot")
+        print(f"[{datetime.datetime.now().astimezone(tz=TZ)}] ### Crootbot")
 
         if len(search_name) == 0:
             raise UserError("A player's first and/or last search_name is required.")
@@ -150,12 +161,12 @@ class RecruitCog(commands.Cog):
 
         await ctx.defer()  # Similiar to sending a message with a loading screen to edit later on
 
-        print(f"### ~~~ Searching for [{year} {search_name.capitalize()}]")
+        log(f"Searching for [{year} {search_name.capitalize()}]", 1)
 
         global croot_search
         croot_search = FootballRecruit(year, search_name)
 
-        print(f"### ~~~ Found [{len(croot_search)}] results")
+        log(f"Found [{len(croot_search)}] results", 1)
 
         if len(croot_search) == 1:
             return await final_send_embed_fap_loop(
@@ -174,7 +185,7 @@ class RecruitCog(commands.Cog):
 
         await ctx.send(embed=embed, components=[action_row])
 
-        print(f"### ~~~ Sent search results for [{year} {search_name.capitalize()}]")
+        log(f"Sent search results for [{year} {search_name.capitalize()}]", 1)
 
     @cog_ext.cog_subcommand(
         name="predict",
@@ -250,7 +261,7 @@ class RecruitCog(commands.Cog):
     @cog_ext.cog_component(components=search_buttons)
     async def process_croot_bot(self, ctx: ComponentContext):
         button_to_index = {"result_1": 0, "result_2": 1, "result_3": 2, "result_4": 3, "result_5": 4}
-        print(f"### ~~~ Button [{ctx.custom_id}] was pressed")
+        log(f"Button [{ctx.custom_id}] was pressed", 1)
 
         global croot_search, fap_search
 

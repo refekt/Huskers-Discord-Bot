@@ -23,6 +23,15 @@ NO_MORE_PREDS = datetime.datetime.now().year
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
 async def get_teams():
     sql_teams = Process_MySQL(query=sqlTeamIDs, fetch='all')
     teams_list = [t['school'] for t in sql_teams]
@@ -252,9 +261,9 @@ class FAP_Commands(commands.Cog):
         try:
             await edit_msg.delete()
         except discord.HTTPException:
-            print("Deleting the message failed.")
+            log(f"Deleting the message failed.", 1)
         except discord.ClientException:
-            print("Unable to delete message due to lack of permissions.")
+            log(f"Unable to delete message due to lack of permissions.", 1)
 
         await send_fap_convo(search_result_player)
 

@@ -16,6 +16,15 @@ from utilities.mysql import (
 exitFlag = 0
 
 
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
 class TwitterStreamListener(tweepy.StreamListener):
     def __init__(self, message_func, loop):
         super().__init__()
@@ -27,31 +36,31 @@ class TwitterStreamListener(tweepy.StreamListener):
         future.result()
 
     def on_connect(self):
-        print("### Twitter Stream Listening has connected.")
+        log(f"Twitter Stream Listening has connected.", 0)
 
     def on_status(self, status):
         # if not status.retweeted and status.in_reply_to_status_id is None and not hasattr(status, "retweeted_status"):
         self.send_message(status)
 
     def on_warning(self, notice):
-        print(f"### ~~~ Twitter Stream Listener Error: {notice}")
+        log(f"Twitter Stream Listener Error: {notice}", 1)
 
     def on_timeout(self):
-        print("### ~~~ Twitter Stream Listener timed out")
+        log(f"Twitter Stream Listener timed out", 1)
 
     def on_error(self, status_code):
-        print(f"### ~~~ Twitter Stream Listener Error: {status_code}")
+        log(f"Twitter Stream Listener Error: {status_code}", 1)
 
     def on_disconnect(self, notice):
-        print(f"### Twitter Stream Listening has disconnected. Notice: {notice}")
+        log(f"Twitter Stream Listening has disconnected. Notice: {notice}", 1)
 
 
 async def send_reminder(num_seconds, destination: typing.Union[discord.Member, discord.TextChannel], message: str, source: typing.Union[discord.Member, discord.TextChannel], alert_when, missed=False):
-    print(f"### ;;; Starting thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].")
+    log(f"Starting thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].", 1)
 
     if not missed:
-        print(f"### ;;; Destination: [{destination}]")
-        print(f"### ;;; Message: [{message[:15] + '...'}]")
+        log(f"Destination: [{destination}]", 1)
+        log(f"Message: [{message[:15] + '...'}]", 1)
 
         await asyncio.sleep(num_seconds)
 
@@ -77,4 +86,4 @@ async def send_reminder(num_seconds, destination: typing.Union[discord.Member, d
 
     Process_MySQL(sqlUpdateTasks, values=(0, str(destination.id), message, alert_when, str(source)))
 
-    print(f"### ;;; Thread completed successfully!")
+    log(f";;; Thread completed successfully!")

@@ -4,11 +4,21 @@ import platform
 
 from cryptography.fernet import Fernet
 
+
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
 if "Windows" in platform.platform():
-    print("### ~~~ Windows encrption key set")
+    log(f"Windows encrption key set", 0)
     key_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key")
 elif "Linux" in platform.platform():
-    print("### ~~~ Windows encrption key set")
+    log(f"Windows encrption key set", 0)
     key_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key")
 
 

@@ -7,6 +7,16 @@ from utilities.constants import (
     SQL_USER
 )
 
+
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
 sqlCreateImageCommand = """
 INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
 """
@@ -233,7 +243,7 @@ UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND send_
 
 
 def Process_MySQL(query: str, **kwargs):
-    print("### Starting an MySQL query")
+    log(f"Starting a MySQL query", 0)
     try:
         sqlConnection = pymysql.connect(
             host=SQL_HOST,
@@ -243,10 +253,9 @@ def Process_MySQL(query: str, **kwargs):
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
-        print(f"### ~~~ Connected to the MySQL Database! ###\n"
-              f"### ~~~ Preparing to execute [`{repr(query)}`{'] and [`' + repr(kwargs) + '`' if kwargs else ''}]")
+        log(f"Connected to the MySQL Database!", 1)
     except:
-        print(f"Unable to connect to the `{SQL_DB}` database.")
+        log(f"Unable to connect to the `{SQL_DB}` database.", 1)
         return
 
     result = None
@@ -287,11 +296,11 @@ def Process_MySQL(query: str, **kwargs):
         sqlConnection.commit()
 
     except:
-        raise ConnectionError("### Error occurred opening the MySQL database.")
+        raise ConnectionError("Error occurred opening the MySQL database.")
     finally:
-        print(f"### ~~~ Closing connection to the MySQL Database")
+        log(f"Closing connection to the MySQL Database", 1)
         sqlConnection.close()
 
         if result:
-            print("### MySQL query finished")
+            log(f"MySQL query finished", 0)
             return result

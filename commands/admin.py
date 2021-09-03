@@ -30,8 +30,8 @@ from utilities.constants import (
     CHAN_RECRUITING,
     CHAN_WAR_ROOM,
     CommandError,
-    ROLE_ALDIS,
     ROLE_AIRPOD,
+    ROLE_ALDIS,
     ROLE_ASPARAGUS,
     ROLE_EVERYONE_PROD,
     ROLE_HYPE_MAX,
@@ -58,6 +58,16 @@ from utilities.mysql import (
     sqlRemoveIowa,
     sqlRetrieveIowa
 )
+
+
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
 
 console_buttons = [
     create_button(
@@ -206,7 +216,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     general_category = guild.get_channel(CAT_GENERAL)
     everyone = guild.get_role(ROLE_EVERYONE_PROD)
 
-    print(f"### ~~~ Creating permissions to be [{mode}]")
+    log(f"Creating permissions to be [{mode}]", 1)
 
     perms_text = discord.PermissionOverwrite()
     perms_text.view_channel = mode
@@ -221,7 +231,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     perms_voice.connect = mode
     perms_voice.speak = mode
 
-    print("### ~~~ Permissions created")
+    log(f"Permissions created", 1)
 
     for channel in general_category.channels:
 
@@ -229,33 +239,33 @@ async def process_gameday(mode: bool, guild: discord.Guild):
             continue
 
         try:
-            print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{not mode}]")
+            log(f"Attempting to changes permissions for [{channel}] to [{not mode}]", 1)
 
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text_opposite)
-                print(f"### ~~~ Changed permissions for [{channel}] to [{not mode}]")
+                log(f"Changed permissions for [{channel}] to [{not mode}]", 1)
         except:
-            print(f"### ~~~ Unable to change permissions for [{channel}] to [{not mode}]")
+            log(f"Unable to change permissions for [{channel}] to [{not mode}]", 1)
             continue
 
     for channel in gameday_category.channels:
         try:
-            print(f"### ~~~ Attempting to changes permissions for [{channel}] to [{mode}]")
+            log(f"Attempting to changes permissions for [{channel}] to [{mode}]", 1)
 
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text)
             elif channel.type == discord.ChannelType.voice:
                 await channel.set_permissions(everyone, overwrite=perms_voice)
             else:
-                print(f"### ~~~ Unable to change permissions for [{channel}] to [{mode}]")
+                log(f"Unable to change permissions for [{channel}] to [{mode}]", 1)
                 continue
-            print(f"### ~~~ Changed permissions for [{channel}] to [{mode}]")
+            log(f"Changed permissions for [{channel}] to [{mode}]", 1)
         except discord.errors.Forbidden:
             raise CommandError("The bot does not have access to change permissions!")
         except:
             continue
 
-    print("### ~~~ All permisisons changes applied")
+    log(f"All permisisons changes applied", 0)
 
 
 class AdminCommands(commands.Cog):
@@ -342,13 +352,13 @@ class AdminCommands(commands.Cog):
         try:
             max_age = datetime.now() - timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True)
-            print(f"Bulk delete of {len(deleted)} messages successful.")
+            log(f"Bulk delete of {len(deleted)} messages successful.", 0)
         except discord.ClientException:
-            print("Cannot delete more than 100 messages at a time.")
+            log(f"Cannot delete more than 100 messages at a time.", 1)
         except discord.Forbidden:
-            print("Missing permissions.")
+            log(f"Missing permissions.", 1)
         except discord.HTTPException:
-            print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
+            log(f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.", 1)
 
         await ctx.send(hidden=True, content="Done!")
 
@@ -375,34 +385,20 @@ class AdminCommands(commands.Cog):
 
             max_age = datetime.now() - timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True, check=is_bot)
-            print(f"Bulk delete of {len(deleted)} messages successful.")
+            log(f"Bulk delete of {len(deleted)} messages successful.", 0)
         except discord.ClientException:
-            print("Cannot delete more than 100 messages at a time.")
+            log(f"Cannot delete more than 100 messages at a time.", 1)
         except discord.Forbidden:
-            print("Missing permissions.")
+            log(f"Missing permissions.", 1)
         except discord.HTTPException:
-            print("Deleting messages failed. Bulk messages possibly include messages over 14 days old.")
+            log(f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.", 1)
 
         await ctx.send(hidden=True, content="Done!")
 
     @cog_ext.cog_slash(
         name="submit",
         description="Report something on GitHub",
-        guild_ids=guild_id_list(),
-        # options=[
-        #     create_option(
-        #         name="bug",
-        #         description="Submit a bug report",
-        #         option_type=1,
-        #         required=False
-        #     ),
-        #     create_option(
-        #         name="feature",
-        #         description="Submit feature request",
-        #         option_type=1,
-        #         required=False
-        #     )
-        # ]
+        guild_ids=guild_id_list()
     )
     async def _submit(self, ctx: SlashContext):
         pass
@@ -447,7 +443,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _roles_hype(self, ctx: SlashContext):
-        print("### Roles: Hype Squad")
+        log(f"Roles: Hype Squad", 0)
 
         hype_action_row = create_actionrow(*buttons_roles_hype)
 
@@ -470,7 +466,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_hype(self, ctx: ComponentContext):
         await ctx.defer()
 
-        print("### ~~~ Gathering roles")
+        log(f"Gathering roles", 0)
 
         hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
         hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
@@ -519,7 +515,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed, delete_after=10)
 
-        print("### Roles: Hype Squad")
+        log(f"Roles: Hype Squad", 0)
 
     @cog_ext.cog_subcommand(
         base="roles",
@@ -529,7 +525,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _roles_food(self, ctx: SlashContext):
-        print("### Roles: Food")
+        log(f"Roles: Food", 0)
 
         embed = build_embed(
             title="Which food roles do you want?",
@@ -553,7 +549,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_food(self, ctx: ComponentContext):
         await ctx.defer()
 
-        print("### ~~~ Gathering roles")
+        log(f"Gathering roles", 0)
 
         food_potato = ctx.guild.get_role(ROLE_POTATO)
         food_asparagus = ctx.guild.get_role(ROLE_ASPARAGUS)
@@ -602,7 +598,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed, delete_after=10)
 
-        print("### Roles: Food")
+        log(f"Roles: Food", 0)
 
     @cog_ext.cog_subcommand(
         base="roles",
@@ -612,7 +608,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list()
     )
     async def _roles_culture(self, ctx: SlashContext):
-        print("### Roles: Culture")
+        log(f"Roles: Culture", 0)
 
         embed = build_embed(
             title="Which culture roles do you want?",
@@ -636,7 +632,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_culture(self, ctx: ComponentContext):
         await ctx.defer()
 
-        print("### ~~~ Gathering roles")
+        log(f"Gathering roles", 0)
 
         culture_meme = ctx.guild.get_role(ROLE_MEME)
         culture_isms = ctx.guild.get_role(ROLE_ISMS)
@@ -685,7 +681,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed, delete_after=10)
 
-        print("### Roles: Culture")
+        log(f"Roles: Culture", 0)
 
     @cog_ext.cog_subcommand(
         base="gameday",
@@ -696,7 +692,7 @@ class AdminCommands(commands.Cog):
         base_permissions=admin_perms
     )
     async def _gameday_on(self, ctx: SlashContext):
-        print("### Game Day: On")
+        log(f"Game Day: On", 0)
         await process_gameday(True, ctx.guild)
         embed = build_embed(
             title="Game Day Mode",
@@ -719,7 +715,7 @@ class AdminCommands(commands.Cog):
         base_permissions=admin_perms
     )
     async def _gameday_off(self, ctx: SlashContext):
-        print("### Game Day: Off")
+        log(f"Game Day: Off", 0)
         await process_gameday(False, ctx.guild)
         embed = build_embed(
             title="Game Day Mode",

@@ -53,6 +53,7 @@ from utilities.constants import (
     TWITTER_SECRET_KEY,
     TWITTER_TOKEN,
     TWITTER_TOKEN_SECRET,
+    TZ,
     UserError,
     set_component_key
 )
@@ -74,12 +75,21 @@ client_percent = 0.0047
 list_members = []
 
 
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
 def current_guild() -> typing.Union[discord.Guild, None]:
     if len(client.guilds) == 0:
-        print("### ~~~ Unable to find any guilds!")
+        log(f"Unable to find any guilds!", 1)
         return None
     else:
-        print(f"### ~~~ Active Guilds: {[guild.name for guild in client.guilds]}")
+        log(f"Active Guilds: {[guild.name for guild in client.guilds]}", 1)
         return client.guilds[0]
 
 
@@ -92,18 +102,18 @@ async def change_my_status():
         "a missed field goal"
     )
     try:
-        print("### Attempting to change status...")
+        log(f"Attempting to change status...", 0)
         await client.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
                 name=random.choice(statuses)
             )
         )
-        print(f"### ~~~ Successfully changed status")
+        log(f"Successfully changed status", 1)
     except (AttributeError, discord.HTTPException) as err:
-        print("### ~~~ Unable to change status: " + str(err).replace("\n", " "))
+        log(f"Unable to change status: " + str(err).replace('\n', ' '), 1)
     except:
-        print(f"### ~~~ Unknown error!", sys.exc_info()[0])
+        log(f"Unknown error!" + str(sys.exc_info()[0]), 0)
 
 
 async def load_tasks():
@@ -141,14 +151,13 @@ async def load_tasks():
         loop = asyncio.get_event_loop()
         loop.stop()
         await client.close()
-        return print("### ~~~ Unable to find any guilds. Exiting...")
+        log(f"Unable to find any guilds. Exiting...", 1)
     else:
-        print(f"### ~~~ Guild == {guild}")
-
+        log(f"Guild == {guild}", 1)
     if tasks is None:
-        return print("### ;;; No tasks were loaded")
+        return log(f"No tasks were loaded", 1)
 
-    print(f"### There are {len(tasks)} to be loaded")
+    log(f"There are {len(tasks)} to be loaded, 0")
 
     task_repo = []
     loop = asyncio.new_event_loop()
@@ -159,14 +168,14 @@ async def load_tasks():
         destination = await convert_destination(guild, task["send_to"])
 
         if destination is None:
-            print(f"### ;;; Skipping task because destination is None.")
+            log(f"Skipping task because destination is None.", 1)
             continue
 
         if task["author"] is None:
             task["author"] = "N/A"
 
         if send_when == timedelta(seconds=0):
-            print(f"### ;;; Alert time already passed! {task['send_when']}")
+            log(f"Alert time already passed! {task['send_when']}", 1)
             await send_reminder(
                 num_seconds=0,
                 destination=destination,
@@ -234,7 +243,7 @@ async def send_tweet(tweet):
         except:
             pass
 
-    print(f"### ~~~ Sending tweeit from @{tweet.author.screen_name}")
+    log(f"Sending tweeit from @{tweet.author.screen_name}", 1)
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
     buttons = [
@@ -291,7 +300,6 @@ def start_twitter_stream():
 
             }
         )
-    print(list_members)
     stream.filter(
         follow=[member["id_str"] for member in list_members],
         is_async=True
@@ -336,7 +344,7 @@ async def hall_of_fame_messages(reactions: list):
 
         if reaction.count >= reaction_threshold:
             multiple_threshold = True
-            print(f"### ~~~ Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] reactions")
+            log(f"Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] in [{reaction.message.channel}] reactions", 0)
             if str(reaction.emoji) == slowpoke_emoji:
                 hof = False
                 hos_channel = client.get_channel(id=CHAN_SHAME)
@@ -383,6 +391,7 @@ async def hall_of_fame_messages(reactions: list):
                     footer=f"Message ID: {reaction.message.id} | Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')}"
                 )
                 await channel.send(embed=embed)
+                log(f"Processed HOF/HOS message.", 0)
 
 
 async def send_welcome_message(who: discord.Member):
@@ -410,23 +419,22 @@ async def on_connect():
 @client.event
 async def on_ready():
     threshold = int(len(client.users) * client_percent)
-    print(
-        f"### Bot Frost version 3.0 ###\n"
-        f"### ~~~ Name: {client.user}\n"
-        f"### ~~~ ID: {client.user.id}\n"
-        f"### ~~~ Guild: {current_guild()}\n"
-        f"### ~~~ HOF/HOS Reaction Threshold: {threshold}\n"
-        f"### The bot is ready!"
-    )
+
+    log(f"Bot Frost version 3.0", 0)
+    log(f"Name: {client.user}", 1)
+    log(f"ID: {client.user.id}", 1)
+    log(f"Guild: {current_guild()}", 1)
+    log(f"HOF/HOS Reaction Threshold: {threshold}", 1)
+    log(f"The bot is ready!", 0)
 
     try:
         changelog_path = None
 
         if "Windows" in platform.platform():
-            print("### ~~~ Windows changelog")
+            log(f"Windows changelog", 1)
             changelog_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
         elif "Linux" in platform.platform():
-            print("### ~~~ Linux changelog")
+            log(f"Linxue changelog", 0)
             changelog_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
 
         changelog = open(changelog_path, "r")
@@ -464,7 +472,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 
 @client.event
 async def on_member_join(member: discord.Member):
-    print(f"### New Member: {member.display_name}")
+    log(f"New Member: {member.display_name}", 0)
     await send_welcome_message(member)
 
 
@@ -556,7 +564,7 @@ extensions = [
     # "commands.testing"
 ]
 for extension in extensions:
-    print(f"### ~~~ Loading extension: {extension}")
+    log(f"Loading extension: {extension}", 1)
     client.load_extension(extension)
 
 client.run(PROD_TOKEN)
