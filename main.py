@@ -60,6 +60,7 @@ client = Bot(
 
 slash = SlashCommand(client, sync_commands=True)  # Sync required
 client_percent = 0.0047
+list_members = []
 
 
 def current_guild() -> typing.Union[discord.Guild, None]:
@@ -182,22 +183,49 @@ async def load_tasks():
 
 
 async def send_tweet(tweet):
-    url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
+    if tweet.author.id_str not in [member["id_str"] for member in list_members]:
+        return
+
+    direct_url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
+
+    if hasattr(tweet, "extended_tweet"):
+        fields = [
+            ["Message", tweet.extended_tweet["full_text"]],
+            ["Tweet Link", f"[Link]({direct_url})"]
+        ]
+    else:
+        fields = [
+            ["Message", tweet.text],
+            ["Tweet Link", f"[Link]({direct_url})"]
+        ]
+
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
-        fields=[
-            # [f"{tweet.author.name} (@{tweet.author.screen_name}) said", tweet.full_text],
-            ["Tweet Link", f"[Link]({url})"],
-            ["Husker Media List", f"[Link](https://twitter.com/i/lists/1307680291285278720)"]
-        ],
+        fields=fields,
         footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}"
     )
+
     embed.set_author(
         name=f"{tweet.author.name} (@{tweet.author.screen_name}) via {tweet.source}",
-        url=url,
         icon_url=tweet.author.profile_image_url_https
     )
 
+    if hasattr(tweet, "extended_entities"):
+        try:
+            for index, media in enumerate(tweet.extended_entities["media"]):
+                if index == 0:
+                    embed.set_image(
+                        url=tweet.extended_entities["media"][index]["media_url"]
+                    )
+                embed.add_field(
+                    name=f"Media #{index + 1}",
+                    value=f"[Link #{index + 1}]({media['media_url']})",
+                    inline=False
+                )
+        except:
+            pass
+
+    print(f"### ~~~ Sending tweeit from @{tweet.author.screen_name}")
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
     await chan_twitter.send(embed=embed)
 
@@ -217,13 +245,26 @@ def start_twitter_stream():
         auth=api.auth,
         listener=listener
     )
-    follow = []
+
+    for member in tweepy.Cursor(api.list_members, list_id=TWITTER_HUSKER_MEDIA_LIST_ID).items():
+        list_members.append(
+            {
+                "screen_name": member.screen_name,
+                "id_str": member.id_str,
+
+            }
+        )
     if "Windows" in platform.platform():
-        follow = ["15899943"]
-    else:
-        follow = [user.id_str for user in api.list_members(list_id=TWITTER_HUSKER_MEDIA_LIST_ID)]
+        list_members.append(
+            {
+                "screen_name": "ayy_gbr",
+                "id_str": "15899943",
+
+            }
+        )
+    print(list_members)
     stream.filter(
-        follow=follow,
+        follow=[member["id_str"] for member in list_members],
         is_async=True
     )
 
