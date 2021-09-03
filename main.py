@@ -201,13 +201,11 @@ async def send_tweet(tweet):
 
     if hasattr(tweet, "extended_tweet"):
         fields = [
-            ["Message", tweet.extended_tweet["full_text"]],
-            ["Tweet Link", f"[Link]({direct_url})"]
+            ["Message", tweet.extended_tweet["full_text"]]
         ]
     else:
         fields = [
-            ["Message", tweet.text],
-            ["Tweet Link", f"[Link]({direct_url})"]
+            ["Message", tweet.text]
         ]
 
     embed = build_embed(
@@ -247,8 +245,13 @@ async def send_tweet(tweet):
         ),
         create_button(
             style=ButtonStyle.gray,
-            custom_id="{set_component_key()}_send_to_recruiting",
+            custom_id=f"{set_component_key()}_send_to_recruiting",
             label="Send to Recruiting"
+        ),
+        create_button(
+            style=ButtonStyle.URL,
+            label="Open Tweet",
+            url=direct_url
         )
     ]
     actionrow = create_actionrow(*buttons)
@@ -474,15 +477,11 @@ async def on_component(ctx: ComponentContext):
             chan = ctx.bot.get_channel(id=CHAN_GENERAL)
         elif "send_to_recruiting" in ctx.custom_id:
             chan = ctx.bot.get_channel(id=CHAN_RECRUITING)
-        twitter_url = ""
         if chan is not None:
-            for field in ctx.origin_message.embeds[0].fields:
-                if field.name == "Tweet Link":
-                    twitter_url = str(field.value)[7:-1]
-                    break
+            twitter_url = ctx.origin_message.components[0]["components"][2]["url"]
+            await chan.send(f"{ctx.author.mention} forwarded: {twitter_url}")
+            await ctx.send(f"Sent to {chan.mention}!", hidden=True)
 
-        await chan.send(f"{ctx.author.mention} forwarded: {twitter_url}")
-        await ctx.send(f"Sent to {chan.mention}!", hidden=True)
 
 if "Windows" not in platform.platform():
     @client.event
