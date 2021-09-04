@@ -157,7 +157,7 @@ async def load_tasks():
     if tasks is None:
         return log(f"No tasks were loaded", 1)
 
-    log(f"There are {len(tasks)} to be loaded, 0")
+    log(f"There are {len(tasks)} to be loaded", 0)
 
     task_repo = []
     loop = asyncio.new_event_loop()
@@ -208,7 +208,9 @@ async def send_tweet_alert(message: str):
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
     embed = build_embed(
-        fields=["Twitter Stream Listener Alert", message]
+        fields=[
+            ["Twitter Stream Listener Alert", message]
+        ]
     )
     await chan_twitter.send(embed=embed)
 
@@ -509,7 +511,9 @@ if "Windows" not in platform.platform():
             return "".join(tback).replace("Aaron", "Secret")
 
         embed = None
-        if isinstance(ex, UserError):
+        if isinstance(ex, discord.errors.NotFound):
+            return log(f"Skipping a NotFound error", 1)
+        elif isinstance(ex, UserError):
             embed = build_embed(
                 title="Husker Bot User Error",
                 description="An error occured with user input",

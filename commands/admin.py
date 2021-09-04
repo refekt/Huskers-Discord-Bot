@@ -8,9 +8,19 @@ from datetime import (
 import discord
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
-from discord_slash import ButtonStyle, cog_ext
-from discord_slash.context import SlashContext, ComponentContext
-from discord_slash.utils.manage_commands import create_option
+from discord_slash import (
+    ButtonStyle,
+    cog_ext
+)
+from discord_slash.model import SlashCommandPermissionType
+from discord_slash.context import (
+    SlashContext,
+    ComponentContext
+)
+from discord_slash.utils.manage_commands import (
+    create_option,
+    create_permission,
+)
 from discord_slash.utils.manage_components import (
     create_actionrow,
     create_button,
@@ -30,6 +40,7 @@ from utilities.constants import (
     CHAN_RECRUITING,
     CHAN_WAR_ROOM,
     CommandError,
+    ROLE_ADMIN_PROD,
     ROLE_AIRPOD,
     ROLE_ALDIS,
     ROLE_ASPARAGUS,
@@ -39,6 +50,7 @@ from utilities.constants import (
     ROLE_HYPE_SOME,
     ROLE_ISMS,
     ROLE_MEME,
+    ROLE_MOD_PROD,
     ROLE_PACKER,
     ROLE_PIXEL,
     ROLE_POTATO,
@@ -337,8 +349,15 @@ class AdminCommands(commands.Cog):
         base_description="Admin only: Delete messages",
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
-        guild_ids=guild_id_list(),
-        base_permissions=admin_perms
+        guild_ids=guild_id_list()
+        # base_permissions=admin_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _everything(self, ctx: SlashContext):
         if ctx.subcommand_passed is not None:
@@ -367,8 +386,15 @@ class AdminCommands(commands.Cog):
         base_description="Admin only: Delete messages",
         name="bot",
         description="Admin only: Deletes previous bot messages",
-        guild_ids=guild_id_list(),
-        base_permissions=admin_perms
+        guild_ids=guild_id_list()
+        # base_permissions=admin_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _bot(self, ctx: SlashContext):
         if ctx.subcommand_passed is not None:
@@ -685,11 +711,19 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="gameday",
-        base_description="Admin only: Turn game day mode on or off",
+        base_description="Admin and mod only: Turn game day mode on or off",
         name="on",
         description="Turn game day mode on",
-        guild_ids=guild_id_list(),
-        base_permissions=admin_perms
+        guild_ids=guild_id_list()
+        # base_permissions=admin_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _gameday_on(self, ctx: SlashContext):
         log(f"Game Day: On", 0)
@@ -708,11 +742,19 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="gameday",
-        base_description="Admin only: Turn game day mode on or off",
+        base_description="Admin and mod only: Turn game day mode on or off",
         name="off",
         description="Turn game day mode off",
-        guild_ids=guild_id_list(),
-        base_permissions=admin_perms
+        guild_ids=guild_id_list()
+        # base_permissions=admin_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _gameday_off(self, ctx: SlashContext):
         log(f"Game Day: Off", 0)
@@ -783,12 +825,21 @@ class AdminCommands(commands.Cog):
 
     @cog_ext.cog_slash(
         name="iowa",
-        description="Admin and Mod only: Sends members to Iowa",
-        guild_ids=guild_id_list(),
-        permissions=admin_mod_perms
+        description="Admin and mod only: Sends members to Iowa",
+        guild_ids=guild_id_list()
+        # permissions=admin_mod_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _iowa(self, ctx: SlashContext, who: discord.Member, reason: str):
         await ctx.defer()
+        log(f"Starting the Iowa command and banishing {who}", 0)
 
         if not who:
             raise UserError("You must include a user!")
@@ -804,15 +855,19 @@ class AdminCommands(commands.Cog):
         if previous_roles:
             previous_roles = ",".join(previous_roles)
 
+        log(f"Gathered all the roles to store", 1)
+
         roles = who.roles
         for role in roles:
             try:
                 await who.remove_roles(role, reason=full_reason)
+                log(f"Removed [{role}] role", 1)
             except (discord.Forbidden, discord.HTTPException):
                 pass
 
         try:
             await who.add_roles(role_timeout, reason=full_reason)
+            log(f"Added [{role_timeout}] role", 1)
         except (discord.Forbidden, discord.HTTPException):
             pass
 
@@ -833,21 +888,32 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
         await who.send(f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}.")
+        log("Iowa command complete", 0)
 
     @cog_ext.cog_slash(
         name="nebraska",
-        description="Admin and Mod only: Bring a member back from Iowa",
-        guild_ids=guild_id_list(),
-        permissions=admin_mod_perms
+        description="Admin and mod only: Bring a member back from Iowa",
+        guild_ids=guild_id_list()
+        # permissions=admin_mod_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _nebraska(self, ctx: SlashContext, who: discord.Member):
         await ctx.defer()
+        log(f"Starting the Nebraska command and banishing {who}", 0)
 
         if not who:
             raise UserError("You must include a user!")
 
         role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         await who.remove_roles(role_timeout)
+        log(f"Removed [{role_timeout}] role", 1)
 
         previous_roles_raw = Process_MySQL(
             query=sqlRetrieveIowa,
@@ -856,12 +922,14 @@ class AdminCommands(commands.Cog):
         )
 
         previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+        log(f"Gathered all the roles to store", 1)
 
         try:
             if previous_roles:
                 for role in previous_roles:
                     new_role = ctx.guild.get_role(int(role))
                     await who.add_roles(new_role, reason="Returning from Iowa")
+                    log(f"Added [{new_role}] role", 1)
         except (discord.Forbidden, discord.HTTPException):
             pass
 
@@ -882,12 +950,21 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
         await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
+        log("Nebraska command complete", 0)
 
     @cog_ext.cog_slash(
         name="console",
-        description="Admin or Mod only",
+        description="Admin or mod only",
         guild_ids=guild_id_list(),
-        permissions=admin_mod_perms
+        # permissions=admin_mod_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _console(self, ctx: SlashContext):
 

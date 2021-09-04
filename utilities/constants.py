@@ -263,14 +263,14 @@ admin_mod_perms = {
     GUILD_PROD: [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
         create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-        create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
+        create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
     ]
 }
 
 admin_perms = {
     GUILD_PROD: [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
-        create_permission(ROLE_ADMIN_TEST, SlashCommandPermissionType.ROLE, True)
+        create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
     ]
 }
 
