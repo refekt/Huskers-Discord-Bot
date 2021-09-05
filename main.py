@@ -514,7 +514,7 @@ if "Windows" not in platform.platform():
         embed = None
         if isinstance(ex, discord.errors.NotFound):
             return log(f"Skipping a NotFound error", 1)
-        elif isinstance(ex, UserError):
+        elif isinstance(ex, (UserError, AssertionError)):
             embed = build_embed(
                 title="Husker Bot User Error",
                 description="An error occured with user input",
