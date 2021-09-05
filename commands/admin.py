@@ -12,11 +12,11 @@ from discord_slash import (
     ButtonStyle,
     cog_ext
 )
-from discord_slash.model import SlashCommandPermissionType
 from discord_slash.context import (
     SlashContext,
     ComponentContext
 )
+from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import (
     create_option,
     create_permission,
@@ -62,7 +62,6 @@ from utilities.constants import (
     ROLE_TIME_OUT,
     UserError,
     admin_mod_perms,
-    admin_perms,
     guild_id_list
 )
 from utilities.embed import build_embed as build_embed
@@ -225,6 +224,7 @@ buttons_roles_culture = [
 ]
 
 
+# noinspection PyUnresolvedReferences
 async def process_gameday(mode: bool, guild: discord.Guild):
     gameday_category = guild.get_channel(CAT_GAMEDAY)
     general_category = guild.get_channel(CAT_GENERAL)

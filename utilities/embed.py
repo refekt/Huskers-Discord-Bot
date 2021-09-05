@@ -248,7 +248,6 @@ def build_schedule_embed(year, **kwargs):
 def return_schedule_embeds(year, **kwargs):
     scheduled_games, season_stats = HuskerSchedule(year=year, sport=kwargs["sport"])
 
-    arrow = "» "
     new_line_char = "\n"
     embeds = []
 

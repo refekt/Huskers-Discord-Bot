@@ -56,7 +56,6 @@ def collect_opponent(game, year, week):
         icon = "https://huskers.com" + game.contents[1].contents[1].contents[1].attrs["data-src"]
         _date = game.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
         _time = game.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
-        conference = game.contents[1].contents[3].contents[1].contents[3].text.strip().replace("\n", " ").replace("*", "")
 
         if "Canceled" in game.contents[5].contents[1].text:
             outcome = "Canceled"
@@ -117,8 +116,6 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
 
     games = []
     season_stats = SeasonStats()
-    exempt_games = ("Spring Game", "Fan Day")
-    special_games = ("Homecoming", "Bowl")
     week = 0
 
     for game in games_raw:

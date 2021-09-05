@@ -511,7 +511,6 @@ if "Windows" not in platform.platform():
         def format_traceback(tback: list):
             return "".join(tback).replace("Aaron", "Secret")
 
-        embed = None
         if isinstance(ex, discord.errors.NotFound):
             return log(f"Skipping a NotFound error", 1)
         elif isinstance(ex, (UserError, AssertionError)):

@@ -106,6 +106,7 @@ def cleanup_source_data(source_data: str):
     return new_source_data
 
 
+# noinspection PyUnresolvedReferences
 class TextCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -272,8 +273,6 @@ class TextCommands(commands.Cog):
             sources.append(member)
 
         source_data = ""
-
-        compiled_message_history = []
 
         CHAN_HIST_LIMIT = 1000
 
@@ -539,8 +538,7 @@ class TextCommands(commands.Cog):
             bot=ctx.bot,
             ctx=ctx,
             question=question,
-            options=options,
-            timeout=12
+            options=options
         ).send()
 
     @commands.Cog.listener()

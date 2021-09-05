@@ -42,7 +42,7 @@ class Survey:
     def __init__(self,
                  bot: typing.Union[AutoShardedBot, Bot],
                  ctx: SlashContext,
-                 options: typing.AnyStr,
+                 options: typing.Union[str, SurveyOption],
                  question: typing.AnyStr,
                  timeout: int = 120,
                  ):
