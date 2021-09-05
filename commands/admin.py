@@ -34,6 +34,8 @@ from utilities.constants import (
     CAT_GAMEDAY,
     CAT_GENERAL,
     CHAN_BANNED,
+    CHAN_DISCUSSION_LIVE,
+    CHAN_DISCUSSION_STREAMING,
     CHAN_GENERAL,
     CHAN_HYPE_GROUP,
     CHAN_IOWA,
@@ -350,7 +352,6 @@ class AdminCommands(commands.Cog):
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
         guild_ids=guild_id_list()
-        # base_permissions=admin_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
@@ -387,7 +388,6 @@ class AdminCommands(commands.Cog):
         name="bot",
         description="Admin only: Deletes previous bot messages",
         guild_ids=guild_id_list()
-        # base_permissions=admin_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
@@ -709,13 +709,41 @@ class AdminCommands(commands.Cog):
 
         log(f"Roles: Culture", 0)
 
+    async def alert_gameday_channels(self, on: bool):
+        chan_general = self.bot.get_channel(id=CHAN_GENERAL)
+        chan_live = self.bot.get_channel(id=CHAN_DISCUSSION_LIVE)
+        chan_streaming = self.bot.get_channel(id=CHAN_DISCUSSION_STREAMING)
+
+        if on:
+            embed = build_embed(
+                title="Game Day Mode",
+                inline=False,
+                description="Game day mode is now on!",
+                fields=[
+                    ["Live TV", f"{chan_live.mention} text and voice channels are for users who are watching live."],
+                    ["Streaming", f"{chan_streaming.mention} text and voice channels are for users who are streaming the game."],
+                    ["Info", "All channels in the General category will be turned off until the game day mode is disbled."]
+                ]
+            )
+        else:
+            embed = build_embed(
+                title="Game Day Mode",
+                inline=False,
+                description="Game day mode is now off!",
+                fields=[
+                    ["Info", f"Game day channels have been disabled and General categories channels have been enabled. Regulare discussion may continue in {chan_general.mention}."]
+                ]
+            )
+        await chan_general.send(embed=embed)
+        await chan_live.send(embed=embed)
+        await chan_streaming.send(embed=embed)
+
     @cog_ext.cog_subcommand(
         base="gameday",
         base_description="Admin and mod only: Turn game day mode on or off",
         name="on",
         description="Turn game day mode on",
         guild_ids=guild_id_list()
-        # base_permissions=admin_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
@@ -728,17 +756,7 @@ class AdminCommands(commands.Cog):
     async def _gameday_on(self, ctx: SlashContext):
         log(f"Game Day: On", 0)
         await process_gameday(True, ctx.guild)
-        embed = build_embed(
-            title="Game Day Mode",
-            inline=False,
-            description="Game day mode is now on for the server! ",
-            fields=[
-                ["Live TV", "Live TV text and voice channels are for users who are watching live."],
-                ["Streaming", "Streaming text and voice channels are for users who are streaming the game."],
-                ["Info", "All game chat belongs in these channels until Game Day mode is turned off."]
-            ]
-        )
-        await ctx.send(embed=embed)
+        await self.alert_gameday_channels(True)
 
     @cog_ext.cog_subcommand(
         base="gameday",
@@ -746,7 +764,6 @@ class AdminCommands(commands.Cog):
         name="off",
         description="Turn game day mode off",
         guild_ids=guild_id_list()
-        # base_permissions=admin_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
@@ -759,15 +776,7 @@ class AdminCommands(commands.Cog):
     async def _gameday_off(self, ctx: SlashContext):
         log(f"Game Day: Off", 0)
         await process_gameday(False, ctx.guild)
-        embed = build_embed(
-            title="Game Day Mode",
-            inline=False,
-            description="Game day mode is now off for the server! ",
-            fields=[
-                ["Info", "Normal discussion may resume outside game day channels."]
-            ]
-        )
-        await ctx.send(embed=embed)
+        await self.alert_gameday_channels(False)
 
     @cog_ext.cog_slash(
         name="commands",
@@ -827,7 +836,6 @@ class AdminCommands(commands.Cog):
         name="iowa",
         description="Admin and mod only: Sends members to Iowa",
         guild_ids=guild_id_list()
-        # permissions=admin_mod_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
@@ -894,7 +902,6 @@ class AdminCommands(commands.Cog):
         name="nebraska",
         description="Admin and mod only: Bring a member back from Iowa",
         guild_ids=guild_id_list()
-        # permissions=admin_mod_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
@@ -956,7 +963,6 @@ class AdminCommands(commands.Cog):
         name="console",
         description="Admin or mod only",
         guild_ids=guild_id_list(),
-        # permissions=admin_mod_perms
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],

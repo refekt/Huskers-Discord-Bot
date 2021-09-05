@@ -53,7 +53,6 @@ from utilities.constants import (
     TWITTER_SECRET_KEY,
     TWITTER_TOKEN,
     TWITTER_TOKEN_SECRET,
-    TZ,
     UserError,
     set_component_key
 )
