@@ -95,9 +95,9 @@ def build_embed(**kwargs):
                 break
 
             if kwargs.get("inline", False):
-                embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit], inline=kwargs["inline"])
+                embed.add_field(name=str(field[0])[:name_limit], value=str(field[1])[:value_limit], inline=kwargs["inline"])
             else:
-                embed.add_field(name=field[0][:name_limit], value=field[1][:value_limit], inline=False)
+                embed.add_field(name=str(field[0])[:name_limit], value=str(field[1])[:value_limit], inline=False)
 
     return embed
 

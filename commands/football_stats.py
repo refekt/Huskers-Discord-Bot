@@ -38,6 +38,15 @@ cfbd_config.api_key['Authorization'] = CFBD_KEY
 cfbd_config.api_key_prefix['Authorization'] = "Bearer"
 
 
+def log(message: str, level: int):
+    import datetime
+
+    if level == 0:
+        print(f"[{datetime.datetime.now()}] ### {message}")
+    elif level == 1:
+        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+
+
 def convert_seconds(n):
     secs = n % (24 * 3600)
     hour = secs // 3600
@@ -74,6 +83,8 @@ def get_consensus_line(team_name: str, year: int = datetime.now().year, week: in
     except ApiException:
         return None
 
+    log(f"Results: {api_response}", 1)
+
     try:
         # Hard code Week 0
         lines = None
@@ -87,6 +98,8 @@ def get_consensus_line(team_name: str, year: int = datetime.now().year, week: in
 
         if lines is None:
             return None
+
+        log(f"Lines: {lines}", 1)
 
         formattedSpread = spreadOpen = overUnder = overUnderOpen = ""
 
@@ -106,6 +119,8 @@ def get_consensus_line(team_name: str, year: int = datetime.now().year, week: in
     except IndexError:
         consensus_line = None
 
+    log(f"Consensus Line: {consensus_line}", 1)
+
     return consensus_line
 
 
@@ -115,12 +130,6 @@ class FootballStatsCommands(commands.Cog):
         description="Get lines for a game",
         guild_ids=guild_id_list(),
         options=[
-            create_option(
-                name="team_name",
-                description="Name of the team in which to get lines",
-                required=False,
-                option_type=3
-            ),
             create_option(
                 name="week",
                 description="Week of the season",
@@ -132,10 +141,17 @@ class FootballStatsCommands(commands.Cog):
                 description="Year of the season",
                 required=False,
                 option_type=4
+            ),
+            create_option(
+                name="team_name",
+                description="Name of the team in which to get lines",
+                required=False,
+                option_type=3
             )
         ]
     )
     async def _lines(self, ctx: SlashContext, week: int = None, team_name: str = "Nebraska", year: int = datetime.now().year):
+        log(f"Gathering info for lines", 0)
         games, stats = HuskerSchedule(sport="football", year=year)
         del stats
 
@@ -144,19 +160,31 @@ class FootballStatsCommands(commands.Cog):
         if week is None:
             week = get_current_week()
 
+        week += 1  # acount for week 0
+
+        log(f"Current week: {week}", 1)
+
+        icon = None
         for game in games:
             if game.week == week:
                 lines = get_consensus_line(team_name=team_name, year=year, week=week)
+                icon = game.icon
                 break
 
+        if lines is None:
+            lines = "TBD"
+
         embed = build_embed(
-            title=f"Line info for the upcoming [{team_name.title()}] game",
-            description=f"Year: {year}, Week: {week}",
+            title=f"Betting lines for [{team_name.title()}]",
             fields=[
-                ["Line Info", lines]
-            ]
+                ["Year", year],
+                ["Week", week - 1],
+                ["Lines", lines]
+            ],
+            thumbnail=icon
         )
         await ctx.send(embed=embed)
+        log(f"Lines completed", 0)
 
     @cog_ext.cog_slash(
         name="countdown",
@@ -178,6 +206,7 @@ class FootballStatsCommands(commands.Cog):
         ]
     )
     async def _countdown(self, ctx: SlashContext, team: str = None, sport: str = "football"):
+        log(f"Starting countdown", 0)
         await ctx.defer()
 
         now_cst = datetime.now().astimezone(tz=TZ)
@@ -197,13 +226,15 @@ class FootballStatsCommands(commands.Cog):
             elif game.game_date_time > now_cst:  # Next future game
                 game_compared = game
                 break
-
+        log(f"Game compared: {game_compared}", 1)
         del games, sport, team, game, stats
 
         dt_game_time_diff = game_compared.game_date_time - now_cst
         diff_hours_minutes = convert_seconds(dt_game_time_diff.seconds)  # datetime object does not have hours or minutes
-
         year_days = 0
+
+        log(f"Time diff: {dt_game_time_diff}", 1)
+        log(f"Time diff mins: {diff_hours_minutes}", 1)
 
         if dt_game_time_diff.days < 0:
             if calendar.isleap(now_cst.year):
@@ -222,6 +253,7 @@ class FootballStatsCommands(commands.Cog):
             location=game_compared.location
         )
         await ctx.send(embed=embed)
+        log(f"Countdown done", 0)
 
     @cog_ext.cog_slash(
         name="compare",
