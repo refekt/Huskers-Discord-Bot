@@ -425,7 +425,8 @@ async def send_welcome_message(who: discord.Member):
 
 @client.event
 async def on_connect():
-    start_twitter_stream()
+    if "Windows" not in platform.platform():
+        start_twitter_stream()
 
 
 @client.event
@@ -439,39 +440,40 @@ async def on_ready():
     log(f"HOF/HOS Reaction Threshold: {threshold}", 1)
     log(f"The bot is ready!", 0)
 
-    try:
-        changelog_path = None
+    if "Windows" not in platform.platform():
+        try:
+            changelog_path = None
 
-        if "Windows" in platform.platform():
-            log(f"Windows changelog", 1)
-            changelog_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
-        elif "Linux" in platform.platform():
-            log(f"Linxue changelog", 0)
-            changelog_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
+            if "Windows" in platform.platform():
+                log(f"Windows changelog", 1)
+                changelog_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
+            elif "Linux" in platform.platform():
+                log(f"Linxue changelog", 0)
+                changelog_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
 
-        changelog = open(changelog_path, "r")
-        lines = changelog.readlines()
-        lines_str = ""
+            changelog = open(changelog_path, "r")
+            lines = changelog.readlines()
+            lines_str = ""
 
-        for line in lines:
-            lines_str += f"* {str(line)}"
-    except OSError:
-        lines_str = "Error loading changelog."
+            for line in lines:
+                lines_str += f"* {str(line)}"
+        except OSError:
+            lines_str = "Error loading changelog."
 
-    bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
-    embed = build_embed(
-        title="Husker Discord Bot",
-        fields=[
-            ["Info", f"I was restarted, but now I'm back! I'm now online as {client.user.mention}! Check out /commands."],
-            ["HOF/HOS Reaction Threshold", f"{threshold}"],
-            ["Changelog", lines_str],
-            ["More Changelog", f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)"]
-        ]
-    )
-    await bot_spam.send(embed=embed)
+        bot_spam = client.get_channel(CHAN_SCOTTS_BOTS)
+        embed = build_embed(
+            title="Husker Discord Bot",
+            fields=[
+                ["Info", f"I was restarted, but now I'm back! I'm now online as {client.user.mention}! Check out /commands."],
+                ["HOF/HOS Reaction Threshold", f"{threshold}"],
+                ["Changelog", lines_str],
+                ["More Changelog", f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)"]
+            ]
+        )
+        await bot_spam.send(embed=embed)
 
-    await change_my_status()
-    await load_tasks()
+        await change_my_status()
+        await load_tasks()
 
 
 @client.event

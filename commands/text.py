@@ -22,6 +22,7 @@ from discord_slash.utils.manage_components import (
     create_button
 )
 
+from objects.Survey import Survey
 from objects.Weather import (
     WeatherHour,
     WeatherResponse
@@ -513,6 +514,34 @@ class TextCommands(commands.Cog):
         )
 
         await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="survey",
+        description="Create a survey",
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="question",
+                description="Question for the survey",
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name="options",
+                description="Space deliminated option(s) for the survey",
+                option_type=3,
+                required=True
+            )
+        ]
+    )
+    async def _survey(self, ctx: SlashContext, question: str, options: str):
+        await Survey(
+            bot=ctx.bot,
+            ctx=ctx,
+            question=question,
+            options=options,
+            timeout=12
+        ).send()
 
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
