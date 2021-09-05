@@ -231,7 +231,6 @@ class TextCommands(commands.Cog):
 
         embed = build_embed(
             title=f"Question: {query.capitalize()}",
-            description="Times out after 60 seconds.",
             inline=False,
             fields=[
                 [buttons_voting[-2]["label"], "0"],
