@@ -101,21 +101,26 @@ def get_consensus_line(team_name: str, year: int = datetime.now().year, week: in
 
         log(f"Lines: {lines}", 1)
 
-        formattedSpread = spreadOpen = overUnder = overUnderOpen = ""
+        formattedSpread = spreadOpen = overUnder = overUnderOpen = homeMoneyline = awayMoneyline = ""
 
         if lines.get("formattedSpread", None):
             formattedSpread = lines.get("formattedSpread")
         if lines.get("spreadOpen", None):
-            # Assumption that the spread doesn't swing from one team to another
-            # Uses the current favored team
-            spreadOpen = f"{formattedSpread.split('.')[0][:-1]}{lines.get('spreadOpen')}"
-            spreadOpen = spreadOpen.replace("--", "-")
+            spreadOpen = lines.get("spreadOpen")
         if lines.get("overUnder", None):
             overUnder = lines.get("overUnder")
         if lines.get("overUnderOpen", None):
             overUnderOpen = lines.get("overUnderOpen")
+        if lines.get("homeMoneyline", None):
+            homeMoneyline = str(lines.get("homeMoneyline"))
+        if lines.get("awayMoneyline", None):
+            awayMoneyline = str(lines.get("awayMoneyline"))
         new_line = "\n"
-        consensus_line = f"{formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}{'Over Under ' + overUnder + ' (Opened: ' + overUnderOpen + ')' if overUnder else ''}"
+        consensus_line = f"{'Spread: ' + formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}" \
+                         f"{'Over/Under:  ' + overUnder + ' (Opened: ' + overUnderOpen + ')' + new_line if overUnder else ''}" \
+                         f"{'Home Moneyline: ' + homeMoneyline + new_line if homeMoneyline else ''}" \
+                         f"{'Away Moneyline: ' + awayMoneyline + new_line if awayMoneyline else ''}"
+
     except IndexError:
         consensus_line = None
 

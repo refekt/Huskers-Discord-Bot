@@ -113,7 +113,7 @@ def build_countdown_embed(days: int, hours: int, minutes: int, opponent, thumbna
                 ["Scheduled Time", date_time.strftime(DT_OBJ_FORMAT_TBA)],
                 ["Location", location],
                 ["Time Remaining", f"{days}"],
-                ["Consensus Line", consensus if consensus else 'Line TBD']
+                ["Betting Info", consensus if consensus else 'Line TBD']
             ]
         )
     else:
@@ -126,7 +126,7 @@ def build_countdown_embed(days: int, hours: int, minutes: int, opponent, thumbna
                 ["Scheduled Time", date_time.strftime(DT_OBJ_FORMAT)],
                 ["Location", location],
                 ["Time Remaining", f"{days} days, {hours} hours, and {minutes} minutes"],
-                ["Consensus Line", consensus if consensus else 'Line TBD']
+                ["Betting Info", consensus if consensus else 'Line TBD']
             ]
         )
 
