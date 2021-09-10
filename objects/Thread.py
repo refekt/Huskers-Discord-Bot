@@ -53,6 +53,7 @@ class TwitterStreamListener(tweepy.StreamListener):
 
     def on_timeout(self):
         log(f"Twitter Stream Listener timed out", 1)
+        return True
 
     def on_error(self, status_code):
         log(f"Twitter Stream Listener Error: {status_code}", 1)
@@ -66,6 +67,7 @@ class TwitterStreamListener(tweepy.StreamListener):
 
     def on_disconnect(self, notice):
         log(f"Twitter Stream Listening has disconnected. Notice: {notice}", 1)
+        return True
 
 
 async def send_reminder(num_seconds, destination: typing.Union[discord.Member, discord.TextChannel], message: str, source: typing.Union[discord.Member, discord.TextChannel], alert_when, missed=False):
