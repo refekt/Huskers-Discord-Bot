@@ -3,7 +3,7 @@ from discord_slash import cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.utils.manage_commands import create_option
 from utilities.constants import guild_id_list
-from objects.Survey import SurveyOption, Survey
+from discord_surveys.survey import SurveyOption, Survey
 
 
 def log(message: str, level: int):

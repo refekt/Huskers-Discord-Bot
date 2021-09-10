@@ -21,8 +21,8 @@ from discord_slash.utils.manage_components import (
     create_actionrow,
     create_button
 )
-# from objects.Survey import Survey
-from discord_surveys import Survey
+from discord_surveys.survey import Survey
+
 from objects.Weather import (
     WeatherHour,
     WeatherResponse
