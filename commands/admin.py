@@ -755,6 +755,7 @@ class AdminCommands(commands.Cog):
     )
     async def _gameday_on(self, ctx: SlashContext):
         log(f"Game Day: On", 0)
+        await ctx.defer()
         await process_gameday(True, ctx.guild)
         await self.alert_gameday_channels(True)
 
@@ -775,6 +776,7 @@ class AdminCommands(commands.Cog):
     )
     async def _gameday_off(self, ctx: SlashContext):
         log(f"Game Day: Off", 0)
+        await ctx.defer()
         await process_gameday(False, ctx.guild)
         await self.alert_gameday_channels(False)
 
