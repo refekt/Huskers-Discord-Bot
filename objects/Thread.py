@@ -77,6 +77,16 @@ class TwitterStreamListener(tweepy.StreamListener):
         self.process_cooldown()
         return True
 
+    def keep_alive(self):
+        log("Twitter Stream Listener has received a keep alive signal.", 1)
+        self.process_cooldown()
+        return True
+
+    def on_exception(self, exception):
+        log(f"Twitter Stream Listener Error: {exception}", 1)
+        self.process_cooldown()
+        return True
+
 
 async def send_reminder(num_seconds, destination: typing.Union[discord.Member, discord.TextChannel], message: str, source: typing.Union[discord.Member, discord.TextChannel], alert_when, missed=False):
     log(f"Starting thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].", 1)
