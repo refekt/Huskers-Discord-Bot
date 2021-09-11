@@ -734,6 +734,7 @@ class AdminCommands(commands.Cog):
                     ["Info", f"Game day channels have been disabled and General categories channels have been enabled. Regulare discussion may continue in {chan_general.mention}."]
                 ]
             )
+
         await chan_general.send(embed=embed)
         await chan_live.send(embed=embed)
         await chan_streaming.send(embed=embed)
@@ -755,7 +756,8 @@ class AdminCommands(commands.Cog):
     )
     async def _gameday_on(self, ctx: SlashContext):
         log(f"Game Day: On", 0)
-        await ctx.defer()
+        await ctx.defer(hidden=True)
+        await ctx.send("Processing!", hidden=True)
         await process_gameday(True, ctx.guild)
         await self.alert_gameday_channels(True)
 
@@ -776,7 +778,8 @@ class AdminCommands(commands.Cog):
     )
     async def _gameday_off(self, ctx: SlashContext):
         log(f"Game Day: Off", 0)
-        await ctx.defer()
+        await ctx.defer(hidden=True)
+        await ctx.send("Processing!", hidden=True)
         await process_gameday(False, ctx.guild)
         await self.alert_gameday_channels(False)
 
