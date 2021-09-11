@@ -33,6 +33,15 @@ class TwitterStreamListener(tweepy.StreamListener):
         self.loop = loop
         self.cooldown = 1
 
+    def reset_cooldown(self):
+        self.cooldown = 0
+
+    def process_cooldown(self):
+        log(f"Pausing for {self.cooldown} seconds", 1)
+        asyncio.sleep(self.cooldown)
+        self.cooldown *= 2
+        log(f"Pause complete. New timer is {self.cooldown} seconds.", 1)
+
     def send_message(self, tweet):
         future = asyncio.run_coroutine_threadsafe(self.message_func(tweet), self.loop)
         future.result()
@@ -53,20 +62,19 @@ class TwitterStreamListener(tweepy.StreamListener):
 
     def on_timeout(self):
         log(f"Twitter Stream Listener timed out", 1)
+        self.process_cooldown()
         return True
 
     def on_error(self, status_code):
         log(f"Twitter Stream Listener Error: {status_code}", 1)
         if status_code == 420:
-            log(f"Pausing for {self.cooldown} seconds", 1)
-            asyncio.sleep(self.cooldown)
-            self.cooldown *= 2
-            log(f"Pause complete. New timer is {self.cooldown} seconds.", 1)
+            self.process_cooldown()
             self.send_alert(f"Twitter Stream Listener Error: {status_code}")
             return True  # Reconnect
 
     def on_disconnect(self, notice):
         log(f"Twitter Stream Listening has disconnected. Notice: {notice}", 1)
+        self.process_cooldown()
         return True
 
 
