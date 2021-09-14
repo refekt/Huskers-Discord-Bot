@@ -50,6 +50,12 @@ def collect_opponent(game, year, week):
     game = game.contents[1]
     try:
         name = game.contents[1].contents[3].contents[3].contents[3].text.strip().replace("\n", " ")
+        ranking = None
+        if "#" in name:
+            try:
+                [ranking, name] = str(name).split(" ", maxsplit=1)
+            except ValueError:
+                pass
         location = game.contents[3].contents[1].text.strip().replace("\n", " ")
         if "Buy Tickets" in location:
             location = location.split("Buy Tickets ")[1].replace(" Memorial Stadium", "")
@@ -87,7 +93,7 @@ def collect_opponent(game, year, week):
 
         return HuskerOpponent(
             name=name,
-            ranking=None,
+            ranking=ranking,
             icon=icon,
             date_time=date_time,
             week=week,
