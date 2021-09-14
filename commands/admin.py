@@ -61,7 +61,6 @@ from utilities.constants import (
     ROLE_TARMAC,
     ROLE_TIME_OUT,
     UserError,
-    admin_mod_perms,
     guild_id_list
 )
 from utilities.embed import build_embed as build_embed
@@ -314,7 +313,14 @@ class AdminCommands(commands.Cog):
         name="quit",
         description="Admin or mod only: Turn off the bot",
         guild_ids=guild_id_list(),
-        permissions=admin_mod_perms
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
     )
     async def _quit(self, ctx: SlashContext):
         await ctx.send(f"Good bye world! 😭 I was turned off by [{ctx.author}].")
@@ -355,8 +361,12 @@ class AdminCommands(commands.Cog):
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
         ]
     )
