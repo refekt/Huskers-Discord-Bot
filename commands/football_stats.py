@@ -172,7 +172,7 @@ class FootballStatsCommands(commands.Cog):
         icon = None
         for game in games:
             if game.week == week:
-                lines = get_consensus_line(team_name=team_name, year=year, week=week)
+                lines = get_consensus_line(team_name=team_name, year=year, week=week - 1)
                 icon = game.icon
                 break
 

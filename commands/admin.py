@@ -361,9 +361,6 @@ class AdminCommands(commands.Cog):
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
-    )
-    @cog_ext.permission(
-        guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
