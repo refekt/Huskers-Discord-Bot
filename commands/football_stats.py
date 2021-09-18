@@ -443,6 +443,8 @@ class FootballStatsCommands(commands.Cog):
     ):
         cfb_api = StatsApi(ApiClient(cfbd_config))
 
+        test = cfb_api.get_stat_categories()
+
         api_response = None
         try:
             api_response = cfb_api.get_team_season_stats_with_http_info(
@@ -455,29 +457,27 @@ class FootballStatsCommands(commands.Cog):
         for stat in api_response[0]:
             season_stats[stat.stat_name] = stat.stat_value
 
-        pass
-
         pages = [
             # Offense
             build_embed(
                 fields=[
                     [
                         "Offense",
-                        f"Total Yards: {season_stats['totalYards']:,}\n"
-                        f"Russhing Attempts: {season_stats['rushingAttempts']:,}\n"
-                        f"Rushing Yards: {season_stats['rushingYards']:,}\n"
-                        f"Rushing TDs: {season_stats['rushingTDs']}\n"
-                        f"Pass Attempts: {season_stats['passAttempts']:,}\n"
-                        f"Pass Comopletions: {season_stats['passCompletions']:,}\n"
-                        f"Passing Yards: {season_stats['netPassingYards']:,}\n"
-                        f"Passing TDs: {season_stats['passingTDs']}\n"
-                        f"First Downs: {season_stats['firstDowns']:,}\n"
-                        f"Third Downs: {season_stats['thirdDowns']:,}\n"
-                        f"Third Down Conversions: {season_stats['thirdDownConversions']:,}\n"
-                        f"Fourth Downs: {season_stats['fourthDowns']}\n"
-                        f"Fourth Down Conversions: {season_stats['fourthDownConversions']}\n"
-                        f"Interceptions Thrown: {season_stats['interceptions']}\n"
-                        f"Time of Possesion: {season_stats['possessionTime']}\n",
+                        f"Total Yards: {season_stats.get('totalYards', 0):,}\n"
+                        f"Russhing Attempts: {season_stats.get('rushingAttempts', 0):,}\n"
+                        f"Rushing Yards: {season_stats.get('rushingYards', 0):,}\n"
+                        f"Rushing TDs: {season_stats.get('rushingTDs', 0)}\n"
+                        f"Pass Attempts: {season_stats.get('passAttempts', 0):,}\n"
+                        f"Pass Comopletions: {season_stats.get('passCompletions', 0):,}\n"
+                        f"Passing Yards: {season_stats.get('netPassingYards', 0):,}\n"
+                        f"Passing TDs: {season_stats.get('passingTDs', 0)}\n"
+                        f"First Downs: {season_stats.get('firstDowns', 0):,}\n"
+                        f"Third Downs: {season_stats.get('thirdDowns', 0):,}\n"
+                        f"Third Down Conversions: {season_stats.get('thirdDownConversions', 0):,}\n"
+                        f"Fourth Downs: {season_stats.get('fourthDowns', 0)}\n"
+                        f"Fourth Down Conversions: {season_stats.get('fourthDownConversions', 0)}\n"
+                        f"Interceptions Thrown: {season_stats.get('interceptions', 0)}\n"
+                        f"Time of Possesion: {season_stats.get('possessionTime', 0)}\n",
                     ],
                 ],
             ),
@@ -486,11 +486,11 @@ class FootballStatsCommands(commands.Cog):
                 fields=[
                     [
                         "Defense",
-                        f"Tackles for Loss: {season_stats['tacklesForLoss']}\n"
-                        f"Sacks: {season_stats['sacks']}\n"
-                        f"Passes Intercepted: {season_stats['passesIntercepted']}\n"
-                        f"Interception Yards: {season_stats['interceptionYards']}\n"
-                        f"Interception TDs: {season_stats['interceptionTDs']}\n",
+                        f"Tackles for Loss: {season_stats.get('tacklesForLoss', 0)}\n"
+                        f"Sacks: {season_stats.get('sacks', 0)}\n"
+                        f"Passes Intercepted: {season_stats.get('passesIntercepted', 0)}\n"
+                        f"Interception Yards: {season_stats.get('interceptionYards', 0)}\n"
+                        f"Interception TDs: {season_stats.get('interceptionTDs', 0)}\n",
                     ],
                 ],
             ),
@@ -499,12 +499,12 @@ class FootballStatsCommands(commands.Cog):
                 fields=[
                     [
                         "Special Teams",
-                        f"Kick Returns: {season_stats['kickReturns']}\n"
-                        f"Kick Return Yards: {season_stats['kickReturnYards']:,}\n"
-                        f"Kick Return TDs: {season_stats['kickReturnTDs']}\n"
-                        f"Punt Returns: {season_stats['puntReturns']}\n"
-                        f"Punt Return Yards: {season_stats['puntReturnYards']:,}\n"
-                        f"Punt Return TDs: {season_stats['puntReturnTDs']}\n",
+                        f"Kick Returns: {season_stats.get('kickReturns', 0)}\n"
+                        f"Kick Return Yards: {season_stats.get('kickReturnYards', 0):,}\n"
+                        f"Kick Return TDs: {season_stats.get('kickReturnTDs', 0)}\n"
+                        f"Punt Returns: {season_stats.get('puntReturns', 0)}\n"
+                        f"Punt Return Yards: {season_stats.get('puntReturnYards', 0):,}\n"
+                        f"Punt Return TDs: {season_stats.get('puntReturnTDs', 0)}\n",
                     ],
                 ],
             ),
@@ -513,8 +513,8 @@ class FootballStatsCommands(commands.Cog):
                 fields=[
                     [
                         "Penalties",
-                        f"Penalities: {season_stats['penalties']}\n"
-                        f"Penalty Yards: {season_stats['penaltyYards']:,}\n",
+                        f"Penalities: {season_stats.get('penalties', 0)}\n"
+                        f"Penalty Yards: {season_stats.get('penaltyYards', 0):,}\n",
                     ],
                 ],
             ),
@@ -523,9 +523,9 @@ class FootballStatsCommands(commands.Cog):
                 fields=[
                     [
                         "Fumbles and Turnovers",
-                        f"Fumbles Lost: {season_stats['fumblesLost']}\n"
-                        f"Fumbles Recovered: {season_stats['fumblesRecovered']}\n"
-                        f"Turnovers: {season_stats['turnovers']}\n",
+                        f"Fumbles Lost: {season_stats.get('fumblesLost', 0)}\n"
+                        f"Fumbles Recovered: {season_stats.get('fumblesRecovered', 0)}\n"
+                        f"Turnovers: {season_stats.get('turnovers', 0)}\n",
                     ],
                 ],
             ),
