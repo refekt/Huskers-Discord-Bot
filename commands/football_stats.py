@@ -1,7 +1,7 @@
 import calendar
 from datetime import datetime
 
-from cfbd import ApiClient, BettingApi, Configuration, GamesApi
+from cfbd import ApiClient, BettingApi, Configuration, GamesApi, StatsApi
 from cfbd.rest import ApiException
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
@@ -371,7 +371,7 @@ class FootballStatsCommands(commands.Cog):
                 name="team_name",
                 required=True,
                 option_type=3,
-                description="Name of the team you want to search for",
+                description="Name of the team you want to search",
             )
         ],
     )
@@ -415,6 +415,143 @@ class FootballStatsCommands(commands.Cog):
             inline=False,
         )
         await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(
+        name="seasonstats",
+        description="Season stats for a team",
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="team_name",
+                required=False,
+                option_type=3,
+                description="Name of the team you want to search",
+            ),
+            create_option(
+                name="year",
+                required=False,
+                option_type=4,
+                description="Year of the season you want to search",
+            ),
+        ],
+    )
+    async def _seasonstats(
+        self,
+        ctx: SlashContext,
+        team_name: str = "Nebraska",
+        year: int = datetime.now().year,
+    ):
+        cfb_api = StatsApi(ApiClient(cfbd_config))
+
+        api_response = None
+        try:
+            api_response = cfb_api.get_team_season_stats_with_http_info(
+                year=year, team=team_name
+            )
+        except ApiException:
+            return None
+
+        season_stats = {}
+        for stat in api_response[0]:
+            season_stats[stat.stat_name] = stat.stat_value
+
+        pass
+
+        pages = [
+            # Offense
+            build_embed(
+                fields=[
+                    [
+                        "Offense",
+                        f"Total Yards: {season_stats['totalYards']:,}\n"
+                        f"Russhing Attempts: {season_stats['rushingAttempts']:,}\n"
+                        f"Rushing Yards: {season_stats['rushingYards']:,}\n"
+                        f"Rushing TDs: {season_stats['rushingTDs']}\n"
+                        f"Pass Attempts: {season_stats['passAttempts']:,}\n"
+                        f"Pass Comopletions: {season_stats['passCompletions']:,}\n"
+                        f"Passing Yards: {season_stats['netPassingYards']:,}\n"
+                        f"Passing TDs: {season_stats['passingTDs']}\n"
+                        f"First Downs: {season_stats['firstDowns']:,}\n"
+                        f"Third Downs: {season_stats['thirdDowns']:,}\n"
+                        f"Third Down Conversions: {season_stats['thirdDownConversions']:,}\n"
+                        f"Fourth Downs: {season_stats['fourthDowns']}\n"
+                        f"Fourth Down Conversions: {season_stats['fourthDownConversions']}\n"
+                        f"Interceptions Thrown: {season_stats['interceptions']}\n"
+                        f"Time of Possesion: {season_stats['possessionTime']}\n",
+                    ],
+                ],
+            ),
+            # Defense
+            build_embed(
+                fields=[
+                    [
+                        "Defense",
+                        f"Tackles for Loss: {season_stats['tacklesForLoss']}\n"
+                        f"Sacks: {season_stats['sacks']}\n"
+                        f"Passes Intercepted: {season_stats['passesIntercepted']}\n"
+                        f"Interception Yards: {season_stats['interceptionYards']}\n"
+                        f"Interception TDs: {season_stats['interceptionTDs']}\n",
+                    ],
+                ],
+            ),
+            # Special Teams
+            build_embed(
+                fields=[
+                    [
+                        "Special Teams",
+                        f"Kick Returns: {season_stats['kickReturns']}\n"
+                        f"Kick Return Yards: {season_stats['kickReturnYards']:,}\n"
+                        f"Kick Return TDs: {season_stats['kickReturnTDs']}\n"
+                        f"Punt Returns: {season_stats['puntReturns']}\n"
+                        f"Punt Return Yards: {season_stats['puntReturnYards']:,}\n"
+                        f"Punt Return TDs: {season_stats['puntReturnTDs']}\n",
+                    ],
+                ],
+            ),
+            # Penalties
+            build_embed(
+                fields=[
+                    [
+                        "Penalties",
+                        f"Penalities: {season_stats['penalties']}\n"
+                        f"Penalty Yards: {season_stats['penaltyYards']:,}\n",
+                    ],
+                ],
+            ),
+            # Fumbles and Turnovers
+            build_embed(
+                fields=[
+                    [
+                        "Fumbles and Turnovers",
+                        f"Fumbles Lost: {season_stats['fumblesLost']}\n"
+                        f"Fumbles Recovered: {season_stats['fumblesRecovered']}\n"
+                        f"Turnovers: {season_stats['turnovers']}\n",
+                    ],
+                ],
+            ),
+        ]
+
+        content = [
+            f"{team_name.title()}'s {year} Offensive Stats",
+            f"{team_name.title()}'s {year} Defensive Stats",
+            f"{team_name.title()}'s {year} Special Teams Stats",
+            f"{team_name.title()}'s {year} Penalties Stats",
+            f"{team_name.title()}'s {year} Fumble and Turnover Stats",
+        ]
+
+        await Paginator(
+            bot=ctx.bot,
+            ctx=ctx,
+            pages=pages,
+            content=content,
+            useIndexButton=True,
+            useSelect=False,
+            firstStyle=ButtonStyle.gray,
+            nextStyle=ButtonStyle.gray,
+            prevStyle=ButtonStyle.gray,
+            lastStyle=ButtonStyle.gray,
+            indexStyle=ButtonStyle.gray,
+        ).run()
 
 
 def setup(bot):
