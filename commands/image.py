@@ -1,3 +1,5 @@
+import random
+
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import cog_ext
@@ -198,6 +200,24 @@ class ImageCommands(commands.Cog):
             indexStyle=ButtonStyle.gray,
             hidden=True,
         ).run()
+
+    @cog_ext.cog_slash(
+        name="imgrandom",
+        description="Show a random image",
+        guild_ids=guild_id_list(),
+    )
+    async def _imgrandom(self, ctx: SlashContext):
+        global all_imgs
+        all_imgs = retrieve_all_img()
+        image = random.choice(all_imgs)
+
+        author = ctx.guild.get_member(user_id=int(image["author"]))
+        if author is None:
+            author = "Unknown"
+
+        await ctx.send(content=f"{image['img_url']}")
+
+        del image
 
     @cog_ext.cog_slash(
         name="img", description="Use an image command", guild_ids=guild_id_list()
