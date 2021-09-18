@@ -1082,6 +1082,20 @@ class AdminCommands(commands.Cog):
             await ctx.send("Unable to restart the bot!", hidden=True)
             return
 
+        # Update change log
+        bash_script_path = pathlib.PurePosixPath(
+            f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/changelog.sh"
+        )
+        bash_script = open(bash_script_path).read()
+
+        stdin, stdout, stderr = client.exec_command(bash_script)
+        log(stdout.read().decode(), 1)
+
+        err = stderr.read().decode()
+        if err:
+            log(err, 1)
+
+        # Restart
         bash_script_path = pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/restart.sh"
         )
