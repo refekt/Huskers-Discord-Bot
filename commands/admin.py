@@ -990,6 +990,22 @@ class AdminCommands(commands.Cog):
         await ctx.send(content="Shh..", hidden=True)
         await ctx.send(content="Shh...", components=[console_actionrow], hidden=True)
 
+    @cog_ext.cog_slash(
+        name="trestart",
+        description="Admin only: Restart the Twitter stream",
+        guild_ids=guild_id_list(),
+    )
+    @cog_ext.permission(
+        guild_id=guild_id_list()[0],
+        permissions=[
+            create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
+            create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, False),
+            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        ]
+    )
+    async def _trestart(self, ctx: SlashContext):
+        pass
+
     @cog_ext.cog_component(components=console_buttons)
     async def process_console(self, ctx: ComponentContext):
         if ctx.custom_id == "SMMS":
