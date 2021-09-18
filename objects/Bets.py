@@ -22,7 +22,9 @@ class GameBetLine:
     formatted_spread = None
     over_under = None
 
-    def __init__(self, provider=None, spread=None, formatted_spread=None, over_under=None):
+    def __init__(
+        self, provider=None, spread=None, formatted_spread=None, over_under=None
+    ):
         self.provider = provider
         self.spread = spread
         self.formatted_spread = formatted_spread
@@ -37,7 +39,9 @@ class GameBetInfo:
     userbets = []
     lines = []
 
-    def __init__(self, year, week, team, season="regular"):  # , home_team=None, home_score=None, away_team=None, away_score=None, lines=None):
+    def __init__(
+        self, year, week, team, season="regular"
+    ):  # , home_team=None, home_score=None, away_team=None, away_score=None, lines=None):
         self.home_team = None
         self.home_score = None
         self.away_team = None
@@ -53,19 +57,19 @@ class GameBetInfo:
         data = re.json()
 
         try:
-            self.home_team = data[0]['homeTeam']
-            self.home_score = data[0]['homeScore']
-            self.away_team = data[0]['awayTeam']
-            self.away_score = data[0]['awayScore']
+            self.home_team = data[0]["homeTeam"]
+            self.home_score = data[0]["homeScore"]
+            self.away_team = data[0]["awayTeam"]
+            self.away_score = data[0]["awayScore"]
             linedata = data[0]["lines"]
 
             for line in linedata:
                 self.lines.append(
                     GameBetLine(
-                        provider=line['provider'],
-                        spread=line['spread'],
-                        formatted_spread=line['formattedSpread'],
-                        over_under=line['overUnder']
+                        provider=line["provider"],
+                        spread=line["spread"],
+                        formatted_spread=line["formattedSpread"],
+                        over_under=line["overUnder"],
                     )
                 )
         except:

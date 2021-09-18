@@ -5,15 +5,13 @@ from utilities.constants import HEADERS
 
 
 class TeamStatsWinsipediaTeam:
-
     def __init__(self, *, team_name: str):
-
         def all_time_record():
             atr = soup.find_all(attrs={"class": "ranking span2 item2"})
             try:
                 return (
                     atr[0].contents[1].contents[3].contents[1].text,
-                    atr[0].contents[3].contents[1].text.strip()
+                    atr[0].contents[3].contents[1].text.strip(),
                 )
             except:
                 return "UNK", "UNK"
@@ -23,7 +21,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     champs[0].contents[3].contents[1].text,
-                    champs[0].contents[5].contents[1].text
+                    champs[0].contents[5].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -33,7 +31,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     conf[0].contents[3].contents[1].text,
-                    conf[0].contents[5].contents[1].text
+                    conf[0].contents[5].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -43,7 +41,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     bowl[0].contents[1].contents[1].text,
-                    bowl[0].contents[3].contents[1].text
+                    bowl[0].contents[3].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -53,7 +51,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     atw[0].contents[1].contents[1].text,
-                    atw[0].contents[3].contents[1].text
+                    atw[0].contents[3].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -63,7 +61,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     bowl[1].contents[1].contents[3].contents[1].text,  # \n and \t
-                    bowl[1].contents[3].contents[1].text.strip()
+                    bowl[1].contents[3].contents[1].text.strip(),
                 )
             except:
                 return "UNK", "UNK"
@@ -73,7 +71,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     caa[1].contents[1].contents[1].text,
-                    caa[1].contents[3].contents[1].text
+                    caa[1].contents[3].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -83,7 +81,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     hw[1].contents[3].contents[1].text,
-                    hw[1].contents[5].contents[1].text
+                    hw[1].contents[5].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -93,7 +91,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     nfl_picks[1].contents[3].contents[1].text,
-                    nfl_picks[1].contents[5].contents[1].text
+                    nfl_picks[1].contents[5].contents[1].text,
                 )
             except:
                 return ("UNK", "UNK")
@@ -103,7 +101,7 @@ class TeamStatsWinsipediaTeam:
             try:
                 return (
                     ap_poll[0].contents[3].contents[1].text,
-                    ap_poll[0].contents[5].contents[1].text
+                    ap_poll[0].contents[5].contents[1].text,
                 )
             except:
                 return "UNK", "UNK"
@@ -136,10 +134,17 @@ class TeamStatsWinsipediaTeam:
         self.week_in_ap_poll_rank = weeks_ap_poll()[1]
 
 
-class CompareWinsipediaTeam():
+class CompareWinsipediaTeam:
     name = None
 
-    def __init__(self, name, largest_mov, largest_mov_date, longest_win_streak, largest_win_streak_date):
+    def __init__(
+        self,
+        name,
+        largest_mov,
+        largest_mov_date,
+        longest_win_streak,
+        largest_win_streak_date,
+    ):
         self.name = name
         self.largest_mov = largest_mov
         self.largest_mov_date = largest_mov_date
@@ -148,10 +153,11 @@ class CompareWinsipediaTeam():
 
 
 class CompareWinsipedia:
-
     def __init__(self, compare: str, against: str):
         self.url = f"http://www.winsipedia.com/{compare.lower()}/vs/{against.lower()}"
-        self.full_games_url = f"http://www.winsipedia.com/games/{compare.lower()}/vs/{against.lower()}"
+        self.full_games_url = (
+            f"http://www.winsipedia.com/games/{compare.lower()}/vs/{against.lower()}"
+        )
 
         def mov(which: int):
             raw_mov = soup.find_all(attrs={"class": f"ranking span2 item{which}"})
@@ -165,8 +171,12 @@ class CompareWinsipedia:
 
         def all_time_wins():
             wins = soup.find_all(attrs={"class": "titleItem left"})[0].contents[1].text
-            ties = soup.find_all(attrs={"class": "titleItem center"})[0].contents[1].text
-            losses = soup.find_all(attrs={"class": "titleItem right"})[0].contents[1].text
+            ties = (
+                soup.find_all(attrs={"class": "titleItem center"})[0].contents[1].text
+            )
+            losses = (
+                soup.find_all(attrs={"class": "titleItem right"})[0].contents[1].text
+            )
 
             return f"{wins} wins - {ties} ties - {losses} losses"
 
@@ -181,7 +191,7 @@ class CompareWinsipedia:
             largest_mov=margin_of_victory[0],
             largest_mov_date=margin_of_victory[1],
             longest_win_streak=win_stream[0],
-            largest_win_streak_date=win_stream[1]
+            largest_win_streak_date=win_stream[1],
         )
 
         margin_of_victory = mov(6)
@@ -191,5 +201,5 @@ class CompareWinsipedia:
             largest_mov=margin_of_victory[0],
             largest_mov_date=margin_of_victory[1],
             longest_win_streak=win_stream[0],
-            largest_win_streak_date=win_stream[1]
+            largest_win_streak_date=win_stream[1],
         )

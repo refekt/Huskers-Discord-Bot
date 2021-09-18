@@ -4,14 +4,9 @@ import typing
 import discord
 import tweepy
 
-from utilities.constants import (
-    pretty_time_delta
-)
+from utilities.constants import pretty_time_delta
 from utilities.embed import build_embed
-from utilities.mysql import (
-    Process_MySQL,
-    sqlUpdateTasks
-)
+from utilities.mysql import Process_MySQL, sqlUpdateTasks
 
 exitFlag = 0
 
@@ -88,8 +83,18 @@ class TwitterStreamListener(tweepy.StreamListener):
         return True
 
 
-async def send_reminder(num_seconds, destination: typing.Union[discord.Member, discord.TextChannel], message: str, source: typing.Union[discord.Member, discord.TextChannel], alert_when, missed=False):
-    log(f"Starting thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].", 1)
+async def send_reminder(
+    num_seconds,
+    destination: typing.Union[discord.Member, discord.TextChannel],
+    message: str,
+    source: typing.Union[discord.Member, discord.TextChannel],
+    alert_when,
+    missed=False,
+):
+    log(
+        f"Starting thread for [{pretty_time_delta(num_seconds)}] seconds. Send_When == [{alert_when}].",
+        1,
+    )
 
     if not missed:
         log(f"Destination: [{destination}]", 1)
@@ -100,10 +105,7 @@ async def send_reminder(num_seconds, destination: typing.Union[discord.Member, d
         embed = build_embed(
             title="Bot Frost Reminder",
             inline=False,
-            fields=[
-                ["Author", source.mention],
-                [f"Reminder!", message]
-            ]
+            fields=[["Author", source.mention], [f"Reminder!", message]],
         )
     else:
         embed = build_embed(
@@ -112,11 +114,14 @@ async def send_reminder(num_seconds, destination: typing.Union[discord.Member, d
             fields=[
                 ["Original Reminder Date Time", alert_when],
                 ["Author", source],
-                ["Message", message]
-            ]
+                ["Message", message],
+            ],
         )
     await destination.send(embed=embed)
 
-    Process_MySQL(sqlUpdateTasks, values=(0, str(destination.id), message, alert_when, str(source)))
+    Process_MySQL(
+        sqlUpdateTasks,
+        values=(0, str(destination.id), message, alert_when, str(source)),
+    )
 
     log(f";;; Thread completed successfully!")

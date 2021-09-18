@@ -1,7 +1,4 @@
-from datetime import (
-    datetime,
-    timezone
-)
+from datetime import datetime, timezone
 
 
 class WeatherHour:
@@ -12,7 +9,6 @@ class WeatherHour:
 
 
 class WeatherMain:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -23,7 +19,6 @@ class WeatherMain:
 
 
 class WeatherCoord:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -34,13 +29,16 @@ class WeatherCoord:
 
 
 class WeatherSys:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             if key == "sunrise":
-                self.sunrise = datetime.utcfromtimestamp(value).astimezone(tz=timezone.utc)
+                self.sunrise = datetime.utcfromtimestamp(value).astimezone(
+                    tz=timezone.utc
+                )
             elif key == "sunset":
-                self.sunset = datetime.utcfromtimestamp(value).astimezone(tz=timezone.utc)
+                self.sunset = datetime.utcfromtimestamp(value).astimezone(
+                    tz=timezone.utc
+                )
             else:
                 setattr(self, key, value)
         self._data_len = len(dictionary)
@@ -50,7 +48,6 @@ class WeatherSys:
 
 
 class WeatherWeather:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -61,7 +58,6 @@ class WeatherWeather:
 
 
 class WeatherWind:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -72,7 +68,6 @@ class WeatherWind:
 
 
 class WeatherClouds:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -83,7 +78,6 @@ class WeatherClouds:
 
 
 class WeatherRain:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -94,7 +88,6 @@ class WeatherRain:
 
 
 class WeatherSnow:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -105,7 +98,6 @@ class WeatherSnow:
 
 
 class WeatherResponse:
-
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             if key == "main":
@@ -128,7 +120,9 @@ class WeatherResponse:
                 self.snow = WeatherSnow(value)
             else:
                 if key == "dt":
-                    self.dt = datetime.utcfromtimestamp(value).astimezone(tz=timezone.utc)
+                    self.dt = datetime.utcfromtimestamp(value).astimezone(
+                        tz=timezone.utc
+                    )
                 # elif key == "timezone":
                 #     self.timezone = datetime.utcfromtimestamp(value)
                 else:

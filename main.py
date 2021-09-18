@@ -5,34 +5,19 @@ import random
 import sys
 import traceback
 import typing
-from datetime import (
-    datetime,
-    timedelta
-)
+from datetime import datetime, timedelta
 
 import discord
 import requests
 import tweepy
 from PIL import Image
 from discord.ext.commands import Bot
-from discord_slash import (
-    ButtonStyle,
-    ComponentContext,
-    SlashCommand
-)
-from discord_slash.context import (
-    SlashContext
-)
-from discord_slash.utils.manage_components import (
-    create_actionrow,
-    create_button
-)
+from discord_slash import ButtonStyle, ComponentContext, SlashCommand
+from discord_slash.context import SlashContext
+from discord_slash.utils.manage_components import create_actionrow, create_button
 from imgurpython import ImgurClient
 
-from objects.Thread import (
-    send_reminder,
-    TwitterStreamListener
-)
+from objects.Thread import send_reminder, TwitterStreamListener
 from utilities.constants import (
     CHAN_GENERAL,
     CHAN_HOF_PROD,
@@ -54,19 +39,16 @@ from utilities.constants import (
     TWITTER_TOKEN,
     TWITTER_TOKEN_SECRET,
     UserError,
-    set_component_key
+    set_component_key,
 )
 from utilities.embed import build_embed
-from utilities.mysql import (
-    Process_MySQL,
-    sqlRetrieveTasks
-)
+from utilities.mysql import Process_MySQL, sqlRetrieveTasks
 
 client = Bot(
     command_prefix="$",
     case_insensitive=True,
     description="Bot Frost version 3.0! Now with Slash Commands",
-    intents=discord.Intents.all()
+    intents=discord.Intents.all(),
 )
 
 slash = SlashCommand(client, sync_commands=True)  # Sync required
@@ -98,19 +80,18 @@ async def change_my_status():
         "Nebraska beat Florida 62-24",
         "the Huskers give up 400 yards rushing to one guy",
         "a swing pass for -1 yards",
-        "a missed field goal"
+        "a missed field goal",
     )
     try:
         log(f"Attempting to change status...", 0)
         await client.change_presence(
             activity=discord.Activity(
-                type=discord.ActivityType.watching,
-                name=random.choice(statuses)
+                type=discord.ActivityType.watching, name=random.choice(statuses)
             )
         )
         log(f"Successfully changed status", 1)
     except (AttributeError, discord.HTTPException) as err:
-        log(f"Unable to change status: " + str(err).replace('\n', ' '), 1)
+        log(f"Unable to change status: " + str(err).replace("\n", " "), 1)
     except:
         log(f"Unknown error!" + str(sys.exc_info()[0]), 0)
 
@@ -181,7 +162,7 @@ async def load_tasks():
                 message=task["message"],
                 source=task["author"],
                 alert_when=task["send_when"],
-                missed=True
+                missed=True,
             )
             continue
 
@@ -192,7 +173,7 @@ async def load_tasks():
                     destination=destination,
                     message=task["message"],
                     source=task["author"],
-                    alert_when=task["send_when"]
+                    alert_when=task["send_when"],
                 )
             )
         )
@@ -206,11 +187,7 @@ async def send_tweet_alert(message: str):
     log(f"Twttier Alert: {message}", 1)
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
-    embed = build_embed(
-        fields=[
-            ["Twitter Stream Listener Alert", message]
-        ]
-    )
+    embed = build_embed(fields=[["Twitter Stream Listener Alert", message]])
     await chan_twitter.send(embed=embed)
 
 
@@ -218,26 +195,24 @@ async def send_tweet(tweet):
     if tweet.author.id_str not in [member["id_str"] for member in list_members]:
         return
 
-    direct_url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
+    direct_url = (
+        f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
+    )
 
     if hasattr(tweet, "extended_tweet"):
-        fields = [
-            ["Message", tweet.extended_tweet["full_text"]]
-        ]
+        fields = [["Message", tweet.extended_tweet["full_text"]]]
     else:
-        fields = [
-            ["Message", tweet.text]
-        ]
+        fields = [["Message", tweet.text]]
 
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
         fields=fields,
-        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}"
+        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}",
     )
 
     embed.set_author(
         name=f"{tweet.author.name} (@{tweet.author.screen_name}) via {tweet.source}",
-        icon_url=tweet.author.profile_image_url_https
+        icon_url=tweet.author.profile_image_url_https,
     )
 
     if hasattr(tweet, "extended_entities"):
@@ -250,7 +225,7 @@ async def send_tweet(tweet):
                 embed.add_field(
                     name=f"Media #{index + 1}",
                     value=f"[Link #{index + 1}]({media['media_url']})",
-                    inline=False
+                    inline=False,
                 )
         except:
             pass
@@ -262,18 +237,14 @@ async def send_tweet(tweet):
         create_button(
             style=ButtonStyle.gray,
             custom_id=f"{set_component_key()}_send_to_general",
-            label="Send to General"
+            label="Send to General",
         ),
         create_button(
             style=ButtonStyle.gray,
             custom_id=f"{set_component_key()}_send_to_recruiting",
-            label="Send to Recruiting"
+            label="Send to Recruiting",
         ),
-        create_button(
-            style=ButtonStyle.URL,
-            label="Open Tweet",
-            url=direct_url
-        )
+        create_button(style=ButtonStyle.URL, label="Open Tweet", url=direct_url),
     ]
     actionrow = create_actionrow(*buttons)
     # noinspection PyArgumentList
@@ -283,25 +254,19 @@ async def send_tweet(tweet):
 def start_twitter_stream():
     listener = TwitterStreamListener(send_tweet, send_tweet_alert, client.loop)
     auth = tweepy.OAuthHandler(
-        consumer_key=TWITTER_KEY,
-        consumer_secret=TWITTER_SECRET_KEY
+        consumer_key=TWITTER_KEY, consumer_secret=TWITTER_SECRET_KEY
     )
-    auth.set_access_token(
-        key=TWITTER_TOKEN,
-        secret=TWITTER_TOKEN_SECRET
-    )
+    auth.set_access_token(key=TWITTER_TOKEN, secret=TWITTER_TOKEN_SECRET)
     api = tweepy.API(auth_handler=auth)
-    stream = tweepy.Stream(
-        auth=api.auth,
-        listener=listener
-    )
+    stream = tweepy.Stream(auth=api.auth, listener=listener)
 
-    for member in tweepy.Cursor(api.list_members, list_id=TWITTER_HUSKER_MEDIA_LIST_ID).items():
+    for member in tweepy.Cursor(
+        api.list_members, list_id=TWITTER_HUSKER_MEDIA_LIST_ID
+    ).items():
         list_members.append(
             {
                 "screen_name": member.screen_name,
                 "id_str": member.id_str,
-
             }
         )
     if "Windows" in platform.platform():
@@ -309,22 +274,14 @@ def start_twitter_stream():
             {
                 "screen_name": "ayy_gbr",
                 "id_str": "15899943",
-
             }
         )
-    stream.filter(
-        follow=[member["id_str"] for member in list_members],
-        is_async=True
-    )
+    stream.filter(follow=[member["id_str"] for member in list_members], is_async=True)
 
 
 def upload_picture(path: str) -> str:
     imgur_client = ImgurClient(IMGUR_CLIENT, IMGUR_SECRET)
-    url = imgur_client.upload_from_path(
-        path=path,
-        config=None,
-        anon=True
-    )
+    url = imgur_client.upload_from_path(path=path, config=None, anon=True)
 
     return url.get("link", None)
 
@@ -343,10 +300,15 @@ def make_slowking(avatar_url):
 async def hall_of_fame_messages(reactions: list):
     multiple_threshold = False
     for reaction in reactions:
-        if multiple_threshold:  # Rare instance where a message has multiple reactions that break the threshold
+        if (
+            multiple_threshold
+        ):  # Rare instance where a message has multiple reactions that break the threshold
             break
 
-        if reaction.message.channel.id in (CHAN_HOF_PROD, CHAN_SHAME):  # Stay out of HOF and HOS
+        if reaction.message.channel.id in (
+            CHAN_HOF_PROD,
+            CHAN_SHAME,
+        ):  # Stay out of HOF and HOS
             continue
 
         slowpoke_emoji = "<:slowpoke:758361250048245770>"
@@ -356,7 +318,10 @@ async def hall_of_fame_messages(reactions: list):
 
         if reaction.count >= reaction_threshold:
             multiple_threshold = True
-            log(f"Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] in [{reaction.message.channel}] reactions", 0)
+            log(
+                f"Reaction threshold broken with [{reaction.count}] [{reaction.emoji}] in [{reaction.message.channel}] reactions",
+                0,
+            )
             if str(reaction.emoji) == slowpoke_emoji:
                 hof = False
                 hos_channel = client.get_channel(id=CHAN_SHAME)
@@ -379,16 +344,24 @@ async def hall_of_fame_messages(reactions: list):
 
                 if not hof:
                     embed_title = f"{slowpoke_emoji * 3} Hall of Shame Message {slowpoke_emoji * 3}"
-                    embed_description = "Messages so shameful they had to be memorialized forever!"
+                    embed_description = (
+                        "Messages so shameful they had to be memorialized forever!"
+                    )
                     channel = hos_channel
 
-                    avatar_url = str(reaction.message.author.avatar_url).split("?")[0].replace("webp", "png")
+                    avatar_url = (
+                        str(reaction.message.author.avatar_url)
+                        .split("?")[0]
+                        .replace("webp", "png")
+                    )
                     make_slowking(avatar_url)
                     slowking_path = f"{pathlib.Path(__file__).parent.resolve()}\\resources\\images\\new_slowking.png"
                     slowking_path = upload_picture(slowking_path)
                 else:
                     embed_title = f"{'🏆' * 3} Hall of Fame Message {'🏆' * 3}"
-                    embed_description = "Messages so amazing they had to be memorialized forever!"
+                    embed_description = (
+                        "Messages so amazing they had to be memorialized forever!"
+                    )
                     channel = hof_channel
 
                 embed = build_embed(
@@ -398,9 +371,12 @@ async def hall_of_fame_messages(reactions: list):
                     fields=[
                         ["Author", reaction.message.author.mention],
                         ["Message", reaction.message.content],
-                        ["Message Link", f"[Click to view message]({reaction.message.jump_url})"]
+                        [
+                            "Message Link",
+                            f"[Click to view message]({reaction.message.jump_url})",
+                        ],
                     ],
-                    footer=f"Message ID: {reaction.message.id} | Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')}"
+                    footer=f"Message ID: {reaction.message.id} | Hall of Shame message created at {reaction.message.created_at.strftime('%B %d, %Y at %H:%M%p')}",
                 )
                 await channel.send(embed=embed)
                 log(f"Processed HOF/HOS message.", 0)
@@ -414,10 +390,19 @@ async def send_welcome_message(who: discord.Member):
         description="The official Husker football discord server",
         thumbnail="https://cdn.discordapp.com/icons/440632686185414677/a_061e9e57e43a5803e1d399c55f1ad1a4.gif",
         fields=[
-            ["Rules", f"Please be sure to check out {chan_rules.mention if chan_rules is not None else 'the rules channel'} to catch up on server rules."],
-            ["Commands", f"View the list of commands with the `/commands` command. Note: commands only work while in the server."],
-            ["Roles", "You can assign yourself come flair by using the `/roles` command."]
-        ]
+            [
+                "Rules",
+                f"Please be sure to check out {chan_rules.mention if chan_rules is not None else 'the rules channel'} to catch up on server rules.",
+            ],
+            [
+                "Commands",
+                f"View the list of commands with the `/commands` command. Note: commands only work while in the server.",
+            ],
+            [
+                "Roles",
+                "You can assign yourself come flair by using the `/roles` command.",
+            ],
+        ],
     )
 
     await who.send(embed=embed)
@@ -446,10 +431,14 @@ async def on_ready():
 
             if "Windows" in platform.platform():
                 log(f"Windows changelog", 1)
-                changelog_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
+                changelog_path = pathlib.PurePath(
+                    f"{pathlib.Path(__file__).parent.resolve()}/changelog.md"
+                )
             elif "Linux" in platform.platform():
                 log(f"Linxue changelog", 0)
-                changelog_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.resolve()}/changelog.md")
+                changelog_path = pathlib.PurePosixPath(
+                    f"{pathlib.Path(__file__).parent.resolve()}/changelog.md"
+                )
 
             changelog = open(changelog_path, "r")
             lines = changelog.readlines()
@@ -464,11 +453,17 @@ async def on_ready():
         embed = build_embed(
             title="Husker Discord Bot",
             fields=[
-                ["Info", f"I was restarted, but now I'm back! I'm now online as {client.user.mention}! Check out /commands."],
+                [
+                    "Info",
+                    f"I was restarted, but now I'm back! I'm now online as {client.user.mention}! Check out /commands.",
+                ],
                 ["HOF/HOS Reaction Threshold", f"{threshold}"],
                 ["Changelog", lines_str],
-                ["More Changelog", f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)"]
-            ]
+                [
+                    "More Changelog",
+                    f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)",
+                ],
+            ],
         )
         await bot_spam.send(embed=embed)
 
@@ -506,6 +501,7 @@ async def on_component(ctx: ComponentContext):
 
 
 if "Windows" not in platform.platform():
+
     @client.event
     async def on_slash_command_error(ctx: SlashContext, ex: Exception):
         def format_traceback(tback: list):
@@ -517,33 +513,25 @@ if "Windows" not in platform.platform():
             embed = build_embed(
                 title="Husker Bot User Error",
                 description="An error occured with user input",
-                fields=[
-                    ["Error Message", ex.message]
-                ]
+                fields=[["Error Message", ex.message]],
             )
         elif isinstance(ex, CommandError):
             embed = build_embed(
                 title="Husker Bot Command Error",
                 description="An error occured with command processing",
-                fields=[
-                    ["Error Message", ex.message]
-                ]
+                fields=[["Error Message", ex.message]],
             )
         else:
             embed = build_embed(
                 title="Husker Bot Command Error",
                 description="An unknown error occured",
-                fields=[
-                    ["Error Message", f"{ex.__class__}: {ex}"]
-                ]
+                fields=[["Error Message", f"{ex.__class__}: {ex}"]],
             )
 
         await ctx.send(embed=embed)
 
         traceback_raw = traceback.format_exception(
-            etype=type(ex),
-            value=ex,
-            tb=ex.__traceback__
+            etype=type(ex), value=ex, tb=ex.__traceback__
         )
 
         tback = format_traceback(traceback_raw)
@@ -557,17 +545,20 @@ if "Windows" not in platform.platform():
         for key, value in ctx.data.items():
             inputs.append(f"{key} = {value}")
 
-        message = f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n" \
-                  f"\n" \
-                  f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n" \
-                  f"\n" \
-                  f"```\n{tback}\n```"
+        message = (
+            f"{ctx.author.mention} ({ctx.author.display_name}, {ctx.author_id}) received an unknown error!\n"
+            f"\n"
+            f"`/{cmd}{' ' + sub_cmd if sub_cmd is not None else ''} {inputs}`\n"
+            f"\n"
+            f"```\n{tback}\n```"
+        )
 
         try:
             gee = client.get_user(id=GEE_USER)
             await gee.send(content=message)
         except:
             await ctx.send(content=f"<@{GEE_USER}>\n{message}")
+
 
 extensions = [
     "commands.croot_bot",

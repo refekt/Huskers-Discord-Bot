@@ -1,23 +1,14 @@
 import asyncio
 import pathlib
 import platform
-from datetime import (
-    datetime,
-    timedelta
-)
+from datetime import datetime, timedelta
 
 import discord
 import paramiko
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
-from discord_slash import (
-    ButtonStyle,
-    cog_ext
-)
-from discord_slash.context import (
-    SlashContext,
-    ComponentContext
-)
+from discord_slash import ButtonStyle, cog_ext
+from discord_slash.context import SlashContext, ComponentContext
 from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import (
     create_option,
@@ -28,7 +19,7 @@ from discord_slash.utils.manage_components import (
     create_button,
     create_select,
     create_select_option,
-    spread_to_rows
+    spread_to_rows,
 )
 
 from utilities.constants import (
@@ -66,15 +57,10 @@ from utilities.constants import (
     SSH_PASSWORD,
     SSH_USERNAME,
     UserError,
-    guild_id_list
+    guild_id_list,
 )
 from utilities.embed import build_embed as build_embed
-from utilities.mysql import (
-    Process_MySQL,
-    sqlInsertIowa,
-    sqlRemoveIowa,
-    sqlRetrieveIowa
-)
+from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
 
 def log(message: str, level: int):
@@ -87,66 +73,40 @@ def log(message: str, level: int):
 
 
 console_buttons = [
-    create_button(
-        style=ButtonStyle.primary,
-        label="SMMS",
-        emoji="🦝",
-        custom_id="SMMS"
-    )
+    create_button(style=ButtonStyle.primary, label="SMMS", emoji="🦝", custom_id="SMMS")
 ]
 
 console_chan_select = create_select(
     options=[
-        create_select_option(
-            label="General",
-            value="SMMS_general"
-        ),
-        create_select_option(
-            label="Recruiting",
-            value="SMMS_recruiting"
-        ),
-        create_select_option(
-            label="War Room",
-            value="SMMS_war"
-        )
+        create_select_option(label="General", value="SMMS_general"),
+        create_select_option(label="Recruiting", value="SMMS_recruiting"),
+        create_select_option(label="War Room", value="SMMS_war"),
     ],
     custom_id="SMMS_select",
     min_values=1,
     max_values=1,
-    placeholder="What channel do you want to send to?"
+    placeholder="What channel do you want to send to?",
 )
 
 buttons_roles_hype = [
     create_button(
-        style=ButtonStyle.gray,
-        label="Max",
-        custom_id="role_hype_max",
-        emoji="📈"
+        style=ButtonStyle.gray, label="Max", custom_id="role_hype_max", emoji="📈"
     ),
     create_button(
-        style=ButtonStyle.gray,
-        label="Some",
-        custom_id="role_hype_some",
-        emoji="⚠"
+        style=ButtonStyle.gray, label="Some", custom_id="role_hype_some", emoji="⚠"
     ),
     create_button(
-        style=ButtonStyle.gray,
-        label="No",
-        custom_id="role_hype_no",
-        emoji="⛔"
+        style=ButtonStyle.gray, label="No", custom_id="role_hype_no", emoji="⛔"
     ),
     create_button(
-        style=ButtonStyle.gray,
-        label="Tarmac",
-        custom_id="role_hype_tarmac",
-        emoji="🛫"
+        style=ButtonStyle.gray, label="Tarmac", custom_id="role_hype_tarmac", emoji="🛫"
     ),
     create_button(
         style=ButtonStyle.gray,
         label="Remove Hype Roles",
         custom_id="role_hype_none",
-        emoji="🕳"
-    )
+        emoji="🕳",
+    ),
 ]
 
 buttons_roles_food = [
@@ -184,8 +144,8 @@ buttons_roles_food = [
         style=ButtonStyle.gray,
         label="Remove Food Roles",
         custom_id="roles_food_remove",
-        emoji="🕳"
-    )
+        emoji="🕳",
+    ),
 ]
 
 buttons_roles_culture = [
@@ -223,8 +183,8 @@ buttons_roles_culture = [
         style=ButtonStyle.gray,
         label="Remove Culture Roles",
         custom_id="roles_culture_remove",
-        emoji="🕳"
-    )
+        emoji="🕳",
+    ),
 ]
 
 
@@ -291,26 +251,36 @@ class AdminCommands(commands.Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(
-        name="about",
-        description="All about Bot Frost!",
-        guild_ids=guild_id_list()
+        name="about", description="All about Bot Frost!", guild_ids=guild_id_list()
     )
     async def _about(self, ctx: SlashContext):
-        """ All about Bot Frost """
+        """All about Bot Frost"""
         await ctx.send(
             embed=build_embed(
                 title="About Me",
                 inline=False,
                 fields=[
-                    ["History", "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!"],
-                    ["Source Code", "[GitHub](https://www.github.com/refekt/Husker-Bot)"],
-                    ["Hosting Location", f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}"],
+                    [
+                        "History",
+                        "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
+                    ],
+                    [
+                        "Source Code",
+                        "[GitHub](https://www.github.com/refekt/Husker-Bot)",
+                    ],
+                    [
+                        "Hosting Location",
+                        f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}",
+                    ],
                     ["Hosting Status", "https://status.hyperexpert.com/"],
                     ["Latency", f"{self.bot.latency * 1000:.2f} ms"],
                     ["Username", self.bot.user.mention],
                     ["Birthday", f"I was born on {self.bot.user.created_at}"],
-                    ["Feeling generous?", f"Check out `/donate` to help out the production and upkeep of the bot."]
-                ]
+                    [
+                        "Feeling generous?",
+                        f"Check out `/donate` to help out the production and upkeep of the bot.",
+                    ],
+                ],
             )
         )
 
@@ -324,37 +294,46 @@ class AdminCommands(commands.Cog):
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _quit(self, ctx: SlashContext):
         await ctx.send(f"Good bye world! 😭 I was turned off by [{ctx.author}].")
         await self.bot.logout()
 
     @cog_ext.cog_slash(
-        name="donate",
-        description="Donate to the cause!",
-        guild_ids=guild_id_list()
+        name="donate", description="Donate to the cause!", guild_ids=guild_id_list()
     )
     async def _donate(self, ctx: SlashContext):
-        """ Donate to the cause """
+        """Donate to the cause"""
 
         await ctx.send(
             embed=build_embed(
                 title="Donation Information",
                 inline=False,
                 fields=[
-                    ["About", "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs."],
-                    ["Terms", "(1) Final discretion of donation usage is up to the creator(s). "
-                              "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
-                              "(3) No refunds. "
-                              "(4) Monthly subscriptions can be terminated by either party at any time. "
-                              "(5) These terms can be changed at any time. Please read before each donation. "
-                              "(6) Clicking the donation link signifies your agreement to these terms."],
-                    ["Donation Link", "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)"]
-                ]
+                    [
+                        "About",
+                        "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs.",
+                    ],
+                    [
+                        "Terms",
+                        "(1) Final discretion of donation usage is up to the creator(s). "
+                        "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
+                        "(3) No refunds. "
+                        "(4) Monthly subscriptions can be terminated by either party at any time. "
+                        "(5) These terms can be changed at any time. Please read before each donation. "
+                        "(6) Clicking the donation link signifies your agreement to these terms.",
+                    ],
+                    [
+                        "Donation Link",
+                        "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)",
+                    ],
+                ],
             ),
-            hidden=True
+            hidden=True,
         )
 
     @cog_ext.cog_subcommand(
@@ -362,15 +341,17 @@ class AdminCommands(commands.Cog):
         base_description="Admin only: Delete messages",
         name="everything",
         description="Admin only: Deletes up to 100 of the previous messages",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _everything(self, ctx: SlashContext):
         if ctx.subcommand_passed is not None:
@@ -382,7 +363,9 @@ class AdminCommands(commands.Cog):
         await ctx.defer(hidden=True)
 
         try:
-            max_age = datetime.now() - timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
+            max_age = datetime.now() - timedelta(
+                days=13, hours=23, minutes=59
+            )  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True)
             log(f"Bulk delete of {len(deleted)} messages successful.", 0)
         except discord.ClientException:
@@ -390,7 +373,10 @@ class AdminCommands(commands.Cog):
         except discord.Forbidden:
             log(f"Missing permissions.", 1)
         except discord.HTTPException:
-            log(f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.", 1)
+            log(
+                f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.",
+                1,
+            )
 
         await ctx.send(hidden=True, content="Done!")
 
@@ -399,14 +385,16 @@ class AdminCommands(commands.Cog):
         base_description="Admin only: Delete messages",
         name="bot",
         description="Admin only: Deletes previous bot messages",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _bot(self, ctx: SlashContext):
         if ctx.subcommand_passed is not None:
@@ -418,10 +406,13 @@ class AdminCommands(commands.Cog):
         await ctx.defer(hidden=True)
 
         try:
+
             def is_bot(message: discord.Message):
                 return message.author.bot
 
-            max_age = datetime.now() - timedelta(days=13, hours=23, minutes=59)  # Discord only lets you delete 14 day old messages
+            max_age = datetime.now() - timedelta(
+                days=13, hours=23, minutes=59
+            )  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True, check=is_bot)
             log(f"Bulk delete of {len(deleted)} messages successful.", 0)
         except discord.ClientException:
@@ -429,14 +420,17 @@ class AdminCommands(commands.Cog):
         except discord.Forbidden:
             log(f"Missing permissions.", 1)
         except discord.HTTPException:
-            log(f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.", 1)
+            log(
+                f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.",
+                1,
+            )
 
         await ctx.send(hidden=True, content="Done!")
 
     @cog_ext.cog_slash(
         name="submit",
         description="Report something on GitHub",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _submit(self, ctx: SlashContext):
         pass
@@ -445,7 +439,7 @@ class AdminCommands(commands.Cog):
         base="submit",
         name="bug",
         description="Submit a bug report",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _submit_bug(self, ctx: SlashContext):
         embed = build_embed(
@@ -453,7 +447,7 @@ class AdminCommands(commands.Cog):
             description="[Submit a bug report here](https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=bug&template=bug_report.md&title=%5BBUG%5D+)",
             author=None,
             image=None,
-            thumbnail=None
+            thumbnail=None,
         )
         await ctx.send(embed=embed)
 
@@ -461,7 +455,7 @@ class AdminCommands(commands.Cog):
         base="submit",
         name="feature",
         description="Submit feature request",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _submit_feature(self, ctx: SlashContext):
         embed = build_embed(
@@ -469,7 +463,7 @@ class AdminCommands(commands.Cog):
             description="[Submit a feature request here](https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=request&template=feature_request.md&title=%5BREQUEST%5D+)",
             author=None,
             image=None,
-            thumbnail=None
+            thumbnail=None,
         )
         await ctx.send(embed=embed)
 
@@ -478,7 +472,7 @@ class AdminCommands(commands.Cog):
         base_description="Manage your roles",
         name="hype",
         description="Assign hype roles",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _roles_hype(self, ctx: SlashContext):
         log(f"Roles: Hype Squad", 0)
@@ -494,8 +488,8 @@ class AdminCommands(commands.Cog):
                 ["⚠ Some Hype", "Little hype or uncertain of Nebraska's performance"],
                 ["⛔ No Hype", "Nebraska will not be good and I expect this"],
                 ["🛫 Tarmac Gang", "FROST MUST BE LEFT ON THE TARMAC"],
-                ["🕳 None", "Remove hype roles"]
-            ]
+                ["🕳 None", "Remove hype roles"],
+            ],
         )
 
         await ctx.send(embed=embed, components=[hype_action_row])
@@ -516,28 +510,38 @@ class AdminCommands(commands.Cog):
 
         if ctx.custom_id == "role_hype_max":
             await ctx.author.add_roles(hype_max, reason="Hype squad")
-            await ctx.author.remove_roles(hype_tarmac, hype_some, hype_no, reason="Hype squad")
+            await ctx.author.remove_roles(
+                hype_tarmac, hype_some, hype_no, reason="Hype squad"
+            )
             chosen_hype = hype_max.mention
         elif ctx.custom_id == "role_hype_some":
             await ctx.author.add_roles(hype_some, reason="Hype squad")
-            await ctx.author.remove_roles(hype_tarmac, hype_max, hype_no, reason="Hype squad")
+            await ctx.author.remove_roles(
+                hype_tarmac, hype_max, hype_no, reason="Hype squad"
+            )
             chosen_hype = hype_some.mention
         elif ctx.custom_id == "role_hype_no":
             await ctx.author.add_roles(hype_no, reason="Hype squad")
-            await ctx.author.remove_roles(hype_tarmac, hype_some, hype_max, reason="Hype squad")
+            await ctx.author.remove_roles(
+                hype_tarmac, hype_some, hype_max, reason="Hype squad"
+            )
             chosen_hype = hype_no.mention
         elif ctx.custom_id == "role_hype_tarmac":
             await ctx.author.add_roles(hype_tarmac, reason="Hype squad")
-            await ctx.author.remove_roles(hype_no, hype_some, hype_max, reason="Hype squad")
+            await ctx.author.remove_roles(
+                hype_no, hype_some, hype_max, reason="Hype squad"
+            )
             chosen_hype = hype_tarmac.mention
         elif ctx.custom_id == "role_hype_none":
-            await ctx.author.remove_roles(hype_tarmac, hype_no, hype_some, hype_max, reason="Hype squad")
+            await ctx.author.remove_roles(
+                hype_tarmac, hype_no, hype_some, hype_max, reason="Hype squad"
+            )
             embed = build_embed(
                 description=f"{ctx.author.mention} has left all hype roles.",
                 image=None,
                 thumbnail=None,
                 author=None,
-                footer="This message will disappear after 10 seconds."
+                footer="This message will disappear after 10 seconds.",
             )
             await ctx.send(embed=embed, delete_after=10)
             return
@@ -549,7 +553,7 @@ class AdminCommands(commands.Cog):
             image=None,
             thumbnail=None,
             author=None,
-            footer="This message will disappear after 10 seconds."
+            footer="This message will disappear after 10 seconds.",
         )
         await ctx.send(embed=embed, delete_after=10)
 
@@ -560,7 +564,7 @@ class AdminCommands(commands.Cog):
         base_description="Manage your roles",
         name="food",
         description="Assign food roles",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _roles_food(self, ctx: SlashContext):
         log(f"Roles: Food", 0)
@@ -575,8 +579,8 @@ class AdminCommands(commands.Cog):
                 ["🥪 Runza", "r/unza"],
                 ["🌯 Qdoba's Witness", "Qdoba is better than Chipotle"],
                 ["🥜 Aldi's Nuts", "Aldi Super Fan"],
-                ["🕳 None", "Remove food roles"]
-            ]
+                ["🕳 None", "Remove food roles"],
+            ],
         )
 
         food_action_row = spread_to_rows(*buttons_roles_food, max_in_row=2)
@@ -595,7 +599,10 @@ class AdminCommands(commands.Cog):
         food_qdoba = ctx.guild.get_role(ROLE_QDOBA)
         food_aldi = ctx.guild.get_role(ROLE_ALDIS)
 
-        if any([food_potato, food_asparagus, food_runza, food_qdoba, food_aldi]) is None:
+        if (
+            any([food_potato, food_asparagus, food_runza, food_qdoba, food_aldi])
+            is None
+        ):
             raise CommandError("Unable to locate role!")
 
         if ctx.custom_id == "role_food_potato":
@@ -614,13 +621,20 @@ class AdminCommands(commands.Cog):
             await ctx.author.add_roles(food_aldi, reason="Hype squad")
             chosen_food = food_aldi.mention
         elif ctx.custom_id == "roles_food_remove":
-            await ctx.author.remove_roles(food_potato, food_asparagus, food_runza, food_qdoba, food_aldi, reason="Hype squad")
+            await ctx.author.remove_roles(
+                food_potato,
+                food_asparagus,
+                food_runza,
+                food_qdoba,
+                food_aldi,
+                reason="Hype squad",
+            )
             embed = build_embed(
                 description=f"{ctx.author.mention} has left all food roles.",
                 image=None,
                 thumbnail=None,
                 author=None,
-                footer="This message will disappear after 10 seconds."
+                footer="This message will disappear after 10 seconds.",
             )
             await ctx.send(embed=embed, delete_after=10)
             return
@@ -632,7 +646,7 @@ class AdminCommands(commands.Cog):
             image=None,
             thumbnail=None,
             author=None,
-            footer="This message will disappear after 10 seconds."
+            footer="This message will disappear after 10 seconds.",
         )
         await ctx.send(embed=embed, delete_after=10)
 
@@ -643,7 +657,7 @@ class AdminCommands(commands.Cog):
         base_description="Manage your roles",
         name="culture",
         description="Assign culture roles",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _roles_culture(self, ctx: SlashContext):
         log(f"Roles: Culture", 0)
@@ -658,8 +672,8 @@ class AdminCommands(commands.Cog):
                 ["🧀 Packer Backer", "Green Bay fan"],
                 ["📱 Pixel Gang", "Android fan"],
                 ["🎧 Airpod Gang", "Apple fan"],
-                ["🕳 None", "Remove food roles"]
-            ]
+                ["🕳 None", "Remove food roles"],
+            ],
         )
 
         culture_action_row = spread_to_rows(*buttons_roles_culture, max_in_row=2)
@@ -678,7 +692,18 @@ class AdminCommands(commands.Cog):
         culture_pixel = ctx.guild.get_role(ROLE_PIXEL)
         culture_airpod = ctx.guild.get_role(ROLE_AIRPOD)
 
-        if any([culture_meme, culture_isms, culiture_packer, culture_pixel, culture_airpod]) is None:
+        if (
+            any(
+                [
+                    culture_meme,
+                    culture_isms,
+                    culiture_packer,
+                    culture_pixel,
+                    culture_airpod,
+                ]
+            )
+            is None
+        ):
             raise CommandError("Unable to locate role!")
 
         if ctx.custom_id == "role_culture_meme":
@@ -697,13 +722,20 @@ class AdminCommands(commands.Cog):
             await ctx.author.add_roles(culture_airpod, reason="Hype squad")
             chosen_food = culture_airpod.mention
         elif ctx.custom_id == "roles_culture_remove":
-            await ctx.author.remove_roles(culture_meme, culture_isms, culiture_packer, culture_pixel, culture_airpod, reason="Hype squad")
+            await ctx.author.remove_roles(
+                culture_meme,
+                culture_isms,
+                culiture_packer,
+                culture_pixel,
+                culture_airpod,
+                reason="Hype squad",
+            )
             embed = build_embed(
                 description=f"{ctx.author.mention} has left all culture roles.",
                 image=None,
                 thumbnail=None,
                 author=None,
-                footer="This message will disappear after 10 seconds."
+                footer="This message will disappear after 10 seconds.",
             )
             await ctx.send(embed=embed, delete_after=10)
             return
@@ -715,7 +747,7 @@ class AdminCommands(commands.Cog):
             image=None,
             thumbnail=None,
             author=None,
-            footer="This message will disappear after 10 seconds."
+            footer="This message will disappear after 10 seconds.",
         )
         await ctx.send(embed=embed, delete_after=10)
 
@@ -732,10 +764,19 @@ class AdminCommands(commands.Cog):
                 inline=False,
                 description="Game day mode is now on!",
                 fields=[
-                    ["Live TV", f"{chan_live.mention} text and voice channels are for users who are watching live."],
-                    ["Streaming", f"{chan_streaming.mention} text and voice channels are for users who are streaming the game."],
-                    ["Info", "All channels in the General category will be turned off until the game day mode is disbled."]
-                ]
+                    [
+                        "Live TV",
+                        f"{chan_live.mention} text and voice channels are for users who are watching live.",
+                    ],
+                    [
+                        "Streaming",
+                        f"{chan_streaming.mention} text and voice channels are for users who are streaming the game.",
+                    ],
+                    [
+                        "Info",
+                        "All channels in the General category will be turned off until the game day mode is disbled.",
+                    ],
+                ],
             )
         else:
             embed = build_embed(
@@ -743,8 +784,11 @@ class AdminCommands(commands.Cog):
                 inline=False,
                 description="Game day mode is now off!",
                 fields=[
-                    ["Info", f"Game day channels have been disabled and General categories channels have been enabled. Regulare discussion may continue in {chan_general.mention}."]
-                ]
+                    [
+                        "Info",
+                        f"Game day channels have been disabled and General categories channels have been enabled. Regulare discussion may continue in {chan_general.mention}.",
+                    ]
+                ],
             )
 
         await chan_general.send(embed=embed)
@@ -756,15 +800,17 @@ class AdminCommands(commands.Cog):
         base_description="Admin and mod only: Turn game day mode on or off",
         name="on",
         description="Turn game day mode on",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _gameday_on(self, ctx: SlashContext):
         log(f"Game Day: On", 0)
@@ -778,15 +824,17 @@ class AdminCommands(commands.Cog):
         base_description="Admin and mod only: Turn game day mode on or off",
         name="off",
         description="Turn game day mode off",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _gameday_off(self, ctx: SlashContext):
         log(f"Game Day: Off", 0)
@@ -804,9 +852,9 @@ class AdminCommands(commands.Cog):
                 name="command_name",
                 description="Name of the command you want to view",
                 option_type=3,
-                required=False
+                required=False,
             )
-        ]
+        ],
     )
     async def _commands(self, ctx: SlashContext, command_name: str = None):
         def command_embed(cur_cmd, cur_options) -> discord.Embed:
@@ -818,8 +866,8 @@ class AdminCommands(commands.Cog):
                 fields=[
                     ["Command Name", cur_cmd.name],
                     ["Description", cur_cmd.description],
-                    ["Options", opts if opts != "" else "N/A"]
-                ]
+                    ["Options", opts if opts != "" else "N/A"],
+                ],
             )
 
         if not command_name:
@@ -829,38 +877,36 @@ class AdminCommands(commands.Cog):
                     pages.append(
                         command_embed(
                             ctx.slash.commands[command],
-                            ctx.slash.commands[command].options
+                            ctx.slash.commands[command].options,
                         )
                     )
             await Paginator(
-                bot=ctx.bot,
-                ctx=ctx,
-                pages=pages,
-                useSelect=False,
-                useIndexButton=True
+                bot=ctx.bot, ctx=ctx, pages=pages, useSelect=False, useIndexButton=True
             ).run()
         else:
             command_name = command_name.lower()
             await ctx.send(
                 embed=command_embed(
                     ctx.slash.commands[command_name],
-                    ctx.slash.commands[command_name].options
+                    ctx.slash.commands[command_name].options,
                 ),
-                hidden=True
+                hidden=True,
             )
 
     @cog_ext.cog_slash(
         name="iowa",
         description="Admin and mod only: Sends members to Iowa",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _iowa(self, ctx: SlashContext, who: discord.Member, reason: str):
         await ctx.defer()
@@ -896,37 +942,43 @@ class AdminCommands(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             pass
 
-        Process_MySQL(
-            query=sqlInsertIowa,
-            values=(who.id, full_reason, previous_roles)
-        )
+        Process_MySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
 
-        await channel_iowa.send(f"[ {who.mention} ] has been sent to {channel_iowa.mention}.")
+        await channel_iowa.send(
+            f"[ {who.mention} ] has been sent to {channel_iowa.mention}."
+        )
 
         embed = build_embed(
             title="Banished to Iowa",
             inline=False,
             fields=[
-                ["Statement", f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."],
-                ["Reason", full_reason]
-            ]
+                [
+                    "Statement",
+                    f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server.",
+                ],
+                ["Reason", full_reason],
+            ],
         )
         await ctx.send(embed=embed)
-        await who.send(f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}.")
+        await who.send(
+            f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
+        )
         log("Iowa command complete", 0)
 
     @cog_ext.cog_slash(
         name="nebraska",
         description="Admin and mod only: Bring a member back from Iowa",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     @cog_ext.permission(
         guild_id=guild_id_list()[0],
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _nebraska(self, ctx: SlashContext, who: discord.Member):
         await ctx.defer()
@@ -940,9 +992,7 @@ class AdminCommands(commands.Cog):
         log(f"Removed [{role_timeout}] role", 1)
 
         previous_roles_raw = Process_MySQL(
-            query=sqlRetrieveIowa,
-            values=who.id,
-            fetch="all"
+            query=sqlRetrieveIowa, values=who.id, fetch="all"
         )
 
         previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
@@ -957,10 +1007,7 @@ class AdminCommands(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             pass
 
-        Process_MySQL(
-            query=sqlRemoveIowa,
-            values=who.id
-        )
+        Process_MySQL(query=sqlRemoveIowa, values=who.id)
 
         iowa = ctx.guild.get_channel(CHAN_IOWA)
 
@@ -969,8 +1016,8 @@ class AdminCommands(commands.Cog):
             inline=False,
             fields=[
                 ["Welcome back!", f"[{who.mention}] is welcomed back to Nebraska!"],
-                ["Welcomed by", ctx.author.mention]
-            ]
+                ["Welcomed by", ctx.author.mention],
+            ],
         )
         await ctx.send(embed=embed)
         await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
@@ -986,8 +1033,10 @@ class AdminCommands(commands.Cog):
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _console(self, ctx: SlashContext):
 
@@ -1005,8 +1054,10 @@ class AdminCommands(commands.Cog):
         permissions=[
             create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
             create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, False),
-            create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
-        ]
+            create_permission(
+                ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False
+            ),
+        ],
     )
     async def _restart(self, ctx: SlashContext):
         if "Windows" in platform.platform():
@@ -1023,9 +1074,7 @@ class AdminCommands(commands.Cog):
 
         try:
             client.connect(
-                hostname=SSH_HOST,
-                username=SSH_USERNAME,
-                password=SSH_PASSWORD
+                hostname=SSH_HOST, username=SSH_USERNAME, password=SSH_PASSWORD
             )
             log("SSH Client connected to host", 1)
         except:
@@ -1033,7 +1082,9 @@ class AdminCommands(commands.Cog):
             await ctx.send("Unable to restart the bot!", hidden=True)
             return
 
-        bash_script_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/restart.sh")
+        bash_script_path = pathlib.PurePosixPath(
+            f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/restart.sh"
+        )
         bash_script = open(bash_script_path).read()
 
         stdin, stdout, stderr = client.exec_command(bash_script)
@@ -1052,14 +1103,20 @@ class AdminCommands(commands.Cog):
     async def process_console(self, ctx: ComponentContext):
         if ctx.custom_id == "SMMS":
             chan_select_actionrow = create_actionrow(console_chan_select)
-            await ctx.send("Choose a channel.", hidden=True, components=[chan_select_actionrow])
+            await ctx.send(
+                "Choose a channel.", hidden=True, components=[chan_select_actionrow]
+            )
 
     @cog_ext.cog_component(components=console_chan_select)
     async def process_console_channel(self, ctx: ComponentContext):
         await ctx.send("What is your message?", hidden=True)
         try:
+
             def validate(messsage):
-                if messsage.channel.id == ctx.channel_id and messsage.author.id == ctx.author_id:
+                if (
+                    messsage.channel.id == ctx.channel_id
+                    and messsage.author.id == ctx.author_id
+                ):
                     return True
                 else:
                     return False
@@ -1075,9 +1132,7 @@ class AdminCommands(commands.Cog):
             title="Secret Mammal Message System (SMMS)",
             thumbnail="https://i.imgur.com/EGC1qNt.jpg",
             footer=BOT_FOOTER_SECRET,
-            fields=[
-                ["Back Channel Communication", user_msg]
-            ]
+            fields=[["Back Channel Communication", user_msg]],
         )
 
         chan = None

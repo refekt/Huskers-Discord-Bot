@@ -1,41 +1,22 @@
 import calendar
 from datetime import datetime
 
-from cfbd import (
-    ApiClient,
-    BettingApi,
-    Configuration,
-    GamesApi
-)
+from cfbd import ApiClient, BettingApi, Configuration, GamesApi
 from cfbd.rest import ApiException
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
-from discord_slash import (
-    cog_ext,
-    SlashContext
-)
+from discord_slash import cog_ext, SlashContext
 from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 
 from objects.Schedule import HuskerSchedule
-from objects.Winsipedia import (
-    CompareWinsipedia,
-    TeamStatsWinsipediaTeam
-)
-from utilities.constants import (
-    CFBD_KEY,
-    TZ,
-    guild_id_list
-)
-from utilities.embed import (
-    build_countdown_embed,
-    build_embed,
-    return_schedule_embeds
-)
+from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
+from utilities.constants import CFBD_KEY, TZ, guild_id_list
+from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
 
 cfbd_config = Configuration()
-cfbd_config.api_key['Authorization'] = CFBD_KEY
-cfbd_config.api_key_prefix['Authorization'] = "Bearer"
+cfbd_config.api_key["Authorization"] = CFBD_KEY
+cfbd_config.api_key_prefix["Authorization"] = "Bearer"
 
 
 def log(message: str, level: int):
@@ -69,11 +50,15 @@ def get_current_week(year: int, team: str) -> int:
             if game.away_points is None and game.home_points is None:
                 return game.week
         else:
-            if any([game.away_team == "Nebraska", game.home_team == "Nebraska"]) and any([game.away_team == team, game.home_team == team]):
+            if any(
+                [game.away_team == "Nebraska", game.home_team == "Nebraska"]
+            ) and any([game.away_team == team, game.home_team == team]):
                 return game.week
 
 
-def get_consensus_line(team_name: str, year: int = datetime.now().year, week: int = None):
+def get_consensus_line(
+    team_name: str, year: int = datetime.now().year, week: int = None
+):
     cfb_api = BettingApi(ApiClient(cfbd_config))
 
     if week is None:
@@ -102,7 +87,9 @@ def get_consensus_line(team_name: str, year: int = datetime.now().year, week: in
 
         log(f"Lines: {lines}", 1)
 
-        formattedSpread = spreadOpen = overUnder = overUnderOpen = homeMoneyline = awayMoneyline = ""
+        formattedSpread = (
+            spreadOpen
+        ) = overUnder = overUnderOpen = homeMoneyline = awayMoneyline = ""
 
         if lines.get("formattedSpread", None):
             formattedSpread = lines.get("formattedSpread")
@@ -117,10 +104,12 @@ def get_consensus_line(team_name: str, year: int = datetime.now().year, week: in
         if lines.get("awayMoneyline", None):
             awayMoneyline = str(lines.get("awayMoneyline"))
         new_line = "\n"
-        consensus_line = f"{'Spread: ' + formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}" \
-                         f"{'Over/Under:  ' + overUnder + ' (Opened: ' + overUnderOpen + ')' + new_line if overUnder else ''}" \
-                         f"{'Home Moneyline: ' + homeMoneyline + new_line if homeMoneyline else ''}" \
-                         f"{'Away Moneyline: ' + awayMoneyline + new_line if awayMoneyline else ''}"
+        consensus_line = (
+            f"{'Spread: ' + formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line if formattedSpread else ''}"
+            f"{'Over/Under:  ' + overUnder + ' (Opened: ' + overUnderOpen + ')' + new_line if overUnder else ''}"
+            f"{'Home Moneyline: ' + homeMoneyline + new_line if homeMoneyline else ''}"
+            f"{'Away Moneyline: ' + awayMoneyline + new_line if awayMoneyline else ''}"
+        )
 
     except IndexError:
         consensus_line = None
@@ -140,23 +129,29 @@ class FootballStatsCommands(commands.Cog):
                 name="week",
                 description="Week of the season",
                 required=False,
-                option_type=4
+                option_type=4,
             ),
             create_option(
                 name="year",
                 description="Year of the season",
                 required=False,
-                option_type=4
+                option_type=4,
             ),
             create_option(
                 name="team_name",
                 description="Name of the team in which to get lines",
                 required=False,
-                option_type=3
-            )
-        ]
+                option_type=3,
+            ),
+        ],
     )
-    async def _lines(self, ctx: SlashContext, week: int = None, team_name: str = "Nebraska", year: int = datetime.now().year):
+    async def _lines(
+        self,
+        ctx: SlashContext,
+        week: int = None,
+        team_name: str = "Nebraska",
+        year: int = datetime.now().year,
+    ):
         log(f"Gathering info for lines", 0)
         games, stats = HuskerSchedule(sport="football", year=year)
         del stats
@@ -173,7 +168,9 @@ class FootballStatsCommands(commands.Cog):
         icon = None
         for game in games:
             if game.week == week:
-                lines = get_consensus_line(team_name=team_name, year=year, week=week - 1)
+                lines = get_consensus_line(
+                    team_name=team_name, year=year, week=week - 1
+                )
                 icon = game.icon
                 break
 
@@ -182,12 +179,8 @@ class FootballStatsCommands(commands.Cog):
 
         embed = build_embed(
             title=f"Betting lines for [{team_name.title()}]",
-            fields=[
-                ["Year", year],
-                ["Week", week - 1],
-                ["Lines", lines]
-            ],
-            thumbnail=icon
+            fields=[["Year", year], ["Week", week - 1], ["Lines", lines]],
+            thumbnail=icon,
         )
         await ctx.send(embed=embed)
         log(f"Lines completed", 0)
@@ -201,17 +194,19 @@ class FootballStatsCommands(commands.Cog):
                 name="team",
                 description="Name of the opponent you want to search",
                 required=False,
-                option_type=3
+                option_type=3,
             ),
             create_option(
                 name="sport",
                 description="The name of the sport. Uses Huskers.com's naming convention",
                 required=False,
-                option_type=3
-            )
-        ]
+                option_type=3,
+            ),
+        ],
     )
-    async def _countdown(self, ctx: SlashContext, team: str = None, sport: str = "football"):
+    async def _countdown(
+        self, ctx: SlashContext, team: str = None, sport: str = "football"
+    ):
         log(f"Starting countdown", 0)
         await ctx.defer()
 
@@ -236,7 +231,9 @@ class FootballStatsCommands(commands.Cog):
         del games, sport, team, game, stats
 
         dt_game_time_diff = game_compared.game_date_time - now_cst
-        diff_hours_minutes = convert_seconds(dt_game_time_diff.seconds)  # datetime object does not have hours or minutes
+        diff_hours_minutes = convert_seconds(
+            dt_game_time_diff.seconds
+        )  # datetime object does not have hours or minutes
         year_days = 0
 
         log(f"Time diff: {dt_game_time_diff}", 1)
@@ -256,7 +253,7 @@ class FootballStatsCommands(commands.Cog):
             thumbnail=game_compared.icon,
             date_time=game_compared.game_date_time,
             consensus=get_consensus_line(game_compared.opponent),
-            location=game_compared.location
+            location=game_compared.location,
         )
         await ctx.send(embed=embed)
         log(f"Countdown done", 0)
@@ -270,39 +267,58 @@ class FootballStatsCommands(commands.Cog):
                 name="comparison_team",
                 option_type=3,
                 required=True,
-                description="The main team you want to compare stats"
+                description="The main team you want to compare stats",
             ),
             create_option(
                 name="comparison_against",
                 option_type=3,
                 required=True,
-                description="The team you want to compare stats again"
-            )
-        ]
+                description="The team you want to compare stats again",
+            ),
+        ],
     )
-    async def _compare(self, ctx: SlashContext, comparison_team: str, comparison_against: str):
+    async def _compare(
+        self, ctx: SlashContext, comparison_team: str, comparison_against: str
+    ):
         await ctx.defer()
 
         comparison_team = comparison_team.replace(" ", "-")
         comparison_against = comparison_against.replace(" ", "-")
 
         comparison = CompareWinsipedia(
-            compare=comparison_team,
-            against=comparison_against
+            compare=comparison_team, against=comparison_against
         )
         embed = build_embed(
             title=f"Historical records for [{comparison_team.title()}] vs. [{comparison_against.title()}]",
             inline=False,
             fields=[
-                ["Links", f"[All Games ]({comparison.full_games_url}) | "
-                          f"[{comparison_team.title()}'s Games]({'http://www.winsipedia.com/' + comparison_team.lower()}) |     "
-                          f"[{comparison_against.title()}'s Games]({'http://www.winsipedia.com/' + comparison_against.lower()})"],
-                [f"{comparison_team.title()}'s Recoard vs. {comparison_against.title()}", comparison.all_time_record],
-                [f"{comparison_team.title()}'s Largest MOV", f"{comparison.compare.largest_mov} ({comparison.compare.largest_mov_date})"],
-                [f"{comparison_team.title()}'s Longest Win Streak", f"{comparison.compare.longest_win_streak} ({comparison.compare.largest_win_streak_date})"],
-                [f"{comparison_against.title()}'s Largest MOV", f"{comparison.against.largest_mov} ({comparison.against.largest_mov_date})"],
-                [f"{comparison_against.title()}'s Longest Win Streak", f"{comparison.against.longest_win_streak} ({comparison.against.largest_win_streak_date})"]
-            ]
+                [
+                    "Links",
+                    f"[All Games ]({comparison.full_games_url}) | "
+                    f"[{comparison_team.title()}'s Games]({'http://www.winsipedia.com/' + comparison_team.lower()}) |     "
+                    f"[{comparison_against.title()}'s Games]({'http://www.winsipedia.com/' + comparison_against.lower()})",
+                ],
+                [
+                    f"{comparison_team.title()}'s Recoard vs. {comparison_against.title()}",
+                    comparison.all_time_record,
+                ],
+                [
+                    f"{comparison_team.title()}'s Largest MOV",
+                    f"{comparison.compare.largest_mov} ({comparison.compare.largest_mov_date})",
+                ],
+                [
+                    f"{comparison_team.title()}'s Longest Win Streak",
+                    f"{comparison.compare.longest_win_streak} ({comparison.compare.largest_win_streak_date})",
+                ],
+                [
+                    f"{comparison_against.title()}'s Largest MOV",
+                    f"{comparison.against.largest_mov} ({comparison.against.largest_mov_date})",
+                ],
+                [
+                    f"{comparison_against.title()}'s Longest Win Streak",
+                    f"{comparison.against.longest_win_streak} ({comparison.against.largest_win_streak_date})",
+                ],
+            ],
         )
         await ctx.send(embed=embed)
 
@@ -315,17 +331,22 @@ class FootballStatsCommands(commands.Cog):
                 name="year",
                 required=False,
                 option_type=4,
-                description="The year of the schedule you want to search"
+                description="The year of the schedule you want to search",
             ),
             create_option(
                 name="sport",
                 required=False,
                 option_type=3,
                 description="The name of the sport. Uses Huskers.com's naming convention",
-            )
-        ]
+            ),
+        ],
     )
-    async def _schedule(self, ctx: SlashContext, year: int = datetime.now().year, sport: str = "football"):
+    async def _schedule(
+        self,
+        ctx: SlashContext,
+        year: int = datetime.now().year,
+        sport: str = "football",
+    ):
         await ctx.defer()
 
         pages = return_schedule_embeds(year, sport=sport)
@@ -338,7 +359,7 @@ class FootballStatsCommands(commands.Cog):
             nextStyle=ButtonStyle.gray,
             prevStyle=ButtonStyle.gray,
             lastStyle=ButtonStyle.gray,
-            indexStyle=ButtonStyle.gray
+            indexStyle=ButtonStyle.gray,
         ).run()
 
     @cog_ext.cog_slash(
@@ -350,9 +371,9 @@ class FootballStatsCommands(commands.Cog):
                 name="team_name",
                 required=True,
                 option_type=3,
-                description="Name of the team you want to search for"
+                description="Name of the team you want to search for",
             )
-        ]
+        ],
     )
     async def _teamstats(self, ctx: SlashContext, team_name: str):
         await ctx.defer()
@@ -362,18 +383,36 @@ class FootballStatsCommands(commands.Cog):
         embed = build_embed(
             title=f"{team_name.title()} Historical Stats",
             fields=[
-                ["All Time Record", f"{team.all_time_record} ({team.all_time_record_rank})"],
+                [
+                    "All Time Record",
+                    f"{team.all_time_record} ({team.all_time_record_rank})",
+                ],
                 ["All Time Wins", f"{team.all_time_wins} ({team.all_time_wins_rank})"],
                 ["Bowl Games", f"{team.bowl_games} ({team.bowl_games_rank})"],
                 ["Bowl Record", f"{team.bowl_record} ({team.bowl_record_rank})"],
                 ["Championships", f"{team.championships} ({team.championships_rank})"],
-                ["Conference Championships", f"{team.conf_championships} ({team.conf_championships_rank})"],
-                ["Consensus All American", f"{team.conf_championships} ({team.conf_championships_rank})"],
-                ["Heisman Winners", f"{team.heisman_winners} ({team.heisman_winners_rank})"],
-                ["NFL Draft Picks", f"{team.nfl_draft_picks} ({team.nfl_draft_picks_rank})"],
-                ["Weeks in AP Poll", f"{team.week_in_ap_poll} ({team.week_in_ap_poll_rank})"]
+                [
+                    "Conference Championships",
+                    f"{team.conf_championships} ({team.conf_championships_rank})",
+                ],
+                [
+                    "Consensus All American",
+                    f"{team.conf_championships} ({team.conf_championships_rank})",
+                ],
+                [
+                    "Heisman Winners",
+                    f"{team.heisman_winners} ({team.heisman_winners_rank})",
+                ],
+                [
+                    "NFL Draft Picks",
+                    f"{team.nfl_draft_picks} ({team.nfl_draft_picks_rank})",
+                ],
+                [
+                    "Weeks in AP Poll",
+                    f"{team.week_in_ap_poll} ({team.week_in_ap_poll_rank})",
+                ],
             ],
-            inline=False
+            inline=False,
         )
         await ctx.send(embed=embed)
 

@@ -1,34 +1,18 @@
 import datetime
 
 from discord.ext import commands
-from discord_slash import (
-    ButtonStyle,
-    ComponentContext,
-    SlashContext,
-    cog_ext
-)
+from discord_slash import ButtonStyle, ComponentContext, SlashContext, cog_ext
 from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import (
     create_actionrow,
     create_button,
-    wait_for_component
+    wait_for_component,
 )
 
-from objects.FAPing import (
-    individual_predictions,
-    initiate_fap
-)
+from objects.FAPing import individual_predictions, initiate_fap
 from objects.Recruits import FootballRecruit
-from utilities.constants import (
-    CROOT_SEARCH_LIMIT,
-    TZ,
-    UserError,
-    guild_id_list
-)
-from utilities.embed import (
-    build_embed,
-    build_recruit_embed
-)
+from utilities.constants import CROOT_SEARCH_LIMIT, TZ, UserError, guild_id_list
+from utilities.embed import build_embed, build_recruit_embed
 
 
 def log(message: str, level: int):
@@ -42,17 +26,11 @@ def log(message: str, level: int):
 
 fap_buttons = [
     create_button(
-        style=ButtonStyle.gray,
-        label="🔮",
-        custom_id="crystal_ball",
-        disabled=True
+        style=ButtonStyle.gray, label="🔮", custom_id="crystal_ball", disabled=True
     ),
     create_button(
-        style=ButtonStyle.gray,
-        label="📜",
-        custom_id="scroll",
-        disabled=False
-    )
+        style=ButtonStyle.gray, label="📜", custom_id="scroll", disabled=False
+    ),
 ]
 fap_action_row = create_actionrow(*fap_buttons)
 
@@ -61,31 +39,11 @@ fap_search = []
 search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4}
 
 search_buttons = [
-    create_button(
-        style=ButtonStyle.blue,
-        label="1",
-        custom_id="result_1"
-    ),
-    create_button(
-        style=ButtonStyle.blue,
-        label="2",
-        custom_id="result_2"
-    ),
-    create_button(
-        style=ButtonStyle.blue,
-        label="3",
-        custom_id="result_3"
-    ),
-    create_button(
-        style=ButtonStyle.blue,
-        label="4",
-        custom_id="result_4"
-    ),
-    create_button(
-        style=ButtonStyle.blue,
-        label="5",
-        custom_id="result_5"
-    )
+    create_button(style=ButtonStyle.blue, label="1", custom_id="result_1"),
+    create_button(style=ButtonStyle.blue, label="2", custom_id="result_2"),
+    create_button(style=ButtonStyle.blue, label="3", custom_id="result_3"),
+    create_button(style=ButtonStyle.blue, label="4", custom_id="result_4"),
+    create_button(style=ButtonStyle.blue, label="5", custom_id="result_5"),
 ]
 
 
@@ -93,11 +51,13 @@ def search_result_info(new_search) -> str:
     result_info = ""
     for index, recruit in enumerate(new_search):
         if index < CROOT_SEARCH_LIMIT:
-            result_info += f"{list(search_reactions.keys())[index]}: " \
-                           f"{recruit.year} - " \
-                           f"{'⭐' * recruit.rating_stars if recruit.rating_stars else 'N/R'} - " \
-                           f"{recruit.position} - " \
-                           f"{recruit.name}\n"
+            result_info += (
+                f"{list(search_reactions.keys())[index]}: "
+                f"{recruit.year} - "
+                f"{'⭐' * recruit.rating_stars if recruit.rating_stars else 'N/R'} - "
+                f"{recruit.position} - "
+                f"{recruit.name}\n"
+            )
     return result_info
 
 
@@ -115,7 +75,9 @@ async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit: bool = False
         embed = build_recruit_embed(target_recruit)
         await ctx.send(embed=embed, components=[fap_action_row])
 
-    button_contenxt: ComponentContext = await wait_for_component(bot, components=fap_action_row)
+    button_contenxt: ComponentContext = await wait_for_component(
+        bot, components=fap_action_row
+    )
 
     if button_contenxt.custom_id == "crystal_ball":
         log(f"Crystal ball pressed for [{target_recruit.name.capitalize()}]", 0)
@@ -140,7 +102,7 @@ class RecruitCog(commands.Cog):
     @cog_ext.cog_slash(
         name="crootbot",
         description="Retreive information about a recruit",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _crootbot(self, ctx: SlashContext, year: int, search_name: str):
         print(f"[{datetime.datetime.now().astimezone(tz=TZ)}] ### Crootbot")
@@ -154,10 +116,14 @@ class RecruitCog(commands.Cog):
             raise UserError("The search year must be two or four digits long.")
 
         if year > datetime.datetime.now().year + 5:
-            raise UserError("The search year must be within five years of the current class.")
+            raise UserError(
+                "The search year must be within five years of the current class."
+            )
 
         if year < 1869:
-            raise UserError("The search year must be after the first season of college football--1869.")
+            raise UserError(
+                "The search year must be after the first season of college football--1869."
+            )
 
         await ctx.defer()  # Similiar to sending a message with a loading screen to edit later on
 
@@ -170,9 +136,7 @@ class RecruitCog(commands.Cog):
 
         if len(croot_search) == 1:
             return await final_send_embed_fap_loop(
-                ctx=ctx,
-                target_recruit=croot_search[0],
-                bot=self.bot
+                ctx=ctx, target_recruit=croot_search[0], bot=self.bot
             )
 
         result_info = search_result_info(croot_search)
@@ -180,7 +144,7 @@ class RecruitCog(commands.Cog):
 
         embed = build_embed(
             title=f"Search Results for [{year} {search_name.capitalize()}]",
-            fields=[["Search Results", result_info]]
+            fields=[["Search Results", result_info]],
         )
 
         await ctx.send(embed=embed, components=[action_row])
@@ -198,25 +162,29 @@ class RecruitCog(commands.Cog):
                 name="year",
                 option_type=4,
                 description="Year of the recruit",
-                required=True
+                required=True,
             ),
             create_option(
                 name="search_name",
                 option_type=3,
                 description="Name of the recruit",
-                required=True
-            )
-        ]
+                required=True,
+            ),
+        ],
     )
     async def _fap_predict(self, ctx: SlashContext, year: int, search_name: str):
         if len(str(year)) == 2:
             year += 2000
 
         if year > datetime.datetime.now().year + 5:
-            raise UserError("The search year must be within five years of the current class.")
+            raise UserError(
+                "The search year must be within five years of the current class."
+            )
 
         if year < 1869:
-            raise UserError("The search year must be after the first season of college football--1869.")
+            raise UserError(
+                "The search year must be after the first season of college football--1869."
+            )
 
         await ctx.defer(hidden=True)
 
@@ -228,10 +196,7 @@ class RecruitCog(commands.Cog):
 
         async def send_fap_convo(target_recruit):
             await initiate_fap(
-                ctx=ctx,
-                user=ctx.author,
-                recruit=target_recruit,
-                client=ctx.bot
+                ctx=ctx, user=ctx.author, recruit=target_recruit, client=ctx.bot
             )
 
         if len(fap_search) == 1:
@@ -242,7 +207,7 @@ class RecruitCog(commands.Cog):
 
         embed = build_embed(
             title=f"Search Results for [{year} {search_name.capitalize()}]",
-            fields=[["Search Results", result_info]]
+            fields=[["Search Results", result_info]],
         )
 
         await ctx.send(embed=embed, components=[action_row], hidden=True)
@@ -260,7 +225,13 @@ class RecruitCog(commands.Cog):
 
     @cog_ext.cog_component(components=search_buttons)
     async def process_croot_bot(self, ctx: ComponentContext):
-        button_to_index = {"result_1": 0, "result_2": 1, "result_3": 2, "result_4": 3, "result_5": 4}
+        button_to_index = {
+            "result_1": 0,
+            "result_2": 1,
+            "result_3": 2,
+            "result_4": 3,
+            "result_5": 4,
+        }
         log(f"Button [{ctx.custom_id}] was pressed", 1)
 
         global croot_search, fap_search
@@ -270,7 +241,7 @@ class RecruitCog(commands.Cog):
                 ctx=ctx,
                 target_recruit=croot_search[button_to_index[ctx.custom_id]],
                 bot=self.bot,
-                edit=True
+                edit=True,
             )
             del croot_search
         if fap_search is not None:
@@ -278,7 +249,7 @@ class RecruitCog(commands.Cog):
                 ctx=ctx,
                 user=ctx.author,
                 recruit=fap_search[button_to_index[ctx.custom_id]],
-                client=ctx.bot
+                client=ctx.bot,
             )
 
             del fap_search

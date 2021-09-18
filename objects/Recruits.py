@@ -4,15 +4,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from utilities.constants import (
-    CROOT_SEARCH_LIMIT,
-    HEADERS,
-    UserError
-)
-from utilities.mysql import (
-    Process_MySQL,
-    sqlTeamIDs
-)
+from utilities.constants import CROOT_SEARCH_LIMIT, HEADERS, UserError
+from utilities.mysql import Process_MySQL, sqlTeamIDs
 
 
 class RecruitInterest:
@@ -27,43 +20,42 @@ class RecruitInterest:
 
 
 class Recruit:
-
     def __init__(
-            self,
-            _247_highlights,
-            _247_profile,
-            ranking_all_time,
-            bio,
-            city,
-            commitment_date,
-            committed,
-            committed_school,
-            early_enrollee,
-            early_signee,
-            cb_experts,
-            height,
-            key,
-            name,
-            ranking_national,
-            position,
-            ranking_position,
-            cb_predictions,
-            rating_numerical,
-            rating_stars,
-            recruit_interests,
-            recruit_interests_url,
-            school,
-            school_type,
-            scout_evaluation,
-            state,
-            state_abbr,
-            ranking_state,
-            thumbnail,
-            twitter,
-            walk_on,
-            weight,
-            year,
-            team_id
+        self,
+        _247_highlights,
+        _247_profile,
+        ranking_all_time,
+        bio,
+        city,
+        commitment_date,
+        committed,
+        committed_school,
+        early_enrollee,
+        early_signee,
+        cb_experts,
+        height,
+        key,
+        name,
+        ranking_national,
+        position,
+        ranking_position,
+        cb_predictions,
+        rating_numerical,
+        rating_stars,
+        recruit_interests,
+        recruit_interests_url,
+        school,
+        school_type,
+        scout_evaluation,
+        state,
+        state_abbr,
+        ranking_state,
+        thumbnail,
+        twitter,
+        walk_on,
+        weight,
+        year,
+        team_id,
     ):
         self._247_highlights = _247_highlights
         self._247_profile = _247_profile
@@ -183,26 +175,31 @@ long_positions = {
     "SDE": "Strong-Side Defensive End",
     "TE": "Tight End",
     "WDE": "Weak-Side Defensive End",
-    "WR": "Wide Receiver"
+    "WR": "Wide Receiver",
 }
 
 
 def get_team_id(search_player):
     if search_player["CommitedInstitutionTeamImage"] is not None:
-        return int(search_player['CommitedInstitutionTeamImage'].split('/')[-1].split('_')[-1].split('.')[0])
+        return int(
+            search_player["CommitedInstitutionTeamImage"]
+            .split("/")[-1]
+            .split("_")[-1]
+            .split(".")[0]
+        )
     else:
         return 0
 
 
 def reformat_commitment_string(search_player):
-    if search_player['HighestRecruitInterestEventType'] == "HardCommit":
+    if search_player["HighestRecruitInterestEventType"] == "HardCommit":
         return "Hard Commit"
-    elif search_player['HighestRecruitInterestEventType'] == "OfficialVisit":
+    elif search_player["HighestRecruitInterestEventType"] == "OfficialVisit":
         return None
-    elif search_player['HighestRecruitInterestEventType'] == "0":
+    elif search_player["HighestRecruitInterestEventType"] == "0":
         return None
     else:
-        return search_player['HighestRecruitInterestEventType'].strip()
+        return search_player["HighestRecruitInterestEventType"].strip()
 
 
 def get_committed_school(all_team_ids, team_id):
@@ -253,9 +250,17 @@ def get_cb_experts(soup, team_ids) -> list:
             predicted_team = None
 
             if expert.find_all("img", src=True):
-                predicted_team_id = int(expert.find_all("img", src=True)[0]["src"].split("/")[-1].split(".")[0])
+                predicted_team_id = int(
+                    expert.find_all("img", src=True)[0]["src"]
+                    .split("/")[-1]
+                    .split(".")[0]
+                )
                 try:
-                    predicted_team = team_ids[str(predicted_team_id)] if predicted_team_id > 0 else None
+                    predicted_team = (
+                        team_ids[str(predicted_team_id)]
+                        if predicted_team_id > 0
+                        else None
+                    )
                 except KeyError:
                     predicted_team = "Unknown Team"
             else:
@@ -265,7 +270,9 @@ def get_cb_experts(soup, team_ids) -> list:
             # If the pick is undecided, it doesn"t have a confidence
             if predicted_team != "Undecided":
                 expert_confidence = f"{expert.contents[5].contents[1].text.strip()}, {expert.contents[5].contents[3].text.strip()}"
-                expert_string = f"{expert_name} picks {predicted_team} ({expert_confidence})"
+                expert_string = (
+                    f"{expert_name} picks {predicted_team} ({expert_confidence})"
+                )
             else:
                 expert_string = f"{expert_name} is {predicted_team}"
 
@@ -306,7 +313,7 @@ def get_cb_predictions(soup):
                 school_weight = cb.contents[5].text.strip()
                 school_string = f"{school_name}: {school_weight}"
                 # If there is an "Undecided" in the list, it won't have a confidence with it
-                if school_name != 'Undecided':
+                if school_name != "Undecided":
                     school_confidence = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
                     school_string += f"({school_confidence})"
                 crystal_balls.append(school_string)
@@ -322,7 +329,9 @@ def get_cb_predictions(soup):
             single_school_confidence = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"
         except:
             single_school_confidence = ""
-        single_school_string = f"{single_school_name}: {single_school_weight} ({single_school_confidence})"
+        single_school_string = (
+            f"{single_school_name}: {single_school_weight} ({single_school_confidence})"
+        )
 
         crystal_balls.append(single_school_string)
     else:
@@ -332,7 +341,9 @@ def get_cb_predictions(soup):
 
 
 def get_all_time_ranking(soup):
-    recruit_rank = soup.find_all(attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"})
+    recruit_rank = soup.find_all(
+        attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"}
+    )
 
     try:
         ranking = recruit_rank[1].contents[3].text
@@ -346,22 +357,22 @@ def get_all_time_ranking(soup):
 
 
 def get_national_ranking(cur_player):
-    if cur_player['NationalRank'] is not None:
-        return cur_player['NationalRank']
+    if cur_player["NationalRank"] is not None:
+        return cur_player["NationalRank"]
     else:
         return 0
 
 
 def get_position_ranking(cur_player):
-    if cur_player['PositionRank'] is not None:
-        return cur_player['PositionRank']
+    if cur_player["PositionRank"] is not None:
+        return cur_player["PositionRank"]
     else:
         return 0
 
 
 def get_state_ranking(cur_player):
-    if cur_player['StateRank'] is not None:
-        return cur_player['StateRank']
+    if cur_player["StateRank"] is not None:
+        return cur_player["StateRank"]
     else:
         return 0
 
@@ -376,18 +387,30 @@ def reformat_composite_rating(cur_player):
 def get_recruit_interests(search_player):
     reqs = requests.get(url=search_player["RecruitInterestsUrl"], headers=HEADERS)
     interests_soup = BeautifulSoup(reqs.content, "html.parser")
-    interests = interests_soup.find('ul', attrs={'class': "recruit-interest-index_lst"}).find_all('li', recursive=False)
+    interests = interests_soup.find(
+        "ul", attrs={"class": "recruit-interest-index_lst"}
+    ).find_all("li", recursive=False)
     all_interests = []
 
     # Goes through the list of interests and only adds in the ones that are offers
     for index, interest in enumerate(interests):
-        offered = interest.find('div', attrs={'class': 'secondary_blk'}).find('span', attrs={'class': 'offer'}).text.split(':')[1].strip()
+        offered = (
+            interest.find("div", attrs={"class": "secondary_blk"})
+            .find("span", attrs={"class": "offer"})
+            .text.split(":")[1]
+            .strip()
+        )
         if offered == "Yes":
             all_interests.append(
                 RecruitInterest(
-                    school=interest.find('div', attrs={'class': 'first_blk'}).find('a').text.strip(),
+                    school=interest.find("div", attrs={"class": "first_blk"})
+                    .find("a")
+                    .text.strip(),
                     offered=offered,
-                    status=interest.find('div', attrs={'class': 'first_blk'}).find('span', attrs={'class': 'status'}).find('span').text
+                    status=interest.find("div", attrs={"class": "first_blk"})
+                    .find("span", attrs={"class": "status"})
+                    .find("span")
+                    .text,
                 )
             )
 
@@ -408,9 +431,9 @@ def get_school_type(soup):
 
 def get_state_abbr(cur_player):
     try:
-        return states[cur_player['Hometown']['State']]
+        return states[cur_player["Hometown"]["State"]]
     except KeyError:
-        return cur_player['Hometown']['State']
+        return cur_player["Hometown"]["State"]
 
 
 def get_thumbnail(cur_player):
@@ -466,14 +489,16 @@ def FootballRecruit(year, name):
         raise UserError(f"Error occurred attempting to create 247sports search URL.")
 
     if not search_results:
-        raise UserError(f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!")
+        raise UserError(
+            f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!"
+        )
 
     search_result_players = []
 
     for index, search_player in enumerate(search_results):
-        cur_player = search_player['Player']
+        cur_player = search_player["Player"]
 
-        reqs = requests.get(url=search_player['Player']['Url'], headers=HEADERS)
+        reqs = requests.get(url=search_player["Player"]["Url"], headers=HEADERS)
         soup = BeautifulSoup(reqs.content, "html.parser")
 
         # Put into separate variables for debugging purposes
@@ -486,7 +511,9 @@ def FootballRecruit(year, name):
         city = cur_player["Hometown"].get("City", None)
         commitment_date = search_player.get("AnnouncementDate", None)
         committed = reformat_commitment_string(search_player)
-        committed_school = get_committed_school(all_team_ids, get_team_id(search_player))
+        committed_school = get_committed_school(
+            all_team_ids, get_team_id(search_player)
+        )
         early_enrollee = is_early_enrolee(soup)
         early_signee = is_early_signee(soup)
         height = reformat_height(cur_player.get("Height", None))
@@ -549,7 +576,7 @@ def FootballRecruit(year, name):
                 twitter=twitter,
                 walk_on=walk_on,
                 weight=weight,
-                year=year
+                year=year,
             )
         )
 

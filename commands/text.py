@@ -10,23 +10,14 @@ import requests
 from bs4 import BeautifulSoup
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
-from discord_slash import (
-    ComponentContext,
-    cog_ext
-)
+from discord_slash import ComponentContext, cog_ext
 from discord_slash.context import SlashContext
 from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils.manage_components import (
-    create_actionrow,
-    create_button
-)
+from discord_slash.utils.manage_components import create_actionrow, create_button
 from discord_surveys.survey import Survey
 
-from objects.Weather import (
-    WeatherHour,
-    WeatherResponse
-)
+from objects.Weather import WeatherHour, WeatherResponse
 from utilities.constants import (
     CHAN_BANNED,
     CHAN_POSSUMS,
@@ -38,22 +29,15 @@ from utilities.constants import (
     UserError,
     WEATHER_API_KEY,
     guild_id_list,
-    set_component_key
+    set_component_key,
 )
 from utilities.embed import build_embed
 
 buttons_ud = [
     create_button(
-        style=ButtonStyle.gray,
-        label="Previous",
-        custom_id="ud_previous",
-        disabled=True
+        style=ButtonStyle.gray, label="Previous", custom_id="ud_previous", disabled=True
     ),
-    create_button(
-        style=ButtonStyle.gray,
-        label="Next",
-        custom_id="ud_next"
-    )
+    create_button(style=ButtonStyle.gray, label="Next", custom_id="ud_next"),
 ]
 
 
@@ -65,12 +49,17 @@ def ud_embed(embed_word, embed_meaning, embed_example, embed_contributor):
         fields=[
             [embed_word, embed_meaning],
             ["Example", embed_example],
-            ["Link", f"https://www.urbandictionary.com/define.php?term={parse.quote(string=embed_word)}"]
-        ]
+            [
+                "Link",
+                f"https://www.urbandictionary.com/define.php?term={parse.quote(string=embed_word)}",
+            ],
+        ],
     )
 
 
-def check_channel_or_message(check_member: discord.Member, check_message: discord.Message = None):
+def check_channel_or_message(
+    check_member: discord.Member, check_message: discord.Message = None
+):
     if check_message.content == "":
         return ""
 
@@ -86,7 +75,7 @@ def check_channel_or_message(check_member: discord.Member, check_message: discor
 def cleanup_source_data(source_data: str):
     regex_strings = [
         r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
-        r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"  # All URLs
+        r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  # All URLs
     ]
 
     new_source_data = source_data
@@ -98,10 +87,14 @@ def cleanup_source_data(source_data: str):
     new_source_data = re.sub(regex_new_line, "\n", new_source_data, flags=re.IGNORECASE)
 
     regex_front_new_line = r"^\n"
-    new_source_data = re.sub(regex_front_new_line, "", new_source_data, flags=re.IGNORECASE)
+    new_source_data = re.sub(
+        regex_front_new_line, "", new_source_data, flags=re.IGNORECASE
+    )
 
     regex_multiple_whitespace = r"\s{2,}"
-    new_source_data = re.sub(regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE)
+    new_source_data = re.sub(
+        regex_multiple_whitespace, " ", new_source_data, flags=re.IGNORECASE
+    )
 
     return new_source_data
 
@@ -121,7 +114,7 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="urbandictionary",
         description="Look up a word on Urban Dictionary",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _urbandictionary(self, ctx: SlashContext, *, word: str):
         r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
@@ -141,24 +134,28 @@ class TextCommands(commands.Cog):
 
         results = []
         for definition in definitions:
-            results.append(self.Definition(
-                lookup_word=definition.contents[1].contents[0].text,
-                meaning=definition.contents[2].text,
-                example=definition.contents[3].text,
-                contributor=definition.contents[4].text
-            ))
+            results.append(
+                self.Definition(
+                    lookup_word=definition.contents[1].contents[0].text,
+                    meaning=definition.contents[2].text,
+                    example=definition.contents[3].text,
+                    contributor=definition.contents[4].text,
+                )
+            )
 
         pages = []
         for index, result in enumerate(results):
-            pages.append(build_embed(
-                title=f"Searched for: {result.lookup_word}",
-                description=f"Definition #{index + 1} from Urban Dictionary",
-                fields=[
-                    ["Meaning", result.meaning],
-                    ["Example", result.example],
-                    ["Contributor", result.contributor]
-                ]
-            ))
+            pages.append(
+                build_embed(
+                    title=f"Searched for: {result.lookup_word}",
+                    description=f"Definition #{index + 1} from Urban Dictionary",
+                    fields=[
+                        ["Meaning", result.meaning],
+                        ["Example", result.example],
+                        ["Contributor", result.contributor],
+                    ],
+                )
+            )
 
         await Paginator(
             bot=ctx.bot,
@@ -170,7 +167,7 @@ class TextCommands(commands.Cog):
             nextStyle=ButtonStyle.gray,
             prevStyle=ButtonStyle.gray,
             lastStyle=ButtonStyle.gray,
-            indexStyle=ButtonStyle.gray
+            indexStyle=ButtonStyle.gray,
         ).run()
 
     @cog_ext.cog_slash(
@@ -182,24 +179,32 @@ class TextCommands(commands.Cog):
                 name="query",
                 description="What to vote on",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="option_a",
                 description="Option A to vote on",
                 option_type=3,
-                required=False
+                required=False,
             ),
             create_option(
                 name="option_b",
                 description="Option b to vote on",
                 option_type=3,
-                required=False
-            )
-        ]
+                required=False,
+            ),
+        ],
     )
-    async def _vote(self, ctx: SlashContext, query: str, option_a: str = "UP VOTE", option_b: str = "DOWN VOTE"):
-        if (option_a is not None and option_b is None) or (option_b is not None and option_a is None):
+    async def _vote(
+        self,
+        ctx: SlashContext,
+        query: str,
+        option_a: str = "UP VOTE",
+        option_b: str = "DOWN VOTE",
+    ):
+        if (option_a is not None and option_b is None) or (
+            option_b is not None and option_a is None
+        ):
             raise UserError("You must provide both options!")
 
         option_a = str(option_a).upper()
@@ -215,18 +220,10 @@ class TextCommands(commands.Cog):
             but_a = but_b = ButtonStyle.gray
 
         buttons_voting.append(
-            create_button(
-                custom_id=f"{key}_a",
-                label=option_a,
-                style=but_a
-            )
+            create_button(custom_id=f"{key}_a", label=option_a, style=but_a)
         )
         buttons_voting.append(
-            create_button(
-                custom_id=f"{key}_b",
-                label=option_b,
-                style=but_b
-            )
+            create_button(custom_id=f"{key}_b", label=option_b, style=but_b)
         )
 
         embed = build_embed(
@@ -235,12 +232,14 @@ class TextCommands(commands.Cog):
             fields=[
                 [buttons_voting[-2]["label"], "0"],
                 [buttons_voting[-1]["label"], "0"],
-                ["Voters", "_"]
+                ["Voters", "_"],
             ],
-            footer=key
+            footer=key,
         )
 
-        await ctx.send(content="", embed=embed, components=[create_actionrow(*buttons_voting)])
+        await ctx.send(
+            content="", embed=embed, components=[create_actionrow(*buttons_voting)]
+        )
 
     @cog_ext.cog_slash(
         name="markov",
@@ -251,15 +250,15 @@ class TextCommands(commands.Cog):
                 name="channel",
                 description="Discord text channel",
                 option_type=7,
-                required=False
+                required=False,
             ),
             create_option(
                 name="member",
                 description="Discord member",
                 option_type=6,
-                required=False
-            )
-        ]
+                required=False,
+            ),
+        ],
     )
     async def _markov(self, ctx: SlashContext, channel=None, member=None):
         await ctx.defer()
@@ -276,28 +275,42 @@ class TextCommands(commands.Cog):
         CHAN_HIST_LIMIT = 1000
 
         if not sources:  # Uses current channel for source data
-            compiled_message_history = await ctx.channel.history(limit=CHAN_HIST_LIMIT).flatten()  # potential discord vs discord_slash issue
+            compiled_message_history = await ctx.channel.history(
+                limit=CHAN_HIST_LIMIT
+            ).flatten()  # potential discord vs discord_slash issue
             for message in compiled_message_history:
                 source_data += check_channel_or_message(ctx.author, message)
         else:
             for source in sources:
-                if type(source) == discord.Member:  # Use current channel and source Discord Member
-                    compiled_message_history = await ctx.channel.history(limit=CHAN_HIST_LIMIT).flatten()
+                if (
+                    type(source) == discord.Member
+                ):  # Use current channel and source Discord Member
+                    compiled_message_history = await ctx.channel.history(
+                        limit=CHAN_HIST_LIMIT
+                    ).flatten()
                     for message in compiled_message_history:
                         if message.author == source:
-                            source_data += check_channel_or_message(message.author, message)
+                            source_data += check_channel_or_message(
+                                message.author, message
+                            )
                 elif type(source) == discord.TextChannel:
-                    compiled_message_history = await source.history(limit=CHAN_HIST_LIMIT).flatten()
+                    compiled_message_history = await source.history(
+                        limit=CHAN_HIST_LIMIT
+                    ).flatten()
                     for message in compiled_message_history:
                         source_data += check_channel_or_message(message.author, message)
 
         if not source_data == "":
             source_data = cleanup_source_data(source_data)
         else:
-            await ctx.send(f"There was not enough information available to make a Markov chain.")
+            await ctx.send(
+                f"There was not enough information available to make a Markov chain."
+            )
 
         chain = markovify.NewlineText(source_data, well_formed=True)
-        markov_output = chain.make_sentence(max_overlap_ratio=.9, max_overlap_total=27, min_words=7, tries=100)
+        markov_output = chain.make_sentence(
+            max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
+        )
 
         if markov_output is None:
             await ctx.send(f"Creating a Markov chain failed.")
@@ -309,13 +322,15 @@ class TextCommands(commands.Cog):
     @cog_ext.cog_slash(
         name="possumdroppings",
         description="Only the most secret and trustworthy drops",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _possumdroppings(self, ctx: SlashContext, message: str):
         await ctx.defer()
 
         if not ctx.channel_id == CHAN_POSSUMS:
-            raise UserError(f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]")
+            raise UserError(
+                f"You can only use this command in [{ctx.guild.get_channel(CHAN_POSSUMS).mention}]"
+            )
 
         await ctx.send("Thinking...", delete_after=0)
 
@@ -324,41 +339,39 @@ class TextCommands(commands.Cog):
             inline=False,
             thumbnail="https://cdn.discordapp.com/attachments/593984711706279937/875162041818693632/unknown.jpeg",
             footer="Created by a possum",
-            fields=[
-                ["Droppings", message]
-            ]
+            fields=[["Droppings", message]],
         )
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(
         name="eightball",
         description="Ask the magic 8-ball a qusetion",
-        guild_ids=guild_id_list()
+        guild_ids=guild_id_list(),
     )
     async def _eightball(self, ctx: SlashContext, question: str):
         eight_ball = [
-            'As I see it, yes.',
-            'Ask again later.',
-            'Better not tell you now.',
-            'Cannot predict now.',
-            'Coach V\'s cigar would like this!',
-            'Concentrate and ask again.',
-            'Definitely yes!',
-            'Don’t count on it...',
-            'Frosty!',
-            'Fuck Iowa!',
-            'It is certain.',
-            'It is decidedly so.',
-            'Most likely...',
-            'My reply is no.',
-            'My sources say no.',
-            'Outlook not so good and reply hazy',
-            'Scott Frost approves!',
-            'These are the affirmative answers.',
-            'Try again...',
-            'Without a doubt.',
-            'Yes – definitely!',
-            'You may rely on it.'
+            "As I see it, yes.",
+            "Ask again later.",
+            "Better not tell you now.",
+            "Cannot predict now.",
+            "Coach V's cigar would like this!",
+            "Concentrate and ask again.",
+            "Definitely yes!",
+            "Don’t count on it...",
+            "Frosty!",
+            "Fuck Iowa!",
+            "It is certain.",
+            "It is decidedly so.",
+            "Most likely...",
+            "My reply is no.",
+            "My sources say no.",
+            "Outlook not so good and reply hazy",
+            "Scott Frost approves!",
+            "These are the affirmative answers.",
+            "Try again...",
+            "Without a doubt.",
+            "Yes – definitely!",
+            "You may rely on it.",
         ]
 
         random.shuffle(eight_ball)
@@ -369,40 +382,36 @@ class TextCommands(commands.Cog):
             inline=False,
             fields=[
                 ["Question", question.capitalize()],
-                ["Response", random.choice(eight_ball)]
+                ["Response", random.choice(eight_ball)],
             ],
-            thumbnail="https://i.imgur.com/L5Gpu0z.png"
+            thumbnail="https://i.imgur.com/L5Gpu0z.png",
         )
 
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(
-        name="police",
-        description="You are under arrest!",
-        guild_ids=guild_id_list()
+        name="police", description="You are under arrest!", guild_ids=guild_id_list()
     )
     async def _police(self, ctx: SlashContext, arestee: discord.Member):
-        message = f"**" \
-                  f"🚨 NANI 🚨\n" \
-                  f"..🚨 THE 🚨\n" \
-                  f"...🚨 FUCK 🚨\n" \
-                  f"....🚨 DID 🚨\n" \
-                  f".....🚨 YOU 🚨\n" \
-                  f"....🚨 JUST 🚨\n" \
-                  f"...🚨 SAY 🚨\n" \
-                  f"..🚨 {arestee.mention} 🚨\n" \
-                  f"🏃‍♀️💨 🔫🚓🔫🚓🔫🚓\n" \
-                  f"\n" \
-                  f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 " \
-                  f"🙅‍♀️Thanks for your cooperation. 😍🤩😘" \
-                  f"**"
+        message = (
+            f"**"
+            f"🚨 NANI 🚨\n"
+            f"..🚨 THE 🚨\n"
+            f"...🚨 FUCK 🚨\n"
+            f"....🚨 DID 🚨\n"
+            f".....🚨 YOU 🚨\n"
+            f"....🚨 JUST 🚨\n"
+            f"...🚨 SAY 🚨\n"
+            f"..🚨 {arestee.mention} 🚨\n"
+            f"🏃‍♀️💨 🔫🚓🔫🚓🔫🚓\n"
+            f"\n"
+            f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
+            f"🙅‍♀️Thanks for your cooperation. 😍🤩😘"
+            f"**"
+        )
 
         embed = build_embed(
-            title="Wee woo wee woo!",
-            inline=False,
-            fields=[
-                ["Halt!", message]
-            ]
+            title="Wee woo wee woo!", inline=False, fields=[["Halt!", message]]
         )
         await ctx.send(embed=embed)
 
@@ -415,23 +424,25 @@ class TextCommands(commands.Cog):
                 name="city",
                 description="City to search for",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="state",
                 description="State to search. Format is two letter state code. AL, AK, AS, etc.",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="country",
                 description="Country coude",
                 option_type=3,
-                required=False
-            )
-        ]
+                required=False,
+            ),
+        ],
     )
-    async def _weather(self, ctx: SlashContext, city: str, state: str, country: str = "US"):
+    async def _weather(
+        self, ctx: SlashContext, city: str, state: str, country: str = "US"
+    ):
         def shift_utc_tz(dt, shift):
             return dt + timedelta(seconds=shift)
 
@@ -444,7 +455,9 @@ class TextCommands(commands.Cog):
                 found = True
                 break
         if not found:
-            raise UserError(f"Unable to find the state {state.upper()}. Please try again!")
+            raise UserError(
+                f"Unable to find the state {state.upper()}. Please try again!"
+            )
 
         weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{state},{country}"
         response = requests.get(weather_url, headers=HEADERS)
@@ -452,21 +465,28 @@ class TextCommands(commands.Cog):
 
         weather = WeatherResponse(j)
         if weather.cod == "404":
-            raise UserError(f"Unable to find {city.title()}, {state.upper()}. Try again!")
+            raise UserError(
+                f"Unable to find {city.title()}, {state.upper()}. Try again!"
+            )
 
-        temp_str = f"Temperature: {weather.main.temp}℉\n" \
-                   f"Feels Like: {weather.main.feels_like}℉\n" \
-                   f"Humidty: {weather.main.humidity}℉\n" \
-                   f"Max: {weather.main.temp_max}℉\n" \
-                   f"Min: {weather.main.temp_min}℉"
+        temp_str = (
+            f"Temperature: {weather.main.temp}℉\n"
+            f"Feels Like: {weather.main.feels_like}℉\n"
+            f"Humidty: {weather.main.humidity}℉\n"
+            f"Max: {weather.main.temp_max}℉\n"
+            f"Min: {weather.main.temp_min}℉"
+        )
 
         if len(weather.wind) == 2:
-            wind_str = f"Speed: {weather.wind.speed} MPH\n" \
-                       f"Direction: {weather.wind.deg} °"
+            wind_str = (
+                f"Speed: {weather.wind.speed} MPH\n" f"Direction: {weather.wind.deg} °"
+            )
         elif len(weather.wind) == 3:
-            wind_str = f"Speed: {weather.wind.speed} MPH\n" \
-                       f"Gusts: {weather.wind.gust} MPH\n" \
-                       f"Direction: {weather.wind.deg} °"
+            wind_str = (
+                f"Speed: {weather.wind.speed} MPH\n"
+                f"Gusts: {weather.wind.gust} MPH\n"
+                f"Direction: {weather.wind.deg} °"
+            )
         else:
             wind_str = f"Speed: {weather.wind.speed} MPH"
 
@@ -492,8 +512,10 @@ class TextCommands(commands.Cog):
         sunrise = shift_utc_tz(weather.sys.sunrise, weather.timezone)
         sunset = shift_utc_tz(weather.sys.sunset, weather.timezone)
 
-        sun_str = f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n" \
-                  f"Sunset: {sunset.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}"
+        sun_str = (
+            f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n"
+            f"Sunset: {sunset.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}"
+        )
 
         embed = build_embed(
             title=f"Weather conditions for {city.title()}, {state.upper()}",
@@ -504,11 +526,10 @@ class TextCommands(commands.Cog):
                 ["Wind", wind_str],
                 ["Temp Next 4 Hours", hour_temp_str],
                 ["Wind Next 4 Hours", hour_wind_str],
-                ["Sun", sun_str]
-
+                ["Sun", sun_str],
             ],
             inline=False,
-            thumbnail=f"https://openweathermap.org/img/wn/{weather.weather[0].icon}@4x.png"
+            thumbnail=f"https://openweathermap.org/img/wn/{weather.weather[0].icon}@4x.png",
         )
 
         await ctx.send(embed=embed)
@@ -522,23 +543,18 @@ class TextCommands(commands.Cog):
                 name="question",
                 description="Question for the survey",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="options",
                 description="Space deliminated option(s) for the survey",
                 option_type=3,
-                required=True
-            )
-        ]
+                required=True,
+            ),
+        ],
     )
     async def _survey(self, ctx: SlashContext, question: str, options: str):
-        await Survey(
-            bot=ctx.bot,
-            ctx=ctx,
-            question=question,
-            options=options
-        ).send()
+        await Survey(bot=ctx.bot, ctx=ctx, question=question, options=options).send()
 
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
@@ -589,13 +605,15 @@ class TextCommands(commands.Cog):
             fields=[
                 [up_vote_label, str(up_vote_count)],
                 [down_vote_label, str(down_vote_count)],
-                ["Voters", voters]
+                ["Voters", voters],
             ],
-            footer=key
+            footer=key,
         )
         new_buttons = ctx.origin_message.components[0]["components"]
 
-        await ctx.edit_origin(content="", embed=embed, components=[create_actionrow(*new_buttons)])
+        await ctx.edit_origin(
+            content="", embed=embed, components=[create_actionrow(*new_buttons)]
+        )
 
 
 def setup(bot):

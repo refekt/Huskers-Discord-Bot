@@ -3,12 +3,7 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from utilities.constants import (
-    DT_STR_FORMAT,
-    DT_TBA_TIME,
-    HEADERS,
-    TZ
-)
+from utilities.constants import DT_STR_FORMAT, DT_TBA_TIME, HEADERS, TZ
 
 
 class SeasonStats:
@@ -32,7 +27,18 @@ class HuskerOpponent:
 
 
 class HuskerDotComSchedule:
-    def __init__(self, location, opponent, icon, outcome, ranking, week, game_date_time, home, conference):
+    def __init__(
+        self,
+        location,
+        opponent,
+        icon,
+        outcome,
+        ranking,
+        week,
+        game_date_time,
+        home,
+        conference,
+    ):
         self.location = location
         self.opponent = opponent
         self.icon = icon
@@ -49,7 +55,14 @@ def collect_opponent(game, year, week):
     # If the website changes, this will more than likely need to change.
     game = game.contents[1]
     try:
-        name = game.contents[1].contents[3].contents[3].contents[3].text.strip().replace("\n", " ")
+        name = (
+            game.contents[1]
+            .contents[3]
+            .contents[3]
+            .contents[3]
+            .text.strip()
+            .replace("\n", " ")
+        )
         ranking = None
         if "#" in name:
             try:
@@ -58,10 +71,29 @@ def collect_opponent(game, year, week):
                 pass
         location = game.contents[3].contents[1].text.strip().replace("\n", " ")
         if "Buy Tickets" in location:
-            location = location.split("Buy Tickets ")[1].replace(" Memorial Stadium", "")
-        icon = "https://huskers.com" + game.contents[1].contents[1].contents[1].attrs["data-src"]
-        _date = game.contents[1].contents[3].contents[1].contents[1].contents[1].text.strip()
-        _time = game.contents[1].contents[3].contents[1].contents[1].contents[3].text.strip()
+            location = location.split("Buy Tickets ")[1].replace(
+                " Memorial Stadium", ""
+            )
+        icon = (
+            "https://huskers.com"
+            + game.contents[1].contents[1].contents[1].attrs["data-src"]
+        )
+        _date = (
+            game.contents[1]
+            .contents[3]
+            .contents[1]
+            .contents[1]
+            .contents[1]
+            .text.strip()
+        )
+        _time = (
+            game.contents[1]
+            .contents[3]
+            .contents[1]
+            .contents[1]
+            .contents[3]
+            .text.strip()
+        )
 
         if "Canceled" in game.contents[5].contents[1].text:
             outcome = "Canceled"
@@ -70,7 +102,11 @@ def collect_opponent(game, year, week):
                 outcome = f"{game.contents[5].contents[1].contents[3].text.strip()} {game.contents[5].contents[1].contents[5].text}"
 
                 if game.contents[5].contents[1].contents[1].text.strip():
-                    outcome = game.contents[5].contents[1].contents[1].text.strip() + " " + outcome
+                    outcome = (
+                        game.contents[5].contents[1].contents[1].text.strip()
+                        + " "
+                        + outcome
+                    )
             except IndexError:
                 outcome = ""
 
@@ -98,14 +134,16 @@ def collect_opponent(game, year, week):
             date_time=date_time,
             week=week,
             location=location,
-            outcome=outcome
+            outcome=outcome,
         )
     except IndexError:
         return "Unknown Opponent"
 
 
 def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
-    reqs = requests.get(url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS)
+    reqs = requests.get(
+        url=f"https://huskers.com/sports/{sport}/schedule/{year}", headers=HEADERS
+    )
 
     if not reqs.status_code == 200:
         raise ConnectionError("Unable to retrieve schedule from Huskers.com.")
@@ -134,12 +172,33 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
         if "TBA" in opponent.date_time:
             # Specific time to refernece later for TBA games
             gdt_string = f"{opponent.date_time[0:6]} {year} {DT_TBA_TIME}"
-            opponent.date_time = datetime.datetime.strptime(gdt_string, DT_STR_FORMAT).astimezone(tz=TZ)
+            opponent.date_time = datetime.datetime.strptime(
+                gdt_string, DT_STR_FORMAT
+            ).astimezone(tz=TZ)
         else:
-            opponent.date_time = datetime.datetime.strptime(opponent.date_time.replace("A.M.", "AM").replace("a.m.", "AM").replace("P.M.", "PM").replace("p.m.", "PM"), DT_STR_FORMAT).astimezone(tz=TZ)
+            opponent.date_time = datetime.datetime.strptime(
+                opponent.date_time.replace("A.M.", "AM")
+                .replace("a.m.", "AM")
+                .replace("P.M.", "PM")
+                .replace("p.m.", "PM"),
+                DT_STR_FORMAT,
+            ).astimezone(tz=TZ)
             opponent.date_time += datetime.timedelta(hours=1)
 
-        teams = ("Illinois", "Michigan State", "Northwestern", "Minnesota", "Purdue", "Ohio State", "Wisconsin", "Iowa", "Michigan", "Maryland", "Rutgers", "Penn State")
+        teams = (
+            "Illinois",
+            "Michigan State",
+            "Northwestern",
+            "Minnesota",
+            "Purdue",
+            "Ohio State",
+            "Wisconsin",
+            "Iowa",
+            "Michigan",
+            "Maryland",
+            "Rutgers",
+            "Penn State",
+        )
         conf = opponent.name in teams
         home = "Lincoln, Neb." in opponent.location
 
@@ -153,7 +212,7 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
                 week=opponent.week,
                 game_date_time=opponent.date_time,
                 conference=conf,
-                home=home
+                home=home,
             )
         )
 

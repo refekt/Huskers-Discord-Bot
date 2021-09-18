@@ -1,9 +1,6 @@
 import asyncio
 import re
-from datetime import (
-    datetime,
-    timedelta
-)
+from datetime import datetime, timedelta
 
 import discord
 import nest_asyncio
@@ -18,13 +15,10 @@ from utilities.constants import (
     CommandError,
     UserError,
     guild_id_list,
-    pretty_time_delta
+    pretty_time_delta,
 )
 from utilities.embed import build_embed
-from utilities.mysql import (
-    Process_MySQL,
-    sqlRecordTasks
-)
+from utilities.mysql import Process_MySQL, sqlRecordTasks
 
 
 class DateTimeStrings:
@@ -44,29 +38,36 @@ class ReminderCommands(commands.Cog):
                 name="remind_when",
                 description="When to send the message",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="message",
                 description="The message to be sent",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="who",
                 description="Who to send the reminder to",
                 option_type=6,
-                required=False
+                required=False,
             ),
             create_option(
                 name="channel",
                 description="Which channel to send the reminder to",
                 option_type=7,
-                required=False
-            )
-        ]
+                required=False,
+            ),
+        ],
     )
-    async def _remindme(self, ctx: SlashContext, remind_when: str, message: str, who: discord.member = None, channel: discord.TextChannel = None):
+    async def _remindme(
+        self,
+        ctx: SlashContext,
+        remind_when: str,
+        message: str,
+        who: discord.member = None,
+        channel: discord.TextChannel = None,
+    ):
         if who and channel:
             raise UserError("You cannot input both a member and channel to remind.")
         elif who and not ctx.author == who:
@@ -87,7 +88,7 @@ class ReminderCommands(commands.Cog):
                 else:
                     try:
                         findall = re.findall(r"\D", raw)[-1]
-                        return int(raw[raw.find(findall) + 1:])
+                        return int(raw[raw.find(findall) + 1 :])
                     except:
                         return 0
             else:
@@ -103,7 +104,9 @@ class ReminderCommands(commands.Cog):
         min_timer_allowed = 5  # 60 * 5
 
         if time_diff.total_seconds() < min_timer_allowed:
-            raise UserError(f"The num_seconds entered is too short! The minimum allowed timer is {min_timer_allowed} seconds.")
+            raise UserError(
+                f"The num_seconds entered is too short! The minimum allowed timer is {min_timer_allowed} seconds."
+            )
 
         try:
             raw_when = today + time_diff
@@ -123,7 +126,16 @@ class ReminderCommands(commands.Cog):
             destination = ctx.channel
 
         try:
-            Process_MySQL(sqlRecordTasks, values=(str(destination.id), message, str(send_when), is_open, mysql_author))
+            Process_MySQL(
+                sqlRecordTasks,
+                values=(
+                    str(destination.id),
+                    message,
+                    str(send_when),
+                    is_open,
+                    mysql_author,
+                ),
+            )
             destination = ctx.channel
         except:
             raise CommandError("Error submitting MySQL")
@@ -135,7 +147,7 @@ class ReminderCommands(commands.Cog):
                 destination=destination,
                 message=message,
                 source=ctx.author,
-                alert_when=str(send_when)
+                alert_when=str(send_when),
             )
         )
 
@@ -143,10 +155,7 @@ class ReminderCommands(commands.Cog):
             title="Bot Frost Reminders",
             description=f"Setting a timer for [{destination.mention}] in [{pretty_time_delta(duration.total_seconds())}]. The timer will go off at [{send_when.strftime('%x %X')}].",
             inline=False,
-            fields=[
-                ["Author", ctx.author.mention],
-                ["Message", message]
-            ]
+            fields=[["Author", ctx.author.mention], ["Message", message]],
         )
         await ctx.send(embed=embed)
 

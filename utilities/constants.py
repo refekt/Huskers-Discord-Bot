@@ -7,16 +7,11 @@ import pytz
 from discord.ext.commands import BucketType
 from discord_slash.utils.manage_commands import (
     SlashCommandPermissionType,
-    create_permission
+    create_permission,
 )
 from dotenv import load_dotenv
 
-from utilities.encryption import (
-    decrypt,
-    decrypt_return_data,
-    encrypt,
-    load_key
-)
+from utilities.encryption import decrypt, decrypt_return_data, encrypt, load_key
 
 
 def log(message: str, level: int):
@@ -65,10 +60,14 @@ variables_path = None
 
 if "Windows" in platform.platform():
     log(f"Windows environment set", 0)
-    variables_path = pathlib.PurePath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
+    variables_path = pathlib.PurePath(
+        f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json"
+    )
 elif "Linux" in platform.platform():
     log(f"Linux environment set", 0)
-    variables_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json")
+    variables_path = pathlib.PurePosixPath(
+        f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json"
+    )
 
 
 def guild_id_list() -> list:
@@ -76,7 +75,10 @@ def guild_id_list() -> list:
 
 
 def set_component_key() -> str:
-    return "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    return "".join(
+        random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+        for _ in range(10)
+    )
 
 
 load_dotenv(dotenv_path=variables_path)
@@ -145,7 +147,9 @@ WEATHER_API_KEY = env_vars["openweather_key"]
 del env_vars, env_file, key
 
 # Headers for `requests`
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'}
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0"
+}
 
 # Embed titles
 EMBED_TITLE_HYPE = "Nebraska Football Hype Squad 📈 ⚠ ⛔"
@@ -205,8 +209,21 @@ CHAN_WAR_ROOM = 525519594417291284
 CAT_GAMEDAY = 768828439636606996
 CAT_GENERAL = 440632687087058944
 
-CHAN_BANNED = (CHAN_BOTLOGS, CHAN_RULES, CHAN_POLITICS, CHAN_MINECRAFT_ADMIN, CHAN_HOF_PROD, CHAN_RULES)
-CHAN_STATS_BANNED = (CHAN_DBL_WAR_ROOM, CHAN_WAR_ROOM, CHAN_BOTLOGS, CHAN_HOF_PROD, CHAN_SHAME)
+CHAN_BANNED = (
+    CHAN_BOTLOGS,
+    CHAN_RULES,
+    CHAN_POLITICS,
+    CHAN_MINECRAFT_ADMIN,
+    CHAN_HOF_PROD,
+    CHAN_RULES,
+)
+CHAN_STATS_BANNED = (
+    CHAN_DBL_WAR_ROOM,
+    CHAN_WAR_ROOM,
+    CHAN_BOTLOGS,
+    CHAN_HOF_PROD,
+    CHAN_SHAME,
+)
 CHAN_HYPE_GROUP = (CHAN_HYPE_MAX, CHAN_HYPE_SOME, CHAN_HYPE_NO)
 
 # Reactions
@@ -234,7 +251,9 @@ BOT_DISPLAY_NAME = "Bot Frost"
 BOT_GITHUB_URL = "https://github.com/refekt/Husker-Bot"
 BOT_ICON_URL = "https://i.imgur.com/Ah3x5NA.png"
 BOT_THUMBNAIL_URL = "https://ucomm.unl.edu/images/brand-book/Our-marks/nebraska-n.jpg"
-BOT_FOOTER_SECRET = "These messages are anonymous and there is no way to verify messages are accurate."
+BOT_FOOTER_SECRET = (
+    "These messages are anonymous and there is no way to verify messages are accurate."
+)
 BOT_FOOTER_BOT = "Created by Bot Frost"
 
 #
@@ -254,15 +273,58 @@ DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
 
 # States
 US_STATES = [
-    {"State": "Alabama", "Abbrev": "Ala.", "Code": "AL"}, {"State": "Alaska", "Abbrev": "Alaska", "Code": "AK"}, {"State": "Arizona", "Abbrev": "Ariz.", "Code": "AZ"}, {"State": "Arkansas", "Abbrev": "Ark.", "Code": "AR"}, {"State": "California", "Abbrev": "Calif.", "Code": "CA"}, {"State": "Colorado", "Abbrev": "Colo.", "Code": "CO"},
-    {"State": "Connecticut", "Abbrev": "Conn.", "Code": "CT"}, {"State": "Delaware", "Abbrev": "Del.", "Code": "DE"}, {"State": "District of Columbia", "Abbrev": "D.C.", "Code": "DC"}, {"State": "Florida", "Abbrev": "Fla.", "Code": "FL"}, {"State": "Georgia", "Abbrev": "Ga.", "Code": "GA"}, {"State": "Hawaii", "Abbrev": "Hawaii", "Code": "HI"},
-    {"State": "Idaho", "Abbrev": "Idaho", "Code": "ID"}, {"State": "Illinois", "Abbrev": "Ill.", "Code": "IL"}, {"State": "Indiana", "Abbrev": "Ind.", "Code": "IN"}, {"State": "Iowa", "Abbrev": "Iowa", "Code": "IA"}, {"State": "Kansas", "Abbrev": "Kans.", "Code": "KS"}, {"State": "Kentucky", "Abbrev": "Ky.", "Code": "KY"}, {"State": "Louisiana", "Abbrev": "La.", "Code": "LA"},
-    {"State": "Maine", "Abbrev": "Maine", "Code": "ME"}, {"State": "Maryland", "Abbrev": "Md.", "Code": "MD"}, {"State": "Massachusetts", "Abbrev": "Mass.", "Code": "MA"}, {"State": "Michigan", "Abbrev": "Mich.", "Code": "MI"}, {"State": "Minnesota", "Abbrev": "Minn.", "Code": "MN"}, {"State": "Mississippi", "Abbrev": "Miss.", "Code": "MS"},
-    {"State": "Missouri", "Abbrev": "Mo.", "Code": "MO"}, {"State": "Montana", "Abbrev": "Mont.", "Code": "MT"}, {"State": "Nebraska", "Abbrev": "Nebr.", "Code": "NE"}, {"State": "Nevada", "Abbrev": "Nev.", "Code": "NV"}, {"State": "New Hampshire", "Abbrev": "N.H.", "Code": "NH"}, {"State": "New Jersey", "Abbrev": "N.J.", "Code": "NJ"},
-    {"State": "New Mexico", "Abbrev": "N.M.", "Code": "NM"}, {"State": "New York", "Abbrev": "N.Y.", "Code": "NY"}, {"State": "North Carolina", "Abbrev": "N.C.", "Code": "NC"}, {"State": "North Dakota", "Abbrev": "N.D.", "Code": "ND"}, {"State": "Ohio", "Abbrev": "Ohio", "Code": "OH"}, {"State": "Oklahoma", "Abbrev": "Okla.", "Code": "OK"},
-    {"State": "Oregon", "Abbrev": "Ore.", "Code": "OR"}, {"State": "Pennsylvania", "Abbrev": "Pa.", "Code": "PA"}, {"State": "Rhode Island", "Abbrev": "R.I.", "Code": "RI"}, {"State": "South Carolina", "Abbrev": "S.C.", "Code": "SC"}, {"State": "South Dakota", "Abbrev": "S.D.", "Code": "SD"}, {"State": "Tennessee", "Abbrev": "Tenn.", "Code": "TN"},
-    {"State": "Texas", "Abbrev": "Tex.", "Code": "TX"}, {"State": "Utah", "Abbrev": "Utah", "Code": "UT"}, {"State": "Vermont", "Abbrev": "Vt.", "Code": "VT"}, {"State": "Virginia", "Abbrev": "Va.", "Code": "VA"}, {"State": "Washington", "Abbrev": "Wash.", "Code": "WA"}, {"State": "West Virginia", "Abbrev": "W.Va.", "Code": "WV"}, {"State": "Wisconsin", "Abbrev": "Wis.", "Code": "WI"},
-    {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"}, {"State": "Puerto Rico", "Code": "PR"}
+    {"State": "Alabama", "Abbrev": "Ala.", "Code": "AL"},
+    {"State": "Alaska", "Abbrev": "Alaska", "Code": "AK"},
+    {"State": "Arizona", "Abbrev": "Ariz.", "Code": "AZ"},
+    {"State": "Arkansas", "Abbrev": "Ark.", "Code": "AR"},
+    {"State": "California", "Abbrev": "Calif.", "Code": "CA"},
+    {"State": "Colorado", "Abbrev": "Colo.", "Code": "CO"},
+    {"State": "Connecticut", "Abbrev": "Conn.", "Code": "CT"},
+    {"State": "Delaware", "Abbrev": "Del.", "Code": "DE"},
+    {"State": "District of Columbia", "Abbrev": "D.C.", "Code": "DC"},
+    {"State": "Florida", "Abbrev": "Fla.", "Code": "FL"},
+    {"State": "Georgia", "Abbrev": "Ga.", "Code": "GA"},
+    {"State": "Hawaii", "Abbrev": "Hawaii", "Code": "HI"},
+    {"State": "Idaho", "Abbrev": "Idaho", "Code": "ID"},
+    {"State": "Illinois", "Abbrev": "Ill.", "Code": "IL"},
+    {"State": "Indiana", "Abbrev": "Ind.", "Code": "IN"},
+    {"State": "Iowa", "Abbrev": "Iowa", "Code": "IA"},
+    {"State": "Kansas", "Abbrev": "Kans.", "Code": "KS"},
+    {"State": "Kentucky", "Abbrev": "Ky.", "Code": "KY"},
+    {"State": "Louisiana", "Abbrev": "La.", "Code": "LA"},
+    {"State": "Maine", "Abbrev": "Maine", "Code": "ME"},
+    {"State": "Maryland", "Abbrev": "Md.", "Code": "MD"},
+    {"State": "Massachusetts", "Abbrev": "Mass.", "Code": "MA"},
+    {"State": "Michigan", "Abbrev": "Mich.", "Code": "MI"},
+    {"State": "Minnesota", "Abbrev": "Minn.", "Code": "MN"},
+    {"State": "Mississippi", "Abbrev": "Miss.", "Code": "MS"},
+    {"State": "Missouri", "Abbrev": "Mo.", "Code": "MO"},
+    {"State": "Montana", "Abbrev": "Mont.", "Code": "MT"},
+    {"State": "Nebraska", "Abbrev": "Nebr.", "Code": "NE"},
+    {"State": "Nevada", "Abbrev": "Nev.", "Code": "NV"},
+    {"State": "New Hampshire", "Abbrev": "N.H.", "Code": "NH"},
+    {"State": "New Jersey", "Abbrev": "N.J.", "Code": "NJ"},
+    {"State": "New Mexico", "Abbrev": "N.M.", "Code": "NM"},
+    {"State": "New York", "Abbrev": "N.Y.", "Code": "NY"},
+    {"State": "North Carolina", "Abbrev": "N.C.", "Code": "NC"},
+    {"State": "North Dakota", "Abbrev": "N.D.", "Code": "ND"},
+    {"State": "Ohio", "Abbrev": "Ohio", "Code": "OH"},
+    {"State": "Oklahoma", "Abbrev": "Okla.", "Code": "OK"},
+    {"State": "Oregon", "Abbrev": "Ore.", "Code": "OR"},
+    {"State": "Pennsylvania", "Abbrev": "Pa.", "Code": "PA"},
+    {"State": "Rhode Island", "Abbrev": "R.I.", "Code": "RI"},
+    {"State": "South Carolina", "Abbrev": "S.C.", "Code": "SC"},
+    {"State": "South Dakota", "Abbrev": "S.D.", "Code": "SD"},
+    {"State": "Tennessee", "Abbrev": "Tenn.", "Code": "TN"},
+    {"State": "Texas", "Abbrev": "Tex.", "Code": "TX"},
+    {"State": "Utah", "Abbrev": "Utah", "Code": "UT"},
+    {"State": "Vermont", "Abbrev": "Vt.", "Code": "VT"},
+    {"State": "Virginia", "Abbrev": "Va.", "Code": "VA"},
+    {"State": "Washington", "Abbrev": "Wash.", "Code": "WA"},
+    {"State": "West Virginia", "Abbrev": "W.Va.", "Code": "WV"},
+    {"State": "Wisconsin", "Abbrev": "Wis.", "Code": "WI"},
+    {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},
+    {"State": "Puerto Rico", "Code": "PR"},
 ]
 
 # Slash command permissions
@@ -270,14 +332,14 @@ admin_mod_perms = {
     GUILD_PROD: [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
         create_permission(ROLE_MOD_PROD, SlashCommandPermissionType.ROLE, True),
-        create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False),
     ]
 }
 
 admin_perms = {
     GUILD_PROD: [
         create_permission(ROLE_ADMIN_PROD, SlashCommandPermissionType.ROLE, True),
-        create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
+        create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False),
     ]
 }
 

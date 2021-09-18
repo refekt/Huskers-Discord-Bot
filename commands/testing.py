@@ -25,15 +25,15 @@ class TestCommand(commands.Cog):
                 name="question",
                 description="Question for the survey",
                 option_type=3,
-                required=True
+                required=True,
             ),
             create_option(
                 name="options",
                 description="Space deliminated option(s) for the survey",
                 option_type=3,
-                required=True
-            )
-        ]
+                required=True,
+            ),
+        ],
     )
     async def _test(self, ctx: SlashContext, question: str, options: str):
         options = options.strip()
@@ -46,12 +46,7 @@ class TestCommand(commands.Cog):
             options[index] = SurveyOption(opt)
 
         await ctx.defer()
-        await Survey(
-            bot=ctx.bot,
-            ctx=ctx,
-            question=question,
-            options=options
-        ).send()
+        await Survey(bot=ctx.bot, ctx=ctx, question=question, options=options).send()
 
 
 def setup(bot):
