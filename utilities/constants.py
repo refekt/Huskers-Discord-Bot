@@ -93,6 +93,11 @@ if run:
 
 env_vars = decrypt_return_data(env_file, key)
 
+# SSH
+SSH_HOST = env_vars["ssh_host"]
+SSH_USERNAME = env_vars["ssh_username"]
+SSH_PASSWORD = env_vars["ssh_password"]
+
 # Imgur
 IMGUR_CLIENT = env_vars["imgur_client"]
 IMGUR_SECRET = env_vars["imgur_secret"]

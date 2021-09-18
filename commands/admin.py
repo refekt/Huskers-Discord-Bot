@@ -1,4 +1,5 @@
 import asyncio
+import pathlib
 import platform
 from datetime import (
     datetime,
@@ -6,6 +7,7 @@ from datetime import (
 )
 
 import discord
+import paramiko
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
 from discord_slash import (
@@ -60,6 +62,9 @@ from utilities.constants import (
     ROLE_RUNZA,
     ROLE_TARMAC,
     ROLE_TIME_OUT,
+    SSH_HOST,
+    SSH_PASSWORD,
+    SSH_USERNAME,
     UserError,
     guild_id_list
 )
@@ -991,7 +996,7 @@ class AdminCommands(commands.Cog):
         await ctx.send(content="Shh...", components=[console_actionrow], hidden=True)
 
     @cog_ext.cog_slash(
-        name="trestart",
+        name="restart",
         description="Admin only: Restart the Twitter stream",
         guild_ids=guild_id_list(),
     )
@@ -1003,8 +1008,45 @@ class AdminCommands(commands.Cog):
             create_permission(ROLE_EVERYONE_PROD, SlashCommandPermissionType.ROLE, False)
         ]
     )
-    async def _trestart(self, ctx: SlashContext):
-        pass
+    async def _restart(self, ctx: SlashContext):
+        if "Windows" in platform.platform():
+            return
+
+        await ctx.defer(hidden=True)
+
+        log("Restarting the bot via SSH", 0)
+
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        log("SSH Client established", 1)
+
+        try:
+            client.connect(
+                hostname=SSH_HOST,
+                username=SSH_USERNAME,
+                password=SSH_PASSWORD
+            )
+            log("SSH Client connected to host", 1)
+        except:
+            log("SSH Client was unable to connect ot host", 0)
+            await ctx.send("Unable to restart the bot!", hidden=True)
+            return
+
+        bash_script_path = pathlib.PurePosixPath(f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/restart.sh")
+        bash_script = open(bash_script_path).read()
+
+        stdin, stdout, stderr = client.exec_command(bash_script)
+        log(stdout.read().decode(), 1)
+
+        err = stderr.read().decode()
+        if err:
+            log(err, 1)
+
+        client.close()
+        log("SSH Client is closed.", 0)
+
+        await ctx.send("Bot restart complete!", hidden=True)
 
     @cog_ext.cog_component(components=console_buttons)
     async def process_console(self, ctx: ComponentContext):
