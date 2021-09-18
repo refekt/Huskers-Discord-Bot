@@ -56,11 +56,8 @@ def convert_seconds(n):
     return hour, mins
 
 
-def get_current_week() -> int:
+def get_current_week(year: int, team: str) -> int:
     api = GamesApi(ApiClient(cfbd_config))
-
-    team = "Nebraska"
-    year = datetime.now().year
 
     try:
         games = api.get_games(year=year, team=team)
@@ -68,15 +65,19 @@ def get_current_week() -> int:
         return -1
 
     for index, game in enumerate(games):
-        if game.home_points is None and game.away_points is None:
-            return game.week
+        if team == "Nebraska":
+            if game.away_points is None and game.home_points is None:
+                return game.week
+        else:
+            if any([game.away_team == "Nebraska", game.home_team == "Nebraska"]) and any([game.away_team == team, game.home_team == team]):
+                return game.week
 
 
 def get_consensus_line(team_name: str, year: int = datetime.now().year, week: int = None):
     cfb_api = BettingApi(ApiClient(cfbd_config))
 
     if week is None:
-        week = get_current_week()
+        week = get_current_week(year=year, team=team_name)
 
     try:
         api_response = cfb_api.get_lines(team=team_name, year=year, week=week)
@@ -163,7 +164,7 @@ class FootballStatsCommands(commands.Cog):
         lines = None
 
         if week is None:
-            week = get_current_week()
+            week = get_current_week(year=year, team=team_name)
 
         week += 1  # acount for week 0
 
