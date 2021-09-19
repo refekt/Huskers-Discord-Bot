@@ -11,7 +11,7 @@ from discord_slash.utils.manage_commands import create_option
 
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
-from utilities.constants import CFBD_KEY, TZ, guild_id_list
+from utilities.constants import CFBD_KEY, TZ, guild_id_list, pretty_time_delta
 from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
 
 cfbd_config = Configuration()
@@ -477,7 +477,7 @@ class FootballStatsCommands(commands.Cog):
                         f"Fourth Downs: {season_stats.get('fourthDowns', 0)}\n"
                         f"Fourth Down Conversions: {season_stats.get('fourthDownConversions', 0)}\n"
                         f"Interceptions Thrown: {season_stats.get('interceptions', 0)}\n"
-                        f"Time of Possesion: {season_stats.get('possessionTime', 0)}\n",
+                        f"Time of Possesion: {pretty_time_delta(season_stats.get('possessionTime', 0))}\n",
                     ],
                 ],
             ),
