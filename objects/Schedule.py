@@ -51,7 +51,7 @@ class HuskerDotComSchedule:
 
 
 def collect_opponent(game, year, week):
-    # This is the cumulation of going line by line through Huskers.com HTML and CSS.
+    # This is the culmination of going line by line through Huskers.com HTML and CSS.
     # If the website changes, this will more than likely need to change.
     game = game.contents[1]
     try:
@@ -170,7 +170,7 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
             continue
 
         if "TBA" in opponent.date_time:
-            # Specific time to refernece later for TBA games
+            # Specific time to reference later for TBA games
             gdt_string = f"{opponent.date_time[0:6]} {year} {DT_TBA_TIME}"
             opponent.date_time = datetime.datetime.strptime(
                 gdt_string, DT_STR_FORMAT

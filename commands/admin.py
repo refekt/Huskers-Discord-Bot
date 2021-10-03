@@ -216,6 +216,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
         if channel.id in CHAN_HYPE_GROUP:
             continue
 
+        # noinspection PyBroadException
         try:
             log(f"Attempting to changes permissions for [{channel}] to [{not mode}]", 1)
 
@@ -243,7 +244,7 @@ async def process_gameday(mode: bool, guild: discord.Guild):
         except:
             continue
 
-    log(f"All permisisons changes applied", 0)
+    log(f"All permissions changes applied", 0)
 
 
 class AdminCommands(commands.Cog):

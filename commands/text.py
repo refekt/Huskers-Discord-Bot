@@ -43,7 +43,7 @@ buttons_ud = [
 
 def ud_embed(embed_word, embed_meaning, embed_example, embed_contributor):
     return build_embed(
-        title="Urband Dictionary Result",
+        title="Urban Dictionary Result",
         inline=False,
         footer=embed_contributor,
         fields=[
@@ -348,7 +348,7 @@ class TextCommands(commands.Cog):
 
     @cog_ext.cog_slash(
         name="eightball",
-        description="Ask the magic 8-ball a qusetion",
+        description="Ask the magic 8-ball a question",
         guild_ids=guild_id_list(),
     )
     async def _eightball(self, ctx: SlashContext, question: str):
@@ -437,7 +437,7 @@ class TextCommands(commands.Cog):
             ),
             create_option(
                 name="country",
-                description="Country coude",
+                description="Country code",
                 option_type=3,
                 required=False,
             ),
@@ -475,7 +475,7 @@ class TextCommands(commands.Cog):
         temp_str = (
             f"Temperature: {weather.main.temp}℉\n"
             f"Feels Like: {weather.main.feels_like}℉\n"
-            f"Humidty: {weather.main.humidity}℉\n"
+            f"Humidity: {weather.main.humidity}%\n"
             f"Max: {weather.main.temp_max}℉\n"
             f"Min: {weather.main.temp_min}℉"
         )
@@ -550,7 +550,7 @@ class TextCommands(commands.Cog):
             ),
             create_option(
                 name="options",
-                description="Space deliminated option(s) for the survey",
+                description="Space delimited option(s) for the survey",
                 option_type=3,
                 required=True,
             ),

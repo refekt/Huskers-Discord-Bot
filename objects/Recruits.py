@@ -420,11 +420,11 @@ def get_recruit_interests(search_player):
 
 
 def get_school_type(soup):
-    insitution_type = soup.find_all(attrs={"data-js": "institution-selector"})
+    institution_type = soup.find_all(attrs={"data-js": "institution-selector"})
 
-    if not len(insitution_type) == 0:
-        insitution_type = str(insitution_type[0].text).strip()
-        return insitution_type
+    if not len(institution_type) == 0:
+        institution_type = str(institution_type[0].text).strip()
+        return institution_type
     else:
         return "High School"
 

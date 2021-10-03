@@ -184,7 +184,7 @@ async def load_tasks():
 
 async def send_tweet_alert(message: str):
     log(f"Receiving Twitter alert", 0)
-    log(f"Twttier Alert: {message}", 1)
+    log(f"Twitter Alert: {message}", 1)
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
     embed = build_embed(fields=[["Twitter Stream Listener Alert", message]])
@@ -435,7 +435,7 @@ async def on_ready():
                     f"{pathlib.Path(__file__).parent.resolve()}/changelog.md"
                 )
             elif "Linux" in platform.platform():
-                log(f"Linxue changelog", 0)
+                log(f"Linux changelog", 0)
                 changelog_path = pathlib.PurePosixPath(
                     f"{pathlib.Path(__file__).parent.resolve()}/changelog.md"
                 )
@@ -512,19 +512,19 @@ if "Windows" not in platform.platform():
         elif isinstance(ex, (UserError, AssertionError)):
             embed = build_embed(
                 title="Husker Bot User Error",
-                description="An error occured with user input",
+                description="An error occurred with user input",
                 fields=[["Error Message", ex.message]],
             )
         elif isinstance(ex, CommandError):
             embed = build_embed(
                 title="Husker Bot Command Error",
-                description="An error occured with command processing",
+                description="An error occurred with command processing",
                 fields=[["Error Message", ex.message]],
             )
         else:
             embed = build_embed(
                 title="Husker Bot Command Error",
-                description="An unknown error occured",
+                description="An unknown error occurred",
                 fields=[["Error Message", f"{ex.__class__}: {ex}"]],
             )
 

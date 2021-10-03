@@ -15,12 +15,12 @@ def log(message: str, level: int):
 
 
 if "Windows" in platform.platform():
-    log(f"Windows encrption key set", 0)
+    log(f"Windows encryption key set", 0)
     key_path = pathlib.PurePath(
         f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
     )
 elif "Linux" in platform.platform():
-    log(f"Windows encrption key set", 0)
+    log(f"Windows encryption key set", 0)
     key_path = pathlib.PurePosixPath(
         f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
     )

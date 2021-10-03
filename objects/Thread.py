@@ -124,4 +124,4 @@ async def send_reminder(
         values=(0, str(destination.id), message, alert_when, str(source)),
     )
 
-    log(f";;; Thread completed successfully!")
+    log(f"Thread completed successfully!", 0)

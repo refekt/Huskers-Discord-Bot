@@ -94,7 +94,7 @@ class TeamStatsWinsipediaTeam:
                     nfl_picks[1].contents[5].contents[1].text,
                 )
             except:
-                return ("UNK", "UNK")
+                return "UNK", "UNK"
 
         def weeks_ap_poll():
             ap_poll = soup.find_all(attrs={"class": "ranking span2 item6"})

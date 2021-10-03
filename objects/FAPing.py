@@ -148,7 +148,7 @@ async def initiate_fap(
                 team_prediction = valid_teams[team_index]
                 if recruit.committed_school == team_prediction:
                     await ctx.send(
-                        f"{recruit.name}] is already ccommitted to [{recruit.committed_school}]. Nice try.",
+                        f"{recruit.name}] is already committed to [{recruit.committed_school}]. Nice try.",
                         hidden=True,
                     )
 
@@ -390,7 +390,7 @@ class FAP_Commands(commands.Cog):
                 faps_user["correct"].mean() * 100
             )
             faps_user["correct"] = faps_user["correct"].replace(0.0, -1.0)
-            ## does -1*confidence for incorrect, confidence*(days_correct/10) for correct less than 10 days correct, and confidence+(days_correct-10)*0.1 for correct over 10 days correct
+            # Does -1*confidence for incorrect, confidence*(days_correct/10) for correct less than 10 days correct, and confidence+(days_correct-10)*0.1 for correct over 10 days correct
             faps_user.loc[faps_user["correct"] == 1, "time_delta"] = (
                 faps_user.loc[faps_user["correct"] == 1, "decision_date"]
                 - faps_user.loc[faps_user["correct"] == 1, "prediction_date"]

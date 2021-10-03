@@ -30,7 +30,7 @@ def create_img(author: int, image_name: str, image_url: str):
 
     if not validators.url(image_url):
         raise UserError(
-            "Invalid iamge URL format. The URL must begin with 'http' or 'https'."
+            "Invalid image URL format. The URL must begin with 'http' or 'https'."
         )
 
     image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")

@@ -29,7 +29,7 @@ class TestCommand(commands.Cog):
             ),
             create_option(
                 name="options",
-                description="Space deliminated option(s) for the survey",
+                description="Space delimited option(s) for the survey",
                 option_type=3,
                 required=True,
             ),

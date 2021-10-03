@@ -161,7 +161,7 @@ class FootballStatsCommands(commands.Cog):
         if week is None:
             week = get_current_week(year=year, team=team_name)
 
-        week += 1  # acount for week 0
+        week += 1  # account for week 0
 
         log(f"Current week: {week}", 1)
 
@@ -464,11 +464,11 @@ class FootballStatsCommands(commands.Cog):
                     [
                         "Offense",
                         f"Total Yards: {season_stats.get('totalYards', 0):,}\n"
-                        f"Russhing Attempts: {season_stats.get('rushingAttempts', 0):,}\n"
+                        f"Rushing Attempts: {season_stats.get('rushingAttempts', 0):,}\n"
                         f"Rushing Yards: {season_stats.get('rushingYards', 0):,}\n"
                         f"Rushing TDs: {season_stats.get('rushingTDs', 0)}\n"
                         f"Pass Attempts: {season_stats.get('passAttempts', 0):,}\n"
-                        f"Pass Comopletions: {season_stats.get('passCompletions', 0):,}\n"
+                        f"Pass Completions: {season_stats.get('passCompletions', 0):,}\n"
                         f"Passing Yards: {season_stats.get('netPassingYards', 0):,}\n"
                         f"Passing TDs: {season_stats.get('passingTDs', 0)}\n"
                         f"First Downs: {season_stats.get('firstDowns', 0):,}\n"
@@ -477,7 +477,7 @@ class FootballStatsCommands(commands.Cog):
                         f"Fourth Downs: {season_stats.get('fourthDowns', 0)}\n"
                         f"Fourth Down Conversions: {season_stats.get('fourthDownConversions', 0)}\n"
                         f"Interceptions Thrown: {season_stats.get('interceptions', 0)}\n"
-                        f"Time of Possesion: {pretty_time_delta(season_stats.get('possessionTime', 0))}\n",
+                        f"Time of Possession: {pretty_time_delta(season_stats.get('possessionTime', 0))}\n",
                     ],
                 ],
             ),
@@ -513,7 +513,7 @@ class FootballStatsCommands(commands.Cog):
                 fields=[
                     [
                         "Penalties",
-                        f"Penalities: {season_stats.get('penalties', 0)}\n"
+                        f"Penalties: {season_stats.get('penalties', 0)}\n"
                         f"Penalty Yards: {season_stats.get('penaltyYards', 0):,}\n",
                     ],
                 ],

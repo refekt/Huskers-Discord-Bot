@@ -75,16 +75,16 @@ async def final_send_embed_fap_loop(ctx, target_recruit, bot, edit: bool = False
         embed = build_recruit_embed(target_recruit)
         await ctx.send(embed=embed, components=[fap_action_row])
 
-    button_contenxt: ComponentContext = await wait_for_component(
+    button_context: ComponentContext = await wait_for_component(
         bot, components=fap_action_row
     )
 
-    if button_contenxt.custom_id == "crystal_ball":
+    if button_context.custom_id == "crystal_ball":
         log(f"Crystal ball pressed for [{target_recruit.name.capitalize()}]", 0)
         await initiate_fap(ctx=ctx, user=ctx.author, recruit=target_recruit, client=bot)
         return
 
-    elif button_contenxt.custom_id == "scroll":
+    elif button_context.custom_id == "scroll":
         log(f"Scroll pressed for [{target_recruit.name.capitalize()}]", 0)
         await individual_predictions(ctx=ctx, recruit=target_recruit)
         return
@@ -125,7 +125,7 @@ class RecruitCog(commands.Cog):
                 "The search year must be after the first season of college football--1869."
             )
 
-        await ctx.defer()  # Similiar to sending a message with a loading screen to edit later on
+        await ctx.defer()  # Similar to sending a message with a loading screen to edit later on
 
         log(f"Searching for [{year} {search_name.capitalize()}]", 1)
 

@@ -245,7 +245,7 @@ def build_recruit_embed(recruit):
             embed.set_footer(
                 text=BOT_FOOTER_BOT
                 + "\nClick the 🔮 to predict what school you think this recruit will commit to."
-                "\nClick the 📜 to get the inividual predictions for this recruit."
+                "\nClick the 📜 to get the individual predictions for this recruit."
             )
         else:
             embed.set_footer(
@@ -256,7 +256,7 @@ def build_recruit_embed(recruit):
         if (FAP.get_croot_predictions(recruit)) is not None:
             embed.set_footer(
                 text=BOT_FOOTER_BOT
-                + "\nClick the 📜 to get the inividual predictions for this recruit."
+                + "\nClick the 📜 to get the individual predictions for this recruit."
             )
         else:
             embed.set_footer(text=BOT_FOOTER_BOT)
