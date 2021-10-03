@@ -1,3 +1,4 @@
+import math
 import random
 
 from dinteractions_Paginator import Paginator
@@ -163,43 +164,52 @@ class ImageCommands(commands.Cog):
     async def _imglist(self, ctx: SlashContext):
         global all_imgs
         all_imgs = retrieve_all_img()
-        pages = []
 
-        for image in all_imgs:
-            try:
-                author = ctx.guild.get_member(user_id=int(image["author"])).mention
-            except:
-                author = "N/A"
+        img_list = []
+        for img in all_imgs:
+            img_list.append(img["img_name"])
 
-            created_at = image["created_at"]
+        img_list.sort()
 
-            pages.append(
-                build_embed(
-                    title=f"Image: {image['img_name']}",
-                    inline=False,
-                    image=image["img_url"],
-                    fields=[
-                        ["Command Name", f"`/img img_name:{image['img_name']}`"],
-                        ["Image URL", f"[URL]({image['img_url']})"],
-                        ["Author", f"{author}"],
-                        ["Created At", f"{created_at.strftime(DT_OBJ_FORMAT)}"],
-                    ],
-                )
-            )
+        await ctx.send(", ".join(img_list), hidden=True)
 
-        await Paginator(
-            bot=ctx.bot,
-            ctx=ctx,
-            pages=pages,
-            useIndexButton=True,
-            useSelect=False,
-            firstStyle=ButtonStyle.gray,
-            nextStyle=ButtonStyle.gray,
-            prevStyle=ButtonStyle.gray,
-            lastStyle=ButtonStyle.gray,
-            indexStyle=ButtonStyle.gray,
-            hidden=True,
-        ).run()
+        # pages = []
+        #
+        # for image in all_imgs:
+        #     try:
+        #         author = ctx.guild.get_member(user_id=int(image["author"])).mention
+        #     except:
+        #         author = "N/A"
+        #
+        #     created_at = image["created_at"]
+        #
+        #     pages.append(
+        #         build_embed(
+        #             title=f"Image: {image['img_name']}",
+        #             inline=False,
+        #             image=image["img_url"],
+        #             fields=[
+        #                 ["Command Name", f"`/img img_name:{image['img_name']}`"],
+        #                 ["Image URL", f"[URL]({image['img_url']})"],
+        #                 ["Author", f"{author}"],
+        #                 ["Created At", f"{created_at.strftime(DT_OBJ_FORMAT)}"],
+        #             ],
+        #         )
+        #     )
+        #
+        # await Paginator(
+        #     bot=ctx.bot,
+        #     ctx=ctx,
+        #     pages=pages,
+        #     useIndexButton=True,
+        #     useSelect=False,
+        #     firstStyle=ButtonStyle.gray,
+        #     nextStyle=ButtonStyle.gray,
+        #     prevStyle=ButtonStyle.gray,
+        #     lastStyle=ButtonStyle.gray,
+        #     indexStyle=ButtonStyle.gray,
+        #     hidden=True,
+        # ).run()
 
     @cog_ext.cog_slash(
         name="imgrandom",

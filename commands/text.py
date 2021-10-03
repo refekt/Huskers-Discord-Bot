@@ -130,7 +130,10 @@ class TextCommands(commands.Cog):
         if len(definitions) == 0:
             raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
 
-        del definitions[1]  # Word of the day
+        try:
+            del definitions[1]  # Word of the day
+        except IndexError:
+            pass
 
         results = []
         for definition in definitions:

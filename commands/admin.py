@@ -995,17 +995,18 @@ class AdminCommands(commands.Cog):
             query=sqlRetrieveIowa, values=who.id, fetch="all"
         )
 
-        previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-        log(f"Gathered all the roles to store", 1)
+        if previous_roles_raw is not None:
+            previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+            log(f"Gathered all the roles to store", 1)
 
-        try:
-            if previous_roles:
-                for role in previous_roles:
-                    new_role = ctx.guild.get_role(int(role))
-                    await who.add_roles(new_role, reason="Returning from Iowa")
-                    log(f"Added [{new_role}] role", 1)
-        except (discord.Forbidden, discord.HTTPException):
-            pass
+            try:
+                if previous_roles:
+                    for role in previous_roles:
+                        new_role = ctx.guild.get_role(int(role))
+                        await who.add_roles(new_role, reason="Returning from Iowa")
+                        log(f"Added [{new_role}] role", 1)
+            except (discord.Forbidden, discord.HTTPException):
+                pass
 
         Process_MySQL(query=sqlRemoveIowa, values=who.id)
 
