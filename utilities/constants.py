@@ -46,7 +46,7 @@ def pretty_time_delta(seconds):
     if days > 0:
         return f"{days:,}d, {hours}h, {minutes}m, and {seconds}s"
     elif hours > 0:
-        return f"{hours}h, {minutes}m, and {seconds} s"
+        return f"{hours}h, {minutes}m, and {seconds}s"
     elif minutes > 0:
         return f"{minutes}m and {seconds}s"
     else:
