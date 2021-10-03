@@ -774,7 +774,7 @@ class AdminCommands(commands.Cog):
                     ],
                     [
                         "Info",
-                        "All channels in the General category will be turned off until the game day mode is disbled.",
+                        "All channels in the General category will be turned off until the game day mode is disabled.",
                     ],
                 ],
             )
@@ -786,7 +786,7 @@ class AdminCommands(commands.Cog):
                 fields=[
                     [
                         "Info",
-                        f"Game day channels have been disabled and General categories channels have been enabled. Regulare discussion may continue in {chan_general.mention}.",
+                        f"Game day channels have been disabled and General categories channels have been enabled. Regular discussion may continue in {chan_general.mention}.",
                     ]
                 ],
             )
