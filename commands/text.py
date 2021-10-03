@@ -219,6 +219,10 @@ class TextCommands(commands.Cog):
         key = set_component_key()
         buttons_voting = []
 
+        query = query.capitalize()
+        if not query.endswith("?"):
+            query += "?"
+
         if option_a != "UP VOTE" and option_b != "DOWN VOTE":  # Non-standard vote
             but_a = but_b = ButtonStyle.gray
 
@@ -230,7 +234,7 @@ class TextCommands(commands.Cog):
         )
 
         embed = build_embed(
-            title=f"Question: {query.capitalize()}",
+            title=f"Q: {query}",
             inline=False,
             fields=[
                 [buttons_voting[-2]["label"], "0"],
@@ -562,14 +566,14 @@ class TextCommands(commands.Cog):
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
         try:  # Avoid listening to events that don't apply to the vote command
-            if "Question" not in ctx.origin_message.embeds[0].title:
+            if "Q:" not in ctx.origin_message.embeds[0].title:
                 return
         except:
             return
 
         embed = ctx.origin_message.embeds[0]
         voters = embed.fields[2].value
-        voter_name = f"{ctx.author.name}#{ctx.author.discriminator}"
+        voter_name = ctx.author.mention
 
         key = embed.footer.text
         if key not in ctx.component_id:  # Avoid over writing other votes
