@@ -6,3 +6,5 @@ resources/variables.json
 *.pyc
 __pycache__
 .gitignore
+/discord_surveys/
+survey_chart.jpg
