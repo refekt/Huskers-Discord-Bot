@@ -306,7 +306,7 @@ def return_schedule_embeds(year, **kwargs):
         embeds.append(
             build_embed(
                 title=f"{game.opponent.title()}",
-                description=f"{year}'s Record: {season_stats.wins} - {season_stats.losses}",
+                description=f"Nebraska's {year}'s Record: {season_stats.wins} - {season_stats.losses}",
                 inline=False,
                 thumbnail=game.icon,
                 fields=[
