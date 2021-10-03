@@ -1,10 +1,12 @@
-.idea
+*.pyc
 *.xml
+.gitignore
+.idea
+/discord_surveys/
+__pycache__
+discord_surveys/__init__.py
+discord_surveys/survey.py
 resources/key.key
 resources/mammals.json
 resources/variables.json
-*.pyc
-__pycache__
-.gitignore
-/discord_surveys/
 survey_chart.jpg
