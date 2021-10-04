@@ -4,7 +4,7 @@ import random
 import re
 from datetime import timedelta
 from urllib import parse
-
+import platform
 import discord
 import markovify
 import requests
@@ -599,7 +599,10 @@ class TextCommands(commands.Cog):
         base_img.paste(avatar_thumbnail, paste_pos, avatar_thumbnail)
         base_img.save(f"resources/images/{make_slowking_filename}", "PNG")
 
-        slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\{make_slowking_filename}"
+        if "Windows" in platform.platform():
+            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\{make_slowking_filename}"
+        else:
+            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/{make_slowking_filename}"
 
         with open(slowking_path, "rb") as f:
             file = discord.File(f)
