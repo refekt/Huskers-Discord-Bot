@@ -1,17 +1,21 @@
+import io
 import pathlib
 import platform
 import random
 
 import discord
 import requests
+import validators
 from PIL import Image
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-from discord_slash.utils.manage_commands import create_option
+from discord_slash.utils.manage_commands import create_option, create_choice
 
+import utilities.fryer as fryer
 from utilities.constants import (
     CommandError,
+    HEADERS,
     ROLE_ADMIN_PROD,
     UserError,
     guild_id_list,
@@ -25,16 +29,14 @@ from utilities.mysql import (
     sqlSelectImageCommand,
 )
 
+image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
+
 
 def create_img(author: int, image_name: str, image_url: str):
-    import validators
-
     if not validators.url(image_url):
         raise UserError(
             "Invalid image URL format. The URL must begin with 'http' or 'https'."
         )
-
-    image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
     if not any(sub_str in image_url for sub_str in image_formats):
         raise UserError(
@@ -290,6 +292,83 @@ class ImageCommands(commands.Cog):
             file = discord.File(f)
 
         await ctx.send(file=file)
+
+    @cog_ext.cog_slash(
+        name="deepfry",
+        description="Deep fry an image",
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="url",
+                description="The URL of the image you want to deep fry.",
+                option_type=3,
+                required=False,
+            ),
+            create_option(
+                name="avatar",
+                description="The avatar you want to deep fry.",
+                option_type=6,
+                required=False,
+            ),
+        ],
+    )
+    async def _deepfry(
+        self, ctx: SlashContext, url: str = None, avatar: discord.Member = None
+    ):
+        if url == avatar:
+            raise UserError("You must provide either a URL or an avatar!")
+
+        if (
+            url is not None
+            and not validators.url(url)
+            and not any(sub_str in url for sub_str in image_formats)
+        ):
+            raise UserError("You must provide a valid URL!")
+
+        await ctx.defer()
+
+        def load(url):
+            image_response = requests.get(url=url, stream=True, headers=HEADERS)
+            return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
+
+        emote_amount = random.randrange(1, 6)
+        noise = random.uniform(0.4, 1.0)
+        contrast = random.randrange(160, 500)
+        layers = random.randrange(1, 3)
+
+        image = None
+
+        if url:
+            image = load(url)
+        elif avatar:
+            image = load(avatar.avatar_url)
+
+        if image is None:
+            raise CommandError("Unable to load image")
+
+        try:
+            fried = fryer.fry(image, emote_amount, noise, contrast)
+
+            for layer in range(layers - 1):
+                emote_amount = random.randrange(1, 6)
+                noise = random.uniform(0.1, 1.0)
+                contrast = random.randrange(501)
+                fried = fryer.fry(fried, emote_amount, noise, contrast)
+
+            with io.BytesIO() as image_binary:
+                fried.save(image_binary, "PNG")
+                if image_binary.tell() > 8000000:
+                    image_binary = io.BytesIO()
+                    fried.convert("RGB").save(
+                        image_binary, "JPEG", quality=90, optimize=True
+                    )
+                image_binary.seek(0)
+
+                await ctx.send(
+                    file=discord.File(fp=image_binary, filename="deepfry.png")
+                )
+        except Exception:
+            raise CommandError("Something went wrong. Blame my creators.")
 
 
 def setup(bot):
