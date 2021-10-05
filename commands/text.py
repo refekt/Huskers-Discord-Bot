@@ -565,50 +565,6 @@ class TextCommands(commands.Cog):
     async def _survey(self, ctx: SlashContext, question: str, options: str):
         await Survey(bot=ctx.bot, ctx=ctx, question=question, options=options).send()
 
-    @cog_ext.cog_slash(
-        name="slowking",
-        description="Turn a user into Slow King",
-        guild_ids=guild_id_list(),
-        options=[
-            create_option(
-                name="user",
-                description="User you want to turn into Slow King",
-                option_type=6,
-                required=True,
-            )
-        ],
-    )
-    async def _slowking(self, ctx: SlashContext, user: discord.Member):
-        await ctx.defer()
-
-        resize = (225, 225)
-
-        try:
-            avatar_thumbnail = Image.open(
-                requests.get(user.avatar_url, stream=True).raw
-            ).convert("RGBA")
-            avatar_thumbnail.thumbnail(resize, Image.ANTIALIAS)
-            # avatar_thumbnail.save("resources/images/avatar_thumbnail.png", "PNG")
-        except IOError:
-            raise CommandError("Unable to create a Slow King avatar for user!")
-
-        paste_pos = (250, 250)
-        make_slowking_filename = "make_slowking.png"
-
-        base_img = Image.open("resources/images/slowking.png").convert("RGBA")
-        base_img.paste(avatar_thumbnail, paste_pos, avatar_thumbnail)
-        base_img.save(f"resources/images/{make_slowking_filename}", "PNG")
-
-        if "Windows" in platform.platform():
-            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\{make_slowking_filename}"
-        else:
-            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/{make_slowking_filename}"
-
-        with open(slowking_path, "rb") as f:
-            file = discord.File(f)
-
-        await ctx.send(file=file)
-
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
         try:  # Avoid listening to events that don't apply to the vote command

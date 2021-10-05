@@ -1,16 +1,17 @@
-import math
+import pathlib
+import platform
 import random
 
-from dinteractions_Paginator import Paginator
+import discord
+import requests
+from PIL import Image
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_commands import create_option
 
 from utilities.constants import (
     CommandError,
-    DT_OBJ_FORMAT,
     ROLE_ADMIN_PROD,
     UserError,
     guild_id_list,
@@ -245,6 +246,50 @@ class ImageCommands(commands.Cog):
             author = "Unknown"
 
         await ctx.send(content=f"{image['img_url']}")
+
+    @cog_ext.cog_slash(
+        name="slowking",
+        description="Turn a user into Slow King",
+        guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="user",
+                description="User you want to turn into Slow King",
+                option_type=6,
+                required=True,
+            )
+        ],
+    )
+    async def _slowking(self, ctx: SlashContext, user: discord.Member):
+        await ctx.defer()
+
+        resize = (225, 225)
+
+        try:
+            avatar_thumbnail = Image.open(
+                requests.get(user.avatar_url, stream=True).raw
+            ).convert("RGBA")
+            avatar_thumbnail.thumbnail(resize, Image.ANTIALIAS)
+            # avatar_thumbnail.save("resources/images/avatar_thumbnail.png", "PNG")
+        except IOError:
+            raise CommandError("Unable to create a Slow King avatar for user!")
+
+        paste_pos = (250, 250)
+        make_slowking_filename = "make_slowking.png"
+
+        base_img = Image.open("resources/images/slowking.png").convert("RGBA")
+        base_img.paste(avatar_thumbnail, paste_pos, avatar_thumbnail)
+        base_img.save(f"resources/images/{make_slowking_filename}", "PNG")
+
+        if "Windows" in platform.platform():
+            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\{make_slowking_filename}"
+        else:
+            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/{make_slowking_filename}"
+
+        with open(slowking_path, "rb") as f:
+            file = discord.File(f)
+
+        await ctx.send(file=file)
 
 
 def setup(bot):
