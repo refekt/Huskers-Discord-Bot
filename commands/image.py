@@ -332,8 +332,8 @@ class ImageCommands(commands.Cog):
             return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
 
         emote_amount = random.randrange(1, 6)
-        noise = random.uniform(0.4, 1.0)
-        contrast = random.randrange(160, 500)
+        noise = random.uniform(0.4, 0.65)
+        contrast = random.randrange(1, 99)
         layers = random.randrange(1, 3)
 
         image = None
@@ -349,10 +349,11 @@ class ImageCommands(commands.Cog):
         try:
             fried = fryer.fry(image, emote_amount, noise, contrast)
 
-            for layer in range(layers - 1):
+            for layer in range(layers):
                 emote_amount = random.randrange(1, 6)
-                noise = random.uniform(0.1, 1.0)
-                contrast = random.randrange(501)
+                noise = random.uniform(0.4, 0.65)
+                contrast = random.randrange(1, 99)
+
                 fried = fryer.fry(fried, emote_amount, noise, contrast)
 
             with io.BytesIO() as image_binary:

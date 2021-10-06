@@ -1,3 +1,4 @@
+import math
 import os
 
 import cv2
@@ -19,27 +20,26 @@ deepfry_path = "resources/deepfry/"
 def fry(image, emote_amount, noise, contrast):
     gray = numpy.array(image.convert("L"))
 
-    add_emotes(image, emote_amount)
-
     eye_coods = find_eyes(gray)
     char_coords = find_chars(gray)
 
     add_flares(image, eye_coods)
-
+    add_emotes(image, emote_amount)
     add_chars(image, char_coords)
+    image = add_noise(image, random.random() * noise)
+    image = change_contrast(image, math.ceil(random.random()) * contrast)
 
     [w, h] = [image.width - 1, image.height - 1]
     w *= numpy.random.random(1)
     h *= numpy.random.random(1)
-    r = int(((image.width + image.height) / 12) * (numpy.random.random(1)[0] + 1))
+    r = int(((image.width + image.height) / 14) * (numpy.random.random(1)[0] + 1))
 
-    bulge_bool = True  # RAN.choice([True, False])
+    bulge_bool = random.choice([True, False])
+
     if bulge_bool:
-        image = bulge(image, numpy.array([int(w), int(h)]), r, 3, 5, 1.8)
-
-    image = add_noise(image, random.random() * noise)
-
-    image = change_contrast(image, random.random() * contrast)
+        image = bulge(
+            img=image, f=numpy.array([int(w), int(h)]), r=r, a=3, h=6, ior=2.25
+        )
 
     return image
 
