@@ -371,6 +371,15 @@ class ImageCommands(commands.Cog):
         except Exception:
             raise CommandError("Something went wrong. Blame my creators.")
 
+    @cog_ext.cog_slash(
+        name="inspireme",
+        description="The bot will send you an inspirational message",
+        guild_ids=guild_id_list(),
+    )
+    async def _inspireme(self, ctx: SlashContext):
+        image = requests.get("https://inspirobot.me/api?generate=true")
+        await ctx.send(image.text)
+
 
 def setup(bot):
     bot.add_cog(ImageCommands(bot))
