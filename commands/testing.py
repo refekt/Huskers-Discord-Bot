@@ -1,9 +1,9 @@
+import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-from discord_slash.utils.manage_commands import create_option
 from utilities.constants import guild_id_list
-from discord_surveys.survey import SurveyOption, Survey
+from datetime import datetime
 
 
 def log(message: str, level: int):
@@ -20,33 +20,39 @@ class TestCommand(commands.Cog):
         name="test",
         description="Test command",
         guild_ids=guild_id_list(),
-        options=[
-            create_option(
-                name="question",
-                description="Question for the survey",
-                option_type=3,
-                required=True,
-            ),
-            create_option(
-                name="options",
-                description="Space delimited option(s) for the survey",
-                option_type=3,
-                required=True,
-            ),
-        ],
     )
-    async def _test(self, ctx: SlashContext, question: str, options: str):
-        options = options.strip()
-        if " " in options:
-            options = options.split()
-        else:
-            options = [options]
+    async def _test(self, ctx: SlashContext):
+        husks_messages = ""
+        all_history = []
 
-        for index, opt in enumerate(options):
-            options[index] = SurveyOption(opt)
+        await ctx.defer(hidden=True)
 
-        await ctx.defer()
-        await Survey(bot=ctx.bot, ctx=ctx, question=question, options=options).send()
+        print(datetime.now())
+
+        for index, channel in enumerate(ctx.guild.channels):
+            if channel.type == discord.ChannelType.text:
+                print(f"[{index} / {len(ctx.guild.channels)}] Searching {channel}")
+                all_history.append(await channel.history(limit=2000).flatten())
+
+            # if index == 10:
+            #     break
+
+        print(datetime.now())
+
+        history = [value for sublist in all_history for value in sublist]
+
+        for message in history:
+            if message.author.id == 598039388148203520:
+                if not str(message.clean_content).startswith("http"):
+                    husks_messages += f"{message.clean_content}\n"
+
+        husks_messages = str(husks_messages).encode("UTF-8", "ignore")
+
+        f = open("husk_messages.txt", "wb")
+        f.write(husks_messages)
+        f.close()
+
+        await ctx.send("Done!", hidden=True)
 
 
 def setup(bot):

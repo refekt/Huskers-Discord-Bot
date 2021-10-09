@@ -4,13 +4,14 @@ import platform
 import random
 
 import discord
+import markovify
 import requests
 import validators
 from PIL import Image
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import SlashContext
-from discord_slash.utils.manage_commands import create_option, create_choice
+from discord_slash.utils.manage_commands import create_option
 
 import utilities.fryer as fryer
 from utilities.constants import (
@@ -379,6 +380,29 @@ class ImageCommands(commands.Cog):
     async def _inspireme(self, ctx: SlashContext):
         image = requests.get("https://inspirobot.me/api?generate=true")
         await ctx.send(image.text)
+
+    @cog_ext.cog_slash(
+        name="hypeme",
+        description="Husk's wise words of wisdom in meme format",
+        guild_ids=guild_id_list(),
+    )
+    async def _hypeme(self, ctx: SlashContext):
+        await ctx.defer()
+        with open("resources/husk_messages.txt", encoding="UTF-8") as f:
+            source_data = f.read()
+
+        text_model = markovify.NewlineText(source_data)
+
+        output = (
+            str(text_model.make_short_sentence(min_chars=20, max_chars=50))
+            .lower()
+            .capitalize()
+        )
+
+        if not output == "None":
+            await ctx.send(f'_"{output}"_ - Husk')
+        else:
+            await ctx.send("Unable to generate a Markov chain")
 
 
 def setup(bot):
