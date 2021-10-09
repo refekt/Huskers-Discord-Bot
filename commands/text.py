@@ -560,10 +560,20 @@ class TextCommands(commands.Cog):
                 option_type=3,
                 required=True,
             ),
+            create_option(
+                name="timeout",
+                description="How long to keep the survey open. 0 is forever.",
+                option_type=4,
+                required=False,
+            ),
         ],
     )
-    async def _survey(self, ctx: SlashContext, question: str, options: str):
-        await Survey(bot=ctx.bot, ctx=ctx, question=question, options=options).send()
+    async def _survey(
+        self, ctx: SlashContext, question: str, options: str, timeout: int = None
+    ):
+        await Survey(
+            bot=ctx.bot, ctx=ctx, question=question, options=options, timeout=timeout
+        ).send()
 
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
