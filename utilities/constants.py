@@ -71,7 +71,7 @@ elif "Linux" in platform.platform():
 
 
 def guild_id_list() -> list:
-    return [GUILD_PROD]
+    return [GUILD_PROD, 587470195132596224]
 
 
 def set_component_key() -> str:
