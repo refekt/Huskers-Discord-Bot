@@ -569,7 +569,7 @@ class TextCommands(commands.Cog):
         ],
     )
     async def _survey(
-        self, ctx: SlashContext, question: str, options: str, timeout: int = None
+        self, ctx: SlashContext, question: str, options: str, timeout: int = 120
     ):
         await Survey(
             bot=ctx.bot, ctx=ctx, question=question, options=options, timeout=timeout
