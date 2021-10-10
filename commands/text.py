@@ -618,7 +618,7 @@ class TextCommands(commands.Cog):
                 raise CommandError(f"Error modifying [{down_vote_label}]")
 
         embed = build_embed(
-            title=f"Question: {query.capitalize()}",
+            title=f"Q: {query.capitalize()}",
             description="Times out after 60 seconds.",
             inline=False,
             fields=[
