@@ -376,10 +376,27 @@ class ImageCommands(commands.Cog):
         name="inspireme",
         description="The bot will send you an inspirational message",
         guild_ids=guild_id_list(),
+        options=[
+            create_option(
+                name="person",
+                description="Person you want to inspire",
+                required=False,
+                option_type=6,
+            )
+        ],
     )
-    async def _inspireme(self, ctx: SlashContext):
+    async def _inspireme(self, ctx: SlashContext, person: discord.Member = None):
         image = requests.get("https://inspirobot.me/api?generate=true")
-        await ctx.send(image.text)
+
+        if person:
+            try:
+                await ctx.send(
+                    f"{ctx.author.mention} wants to inspire {person.mention}"
+                )
+            except:
+                await ctx.send(f"{ctx.author} wants to inspire {person}")
+        else:
+            await ctx.send(image.text)
 
     @cog_ext.cog_slash(
         name="hypeme",
