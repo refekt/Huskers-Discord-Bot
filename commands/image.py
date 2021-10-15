@@ -391,7 +391,7 @@ class ImageCommands(commands.Cog):
         if person:
             try:
                 await ctx.send(
-                    f"{ctx.author.mention} wants to inspire {person.mention}"
+                    f"{ctx.author.mention} wants to inspire {person.mention}\n{image}"
                 )
             except:
                 await ctx.send(f"{ctx.author} wants to inspire {person}")
