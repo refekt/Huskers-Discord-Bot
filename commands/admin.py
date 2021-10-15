@@ -945,9 +945,9 @@ class AdminCommands(commands.Cog):
 
         Process_MySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
 
-        await channel_iowa.send(
-            f"[ {who.mention} ] has been sent to {channel_iowa.mention}."
-        )
+        # await channel_iowa.send(
+        #     f"[ {who.mention} ] has been sent to {channel_iowa.mention}."
+        # )
 
         embed = build_embed(
             title="Banished to Iowa",
@@ -1011,7 +1011,7 @@ class AdminCommands(commands.Cog):
 
         Process_MySQL(query=sqlRemoveIowa, values=who.id)
 
-        iowa = ctx.guild.get_channel(CHAN_IOWA)
+        # iowa = ctx.guild.get_channel(CHAN_IOWA)
 
         embed = build_embed(
             title="Return to Nebraska",
@@ -1022,7 +1022,7 @@ class AdminCommands(commands.Cog):
             ],
         )
         await ctx.send(embed=embed)
-        await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
+        # await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
         log("Nebraska command complete", 0)
 
     @cog_ext.cog_slash(
