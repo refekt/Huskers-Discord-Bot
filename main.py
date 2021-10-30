@@ -81,6 +81,7 @@ async def change_my_status():
         "the Huskers give up 400 yards rushing to one guy",
         "a swing pass for -1 yards",
         "a missed field goal",
+        "the Huskers lose another one-score game",
     )
     try:
         log(f"Attempting to change status...", 0)
@@ -207,7 +208,7 @@ async def send_tweet(tweet):
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
         fields=fields,
-        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}",
+        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)} | {direct_url}",
     )
 
     embed.set_author(
