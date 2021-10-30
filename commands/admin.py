@@ -235,6 +235,14 @@ async def process_gameday(mode: bool, guild: discord.Guild):
                 await channel.set_permissions(everyone, overwrite=perms_text)
             elif channel.type == discord.ChannelType.voice:
                 await channel.set_permissions(everyone, overwrite=perms_voice)
+
+                # TODO Trying to kick people from voice channels if game day mode is turned off.
+                # if not mode:
+                #     for member in channel.members:
+                #         try:
+                #             await member.voice.kick()
+                #         except:
+                #             pass
             else:
                 log(f"Unable to change permissions for [{channel}] to [{mode}]", 1)
                 continue
@@ -775,7 +783,7 @@ class AdminCommands(commands.Cog):
                     ],
                     [
                         "Info",
-                        "All channels in the General category will be turned off until the game day mode is disabled.",
+                        "All channels in the Huskers category will be turned off until the game day mode is disabled.",
                     ],
                 ],
             )
