@@ -8,9 +8,7 @@ import typing
 from datetime import datetime, timedelta
 
 import discord
-import requests
 import tweepy
-from PIL import Image
 from discord.ext.commands import Bot
 from discord_slash import ButtonStyle, ComponentContext, SlashCommand
 from discord_slash.context import SlashContext
@@ -40,6 +38,7 @@ from utilities.constants import (
     TWITTER_TOKEN_SECRET,
     UserError,
     set_component_key,
+    make_slowking,
 )
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks
@@ -287,15 +286,15 @@ def upload_picture(path: str) -> str:
     return url.get("link", None)
 
 
-def make_slowking(avatar_url):
-    avatar_img = Image.open(requests.get(avatar_url, stream=True).raw)
-
-    base_img_path = "resources/images/slowking.png"
-    base_img = Image.open(base_img_path)
-
-    paste_pos = (262, 262)
-    base_img.paste(avatar_img, paste_pos, avatar_img)
-    base_img.save("resources/images/new_slowking.png", "PNG")
+# def make_slowking(avatar_url):
+#     avatar_img = Image.open(requests.get(avatar_url, stream=True).raw)
+#
+#     base_img_path = "resources/images/slowking.png"
+#     base_img = Image.open(base_img_path)
+#
+#     paste_pos = (262, 262)
+#     base_img.paste(avatar_img, paste_pos, avatar_img)
+#     base_img.save("resources/images/new_slowking.png", "PNG")
 
 
 async def hall_of_fame_messages(reactions: list):
@@ -341,7 +340,7 @@ async def hall_of_fame_messages(reactions: list):
             del raw_message_history
 
             if not duplicate:
-                slowking_path = None
+                thumb_url = ""
 
                 if not hof:
                     embed_title = f"{slowpoke_emoji * 3} Hall of Shame Message {slowpoke_emoji * 3}"
@@ -350,14 +349,8 @@ async def hall_of_fame_messages(reactions: list):
                     )
                     channel = hos_channel
 
-                    avatar_url = (
-                        str(reaction.message.author.avatar_url)
-                        .split("?")[0]
-                        .replace("webp", "png")
-                    )
-                    make_slowking(avatar_url)
-                    slowking_path = f"{pathlib.Path(__file__).parent.resolve()}\\resources\\images\\new_slowking.png"
-                    slowking_path = upload_picture(slowking_path)
+                    thumb = make_slowking(reaction.message.author)
+                    thumb_url = upload_picture(pathlib.Path(thumb.filename).resolve())
                 else:
                     embed_title = f"{'🏆' * 3} Hall of Fame Message {'🏆' * 3}"
                     embed_description = (
@@ -368,10 +361,15 @@ async def hall_of_fame_messages(reactions: list):
                 embed = build_embed(
                     title=embed_title,
                     description=embed_description,
-                    thumbnail=slowking_path if not None else None,
+                    thumbnail=thumb_url if thumb_url != "" else None,
                     fields=[
                         ["Author", reaction.message.author.mention],
-                        ["Message", reaction.message.content],
+                        [
+                            "Message",
+                            reaction.message.content
+                            if reaction.message.content != ""
+                            else reaction.message.attachments[0].url,
+                        ],
                         [
                             "Message Link",
                             f"[Click to view message]({reaction.message.jump_url})",

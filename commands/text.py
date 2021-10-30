@@ -1,14 +1,12 @@
 import json
-import pathlib
 import random
 import re
 from datetime import timedelta
 from urllib import parse
-import platform
+
 import discord
 import markovify
 import requests
-from PIL import Image
 from bs4 import BeautifulSoup
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
