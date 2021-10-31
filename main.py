@@ -204,10 +204,12 @@ async def send_tweet(tweet):
     else:
         fields = [["Message", tweet.text]]
 
+    fields.append(["URL", direct_url])
+
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
         fields=fields,
-        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)} | {direct_url}",
+        footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}",
     )
 
     embed.set_author(
