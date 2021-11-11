@@ -51,7 +51,7 @@ client = Bot(
 )
 
 slash = SlashCommand(client, sync_commands=True)  # Sync required
-client_percent = 0.0047
+client_percent = 0.0035
 list_members = []
 
 
@@ -204,7 +204,7 @@ async def send_tweet(tweet):
     else:
         fields = [["Message", tweet.text]]
 
-    fields.append(["URL", direct_url])
+    fields.append(["URL", direct_urlt])
 
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
