@@ -31,17 +31,18 @@ from utilities.constants import (
     IMGUR_CLIENT,
     IMGUR_SECRET,
     PROD_TOKEN,
+    ROLE_TIME_OUT,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_KEY,
     TWITTER_SECRET_KEY,
     TWITTER_TOKEN,
     TWITTER_TOKEN_SECRET,
     UserError,
-    set_component_key,
     make_slowking,
+    set_component_key,
 )
 from utilities.embed import build_embed
-from utilities.mysql import Process_MySQL, sqlRetrieveTasks
+from utilities.mysql import Process_MySQL, sqlRetrieveTasks, sqlRetrieveIowa
 
 client = Bot(
     command_prefix="$",
@@ -383,6 +384,14 @@ async def hall_of_fame_messages(reactions: list):
                 log(f"Processed HOF/HOS message.", 0)
 
 
+def check_if_iowa(member: discord.Member) -> bool:
+    previous_roles_raw = Process_MySQL(
+        query=sqlRetrieveIowa, values=member.id, fetch="all"
+    )
+
+    return True if previous_roles_raw is not None else False
+
+
 async def send_welcome_message(who: discord.Member):
     chan_rules = client.get_channel(CHAN_RULES)
 
@@ -483,7 +492,12 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 @client.event
 async def on_member_join(member: discord.Member):
     log(f"New Member: {member.display_name}", 0)
-    await send_welcome_message(member)
+    if not check_if_iowa(member):
+        await send_welcome_message(member)
+    else:
+        role_timeout = member.guild.get_role(ROLE_TIME_OUT)
+        await member.add_roles(role_timeout, reason="Returning back to Iowa.")
+        log(f"Added [{role_timeout}] role", 1)
 
 
 @client.event
