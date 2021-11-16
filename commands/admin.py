@@ -1012,10 +1012,11 @@ class AdminCommands(commands.Cog):
                 if previous_roles:
                     for role in previous_roles:
                         new_role = ctx.guild.get_role(int(role))
+                        log(f"Attempting to add [{new_role}] role...", 1)
                         await who.add_roles(new_role, reason="Returning from Iowa")
                         log(f"Added [{new_role}] role", 1)
-            except (discord.Forbidden, discord.HTTPException):
-                pass
+            except (discord.Forbidden, discord.HTTPException) as e:
+                log(f"Unable to add role! {e}")
 
         Process_MySQL(query=sqlRemoveIowa, values=who.id)
 
