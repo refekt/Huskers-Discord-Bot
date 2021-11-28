@@ -57,16 +57,13 @@ class TwitterStreamListener(tweepy.Stream):
         future = asyncio.run_coroutine_threadsafe(self.message_func(tweet), self.loop)
         future.result()
 
-    # def send_alert(self, message):
-    # log("Sending an alert", 1)
-    # future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
-    # future.result()
+    def send_alert(self, message):
+        log("Sending an alert", 1)
+        future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
+        future.result()
 
     def on_connect(self):
         log(f"Twitter Stream Listening has connected.", 0)
-
-    def on_keep_alive(self):
-        log("Keep alive message received", 1)
 
     def on_status(self, status):
         # if not status.retweeted and status.in_reply_to_status_id is None and not hasattr(status, "retweeted_status"):
@@ -77,22 +74,38 @@ class TwitterStreamListener(tweepy.Stream):
 
     def on_connection_error(self):
         log(f"Twitter Stream Listener timed out", 1)
+        self.send_alert(
+            f"Twitter stream failed to connect. Retrying in {self.cooldown} seconds..."
+        )
         self.process_cooldown()
-        return True
+        self.send_alert("Twitter stream attempting to reconnect!")
+        return True  # Reconnect
 
     def on_request_error(self, status_code):
         log(f"Twitter Stream Listener Error: {status_code}", 1)
         if status_code == 420:
+            log(
+                f"Twitter Stream is being rate limited. Retrying in {self.cooldown} seconds...",
+                1,
+            )
+            self.send_alert(
+                f"Twitter Stream is being rate limited. Retrying in {self.cooldown} seconds..."
+            )
             self.process_cooldown()
-            self.send_alert(f"Twitter Stream Listener Error: {status_code}")
+            self.send_alert("Twitter stream attempting to reconnect!")
             return True  # Reconnect
 
     def on_disconnect_message(self, message):
         log(f"Twitter Stream Listening has disconnected. Notice: {message}", 1)
+        self.send_alert(
+            f"Twitter Stream was disconnected. Retrying in {self.cooldown} seconds..."
+        )
         self.process_cooldown()
-        return True
+        self.send_alert("Twitter stream attempting to reconnect!")
 
-    def keep_alive(self):
+        return True  # Reconnect
+
+    def on_keep_alive(self):
         log("Twitter Stream Listener has received a keep alive signal.", 1)
         self.process_cooldown()
         return True
@@ -103,7 +116,17 @@ class TwitterStreamListener(tweepy.Stream):
         return True
 
     def on_limit(self, track):
-        ...
+        log(
+            f"Twitter Stream Listening is being rate limited. Unable to deliver {track} tweets",
+            1,
+        )
+        self.send_alert(
+            f"Twitter Stream Listening is being rate limited. Unable to deliver {track} tweets"
+        )
+        self.process_cooldown()
+        self.send_alert("Twitter stream attempting to reconnect!")
+
+        return True  # Reconnect
 
 
 async def send_reminder(
