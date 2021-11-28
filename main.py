@@ -582,7 +582,7 @@ extensions = [
     "commands.image",
     "commands.football_stats",
     "commands.reminder",
-    "commands.testing",
+    # "commands.testing",
 ]
 for extension in extensions:
     log(f"Loading extension: {extension}", 1)

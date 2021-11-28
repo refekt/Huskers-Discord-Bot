@@ -66,7 +66,7 @@ def get_consensus_line(
 
     try:
         api_response = cfb_api.get_lines(team=team_name, year=year, week=week)
-    except ApiException:
+    except (ApiException, TypeError):
         return None
 
     log(f"Results: {api_response}", 1)
@@ -224,6 +224,7 @@ class FootballStatsCommands(commands.Cog):
             log("The current season is over! Looking to next year...", 1)
             del games, stats
             games, stats = HuskerSchedule(sport=sport, year=now_cst.year + 1)
+            now_cst = datetime(datetime.now().year + 1, 3, 1).astimezone(tz=TZ)
 
         game_compared = None
 
@@ -260,7 +261,9 @@ class FootballStatsCommands(commands.Cog):
             opponent=game_compared.opponent,
             thumbnail=game_compared.icon,
             date_time=game_compared.game_date_time,
-            consensus=get_consensus_line(game_compared.opponent),
+            consensus=get_consensus_line(
+                team_name=game_compared.opponent, year=now_cst.year
+            ),
             location=game_compared.location,
         )
         await ctx.send(embed=embed)
