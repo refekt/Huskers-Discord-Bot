@@ -60,9 +60,9 @@ def log(message: str, level: int):
     import datetime
 
     if level == 0:
-        print(f"[{datetime.datetime.now()}] ### {message}")
+        print(f"[{datetime.datetime.now()}] ### Main: {message}")
     elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+        print(f"[{datetime.datetime.now()}] ### ~~~ Main: {message}")
 
 
 def current_guild() -> typing.Union[discord.Guild, None]:
@@ -205,7 +205,7 @@ async def send_tweet(tweet):
     else:
         fields = [["Message", tweet.text]]
 
-    fields.append(["URL", direct_urlt])
+    fields.append(["URL", direct_url])
 
     embed = build_embed(
         url="https://twitter.com/i/lists/1307680291285278720",
@@ -255,16 +255,27 @@ async def send_tweet(tweet):
 
 
 def start_twitter_stream():
-    listener = TwitterStreamListener(send_tweet, send_tweet_alert, client.loop)
+    log("Bot is starting the Twitter stream", 0)
+
+    # listener = TwitterStreamListener(send_tweet, send_tweet_alert, client.loop)
     auth = tweepy.OAuthHandler(
         consumer_key=TWITTER_KEY, consumer_secret=TWITTER_SECRET_KEY
     )
     auth.set_access_token(key=TWITTER_TOKEN, secret=TWITTER_TOKEN_SECRET)
-    api = tweepy.API(auth_handler=auth)
-    stream = tweepy.Stream(auth=api.auth, listener=listener)
+    api = tweepy.API(auth)
+    # stream = tweepy.Stream(api.auth, listener)
+    stream = TwitterStreamListener(
+        consumer_key=TWITTER_KEY,
+        consumer_secret=TWITTER_SECRET_KEY,
+        access_token=TWITTER_TOKEN,
+        access_token_secret=TWITTER_TOKEN_SECRET,
+        message_func=send_tweet,
+        alert_func=send_tweet_alert,
+        loop=client.loop,
+    )
 
     for member in tweepy.Cursor(
-        api.list_members, list_id=TWITTER_HUSKER_MEDIA_LIST_ID
+        api.get_list_members, list_id=TWITTER_HUSKER_MEDIA_LIST_ID
     ).items():
         list_members.append(
             {
@@ -279,7 +290,7 @@ def start_twitter_stream():
                 "id_str": "15899943",
             }
         )
-    stream.filter(follow=[member["id_str"] for member in list_members], is_async=True)
+    stream.filter(follow=[member["id_str"] for member in list_members], threaded=True)
 
 
 def upload_picture(path: str) -> str:
@@ -420,6 +431,7 @@ async def send_welcome_message(who: discord.Member):
 
 @client.event
 async def on_connect():
+    start_twitter_stream()
     if "Windows" not in platform.platform():
         start_twitter_stream()
 

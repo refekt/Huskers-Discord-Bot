@@ -10,9 +10,9 @@ def log(message: str, level: int):
     import datetime
 
     if level == 0:
-        print(f"[{datetime.datetime.now()}] ### {message}")
+        print(f"[{datetime.datetime.now()}] ### Testing: {message}")
     elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+        print(f"[{datetime.datetime.now()}] ### ~~~ Testing: {message}")
 
 
 class TestCommand(commands.Cog):

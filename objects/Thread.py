@@ -15,14 +15,29 @@ def log(message: str, level: int):
     import datetime
 
     if level == 0:
-        print(f"[{datetime.datetime.now()}] ### {message}")
+        print(f"[{datetime.datetime.now()}] ### Twitter Stream: {message}")
     elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ {message}")
+        print(f"[{datetime.datetime.now()}] ### ~~~ Twitter Stream: {message}")
 
 
-class TwitterStreamListener(tweepy.StreamListener):
-    def __init__(self, message_func, alert_func, loop):
-        super().__init__()
+class TwitterStreamListener(tweepy.Stream):
+    def __init__(
+        self,
+        consumer_key,
+        consumer_secret,
+        access_token,
+        access_token_secret,
+        message_func,
+        alert_func,
+        loop,
+    ):
+        super().__init__(
+            consumer_key, consumer_secret, access_token, access_token_secret
+        )
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
+        self.access_token = access_token
+        self.access_token_secret = access_token_secret
         self.message_func = message_func
         self.alert_func = alert_func
         self.loop = loop
@@ -38,15 +53,20 @@ class TwitterStreamListener(tweepy.StreamListener):
         log(f"Pause complete. New timer is {self.cooldown} seconds.", 1)
 
     def send_message(self, tweet):
+        log("Sending a new tweet", 1)
         future = asyncio.run_coroutine_threadsafe(self.message_func(tweet), self.loop)
         future.result()
 
     def send_alert(self, message):
+        log("Sending an alert", 1)
         future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
         future.result()
 
     def on_connect(self):
         log(f"Twitter Stream Listening has connected.", 0)
+
+    def on_keep_alive(self):
+        log("Keep alive message received", 1)
 
     def on_status(self, status):
         # if not status.retweeted and status.in_reply_to_status_id is None and not hasattr(status, "retweeted_status"):
@@ -55,20 +75,20 @@ class TwitterStreamListener(tweepy.StreamListener):
     def on_warning(self, notice):
         log(f"Twitter Stream Listener Error: {notice}", 1)
 
-    def on_timeout(self):
+    def on_connection_error(self):
         log(f"Twitter Stream Listener timed out", 1)
         self.process_cooldown()
         return True
 
-    def on_error(self, status_code):
+    def on_request_error(self, status_code):
         log(f"Twitter Stream Listener Error: {status_code}", 1)
         if status_code == 420:
             self.process_cooldown()
             self.send_alert(f"Twitter Stream Listener Error: {status_code}")
             return True  # Reconnect
 
-    def on_disconnect(self, notice):
-        log(f"Twitter Stream Listening has disconnected. Notice: {notice}", 1)
+    def on_disconnect_message(self, message):
+        log(f"Twitter Stream Listening has disconnected. Notice: {message}", 1)
         self.process_cooldown()
         return True
 
@@ -81,6 +101,9 @@ class TwitterStreamListener(tweepy.StreamListener):
         log(f"Twitter Stream Listener Error: {exception}", 1)
         self.process_cooldown()
         return True
+
+    def on_limit(self, track):
+        ...
 
 
 async def send_reminder(
