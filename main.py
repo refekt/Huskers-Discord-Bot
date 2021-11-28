@@ -475,7 +475,7 @@ async def on_ready():
                 ],
             ],
         )
-        await bot_spam.send(embed=embed)
+        await bot_spam.send(embed=embed, delete_after=600)
 
         await change_my_status()
         await load_tasks()
