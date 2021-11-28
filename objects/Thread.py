@@ -57,10 +57,10 @@ class TwitterStreamListener(tweepy.Stream):
         future = asyncio.run_coroutine_threadsafe(self.message_func(tweet), self.loop)
         future.result()
 
-    def send_alert(self, message):
-        log("Sending an alert", 1)
-        future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
-        future.result()
+    # def send_alert(self, message):
+    # log("Sending an alert", 1)
+    # future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
+    # future.result()
 
     def on_connect(self):
         log(f"Twitter Stream Listening has connected.", 0)
