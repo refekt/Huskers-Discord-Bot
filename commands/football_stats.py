@@ -211,11 +211,19 @@ class FootballStatsCommands(commands.Cog):
         await ctx.defer()
 
         now_cst = datetime.now().astimezone(tz=TZ)
+        log(f"Now CST is... {now_cst}", 1)
 
         games, stats = HuskerSchedule(sport=sport, year=now_cst.year)
 
         if not games:
+            log("No games found!", 1)
             return await ctx.send(content="No games found!")
+
+        last_game = len(games) - 1
+        if games[last_game].game_date_time < now_cst:
+            log("The current season is over! Looking to next year...", 1)
+            del games, stats
+            games, stats = HuskerSchedule(sport=sport, year=now_cst.year + 1)
 
         game_compared = None
 
