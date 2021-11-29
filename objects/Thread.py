@@ -66,6 +66,7 @@ class TwitterStreamListener(tweepy.Stream):
 
     def on_connect(self):
         log(f"Stream connected", 0)
+        self.send_alert(f"Stream connected!")
         self.reset_cooldown()
 
     def on_status(self, status):
@@ -94,8 +95,6 @@ class TwitterStreamListener(tweepy.Stream):
             )
             self.send_alert(rl_msg)
             self.process_cooldown()
-            self.send_alert("Attempting to reconnect!")
-            # return True  # Reconnect
         else:
             log(f"Request Error: {status_code}", 1)
             return True  # Reconnect
