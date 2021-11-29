@@ -419,7 +419,7 @@ async def send_welcome_message(who: discord.Member):
 
 @client.event
 async def on_connect():
-    start_twitter_stream()
+    # start_twitter_stream()  # Keeping for posterity to remind myself to remove debugging code before deep diving for how ever long to fix code that isn't broken
     if "Windows" not in platform.platform():
         start_twitter_stream()
 
