@@ -193,6 +193,7 @@ async def send_tweet_alert(message: str):
 
 
 async def send_tweet(tweet):
+    log(f"Sending a tweet to Discord", 1)
     if tweet.author.id_str not in [member["id_str"] for member in list_members]:
         return
 
@@ -233,7 +234,7 @@ async def send_tweet(tweet):
         except:
             pass
 
-    log(f"Sending tweeit from @{tweet.author.screen_name}", 1)
+    log(f"Sending tweet from @{tweet.author.screen_name}", 1)
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
     buttons = [
@@ -257,13 +258,11 @@ async def send_tweet(tweet):
 def start_twitter_stream():
     log("Bot is starting the Twitter stream", 0)
 
-    # listener = TwitterStreamListener(send_tweet, send_tweet_alert, client.loop)
     auth = tweepy.OAuthHandler(
         consumer_key=TWITTER_KEY, consumer_secret=TWITTER_SECRET_KEY
     )
     auth.set_access_token(key=TWITTER_TOKEN, secret=TWITTER_TOKEN_SECRET)
-    api = tweepy.API(auth)
-    # stream = tweepy.Stream(api.auth, listener)
+    api = tweepy.API(auth=auth, wait_on_rate_limit=True)
     stream = TwitterStreamListener(
         consumer_key=TWITTER_KEY,
         consumer_secret=TWITTER_SECRET_KEY,
@@ -298,17 +297,6 @@ def upload_picture(path: str) -> str:
     url = imgur_client.upload_from_path(path=path, config=None, anon=True)
 
     return url.get("link", None)
-
-
-# def make_slowking(avatar_url):
-#     avatar_img = Image.open(requests.get(avatar_url, stream=True).raw)
-#
-#     base_img_path = "resources/images/slowking.png"
-#     base_img = Image.open(base_img_path)
-#
-#     paste_pos = (262, 262)
-#     base_img.paste(avatar_img, paste_pos, avatar_img)
-#     base_img.save("resources/images/new_slowking.png", "PNG")
 
 
 async def hall_of_fame_messages(reactions: list):
