@@ -12,6 +12,7 @@ def log(message: str, level: int):
         print(f"[{datetime.datetime.now()}] ### ~~~ MySQL: {message}")
 
 
+# Image Command
 sqlCreateImageCommand = """
 INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
 """
@@ -28,10 +29,12 @@ sqlDeleteImageCommand = """
 DELETE FROM img_cmd_db WHERE img_name = %s AND author = %s
 """
 
+# Croot Bot
 sqlTeamIDs = """
 SELECT id, school from botfrost.team_ids
 """
 
+# Iowa Command
 sqlInsertIowa = """
 INSERT INTO iowa (user_id, reason, previous_roles) VALUES (%s, %s, %s)
 """
@@ -44,6 +47,7 @@ sqlRemoveIowa = """
 DELETE FROM iowa WHERE user_id = %s
 """
 
+# Tasks
 sqlRetrieveTasks = """
 SELECT * FROM tasks_repo WHERE is_open = 1
 """
@@ -56,6 +60,12 @@ sqlUpdateTasks = """
 UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
 """
 
+# Karma
+sqlUpdateKarma = """
+INSERT INTO karma (positive, negative, total)
+VALUES (%s, %s, %s)
+ON DUPLICATE KEY UPDATE (positive=%s, negative=%s, total=%s)
+"""
 
 # sqlRecordStats = """
 # INSERT INTO stats (source, channel) VALUES (%s, %s)

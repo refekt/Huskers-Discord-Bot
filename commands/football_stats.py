@@ -220,10 +220,13 @@ class FootballStatsCommands(commands.Cog):
             return await ctx.send(content="No games found!")
 
         last_game = len(games) - 1
+        now_cst_orig = None
+
         if games[last_game].game_date_time < now_cst:
             log("The current season is over! Looking to next year...", 1)
             del games, stats
             games, stats = HuskerSchedule(sport=sport, year=now_cst.year + 1)
+            now_cst_orig = now_cst
             now_cst = datetime(datetime.now().year + 1, 3, 1).astimezone(tz=TZ)
 
         game_compared = None
@@ -239,7 +242,10 @@ class FootballStatsCommands(commands.Cog):
         log(f"Game compared: {game_compared}", 1)
         del games, sport, team, game, stats
 
-        dt_game_time_diff = game_compared.game_date_time - now_cst
+        if now_cst_orig:
+            dt_game_time_diff = game_compared.game_date_time - now_cst_orig
+        else:
+            dt_game_time_diff = game_compared.game_date_time - now_cst
         diff_hours_minutes = convert_seconds(
             dt_game_time_diff.seconds
         )  # datetime object does not have hours or minutes
