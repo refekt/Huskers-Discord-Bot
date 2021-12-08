@@ -247,7 +247,9 @@ class ImageCommands(commands.Cog):
         if author is None:
             author = "Unknown"
 
-        await ctx.send(content=f"{image['img_url']}")
+        await ctx.send(
+            content=f"{ctx.author.mention} used [{image_name}]: \n{image['img_url']}"
+        )
 
     @cog_ext.cog_slash(
         name="slowking",
