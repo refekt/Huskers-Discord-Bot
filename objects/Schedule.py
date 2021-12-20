@@ -74,10 +74,14 @@ def collect_opponent(game, year, week):
             location = location.split("Buy Tickets ")[1].replace(
                 " Memorial Stadium", ""
             )
-        icon = (
-            "https://huskers.com"
-            + game.contents[1].contents[1].contents[1].attrs["data-src"]
-        )
+        temp_icon = game.contents[1].contents[1].contents[1].attrs["data-src"]
+        if "://" in temp_icon:
+            icon = temp_icon
+        else:
+            icon = (
+                "https://huskers.com"
+                + game.contents[1].contents[1].contents[1].attrs["data-src"]
+            )
         _date = (
             game.contents[1]
             .contents[3]

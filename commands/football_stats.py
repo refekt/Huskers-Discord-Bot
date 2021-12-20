@@ -239,7 +239,7 @@ class FootballStatsCommands(commands.Cog):
             elif game.game_date_time > now_cst:  # Next future game
                 game_compared = game
                 break
-        log(f"Game compared: {game_compared}", 1)
+        log(f"Game compared: {game_compared.opponent}", 1)
         del games, sport, team, game, stats
 
         if now_cst_orig:
