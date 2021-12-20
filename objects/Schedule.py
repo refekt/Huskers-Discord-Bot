@@ -7,7 +7,7 @@
 # import requests
 # from bs4 import BeautifulSoup
 #
-# from utilities.constants import DT_STR_FORMAT, DT_TBA_TIME, HEADERS, TZ
+# from helpers.constants import DT_STR_FORMAT, DT_TBA_TIME, HEADERS, TZ
 #
 #
 # class SeasonStats:

@@ -9,9 +9,9 @@
 # import tweepy
 # import time
 #
-# from utilities.constants import pretty_time_delta
-# from utilities.embed import build_embed
-# from utilities.mysql import Process_MySQL, sqlUpdateTasks
+# from helpers.constants import pretty_time_delta
+# from helpers.embed import build_embed
+# from helpers.mysql import Process_MySQL, sqlUpdateTasks
 #
 # exitFlag = 0
 #

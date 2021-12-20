@@ -4,8 +4,8 @@
 
 from typing import AnyStr
 
-from utilities.constants import CommandError
-from utilities.mysql import sqlUpdateKarma, Process_MySQL
+from helpers.constants import CommandError
+from helpers.mysql import sqlUpdateKarma, Process_MySQL
 
 
 class KarmaUser:

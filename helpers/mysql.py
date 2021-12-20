@@ -4,7 +4,7 @@
 
 # import pymysql.cursors
 #
-# from utilities.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
+# from helpers.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
 #
 #
 # def log(message: str, level: int):

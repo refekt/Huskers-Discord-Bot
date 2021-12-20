@@ -8,8 +8,8 @@
 # import requests
 # from bs4 import BeautifulSoup
 #
-# from utilities.constants import CROOT_SEARCH_LIMIT, HEADERS, UserError
-# from utilities.mysql import Process_MySQL, sqlTeamIDs
+# from helpers.constants import CROOT_SEARCH_LIMIT, HEADERS, UserError
+# from helpers.mysql import Process_MySQL, sqlTeamIDs
 #
 #
 # class RecruitInterest:

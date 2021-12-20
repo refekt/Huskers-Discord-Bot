@@ -8,7 +8,7 @@
 #
 # import commands.recruiting as FAP
 # from objects.Schedule import HuskerSchedule
-# from utilities.constants import (
+# from helpers.constants import (
 #     BOT_DISPLAY_NAME,
 #     BOT_FOOTER_BOT,
 #     BOT_GITHUB_URL,
