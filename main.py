@@ -8,13 +8,13 @@
 # * Welcome message
 # TODO
 
-import interactions
-from interactions import CommandContext
+import inspect
 from logging import CRITICAL
 
-from helpers.constants import PROD_TOKEN, GUILD_PROD
-from helpers.misc import getUserMention, getBotUser, getGuild, getCurrentGuildID
-import inspect
+import interactions
+
+from helpers.constants import PROD_TOKEN
+
 
 # threshold: int = 999
 
@@ -37,74 +37,57 @@ del PROD_TOKEN
 
 @bot.event
 async def on_ready():
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+    log(f"The bot is ready!", 0)
 
 
 @bot.event
-async def on_resumed(resume):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_reconnect():
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_channel_create(channel: interactions.Channel):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_channel_update(channel: interactions.Channel):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_channel_delete(channel: interactions.Channel):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_channel_pins_update(channel: interactions.Channel):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_thread_create(
-    channel: interactions.Channel, thread_member: interactions.ThreadMember = None
+async def on_channel_pins_update(
+    # guild: interactions.Guild,
+    channel: interactions.Channel,
+    timestamp,
 ):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+    log(f"A a pin was updated in {channel.name}", 1)
 
 
-@bot.event
-async def on_thread_update(channel: interactions.Channel):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_thread_delete(channel: interactions.Channel):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_thread_list_sync():
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_thread_member_update(thread_member: interactions.ThreadMember):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_thread_members_update(thread_member: interactions.ThreadMember):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+# d-p-i.py bug
+# CRITICAL:gateway:(ln.303):You're missing a data model for the event thread_create: module 'interactions' has no attribute 'Thread'
+# CRITICAL:gateway:You're missing a data model for the event thread_create: module 'interactions' has no attribute 'Thread'
+#
+# @bot.event
+# async def on_thread_create(
+#     channel: interactions.Channel, thread_member: interactions.ThreadMember = None
+# ):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_update(channel: interactions.Channel):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_delete(channel: interactions.Channel):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_list_sync():
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_member_update(thread_member: interactions.ThreadMember):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_members_update(thread_member: interactions.ThreadMember):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
 async def on_guild_create(guild: interactions.Guild):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+    log(f"Establishing guild connection to: {guild.name}", 0)
 
 
 @bot.event
@@ -117,32 +100,24 @@ async def on_guild_delete(guild: interactions.Guild):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
+# d-p-i.py bug
+# @bot.event
+# async def on_guild_ban_add(user: interactions.User):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_guild_ban_remove(user: interactions.User):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
 @bot.event
-async def on_guild_ban_add(guild: interactions.Guild, user: interactions.User):
+async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
-async def on_guild_ban_remove(guild: interactions.Guild, user: interactions.User):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_guild_emojis_update(
-    guild: interactions.Guild, emojis: interactions.GuildEmojis
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_guild_stickers_update(
-    guild: interactions.Guild, stickers: interactions.GuildStickers
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_guild_integrations_update(guild: interactions.Guild):
+async def on_guild_stickers_update(stickers: interactions.GuildStickers):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
@@ -162,17 +137,17 @@ async def on_guild_member_update(guild_member: interactions.GuildMember):
 
 
 @bot.event
-async def on_guild_role_create(guild: interactions.Guild, role: interactions.Role):
+async def on_guild_role_create(role: interactions.Role):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
-async def on_guild_role_update(guild: interactions.Guild, role: interactions.Role):
+async def on_guild_role_update(role: interactions.Role):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
-async def on_guild_role_delete(guild: interactions.Guild, role: interactions.Role):
+async def on_guild_role_delete(role: interactions.Role):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
@@ -217,143 +192,83 @@ async def on_guild_scheduled_event_user_remove(
 
 @bot.event
 async def on_invite_create(
-    channel: interactions.Channel,
-    code: str,
-    created_at,
-    guild: interactions.Guild,
-    inviter: interactions.User,
-    max_age: int,
-    max_uses: int,
-    target_type: int,
-    target_user: interactions.User,
-    target_application: interactions.Application,
-    temporary: bool,
-    uses: int,
+    invite: interactions.Invite,
 ):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_invite_delete(
-    channel: interactions.Channel, guild: interactions.Guild, code: str
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_create(message: interactions.Message):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_update(message: interactions.Message):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_delete(message: interactions.Message):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_delete_bulk(
-    message_ids, channel: interactions.Channel, guild: interactions.Guild
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_reaction_add(
-    user: interactions.User,
-    channel: interactions.Channel,
-    message: interactions.Message,
-    guild: interactions.Guild,
-    member: interactions.Member,
-    emoji: interactions.Emoji,
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_reaction_remove(
-    user: interactions.User,
-    channel: interactions.Channel,
-    message: interactions.Message,
-    guild: interactions.Guild,
-    member: interactions.Member,
-    emoji: interactions.Emoji,
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_reaction_remove_all(
-    channel: interactions.Channel,
-    message: interactions.Message,
-    guild: interactions.Guild,
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_message_reaction_remove_emoji(
-    channel: interactions.Channel,
-    message: interactions.Message,
-    guild: interactions.Guild,
-    emoji: interactions.Emoji,
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_presence_update(
-    presence: interactions.Presence,
-):
-
-    if presence.activities is not None:
-        activities = presence.activities[0].name
-    else:
-        activities = None
-
-    if presence.client_status is not None:
-        status = (
-            f"{presence.client_status.web if not presence.client_status.web is None else None} | "
-            f"{presence.client_status.desktop if not presence.client_status.desktop is None else None} | "
-            f"{presence.client_status.mobile if not presence.client_status.mobile is None else None}"
-        )
-    else:
-        status = None
+    inviter = invite._json.get("inviter")
+    code = invite._json.get("code")
 
     log(
-        f"Presence update for {presence.user.id}: {presence.status}, {activities}, {status}",
-        0,
+        f"{inviter['username']}#{inviter['discriminator']} created the {'permanent' if invite.temporary else 'temporary'} invite code {code} at {invite.created_at}.",
+        1,
     )
 
 
 @bot.event
-async def on_stage_instance_create(stage: interactions.StageInstance):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+async def on_invite_delete(invite: interactions.Invite):
+    log(f"The invite code {invite._json.get('code')} was deleted.", 1)
 
 
-@bot.event
-async def on_stage_instance_delete(stage: interactions.StageInstance):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+# TODO Capture metrics for guild karma
+# @bot.event
+# async def on_message_create(message: interactions.Message):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
-@bot.event
-async def on_stage_instance_update(stage: interactions.StageInstance):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+# TODO Botlogs record?
+# @bot.event
+# async def on_message_update(message: interactions.Message):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
-@bot.event
-async def on_typing_start(
-    channel: interactions.Channel,
-    guild: interactions.Guild,
-    user: interactions.User,
-    timestamp: int,
-    member: interactions.Member,
-):
-    log(f"Loaded {inspect.stack()[0][3]}", 0)
+# TODO Botlogs record?
+# @bot.event
+# async def on_message_delete(message: interactions.Message):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
+# TODO Purge commands?
+# @bot.event
+# async def on_message_delete_bulk(
+#     message_ids, channel: interactions.Channel, guild: interactions.Guild
+# ):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
+# TODO d-p-i.py bug
+# CRITICAL:gateway:(ln.303):You're missing a data model for the event message_reaction_add: module 'interactions' has no attribute 'MessageReaction'
+# CRITICAL:gateway:You're missing a data model for the event message_reaction_add: module 'interactions' has no attribute 'MessageReaction'
+# @bot.event
+# async def on_message_reaction_add(
+#     reaction: interactions.Reaction,
+# ):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     # log(f"{user.username} added {emoji.name} in {channel.name}", 1)
+#
+#
+# @bot.event
+# async def on_message_reaction_remove(
+#     reaction: interactions.Reaction
+# ):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_message_reaction_remove_all(
+#     channel: interactions.Channel,
+#     message: interactions.Message,
+#     guild: interactions.Guild,
+# ):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_message_reaction_remove_emoji(
+#     channel: interactions.Channel,
+#     message: interactions.Message,
+#     guild: interactions.Guild,
+#     emoji: interactions.Emoji = None,
+# ):
+#     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
@@ -361,7 +276,7 @@ async def on_user_update(user: interactions.User):
     log(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
-log("Starting bot!", 0)
+log("Initializing the bot...", 0)
 
 bot.start()
 
