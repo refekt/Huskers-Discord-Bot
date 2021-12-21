@@ -9,7 +9,7 @@ import platform
 from cryptography.fernet import Fernet
 
 
-def log(message: str, level: int):
+def log(level: int, message: str):
     import datetime
 
     if level == 0:

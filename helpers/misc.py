@@ -8,7 +8,7 @@ import interactions
 from objects.Exceptions import CommandException, UserInputException
 
 
-def log(message: str, level: int):
+def log(level: int, message: str):
     import datetime
 
     if level == 0:
@@ -39,12 +39,12 @@ def grabPlatform():
 def loadVarPath() -> [str, CommandException]:
     p = platform.platform()
     if "Windows" in p:
-        log(f"Windows environment set", 0)
+        log(0, f"Windows environment set")
         return pathlib.PurePath(
             f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json"
         )
     elif "Linux" in p:
-        log(f"Linux environment set", 0)
+        log(0, f"Linux environment set")
         return pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json"
         )

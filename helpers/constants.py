@@ -12,7 +12,7 @@ from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
 from helpers.misc import loadVarPath
 
 
-def log(message: str, level: int):
+def log(level: int, message: str):
     import datetime
 
     if level == 0:
@@ -21,7 +21,7 @@ def log(message: str, level: int):
         print(f"[{datetime.datetime.now()}] ### ~~~ Constants: {message}")
 
 
-log(f"Platform == {platform.platform()}", 0)
+log(0, f"Platform == {platform.platform()}")
 
 # Consistent timezone
 TZ = pytz.timezone("CST6CDT")

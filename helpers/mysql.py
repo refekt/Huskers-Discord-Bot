@@ -7,7 +7,7 @@
 # from helpers.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
 #
 #
-# def log(message: str, level: int):
+# def log(level: int, message: str):
 #     import datetime
 #
 #     if level == 0:
@@ -252,7 +252,7 @@
 #
 #
 # def Process_MySQL(query: str, **kwargs):
-#     log(f"Starting a MySQL query", 0)
+#     log(0, f"Starting a MySQL query")
 #     try:
 #         sqlConnection = pymysql.connect(
 #             host=SQL_HOST,

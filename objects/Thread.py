@@ -16,7 +16,7 @@
 # exitFlag = 0
 #
 #
-# def log(message: str, level: int):
+# def log(level: int, message: str):
 #     import datetime
 #
 #     if level == 0:
@@ -52,43 +52,43 @@
 #         self.cooldown = 0
 #
 #     def process_cooldown(self):
-#         log(f"Pausing for {self.cooldown} seconds", 1)
+#         log(1, f"Pausing for {self.cooldown} seconds")
 #         # asyncio.sleep(self.cooldown)
 #         time.sleep(self.cooldown)
 #         self.cooldown = min(self.cooldown * 2, 600)  # 10 minute max
-#         log(f"Pause complete. New timer is {self.cooldown} seconds", 1)
+#         log(1, f"Pause complete. New timer is {self.cooldown} seconds")
 #
 #     def send_message(self, tweet):
-#         log("Sending a new tweet", 1)
+#         log(1, "Sending a new tweet")
 #         future = asyncio.run_coroutine_threadsafe(self.message_func(tweet), self.loop)
 #         future.result()
 #
 #     def send_alert(self, message):
-#         log("Sending an alert", 1)
+#         log(1, "Sending an alert")
 #         future = asyncio.run_coroutine_threadsafe(self.alert_func(message), self.loop)
 #         future.result()
 #
 #     def on_connect(self):
-#         log(f"Stream connected", 0)
+#         log(0, f"Stream connected")
 #         self.send_alert(f"Stream connected!")
 #         self.reset_cooldown()
 #
 #     def on_status(self, status):
 #         # if not status.retweeted and status.in_reply_to_status_id is None and not hasattr(status, "retweeted_status"):
-#         log(f"Status received", 1)
+#         log(1, f"Status received")
 #         self.send_message(status)
 #
 #     def on_warning(self, notice):
-#         log(f"Warning: {notice}", 1)
+#         log(1, f"Warning: {notice}")
 #
 #     def on_connection_error(self):
-#         log(f"Connection error", 1)
+#         log(1, f"Connection error")
 #         self.send_alert(f"Stream failed to connect.")
 #         self.process_cooldown()
 #         # return True  # Reconnect
 #
 #     def on_request_error(self, status_code):
-#         log(f"Request Error: {status_code}", 1)
+#         log(1, f"Request Error: {status_code}")
 #         if status_code == 420:
 #             rl_msg = (
 #                 f"Stream is being rate limited. Retrying in {self.cooldown} seconds..."
@@ -100,11 +100,11 @@
 #             self.send_alert(rl_msg)
 #             self.process_cooldown()
 #         else:
-#             log(f"Request Error: {status_code}", 1)
+#             log(1, f"Request Error: {status_code}")
 #             return True  # Reconnect
 #
 #     async def on_disconnect_message(self, message):
-#         log(f"Stream disconnected. Notice: {message}", 1)
+#         log(1, f"Stream disconnected. Notice: {message}")
 #         self.send_alert(
 #             f"Stream was disconnected. Retrying in {self.cooldown} seconds..."
 #         )
@@ -114,11 +114,11 @@
 #         return True  # Reconnect
 #
 #     def on_keep_alive(self):
-#         log("Stream has received a keep alive signal.", 1)
+#         log(1, "Stream has received a keep alive signal.")
 #         # self.process_cooldown()
 #
 #     def on_exception(self, exception):
-#         log(f"Exception: {exception}", 1)
+#         log(1, f"Exception: {exception}")
 #         self.process_cooldown()
 #         return True
 #
@@ -150,8 +150,8 @@
 #     )
 #
 #     if not missed:
-#         log(f"Destination: [{destination}]", 1)
-#         log(f"Message: [{message[:15] + '...'}]", 1)
+#         log(1, f"Destination: [{destination}]")
+#         log(1, f"Message: [{message[:15] + '...'}]")
 #
 #         await asyncio.sleep(num_seconds)
 #
@@ -177,4 +177,4 @@
 #         values=(0, str(destination.id), message, alert_when, str(source)),
 #     )
 #
-#     log(f"Thread completed successfully!", 0)
+#     log(0, f"Thread completed successfully!")
