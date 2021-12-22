@@ -1,5 +1,9 @@
 import io
+import pathlib
+import platform
 import random
+from os import listdir
+from os.path import isfile, join
 
 import discord
 import markovify
@@ -395,6 +399,27 @@ class ImageCommands(commands.Cog):
             await ctx.send(f'_"{output}"_ - Husk')
         else:
             await ctx.send("Unable to generate a Markov chain")
+
+    @cog_ext.cog_slash(
+        name="twos",
+        description="Send a randomly selected TWOS image",
+        guild_ids=guild_id_list(),
+    )
+    async def _twos(self, ctx: SlashContext):
+        if "Windows" in platform.platform():
+            twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
+        else:
+            twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/TWOS/"
+
+        twos_files = [
+            file for file in listdir(twos_path) if isfile(join(twos_path, file))
+        ]
+
+        random.shuffle(twos_files)
+
+        with open(f"{twos_path}{random.choice(twos_files)}", "rb") as f:
+            file = discord.File(f)
+        await ctx.send(file=file)
 
 
 def setup(bot):
