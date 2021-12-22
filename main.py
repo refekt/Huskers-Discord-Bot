@@ -13,10 +13,10 @@ from logging import CRITICAL
 
 import interactions
 
-from helpers.constants import PROD_TOKEN
-
+from helpers.constants import PROD_TOKEN, CHAN_BOT_SPAM
 
 # threshold: int = 999
+from helpers.embed import buildEmbed
 
 
 def log(level: int, message: str):
@@ -26,6 +26,28 @@ def log(level: int, message: str):
         print(f"[{datetime.datetime.now()}] ### Main: {message}")
     elif level == 1:
         print(f"[{datetime.datetime.now()}] ### ~~~ Main: {message}")
+
+
+def getWelcomeMessage() -> interactions.Embed:
+    return buildEmbed(
+        title="Welcome to the Huskers server!",
+        description="The official Husker football discord server",
+        thumbnail="https://cdn.discordapp.com/icons/440632686185414677/a_061e9e57e43a5803e1d399c55f1ad1a4.gif",
+        fields=[
+            [
+                "Rules",
+                f"Please be sure to check out the rules channel to catch up on server rules.",
+            ],
+            [
+                "Commands",
+                f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
+            ],
+            [
+                "Roles",
+                "You can assign yourself come flair by using the `/roles` command.",
+            ],
+        ],
+    )
 
 
 bot = interactions.Client(
@@ -119,7 +141,16 @@ async def on_guild_stickers_update(stickers: interactions.GuildStickers):
 
 @bot.event
 async def on_guild_member_add(guild_member: interactions.GuildMember):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    # TODO d-p-i.py is slated to add `send()` to Member, Channel, etc. models
+    # channel = interactions.Channel(
+    #     **await bot.http.create_dm(recipient_id=int(guild_member.user.id))
+    # )
+    # res = await bot.http.send_message(
+    #     channel_id=int(channel.id),
+    #     content="",
+    #     embeds=getWelcomeMessage()._json,
+    # )
+    pass
 
 
 @bot.event

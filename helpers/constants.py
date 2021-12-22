@@ -180,6 +180,7 @@ MEMBER_GEE = 189554873778307073
 CURRENCY_NAME = "Husker Coins"
 
 # Bot Info
+BOT_DISPLAY_NAME = "Bot Frost"
 BOT_GITHUB_URL = "https://github.com/refekt/Husker-Bot"
 BOT_ICON_URL = "https://i.imgur.com/Ah3x5NA.png"
 BOT_THUMBNAIL_URL = "https://ucomm.unl.edu/images/brand-book/Our-marks/nebraska-n.jpg"

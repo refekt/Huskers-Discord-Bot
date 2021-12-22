@@ -1,107 +1,95 @@
 # TODO
 # * Update and modernize
 # TODO
-# from datetime import datetime
-#
-# import discord
-# import validators
-#
+
+from datetime import datetime
+
+import interactions
+import validators
+
 # import commands.recruiting as FAP
 # from objects.Schedule import HuskerSchedule
-# from helpers.constants import (
-#     BOT_DISPLAY_NAME,
-#     BOT_FOOTER_BOT,
-#     BOT_GITHUB_URL,
-#     BOT_ICON_URL,
-#     BOT_THUMBNAIL_URL,
-#     DT_OBJ_FORMAT,
-#     DT_OBJ_FORMAT_TBA,
-#     DT_STR_RECRUIT,
-#     DT_TBA_HR,
-#     DT_TBA_MIN,
-#     TZ,
-# )
-#
-#
-# class EmbedType:
-#     rich = "rich"
-#     image = "image"
-#     video = "video"
-#     gifv = "gifv"
-#     article = "article"
-#     link = "link"
-#
-#
-# def build_embed(**kwargs):
-#     title_limit = name_limit = 256
-#     desc_limit = 4096
-#     fields_limit = 25
-#     value_limit = 1024
-#     footer_limit = 2048
-#     # embed_limit = 6000
-#
-#     if kwargs.get("color", False):
-#         embed = discord.Embed(
-#             timestamp=datetime.now().astimezone(tz=TZ), color=kwargs.get("color")
-#         )
-#     else:
-#         embed = discord.Embed(
-#             timestamp=datetime.now().astimezone(tz=TZ), color=0xD00000
-#         )
-#
-#     if kwargs.get("author", False) is not None:
-#         embed.set_author(
-#             name=BOT_DISPLAY_NAME, url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
-#         )
-#
-#     if kwargs.get("description", False):
-#         embed.description = kwargs.get("description")[:desc_limit]
-#
-#     if kwargs.get("title", False):
-#         embed.title = kwargs.get("title")[:title_limit]
-#
-#     if kwargs.get("url", False) and validators.url(kwargs.get("url")):
-#         embed.url = kwargs.get("url")
-#
-#     if kwargs.get("type", False):
-#         embed.type = kwargs.get("type")
-#     else:
-#         embed.type = EmbedType.rich
-#
-#     if kwargs.get("footer", False):
-#         embed.set_footer(
-#             text=kwargs.get("footer")[:footer_limit], icon_url=BOT_ICON_URL
-#         )
-#
-#     if kwargs.get("image", False) and validators.url(kwargs.get("image")):
-#         if kwargs.get("image") is not None:
-#             embed.set_image(url=kwargs["image"])
-#
-#     if kwargs.get("thumbnail", False):
-#         embed.set_thumbnail(url=kwargs.get("thumbnail"))
-#     else:
-#         if kwargs.get("thumbnail") is not None:
-#             embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
-#
-#     if kwargs.get("fields", False):
-#         for index, field in enumerate(kwargs["fields"]):
-#             if index >= fields_limit:
-#                 break
-#
-#             if kwargs.get("inline", False):
-#                 embed.add_field(
-#                     name=str(field[0])[:name_limit],
-#                     value=str(field[1])[:value_limit],
-#                     inline=kwargs["inline"],
-#                 )
-#             else:
-#                 embed.add_field(
-#                     name=str(field[0])[:name_limit],
-#                     value=str(field[1])[:value_limit],
-#                     inline=False,
-#                 )
-#
-#     return embed
+from helpers.constants import (
+    BOT_DISPLAY_NAME,
+    BOT_FOOTER_BOT,
+    BOT_GITHUB_URL,
+    BOT_ICON_URL,
+    BOT_THUMBNAIL_URL,
+    DT_OBJ_FORMAT,
+    DT_OBJ_FORMAT_TBA,
+    DT_STR_RECRUIT,
+    DT_TBA_HR,
+    DT_TBA_MIN,
+    TZ,
+)
+
+
+def buildEmbed(**kwargs) -> interactions.Embed:
+    title_limit = name_limit = 256
+    desc_limit = 4096
+    fields_limit = 25
+    value_limit = 1024
+    footer_limit = 2048
+    # embed_limit = 6000
+
+    # Establish embed color
+    dtNow = datetime.now().astimezone(tz=TZ).isoformat()
+    if kwargs.get("color", False):
+        embed = interactions.Embed(timestamp=dtNow, color=kwargs.get("color"))
+    else:
+        embed = interactions.Embed(timestamp=dtNow, color=0xD00000)
+
+    # Establish embed author
+    if kwargs.get("author", False):
+        embed.author = interactions.EmbedAuthor(
+            name=BOT_DISPLAY_NAME, url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
+        )
+    else:
+        embed.author = interactions.EmbedAuthor(
+            name=kwargs.get("author"), url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
+        )
+
+    if kwargs.get("description", False):
+        embed.description = kwargs.get("description")[:desc_limit]
+
+    if kwargs.get("title", False):
+        embed.title = kwargs.get("title")[:title_limit]
+
+    if kwargs.get("url", False) and validators.url(kwargs.get("url")):
+        embed.url = kwargs.get("url")
+
+    if kwargs.get("footer", False):
+        embed.footer = interactions.EmbedFooter(
+            text=kwargs.get("footer")[:footer_limit], icon_url=BOT_ICON_URL
+        )
+
+    if kwargs.get("image", False) and validators.url(kwargs.get("image")):
+        # if kwargs.get("image") is not None:
+        embed.image = interactions.EmbedImageStruct(url=kwargs["image"])
+
+    if kwargs.get("thumbnail", False) and validators.url(kwargs.get("thumbnail")):
+        embed.thumbnail = interactions.EmbedImageStruct(url=kwargs.get("thumbnail"))
+    else:
+        # if kwargs.get("thumbnail") is not None:
+        embed.thumbnail = interactions.EmbedImageStruct(url=BOT_THUMBNAIL_URL)
+
+    if kwargs.get("fields", False):
+        f = []
+
+        for index, field in enumerate(kwargs["fields"]):
+            if index >= fields_limit:
+                break
+            f.append(
+                interactions.EmbedField(
+                    name=str(field[0])[:name_limit],
+                    value=str(field[1])[:value_limit],
+                    inline=kwargs.get("inline", True),
+                )
+            )
+
+    return embed
+
+
 #
 #
 # def build_countdown_embed(
