@@ -187,7 +187,6 @@ async def load_tasks():
 
 
 async def send_tweet_alert(message: str):
-    log(f"Receiving Twitter alert", 0)
     log(f"Twitter Alert: {message}", 1)
 
     chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
@@ -196,7 +195,6 @@ async def send_tweet_alert(message: str):
 
 
 async def send_tweet(tweet):
-    log(f"Sending a tweet to Discord", 1)
     if tweet.author.id_str not in [member["id_str"] for member in list_members]:
         return
 
@@ -239,11 +237,10 @@ async def send_tweet(tweet):
 
     log(f"Sending tweet from @{tweet.author.screen_name}", 1)
 
-    if tweet.author.name == f"@{TWITTER_BLOCK16_SCREENANME}":
+    if tweet.author.name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
         chan: discord.TextChannel = client.get_channel(id=CHAN_FOOD)
         await chan.send(embed=embed)
     else:
-
         buttons = [
             create_button(
                 style=ButtonStyle.gray,
@@ -260,6 +257,7 @@ async def send_tweet(tweet):
 
         chan: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
         actionrow = create_actionrow(*buttons)
+
         # noinspection PyArgumentList
         await chan.send(embed=embed, components=[actionrow])
 
