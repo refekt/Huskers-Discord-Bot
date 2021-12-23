@@ -32,6 +32,8 @@ from utilities.constants import (
     IMGUR_SECRET,
     PROD_TOKEN,
     ROLE_TIME_OUT,
+    TWITTER_BLOCK16_ID_STR,
+    TWITTER_BLOCK16_SCREENANME,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_KEY,
     TWITTER_SECRET_KEY,
@@ -40,6 +42,7 @@ from utilities.constants import (
     UserError,
     make_slowking,
     set_component_key,
+    CHAN_FOOD,
 )
 from utilities.embed import build_embed
 from utilities.mysql import Process_MySQL, sqlRetrieveTasks, sqlRetrieveIowa
@@ -186,8 +189,8 @@ async def load_tasks():
 async def send_tweet_alert(message: str):
     log(f"Receiving Twitter alert", 0)
     log(f"Twitter Alert: {message}", 1)
-    chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
+    chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
     embed = build_embed(fields=[["Twitter Stream Listener Alert", message]])
     await chan_twitter.send(embed=embed)
 
@@ -235,24 +238,30 @@ async def send_tweet(tweet):
             pass
 
     log(f"Sending tweet from @{tweet.author.screen_name}", 1)
-    chan_twitter: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
 
-    buttons = [
-        create_button(
-            style=ButtonStyle.gray,
-            custom_id=f"{set_component_key()}_send_to_general",
-            label="Send to General",
-        ),
-        create_button(
-            style=ButtonStyle.gray,
-            custom_id=f"{set_component_key()}_send_to_recruiting",
-            label="Send to Recruiting",
-        ),
-        create_button(style=ButtonStyle.URL, label="Open Tweet", url=direct_url),
-    ]
-    actionrow = create_actionrow(*buttons)
-    # noinspection PyArgumentList
-    await chan_twitter.send(embed=embed, components=[actionrow])
+    if tweet.author.name == f"@{TWITTER_BLOCK16_SCREENANME}":
+        chan: discord.TextChannel = client.get_channel(id=CHAN_FOOD)
+        await chan.send(embed=embed)
+    else:
+
+        buttons = [
+            create_button(
+                style=ButtonStyle.gray,
+                custom_id=f"{set_component_key()}_send_to_general",
+                label="Send to General",
+            ),
+            create_button(
+                style=ButtonStyle.gray,
+                custom_id=f"{set_component_key()}_send_to_recruiting",
+                label="Send to Recruiting",
+            ),
+            create_button(style=ButtonStyle.URL, label="Open Tweet", url=direct_url),
+        ]
+
+        chan: discord.TextChannel = client.get_channel(id=CHAN_TWITTERVERSE)
+        actionrow = create_actionrow(*buttons)
+        # noinspection PyArgumentList
+        await chan.send(embed=embed, components=[actionrow])
 
 
 def start_twitter_stream():
@@ -282,6 +291,12 @@ def start_twitter_stream():
                 "id_str": member.id_str,
             }
         )
+
+    # Block16
+    list_members.append(
+        {"screen_name": TWITTER_BLOCK16_SCREENANME, "id_str": TWITTER_BLOCK16_ID_STR}
+    )
+
     if "Windows" in platform.platform():
         list_members.append(
             {
@@ -419,9 +434,9 @@ async def send_welcome_message(who: discord.Member):
 
 @client.event
 async def on_connect():
-    # start_twitter_stream()  # Keeping for posterity to remind myself to remove debugging code before deep diving for how ever long to fix code that isn't broken
-    if "Windows" not in platform.platform():
-        start_twitter_stream()
+    start_twitter_stream()  # Keeping for posterity to remind myself to remove debugging code before deep diving for how ever long to fix code that isn't broken
+    # if "Windows" not in platform.platform():
+    #     start_twitter_stream()
 
 
 @client.event
