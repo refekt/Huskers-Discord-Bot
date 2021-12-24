@@ -237,7 +237,7 @@ async def send_tweet(tweet):
 
     log(f"Sending tweet from @{tweet.author.screen_name}", 1)
 
-    if tweet.author.name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
+    if tweet.author.screen_name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
         chan: discord.TextChannel = client.get_channel(id=CHAN_FOOD)
         await chan.send(embed=embed)
     else:
