@@ -578,7 +578,7 @@ class TextCommands(commands.Cog):
         try:  # Avoid listening to events that don't apply to the vote command
             if "Q:" not in ctx.origin_message.embeds[0].title:
                 return
-        except:
+        except:  # noqa
             return
 
         embed = ctx.origin_message.embeds[0]

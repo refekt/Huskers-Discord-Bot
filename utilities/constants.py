@@ -430,5 +430,5 @@ admin_perms = {
 #     except discord.HTTPException as err:
 #         err_msg = "### Unable to change display name: " + str(err).replace("\n", " ")
 #         print(err_msg)
-#     except:
+#     except:  # noqa
 #         log(f"Unknown error!", sys.exc_info()[0])

@@ -259,7 +259,7 @@ def Process_MySQL(query: str, **kwargs):
             cursorclass=pymysql.cursors.DictCursor,
         )
         log(f"Connected to the MySQL Database!", 1)
-    except:
+    except:  # noqa
         log(f"Unable to connect to the `{SQL_DB}` database.", 1)
         return
 
@@ -302,7 +302,7 @@ def Process_MySQL(query: str, **kwargs):
 
         sqlConnection.commit()
 
-    except:
+    except:  # noqa
         raise ConnectionError("Error occurred opening the MySQL database.")
     finally:
         log(f"Closing connection to the MySQL Database", 1)

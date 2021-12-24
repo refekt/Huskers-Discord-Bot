@@ -72,5 +72,5 @@ class GameBetInfo:
                         over_under=line["overUnder"],
                     )
                 )
-        except:
+        except:  # noqa
             pass

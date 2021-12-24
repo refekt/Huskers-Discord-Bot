@@ -51,7 +51,7 @@ def create_img(author: int, image_name: str, image_url: str):
         Process_MySQL(
             query=sqlCreateImageCommand, values=[author, image_name, image_url]
         )
-    except:
+    except:  # noqa
         raise CommandError("Unable to create image command in MySQL database!")
 
 
@@ -60,14 +60,14 @@ def retrieve_img(image_name: str):
         return Process_MySQL(
             query=sqlSelectImageCommand, values=image_name, fetch="one"
         )
-    except:
+    except:  # noqa
         raise UserError(f"Unable to locate an image command named [{image_name}].")
 
 
 def retrieve_all_img():
     try:
         return Process_MySQL(query=sqlSelectAllImageCommand, fetch="all")
-    except:
+    except:  # noqa
         raise CommandError(f"Unable to retrieve image commands.")
 
 
@@ -154,7 +154,7 @@ class ImageCommands(commands.Cog):
                 Process_MySQL(
                     query=sqlDeleteImageCommand, values=[image_name, str(ctx.author_id)]
                 )
-        except:
+        except:  # noqa
             raise CommandError("Unable to delete this image command!")
 
         embed = build_embed(
@@ -185,7 +185,7 @@ class ImageCommands(commands.Cog):
         # for image in all_imgs:
         #     try:
         #         author = ctx.guild.get_member(user_id=int(image["author"])).mention
-        #     except:
+        #     except:  # noqa
         #         author = "N/A"
         #
         #     created_at = image["created_at"]
@@ -372,7 +372,7 @@ class ImageCommands(commands.Cog):
                 await ctx.send(
                     f"{ctx.author.mention} wants to inspire {person.mention}\n{image.text}"
                 )
-            except:
+            except:  # noqa
                 await ctx.send(f"{ctx.author} wants to inspire {person}")
         else:
             await ctx.send(image.text)

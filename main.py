@@ -96,7 +96,7 @@ async def change_my_status():
         log(f"Successfully changed status", 1)
     except (AttributeError, discord.HTTPException) as err:
         log(f"Unable to change status: " + str(err).replace("\n", " "), 1)
-    except:
+    except:  # noqa
         log(f"Unknown error!" + str(sys.exc_info()[0]), 0)
 
 
@@ -116,14 +116,14 @@ async def load_tasks():
             member = cur_guild.get_member(destination_id)
             if member is not None:
                 return member
-        except:
+        except:  # noqa
             pass
 
         try:
             channel = cur_guild.get_channel(destination_id)
             if channel is not None:
                 return channel
-        except:
+        except:  # noqa
             pass
 
         return None
@@ -232,7 +232,7 @@ async def send_tweet(tweet):
                     value=f"[Link #{index + 1}]({media['media_url']})",
                     inline=False,
                 )
-        except:
+        except:  # noqa
             pass
 
     log(f"Sending tweet from @{tweet.author.screen_name}", 1)
@@ -584,7 +584,7 @@ if "Windows" not in platform.platform():
         try:
             gee = client.get_user(id=GEE_USER)
             await gee.send(content=message)
-        except:
+        except:  # noqa
             await ctx.send(content=f"<@{GEE_USER}>\n{message}")
 
 

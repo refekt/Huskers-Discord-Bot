@@ -185,7 +185,7 @@ async def initiate_fap(
 
             try:
                 confidence = int(confidence_response)
-            except:
+            except:  # noqa
                 await ctx.send(
                     "That input was not accepted, please enter a number between 1 and 10.",
                     hidden=True,
@@ -234,7 +234,7 @@ async def individual_predictions(ctx, recruit):
         try:
             pred_user = ctx.guild.get_member(p["user_id"])
             pred_user = pred_user.display_name
-        except:
+        except:  # noqa
             pred_user = p["user"]
         if pred_user is None:
             pred_user = p["user"]
@@ -446,7 +446,7 @@ class FAP_Commands(commands.Cog):
             try:
                 user = ctx.guild.get_member(u)
                 username = user.display_name
-            except:
+            except:  # noqa
                 user = faps_df.loc[faps_df["user_id"] == u, "user"].values[-1]
                 username = user
             if user is None:

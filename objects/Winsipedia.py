@@ -13,7 +13,7 @@ class TeamStatsWinsipediaTeam:
                     atr[0].contents[1].contents[3].contents[1].text,
                     atr[0].contents[3].contents[1].text.strip(),
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def championships():
@@ -23,7 +23,7 @@ class TeamStatsWinsipediaTeam:
                     champs[0].contents[3].contents[1].text,
                     champs[0].contents[5].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def conf_championships():
@@ -33,7 +33,7 @@ class TeamStatsWinsipediaTeam:
                     conf[0].contents[3].contents[1].text,
                     conf[0].contents[5].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def bowl_games():
@@ -43,7 +43,7 @@ class TeamStatsWinsipediaTeam:
                     bowl[0].contents[1].contents[1].text,
                     bowl[0].contents[3].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def all_time_wins():
@@ -53,7 +53,7 @@ class TeamStatsWinsipediaTeam:
                     atw[0].contents[1].contents[1].text,
                     atw[0].contents[3].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def bowl_record():
@@ -63,7 +63,7 @@ class TeamStatsWinsipediaTeam:
                     bowl[1].contents[1].contents[3].contents[1].text,  # \n and \t
                     bowl[1].contents[3].contents[1].text.strip(),
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def consensus_all_americans():
@@ -73,7 +73,7 @@ class TeamStatsWinsipediaTeam:
                     caa[1].contents[1].contents[1].text,
                     caa[1].contents[3].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def heisman_winners():
@@ -83,7 +83,7 @@ class TeamStatsWinsipediaTeam:
                     hw[1].contents[3].contents[1].text,
                     hw[1].contents[5].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def nfl_draft_picks():
@@ -93,7 +93,7 @@ class TeamStatsWinsipediaTeam:
                     nfl_picks[1].contents[3].contents[1].text,
                     nfl_picks[1].contents[5].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         def weeks_ap_poll():
@@ -103,7 +103,7 @@ class TeamStatsWinsipediaTeam:
                     ap_poll[0].contents[3].contents[1].text,
                     ap_poll[0].contents[5].contents[1].text,
                 )
-            except:
+            except:  # noqa
                 return "UNK", "UNK"
 
         self.team_name = team_name.replace(" ", "-").replace("&", "")

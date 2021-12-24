@@ -238,7 +238,7 @@ def get_cb_experts(soup, team_ids) -> list:
 
     try:
         cbs_long_expert = soup.find_all(attrs={"class": "prediction-list long expert"})
-    except:
+    except:  # noqa
         return experts
 
     if len(cbs_long_expert) == 0:
@@ -279,7 +279,7 @@ def get_cb_experts(soup, team_ids) -> list:
             # I think 247 has some goofiness where there are some instances of "None" making a prediction, so I"m just not going to let those be added on
             if expert_name is not None:
                 experts.append(expert_string)
-        except:
+        except:  # noqa
             continue
 
     return experts
@@ -298,12 +298,12 @@ def get_cb_predictions(soup):
     # When there are more than one predicted schools
     try:
         cbs_long = soup.find_all(attrs={"class": "prediction-list long"})
-    except:
+    except:  # noqa
         pass
     # When there is only one predicted school
     try:
         cbs_one = soup.find_all(attrs={"class": "prediction-list one"})
-    except:
+    except:  # noqa
         pass
 
     if len(cbs_long) > 0:
@@ -317,7 +317,7 @@ def get_cb_predictions(soup):
                     school_confidence = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
                     school_string += f"({school_confidence})"
                 crystal_balls.append(school_string)
-            except:
+            except:  # noqa
                 continue
 
         return crystal_balls
@@ -327,7 +327,7 @@ def get_cb_predictions(soup):
         single_school_weight = single_school.contents[5].text.strip()
         try:
             single_school_confidence = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"
-        except:
+        except:  # noqa
             single_school_confidence = ""
         single_school_string = (
             f"{single_school_name}: {single_school_weight} ({single_school_confidence})"
@@ -449,7 +449,7 @@ def get_twitter_handle(soup):
         twitter = twitter[0].attrs["data-username"]
         twitter = re.sub(r"[^\w*]+", "", twitter)
         return twitter
-    except:
+    except:  # noqa
         return "N/A"
 
 

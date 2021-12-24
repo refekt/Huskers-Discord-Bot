@@ -89,7 +89,7 @@ class ReminderCommands(commands.Cog):
                     try:
                         findall = re.findall(r"\D", raw)[-1]
                         return int(raw[raw.find(findall) + 1 :])
-                    except:
+                    except:  # noqa
                         return 0
             else:
                 return 0
@@ -137,7 +137,7 @@ class ReminderCommands(commands.Cog):
                 ),
             )
             destination = ctx.channel
-        except:
+        except:  # noqa
             raise CommandError("Error submitting MySQL")
 
         nest_asyncio.apply()
