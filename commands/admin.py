@@ -63,7 +63,7 @@ from utilities.embed import build_embed as build_embed
 from utilities.mysql import Process_MySQL, sqlInsertIowa, sqlRemoveIowa, sqlRetrieveIowa
 
 
-def log(message: str, level: int):
+def log(level: int, message: str):
     import datetime
 
     if level == 0:
@@ -194,22 +194,23 @@ async def process_gameday(mode: bool, guild: discord.Guild):
     general_category = guild.get_channel(CAT_GENERAL)
     everyone = guild.get_role(ROLE_EVERYONE_PROD)
 
-    log(f"Creating permissions to be [{mode}]", 1)
+    log(1, f"Creating permissions to be [{mode}]")
 
     perms_text = discord.PermissionOverwrite()
-    perms_text.view_channel = mode
-    perms_text.send_messages = mode
-    perms_text.read_messages = mode
+
+    perms_text.view_channel = mode  # noqa
+    perms_text.send_messages = mode  # noqa
+    perms_text.read_messages = mode  # noqa
 
     perms_text_opposite = discord.PermissionOverwrite()
-    perms_text_opposite.send_messages = not mode
+    perms_text_opposite.send_messages = not mode  # noqa
 
     perms_voice = discord.PermissionOverwrite()
-    perms_voice.view_channel = mode
-    perms_voice.connect = mode
-    perms_voice.speak = mode
+    perms_voice.view_channel = mode  # noqa
+    perms_voice.connect = mode  # noqa
+    perms_voice.speak = mode  # noqa
 
-    log(f"Permissions created", 1)
+    log(1, f"Permissions created")
 
     for channel in general_category.channels:
 
@@ -218,18 +219,18 @@ async def process_gameday(mode: bool, guild: discord.Guild):
 
         # noinspection PyBroadException
         try:
-            log(f"Attempting to changes permissions for [{channel}] to [{not mode}]", 1)
+            log(1, f"Attempting to changes permissions for [{channel}] to [{not mode}]")
 
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text_opposite)
-                log(f"Changed permissions for [{channel}] to [{not mode}]", 1)
-        except:
-            log(f"Unable to change permissions for [{channel}] to [{not mode}]", 1)
+                log(1, f"Changed permissions for [{channel}] to [{not mode}]")
+        except:  # noqa
+            log(1, f"Unable to change permissions for [{channel}] to [{not mode}]")
             continue
 
     for channel in gameday_category.channels:
         try:
-            log(f"Attempting to changes permissions for [{channel}] to [{mode}]", 1)
+            log(1, f"Attempting to changes permissions for [{channel}] to [{mode}]")
 
             if channel.type == discord.ChannelType.text:
                 await channel.set_permissions(everyone, overwrite=perms_text)
@@ -241,18 +242,18 @@ async def process_gameday(mode: bool, guild: discord.Guild):
                 #     for member in channel.members:
                 #         try:
                 #             await member.voice.kick()
-                #         except:
+                #         except:  # noqa
                 #             pass
             else:
-                log(f"Unable to change permissions for [{channel}] to [{mode}]", 1)
+                log(1, f"Unable to change permissions for [{channel}] to [{mode}]")
                 continue
-            log(f"Changed permissions for [{channel}] to [{mode}]", 1)
+            log(1, f"Changed permissions for [{channel}] to [{mode}]")
         except discord.errors.Forbidden:
             raise CommandError("The bot does not have access to change permissions!")
-        except:
+        except:  # noqa
             continue
 
-    log(f"All permissions changes applied", 0)
+    log(0, f"All permissions changes applied")
 
 
 class AdminCommands(commands.Cog):
@@ -376,15 +377,15 @@ class AdminCommands(commands.Cog):
                 days=13, hours=23, minutes=59
             )  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True)
-            log(f"Bulk delete of {len(deleted)} messages successful.", 0)
+            log(0, f"Bulk delete of {len(deleted)} messages successful.")
         except discord.ClientException:
-            log(f"Cannot delete more than 100 messages at a time.", 1)
+            log(1, f"Cannot delete more than 100 messages at a time.")
         except discord.Forbidden:
-            log(f"Missing permissions.", 1)
+            log(1, f"Missing permissions.")
         except discord.HTTPException:
             log(
-                f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.",
                 1,
+                f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.",
             )
 
         await ctx.send(hidden=True, content="Done!")
@@ -423,15 +424,15 @@ class AdminCommands(commands.Cog):
                 days=13, hours=23, minutes=59
             )  # Discord only lets you delete 14 day old messages
             deleted = await ctx.channel.purge(after=max_age, bulk=True, check=is_bot)
-            log(f"Bulk delete of {len(deleted)} messages successful.", 0)
+            log(0, f"Bulk delete of {len(deleted)} messages successful.")
         except discord.ClientException:
-            log(f"Cannot delete more than 100 messages at a time.", 1)
+            log(1, f"Cannot delete more than 100 messages at a time.")
         except discord.Forbidden:
-            log(f"Missing permissions.", 1)
+            log(1, f"Missing permissions.")
         except discord.HTTPException:
             log(
-                f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.",
                 1,
+                f"Deleting messages failed. Bulk messages possibly include messages over 14 days old.",
             )
 
         await ctx.send(hidden=True, content="Done!")
@@ -484,7 +485,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list(),
     )
     async def _roles_hype(self, ctx: SlashContext):
-        log(f"Roles: Hype Squad", 0)
+        log(1, f"Roles: Hype Squad")
 
         hype_action_row = create_actionrow(*buttons_roles_hype)
 
@@ -507,7 +508,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_hype(self, ctx: ComponentContext):
         await ctx.defer()
 
-        log(f"Gathering roles", 0)
+        log(0, f"Gathering roles")
 
         hype_max = ctx.guild.get_role(ROLE_HYPE_MAX)
         hype_some = ctx.guild.get_role(ROLE_HYPE_SOME)
@@ -566,7 +567,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed, delete_after=10)
 
-        log(f"Roles: Hype Squad", 0)
+        log(0, f"Roles: Hype Squad")
 
     @cog_ext.cog_subcommand(
         base="roles",
@@ -576,7 +577,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list(),
     )
     async def _roles_food(self, ctx: SlashContext):
-        log(f"Roles: Food", 0)
+        log(0, f"Roles: Food")
 
         embed = build_embed(
             title="Which food roles do you want?",
@@ -600,7 +601,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_food(self, ctx: ComponentContext):
         await ctx.defer()
 
-        log(f"Gathering roles", 0)
+        log(0, f"Gathering roles")
 
         food_potato = ctx.guild.get_role(ROLE_POTATO)
         food_asparagus = ctx.guild.get_role(ROLE_ASPARAGUS)
@@ -659,7 +660,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed, delete_after=10)
 
-        log(f"Roles: Food", 0)
+        log(0, f"Roles: Food")
 
     @cog_ext.cog_subcommand(
         base="roles",
@@ -669,7 +670,7 @@ class AdminCommands(commands.Cog):
         guild_ids=guild_id_list(),
     )
     async def _roles_culture(self, ctx: SlashContext):
-        log(f"Roles: Culture", 0)
+        log(0, f"Roles: Culture")
 
         embed = build_embed(
             title="Which culture roles do you want?",
@@ -693,7 +694,7 @@ class AdminCommands(commands.Cog):
     async def process_roles_culture(self, ctx: ComponentContext):
         await ctx.defer()
 
-        log(f"Gathering roles", 0)
+        log(0, f"Gathering roles")
 
         culture_meme = ctx.guild.get_role(ROLE_MEME)
         culture_isms = ctx.guild.get_role(ROLE_ISMS)
@@ -760,7 +761,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed, delete_after=10)
 
-        log(f"Roles: Culture", 0)
+        log(0, f"Roles: Culture")
 
     async def alert_gameday_channels(self, on: bool):
         chan_general = self.bot.get_channel(id=CHAN_GENERAL)
@@ -822,7 +823,7 @@ class AdminCommands(commands.Cog):
         ],
     )
     async def _gameday_on(self, ctx: SlashContext):
-        log(f"Game Day: On", 0)
+        log(0, f"Game Day: On")
         await ctx.defer(hidden=True)
         await ctx.send("Processing!", hidden=True)
         await process_gameday(True, ctx.guild)
@@ -846,7 +847,7 @@ class AdminCommands(commands.Cog):
         ],
     )
     async def _gameday_off(self, ctx: SlashContext):
-        log(f"Game Day: Off", 0)
+        log(0, f"Game Day: Off")
         await ctx.defer(hidden=True)
         await ctx.send("Processing!", hidden=True)
         await process_gameday(False, ctx.guild)
@@ -919,7 +920,7 @@ class AdminCommands(commands.Cog):
     )
     async def _iowa(self, ctx: SlashContext, who: discord.Member, reason: str):
         await ctx.defer()
-        log(f"Starting the Iowa command and banishing {who}", 0)
+        log(0, f"Starting the Iowa command and banishing {who}")
 
         if not who:
             raise UserError("You must include a user!")
@@ -935,19 +936,19 @@ class AdminCommands(commands.Cog):
         if previous_roles:
             previous_roles = ",".join(previous_roles)
 
-        log(f"Gathered all the roles to store", 1)
+        log(1, f"Gathered all the roles to store")
 
         roles = who.roles
         for role in roles:
             try:
                 await who.remove_roles(role, reason=full_reason)
-                log(f"Removed [{role}] role", 1)
+                log(1, f"Removed [{role}] role")
             except (discord.Forbidden, discord.HTTPException):
                 pass
 
         try:
             await who.add_roles(role_timeout, reason=full_reason)
-            log(f"Added [{role_timeout}] role", 1)
+            log(1, f"Added [{role_timeout}] role")
         except (discord.Forbidden, discord.HTTPException):
             pass
 
@@ -972,7 +973,7 @@ class AdminCommands(commands.Cog):
         await who.send(
             f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
         )
-        log("Iowa command complete", 0)
+        log(0, "Iowa command complete")
 
     @cog_ext.cog_slash(
         name="nebraska",
@@ -991,14 +992,14 @@ class AdminCommands(commands.Cog):
     )
     async def _nebraska(self, ctx: SlashContext, who: discord.Member):
         await ctx.defer()
-        log(f"Starting the Nebraska command and banishing {who}", 0)
+        log(0, f"Starting the Nebraska command and banishing {who}")
 
         if not who:
             raise UserError("You must include a user!")
 
         role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         await who.remove_roles(role_timeout)
-        log(f"Removed [{role_timeout}] role", 1)
+        log(1, f"Removed [{role_timeout}] role")
 
         previous_roles_raw = Process_MySQL(
             query=sqlRetrieveIowa, values=who.id, fetch="all"
@@ -1006,17 +1007,17 @@ class AdminCommands(commands.Cog):
 
         if previous_roles_raw is not None:
             previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-            log(f"Gathered all the roles to store", 1)
+            log(1, f"Gathered all the roles to store")
 
             try:
                 if previous_roles:
                     for role in previous_roles:
                         new_role = ctx.guild.get_role(int(role))
-                        log(f"Attempting to add [{new_role}] role...", 1)
+                        log(1, f"Attempting to add [{new_role}] role...")
                         await who.add_roles(new_role, reason="Returning from Iowa")
-                        log(f"Added [{new_role}] role", 1)
+                        log(1, f"Added [{new_role}] role")
             except (discord.Forbidden, discord.HTTPException) as e:
-                log(f"Unable to add role! {e}")
+                log(1, f"Unable to add role! {e}")
 
         Process_MySQL(query=sqlRemoveIowa, values=who.id)
 
@@ -1032,7 +1033,7 @@ class AdminCommands(commands.Cog):
         )
         await ctx.send(embed=embed)
         # await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
-        log("Nebraska command complete", 0)
+        log(0, "Nebraska command complete")
 
     @cog_ext.cog_slash(
         name="console",
@@ -1076,20 +1077,20 @@ class AdminCommands(commands.Cog):
 
         await ctx.defer(hidden=True)
 
-        log("Restarting the bot via SSH", 0)
+        log(0, "Restarting the bot via SSH")
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        log("SSH Client established", 1)
+        log(1, "SSH Client established")
 
         try:
             client.connect(
                 hostname=SSH_HOST, username=SSH_USERNAME, password=SSH_PASSWORD
             )
-            log("SSH Client connected to host", 1)
-        except:
-            log("SSH Client was unable to connect ot host", 0)
+            log(1, "SSH Client connected to host")
+        except:  # noqa
+            log(0, "SSH Client was unable to connect ot host")
             await ctx.send("Unable to restart the bot!", hidden=True)
             return
 
@@ -1100,11 +1101,11 @@ class AdminCommands(commands.Cog):
         bash_script = open(bash_script_path).read()
 
         stdin, stdout, stderr = client.exec_command(bash_script)
-        log(stdout.read().decode(), 1)
+        log(1, stdout.read().decode())
 
         err = stderr.read().decode()
         if err:
-            log(err, 1)
+            log(1, err)
 
         # Restart
         bash_script_path = pathlib.PurePosixPath(
@@ -1113,14 +1114,14 @@ class AdminCommands(commands.Cog):
         bash_script = open(bash_script_path).read()
 
         stdin, stdout, stderr = client.exec_command(bash_script)
-        log(stdout.read().decode(), 1)
+        log(1, stdout.read().decode())
 
         err = stderr.read().decode()
         if err:
-            log(err, 1)
+            log(1, err)
 
         client.close()
-        log("SSH Client is closed.", 0)
+        log(0, "SSH Client is closed.")
 
         await ctx.send("Bot restart complete!", hidden=True)
 
