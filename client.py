@@ -10,18 +10,25 @@
 
 import inspect
 import logging
-from logging import CRITICAL
+import pathlib
+import platform
 
 import interactions
 
-from helpers.constants import PROD_TOKEN
+from helpers.constants import PROD_TOKEN, CHAN_BOT_SPAM
 from helpers.embed import buildEmbed
-
-logger = logging.getLogger(__name__)
+from objects.Exceptions import CommandException
 
 bot = interactions.Client(
-    token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=CRITICAL
+    token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=logging.CRITICAL
 )
+
+# Get rid of d-p-i.py spam
+bot_loggers = ["client", "context", "dispatch", "gateway", "http", "mixin"]
+for logger in bot_loggers:
+    logging.getLogger(logger).handlers.clear()
+
+logger = logging.getLogger(f"{__name__}-frost")
 
 
 def getWelcomeMessage() -> interactions.Embed:
@@ -42,6 +49,47 @@ def getWelcomeMessage() -> interactions.Embed:
                 "Roles",
                 "You can assign yourself come flair by using the `/roles` command.",
             ],
+        ],
+    )
+
+
+def getChangelog() -> [str, CommandException]:
+    try:
+        changelog_path = None
+
+        if "Windows" in platform.platform():
+            changelog_path = pathlib.PurePath(
+                f"{pathlib.Path(__file__).parent.resolve()}/changelog.md"
+            )
+        elif "Linux" in platform.platform():
+            changelog_path = pathlib.PurePosixPath(
+                f"{pathlib.Path(__file__).parent.resolve()}/changelog.md"
+            )
+
+        changelog = open(changelog_path, "r")
+        lines = changelog.readlines()
+        lines_str = ""
+
+        for line in lines:
+            lines_str += f"* {str(line)}"
+    except OSError:
+        return CommandException("Error loading changelog.")
+
+
+def getOnlineMessage() -> interactions.Embed:
+    return buildEmbed(
+        title="Husker Discord Bot",
+        fields=[
+            [
+                "Info",
+                f"I was restarted, but now I'm back! Check out `/` to see what I can do!",
+                ["HOF & HOS Reaction Threshold", "TBD"],
+                ["Changelog", getChangelog()],
+                [
+                    "More Changelog",
+                    f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)",
+                ],
+            ]
         ],
     )
 
@@ -289,13 +337,3 @@ async def on_invite_delete(invite: interactions.Invite):
 @bot.event
 async def on_user_update(user: interactions.User):
     logger.info(f"Loaded {inspect.stack()[0][3]}")
-
-
-if __name__ == "__main__":
-    del PROD_TOKEN
-
-    logger.info("Starting the bot")
-
-    bot.start()
-
-    logger.info("Bot loop closed!")
