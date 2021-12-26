@@ -1,3 +1,4 @@
+import logging
 import pathlib
 import platform
 import random
@@ -7,17 +8,10 @@ import interactions
 
 from objects.Exceptions import CommandException, UserInputException
 
-
-def log(level: int, message: str):
-    import datetime
-
-    if level == 0:
-        print(f"[{datetime.datetime.now()}] ### Misc: {message}")
-    elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ Misc: {message}")
+logger = logging.getLogger(__name__)
 
 
-def formatPrettyTimeDelta(seconds):
+def formatPrettyTimeDelta(seconds) -> str:
     seconds = int(seconds)
     days, seconds = divmod(seconds, 86400)
     hours, seconds = divmod(seconds, 3600)
@@ -32,19 +26,19 @@ def formatPrettyTimeDelta(seconds):
         return f"{seconds}S"
 
 
-def grabPlatform():
+def grabPlatform() -> str:
     return platform.platform()
 
 
 def loadVarPath() -> [str, CommandException]:
-    p = platform.platform()
-    if "Windows" in p:
-        log(0, f"Windows environment set")
+    myPlatform = platform.platform()
+    if "Windows" in myPlatform:
+        logger.info(f"Windows environment set")
         return pathlib.PurePath(
             f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json"
         )
-    elif "Linux" in p:
-        log(0, f"Linux environment set")
+    elif "Linux" in myPlatform:
+        logger.info(f"Linux environment set")
         return pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/variables.json"
         )

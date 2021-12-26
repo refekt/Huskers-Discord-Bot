@@ -9,23 +9,19 @@
 # TODO
 
 import inspect
+import logging
 from logging import CRITICAL
 
 import interactions
 
-from helpers.constants import PROD_TOKEN, CHAN_BOT_SPAM
-
-# threshold: int = 999
+from helpers.constants import PROD_TOKEN
 from helpers.embed import buildEmbed
 
+logger = logging.getLogger(__name__)
 
-def log(level: int, message: str):
-    import datetime
-
-    if level == 0:
-        print(f"[{datetime.datetime.now()}] ### Main: {message}")
-    elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ Main: {message}")
+bot = interactions.Client(
+    token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=CRITICAL
+)
 
 
 def getWelcomeMessage() -> interactions.Embed:
@@ -50,21 +46,14 @@ def getWelcomeMessage() -> interactions.Embed:
     )
 
 
-bot = interactions.Client(
-    token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=CRITICAL
-)
-
-del PROD_TOKEN
-
-
 @bot.event
 async def on_ready():
-    log(0, f"The bot is ready!")
+    logger.info("The bot is ready!")
 
 
 @bot.event
 async def on_channel_pins_update(pin: interactions.ChannelPins):
-    log(1, f"A a pin was updated in {pin.channel_id}")
+    logger.info(f"A a pin was updated in {pin.channel_id}")
 
 
 # d-p-i.py bug
@@ -75,68 +64,68 @@ async def on_channel_pins_update(pin: interactions.ChannelPins):
 # async def on_thread_create(
 #     channel: interactions.Channel, thread_member: interactions.ThreadMember = None
 # ):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
 # async def on_thread_update(channel: interactions.Channel):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
 # async def on_thread_delete(channel: interactions.Channel):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
 # async def on_thread_list_sync():
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
 # async def on_thread_member_update(thread_member: interactions.ThreadMember):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
 # async def on_thread_members_update(thread_member: interactions.ThreadMember):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
 async def on_guild_create(guild: interactions.Guild):
-    log(0, f"Establishing guild connection to: {guild.name}")
+    logger.info(f"Establishing guild connection to: {guild.name}")
 
 
 @bot.event
 async def on_guild_update(guild: interactions.Guild):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_delete(guild: interactions.Guild):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 # d-p-i.py bug
 # @bot.event
 # async def on_guild_ban_add(user: interactions.User):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
 # async def on_guild_ban_remove(user: interactions.User):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
 async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_stickers_update(stickers: interactions.GuildStickers):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
@@ -155,48 +144,48 @@ async def on_guild_member_add(guild_member: interactions.GuildMember):
 
 @bot.event
 async def on_guild_member_remove(guild_member: interactions.GuildMember):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_member_update(guild_member: interactions.GuildMember):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_role_create(role: interactions.Role):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_role_update(role: interactions.Role):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_role_delete(role: interactions.Role):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_scheduled_event_create(
     scheduled_event: interactions.ScheduledEvents,
 ):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_scheduled_event_update(
     scheduled_event: interactions.ScheduledEvents,
 ):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_scheduled_event_delete(
     scheduled_event: interactions.ScheduledEvents,
 ):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
@@ -205,7 +194,7 @@ async def on_guild_scheduled_event_user_add(
     user: interactions.User,
     guild: interactions.Guild,
 ):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
@@ -214,7 +203,7 @@ async def on_guild_scheduled_event_user_remove(
     user: interactions.User,
     guild: interactions.Guild,
 ):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
@@ -224,33 +213,32 @@ async def on_invite_create(
     inviter = invite._json.get("inviter")
     code = invite._json.get("code")
 
-    log(
-        1,
+    logger.info(
         f"{inviter['username']}#{inviter['discriminator']} created the {'permanent' if invite.temporary else 'temporary'} invite code {code} at {invite.created_at}.",
     )
 
 
 @bot.event
 async def on_invite_delete(invite: interactions.Invite):
-    log(1, f"The invite code {invite._json.get('code')} was deleted.")
+    logger.info(f"The invite code {invite._json.get('code')} was deleted.")
 
 
 # TODO Capture metrics for guild karma
 # @bot.event
 # async def on_message_create(message: interactions.Message):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 # TODO Botlogs record?
 # @bot.event
 # async def on_message_update(message: interactions.Message):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 # TODO Botlogs record?
 # @bot.event
 # async def on_message_delete(message: interactions.Message):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 # TODO Purge commands?
@@ -258,7 +246,7 @@ async def on_invite_delete(invite: interactions.Invite):
 # async def on_message_delete_bulk(
 #     message_ids, channel: interactions.Channel, guild: interactions.Guild
 # ):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 # TODO d-p-i.py bug
@@ -268,15 +256,15 @@ async def on_invite_delete(invite: interactions.Invite):
 # async def on_message_reaction_add(
 #     reaction: interactions.Reaction,
 # ):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
-#     # log(f"{user.username} added {emoji.name} in {channel.name}", 1)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#     # logger.info(f"{user.username} added {emoji.name} in {channel.name}", 1)
 #
 #
 # @bot.event
 # async def on_message_reaction_remove(
 #     reaction: interactions.Reaction
 # ):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
@@ -285,7 +273,7 @@ async def on_invite_delete(invite: interactions.Invite):
 #     message: interactions.Message,
 #     guild: interactions.Guild,
 # ):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
 # @bot.event
@@ -295,16 +283,19 @@ async def on_invite_delete(invite: interactions.Invite):
 #     guild: interactions.Guild,
 #     emoji: interactions.Emoji = None,
 # ):
-#     log(f"Loaded {inspect.stack()[0][3]}", 0)
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
 @bot.event
 async def on_user_update(user: interactions.User):
-    log(0, f"Loaded {inspect.stack()[0][3]}")
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
-log(0, "Initializing the bot...")
+if __name__ == "__main__":
+    del PROD_TOKEN
 
-bot.start()
+    logger.info("Starting the bot")
 
-log(0, "Bot finished!")
+    bot.start()
+
+    logger.info("Bot loop closed!")

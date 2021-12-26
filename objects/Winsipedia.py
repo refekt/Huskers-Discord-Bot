@@ -1,6 +1,8 @@
 # TODO
 # * Modernize and revamp
 # TODO
+import logging
+logger = logging.getLogger(__name__)
 
 # import requests
 # from bs4 import BeautifulSoup

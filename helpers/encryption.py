@@ -1,22 +1,10 @@
-# TODO
-# * Review
-# TODO
-
 import json
+import logging
 import pathlib
-import platform
 
 from cryptography.fernet import Fernet
 
-
-def log(level: int, message: str):
-    import datetime
-
-    if level == 0:
-        print(f"[{datetime.datetime.now()}] ### Encryption: {message}")
-    elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ Encryption: {message}")
-
+logger = logging.getLogger(__name__)
 
 key_path = pathlib.PurePath(
     f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"

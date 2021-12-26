@@ -10,6 +10,10 @@
 # from PIL import Image
 # from numpy import random
 #
+import logging
+
+logger = logging.getLogger(__name__)
+
 # face_cascade = cv2.CascadeClassifier(
 #     os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
 # )

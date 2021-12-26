@@ -1,7 +1,7 @@
 # TODO
 # * Update and modernize
 # TODO
-
+import logging
 from datetime import datetime
 
 import interactions
@@ -11,20 +11,18 @@ import validators
 # from objects.Schedule import HuskerSchedule
 from helpers.constants import (
     BOT_DISPLAY_NAME,
-    BOT_FOOTER_BOT,
     BOT_GITHUB_URL,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
-    DT_OBJ_FORMAT,
-    DT_OBJ_FORMAT_TBA,
-    DT_STR_RECRUIT,
-    DT_TBA_HR,
-    DT_TBA_MIN,
     TZ,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def buildEmbed(**kwargs) -> interactions.Embed:
+    logger.info("Creating a normal embed")
+
     title_limit = name_limit = 256
     desc_limit = 4096
     fields_limit = 25
@@ -87,6 +85,7 @@ def buildEmbed(**kwargs) -> interactions.Embed:
                 )
             )
 
+    logger.info("Returning a normal embed")
     return embed
 
 

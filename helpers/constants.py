@@ -1,8 +1,7 @@
 # TODO
 # * update and modernize
 # TODO
-
-
+import logging
 import platform
 
 import pytz
@@ -11,56 +10,56 @@ from dotenv import load_dotenv
 from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
 from helpers.misc import loadVarPath
 
+logger = logging.getLogger(__name__)
 
-def log(level: int, message: str):
-    import datetime
-
-    if level == 0:
-        print(f"[{datetime.datetime.now()}] ### Constants: {message}")
-    elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ Constants: {message}")
-
-
-log(0, f"Platform == {platform.platform()}")
+logger.info(f"Platform == {platform.platform()}")
 
 # Consistent timezone
 TZ = pytz.timezone("CST6CDT")
+logger.info("Timezone set")
 
 # Setting variables location
 variables_path = loadVarPath()
 load_dotenv(dotenv_path=variables_path)
+logger.info("Enviroment path loaded")
 
 # Decrypt Env file
 env_file = variables_path
 key = load_key()
+logger.info("Encryption key loaded")
 
-# Save decrypted file
+# DEBUGGING Save decrypted file
 run = False
 if run:
     decrypt(env_file, key)
     encrypt(env_file, key)
 
 env_vars = decrypt_return_data(env_file, key)
+logger.info("Environment variables loaded")
 
 # SSH
 SSH_HOST = env_vars["ssh_host"]
 SSH_USERNAME = env_vars["ssh_username"]
 SSH_PASSWORD = env_vars["ssh_password"]
+logger.info("SSH variables loaded")
 
 # Imgur
 IMGUR_CLIENT = env_vars["imgur_client"]
 IMGUR_SECRET = env_vars["imgur_secret"]
+logger.info("Imgur variables loaded")
 
 # Discord Bot Tokens
 TEST_TOKEN = env_vars["TEST_TOKEN"]
 PROD_TOKEN = env_vars["DISCORD_TOKEN"]
 BACKUP_TOKEN = env_vars["BACKUP_TOKEN"]
+logger.info("Discord tokens loaded")
 
 # SQL information
 SQL_HOST = env_vars["sqlHost"]
 SQL_USER = env_vars["sqlUser"]
 SQL_PASSWD = env_vars["sqlPass"]
 SQL_DB = env_vars["sqlDb"]
+logger.info("MySQL variables loaded")
 
 # Reddit Bot Info
 REDDIT_CLIENT_ID = env_vars["reddit_client_id"]
@@ -69,11 +68,7 @@ REDDIT_PW = env_vars["reddit_pw"]
 
 # CFBD API Key
 CFBD_KEY = env_vars["cfbd_api"]
-
-# SSH Information
-# SSH_HOST = env_vars["ssh_host"]
-# SSH_USER = env_vars["ssh_user"]
-# SSH_PW = env_vars["ssh_pw"]
+logger.info("CFBD key loaded")
 
 # Twitter variables
 TWITTER_KEY = env_vars["twitter_key"]
@@ -82,16 +77,20 @@ TWITTER_BEARER = env_vars["twitter_bearer"]
 TWITTER_TOKEN = env_vars["twitter_token"]
 TWITTER_TOKEN_SECRET = env_vars["twitter_token_secret"]
 TWITTER_HUSKER_MEDIA_LIST_ID = 1307680291285278720
+logger.info("Twitter variables loaded")
 
 # Weather API
 WEATHER_API_KEY = env_vars["openweather_key"]
+logger.info("Weather API key loaded")
 
 del env_vars, env_file, key
+logger.info("Deleted environment variables, files, and key")
 
 # Headers for `requests`
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0"
 }
+logger.info("User-Agengt Header loaded")
 
 # Discord Roles
 ROLE_ADMIN_PROD = 440639061191950336
@@ -116,6 +115,7 @@ ROLE_QDOBA = 797587264112820264
 ROLE_RUNZA = 485086088017215500
 ROLE_TARMAC = 881546056687583242
 ROLE_TIME_OUT = 663881203983843338
+logger.info("Role variables loaded")
 
 # Discord Channels
 CHAN_ADMIN = 525519594417291284
@@ -137,12 +137,14 @@ CHAN_POLITICS = 504777800100741120
 CHAN_POSSUMS = 873645025878233099
 CHAN_RECRUITING = 507520543096832001
 CHAN_TWITTERVERSE = 636220560010903584
+logger.info("Channel variables loaded")
 
 # Game Day Category
 CAT_ADMIN = 600530901407105055
 CAT_GAMEDAY = 768828439636606996
 CAT_GENERAL = 440632687087058944
 CAT_INTRO = 442062321695719434
+logger.info("Channel category variables loaded")
 
 CHAN_BANNED = (
     CHAN_ANNOUNCEMENT,
@@ -152,6 +154,8 @@ CHAN_BANNED = (
     CHAN_HOS,
     CHAN_POLITICS,
 )
+logger.info("Banned channels loaded")
+
 CHAN_STATS_BANNED = (
     CHAN_ADMIN,
     CHAN_ADMIN_DOUBLE,
@@ -160,24 +164,23 @@ CHAN_STATS_BANNED = (
     CHAN_HOF,
     CHAN_HOS,
 )
+logger.info("Banned channel stats loaded")
+
 CHAN_HYPE_GROUP = (CHAN_HYPE_MAX, CHAN_HYPE_SOME, CHAN_HYPE_NO)
-
-# Reactions
-REACTION_HYPE_MAX = "📈"
-REACTION_HYPE_SOME = "⚠"
-REACTION_HYPE_NO = "⛔"
-
-REACITON_HYPE_SQUAD = (REACTION_HYPE_MAX, REACTION_HYPE_SOME, REACTION_HYPE_NO)
+logger.info("Hype channels loaded")
 
 # Servers/guilds
 GUILD_PROD = 440632686185414677
+logger.info("Guild variable loaded")
 
 # Member ID
 MEMBER_BOT = 593949013443608596
 MEMBER_GEE = 189554873778307073
+logger.info("Member variables loaded")
 
 # Currency
 CURRENCY_NAME = "Husker Coins"
+logger.info("Currency variable loaded")
 
 # Bot Info
 BOT_DISPLAY_NAME = "Bot Frost"
@@ -188,6 +191,7 @@ BOT_FOOTER_SECRET = (
     "These messages are anonymous and there is no way to verify messages are accurate."
 )
 BOT_FOOTER_BOT = "Created by Bot Frost"
+logger.info("Bot info variables loaded")
 
 # DateTime format
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
@@ -200,6 +204,7 @@ DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TBA_TIME = "10:58 PM"
 DT_TWEET_FORMAT = "%Y-%m-%d %H:%M:%S"
+logger.info("Datetime formatting variables loaded")
 
 # States
 US_STATES = [
@@ -256,3 +261,4 @@ US_STATES = [
     {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},
     {"State": "Puerto Rico", "Code": "PR"},
 ]
+logger.info("State dict variables loaded")

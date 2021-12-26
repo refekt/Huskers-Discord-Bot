@@ -1,9 +1,15 @@
 # Global Errors
+import logging
+from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass()
 class CommandException(Exception):
-    def __init__(self, message):
-        self.message = message
+    message: str
 
 
+@dataclass()
 class UserInputException(Exception):
-    def __init__(self, message):
-        self.message = message
+    message: str

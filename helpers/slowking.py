@@ -2,6 +2,10 @@
 # * Everything
 # TODO
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # def make_slowking(user: discord.Member) -> discord.File:
 #     resize = (225, 225)
 #
