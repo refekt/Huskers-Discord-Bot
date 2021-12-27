@@ -15,6 +15,7 @@ from helpers.constants import (
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
     TZ,
+    BOT_FOOTER_BOT,
 )
 
 logger = logging.getLogger(__name__)
@@ -25,68 +26,48 @@ def buildEmbed(**kwargs) -> interactions.Embed:
 
     title_limit = name_limit = 256
     desc_limit = 4096
-    fields_limit = 25
-    value_limit = 1024
     footer_limit = 2048
-    # embed_limit = 6000
 
-    # Establish embed color
     dtNow = datetime.now().astimezone(tz=TZ).isoformat()
-    if kwargs.get("color", False):
-        embed = interactions.Embed(timestamp=dtNow, color=kwargs.get("color"))
-    else:
-        embed = interactions.Embed(timestamp=dtNow, color=0xD00000)
-
-    # Establish embed author
-    if kwargs.get("author", False):
-        embed.author = interactions.EmbedAuthor(
-            name=BOT_DISPLAY_NAME, url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
-        )
-    else:
-        embed.author = interactions.EmbedAuthor(
+    e: interactions.Embed = interactions.Embed(
+        title=kwargs.get("title", BOT_DISPLAY_NAME)[:title_limit],
+        description=kwargs.get("description", "A Bot Frost message!")[:desc_limit],
+        timestamp=dtNow,
+        url=kwargs.get("url")
+        if kwargs.get("url") and validators.url(kwargs.get("url"))
+        else None,
+        author=interactions.EmbedAuthor(
             name=kwargs.get("author"), url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
         )
-
-    if kwargs.get("description", False):
-        embed.description = kwargs.get("description")[:desc_limit]
-
-    if kwargs.get("title", False):
-        embed.title = kwargs.get("title")[:title_limit]
-
-    if kwargs.get("url", False) and validators.url(kwargs.get("url")):
-        embed.url = kwargs.get("url")
-
-    if kwargs.get("footer", False):
-        embed.footer = interactions.EmbedFooter(
+        if kwargs.get("author", False)
+        else interactions.EmbedAuthor(
+            name=BOT_DISPLAY_NAME, url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
+        ),
+        footer=interactions.EmbedFooter(
             text=kwargs.get("footer")[:footer_limit], icon_url=BOT_ICON_URL
         )
-
-    if kwargs.get("image", False) and validators.url(kwargs.get("image")):
-        # if kwargs.get("image") is not None:
-        embed.image = interactions.EmbedImageStruct(url=kwargs["image"])
-
-    if kwargs.get("thumbnail", False) and validators.url(kwargs.get("thumbnail")):
-        embed.thumbnail = interactions.EmbedImageStruct(url=kwargs.get("thumbnail"))
-    else:
-        # if kwargs.get("thumbnail") is not None:
-        embed.thumbnail = interactions.EmbedImageStruct(url=BOT_THUMBNAIL_URL)
-
-    if kwargs.get("fields", False):
-        f = []
-
-        for index, field in enumerate(kwargs["fields"]):
-            if index >= fields_limit:
-                break
-            f.append(
-                interactions.EmbedField(
-                    name=str(field[0])[:name_limit],
-                    value=str(field[1])[:value_limit],
-                    inline=kwargs.get("inline", True),
-                )
+        if kwargs.get("footer", False)
+        else interactions.EmbedFooter(
+            text=BOT_FOOTER_BOT[:footer_limit], icon_url=BOT_ICON_URL
+        ),
+        image=interactions.EmbedImageStruct(url=kwargs["image"])
+        if kwargs.get("image", False)
+        else None,
+        thumbnail=interactions.EmbedImageStruct(url=kwargs.get("thumbnail"))
+        if kwargs.get("thumbnail", False) and validators.url(kwargs.get("thumbnail"))
+        else interactions.EmbedImageStruct(url=BOT_THUMBNAIL_URL),
+        fields=[
+            interactions.EmbedField(
+                name=str(field[0]),
+                value=str(field[1]),
+                inline=kwargs.get("inline", True),
             )
+            for field in kwargs.get("fields")
+        ],
+    )
 
     logger.info("Returning a normal embed")
-    return embed
+    return e
 
 
 #

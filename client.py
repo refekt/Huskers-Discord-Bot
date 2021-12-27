@@ -17,6 +17,7 @@ import interactions
 
 from helpers.constants import PROD_TOKEN, CHAN_BOT_SPAM
 from helpers.embed import buildEmbed
+from helpers.misc import convertEmbedtoDict
 from objects.Exceptions import CommandException
 
 bot = interactions.Client(
@@ -50,6 +51,7 @@ def getWelcomeMessage() -> interactions.Embed:
                 "You can assign yourself come flair by using the `/roles` command.",
             ],
         ],
+        inline=False,
     )
 
 
@@ -72,6 +74,8 @@ def getChangelog() -> [str, CommandException]:
 
         for line in lines:
             lines_str += f"* {str(line)}"
+
+        return lines_str
     except OSError:
         return CommandException("Error loading changelog.")
 
@@ -83,111 +87,46 @@ def getOnlineMessage() -> interactions.Embed:
             [
                 "Info",
                 f"I was restarted, but now I'm back! Check out `/` to see what I can do!",
-                ["HOF & HOS Reaction Threshold", "TBD"],
-                ["Changelog", getChangelog()],
-                [
-                    "More Changelog",
-                    f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)",
-                ],
-            ]
+            ],
+            ["HOF & HOS Reaction Threshold", "TBD"],
+            ["Changelog", getChangelog()],
+            [
+                "More Changelog",
+                f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)",
+            ],
         ],
+        inline=False,
     )
 
 
 @bot.event
 async def on_ready():
+    await bot.http.send_message(
+        channel_id=CHAN_BOT_SPAM,
+        content="",
+        tts=False,
+        embeds=[convertEmbedtoDict(getOnlineMessage())],
+        nonce=None,
+        allowed_mentions=None,
+        message_reference=None,
+    )
+
     logger.info("The bot is ready!")
-
-
-@bot.event
-async def on_channel_pins_update(pin: interactions.ChannelPins):
-    logger.info(f"A a pin was updated in {pin.channel_id}")
-
-
-# d-p-i.py bug
-# CRITICAL:gateway:(ln.303):You're missing a data model for the event thread_create: module 'interactions' has no attribute 'Thread'
-# CRITICAL:gateway:You're missing a data model for the event thread_create: module 'interactions' has no attribute 'Thread'
-#
-# @bot.event
-# async def on_thread_create(
-#     channel: interactions.Channel, thread_member: interactions.ThreadMember = None
-# ):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-# @bot.event
-# async def on_thread_update(channel: interactions.Channel):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-# @bot.event
-# async def on_thread_delete(channel: interactions.Channel):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-# @bot.event
-# async def on_thread_list_sync():
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-# @bot.event
-# async def on_thread_member_update(thread_member: interactions.ThreadMember):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-# @bot.event
-# async def on_thread_members_update(thread_member: interactions.ThreadMember):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_guild_create(guild: interactions.Guild):
-    logger.info(f"Establishing guild connection to: {guild.name}")
-
-
-@bot.event
-async def on_guild_update(guild: interactions.Guild):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
-
-
-@bot.event
-async def on_guild_delete(guild: interactions.Guild):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
-
-
-# d-p-i.py bug
-# @bot.event
-# async def on_guild_ban_add(user: interactions.User):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-# @bot.event
-# async def on_guild_ban_remove(user: interactions.User):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
-
-
-@bot.event
-async def on_guild_stickers_update(stickers: interactions.GuildStickers):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 @bot.event
 async def on_guild_member_add(guild_member: interactions.GuildMember):
     # TODO d-p-i.py is slated to add `send()` to Member, Channel, etc. models
-    # channel = interactions.Channel(
-    #     **await bot.http.create_dm(recipient_id=int(guild_member.user.id))
-    # )
-    # res = await bot.http.send_message(
-    #     channel_id=int(channel.id),
-    #     content="",
-    #     embeds=getWelcomeMessage()._json,
-    # )
-    pass
+    try:
+        await bot.http.send_message(
+            channel_id=guild_member.user.id,
+            content="",
+            embeds=[convertEmbedtoDict(getWelcomeMessage())],
+        )
+    except Exception:
+        raise CommandException(
+            f"Unable to send message to {guild_member.user.username}"
+        )
 
 
 @bot.event
@@ -213,6 +152,49 @@ async def on_guild_role_update(role: interactions.Role):
 @bot.event
 async def on_guild_role_delete(role: interactions.Role):
     logger.info(f"Loaded {inspect.stack()[0][3]}")
+
+
+# TODO Capture metrics for guild karma
+# @bot.event
+# async def on_message_create(message: interactions.Message):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
+# TODO Botlogs record?
+# @bot.event
+# async def on_message_update(message: interactions.Message):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
+# TODO Botlogs record?
+# @bot.event
+# async def on_message_delete(message: interactions.Message):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
+# TODO Purge commands?
+# @bot.event
+# async def on_message_delete_bulk(
+#     message_ids, channel: interactions.Channel, guild: interactions.Guild
+# ):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+
+
+@bot.event
+async def on_channel_pins_update(pin: interactions.ChannelPins):
+    logger.info(f"A a pin was updated in {pin.channel_id}")
+
+
+@bot.event
+async def on_invite_create(
+    invite: interactions.Invite,
+):
+    inviter = invite._json.get("inviter")
+    code = invite._json.get("code")
+
+    logger.info(
+        f"{inviter['username']}#{inviter['discriminator']} created the {'permanent' if invite.temporary else 'temporary'} invite code {code} at {invite.created_at}.",
+    )
 
 
 @bot.event
@@ -255,51 +237,78 @@ async def on_guild_scheduled_event_user_remove(
 
 
 @bot.event
-async def on_invite_create(
-    invite: interactions.Invite,
-):
-    inviter = invite._json.get("inviter")
-    code = invite._json.get("code")
-
-    logger.info(
-        f"{inviter['username']}#{inviter['discriminator']} created the {'permanent' if invite.temporary else 'temporary'} invite code {code} at {invite.created_at}.",
-    )
-
-
-@bot.event
 async def on_invite_delete(invite: interactions.Invite):
     logger.info(f"The invite code {invite._json.get('code')} was deleted.")
 
 
-# TODO Capture metrics for guild karma
-# @bot.event
-# async def on_message_create(message: interactions.Message):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+@bot.event
+async def on_guild_create(guild: interactions.Guild):
+    logger.info(f"Establishing guild connection to: {guild.name}")
 
 
-# TODO Botlogs record?
-# @bot.event
-# async def on_message_update(message: interactions.Message):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+@bot.event
+async def on_guild_update(guild: interactions.Guild):
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
-# TODO Botlogs record?
-# @bot.event
-# async def on_message_delete(message: interactions.Message):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+@bot.event
+async def on_guild_delete(guild: interactions.Guild):
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
-# TODO Purge commands?
-# @bot.event
-# async def on_message_delete_bulk(
-#     message_ids, channel: interactions.Channel, guild: interactions.Guild
-# ):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+@bot.event
+async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
+
+
+@bot.event
+async def on_guild_stickers_update(stickers: interactions.GuildStickers):
+    logger.info(f"Loaded {inspect.stack()[0][3]}")
 
 
 # TODO d-p-i.py bug
-# CRITICAL:gateway:(ln.303):You're missing a data model for the event message_reaction_add: module 'interactions' has no attribute 'MessageReaction'
-# CRITICAL:gateway:You're missing a data model for the event message_reaction_add: module 'interactions' has no attribute 'MessageReaction'
+# @bot.event
+# async def on_guild_ban_add(user: interactions.User):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_guild_ban_remove(user: interactions.User):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_create(
+#     channel: interactions.Channel, thread_member: interactions.ThreadMember = None
+# ):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_update(channel: interactions.Channel):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_delete(channel: interactions.Channel):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_list_sync():
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_member_update(thread_member: interactions.ThreadMember):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_thread_members_update(thread_member: interactions.ThreadMember):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
 # @bot.event
 # async def on_message_reaction_add(
 #     reaction: interactions.Reaction,

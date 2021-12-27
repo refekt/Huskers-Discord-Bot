@@ -71,3 +71,21 @@ async def getGuild(bot: interactions.Client, gID: int) -> interactions.Guild:
 
 async def getBotUser(bot: interactions.Client):
     return interactions.User(**(await bot.http.get_self()))
+
+
+async def convertChannelIDtoChannel(
+    bot: interactions.Client, chan_id: int
+) -> interactions.Channel:
+    return interactions.Channel(**(await bot.http.get_channel(chan_id)))
+
+
+def convertEmbedtoDict(embed: interactions.Embed) -> dict:
+    from pprint import pprint
+
+    _ = embed._json
+    _["author"] = embed.author._json
+    _["footer"] = embed.footer._json
+    _["thumbnail"] = embed.thumbnail._json
+    _["fields"] = [field._json for field in _["fields"]]
+
+    return _
