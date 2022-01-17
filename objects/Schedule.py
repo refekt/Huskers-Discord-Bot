@@ -1,4 +1,5 @@
 import datetime
+import urllib.parse
 
 import requests
 from bs4 import BeautifulSoup
@@ -74,9 +75,14 @@ def collect_opponent(game, year, week):
             location = location.split("Buy Tickets ")[1].replace(
                 " Memorial Stadium", ""
             )
-        temp_icon = game.contents[1].contents[1].contents[1].attrs["data-src"]
-        if "://" in temp_icon:
-            icon = temp_icon
+        temp = game.contents[1].contents[1].contents[1].attrs["data-src"]
+        if "://" in temp:  # game.contents[1].contents[1].contents[1].attrs["data-src"]:
+            # icon = temp_icon
+            try:
+                url_parser = urllib.parse.urlparse(temp)
+                icon = f"{url_parser.scheme}://{url_parser.netloc}{urllib.parse.quote(url_parser.path)}"
+            except:
+                pass
         else:
             icon = (
                 "https://huskers.com"

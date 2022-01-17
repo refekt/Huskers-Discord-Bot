@@ -13,6 +13,7 @@ from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia, TeamStatsWinsipediaTeam
 from utilities.constants import CFBD_KEY, TZ, guild_id_list, pretty_time_delta
 from utilities.embed import build_countdown_embed, build_embed, return_schedule_embeds
+import urllib.parse
 
 cfbd_config = Configuration()
 cfbd_config.api_key["Authorization"] = CFBD_KEY
