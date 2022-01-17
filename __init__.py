@@ -3,12 +3,14 @@ import logging
 from time import perf_counter
 
 logging.basicConfig(
-    format="%(asctime)s :: %(name)s/%(levelname)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
+    format="%(asctime)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
     datefmt="%Y-%m-%d-%H%M%z",
     level=logging.INFO,
     encoding="utf-8",
     stream=sys.stdout,
 )
+logger = logging.getLogger(__name__)
+
 
 start = perf_counter()
 
@@ -35,9 +37,9 @@ from objects.Thread import *  # noqa
 from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa
 
-# Star the bot
-logger = logging.getLogger(__name__)
 end = perf_counter()
 logger.info(f"The bot initialized in {end - start:,.2f} seconds")
+
+# Star the bot
 logger.info("Starting the bot!")
 bot.start()

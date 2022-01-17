@@ -70,3 +70,6 @@ def decrypt(filename, key):
     # write the original file
     with open(filename, "wb") as file:
         file.write(decrypted_data)
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

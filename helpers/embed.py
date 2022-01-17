@@ -17,27 +17,34 @@ from helpers.constants import (
     TZ,
     BOT_FOOTER_BOT,
 )
+from objects.Exceptions import CommandException
 
 logger = logging.getLogger(__name__)
+__all__ = ["buildEmbed"]
 
 
-def buildEmbed(**kwargs) -> interactions.Embed:
+def buildEmbed(title: str, **kwargs) -> interactions.Embed:
     logger.info("Creating a normal embed")
+
+    assert title is not None, CommandException("Title must not be blank!")
 
     title_limit = name_limit = 256
     desc_limit = 4096
     footer_limit = 2048
+    field_value_limit = 1024
 
     dtNow = datetime.now().astimezone(tz=TZ).isoformat()
     e: interactions.Embed = interactions.Embed(
-        title=kwargs.get("title", BOT_DISPLAY_NAME)[:title_limit],
+        title=title[:title_limit],
         description=kwargs.get("description", "A Bot Frost message!")[:desc_limit],
         timestamp=dtNow,
         url=kwargs.get("url")
         if kwargs.get("url") and validators.url(kwargs.get("url"))
         else None,
         author=interactions.EmbedAuthor(
-            name=kwargs.get("author"), url=BOT_GITHUB_URL, icon_url=BOT_ICON_URL
+            name=kwargs.get("author")[:name_limit],
+            url=BOT_GITHUB_URL,
+            icon_url=BOT_ICON_URL,
         )
         if kwargs.get("author", False)
         else interactions.EmbedAuthor(
@@ -59,7 +66,7 @@ def buildEmbed(**kwargs) -> interactions.Embed:
         fields=[
             interactions.EmbedField(
                 name=str(field[0]),
-                value=str(field[1]),
+                value=str(field[1])[:field_value_limit],
                 inline=kwargs.get("inline", True),
             )
             for field in kwargs.get("fields")
@@ -69,6 +76,8 @@ def buildEmbed(**kwargs) -> interactions.Embed:
     logger.info("Returning a normal embed")
     return e
 
+
+logger.info(f"{str(__name__).title()} module loaded!")
 
 #
 #

@@ -6,6 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+logger.info(f"{str(__name__).title()} module loaded!")
+
 # def make_slowking(user: discord.Member) -> discord.File:
 #     resize = (225, 225)
 #

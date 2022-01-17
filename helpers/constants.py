@@ -16,7 +16,7 @@ logger.info(f"Platform == {platform.platform()}")
 
 # Consistent timezone
 TZ = pytz.timezone("CST6CDT")
-logger.info("Timezone set")
+logger.info(f"Timezone set as {TZ}")
 
 # Setting variables location
 variables_path = loadVarPath()
@@ -171,6 +171,7 @@ logger.info("Hype channels loaded")
 
 # Servers/guilds
 GUILD_PROD = 440632686185414677
+GUILD_TEST = 595705205069185045
 logger.info("Guild variable loaded")
 
 # Member ID
@@ -261,4 +262,11 @@ US_STATES = [
     {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},
     {"State": "Puerto Rico", "Code": "PR"},
 ]
-logger.info("State dict variables loaded")
+
+__all__ = [
+    item
+    for item in globals()
+    if not item[1].islower() and (not item.startswith("__") or not item.startswith("_"))
+]  # Get rid of all local variables and imports.
+
+logger.info(f"{str(__name__).title()} module loaded!")

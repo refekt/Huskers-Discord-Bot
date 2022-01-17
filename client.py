@@ -5,7 +5,6 @@
 # * Iowa checks
 # * Reminders
 # * Twitter stream
-# * Welcome message
 # TODO
 
 import inspect
@@ -15,14 +14,26 @@ import platform
 
 import interactions
 
-from helpers.constants import PROD_TOKEN, CHAN_BOT_SPAM
+from helpers.constants import (
+    PROD_TOKEN,
+    TEST_TOKEN,
+    CHAN_BOT_SPAM,
+    GUILD_PROD,
+    CHAN_ANNOUNCEMENT,
+)
 from helpers.embed import buildEmbed
-from helpers.misc import convertEmbedtoDict
+from helpers.misc import convertEmbedtoDict, getUserMention, getChannelMention
 from objects.Exceptions import CommandException
 
+__author__ = "u/refekt"
+__version__ = "3.5.0"
+
+CUR_TOKEN = PROD_TOKEN  # TEST_TOKEN
+
 bot = interactions.Client(
-    token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=logging.CRITICAL
+    token=CUR_TOKEN, intents=interactions.Intents.ALL, log_level=logging.CRITICAL
 )
+__all__ = ["bot"]
 
 # Get rid of d-p-i.py spam
 bot_loggers = ["client", "context", "dispatch", "gateway", "http", "mixin"]
@@ -30,6 +41,8 @@ for logger in bot_loggers:
     logging.getLogger(logger).handlers.clear()
 
 logger = logging.getLogger(f"{__name__}-frost")
+
+reaction_threshold = 12
 
 
 def getWelcomeMessage() -> interactions.Embed:
@@ -53,6 +66,34 @@ def getWelcomeMessage() -> interactions.Embed:
         ],
         inline=False,
     )
+
+
+async def getServerStatistics(client: interactions.Client) -> str:
+    guild = await client.http.get_guild(guild_id=GUILD_PROD)
+    description = guild.get("description", "N/A")
+    features_raw = guild.get("features", [])
+    features_raw.sort()
+    features = ", ".join(features_raw).replace("_", " ").title()
+    owner = getUserMention(
+        user=await client.http.get_user(user_id=guild.get("owner_id"))
+    )
+    region = guild.get("region", "N/A")
+    vanity_url = (
+        f"https://discord.gg/{guild.get('vanity_url_code')}"
+        if guild.get("vanity_url_code")
+        else "N/A"
+    )
+    boost_count = guild.get("premium_subscription_count", "N/A")
+    server_stats = (
+        f"• __Onwer:__ {owner}\n"
+        f"• __Description:__ {description}\n"
+        f"• __Server Features:__ {features}\n"
+        f"• __Server Region:__ {region}\n"
+        f"• __Vanity URL:__ {vanity_url}\n"
+        f"• __Boost Count:__ {boost_count}\n"
+        f"• __Rules Channel:__ {getChannelMention(CHAN_ANNOUNCEMENT)}"
+    )
+    return server_stats
 
 
 def getChangelog() -> [str, CommandException]:
@@ -80,7 +121,7 @@ def getChangelog() -> [str, CommandException]:
         return CommandException("Error loading changelog.")
 
 
-def getOnlineMessage() -> interactions.Embed:
+async def getOnlineMessage() -> interactions.Embed:
     return buildEmbed(
         title="Husker Discord Bot",
         fields=[
@@ -88,7 +129,9 @@ def getOnlineMessage() -> interactions.Embed:
                 "Info",
                 f"I was restarted, but now I'm back! Check out `/` to see what I can do!",
             ],
-            ["HOF & HOS Reaction Threshold", "TBD"],
+            ["Bot Version", __version__],
+            ["Server Insights", await getServerStatistics(bot)],
+            ["HOF & HOS Reaction Threshold", reaction_threshold],
             ["Changelog", getChangelog()],
             [
                 "More Changelog",
@@ -99,17 +142,28 @@ def getOnlineMessage() -> interactions.Embed:
     )
 
 
+# TODO Waiting for d-p-i.py to add `MessageReaction` attribute
+def surpassedReactionThreshold(reaction: interactions.Reaction) -> bool:
+    return True
+
+
+# Events
+
+
 @bot.event
 async def on_ready():
-    await bot.http.send_message(
-        channel_id=CHAN_BOT_SPAM,
-        content="",
-        tts=False,
-        embeds=[convertEmbedtoDict(getOnlineMessage())],
-        nonce=None,
-        allowed_mentions=None,
-        message_reference=None,
-    )
+    try:
+        await bot.http.send_message(
+            channel_id=CHAN_BOT_SPAM,
+            content="",
+            tts=False,
+            embeds=[convertEmbedtoDict(await getOnlineMessage())],
+            nonce=None,
+            allowed_mentions=None,
+            message_reference=None,
+        )
+    except Exception as err:
+        logger.error(f"Exception received: {err}")
 
     logger.info("The bot is ready!")
 
@@ -313,8 +367,10 @@ async def on_guild_stickers_update(stickers: interactions.GuildStickers):
 # async def on_message_reaction_add(
 #     reaction: interactions.Reaction,
 # ):
+#     test = surpassedReactionThreshold(reaction)
 #     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#     # logger.info(f"{user.username} added {emoji.name} in {channel.name}", 1)
+#
+#
 #
 #
 # @bot.event
@@ -341,6 +397,56 @@ async def on_guild_stickers_update(stickers: interactions.GuildStickers):
 #     emoji: interactions.Emoji = None,
 # ):
 #     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+
+# Events
+
+# Commands
+
+
+@bot.command(
+    type=interactions.ApplicationCommandType.CHAT_INPUT,
+    name="about",
+    description="About the bot!",
+    scope=GUILD_PROD,
+)
+async def _about(ctx: interactions.CommandContext) -> None:
+    embed: interactions.Embed = buildEmbed(
+        title="About Me",
+        fields=[
+            [
+                "History",
+                "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt). [/u/psyspoop](https://reddit.com/u/psyspoop), Jeyrad, and ModestBeaver greatly assisted with the creation.",
+            ],
+            [
+                "Source Code",
+                "[GitHub](https://www.github.com/refekt/Husker-Bot)",
+            ],
+            [
+                "Hosting Location",
+                f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}",
+            ],
+            [
+                "Hosting Status",
+                f"{'Lol' if 'Windows' in platform.platform() else 'https://status.hyperexpert.com/'}",
+            ],
+            ["Latency", f"TBD"],
+            ["Username", getUserMention(bot.me)],
+            ["Birthday", f"I was born on ..."],
+            [
+                "Feeling generous?",
+                f"Check out `/donate` to help out the production and upkeep of the bot.",
+            ],
+        ],
+        inline=False,
+    )
+
+    await ctx.send(
+        content="",
+        embeds=[embed],
+    )
+
+
+# Commands
 
 
 @bot.event

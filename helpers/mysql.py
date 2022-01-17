@@ -311,3 +311,6 @@ def processMySQL(query: str, **kwargs):
     #     if result:
     #         log(f"MySQL query finished", 0)
     #         return result
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

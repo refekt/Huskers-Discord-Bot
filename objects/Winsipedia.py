@@ -2,7 +2,12 @@
 # * Modernize and revamp
 # TODO
 import logging
+
 logger = logging.getLogger(__name__)
+
+# __all__ = [""]
+
+logger.info(f"{str(__name__).title()} module loaded!")
 
 # import requests
 # from bs4 import BeautifulSoup

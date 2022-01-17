@@ -54,10 +54,17 @@ def createComponentKey() -> str:
 
 
 def getUserMention(user: interactions.User) -> [str, UserInputException]:
-    if not type(user) == interactions.User:
+    if not isinstance(user, dict):
         return UserInputException("An `interactions.User` was not provided!")
-    else:
-        return f"<@{user.id}>"
+
+    return f"<@{user.get('id')}>"
+
+
+def getChannelMention(channel_id: int) -> [str, UserInputException]:
+    if not isinstance(channel_id, int):
+        return UserInputException("Must provide a value channel ID")
+
+    return f"<#{channel_id}>"
 
 
 async def getCurrentGuildID(bot: interactions.Client) -> int:
@@ -89,3 +96,6 @@ def convertEmbedtoDict(embed: interactions.Embed) -> dict:
     _["fields"] = [field._json for field in _["fields"]]
 
     return _
+
+
+logger.info(f"{str(__name__).title()} module loaded!")
