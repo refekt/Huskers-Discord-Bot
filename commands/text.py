@@ -117,32 +117,35 @@ class TextCommands(commands.Cog):
         guild_ids=guild_id_list(),
     )
     async def _urbandictionary(self, ctx: SlashContext, *, word: str):
-        r = requests.get(f"http://www.urbandictionary.com/define.php?term={word}")
+        r = requests.get(f"https://www.urbandictionary.com/define.php?term={word}")
         soup = BeautifulSoup(r.content, features="html.parser")
 
         try:
-            definitions = soup.find_all(name="div", attrs={"class": "def-panel"})
+            definitions = soup.find_all(
+                name="div", attrs={"class": re.compile("definition.*")}
+            )
         except AttributeError:
             raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
 
         del r, soup
 
-        if len(definitions) == 0:
-            raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
+        # if len(definitions) == 0:
+        #     raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
 
-        try:
-            del definitions[1]  # Word of the day
-        except IndexError:
-            pass
+        # try:
+        #     del definitions[1]  # Word of the day
+        # except IndexError:
+        #     # pass
+        #     raise UserError(f"Unable to find [{word}] in the Urban Dictionary.")
 
         results = []
         for definition in definitions:
             results.append(
                 self.Definition(
-                    lookup_word=definition.contents[1].contents[0].text,
-                    meaning=definition.contents[2].text,
-                    example=definition.contents[3].text,
-                    contributor=definition.contents[4].text,
+                    lookup_word=definition.contents[0].contents[0].text,
+                    meaning=definition.contents[0].contents[1].text,
+                    example=definition.contents[0].contents[2].text,
+                    contributor=definition.contents[0].contents[3].text,
                 )
             )
 
