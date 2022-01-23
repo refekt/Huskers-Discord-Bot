@@ -261,8 +261,10 @@ def build_recruit_embed(recruit):
         else:
             embed.set_footer(text=BOT_FOOTER_BOT)
 
-    if not recruit.thumbnail == "/.":
+    if recruit.thumbnail and not recruit.thumbnail == "/.":
         embed.set_thumbnail(url=recruit.thumbnail)
+    else:
+        embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
     return embed
 
 
