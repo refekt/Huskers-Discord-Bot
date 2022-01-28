@@ -556,7 +556,7 @@ if "Windows" not in platform.platform():
                 fields=[["Error Message", f"{ex.__class__}: {ex}"]],
             )
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=True)
 
         traceback_raw = traceback.format_exception(
             etype=type(ex), value=ex, tb=ex.__traceback__

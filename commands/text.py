@@ -149,6 +149,9 @@ class TextCommands(commands.Cog):
                 )
             )
 
+        if not results:
+            raise CommandError(f"No results found for {word}. Try again!")
+
         pages = []
         for index, result in enumerate(results):
             pages.append(
