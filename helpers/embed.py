@@ -70,7 +70,7 @@ def buildEmbed(title: str, **kwargs) -> interactions.Embed:
                 inline=kwargs.get("inline", True),
             )
             for field in kwargs.get("fields")
-        ],
+        ] if kwargs.get("fields") else None,
     )
     
     logger.info("Returning a normal embed")

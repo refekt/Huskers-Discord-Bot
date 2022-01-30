@@ -19,6 +19,7 @@ __all__ = [
     "getChannelbyID",
     "getCurrentGuildID",
     "getGuild",
+    "getMemberfromGuildMember",
     "getUserMention",
     "grabPlatform",
     "loadVarPath",
@@ -85,29 +86,32 @@ async def getCurrentGuildID(bot: interactions.Client) -> int:
     return int(await bot._http.get_self_guilds()[0]["id"])
 
 
+def getMemberfromGuildMember(
+    guild_member: interactions.GuildMember,
+) -> interactions.Member:
+    return interactions.Member(**guild_member._json)  # noqa
+
+
 async def getGuild(bot: interactions.Client, gID: int) -> interactions.Guild:
     return interactions.Guild(
-        **await bot._http.get_guild(guild_id=gID), _state=bot._http
+        **await bot._http.get_guild(guild_id=gID), _state=bot._http  # noqa
     )
 
 
 async def getBotUser(bot: interactions.Client):
-    return interactions.User(**await bot._http.get_self(), _state=bot._http)
+    return interactions.User(**await bot._http.get_self(), _state=bot._http)  # noqa
 
 
 async def getChannelbyID(
     bot: interactions.Client, chan_id: int
 ) -> interactions.Channel:
-    return interactions.Channel(**await bot._http.get_channel(chan_id), _client=bot._http)
+    return interactions.Channel(
+        **await bot._http.get_channel(chan_id), _client=bot._http
+    )  # noqa
 
 
 def convertEmbedtoDict(embed: interactions.Embed) -> dict:
-    _ = embed._json
-    # _["author"] = embed.author._json
-    # _["footer"] = embed.footer._json
-    # _["thumbnail"] = embed.thumbnail._json
-    # _["fields"] = [field._json for field in _["fields"]]
-    return _
+    return embed._json  # noqa
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

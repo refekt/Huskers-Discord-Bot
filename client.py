@@ -7,7 +7,6 @@
 # * Twitter stream
 # TODO
 
-import inspect
 import logging
 import pathlib
 import platform
@@ -27,12 +26,12 @@ from helpers.misc import (
     getChannelMention,
     getGuild,
     getChannelbyID,
+    getMemberfromGuildMember,
 )
 from objects.Exceptions import CommandException
 
 __author__ = "u/refekt"
 __version__ = "3.5.0"
-
 
 bot = interactions.Client(
     token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=logging.CRITICAL
@@ -62,10 +61,6 @@ def getWelcomeMessage() -> interactions.Embed:
             [
                 "Commands",
                 f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
-            ],
-            [
-                "Roles",
-                "You can assign yourself come flair by using the `/roles` command.",
             ],
         ],
         inline=False,
@@ -131,6 +126,10 @@ async def getOnlineMessage() -> interactions.Embed:
                 "More Changelog",
                 f"[View rest of commits](https://github.com/refekt/Bot-Frost/commits/master)",
             ],
+            [
+                "Support the project",
+                "Check out `/donate` to see how you can support the project!",
+            ],
         ],
         inline=False,
     )
@@ -146,56 +145,50 @@ def surpassedReactionThreshold(reaction: interactions.MessageReaction) -> bool:
 
 @bot.event
 async def on_ready():
-    
-    channel: interactions.Channel = await getChannelbyID(
-        bot=bot, chan_id=CHAN_BOT_SPAM
-    )
-    await channel.send(
-        content="",
-        embeds=await getOnlineMessage(),
-    )
+    # channel: interactions.Channel = await getChannelbyID(
+    #     bot=bot, chan_id=CHAN_BOT_SPAM
+    # )
+    # await channel.send(
+    #     content="",
+    #     embeds=await getOnlineMessage(),
+    # )
 
     logger.info("The bot is ready!")
 
 
 @bot.event
-async def on_guild_member_add(guild_member: interactions.GuildMember):
+async def on_guild_member_add(guild_member: interactions.GuildMember):  #
     # TODO d-p-i.py is slated to add `send()` to Member, Channel, etc. models
-    try:
-        await bot._http.send_message(
-            channel_id=guild_member.user.id,
-            content="",
-            embeds=[convertEmbedtoDict(getWelcomeMessage())],
-        )
-    except Exception:
-        raise CommandException(
-            f"Unable to send message to {guild_member.user.username}"
-        )
+
+    new_member: interactions.Member = getMemberfromGuildMember(
+        guild_member=guild_member
+    )
+    await new_member.send(content="", embeds=getWelcomeMessage())
 
 
 @bot.event
 async def on_guild_member_remove(guild_member: interactions.GuildMember):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_member_update(guild_member: interactions.GuildMember):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_role_create(role: interactions.Role):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_role_update(role: interactions.Role):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_role_delete(role: interactions.Role):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 # TODO Capture metrics for guild karma
@@ -233,33 +226,35 @@ async def on_channel_pins_update(pin: interactions.ChannelPins):
 async def on_invite_create(
     invite: interactions.Invite,
 ):
-    inviter = invite._json.get("inviter")
-    code = invite._json.get("code")
-
     logger.info(
-        f"{inviter['username']}#{inviter['discriminator']} created the {'permanent' if invite.temporary else 'temporary'} invite code {code} at {invite.created_at}.",
+        f"{invite.inviter['username']}#{invite.inviter['discriminator']} created the {'permanent' if invite.temporary else 'temporary'} invite code {invite.code} at {invite.created_at}.",
     )
+
+
+@bot.event
+async def on_invite_delete(invite: interactions.Invite):
+    logger.info(f"The invite code {invite.code} was deleted.")
 
 
 @bot.event
 async def on_guild_scheduled_event_create(
     scheduled_event: interactions.ScheduledEvents,
 ):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_scheduled_event_update(
     scheduled_event: interactions.ScheduledEvents,
 ):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_scheduled_event_delete(
     scheduled_event: interactions.ScheduledEvents,
 ):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
@@ -268,7 +263,7 @@ async def on_guild_scheduled_event_user_add(
     user: interactions.User,
     guild: interactions.Guild,
 ):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
@@ -277,12 +272,7 @@ async def on_guild_scheduled_event_user_remove(
     user: interactions.User,
     guild: interactions.Guild,
 ):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
-
-
-@bot.event
-async def on_invite_delete(invite: interactions.Invite):
-    logger.info(f"The invite code {invite._json.get('code')} was deleted.")
+    ...
 
 
 @bot.event
@@ -292,22 +282,22 @@ async def on_guild_create(guild: interactions.Guild):
 
 @bot.event
 async def on_guild_update(guild: interactions.Guild):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_delete(guild: interactions.Guild):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 @bot.event
 async def on_guild_stickers_update(stickers: interactions.GuildStickers):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
 
 
 # TODO d-p-i.py bug
@@ -449,4 +439,4 @@ async def _about(ctx: interactions.CommandContext) -> None:
 
 @bot.event
 async def on_user_update(user: interactions.User):
-    logger.info(f"Loaded {inspect.stack()[0][3]}")
+    ...
