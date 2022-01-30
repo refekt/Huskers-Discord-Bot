@@ -1,3 +1,4 @@
+black
 cryptography
 discord-py-interactions>=4.0.1
 python-dotenv

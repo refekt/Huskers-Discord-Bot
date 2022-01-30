@@ -25,14 +25,14 @@ __all__ = ["buildEmbed"]
 
 def buildEmbed(title: str, **kwargs) -> interactions.Embed:
     logger.info("Creating a normal embed")
-
+    
     assert title is not None, CommandException("Title must not be blank!")
-
+    
     title_limit = name_limit = 256
     desc_limit = 4096
     footer_limit = 2048
     field_value_limit = 1024
-
+    
     dtNow = datetime.now().astimezone(tz=TZ).isoformat()
     e: interactions.Embed = interactions.Embed(
         title=title[:title_limit],
@@ -57,12 +57,12 @@ def buildEmbed(title: str, **kwargs) -> interactions.Embed:
         else interactions.EmbedFooter(
             text=BOT_FOOTER_BOT[:footer_limit], icon_url=BOT_ICON_URL
         ),
-        image=interactions.EmbedImageStruct(url=kwargs["image"])
+        image=interactions.EmbedImageStruct(url=kwargs["image"])._json  # noqa
         if kwargs.get("image", False)
         else None,
-        thumbnail=interactions.EmbedImageStruct(url=kwargs.get("thumbnail"))
+        thumbnail=interactions.EmbedImageStruct(url=kwargs.get("thumbnail"))._json  # noqa
         if kwargs.get("thumbnail", False) and validators.url(kwargs.get("thumbnail"))
-        else interactions.EmbedImageStruct(url=BOT_THUMBNAIL_URL),
+        else interactions.EmbedImageStruct(url=BOT_THUMBNAIL_URL)._json,  # noqa
         fields=[
             interactions.EmbedField(
                 name=str(field[0]),
@@ -72,7 +72,7 @@ def buildEmbed(title: str, **kwargs) -> interactions.Embed:
             for field in kwargs.get("fields")
         ],
     )
-
+    
     logger.info("Returning a normal embed")
     return e
 

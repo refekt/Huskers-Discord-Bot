@@ -16,22 +16,26 @@ import interactions
 
 from helpers.constants import (
     PROD_TOKEN,
-    TEST_TOKEN,
     CHAN_BOT_SPAM,
     GUILD_PROD,
     CHAN_ANNOUNCEMENT,
 )
 from helpers.embed import buildEmbed
-from helpers.misc import convertEmbedtoDict, getUserMention, getChannelMention
+from helpers.misc import (
+    convertEmbedtoDict,
+    getUserMention,
+    getChannelMention,
+    getGuild,
+    getChannelbyID,
+)
 from objects.Exceptions import CommandException
 
 __author__ = "u/refekt"
 __version__ = "3.5.0"
 
-CUR_TOKEN = PROD_TOKEN  # TEST_TOKEN
 
 bot = interactions.Client(
-    token=CUR_TOKEN, intents=interactions.Intents.ALL, log_level=logging.CRITICAL
+    token=PROD_TOKEN, intents=interactions.Intents.ALL, log_level=logging.CRITICAL
 )
 __all__ = ["bot"]
 
@@ -42,7 +46,7 @@ for logger in bot_loggers:
 
 logger = logging.getLogger(f"{__name__}-frost")
 
-reaction_threshold = 12
+reaction_threshold = 12  # Used for Hall of Fame/Shame
 
 
 def getWelcomeMessage() -> interactions.Embed:
@@ -69,28 +73,18 @@ def getWelcomeMessage() -> interactions.Embed:
 
 
 async def getServerStatistics(client: interactions.Client) -> str:
-    guild = await client.http.get_guild(guild_id=GUILD_PROD)
-    description = guild.get("description", "N/A")
-    features_raw = guild.get("features", [])
-    features_raw.sort()
-    features = ", ".join(features_raw).replace("_", " ").title()
-    owner = getUserMention(
-        user=await client.http.get_user(user_id=guild.get("owner_id"))
-    )
-    region = guild.get("region", "N/A")
-    vanity_url = (
-        f"https://discord.gg/{guild.get('vanity_url_code')}"
-        if guild.get("vanity_url_code")
-        else "N/A"
-    )
-    boost_count = guild.get("premium_subscription_count", "N/A")
+    guild = await getGuild(bot=client, gID=GUILD_PROD)
+
+    features = sorted(guild.features)
+    features = ", ".join(features).replace("_", " ").title()
+
     server_stats = (
-        f"• __Onwer:__ {owner}\n"
-        f"• __Description:__ {description}\n"
+        f"• __Onwer:__ {guild.owner_id}\n"
+        f"• __Description:__ {guild.description}\n"
         f"• __Server Features:__ {features}\n"
-        f"• __Server Region:__ {region}\n"
-        f"• __Vanity URL:__ {vanity_url}\n"
-        f"• __Boost Count:__ {boost_count}\n"
+        f"• __Server Region:__ {guild.region}\n"
+        f"• __Vanity URL:__ {f'https://discord.gg/{guild.vanity_url_code}' if guild.vanity_url_code else 'N/A'}\n"
+        f"• __Boost Count:__ {guild.premium_subscription_count}\n"
         f"• __Rules Channel:__ {getChannelMention(CHAN_ANNOUNCEMENT)}"
     )
     return server_stats
@@ -143,7 +137,7 @@ async def getOnlineMessage() -> interactions.Embed:
 
 
 # TODO Waiting for d-p-i.py to add `MessageReaction` attribute
-def surpassedReactionThreshold(reaction: interactions.Reaction) -> bool:
+def surpassedReactionThreshold(reaction: interactions.MessageReaction) -> bool:
     return True
 
 
@@ -152,18 +146,14 @@ def surpassedReactionThreshold(reaction: interactions.Reaction) -> bool:
 
 @bot.event
 async def on_ready():
-    try:
-        await bot.http.send_message(
-            channel_id=CHAN_BOT_SPAM,
-            content="",
-            tts=False,
-            embeds=[convertEmbedtoDict(await getOnlineMessage())],
-            nonce=None,
-            allowed_mentions=None,
-            message_reference=None,
-        )
-    except Exception as err:
-        logger.error(f"Exception received: {err}")
+    
+    channel: interactions.Channel = await getChannelbyID(
+        bot=bot, chan_id=CHAN_BOT_SPAM
+    )
+    await channel.send(
+        content="",
+        embeds=await getOnlineMessage(),
+    )
 
     logger.info("The bot is ready!")
 
@@ -172,7 +162,7 @@ async def on_ready():
 async def on_guild_member_add(guild_member: interactions.GuildMember):
     # TODO d-p-i.py is slated to add `send()` to Member, Channel, etc. models
     try:
-        await bot.http.send_message(
+        await bot._http.send_message(
             channel_id=guild_member.user.id,
             content="",
             embeds=[convertEmbedtoDict(getWelcomeMessage())],
@@ -363,12 +353,20 @@ async def on_guild_stickers_update(stickers: interactions.GuildStickers):
 #     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 #
 #
-# @bot.event
-# async def on_message_reaction_add(
-#     reaction: interactions.Reaction,
-# ):
-#     test = surpassedReactionThreshold(reaction)
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+@bot.event
+async def on_message_reaction_add(
+    reaction: interactions.MessageReaction,
+):
+    test = surpassedReactionThreshold(reaction)
+
+    chan: interactions.Channel = interactions.Channel(
+        **await bot._http.get_channel(int(reaction.channel_id)), _state=bot._http
+    )
+    logger.info(
+        f"Reaction added in {chan.name} to {reaction.message_id} with {reaction.emoji.id}:{reaction.emoji.name}"
+    )
+
+
 #
 #
 #

@@ -10,6 +10,20 @@ from objects.Exceptions import CommandException, UserInputException
 
 logger = logging.getLogger(__name__)
 
+__all__ = [
+    "convertEmbedtoDict",
+    "createComponentKey",
+    "formatPrettyTimeDelta",
+    "getBotUser",
+    "getChannelMention",
+    "getChannelbyID",
+    "getCurrentGuildID",
+    "getGuild",
+    "getUserMention",
+    "grabPlatform",
+    "loadVarPath",
+]
+
 
 def formatPrettyTimeDelta(seconds) -> str:
     seconds = int(seconds)
@@ -68,33 +82,31 @@ def getChannelMention(channel_id: int) -> [str, UserInputException]:
 
 
 async def getCurrentGuildID(bot: interactions.Client) -> int:
-    g = await bot.http.get_self_guilds()
-    return int(g[0]["id"])
+    return int(await bot._http.get_self_guilds()[0]["id"])
 
 
 async def getGuild(bot: interactions.Client, gID: int) -> interactions.Guild:
-    return interactions.Guild(**(await bot.http.get_guild(guild_id=gID)))
+    return interactions.Guild(
+        **await bot._http.get_guild(guild_id=gID), _state=bot._http
+    )
 
 
 async def getBotUser(bot: interactions.Client):
-    return interactions.User(**(await bot.http.get_self()))
+    return interactions.User(**await bot._http.get_self(), _state=bot._http)
 
 
-async def convertChannelIDtoChannel(
+async def getChannelbyID(
     bot: interactions.Client, chan_id: int
 ) -> interactions.Channel:
-    return interactions.Channel(**(await bot.http.get_channel(chan_id)))
+    return interactions.Channel(**await bot._http.get_channel(chan_id), _client=bot._http)
 
 
 def convertEmbedtoDict(embed: interactions.Embed) -> dict:
-    from pprint import pprint
-
     _ = embed._json
-    _["author"] = embed.author._json
-    _["footer"] = embed.footer._json
-    _["thumbnail"] = embed.thumbnail._json
-    _["fields"] = [field._json for field in _["fields"]]
-
+    # _["author"] = embed.author._json
+    # _["footer"] = embed.footer._json
+    # _["thumbnail"] = embed.thumbnail._json
+    # _["fields"] = [field._json for field in _["fields"]]
     return _
 
 
