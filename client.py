@@ -20,10 +20,12 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from helpers.misc import (
-    getUserMention,
     getChannelMention,
+    getChannelbyID,
     getGuild,
     getMemberfromGuildMember,
+    getMessagebyID,
+    getUserMention,
 )
 from objects.Exceptions import CommandException
 
@@ -42,7 +44,7 @@ for logger in bot_loggers:
 
 logger = logging.getLogger(f"{__name__}-frost")
 
-reaction_threshold = 12  # Used for Hall of Fame/Shame
+reaction_threshold = 2  # Used for Hall of Fame/Shame
 
 
 def getWelcomeMessage() -> interactions.Embed:
@@ -133,8 +135,13 @@ async def getOnlineMessage() -> interactions.Embed:
 
 
 # TODO Waiting for d-p-i.py to add `MessageReaction` attribute
-def surpassedReactionThreshold(reaction: interactions.MessageReaction) -> bool:
-    return True
+async def surpassedReactionThreshold(reaction: interactions.MessageReaction) -> bool:
+    msg: interactions.Message = await getMessagebyID(
+        bot, reaction.channel_id, reaction.message_id
+    )
+    for msg_reaction in msg.reactions:
+        if msg_reaction["emoji"]["name"] == reaction.emoji.name:
+            return msg_reaction["count"] >= reaction_threshold
 
 
 # Start Events
@@ -156,14 +163,18 @@ async def on_ready():
 async def on_message_reaction_add(
     reaction: interactions.MessageReaction,
 ):
-    test = surpassedReactionThreshold(reaction)
+    chan: interactions.Channel = await getChannelbyID(
+        bot=bot, chan_id=reaction.channel_id
+    )
 
-    chan: interactions.Channel = interactions.Channel(
-        **await bot._http.get_channel(int(reaction.channel_id)), _state=bot._http
-    )
-    logger.info(
-        f"Reaction added in {chan.name} to {reaction.message_id} with {reaction.emoji.id}:{reaction.emoji.name}"
-    )
+    if await surpassedReactionThreshold(reaction):
+        logger.info(
+            f"Reaction added in {chan.name} to {reaction.message_id} with {reaction.emoji.id}:{reaction.emoji.name}. The reaction count did surpass the threshold for HOF or HOS."
+        )
+    else:
+        logger.info(
+            f"Reaction added in {chan.name} to {reaction.message_id} with {reaction.emoji.id}:{reaction.emoji.name}. The reaction count did not surpass the threshold for HOF or HOS."
+        )
 
 
 @bot.event

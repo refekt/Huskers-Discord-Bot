@@ -20,6 +20,7 @@ __all__ = [
     "getCurrentGuildID",
     "getGuild",
     "getMemberfromGuildMember",
+    "getMessagebyID",
     "getUserMention",
     "grabPlatform",
     "loadVarPath",
@@ -108,6 +109,15 @@ async def getChannelbyID(
     return interactions.Channel(
         **await bot._http.get_channel(chan_id), _client=bot._http
     )  # noqa
+
+
+async def getMessagebyID(
+    bot: interactions.Client, chan_id: int, msg_id: int
+) -> interactions.Message:
+    return interactions.Message(
+        **await bot._http.get_message(channel_id=chan_id, message_id=msg_id),
+        _client=bot._http,
+    )
 
 
 def convertEmbedtoDict(embed: interactions.Embed) -> dict:
