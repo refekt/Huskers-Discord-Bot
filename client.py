@@ -15,17 +15,14 @@ import interactions
 
 from helpers.constants import (
     PROD_TOKEN,
-    CHAN_BOT_SPAM,
     GUILD_PROD,
     CHAN_ANNOUNCEMENT,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import (
-    convertEmbedtoDict,
     getUserMention,
     getChannelMention,
     getGuild,
-    getChannelbyID,
     getMemberfromGuildMember,
 )
 from objects.Exceptions import CommandException
@@ -140,9 +137,7 @@ def surpassedReactionThreshold(reaction: interactions.MessageReaction) -> bool:
     return True
 
 
-# Events
-
-
+# Start Events
 @bot.event
 async def on_ready():
     # channel: interactions.Channel = await getChannelbyID(
@@ -156,6 +151,21 @@ async def on_ready():
     logger.info("The bot is ready!")
 
 
+# TODO Reaction counts for HOF/HOS
+@bot.event
+async def on_message_reaction_add(
+    reaction: interactions.MessageReaction,
+):
+    test = surpassedReactionThreshold(reaction)
+
+    chan: interactions.Channel = interactions.Channel(
+        **await bot._http.get_channel(int(reaction.channel_id)), _state=bot._http
+    )
+    logger.info(
+        f"Reaction added in {chan.name} to {reaction.message_id} with {reaction.emoji.id}:{reaction.emoji.name}"
+    )
+
+
 @bot.event
 async def on_guild_member_add(guild_member: interactions.GuildMember):  #
     # TODO d-p-i.py is slated to add `send()` to Member, Channel, etc. models
@@ -167,59 +177,8 @@ async def on_guild_member_add(guild_member: interactions.GuildMember):  #
 
 
 @bot.event
-async def on_guild_member_remove(guild_member: interactions.GuildMember):
-    ...
-
-
-@bot.event
-async def on_guild_member_update(guild_member: interactions.GuildMember):
-    ...
-
-
-@bot.event
-async def on_guild_role_create(role: interactions.Role):
-    ...
-
-
-@bot.event
-async def on_guild_role_update(role: interactions.Role):
-    ...
-
-
-@bot.event
-async def on_guild_role_delete(role: interactions.Role):
-    ...
-
-
-# TODO Capture metrics for guild karma
-# @bot.event
-# async def on_message_create(message: interactions.Message):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-# TODO Botlogs record?
-# @bot.event
-# async def on_message_update(message: interactions.Message):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-# TODO Botlogs record?
-# @bot.event
-# async def on_message_delete(message: interactions.Message):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-# TODO Purge commands?
-# @bot.event
-# async def on_message_delete_bulk(
-#     message_ids, channel: interactions.Channel, guild: interactions.Guild
-# ):
-#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-
-
-@bot.event
-async def on_channel_pins_update(pin: interactions.ChannelPins):
-    logger.info(f"A a pin was updated in {pin.channel_id}")
+async def on_guild_create(guild: interactions.Guild):
+    logger.info(f"Establishing guild connection to: {guild.name}")
 
 
 @bot.event
@@ -236,69 +195,117 @@ async def on_invite_delete(invite: interactions.Invite):
     logger.info(f"The invite code {invite.code} was deleted.")
 
 
-@bot.event
-async def on_guild_scheduled_event_create(
-    scheduled_event: interactions.ScheduledEvents,
-):
-    ...
+# TODO Monitor guild member changes
+# @bot.event
+# async def on_guild_member_remove(guild_member: interactions.GuildMember):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_member_update(guild_member: interactions.GuildMember):
+#     ...
 
 
-@bot.event
-async def on_guild_scheduled_event_update(
-    scheduled_event: interactions.ScheduledEvents,
-):
-    ...
+# TODO Monitor role changes
+# @bot.event
+# async def on_guild_role_create(role: interactions.Role):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_role_update(role: interactions.Role):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_role_delete(role: interactions.Role):
+#     ...
 
 
-@bot.event
-async def on_guild_scheduled_event_delete(
-    scheduled_event: interactions.ScheduledEvents,
-):
-    ...
+# TODO Capture metrics for guild karma
+# @bot.event
+# async def on_message_create(message: interactions.Message):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_channel_pins_update(pin: interactions.ChannelPins):
+#     logger.info(f"A a pin was updated in {pin.channel_id}")
 
 
-@bot.event
-async def on_guild_scheduled_event_user_add(
-    scheduled_event: interactions.ScheduledEvents,
-    user: interactions.User,
-    guild: interactions.Guild,
-):
-    ...
+# TODO Botlogs record?
+# @bot.event
+# async def on_message_delete(message: interactions.Message):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
+#
+#
+# @bot.event
+# async def on_user_update(user: interactions.User):
+#     ...
 
 
-@bot.event
-async def on_guild_scheduled_event_user_remove(
-    scheduled_event: interactions.ScheduledEvents,
-    user: interactions.User,
-    guild: interactions.Guild,
-):
-    ...
+# TODO Purge commands?
+# @bot.event
+# async def on_message_delete_bulk(
+#     message_ids, channel: interactions.Channel, guild: interactions.Guild
+# ):
+#     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
 
-@bot.event
-async def on_guild_create(guild: interactions.Guild):
-    logger.info(f"Establishing guild connection to: {guild.name}")
+# TODO Work on scheudled events for games
+# @bot.event
+# async def on_guild_scheduled_event_create(
+#     scheduled_event: interactions.ScheduledEvents,
+# ):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_scheduled_event_update(
+#     scheduled_event: interactions.ScheduledEvents,
+# ):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_scheduled_event_delete(
+#     scheduled_event: interactions.ScheduledEvents,
+# ):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_scheduled_event_user_add(
+#     scheduled_event: interactions.ScheduledEvents,
+#     user: interactions.User,
+#     guild: interactions.Guild,
+# ):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_scheduled_event_user_remove(
+#     scheduled_event: interactions.ScheduledEvents,
+#     user: interactions.User,
+#     guild: interactions.Guild,
+# ):
+#     ...
 
 
-@bot.event
-async def on_guild_update(guild: interactions.Guild):
-    ...
+# TODO Remove from guild
+# @bot.event
+# async def on_guild_delete(guild: interactions.Guild):
+#     ...
 
-
-@bot.event
-async def on_guild_delete(guild: interactions.Guild):
-    ...
-
-
-@bot.event
-async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
-    ...
-
-
-@bot.event
-async def on_guild_stickers_update(stickers: interactions.GuildStickers):
-    ...
-
+# Monitor emoji and stickers
+# @bot.event
+# async def on_guild_emojis_update(emojis: interactions.GuildEmojis):
+#     ...
+#
+#
+# @bot.event
+# async def on_guild_stickers_update(stickers: interactions.GuildStickers):
+#     ...
 
 # TODO d-p-i.py bug
 # @bot.event
@@ -341,26 +348,9 @@ async def on_guild_stickers_update(stickers: interactions.GuildStickers):
 # @bot.event
 # async def on_thread_members_update(thread_member: interactions.ThreadMember):
 #     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
-#
-#
-@bot.event
-async def on_message_reaction_add(
-    reaction: interactions.MessageReaction,
-):
-    test = surpassedReactionThreshold(reaction)
-
-    chan: interactions.Channel = interactions.Channel(
-        **await bot._http.get_channel(int(reaction.channel_id)), _state=bot._http
-    )
-    logger.info(
-        f"Reaction added in {chan.name} to {reaction.message_id} with {reaction.emoji.id}:{reaction.emoji.name}"
-    )
 
 
-#
-#
-#
-#
+# TODO Reaction monitoring
 # @bot.event
 # async def on_message_reaction_remove(
 #     reaction: interactions.Reaction
@@ -386,11 +376,9 @@ async def on_message_reaction_add(
 # ):
 #     logger.info(f"Loaded {inspect.stack()[0][3]}", 0)
 
-# Events
+# End Events
 
-# Commands
-
-
+# Start Commands
 @bot.command(
     type=interactions.ApplicationCommandType.CHAT_INPUT,
     name="about",
@@ -434,9 +422,4 @@ async def _about(ctx: interactions.CommandContext) -> None:
     )
 
 
-# Commands
-
-
-@bot.event
-async def on_user_update(user: interactions.User):
-    ...
+# End Commands
