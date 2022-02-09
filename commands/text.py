@@ -580,6 +580,38 @@ class TextCommands(commands.Cog):
             bot=ctx.bot, ctx=ctx, question=question, options=options, timeout=timeout
         ).send()
 
+    @cog_ext.cog_slash(
+        name="recipes",
+        description="Gives you recipes ideas",
+        guild_ids=guild_id_list(),
+    )
+    async def _recipes(self, ctx: ComponentContext):
+        r = requests.get(url="https://breakfastapi.fun/")
+        data = r.json()
+        import ast
+
+        try:
+            ingredients = ast.literal_eval(data["Ingredients"])
+
+            embed = build_embed(
+                title=f"Recipe ideas for the lazy chef",
+                description="Who knows what you'll get? Probably not vegan.",
+                fields=[
+                    ["Recipe Name", data["Recipe Name"]],
+                    ["Cooking Time", f"{data['Cook Time (Minutes)']} mins"],
+                    [
+                        "Ingredients",
+                        f"\n".join(ingredients),
+                    ],
+                    ["Directions", data["Directions"]],
+                ],
+                inline=False,
+            )
+
+            await ctx.send(embed=embed)
+        except:
+            await ctx.send("Error!", hidden=True)
+
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
         try:  # Avoid listening to events that don't apply to the vote command
