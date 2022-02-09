@@ -590,27 +590,24 @@ class TextCommands(commands.Cog):
         data = r.json()
         import ast
 
-        try:
-            ingredients = ast.literal_eval(data["Ingredients"])
+        ingredients = ast.literal_eval(data["Ingredients"])
 
-            embed = build_embed(
-                title=f"Recipe ideas for the lazy chef",
-                description="Who knows what you'll get? Probably not vegan.",
-                fields=[
-                    ["Recipe Name", data["Recipe Name"]],
-                    ["Cooking Time", f"{data['Cook Time (Minutes)']} mins"],
-                    [
-                        "Ingredients",
-                        f"\n".join(ingredients),
-                    ],
-                    ["Directions", data["Directions"]],
+        embed = build_embed(
+            title=f"Recipe ideas for the lazy chef",
+            description="Who knows what you'll get? Probably not vegan.",
+            fields=[
+                ["Recipe Name", data["Recipe Name"]],
+                ["Cooking Time", f"{data['Cook Time (Minutes)']} mins"],
+                [
+                    "Ingredients",
+                    f"\n".join(ingredients),
                 ],
-                inline=False,
-            )
+                ["Directions", data["Directions"]],
+            ],
+            inline=False,
+        )
 
-            await ctx.send(embed=embed)
-        except:
-            await ctx.send("Error!", hidden=True)
+        await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext):
