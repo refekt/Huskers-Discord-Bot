@@ -317,7 +317,8 @@ class TextCommands(commands.Cog):
             source_data = cleanup_source_data(source_data)
         else:
             await ctx.send(
-                f"There was not enough information available to make a Markov chain."
+                f"There was not enough information available to make a Markov chain.",
+                hidden=True,
             )
 
         chain = markovify.NewlineText(source_data, well_formed=True)
@@ -326,7 +327,7 @@ class TextCommands(commands.Cog):
         )
 
         if markov_output is None:
-            await ctx.send(f"Creating a Markov chain failed.")
+            await ctx.send(f"Creating a Markov chain failed.", hidden=True)
         else:
             punctuation = ("!", ".", "?", "...")
             markov_output += random.choice(punctuation)
