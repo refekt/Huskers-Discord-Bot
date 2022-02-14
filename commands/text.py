@@ -593,7 +593,7 @@ class TextCommands(commands.Cog):
         ingredients = ast.literal_eval(data["Ingredients"])
 
         embed = build_embed(
-            title=f"Recipe ideas for the lazy chef",
+            title="Recipe ideas for the lazy chef",
             description="Who knows what you'll get? Probably not vegan.",
             fields=[
                 ["Recipe Name", data["Recipe Name"]],
