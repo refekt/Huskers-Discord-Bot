@@ -1,9 +1,10 @@
 import asyncio
+import time
 import typing
 
 import discord
 import tweepy
-import time
+from discord_slash.context import SlashContext
 
 from utilities.constants import pretty_time_delta
 from utilities.embed import build_embed
@@ -174,3 +175,24 @@ async def send_reminder(
     )
 
     log(f"Thread completed successfully!", 0)
+
+
+async def end_timeout(duration: int, ctx: SlashContext, who: discord.Member):
+    await asyncio.sleep(duration)
+
+    from commands.admin import process_nebraska
+
+    if await process_nebraska(ctx=ctx, who=who):
+        embed = build_embed(
+            title="Return to Nebraska",
+            inline=False,
+            fields=[
+                ["Welcome back!", f"[{who.mention}] is welcomed back to Nebraska!"],
+                ["Welcomed by", ctx.author.mention],
+            ],
+        )
+        await ctx.send(embed=embed)
+        log("Nebraska command complete", 0)
+    else:
+        await ctx.send("Unable to complete the Nebraska command!", hidden=True)
+        log("Unable to complete the Nebraska command", 0)

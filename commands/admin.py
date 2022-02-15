@@ -4,6 +4,7 @@ import platform
 from datetime import datetime, timedelta
 
 import discord
+import nest_asyncio
 import paramiko
 from dinteractions_Paginator import Paginator
 from discord.ext import commands
@@ -21,7 +22,9 @@ from discord_slash.utils.manage_components import (
     create_select_option,
     spread_to_rows,
 )
+from utilities.constants import pretty_time_delta
 
+from objects.Thread import end_timeout
 from utilities.constants import (
     BOT_FOOTER_SECRET,
     CAT_GAMEDAY,
@@ -254,6 +257,41 @@ async def process_gameday(mode: bool, guild: discord.Guild):
             continue
 
     log(0, f"All permissions changes applied")
+
+
+async def process_nebraska(ctx, who: discord.Member):
+    assert who, UserError("You must include a user!")
+
+    role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
+    await who.remove_roles(role_timeout)
+
+    log(1, f"Removed [{role_timeout}] role")
+
+    previous_roles_raw = Process_MySQL(
+        query=sqlRetrieveIowa, values=who.id, fetch="all"
+    )
+
+    if previous_roles_raw is not None:
+        previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+        log(1, f"Gathered all the roles to store")
+
+        if previous_roles:
+            for role in previous_roles:
+                try:
+                    new_role = ctx.guild.get_role(int(role))
+                    log(1, f"Attempting to add [{new_role}] role...")
+                    await who.add_roles(new_role, reason="Returning from Iowa")
+                    log(1, f"Added [{new_role}] role")
+                except (
+                    discord.Forbidden,
+                    discord.HTTPException,
+                    discord.ext.commands.MissingPermissions,
+                ) as e:
+                    log(1, f"Unable to add role! {e}")
+                    continue
+
+    Process_MySQL(query=sqlRemoveIowa, values=who.id)
+    return True
 
 
 class AdminCommands(commands.Cog):
@@ -918,15 +956,14 @@ class AdminCommands(commands.Cog):
             ),
         ],
     )
-    async def _iowa(self, ctx: SlashContext, who: discord.Member, reason: str):
+    async def _iowa(
+        self, ctx: SlashContext, who: discord.Member, reason: str, duration: int = None
+    ):
         await ctx.defer()
         log(0, f"Starting the Iowa command and banishing {who}")
 
-        if not who:
-            raise UserError("You must include a user!")
-
-        if not reason:
-            raise UserError("You must include a reason why!")
+        assert who, UserError("You must include a user!")
+        assert reason, UserError("You must include a reason why!")
 
         role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
         channel_iowa = ctx.guild.get_channel(CHAN_IOWA)
@@ -954,21 +991,34 @@ class AdminCommands(commands.Cog):
 
         Process_MySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
 
-        # await channel_iowa.send(
-        #     f"[ {who.mention} ] has been sent to {channel_iowa.mention}."
-        # )
+        if duration:
+            nest_asyncio.apply()
+            asyncio.create_task(end_timeout(duration=duration, ctx=ctx, who=who))
 
-        embed = build_embed(
-            title="Banished to Iowa",
-            inline=False,
-            fields=[
-                [
-                    "Statement",
-                    f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server.",
+            embed = build_embed(
+                title="Banished to Iowa",
+                inline=False,
+                fields=[
+                    [
+                        "Statement",
+                        f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server. The user will be brought back in {pretty_time_delta(duration)}.",
+                    ],
+                    ["Reason", full_reason],
                 ],
-                ["Reason", full_reason],
-            ],
-        )
+            )
+        else:
+            embed = build_embed(
+                title="Banished to Iowa",
+                inline=False,
+                fields=[
+                    [
+                        "Statement",
+                        f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server.",
+                    ],
+                    ["Reason", full_reason],
+                ],
+            )
+
         await ctx.send(embed=embed)
         await who.send(
             f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
@@ -994,46 +1044,17 @@ class AdminCommands(commands.Cog):
         await ctx.defer()
         log(0, f"Starting the Nebraska command and banishing {who}")
 
-        if not who:
-            raise UserError("You must include a user!")
-
-        role_timeout = ctx.guild.get_role(ROLE_TIME_OUT)
-        await who.remove_roles(role_timeout)
-        log(1, f"Removed [{role_timeout}] role")
-
-        previous_roles_raw = Process_MySQL(
-            query=sqlRetrieveIowa, values=who.id, fetch="all"
-        )
-
-        if previous_roles_raw is not None:
-            previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-            log(1, f"Gathered all the roles to store")
-
-            try:
-                if previous_roles:
-                    for role in previous_roles:
-                        new_role = ctx.guild.get_role(int(role))
-                        log(1, f"Attempting to add [{new_role}] role...")
-                        await who.add_roles(new_role, reason="Returning from Iowa")
-                        log(1, f"Added [{new_role}] role")
-            except (discord.Forbidden, discord.HTTPException) as e:
-                log(1, f"Unable to add role! {e}")
-
-        Process_MySQL(query=sqlRemoveIowa, values=who.id)
-
-        # iowa = ctx.guild.get_channel(CHAN_IOWA)
-
-        embed = build_embed(
-            title="Return to Nebraska",
-            inline=False,
-            fields=[
-                ["Welcome back!", f"[{who.mention}] is welcomed back to Nebraska!"],
-                ["Welcomed by", ctx.author.mention],
-            ],
-        )
-        await ctx.send(embed=embed)
-        # await iowa.send(f"[ {who.mention} ] has been sent back to Nebraska.")
-        log(0, "Nebraska command complete")
+        if await process_nebraska(ctx, who):
+            embed = build_embed(
+                title="Return to Nebraska",
+                inline=False,
+                fields=[
+                    ["Welcome back!", f"[{who.mention}] is welcomed back to Nebraska!"],
+                    ["Welcomed by", ctx.author.mention],
+                ],
+            )
+            await ctx.send(embed=embed)
+            log(0, "Nebraska command complete")
 
     @cog_ext.cog_slash(
         name="console",
