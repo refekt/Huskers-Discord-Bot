@@ -198,9 +198,7 @@ async def send_tweet(tweet):
     if tweet.author.id_str not in [member["id_str"] for member in list_members]:
         return
 
-    direct_url = (
-        f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}/"
-    )
+    direct_url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}"
 
     if hasattr(tweet, "extended_tweet"):
         fields = [["Message", tweet.extended_tweet["full_text"]]]
