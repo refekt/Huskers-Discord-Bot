@@ -522,6 +522,8 @@ async def on_component(ctx: ComponentContext):
             chan = ctx.bot.get_channel(id=CHAN_RECRUITING)
         if chan is not None:
             twitter_url = ctx.origin_message.components[0]["components"][2]["url"]
+            if twitter_url[:-1] == "/":
+                twitter_url = str(twitter_url).rstrip("/")
             await chan.send(f"{ctx.author.mention} forwarded: {twitter_url}")
             await ctx.send(f"Sent to {chan.mention}!", hidden=True)
 
