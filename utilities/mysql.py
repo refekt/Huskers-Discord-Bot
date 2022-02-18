@@ -267,38 +267,56 @@ def Process_MySQL(query: str, **kwargs):
 
     try:
         with sqlConnection.cursor() as cursor:
-            if (
-                not "fetch" in kwargs
-            ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
-                if not "values" in kwargs:
-                    cursor.execute(query=query)
-                else:
-                    cursor.execute(query=query, args=kwargs["values"])
+            fetch_witch = kwargs.get("fetch")
+            vals = kwargs.get("vals", None)
+
+            if not fetch_witch:
+                cursor.execute(query=query, args=vals)
             else:
-                if not "values" in kwargs:
-                    if kwargs["fetch"] == "one":
-                        cursor.execute(query=query)
-                        result = cursor.fetchone()
-                    elif kwargs["fetch"] == "many":
-                        if not "size" in kwargs:
-                            raise ValueError("Fetching many requires a `size` kwargs.")
-                        cursor.execute(query=query)
-                        result = cursor.fetchmany(many=kwargs["size"])
-                    elif kwargs["fetch"] == "all":
-                        cursor.execute(query=query)
-                        result = cursor.fetchall()
-                else:
-                    if kwargs["fetch"] == "one":
-                        cursor.execute(query=query, args=kwargs["values"])
-                        result = cursor.fetchone()
-                    elif kwargs["fetch"] == "many":
-                        if not "size" in kwargs:
-                            raise ValueError("Fetching many requires a `size` kwargs.")
-                        cursor.execute(query=query, args=kwargs["values"])
-                        result = cursor.fetchmany(many=kwargs["size"])
-                    elif kwargs["fetch"] == "all":
-                        cursor.execute(query=query, args=kwargs["values"])
-                        result = cursor.fetchall()
+                if fetch_witch == "one":
+                    cursor.execute(query=query, args=vals)
+                    result = cursor.fetchone()
+                elif fetch_witch == "many":
+                    assert kwargs.get("size"), ValueError(
+                        "Fetching many requires a size in kwargs"
+                    )
+
+                    cursor.execute(query=query, args=vals)
+                    result = cursor.fetchmany(kwargs.get("size", 5))
+                elif fetch_witch == "all":
+                    cursor.execute(query=query, args=vals)
+                    result = cursor.fetchall()
+
+                # if not kwargs.get("values"):
+                #     if fetch_witch == "one":
+                #         cursor.execute(query=query)
+                #         result = cursor.fetchone()
+                #     elif fetch_witch == "many":
+                #         assert kwargs.get("size"), ValueError(
+                #             "Fetching many requires a size in kwargs"
+                #         )
+                #
+                #         cursor.execute(query=query)
+                #         result = cursor.fetchmany(kwargs["size"])
+                #     elif fetch_witch == "all":
+                #         cursor.execute(query=query)
+                #         result = cursor.fetchall()
+                # else:
+                #     vals = kwargs.get("vals", None)
+                #
+                #     if fetch_witch == "one":
+                #         cursor.execute(query=query, args=vals)
+                #         result = cursor.fetchone()
+                #     elif fetch_witch == "many":
+                #         assert kwargs.get("size"), ValueError(
+                #             "Fetching many requires a size in kwargs"
+                #         )
+                #
+                #         cursor.execute(query=query, args=vals)
+                #         result = cursor.fetchmany(kwargs["size"])
+                #     elif fetch_witch == "all":
+                #         cursor.execute(query=query, args=vals)
+                #         result = cursor.fetchall()
 
         sqlConnection.commit()
 
