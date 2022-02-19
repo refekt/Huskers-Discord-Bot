@@ -267,12 +267,16 @@ def Process_MySQL(query: str, **kwargs):
 
     try:
         with sqlConnection.cursor() as cursor:
-            fetch_witch = kwargs.get("fetch")
-            vals = kwargs.get("vals", None)
+            fetch_witch = kwargs.get("fetch", None)
+            vals = kwargs.get("values", None)
 
-            if not fetch_witch:
+            if fetch_witch is None:
+                log("No fetch found", 1)
+
                 cursor.execute(query=query, args=vals)
             else:
+                log("Fetch found", 1)
+
                 if fetch_witch == "one":
                     cursor.execute(query=query, args=vals)
                     result = cursor.fetchone()
@@ -319,9 +323,11 @@ def Process_MySQL(query: str, **kwargs):
                 #         result = cursor.fetchall()
 
         sqlConnection.commit()
-
+    except pymysql.err.ProgrammingError as e:
+        log(e, 1)
+        raise e
     except:  # noqa
-        raise ConnectionError("Error occurred opening the MySQL database.")
+        raise "Unknown error"  # ConnectionError("Error occurred opening the MySQL database.")
     finally:
         log(f"Closing connection to the MySQL Database", 1)
         sqlConnection.close()
