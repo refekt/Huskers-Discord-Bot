@@ -1,11 +1,11 @@
 import logging
 import pathlib
 import platform
-from typing import Union
+from typing import Union, Any
 
 import discord
 
-from helpers.constants import CHAN_BOT_SPAM
+from helpers.constants import CHAN_BOT_SPAM, CHAN_GENERAL
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException
 
@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 __all__ = ["HuskerClient"]
 
 logger.info(f"{str(__name__).title()} module loaded!")
+
+discord_channel_types = Union[
+    discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel, Any
+]
 
 
 def getChangelog() -> [str, CommandException]:
@@ -40,16 +44,22 @@ def getChangelog() -> [str, CommandException]:
         return lines_str
     except OSError:
         logger.warning("Error loading the changelog!")
-        return CommandException("Error loading the changelog!")
+        raise CommandException("Error loading the changelog!")
 
 
 class HuskerClient(discord.Client):
 
     # noinspection PyMethodMayBeStatic
-    # async def create_welcome_message(
-    #     self, guild_member: Union[discord.Member, discord.User]
-    # ):
-    #     ...
+    async def create_welcome_message(
+        self, guild_member: Union[discord.Member, discord.User]
+    ):
+        channel_general: discord_channel_types = await self.fetch_channel(
+            channel_id=CHAN_GENERAL
+        )
+
+        await channel_general.send(
+            content=f"New guild member alert: welcome to {guild_member.mention}!"
+        )
 
     # noinspection PyMethodMayBeStatic
     async def create_online_message(self):
@@ -98,9 +108,9 @@ class HuskerClient(discord.Client):
     async def on_ready(self):
         logger.info("The bot is ready!")
 
-        chan_botspam: Union[
-            discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel
-        ] = await self.fetch_channel(channel_id=CHAN_BOT_SPAM)
+        chan_botspam: discord_channel_types = await self.fetch_channel(
+            channel_id=CHAN_BOT_SPAM
+        )
 
         online_message = await self.create_online_message()
 
@@ -112,10 +122,8 @@ class HuskerClient(discord.Client):
     # ):
     #     await self.check_reaction(reaction)
 
-    # async def on_guild_member_add(
-    #     self, guild_member: Union[discord.Member, discord.User]
-    # ):
-    #     await self.create_welcome_message(guild_member)
+    async def on_member_join(self, guild_member: Union[discord.Member, discord.User]):
+        await self.create_welcome_message(guild_member)
 
     # async def on_error(self, event_method, *args, **Kwargs):
     #     ...
