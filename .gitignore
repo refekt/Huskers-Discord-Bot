@@ -14,3 +14,5 @@ resources/images
 resources/images/make_slowking.png
 /husk_messages.txt
 /changelog.md
+*.json
+*.key
