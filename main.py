@@ -366,7 +366,9 @@ async def hall_of_fame_messages(reactions: list):
                     channel = hos_channel
 
                     thumb = make_slowking(reaction.message.author)
-                    thumb_url = upload_picture(pathlib.Path(thumb.filename).resolve())
+                    thumb_url = upload_picture(
+                        str(pathlib.Path(thumb.filename).resolve())
+                    )
                 else:
                     embed_title = f"{'🏆' * 3} Hall of Fame Message {'🏆' * 3}"
                     embed_description = (
