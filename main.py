@@ -28,6 +28,7 @@ from utilities.constants import (
     DT_TASK_FORMAT,
     DT_TWEET_FORMAT,
     GEE_USER,
+    GUILD_PROD,
     IMGUR_CLIENT,
     IMGUR_SECRET,
     PROD_TOKEN,
@@ -313,6 +314,8 @@ def upload_picture(path: str) -> str:
 async def hall_of_fame_messages(reactions: list):
     multiple_threshold = False
     for reaction in reactions:
+        if not reaction.message.guild.id == GUILD_PROD:
+            break
         if (
             multiple_threshold
         ):  # Rare instance where a message has multiple reactions that break the threshold
