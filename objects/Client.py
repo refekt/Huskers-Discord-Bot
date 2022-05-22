@@ -1,0 +1,124 @@
+import logging
+import pathlib
+import platform
+from typing import Union
+
+import discord
+
+from helpers.constants import CHAN_BOT_SPAM
+from helpers.embed import buildEmbed
+from objects.Exceptions import CommandException
+
+logger = logging.getLogger(__name__)
+
+__all__ = ["HuskerClient"]
+
+logger.info(f"{str(__name__).title()} module loaded!")
+
+
+def getChangelog() -> [str, CommandException]:
+    try:
+        changelog_path = None
+        changelog_file = "changelog.md"
+
+        if "Windows" in platform.platform():
+            changelog_path = pathlib.PurePath(
+                f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
+            )
+        elif "Linux" in platform.platform():
+            changelog_path = pathlib.PurePosixPath(
+                f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
+            )
+
+        changelog = open(changelog_path, "r")
+        lines = changelog.readlines()
+        lines_str = ""
+
+        for line in lines:
+            lines_str += f"* {str(line)}"
+
+        return lines_str
+    except OSError:
+        logger.warning("Error loading the changelog!")
+        return CommandException("Error loading the changelog!")
+
+
+class HuskerClient(discord.Client):
+
+    # noinspection PyMethodMayBeStatic
+    # async def create_welcome_message(
+    #     self, guild_member: Union[discord.Member, discord.User]
+    # ):
+    #     ...
+
+    # noinspection PyMethodMayBeStatic
+    async def create_online_message(self):
+        return buildEmbed(
+            title="Welcome to the Huskers server!",
+            description="The official Husker football discord server",
+            thumbnail="https://cdn.discordapp.com/icons/440632686185414677/a_061e9e57e43a5803e1d399c55f1ad1a4.gif",
+            fields=[
+                {
+                    "name": "Rules",
+                    "value": f"Please be sure to check out the rules channel to catch up on server rules.",
+                    "inline": False,
+                },
+                {
+                    "name": "Commands",
+                    "value": f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
+                    "inline": False,
+                },
+                {
+                    "name": "Hall of Fame & Shame Threshold",
+                    "value": "TBD",
+                    "inline": False,
+                },
+                {"name": "Changelog", "value": getChangelog(), "inline": False},
+                {
+                    "name": "Complete Changelog",
+                    "value": "https://github.com/refekt/Bot-Frost/commits/master",
+                    "inline": False,
+                },
+                {
+                    "name": "Support HuskerBot",
+                    "value": "Check out `/donate` to see how you can support the project!",
+                    "inline": False,
+                },
+            ],
+        )
+
+    # async def check_reaction(self, reaction: discord.Reaction):
+    #     ...
+
+    # noinspection PyMethodMayBeStatic
+    async def on_connect(self):
+        logger.info("The bot has connected!")
+
+    # noinspection PyMethodMayBeStatic
+    async def on_ready(self):
+        logger.info("The bot is ready!")
+
+        chan_botspam: Union[
+            discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel
+        ] = await self.fetch_channel(channel_id=CHAN_BOT_SPAM)
+
+        online_message = await self.create_online_message()
+
+        await chan_botspam.send(content="", embed=online_message)
+
+    # async def on_message_reaction_add(
+    #     self,
+    #     reaction: discord.Reaction,
+    # ):
+    #     await self.check_reaction(reaction)
+
+    # async def on_guild_member_add(
+    #     self, guild_member: Union[discord.Member, discord.User]
+    # ):
+    #     await self.create_welcome_message(guild_member)
+
+    # async def on_error(self, event_method, *args, **Kwargs):
+    #     ...
+
+    # async def on_command_error(self, context, exception):
+    #     ...

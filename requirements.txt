@@ -1,6 +1,6 @@
-black
-cryptography
-discord-py-interactions>=4.0.1
-python-dotenv
-pytz
-validators
+discord.py==1.7.3
+black==22.3.0
+python-dotenv==0.20.0
+pytz==2022.1
+validators==0.19.0
+cryptography==37.0.2

@@ -42,4 +42,4 @@ logger.info(f"The bot initialized in {end - start:,.2f} seconds")
 
 # Star the bot
 logger.info("Starting the bot!")
-bot.start()
+bot.run(PROD_TOKEN)
