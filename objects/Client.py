@@ -1,9 +1,19 @@
+# TODO
+# * Bot status updates
+# * Client events
+# * Hall of Fame/Shame
+# * Iowa checks
+# * Reminders
+# * Twitter stream
+# TODO
+
 import logging
 import pathlib
 import platform
 from typing import Union, Any
 
 import discord
+from discord.ext.commands import Bot
 
 from helpers.constants import CHAN_BOT_SPAM, CHAN_GENERAL
 from helpers.embed import buildEmbed
@@ -19,35 +29,47 @@ discord_channel_types = Union[
     discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel, Any
 ]
 
-
-def getChangelog() -> [str, CommandException]:
-    try:
-        changelog_path = None
-        changelog_file = "changelog.md"
-
-        if "Windows" in platform.platform():
-            changelog_path = pathlib.PurePath(
-                f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
-            )
-        elif "Linux" in platform.platform():
-            changelog_path = pathlib.PurePosixPath(
-                f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
-            )
-
-        changelog = open(changelog_path, "r")
-        lines = changelog.readlines()
-        lines_str = ""
-
-        for line in lines:
-            lines_str += f"* {str(line)}"
-
-        return lines_str
-    except OSError:
-        logger.warning("Error loading the changelog!")
-        raise CommandException("Error loading the changelog!")
+reaction_threshold = 3  # Used for Hall of Fame/Shame
 
 
-class HuskerClient(discord.Client):
+# server_stats = (
+#     f"• __Onwer:__ {guild.owner_id}\n"
+#     f"• __Description:__ {guild.description}\n"
+#     f"• __Server Features:__ {features}\n"
+#     f"• __Server Region:__ {guild.region}\n"
+#     f"• __Vanity URL:__ {f'https://discord.gg/{guild.vanity_url_code}' if guild.vanity_url_code else 'N/A'}\n"
+#     f"• __Boost Count:__ {guild.premium_subscription_count}\n"
+#     f"• __Rules Channel:__ {getChannelMention(CHAN_ANNOUNCEMENT)}"
+# )
+
+
+class HuskerClient(Bot):
+    # noinspection PyMethodMayBeStatic
+    def get_change_log(self) -> [str, CommandException]:
+        try:
+            changelog_path = None
+            changelog_file = "changelog.md"
+
+            if "Windows" in platform.platform():
+                changelog_path = pathlib.PurePath(
+                    f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
+                )
+            elif "Linux" in platform.platform():
+                changelog_path = pathlib.PurePosixPath(
+                    f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
+                )
+
+            changelog = open(changelog_path, "r")
+            lines = changelog.readlines()
+            lines_str = ""
+
+            for line in lines:
+                lines_str += f"* {str(line)}"
+
+            return lines_str
+        except OSError:
+            logger.warning("Error loading the changelog!")
+            raise CommandException("Error loading the changelog!")
 
     # noinspection PyMethodMayBeStatic
     async def create_welcome_message(
@@ -83,7 +105,7 @@ class HuskerClient(discord.Client):
                     "value": "TBD",
                     "inline": False,
                 },
-                {"name": "Changelog", "value": getChangelog(), "inline": False},
+                {"name": "Changelog", "value": self.get_change_log(), "inline": False},
                 {
                     "name": "Complete Changelog",
                     "value": "https://github.com/refekt/Bot-Frost/commits/master",

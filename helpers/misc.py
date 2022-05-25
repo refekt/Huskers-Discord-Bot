@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 __all__ = [
     "createComponentKey",
     "formatPrettyTimeDelta",
-    "grabPlatform",
     "loadVarPath",
 ]
 
@@ -29,10 +28,6 @@ def formatPrettyTimeDelta(seconds) -> str:
         return f"{minutes}M and {seconds}S"
     else:
         return f"{seconds}S"
-
-
-def grabPlatform() -> str:
-    return platform.platform()
 
 
 def loadVarPath() -> [str, CommandException]:
