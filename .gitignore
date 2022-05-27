@@ -16,3 +16,4 @@ resources/images/make_slowking.png
 /changelog.md
 *.json
 *.key
+*.log
