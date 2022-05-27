@@ -41,6 +41,7 @@ from objects.Prediction import *  # noqa
 from objects.Recruits import *  # noqa
 from objects.Schedule import *  # noqa
 from objects.Thread import *  # noqa
+from objects.TweepyStreamListener import *  # noqa
 from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa
 
