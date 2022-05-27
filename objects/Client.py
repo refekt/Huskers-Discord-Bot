@@ -6,7 +6,6 @@
 # * Reminders
 # * Twitter stream
 # TODO
-
 import logging
 import pathlib
 import platform
@@ -15,7 +14,7 @@ from typing import Union, Any
 import discord
 from discord.ext.commands import Bot
 
-from helpers.constants import CHAN_BOT_SPAM, CHAN_GENERAL
+from helpers.constants import CHAN_BOT_SPAM, CHAN_GENERAL, DISCORD_CHANNEL_TYPES
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException
 
@@ -25,12 +24,7 @@ __all__ = ["HuskerClient"]
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
-discord_channel_types = Union[
-    discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel, Any
-]
-
 reaction_threshold = 3  # Used for Hall of Fame/Shame
-
 
 # server_stats = (
 #     f"• __Onwer:__ {guild.owner_id}\n"
@@ -75,7 +69,7 @@ class HuskerClient(Bot):
     async def create_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ):
-        channel_general: discord_channel_types = await self.fetch_channel(
+        channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(
             channel_id=CHAN_GENERAL
         )
 
@@ -130,7 +124,7 @@ class HuskerClient(Bot):
     async def on_ready(self):
         logger.info("The bot is ready!")
 
-        chan_botspam: discord_channel_types = await self.fetch_channel(
+        chan_botspam: DISCORD_CHANNEL_TYPES = await self.fetch_channel(
             channel_id=CHAN_BOT_SPAM
         )
 
@@ -138,17 +132,17 @@ class HuskerClient(Bot):
 
         await chan_botspam.send(content="", embed=online_message)
 
-    # async def on_message_reaction_add(
-    #     self,
-    #     reaction: discord.Reaction,
-    # ):
-    #     await self.check_reaction(reaction)
-
     async def on_member_join(self, guild_member: Union[discord.Member, discord.User]):
         await self.create_welcome_message(guild_member)
 
-    # async def on_error(self, event_method, *args, **Kwargs):
-    #     ...
+    async def on_error(self, event_method, *args, **Kwargs):
+        ...
 
-    # async def on_command_error(self, context, exception):
-    #     ...
+    async def on_command_error(self, context, exception):
+        ...
+
+    async def on_message_reaction_add(
+        self,
+        reaction: discord.Reaction,
+    ):
+        ...  # await self.check_reaction(reaction)
