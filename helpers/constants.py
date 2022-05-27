@@ -3,7 +3,9 @@
 # TODO
 import logging
 import platform
+from typing import Union, Any
 
+import discord
 import pytz
 from dotenv import load_dotenv
 
@@ -262,6 +264,15 @@ US_STATES = [
     {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},
     {"State": "Puerto Rico", "Code": "PR"},
 ]
+
+
+DISCORD_CHANNEL_TYPES = Union[
+    discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel, Any
+]
+DISCORD_USER_TYPES = Union[discord.Member, discord.User]
+
+logger.info("Discord Union group variables loaded")
+
 
 __all__ = [
     item
