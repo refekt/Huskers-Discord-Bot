@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 __all__ = [
     "createComponentKey",
+    "discordURLFormatter",
     "formatPrettyTimeDelta",
     "loadVarPath",
 ]
@@ -51,6 +52,10 @@ def createComponentKey() -> str:
         random.SystemRandom().choice(string.ascii_uppercase + string.digits)
         for _ in range(10)
     )
+
+
+def discordURLFormatter(display_text: str, url: str) -> str:
+    return f"[{display_text}]({url})"
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
