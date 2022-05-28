@@ -1,8 +1,6 @@
-import sys
 import logging
+import sys
 from time import perf_counter
-
-import discord
 
 from objects.Client import HuskerClient
 

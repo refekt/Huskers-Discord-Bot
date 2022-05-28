@@ -4,7 +4,7 @@ import platform
 import random
 import string
 
-from objects.Exceptions import CommandException, UserInputException
+from objects.Exceptions import CommandException
 
 logger = logging.getLogger(__name__)
 

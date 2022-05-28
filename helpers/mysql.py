@@ -246,71 +246,70 @@ logger = logging.getLogger(__name__)
 # # """
 
 
-def processMySQL(query: str, **kwargs):
-    ...
-    # log(0, f"Starting a MySQL query")
-    # try:
-    #     sqlConnection = pymysql.connect(
-    #         host=SQL_HOST,
-    #         user=SQL_USER,
-    #         password=SQL_PASSWD,
-    #         db=SQL_DB,
-    #         charset="utf8mb4",
-    #         cursorclass=pymysql.cursors.DictCursor,
-    #     )
-    #     log(f"Connected to the MySQL Database!", 1)
-    # except:
-    #     log(f"Unable to connect to the `{SQL_DB}` database.", 1)
-    #     return
-    #
-    # result = None
-    #
-    # try:
-    #     with sqlConnection.cursor() as cursor:
-    #         if (
-    #             not "fetch" in kwargs
-    #         ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
-    #             if not "values" in kwargs:
-    #                 cursor.execute(query=query)
-    #             else:
-    #                 cursor.execute(query=query, args=kwargs["values"])
-    #         else:
-    #             if not "values" in kwargs:
-    #                 if kwargs["fetch"] == "one":
-    #                     cursor.execute(query=query)
-    #                     result = cursor.fetchone()
-    #                 elif kwargs["fetch"] == "many":
-    #                     if not "size" in kwargs:
-    #                         raise ValueError("Fetching many requires a `size` kwargs.")
-    #                     cursor.execute(query=query)
-    #                     result = cursor.fetchmany(many=kwargs["size"])
-    #                 elif kwargs["fetch"] == "all":
-    #                     cursor.execute(query=query)
-    #                     result = cursor.fetchall()
-    #             else:
-    #                 if kwargs["fetch"] == "one":
-    #                     cursor.execute(query=query, args=kwargs["values"])
-    #                     result = cursor.fetchone()
-    #                 elif kwargs["fetch"] == "many":
-    #                     if not "size" in kwargs:
-    #                         raise ValueError("Fetching many requires a `size` kwargs.")
-    #                     cursor.execute(query=query, args=kwargs["values"])
-    #                     result = cursor.fetchmany(many=kwargs["size"])
-    #                 elif kwargs["fetch"] == "all":
-    #                     cursor.execute(query=query, args=kwargs["values"])
-    #                     result = cursor.fetchall()
-    #
-    #     sqlConnection.commit()
-    #
-    # except:
-    #     raise ConnectionError("Error occurred opening the MySQL database.")
-    # finally:
-    #     log(f"Closing connection to the MySQL Database", 1)
-    #     sqlConnection.close()
-    #
-    #     if result:
-    #         log(f"MySQL query finished", 0)
-    #         return result
+# def processMySQL(query: str, **kwargs):
+# log(0, f"Starting a MySQL query")
+# try:
+#     sqlConnection = pymysql.connect(
+#         host=SQL_HOST,
+#         user=SQL_USER,
+#         password=SQL_PASSWD,
+#         db=SQL_DB,
+#         charset="utf8mb4",
+#         cursorclass=pymysql.cursors.DictCursor,
+#     )
+#     log(f"Connected to the MySQL Database!", 1)
+# except:
+#     log(f"Unable to connect to the `{SQL_DB}` database.", 1)
+#     return
+#
+# result = None
+#
+# try:
+#     with sqlConnection.cursor() as cursor:
+#         if (
+#             not "fetch" in kwargs
+#         ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
+#             if not "values" in kwargs:
+#                 cursor.execute(query=query)
+#             else:
+#                 cursor.execute(query=query, args=kwargs["values"])
+#         else:
+#             if not "values" in kwargs:
+#                 if kwargs["fetch"] == "one":
+#                     cursor.execute(query=query)
+#                     result = cursor.fetchone()
+#                 elif kwargs["fetch"] == "many":
+#                     if not "size" in kwargs:
+#                         raise ValueError("Fetching many requires a `size` kwargs.")
+#                     cursor.execute(query=query)
+#                     result = cursor.fetchmany(many=kwargs["size"])
+#                 elif kwargs["fetch"] == "all":
+#                     cursor.execute(query=query)
+#                     result = cursor.fetchall()
+#             else:
+#                 if kwargs["fetch"] == "one":
+#                     cursor.execute(query=query, args=kwargs["values"])
+#                     result = cursor.fetchone()
+#                 elif kwargs["fetch"] == "many":
+#                     if not "size" in kwargs:
+#                         raise ValueError("Fetching many requires a `size` kwargs.")
+#                     cursor.execute(query=query, args=kwargs["values"])
+#                     result = cursor.fetchmany(many=kwargs["size"])
+#                 elif kwargs["fetch"] == "all":
+#                     cursor.execute(query=query, args=kwargs["values"])
+#                     result = cursor.fetchall()
+#
+#     sqlConnection.commit()
+#
+# except:
+#     raise ConnectionError("Error occurred opening the MySQL database.")
+# finally:
+#     log(f"Closing connection to the MySQL Database", 1)
+#     sqlConnection.close()
+#
+#     if result:
+#         log(f"MySQL query finished", 0)
+#         return result
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
