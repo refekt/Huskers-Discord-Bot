@@ -44,5 +44,5 @@ class TextCog(commands.Cog, name="Text Commands"):
         ...
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(TextCog(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(TextCog(bot))

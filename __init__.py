@@ -1,7 +1,7 @@
 import logging
 import sys
 from time import perf_counter
-
+import discord  # noqa
 from objects.Client import HuskerClient
 
 logging.basicConfig(
@@ -12,9 +12,6 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
-
-__author__ = "u/refekt"
-__version__ = "3.5.0b"
 
 start = perf_counter()
 
@@ -59,19 +56,24 @@ client = HuskerClient(
 
 __all__ = ["client"]
 
-logger.info("Loading extensions")
 
-extensions = ["admin", "football_stats", "image", "recruiting", "reminder", "text"]
-
-for extension in extensions:
-    try:
-        client.load_extension(f"commands.{extension}")
-        logger.info(f"Loaded the {extension} extension")
-    except:  # noqa
-        logger.info(f"Unable to laod the {extension} extension")
-        continue
-
-logger.info("All extensions loaded")
+# async def load_all_extensions():
+#     logger.info("Loading extensions")
+#
+#     extensions = ["admin", "football_stats", "image", "recruiting", "reminder", "text"]
+#
+#     for extension in extensions:
+#         try:
+#             await client.load_extension(f"commands.{extension}")
+#             logger.info(f"Loaded the {extension} extension")
+#         except:  # noqa
+#             logger.info(f"Unable to laod the {extension} extension")
+#             continue
+#
+#     logger.info("All extensions loaded")
+#
+#
+# await load_all_extensions()
 
 end = perf_counter()
 logger.info(f"The bot initialized in {end - start:,.2f} seconds")

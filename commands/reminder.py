@@ -12,5 +12,5 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
         ...
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(ReminderCog(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(ReminderCog(bot))

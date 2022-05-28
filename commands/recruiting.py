@@ -18,5 +18,5 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         ...
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(RecruitingCog(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(RecruitingCog(bot))

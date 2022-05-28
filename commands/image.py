@@ -34,5 +34,5 @@ class ImageCog(commands.Cog, name="Image Commands"):
         ...
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(ImageCog(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(ImageCog(bot))

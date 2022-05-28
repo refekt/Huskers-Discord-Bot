@@ -7,12 +7,22 @@
 # * Twitter stream
 # TODO
 import logging
+import os
 import pathlib
 import platform
 from typing import Union
 
+import aiohttp
 import discord
-from discord.ext.commands import Bot
+from discord.ext.commands import (
+    Bot,
+    ExtensionNotFound,
+    ExtensionAlreadyLoaded,
+    NoEntryPointError,
+    ExtensionFailed,
+)
+
+from discord.ext import tasks
 
 from helpers.constants import CHAN_BOT_SPAM, CHAN_GENERAL, DISCORD_CHANNEL_TYPES
 from helpers.embed import buildEmbed
@@ -21,10 +31,13 @@ from objects.Exceptions import CommandException
 logger = logging.getLogger(__name__)
 
 __all__ = ["HuskerClient"]
+__author__ = "u/refekt"
+__version__ = "3.5.0b"
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
 reaction_threshold = 3  # Used for Hall of Fame/Shame
+
 
 # server_stats = (
 #     f"• __Onwer:__ {guild.owner_id}\n"
@@ -38,6 +51,15 @@ reaction_threshold = 3  # Used for Hall of Fame/Shame
 
 
 class HuskerClient(Bot):
+    add_extensions = [
+        "commands.admin",
+        "commands.football_stats",
+        "commands.image",
+        "commands.recruiting",
+        "commands.reminder",
+        "commands.text",
+    ]
+
     # noinspection PyMethodMayBeStatic
     def get_change_log(self) -> [str, CommandException]:
         try:
@@ -108,6 +130,7 @@ class HuskerClient(Bot):
                     "value": "Check out `/donate` to see how you can support the project!",
                     "inline": False,
                 },
+                {"name": "Version", "value": __version__, "inline": False},
             ],
         )
 
@@ -120,15 +143,33 @@ class HuskerClient(Bot):
 
     # noinspection PyMethodMayBeStatic
     async def on_ready(self):
-        logger.info("The bot is ready!")
+        logger.info("Loading extensions")
 
-        await self.tree.sync()
+        for extension in self.add_extensions:
+            try:
+                await self.load_extension(extension)
+                logger.info(f"Loaded the {extension} extension")
+            except (
+                ExtensionNotFound,
+                ExtensionAlreadyLoaded,
+                NoEntryPointError,
+                ExtensionFailed,
+            ) as e:  # noqa
+                logger.info(
+                    f"Unable to laod the {extension} extension. Received the following error:\n{e}"
+                )
+                continue
+
+        logger.info("All extensions loaded")
+
+        await self.tree.sync()  # Add commands to Global list
 
         chan_botspam: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_BOT_SPAM)
 
         online_message = await self.create_online_message()
 
         await chan_botspam.send(content="", embed=online_message)
+        logger.info("The bot is ready!")
 
     async def on_member_join(self, guild_member: Union[discord.Member, discord.User]):
         await self.create_welcome_message(guild_member)

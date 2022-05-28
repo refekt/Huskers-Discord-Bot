@@ -335,5 +335,5 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         ...
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(AdminCog(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(AdminCog(bot))
