@@ -13,7 +13,7 @@ key_path = pathlib.PurePath(
 
 def write_key():
     """
-    Generates a image_name and save it into a file
+    Generates an image_name and save it into a file
     """
     key = Fernet.generate_key()
     with open(key_path, "wb") as key_file:
