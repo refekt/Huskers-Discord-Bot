@@ -2,10 +2,11 @@ import logging
 import pathlib
 import platform
 import socket
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord.ext.commands
 import paramiko
+from discord import app_commands
 from discord.ext import commands
 from paramiko.ssh_exception import (
     BadHostKeyException,
@@ -28,10 +29,14 @@ logger = logging.getLogger(__name__)
 
 
 class AdminCog(commands.Cog, name="Admin Commands"):
-    def __init__(self, client) -> None:
-        self.client = client
+    def __init__(self, client: discord.ext.commands.Bot) -> None:
+        self.client: discord.ext.commands.Bot = client
+        super().__init__()
 
-    @commands.command()
+    group_purge = app_commands.Group(name="purge", description="TBD")
+    group_submit = app_commands.Group(name="submit", description="TBD")
+
+    @app_commands.command(name="about")
     async def about(self, ctx: discord.ext.commands.Context):
         """All about Bot Frost"""
         import platform
@@ -83,7 +88,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
         )
 
-    @commands.command()
+    @app_commands.command(name="donate")
     async def donate(self, ctx: discord.ext.commands.Context):
         """Donate to the cause"""
 
@@ -121,11 +126,16 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
         )
 
-    @commands.command()  # TODO
+    @app_commands.command(name="commands")  # TODO
     async def commands(self, ctx: discord.ext.commands.Context):
-        ...
+        embed_fields_commands = [
+            dict(name=cmd.name, value=cmd.description, inline=False)
+            for cmd in self.client.commands
+        ]
+        embed = buildEmbed(title="Bot Commands", fields=[embed_fields_commands])
+        await ctx.send(embed=embed)
 
-    @commands.group()
+    @app_commands.command(name="purge")
     async def purge(self, ctx: discord.ext.commands.Context):  # Bot, All
         """Deletes up to 100 bot messages"""
 
@@ -136,10 +146,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             "This command is not authorized in this channel."
         )
 
-    @purge.command()
+    @group_purge.command(name="bot")
     async def bot(self, ctx: discord.ext.commands.Context):
         msgs = []
-        max_age = datetime.now() - datetime.timedelta(
+        max_age = datetime.now() - timedelta(
             days=13, hours=23, minutes=59
         )  # Discord only lets you delete 14 day old messages
 
@@ -160,12 +170,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
-    @purge.command()
+    @group_purge.command(name="all")
     async def all(self, ctx: discord.ext.commands.Context):
         # TODO Add a "double check" button to make sure you want to delete
 
         msgs = []
-        max_age = datetime.now() - datetime.timedelta(
+        max_age = datetime.now() - timedelta(
             days=13, hours=23, minutes=59
         )  # Discord only lets you delete 14 day old messages
 
@@ -186,17 +196,17 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
-    @purge.command()
+    @group_purge.command(name="user")
     async def user(
         self,
         ctx: discord.ext.commands.Context,
         who: DISCORD_USER_TYPES,
     ):
         # TODO Add a "double check" button to make sure you want to delete
-        assert who is None, UserInputException("You must provide a user/member.")
+        assert who is not None, UserInputException("You must provide a user/member.")
 
         msgs = []
-        max_age = datetime.now() - datetime.timedelta(
+        max_age = datetime.now() - timedelta(
             days=13, hours=23, minutes=59
         )  # Discord only lets you delete 14 day old messages
 
@@ -217,13 +227,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Bulk delete of {len(msgs)} {who.mention}'s messages successful.")
 
-    @commands.command()
+    @app_commands.command(name="quit")
     async def quit(self, ctx: discord.ext.commands.Context):
         await ctx.send(f"Goodbye for now! {ctx.author.mention} has turned me off!")
-        await self.client.logout()
+        await self.client.logout()  # noqa
         logger.info(f"User `{ctx.author}` turned off the bot.")
 
-    @commands.command()
+    @app_commands.command(name="restart")
     async def restart(self, ctx: discord.ext.commands.Context):
         assert "Windows" not in platform.platform(), CommandException(
             "Cannot run this command while hosted on Windows"
@@ -280,13 +290,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await ctx.send("Bot restart complete!")
 
-    @commands.group()
+    @app_commands.command(name="submit")
     async def submit(self, ctx: discord.ext.commands.Context):
         assert ctx.subcommand_passed, UserInputException(
             "A subcommmand must be passed."
         )
 
-    @submit.command()
+    @group_submit.command()
     async def bug(self, ctx: discord.ext.commands.Context):
         embed = buildEmbed(
             title="Bug Reporter",
@@ -297,7 +307,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         await ctx.send(embed=embed)
 
-    @submit.command()
+    @group_submit.command()
     async def feature(self, ctx: discord.ext.commands.Context):
         embed = buildEmbed(
             title="Feature Request",
@@ -308,19 +318,19 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         await ctx.send(embed=embed)
 
-    @commands.command()  # TODO
+    @app_commands.command(name="iowa")  # TODO
     async def iowa(self, ctx: discord.ext.commands.Context):
         ...
 
-    @commands.command()  # TODO
+    @app_commands.command(name="nebraska")  # TODO
     async def nebraska(self, ctx: discord.ext.commands.Context):
         ...
 
-    @commands.command()  # TODO
+    @app_commands.command(name="gameday")  # TODO
     async def gameday(self, ctx: discord.ext.commands.Context):
         ...
 
-    @commands.command()  # TODO
+    @app_commands.command(name="smms")  # TODO
     async def smms(self, ctx: discord.ext.commands.Context):
         ...
 

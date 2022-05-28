@@ -9,7 +9,7 @@
 import logging
 import pathlib
 import platform
-from typing import Union, Any
+from typing import Union
 
 import discord
 from discord.ext.commands import Bot
@@ -69,9 +69,7 @@ class HuskerClient(Bot):
     async def create_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ):
-        channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(
-            channel_id=CHAN_GENERAL
-        )
+        channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
 
         await channel_general.send(
             content=f"New guild member alert: welcome to {guild_member.mention}!"
@@ -124,9 +122,9 @@ class HuskerClient(Bot):
     async def on_ready(self):
         logger.info("The bot is ready!")
 
-        chan_botspam: DISCORD_CHANNEL_TYPES = await self.fetch_channel(
-            channel_id=CHAN_BOT_SPAM
-        )
+        await self.tree.sync()
+
+        chan_botspam: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_BOT_SPAM)
 
         online_message = await self.create_online_message()
 
@@ -135,14 +133,14 @@ class HuskerClient(Bot):
     async def on_member_join(self, guild_member: Union[discord.Member, discord.User]):
         await self.create_welcome_message(guild_member)
 
-    async def on_error(self, event_method, *args, **Kwargs):
+    async def on_error(self, event_method, *args, **Kwargs):  # TODO
         ...
 
-    async def on_command_error(self, context, exception):
+    async def on_command_error(self, context, exception):  # TODO
         ...
 
     async def on_message_reaction_add(
         self,
         reaction: discord.Reaction,
-    ):
+    ):  # TODO
         ...  # await self.check_reaction(reaction)
