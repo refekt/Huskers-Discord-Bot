@@ -32,7 +32,7 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
     field_value_limit = 1024
     embed_max = 6000
 
-    dtNow = datetime.now().astimezone(tz=TZ).isoformat()
+    dtNow = datetime.now().astimezone(tz=TZ)  # .isoformat()
 
     if "color" in kwargs.keys():
         if "description" in kwargs.keys():
