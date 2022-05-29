@@ -80,6 +80,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         description="Sbumit a bug or feature request for the bot",
         guild_ids=[GUILD_PROD],
     )
+    group_gameday = app_commands.Group(
+        name="gameday",
+        description="Turn game day mode on or off",
+        default_permissions=discord.Permissions(manage_messages=True),
+        guild_ids=[GUILD_PROD],
+    )
 
     @app_commands.command(name="about", description="Learn all about Bot Frost")
     @app_commands.guilds(GUILD_PROD)
@@ -463,11 +469,18 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info("Nebraska command complete")
 
-    @app_commands.command(
-        name="gameday", description="WIP: Turn game day mode on"
+    @group_gameday.command(
+        name="on",
+        description="WIP: Turn game day mode on. Restricts access to server channels.",
     )  # TODO
-    @app_commands.default_permissions(manage_messages=True)
-    async def gameday(self, interaction: discord.Interaction) -> None:
+    async def gameday_on(self, interaction: discord.Interaction) -> None:
+        ...
+
+    @group_gameday.command(
+        name="off",
+        description="WIP: Turn game day mode off. Restores access to server channels.",
+    )  # TODO
+    async def gameday_off(self, interaction: discord.Interaction) -> None:
         ...
 
     @app_commands.command(name="smms")  # TODO
