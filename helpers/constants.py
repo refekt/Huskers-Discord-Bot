@@ -7,6 +7,15 @@ from typing import Union, Any
 
 import discord
 import pytz
+from discord import (
+    VoiceChannel,
+    StageChannel,
+    TextChannel,
+    ForumChannel,
+    CategoryChannel,
+    Thread,
+    PartialMessageable,
+)
 from dotenv import load_dotenv
 
 from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
@@ -267,7 +276,13 @@ US_STATES = [
 
 
 DISCORD_CHANNEL_TYPES = Union[
-    discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.TextChannel, Any
+    VoiceChannel,
+    StageChannel,
+    TextChannel,
+    ForumChannel,
+    CategoryChannel,
+    Thread,
+    PartialMessageable,
 ]
 DISCORD_USER_TYPES = Union[discord.Member, discord.User]
 
