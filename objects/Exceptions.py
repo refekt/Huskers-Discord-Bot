@@ -22,3 +22,8 @@ class UserInputException(Exception):
 @dataclass()
 class MySQLException(Exception):
     message: str
+
+
+@dataclass()
+class ExtensionException(Exception):
+    message: str

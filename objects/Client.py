@@ -29,7 +29,7 @@ from helpers.constants import (
     GUILD_PROD,
 )
 from helpers.embed import buildEmbed
-from objects.Exceptions import CommandException
+from objects.Exceptions import CommandException, ExtensionException
 from __version__ import _version, _author
 
 logger = logging.getLogger(__name__)
@@ -157,17 +157,16 @@ class HuskerClient(Bot):
                 NoEntryPointError,
                 ExtensionFailed,
             ) as e:  # noqa
-                logger.info(
+                raise ExtensionException(
                     f"\t\t\tERROR: Unable to laod the {extension} extension. Received the following error:\n{e}"
                 )
-                continue
 
         logger.info("All extensions loaded")
 
         chan_botspam: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_BOT_SPAM)
         online_message = await self.create_online_message()
 
-        await chan_botspam.send(content="", embed=online_message)
+        await chan_botspam.send(embed=online_message)  # noqa
 
         logger.info("The bot is ready!")
 

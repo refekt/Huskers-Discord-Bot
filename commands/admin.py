@@ -69,8 +69,15 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         self.client: discord.ext.commands.Bot = client
         super().__init__()
 
-    group_purge = app_commands.Group(name="purge", description="TBD")
-    group_submit = app_commands.Group(name="submit", description="TBD")
+    group_purge = app_commands.Group(
+        name="purge",
+        description="TBD",
+        default_permissions=discord.Permissions(manage_messages=True),
+    )
+    group_submit = app_commands.Group(
+        name="submit",
+        description="TBD",
+    )
 
     @app_commands.command(name="about")
     async def about(self, interaction: discord.Interaction) -> None:
@@ -214,6 +221,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
     @app_commands.command(name="quit")
+    @app_commands.default_permissions(manage_messages=True)
     async def quit(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             f"Goodbye for now! {interaction.user.mention} has turned me off!"
@@ -224,6 +232,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
     @app_commands.command(name="restart")  # TODO Test on Linux
+    @app_commands.default_permissions(manage_messages=True)
     async def restart(self, interaction: discord.Interaction) -> None:
         interaction.response.defer(ephemeral=True, thinking=True)
 
@@ -305,6 +314,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="iowa")  # TODO
+    @app_commands.default_permissions(manage_messages=True)
     async def iowa(
         self,
         interaction: discord.Interaction,
@@ -371,6 +381,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info("Iowa command complete")
 
     @app_commands.command(name="nebraska")  # TODO
+    @app_commands.default_permissions(manage_messages=True)
     async def nebraska(
         self,
         interaction: discord.Interaction,
@@ -434,10 +445,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info("Nebraska command complete")
 
     @app_commands.command(name="gameday")  # TODO
+    @app_commands.default_permissions(manage_messages=True)
     async def gameday(self, interaction: discord.Interaction) -> None:
         ...
 
     @app_commands.command(name="smms")  # TODO
+    @app_commands.default_permissions(manage_messages=True)
     async def smms(self, interaction: discord.Interaction) -> None:
         ...
 
