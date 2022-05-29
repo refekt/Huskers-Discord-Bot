@@ -7,13 +7,13 @@
 # * Twitter stream
 # TODO
 import logging
-import os
 import pathlib
 import platform
 from typing import Union
 
-import aiohttp
 import discord
+from discord import Forbidden, HTTPException
+from discord.app_commands import MissingApplicationID
 from discord.ext.commands import (
     Bot,
     ExtensionNotFound,
@@ -22,17 +22,19 @@ from discord.ext.commands import (
     ExtensionFailed,
 )
 
-from discord.ext import tasks
-
-from helpers.constants import CHAN_BOT_SPAM, CHAN_GENERAL, DISCORD_CHANNEL_TYPES
+from helpers.constants import (
+    CHAN_BOT_SPAM,
+    CHAN_GENERAL,
+    DISCORD_CHANNEL_TYPES,
+    GUILD_PROD,
+)
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException
+from __version__ import _version, _author
 
 logger = logging.getLogger(__name__)
 
 __all__ = ["HuskerClient"]
-__author__ = "u/refekt"
-__version__ = "3.5.0b"
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
@@ -90,7 +92,7 @@ class HuskerClient(Bot):
     # noinspection PyMethodMayBeStatic
     async def create_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
-    ):
+    ) -> None:
         channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
 
         await channel_general.send(
@@ -98,7 +100,7 @@ class HuskerClient(Bot):
         )
 
     # noinspection PyMethodMayBeStatic
-    async def create_online_message(self):
+    async def create_online_message(self) -> None:
         return buildEmbed(
             title="Welcome to the Huskers server!",
             description="The official Husker football discord server",
@@ -130,7 +132,7 @@ class HuskerClient(Bot):
                     "value": "Check out `/donate` to see how you can support the project!",
                     "inline": False,
                 },
-                {"name": "Version", "value": __version__, "inline": False},
+                {"name": "Version", "value": _version, "inline": False},
             ],
         )
 
@@ -138,11 +140,11 @@ class HuskerClient(Bot):
     #     ...
 
     # noinspection PyMethodMayBeStatic
-    async def on_connect(self):
+    async def on_connect(self) -> None:
         logger.info("The bot has connected!")
 
     # noinspection PyMethodMayBeStatic
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         logger.info("Loading extensions")
 
         for extension in self.add_extensions:
@@ -156,32 +158,40 @@ class HuskerClient(Bot):
                 ExtensionFailed,
             ) as e:  # noqa
                 logger.info(
-                    f"Unable to laod the {extension} extension. Received the following error:\n{e}"
+                    f"\t\t\tERROR: Unable to laod the {extension} extension. Received the following error:\n{e}"
                 )
                 continue
 
         logger.info("All extensions loaded")
 
-        await self.tree.sync()  # Add commands to Global list
-
         chan_botspam: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_BOT_SPAM)
-
         online_message = await self.create_online_message()
 
         await chan_botspam.send(content="", embed=online_message)
+
         logger.info("The bot is ready!")
 
-    async def on_member_join(self, guild_member: Union[discord.Member, discord.User]):
-        await self.create_welcome_message(guild_member)
+        try:
+            await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
+        except (HTTPException, Forbidden, MissingApplicationID) as e:
+            logger.error("Error syncing the tree!\n\n{e}")
 
-    async def on_error(self, event_method, *args, **Kwargs):  # TODO
+        logger.info("The bot tree has synced!")
+
+    async def on_member_join(
+        self, guild_member: Union[discord.Member, discord.User]
+    ) -> None:
+        # await self.create_welcome_message(guild_member)
+        pass
+
+    async def on_error(self, event_method, *args, **Kwargs) -> None:  # TODO
         ...
 
-    async def on_command_error(self, context, exception):  # TODO
+    async def on_command_error(self, context, exception) -> None:  # TODO
         ...
 
     async def on_message_reaction_add(
         self,
         reaction: discord.Reaction,
-    ):  # TODO
+    ) -> None:  # TODO
         ...  # await self.check_reaction(reaction)
