@@ -1,8 +1,11 @@
 # https://gist.github.com/AbstractUmbra/a9c188797ae194e592efe05fa129c57f
+# https://discordpy.readthedocs.io/en/latest/interactions/api.html#discord.Interaction
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+from helpers.constants import GUILD_PROD
 
 
 class MyCog(commands.Cog):
@@ -10,6 +13,13 @@ class MyCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         super().__init__()  # this is now required in this context.
+
+    group_example = app_commands.Group(name="example-command", description="TBD")
+
+    @group_example.command(name="sub-command")
+    async def sub_command(self, interaction: discord.Interaction) -> None:
+        """/example-command sub-command"""
+        ...
 
     @app_commands.command(name="command-1")
     async def my_command(self, interaction: discord.Interaction) -> None:
@@ -28,7 +38,7 @@ class MyCog(commands.Cog):
     async def my_sub_command_1(self, interaction: discord.Interaction) -> None:
         """/parent sub-1"""
         await interaction.response.send_message(
-            "Hello from sub command 1", ephemeral=True
+            "Hello from sub command 1", ephemeral=True  # ephemeral hides messages
         )
 
     @app_commands.command(name="sub-2")
@@ -40,6 +50,4 @@ class MyCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(MyCog(bot))
-    # or if you want guild/guilds only...
-    # await bot.add_cog(MyCog(bot), guilds=[discord.Object(id=...)])
+    await bot.add_cog(MyCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
