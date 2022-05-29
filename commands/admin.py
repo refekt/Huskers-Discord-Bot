@@ -3,6 +3,7 @@ import pathlib
 import platform
 import socket
 from datetime import datetime, timedelta
+from typing import Any
 
 import discord.ext.commands
 import paramiko
@@ -14,18 +15,50 @@ from paramiko.ssh_exception import (
     SSHException,
 )
 
+from __version__ import _version
 from helpers.constants import (
-    CHAN_BOTLOGS,
     DISCORD_USER_TYPES,
     SSH_HOST,
     SSH_USERNAME,
     SSH_PASSWORD,
+    GUILD_PROD,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from objects.Exceptions import UserInputException, CommandException
 
 logger = logging.getLogger(__name__)
+
+
+async def validate_purge(interaction: discord.Interaction):
+    ...
+
+
+async def college_purge_messages(channel: Any, all_messages: bool = False):
+    msgs = []
+    max_age = datetime.now() - timedelta(
+        days=13, hours=23, minutes=59
+    )  # Discord only lets you delete 14 day old messages
+
+    try:
+        async for message in channel.history(limit=100):
+            if (
+                message.created_at >= max_age.astimezone() and message.author.bot
+                if not all_messages
+                else True
+            ):
+                msgs.append(message)
+
+    except discord.ClientException:
+        logger.warning("Cannot delete more than 100 messages at a time.")
+    except discord.Forbidden:
+        logger.error("Missing permissions.")
+    except discord.HTTPException:
+        logger.error(
+            "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
+        )
+
+    return msgs
 
 
 class AdminCog(commands.Cog, name="Admin Commands"):
@@ -37,11 +70,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     group_submit = app_commands.Group(name="submit", description="TBD")
 
     @app_commands.command(name="about")
-    async def about(self, ctx: discord.ext.commands.Context):
+    async def about(self, interaction: discord.Interaction) -> None:
         """All about Bot Frost"""
         import platform
 
-        await ctx.send(
+        await interaction.response.send_message(
             embed=buildEmbed(
                 title="About Me",
                 inline=False,
@@ -59,6 +92,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         ),
                         "inline": False,
                     },
+                    {"name": "Version", "value": _version, "inline": False},
                     {
                         "name": "Hosting Location",
                         "value": f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}",
@@ -89,10 +123,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
     @app_commands.command(name="donate")
-    async def donate(self, ctx: discord.ext.commands.Context):
+    async def donate(self, interaction: discord.Interaction) -> None:
         """Donate to the cause"""
 
-        await ctx.send(
+        await interaction.response.send_message(
             embed=buildEmbed(
                 title="Donation Information",
                 inline=False,
@@ -126,115 +160,70 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
         )
 
-    @app_commands.command(name="commands")  # TODO
-    async def commands(self, ctx: discord.ext.commands.Context):
+    @app_commands.command(name="commands")
+    async def commands(self, interaction: discord.Interaction) -> None:
+        """Lists all commands within the bot"""
         embed_fields_commands = [
-            dict(name=cmd.name, value=cmd.description, inline=False)
+            dict(
+                name=cmd.name,
+                value=cmd.description if cmd.description else "TBD",
+                inline=False,
+            )
             for cmd in self.client.commands
         ]
-        embed = buildEmbed(title="Bot Commands", fields=[embed_fields_commands])
-        await ctx.send(embed=embed)
-
-    @app_commands.command(name="purge")
-    async def purge(self, ctx: discord.ext.commands.Context):  # Bot, All
-        """Deletes up to 100 bot messages"""
-
-        assert ctx.subcommand_passed, UserInputException(
-            "A subcommmand must be passed."
-        )
-        assert ctx.message.channel.id == CHAN_BOTLOGS, UserInputException(
-            "This command is not authorized in this channel."
-        )
+        embed = buildEmbed(title="Bot Commands", fields=embed_fields_commands)
+        await interaction.response.send_message(embed=embed)
 
     @group_purge.command(name="bot")
-    async def bot(self, ctx: discord.ext.commands.Context):
-        msgs = []
-        max_age = datetime.now() - timedelta(
-            days=13, hours=23, minutes=59
-        )  # Discord only lets you delete 14 day old messages
+    async def purge_bot(self, interaction: discord.Interaction) -> None:
+        # TODO Add a "double check" button to make sure you want to delete
+        await validate_purge(interaction)
 
-        try:
-            async for message in ctx.message.channel.history(limit=100):
-                if message.created_at >= max_age and message.author.bot:
-                    msgs.append(message)
-
-            await ctx.message.channel.delete_messages(msgs)
-        except discord.ClientException:
-            logger.warning("Cannot delete more than 100 messages at a time.")
-        except discord.Forbidden:
-            logger.error("Missing permissions.")
-        except discord.HTTPException:
-            logger.error(
-                "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
-            )
-
+        assert type(interaction.channel) is discord.TextChannel, CommandException(
+            "Unable to run this command outside text channels."
+        )
+        await interaction.response.defer(ephemeral=True)
+        msgs = await college_purge_messages(
+            channel=interaction.channel, all_messages=False
+        )
+        await interaction.channel.delete_messages(msgs)
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
+        await interaction.followup.send(
+            f"Bulk delete of {len(msgs)} messages successful.", ephemeral=True
+        )
 
     @group_purge.command(name="all")
-    async def all(self, ctx: discord.ext.commands.Context):
+    async def purge_all(self, interaction: discord.Interaction) -> None:
         # TODO Add a "double check" button to make sure you want to delete
+        await validate_purge(interaction)
 
-        msgs = []
-        max_age = datetime.now() - timedelta(
-            days=13, hours=23, minutes=59
-        )  # Discord only lets you delete 14 day old messages
-
-        try:
-            async for message in ctx.message.channel.history(limit=100):
-                if message.created_at >= max_age:
-                    msgs.append(message)
-
-            await ctx.message.channel.delete_messages(msgs)
-        except discord.ClientException:
-            logger.warning("Cannot delete more than 100 messages at a time.")
-        except discord.Forbidden:
-            logger.error("Missing permissions.")
-        except discord.HTTPException:
-            logger.error(
-                "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
-            )
-
+        assert type(interaction.channel) is discord.TextChannel, CommandException(
+            "Unable to run this command outside text channels."
+        )
+        await interaction.response.defer(ephemeral=True)
+        msgs = await college_purge_messages(
+            channel=interaction.channel, all_messages=True
+        )
+        await interaction.channel.delete_messages(msgs)
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
-
-    @group_purge.command(name="user")
-    async def user(
-        self,
-        ctx: discord.ext.commands.Context,
-        who: DISCORD_USER_TYPES,
-    ):
-        # TODO Add a "double check" button to make sure you want to delete
-        assert who is not None, UserInputException("You must provide a user/member.")
-
-        msgs = []
-        max_age = datetime.now() - timedelta(
-            days=13, hours=23, minutes=59
-        )  # Discord only lets you delete 14 day old messages
-
-        try:
-            async for message in ctx.message.channel.history(limit=100):
-                if message.created_at >= max_age and message.author.id == who.id:
-                    msgs.append(message)
-
-            await ctx.message.channel.delete_messages(msgs)
-        except discord.ClientException:
-            logger.warning("Cannot delete more than 100 messages at a time.")
-        except discord.Forbidden:
-            logger.error("Missing permissions.")
-        except discord.HTTPException:
-            logger.error(
-                "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
-            )
-
-        logger.info(f"Bulk delete of {len(msgs)} {who.mention}'s messages successful.")
+        await interaction.followup.send(
+            f"Bulk delete of {len(msgs)} messages successful.", ephemeral=True
+        )
 
     @app_commands.command(name="quit")
-    async def quit(self, ctx: discord.ext.commands.Context):
-        await ctx.send(f"Goodbye for now! {ctx.author.mention} has turned me off!")
-        await self.client.logout()  # noqa
-        logger.info(f"User `{ctx.author}` turned off the bot.")
+    async def quit(self, interaction: discord.Interaction) -> None:
+        await interaction.response.send_message(
+            f"Goodbye for now! {interaction.user.mention} has turned me off!"
+        )
+        await self.client.close()
+        logger.info(
+            f"User {interaction.user.name}#{interaction.user.discriminator} turned off the bot."
+        )
 
-    @app_commands.command(name="restart")
-    async def restart(self, ctx: discord.ext.commands.Context):
+    @app_commands.command(name="restart")  # TODO Test on Linux
+    async def restart(self, interaction: discord.Interaction) -> None:
+        interaction.response.defer(ephemeral=True, thinking=True)
+
         assert "Windows" not in platform.platform(), CommandException(
             "Cannot run this command while hosted on Windows"
         )
@@ -288,16 +277,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         client.close()
         logger.info("SSH Client is closed.")
 
-        await ctx.send("Bot restart complete!")
-
-    @app_commands.command(name="submit")
-    async def submit(self, ctx: discord.ext.commands.Context):
-        assert ctx.subcommand_passed, UserInputException(
-            "A subcommmand must be passed."
-        )
+        await interaction.channel.send("Bot restart complete!")
 
     @group_submit.command()
-    async def bug(self, ctx: discord.ext.commands.Context):
+    async def bug(self, interaction: discord.Interaction) -> None:
         embed = buildEmbed(
             title="Bug Reporter",
             description=discordURLFormatter(
@@ -305,10 +288,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=bug&template=bug_report.md&title=%5BBUG%5D+",
             ),
         )
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @group_submit.command()
-    async def feature(self, ctx: discord.ext.commands.Context):
+    async def feature(self, interaction: discord.Interaction) -> None:
         embed = buildEmbed(
             title="Feature Request",
             description=discordURLFormatter(
@@ -316,24 +299,24 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=request&template=feature_request.md&title=%5BREQUEST%5D+",
             ),
         )
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="iowa")  # TODO
-    async def iowa(self, ctx: discord.ext.commands.Context):
+    async def iowa(self, interaction: discord.Interaction) -> None:
         ...
 
     @app_commands.command(name="nebraska")  # TODO
-    async def nebraska(self, ctx: discord.ext.commands.Context):
+    async def nebraska(self, interaction: discord.Interaction) -> None:
         ...
 
     @app_commands.command(name="gameday")  # TODO
-    async def gameday(self, ctx: discord.ext.commands.Context):
+    async def gameday(self, interaction: discord.Interaction) -> None:
         ...
 
     @app_commands.command(name="smms")  # TODO
-    async def smms(self, ctx: discord.ext.commands.Context):
+    async def smms(self, interaction: discord.Interaction) -> None:
         ...
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(AdminCog(bot))
+    await bot.add_cog(AdminCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
