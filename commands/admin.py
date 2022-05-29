@@ -7,7 +7,7 @@ from typing import Any
 
 import discord.ext.commands
 import paramiko
-from discord import app_commands
+from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 from paramiko.ssh_exception import (
     BadHostKeyException,
@@ -22,10 +22,13 @@ from helpers.constants import (
     SSH_USERNAME,
     SSH_PASSWORD,
     GUILD_PROD,
+    ROLE_TIME_OUT,
+    CHAN_IOWA,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
-from objects.Exceptions import UserInputException, CommandException
+from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
+from objects.Exceptions import CommandException, UserInputException
 
 logger = logging.getLogger(__name__)
 
@@ -302,12 +305,133 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="iowa")  # TODO
-    async def iowa(self, interaction: discord.Interaction) -> None:
-        ...
+    async def iowa(
+        self,
+        interaction: discord.Interaction,
+        who: DISCORD_USER_TYPES,
+        reason: str,
+    ) -> None:
+        await interaction.response.defer(thinking=True)
+
+        logger.info(
+            f"Starting the Iowa command and banishing {who.name}#{who.discriminator}"
+        )
+
+        assert who, UserInputException("You must include a user!")
+        assert reason, UserInputException("You must include a reason why!")
+
+        role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
+        channel_iowa = interaction.guild.get_channel(CHAN_IOWA)
+        full_reason = (
+            f"Time Out by {interaction.user.name}#{interaction.user.discriminator}: "
+            + reason
+        )
+
+        previous_roles = [str(role.id) for role in who.roles[1:]]
+        if previous_roles:
+            previous_roles = ",".join(previous_roles)
+
+        logger.info(f"Gathered all the roles to store")
+
+        roles = who.roles
+        for role in roles:
+            try:
+                await who.remove_roles(role, reason=full_reason)
+                logger.info(f"Removed [{role}] role")
+            except (discord.Forbidden, discord.HTTPException):
+                continue
+
+        try:
+            await who.add_roles(role_timeout, reason=full_reason)
+        except (discord.Forbidden, discord.HTTPException):
+            raise CommandException(
+                f"Unable to add role to {who.name}#{who.discriminator}!"
+            )
+
+        logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
+
+        processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
+
+        embed = buildEmbed(
+            title="Banished to Iowa",
+            fields=[
+                {
+                    "name": "Statement",
+                    "value": f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server.",
+                    "inline": False,
+                },
+                {"name": "Reason", "value": full_reason, "inline": False},
+            ],
+        )
+
+        await interaction.followup.send(embed=embed)
+        await who.send(
+            f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
+        )
+        logger.info("Iowa command complete")
 
     @app_commands.command(name="nebraska")  # TODO
-    async def nebraska(self, interaction: discord.Interaction) -> None:
-        ...
+    async def nebraska(
+        self,
+        interaction: discord.Interaction,
+        who: DISCORD_USER_TYPES,
+    ) -> None:
+        assert who, UserInputException("You must include a user!")
+
+        await interaction.response.defer(thinking=True)
+
+        role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
+        try:
+            await who.remove_roles(role_timeout)
+        except (Forbidden, HTTPException) as e:
+            raise CommandException(f"Unable to remove the timeout role!\n{e}")
+
+        logger.info(f"Removed [{role_timeout}] role")
+
+        previous_roles_raw = processMySQL(
+            query=sqlRetrieveIowa, values=who.id, fetch="all"
+        )
+
+        processMySQL(query=sqlRemoveIowa, values=who.id)
+
+        if previous_roles_raw is not None:
+            previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+            logger.info(f"Gathered all the roles to store")
+
+            if previous_roles:
+                for role in previous_roles:
+                    try:
+                        new_role = interaction.guild.get_role(int(role))
+                        logger.info(f"Attempting to add [{new_role}] role...")
+                        await who.add_roles(new_role, reason="Returning from Iowa")
+                    except (
+                        discord.Forbidden,
+                        discord.HTTPException,
+                        discord.ext.commands.MissingPermissions,
+                    ) as e:
+                        logger.info(f"Unable to add role!\n{e}")
+                        continue
+
+                    logger.info(f"Added [{new_role}] role")
+
+        embed = buildEmbed(
+            title="Return to Nebraska",
+            fields=[
+                {
+                    "name": "Welcome back!",
+                    "value": f"[{who.mention}] is welcomed back to Nebraska!",
+                    "inline": False,
+                },
+                {
+                    "name": "Welcomed by",
+                    "value": interaction.user.mention,
+                    "inline": False,
+                },
+            ],
+        )
+        await interaction.followup.send(embed=embed)
+
+        logger.info("Nebraska command complete")
 
     @app_commands.command(name="gameday")  # TODO
     async def gameday(self, interaction: discord.Interaction) -> None:
