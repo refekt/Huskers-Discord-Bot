@@ -3,6 +3,12 @@
 # TODO
 import logging
 
+import pymysql
+from pymysql import OperationalError
+
+from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
+from objects.Exceptions import MySQLException
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,17 +40,17 @@ logger = logging.getLogger(__name__)
 # """
 #
 # # Iowa Command
-# sqlInsertIowa = """
-# INSERT INTO iowa (user_id, reason, previous_roles) VALUES (%s, %s, %s)
-# """
-#
-# sqlRetrieveIowa = """
-# SELECT previous_roles FROM iowa WHERE user_id = %s
-# """
-#
-# sqlRemoveIowa = """
-# DELETE FROM iowa WHERE user_id = %s
-# """
+sqlInsertIowa = """
+INSERT INTO iowa (user_id, reason, previous_roles) VALUES (%s, %s, %s)
+"""
+
+sqlRetrieveIowa = """
+SELECT previous_roles FROM iowa WHERE user_id = %s
+"""
+
+sqlRemoveIowa = """
+DELETE FROM iowa WHERE user_id = %s
+"""
 #
 # # Tasks
 # sqlRetrieveTasks = """
@@ -246,70 +252,68 @@ logger = logging.getLogger(__name__)
 # # """
 
 
-# def processMySQL(query: str, **kwargs):
-# log(0, f"Starting a MySQL query")
-# try:
-#     sqlConnection = pymysql.connect(
-#         host=SQL_HOST,
-#         user=SQL_USER,
-#         password=SQL_PASSWD,
-#         db=SQL_DB,
-#         charset="utf8mb4",
-#         cursorclass=pymysql.cursors.DictCursor,
-#     )
-#     log(f"Connected to the MySQL Database!", 1)
-# except:
-#     log(f"Unable to connect to the `{SQL_DB}` database.", 1)
-#     return
-#
-# result = None
-#
-# try:
-#     with sqlConnection.cursor() as cursor:
-#         if (
-#             not "fetch" in kwargs
-#         ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
-#             if not "values" in kwargs:
-#                 cursor.execute(query=query)
-#             else:
-#                 cursor.execute(query=query, args=kwargs["values"])
-#         else:
-#             if not "values" in kwargs:
-#                 if kwargs["fetch"] == "one":
-#                     cursor.execute(query=query)
-#                     result = cursor.fetchone()
-#                 elif kwargs["fetch"] == "many":
-#                     if not "size" in kwargs:
-#                         raise ValueError("Fetching many requires a `size` kwargs.")
-#                     cursor.execute(query=query)
-#                     result = cursor.fetchmany(many=kwargs["size"])
-#                 elif kwargs["fetch"] == "all":
-#                     cursor.execute(query=query)
-#                     result = cursor.fetchall()
-#             else:
-#                 if kwargs["fetch"] == "one":
-#                     cursor.execute(query=query, args=kwargs["values"])
-#                     result = cursor.fetchone()
-#                 elif kwargs["fetch"] == "many":
-#                     if not "size" in kwargs:
-#                         raise ValueError("Fetching many requires a `size` kwargs.")
-#                     cursor.execute(query=query, args=kwargs["values"])
-#                     result = cursor.fetchmany(many=kwargs["size"])
-#                 elif kwargs["fetch"] == "all":
-#                     cursor.execute(query=query, args=kwargs["values"])
-#                     result = cursor.fetchall()
-#
-#     sqlConnection.commit()
-#
-# except:
-#     raise ConnectionError("Error occurred opening the MySQL database.")
-# finally:
-#     log(f"Closing connection to the MySQL Database", 1)
-#     sqlConnection.close()
-#
-#     if result:
-#         log(f"MySQL query finished", 0)
-#         return result
+def processMySQL(query: str, **kwargs):
+    logger.info(f"Starting a MySQL query")
+    try:
+        sqlConnection = pymysql.connect(
+            host=SQL_HOST,
+            user=SQL_USER,
+            password=SQL_PASSWD,
+            db=SQL_DB,
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.DictCursor,
+        )
+        logger.info(f"Connected to the MySQL Database!")
+    except OperationalError:  # Unsure if this is the correct exception
+        raise MySQLException(f"Unable to connect to the `{SQL_DB}` database.")
+
+    result = None
+
+    try:
+        with sqlConnection.cursor() as cursor:
+            if (
+                "fetch" not in kwargs.keys()
+            ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
+                if "values" not in kwargs.keys():
+                    cursor.execute(query=query)
+                else:
+                    cursor.execute(query=query, args=kwargs["values"])
+            else:
+                if not "values" in kwargs.keys():
+                    if kwargs["fetch"] == "one":
+                        cursor.execute(query=query)
+                        result = cursor.fetchone()
+                    elif kwargs["fetch"] == "many":
+                        if "size" not in kwargs.keys():
+                            raise ValueError("Fetching many requires a `size` kwargs.")
+                        cursor.execute(query=query)
+                        result = cursor.fetchmany(many=kwargs["size"])
+                    elif kwargs["fetch"] == "all":
+                        cursor.execute(query=query)
+                        result = cursor.fetchall()
+                else:
+                    if kwargs["fetch"] == "one":
+                        cursor.execute(query=query, args=kwargs["values"])
+                        result = cursor.fetchone()
+                    elif kwargs["fetch"] == "many":
+                        if "size" not in kwargs.keys():
+                            raise ValueError("Fetching many requires a `size` kwargs.")
+                        cursor.execute(query=query, args=kwargs["values"])
+                        result = cursor.fetchmany(many=kwargs["size"])
+                    elif kwargs["fetch"] == "all":
+                        cursor.execute(query=query, args=kwargs["values"])
+                        result = cursor.fetchall()
+
+        sqlConnection.commit()
+    except:
+        raise ConnectionError("Error occurred opening the MySQL database.")
+    finally:
+        logger.info(f"Closing connection to the MySQL Database")
+        sqlConnection.close()
+
+        if result:
+            logger.info(f"MySQL query finished", 0)
+            return result
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

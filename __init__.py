@@ -1,7 +1,7 @@
 import logging
 import sys
 from time import perf_counter
-import discord  # noqa
+import discord  # noqa # Beta version thing
 from objects.Client import HuskerClient
 
 logging.basicConfig(
@@ -56,26 +56,16 @@ client = HuskerClient(
 
 __all__ = ["client"]
 
-
-# async def load_all_extensions():
-#     logger.info("Loading extensions")
-#
-#     extensions = ["admin", "football_stats", "image", "recruiting", "reminder", "text"]
-#
-#     for extension in extensions:
-#         try:
-#             await client.load_extension(f"commands.{extension}")
-#             logger.info(f"Loaded the {extension} extension")
-#         except:  # noqa
-#             logger.info(f"Unable to laod the {extension} extension")
-#             continue
-#
-#     logger.info("All extensions loaded")
-#
-#
-# await load_all_extensions()
-
 end = perf_counter()
 logger.info(f"The bot initialized in {end - start:,.2f} seconds")
+
+
+# v2.0 loop
+# async def main():
+#     async with client:
+#         await client.run(PROD_TOKEN)
+#
+#
+# asyncio.run(main())
 
 client.run(PROD_TOKEN)
