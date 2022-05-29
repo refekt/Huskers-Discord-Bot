@@ -21,8 +21,13 @@ class MyCog(commands.Cog):
         """/example-command sub-command"""
         ...
 
-    @app_commands.command(name="command-1")
-    async def my_command(self, interaction: discord.Interaction) -> None:
+    @app_commands.command(name="command-1", description="Descript #1")
+    @app_commands.describe(example="Description for example variable")
+    @app_commands.guilds(GUILD_PROD)
+    @app_commands.default_permissions(
+        manage_messages=True
+    )  # https://discordpy.readthedocs.io/en/latest/api.html#discord.Permissions
+    async def my_command(self, interaction: discord.Interaction, example: str) -> None:
         """/command-1"""
         await interaction.response.send_message("Hello from command 1!", ephemeral=True)
 
