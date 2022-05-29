@@ -148,18 +148,18 @@ class HuskerClient(Bot):
         logger.info("Loading extensions")
 
         for extension in self.add_extensions:
-            try:
-                await self.load_extension(extension)
-                logger.info(f"Loaded the {extension} extension")
-            except (
-                ExtensionNotFound,
-                ExtensionAlreadyLoaded,
-                NoEntryPointError,
-                ExtensionFailed,
-            ) as e:  # noqa
-                raise ExtensionException(
-                    f"\t\t\tERROR: Unable to laod the {extension} extension. Received the following error:\n{e}"
-                )
+            # try:
+            await self.load_extension(extension)
+            logger.info(f"Loaded the {extension} extension")
+            # except (
+            #     ExtensionNotFound,
+            #     ExtensionAlreadyLoaded,
+            #     NoEntryPointError,
+            #     ExtensionFailed,
+            # ) as e:  # noqa
+            #     raise ExtensionException(
+            #         f"ERROR: Unable to laod the {extension} extension\n{e}"
+            #     )
 
         logger.info("All extensions loaded")
 

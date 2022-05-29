@@ -71,15 +71,18 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     group_purge = app_commands.Group(
         name="purge",
-        description="TBD",
+        description="Purge messages from channel",
         default_permissions=discord.Permissions(manage_messages=True),
+        guild_ids=[GUILD_PROD],
     )
     group_submit = app_commands.Group(
         name="submit",
-        description="TBD",
+        description="Sbumit a bug or feature request for the bot",
+        guild_ids=[GUILD_PROD],
     )
 
-    @app_commands.command(name="about")
+    @app_commands.command(name="about", description="Learn all about Bot Frost")
+    @app_commands.guilds(GUILD_PROD)
     async def about(self, interaction: discord.Interaction) -> None:
         """All about Bot Frost"""
         import platform
@@ -132,9 +135,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
         )
 
-    @app_commands.command(name="donate")
+    @app_commands.command(
+        name="donate", description="Contribute to the development of Bot Frost"
+    )
+    @app_commands.guilds(GUILD_PROD)
     async def donate(self, interaction: discord.Interaction) -> None:
-        """Donate to the cause"""
+        """Contribute to the development of Bot Frost"""
 
         await interaction.response.send_message(
             embed=buildEmbed(
@@ -170,7 +176,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
         )
 
-    @app_commands.command(name="commands")
+    @app_commands.command(
+        name="commands", description="Lists all commands within the bot"
+    )
+    @app_commands.guilds(GUILD_PROD)
     async def commands(self, interaction: discord.Interaction) -> None:
         """Lists all commands within the bot"""
         embed_fields_commands = [
@@ -184,7 +193,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         embed = buildEmbed(title="Bot Commands", fields=embed_fields_commands)
         await interaction.response.send_message(embed=embed)
 
-    @group_purge.command(name="bot")
+    @group_purge.command(
+        name="bot", description="Purge the 100 most recent bot messages"
+    )
     async def purge_bot(self, interaction: discord.Interaction) -> None:
         # TODO Add a "double check" button to make sure you want to delete
         await validate_purge(interaction)
@@ -202,7 +213,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             f"Bulk delete of {len(msgs)} messages successful.", ephemeral=True
         )
 
-    @group_purge.command(name="all")
+    @group_purge.command(name="all", description="Purge the 100 most recent messages")
     async def purge_all(self, interaction: discord.Interaction) -> None:
         # TODO Add a "double check" button to make sure you want to delete
         await validate_purge(interaction)
@@ -220,8 +231,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             f"Bulk delete of {len(msgs)} messages successful.", ephemeral=True
         )
 
-    @app_commands.command(name="quit")
+    @app_commands.command(name="quit", description="Turn off Bot Frost")
     @app_commands.default_permissions(manage_messages=True)
+    @app_commands.guilds(GUILD_PROD)
     async def quit(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             f"Goodbye for now! {interaction.user.mention} has turned me off!"
@@ -231,7 +243,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             f"User {interaction.user.name}#{interaction.user.discriminator} turned off the bot."
         )
 
-    @app_commands.command(name="restart")  # TODO Test on Linux
+    @app_commands.command(
+        name="restart", description="Restart the bot (Linux host only)"
+    )  # TODO Test on Linux
+    @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def restart(self, interaction: discord.Interaction) -> None:
         interaction.response.defer(ephemeral=True, thinking=True)
@@ -291,8 +306,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.channel.send("Bot restart complete!")
 
-    @group_submit.command()
-    async def bug(self, interaction: discord.Interaction) -> None:
+    @group_submit.command(name="bug", description="Submit a bug")
+    async def submit_bug(self, interaction: discord.Interaction) -> None:
         embed = buildEmbed(
             title="Bug Reporter",
             description=discordURLFormatter(
@@ -302,8 +317,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         await interaction.response.send_message(embed=embed)
 
-    @group_submit.command()
-    async def feature(self, interaction: discord.Interaction) -> None:
+    @group_submit.command(name="feature", description="Submit a feature")
+    async def submit_feature(self, interaction: discord.Interaction) -> None:
         embed = buildEmbed(
             title="Feature Request",
             description=discordURLFormatter(
@@ -313,7 +328,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="iowa")  # TODO
+    @app_commands.command(name="iowa", description="Send someone to Iowa")
+    @app_commands.describe(who="User to send to Iowa", reason="The reason why")
+    @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def iowa(
         self,
@@ -380,7 +397,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         logger.info("Iowa command complete")
 
-    @app_commands.command(name="nebraska")  # TODO
+    @app_commands.command(name="nebraska", description="Bring someone back to Nebraska")
+    @app_commands.describe(who="User to bring back to Nebraska")
+    @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def nebraska(
         self,
@@ -444,7 +463,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info("Nebraska command complete")
 
-    @app_commands.command(name="gameday")  # TODO
+    @app_commands.command(
+        name="gameday", description="WIP: Turn game day mode on"
+    )  # TODO
     @app_commands.default_permissions(manage_messages=True)
     async def gameday(self, interaction: discord.Interaction) -> None:
         ...
