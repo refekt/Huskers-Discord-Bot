@@ -9,30 +9,32 @@
 import discord.ext.commands
 from discord.ext import commands
 
+from helpers.constants import GUILD_PROD
+
 
 class ImageCog(commands.Cog, name="Image Commands"):
     @commands.command()
-    async def deepfry(self, ctx: discord.ext.commands.Context):
+    async def deepfry(self, ctx: discord.interactions.Interaction):
         ...
 
     @commands.command()
-    async def hypeme(self, ctx: discord.ext.commands.Context):
+    async def hypeme(self, ctx: discord.interactions.Interaction):
         ...
 
     @commands.command()
-    async def inspireme(self, ctx: discord.ext.commands.Context):
+    async def inspireme(self, ctx: discord.interactions.Interaction):
         ...
 
     @commands.command()
-    async def slowking(self, ctx: discord.ext.commands.Context):
+    async def slowking(self, ctx: discord.interactions.Interaction):
         ...
 
     @commands.command()
     async def img(
-        self, ctx: discord.ext.commands.Context
+        self, ctx: discord.interactions.Interaction
     ):  # create, list, delete, random
         ...
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(ImageCog(bot))
+    await bot.add_cog(ImageCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
