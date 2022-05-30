@@ -1,3 +1,4 @@
+import enum
 import logging
 import pathlib
 import platform
@@ -31,6 +32,8 @@ from helpers.constants import (
     CHAN_GENERAL,
     CHAN_DISCUSSION_LIVE,
     CHAN_DISCUSSION_STREAMING,
+    CHAN_RECRUITING,
+    CHAN_ADMIN,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -40,127 +43,16 @@ from objects.Exceptions import CommandException, UserInputException
 logger = logging.getLogger(__name__)
 
 
-async def alert_gameday_channels(client: discord.ext.commands.Bot, on: bool):
-    chan_general = await client.fetch_channel(CHAN_GENERAL)
-    chan_live = await client.fetch_channel(CHAN_DISCUSSION_LIVE)
-    chan_streaming = await client.fetch_channel(CHAN_DISCUSSION_STREAMING)
-
-    if on:
-        embed = buildEmbed(
-            title="Game Day Mode",
-            description="Game day mode is now on!",
-            fields=[
-                dict(
-                    name="Live TV",
-                    value=f"{chan_live.mention} text and voice channels are for users who are watching live.",
-                    inline=False,
-                ),
-                dict(
-                    name="Streaming",
-                    value=f"{chan_streaming.mention} text and voice channels are for users who are streaming the game.",
-                    inline=False,
-                ),
-                dict(
-                    name="Info",
-                    value="All channels in the Huskers category will be turned off until the game day mode is disabled.",
-                    inline=False,
-                ),
-            ],
-        )
-    else:
-        embed = buildEmbed(
-            title="Game Day Mode",
-            description="Game day mode is now off!",
-            fields=[
-                dict(
-                    name="Info",
-                    value=f"Game day channels have been disabled and General categories channels have been enabled. Regular discussion may continue in {chan_general.mention}.",
-                    inline=False,
-                )
-            ],
-        )
-
-    await chan_general.send(embed=embed)
-    await chan_live.send(embed=embed)
-    await chan_streaming.send(embed=embed)
-
-
-async def process_gameday(mode: bool, guild: discord.Guild):
-    gameday_category = guild.get_channel(CAT_GAMEDAY)
-    general_category = guild.get_channel(CAT_GENERAL)
-    everyone = guild.get_role(ROLE_EVERYONE_PROD)
-
-    logger.info(f"Creating permissions to be [{mode}]")
-
-    perms_text = discord.PermissionOverwrite()
-
-    perms_text.view_channel = mode  # noqa
-    perms_text.send_messages = mode  # noqa
-    perms_text.read_messages = mode  # noqa
-
-    perms_text_opposite = discord.PermissionOverwrite()
-    perms_text_opposite.send_messages = not mode  # noqa
-
-    perms_voice = discord.PermissionOverwrite()
-    perms_voice.view_channel = mode  # noqa
-    perms_voice.connect = mode  # noqa
-    perms_voice.speak = mode  # noqa
-
-    logger.info(f"Permissions created")
-
-    for channel in general_category.channels:
-
-        if channel.id in CHAN_HYPE_GROUP:
-            continue
-
-        try:
-            logger.info(
-                f"Attempting to changes permissions for [{channel}] to [{not mode}]"
-            )
-            if channel.type == discord.ChannelType.text:
-                await channel.set_permissions(everyone, overwrite=perms_text_opposite)
-        except:  # noqa
-            logger.info(f"Unable to change permissions for [{channel}] to [{not mode}]")
-            continue
-
-        logger.info(f"Changed permissions for [{channel}] to [{not mode}]")
-
-    for channel in gameday_category.channels:
-        try:
-            logger.info(
-                f"Attempting to changes permissions for [{channel}] to [{mode}]"
-            )
-
-            if channel.type == discord.ChannelType.text:
-                await channel.set_permissions(everyone, overwrite=perms_text)
-            elif channel.type == discord.ChannelType.voice:
-                await channel.set_permissions(everyone, overwrite=perms_voice)
-
-                # TODO Trying to kick people from voice channels if game day mode is turned off.
-            else:
-                logger.info(f"Unable to change permissions for [{channel}] to [{mode}]")
-                continue
-            logger.info(f"Changed permissions for [{channel}] to [{mode}]")
-        except discord.errors.Forbidden:
-            raise CommandException(
-                "The bot does not have access to change permissions!"
-            )
-        except:  # noqa
-            continue
-
-    logger.info(f"All permissions changes applied")
-
-
 class Confirm(discord.ui.View):
     def __init__(self):
-        super(Confirm, self).__init__()
+        super().__init__()
         self.value = None
 
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
     async def confirm(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
-        await interaction.response.send_message("Confirming", ephemeral=True)
+        await interaction.response.send_message("Confirmed!", ephemeral=True)
         self.value = True
         self.stop()
 
@@ -171,55 +63,15 @@ class Confirm(discord.ui.View):
         self.stop()
 
 
-async def college_purge_messages(channel: Any, all_messages: bool = False):
-    msgs = []
-    max_age = datetime.now() - timedelta(
-        days=13, hours=23, minutes=59
-    )  # Discord only lets you delete 14 day old messages
-
-    try:
-        async for message in channel.history(limit=100):
-            if (
-                message.created_at >= max_age.astimezone() and message.author.bot
-                if not all_messages
-                else True
-            ):
-                msgs.append(message)
-
-    except discord.ClientException:
-        logger.warning("Cannot delete more than 100 messages at a time.")
-    except discord.Forbidden:
-        logger.error("Missing permissions.")
-    except discord.HTTPException:
-        logger.error(
-            "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
-        )
-
-    return msgs
-
-
-async def confirm_purge(interaction: discord.Interaction):
-
-    view = Confirm()
-    await interaction.response.send_message(
-        "Do you want to continue?", view=view, ephemeral=True
-    )
-    await view.wait()
-
-    if view.value is None:
-        logger.info("Purge confirmation timed out!")
-    elif view.value:
-        logger.info("Purge confirmed. Continuing!")
-        return True
-    else:
-        logger.info("Purge cancelled. Halting!")
-        return False
-
-
 class AdminCog(commands.Cog, name="Admin Commands"):
     def __init__(self, client: discord.ext.commands.Bot) -> None:
         self.client: discord.ext.commands.Bot = client
         super().__init__()
+
+    class MammaleChannels(enum.Enum):
+        general = 1
+        recruiting = 2
+        admin = 3
 
     group_purge = app_commands.Group(
         name="purge",
@@ -238,6 +90,168 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         default_permissions=discord.Permissions(manage_messages=True),
         guild_ids=[GUILD_PROD],
     )
+
+    # noinspection PyMethodMayBeStatic
+    async def alert_gameday_channels(self, client: discord.ext.commands.Bot, on: bool):
+        chan_general = await client.fetch_channel(CHAN_GENERAL)
+        chan_live = await client.fetch_channel(CHAN_DISCUSSION_LIVE)
+        chan_streaming = await client.fetch_channel(CHAN_DISCUSSION_STREAMING)
+
+        if on:
+            embed = buildEmbed(
+                title="Game Day Mode",
+                description="Game day mode is now on!",
+                fields=[
+                    dict(
+                        name="Live TV",
+                        value=f"{chan_live.mention} text and voice channels are for users who are watching live.",
+                        inline=False,
+                    ),
+                    dict(
+                        name="Streaming",
+                        value=f"{chan_streaming.mention} text and voice channels are for users who are streaming the game.",
+                        inline=False,
+                    ),
+                    dict(
+                        name="Info",
+                        value="All channels in the Huskers category will be turned off until the game day mode is disabled.",
+                        inline=False,
+                    ),
+                ],
+            )
+        else:
+            embed = buildEmbed(
+                title="Game Day Mode",
+                description="Game day mode is now off!",
+                fields=[
+                    dict(
+                        name="Info",
+                        value=f"Game day channels have been disabled and General categories channels have been enabled. Regular discussion may continue in {chan_general.mention}.",
+                        inline=False,
+                    )
+                ],
+            )
+
+        await chan_general.send(embed=embed)
+        await chan_live.send(embed=embed)
+        await chan_streaming.send(embed=embed)
+
+    # noinspection PyMethodMayBeStatic
+    async def process_gameday(self, mode: bool, guild: discord.Guild):
+        gameday_category = guild.get_channel(CAT_GAMEDAY)
+        general_category = guild.get_channel(CAT_GENERAL)
+        everyone = guild.get_role(ROLE_EVERYONE_PROD)
+
+        logger.info(f"Creating permissions to be [{mode}]")
+
+        perms_text = discord.PermissionOverwrite()
+
+        perms_text.view_channel = mode  # noqa
+        perms_text.send_messages = mode  # noqa
+        perms_text.read_messages = mode  # noqa
+
+        perms_text_opposite = discord.PermissionOverwrite()
+        perms_text_opposite.send_messages = not mode  # noqa
+
+        perms_voice = discord.PermissionOverwrite()
+        perms_voice.view_channel = mode  # noqa
+        perms_voice.connect = mode  # noqa
+        perms_voice.speak = mode  # noqa
+
+        logger.info(f"Permissions created")
+
+        for channel in general_category.channels:
+
+            if channel.id in CHAN_HYPE_GROUP:
+                continue
+
+            try:
+                logger.info(
+                    f"Attempting to changes permissions for [{channel}] to [{not mode}]"
+                )
+                if channel.type == discord.ChannelType.text:
+                    await channel.set_permissions(
+                        everyone, overwrite=perms_text_opposite
+                    )
+            except:  # noqa
+                logger.info(
+                    f"Unable to change permissions for [{channel}] to [{not mode}]"
+                )
+                continue
+
+            logger.info(f"Changed permissions for [{channel}] to [{not mode}]")
+
+        for channel in gameday_category.channels:
+            try:
+                logger.info(
+                    f"Attempting to changes permissions for [{channel}] to [{mode}]"
+                )
+
+                if channel.type == discord.ChannelType.text:
+                    await channel.set_permissions(everyone, overwrite=perms_text)
+                elif channel.type == discord.ChannelType.voice:
+                    await channel.set_permissions(everyone, overwrite=perms_voice)
+
+                    # TODO Trying to kick people from voice channels if game day mode is turned off.
+                else:
+                    logger.info(
+                        f"Unable to change permissions for [{channel}] to [{mode}]"
+                    )
+                    continue
+                logger.info(f"Changed permissions for [{channel}] to [{mode}]")
+            except discord.errors.Forbidden:
+                raise CommandException(
+                    "The bot does not have access to change permissions!"
+                )
+            except:  # noqa
+                continue
+
+        logger.info(f"All permissions changes applied")
+
+    # noinspection PyMethodMayBeStatic
+    async def college_purge_messages(self, channel: Any, all_messages: bool = False):
+        msgs = []
+        max_age = datetime.now() - timedelta(
+            days=13, hours=23, minutes=59
+        )  # Discord only lets you delete 14 day old messages
+
+        try:
+            async for message in channel.history(limit=100):
+                if (
+                    message.created_at >= max_age.astimezone() and message.author.bot
+                    if not all_messages
+                    else True
+                ):
+                    msgs.append(message)
+
+        except discord.ClientException:
+            logger.warning("Cannot delete more than 100 messages at a time.")
+        except discord.Forbidden:
+            logger.error("Missing permissions.")
+        except discord.HTTPException:
+            logger.error(
+                "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
+            )
+
+        return msgs
+
+    # noinspection PyMethodMayBeStatic
+    async def confirm_purge(self, interaction: discord.Interaction):
+
+        view = Confirm()
+        await interaction.response.send_message(
+            "Do you want to continue?", view=view, ephemeral=True
+        )
+        await view.wait()
+
+        if view.value is None:
+            logger.info("Purge confirmation timed out!")
+        elif view.value:
+            logger.info("Purge confirmed. Continuing!")
+            return True
+        else:
+            logger.info("Purge cancelled. Halting!")
+            return False
 
     @app_commands.command(name="about", description="Learn all about Bot Frost")
     @app_commands.guilds(GUILD_PROD)
@@ -359,10 +373,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             "Unable to run this command outside text channels."
         )
 
-        if not await confirm_purge(interaction):
+        if not await self.confirm_purge(interaction):
             return
 
-        msgs = await college_purge_messages(
+        msgs = await self.college_purge_messages(
             channel=interaction.channel, all_messages=False
         )
 
@@ -378,10 +392,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             "Unable to run this command outside text channels."
         )
 
-        if not await confirm_purge(interaction):
+        if not await self.confirm_purge(interaction):
             return
 
-        msgs = await college_purge_messages(
+        msgs = await self.college_purge_messages(
             channel=interaction.channel, all_messages=True
         )
 
@@ -632,8 +646,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"Game Day: On")
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("Processing!")
-        await process_gameday(True, interaction.guild)
-        await alert_gameday_channels(self.client, True)
+        await self.process_gameday(True, interaction.guild)
+        await self.alert_gameday_channels(self.client, True)
 
     @group_gameday.command(
         name="off",
@@ -644,14 +658,32 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"Game Day: Off")
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("Processing!")
-        await process_gameday(False, interaction.guild)
-        await alert_gameday_channels(self.client, False)
+        await self.process_gameday(False, interaction.guild)
+        await self.alert_gameday_channels(self.client, False)
 
-    @app_commands.command(name="smms")  # TODO
+    @app_commands.command(name="smms", description="Tee hee")  # TODO Make hidden
     @app_commands.default_permissions(manage_messages=True)
-    async def smms(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
-        await interaction.followup.send("Hehe")
+    async def smms(
+        self,
+        interaction: discord.Interaction,
+        destination: MammaleChannels,
+        message: str,
+    ) -> None:
+        assert message, CommandException("You cannot have a blank message!")
+
+        await interaction.response.defer(ephemeral=True, thinking=True)
+
+        chan = None
+        if destination.name == "general":
+            chan = await interaction.guild.fetch_channel(CHAN_GENERAL)
+        elif destination.name == "recruiting":
+            chan = await interaction.guild.fetch_channel(CHAN_RECRUITING)
+        elif destination.name == "admin":
+            chan = await interaction.guild.fetch_channel(CHAN_ADMIN)
+
+        await chan.send(message)
+
+        await interaction.followup.send("Done!")
 
 
 async def setup(bot: commands.Bot) -> None:

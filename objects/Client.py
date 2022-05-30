@@ -9,7 +9,7 @@
 import logging
 import pathlib
 import platform
-from typing import Union
+from typing import Union, Any
 
 import discord
 from discord import Forbidden, HTTPException
@@ -149,14 +149,14 @@ class HuskerClient(Bot):
 
         for extension in self.add_extensions:
             try:
+                # NOTE Extensions will fail to load when runtime errors exist in the code.
+                # It will also NOT currently output a traceback. You MUST investigate
+                # mannually by stepping through code until I find a way to capture these
+                # exceptions.
                 await self.load_extension(extension)
                 logger.info(f"Loaded the {extension} extension")
-            except (
-                ExtensionNotFound,
-                ExtensionAlreadyLoaded,
-                NoEntryPointError,
-                ExtensionFailed,
-            ) as e:  # noqa
+            except Exception as e:
+                logger.error(f"ERROR: Unable to laod the {extension} extension\n{e}")
                 raise ExtensionException(
                     f"ERROR: Unable to laod the {extension} extension\n{e}"
                 )
@@ -172,7 +172,7 @@ class HuskerClient(Bot):
 
         try:
             await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
-        except (HTTPException, Forbidden, MissingApplicationID) as e:
+        except Exception as e:
             logger.error("Error syncing the tree!\n\n{e}")
 
         logger.info("The bot tree has synced!")
