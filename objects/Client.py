@@ -22,6 +22,7 @@ from discord.ext.commands import (
     ExtensionFailed,
 )
 
+from __version__ import _version
 from helpers.constants import (
     CHAN_BOT_SPAM,
     CHAN_GENERAL,
@@ -30,7 +31,6 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException, ExtensionException
-from __version__ import _version, _author
 
 logger = logging.getLogger(__name__)
 
@@ -148,18 +148,18 @@ class HuskerClient(Bot):
         logger.info("Loading extensions")
 
         for extension in self.add_extensions:
-            # try:
-            await self.load_extension(extension)
-            logger.info(f"Loaded the {extension} extension")
-            # except (
-            #     ExtensionNotFound,
-            #     ExtensionAlreadyLoaded,
-            #     NoEntryPointError,
-            #     ExtensionFailed,
-            # ) as e:  # noqa
-            #     raise ExtensionException(
-            #         f"ERROR: Unable to laod the {extension} extension\n{e}"
-            #     )
+            try:
+                await self.load_extension(extension)
+                logger.info(f"Loaded the {extension} extension")
+            except (
+                ExtensionNotFound,
+                ExtensionAlreadyLoaded,
+                NoEntryPointError,
+                ExtensionFailed,
+            ) as e:  # noqa
+                raise ExtensionException(
+                    f"ERROR: Unable to laod the {extension} extension\n{e}"
+                )
 
         logger.info("All extensions loaded")
 

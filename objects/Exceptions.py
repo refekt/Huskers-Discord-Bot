@@ -4,7 +4,12 @@ from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["CommandException", "UserInputException", "MySQLException"]
+__all__ = [
+    "CommandException",
+    "ExtensionException",
+    "MySQLException",
+    "UserInputException",
+]
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
