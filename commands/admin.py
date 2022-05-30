@@ -34,6 +34,7 @@ from helpers.constants import (
     CHAN_DISCUSSION_STREAMING,
     CHAN_RECRUITING,
     CHAN_ADMIN,
+    BOT_FOOTER_SECRET,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -681,9 +682,20 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         elif destination.name == "admin":
             chan = await interaction.guild.fetch_channel(CHAN_ADMIN)
 
-        await chan.send(message)
+        embed = buildEmbed(
+            title="Secret Mammal Message System (SMMS)",
+            description="These messages have no way to be verified to be accurate.",
+            thumbnail="https://i.imgur.com/EGC1qNt.jpg",
+            footer=BOT_FOOTER_SECRET,
+            fields=[
+                dict(name="Back Channel Communication", value=message, inline=False)
+            ],
+        )
+        await chan.send(embed=embed)
 
-        await interaction.followup.send("Done!")
+        await interaction.followup.send(
+            f"Back channel communication successfully sent to {chan.mention}!"
+        )
 
 
 async def setup(bot: commands.Bot) -> None:
