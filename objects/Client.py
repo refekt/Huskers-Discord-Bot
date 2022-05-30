@@ -9,17 +9,11 @@
 import logging
 import pathlib
 import platform
-from typing import Union, Any
+from typing import Union
 
 import discord
-from discord import Forbidden, HTTPException
-from discord.app_commands import MissingApplicationID
 from discord.ext.commands import (
     Bot,
-    ExtensionNotFound,
-    ExtensionAlreadyLoaded,
-    NoEntryPointError,
-    ExtensionFailed,
 )
 
 from __version__ import _version
