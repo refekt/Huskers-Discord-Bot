@@ -1,7 +1,9 @@
 import logging
 import sys
 from time import perf_counter
+
 import discord  # noqa # Beta version thing
+
 from objects.Client import HuskerClient
 
 logging.basicConfig(
@@ -49,23 +51,22 @@ intents.presences = False
 
 client = HuskerClient(
     command_prefix=None,
-    intents=intents,
     fetch_offline_members=True,
+    intents=intents,
     owner_id=MEMBER_GEE,
 )
-
-__all__ = ["client"]
 
 end = perf_counter()
 logger.info(f"The bot initialized in {end - start:,.2f} seconds")
 
+__all__ = ["client"]
+
 
 # v2.0 loop
-# async def main():
-#     async with client:
-#         await client.run(PROD_TOKEN)
-#
-#
-# asyncio.run(main())
+async def main():
+    async with client:
+        await client.start(PROD_TOKEN)
 
-client.run(PROD_TOKEN)
+
+if __name__ == "__main__":
+    asyncio.run(main())

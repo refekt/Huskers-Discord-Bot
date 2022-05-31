@@ -82,13 +82,24 @@ CFBD_KEY = env_vars["cfbd_api"]
 logger.info("CFBD key loaded")
 
 # Twitter variables
-TWITTER_KEY = env_vars["twitter_key"]
-TWITTER_SECRET_KEY = env_vars["twitter_secret_key"]
-TWITTER_BEARER = env_vars["twitter_bearer"]
-TWITTER_TOKEN = env_vars["twitter_token"]
-TWITTER_TOKEN_SECRET = env_vars["twitter_token_secret"]
 TWITTER_HUSKER_MEDIA_LIST_ID = 1307680291285278720
+TWITTER_BLOCK16_ID_STR = "457066083"
+TWITTER_BLOCK16_SCREENANME = "Block16Omaha"
+TWITTER_QUERY_MAX = 512
+
+TWITTER_BEARER = env_vars["twitter_bearer"]
+
+TWITTER_KEY = env_vars["twitter_api_key"]
+TWITTER_SECRET_KEY = env_vars["twitter_api_key_secret"]
+
+TWITTER_TOKEN = env_vars["twitter_access_token"]
+TWITTER_TOKEN_SECRET = env_vars["twitter_access_token_secret"]
+
+TWITTER_V2_CLIENT_ID = env_vars["twitter_v2_client_id"]
+TWITTER_V2_CLIENT_SECRET = env_vars["twitter_v2_client_secret"]
+
 logger.info("Twitter variables loaded")
+
 
 # Weather API
 WEATHER_API_KEY = env_vars["openweather_key"]
@@ -136,6 +147,7 @@ CHAN_BOTLOGS = 458474143403212801
 CHAN_BOT_SPAM = 593984711706279937
 CHAN_DISCUSSION_LIVE = 768828614773833768
 CHAN_DISCUSSION_STREAMING = 768828705102888980
+CHAN_FOOD = 453994941857923082
 CHAN_GENERAL = 440868279150444544
 CHAN_HOF = 487431877792104470
 CHAN_HOS = 860686057850798090
