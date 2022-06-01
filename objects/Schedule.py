@@ -186,6 +186,13 @@ def HuskerSchedule(sport: str, year=datetime.datetime.now().year):
                 gdt_string, DT_STR_FORMAT
             ).astimezone(tz=TZ)
         else:
+            if "or" in opponent.date_time.lower():
+                temp = opponent.date_time.split(" or ")
+                if ":" in temp[0]:
+                    opponent.date_time = f"{temp[0]} {temp[1][-3:]}"
+                else:
+                    opponent.date_time = f"{temp[0]}:00 {temp[1][-3:]}"
+
             opponent.date_time = datetime.datetime.strptime(
                 opponent.date_time.replace("A.M.", "AM")
                 .replace("a.m.", "AM")
