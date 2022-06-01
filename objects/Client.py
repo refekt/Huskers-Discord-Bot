@@ -15,14 +15,8 @@ from helpers.constants import (
     CHAN_GENERAL,
     DISCORD_CHANNEL_TYPES,
     GUILD_PROD,
-    TWITTER_BLOCK16_ID_STR,
-    TWITTER_BLOCK16_SCREENANME,
-    TWITTER_HUSKER_MEDIA_LIST_ID,
-    TWITTER_KEY,
-    TWITTER_SECRET_KEY,
-    TWITTER_TOKEN,
-    TWITTER_TOKEN_SECRET,
     TWITTER_BEARER,
+    TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_QUERY_MAX,
 )
 from helpers.embed import buildEmbed
@@ -32,8 +26,6 @@ from objects.TweepyStreamListener import TwitterStreamListenerV2
 logger = logging.getLogger(__name__)
 
 __all__ = ["HuskerClient"]
-
-# list_members = []
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
@@ -126,33 +118,15 @@ reaction_threshold = 3  # Used for Hall of Fame/Shame
 def start_twitter_stream() -> None:
     logger.info("Bot is starting the Twitter stream")
 
-    # auth = tweepy.OAuthHandler(
-    #     consumer_key=TWITTER_KEY, consumer_secret=TWITTER_SECRET_KEY
-    # )
-    # auth.set_access_token(key=TWITTER_TOKEN, secret=TWITTER_TOKEN_SECRET)
-    # api = tweepy.API(auth=auth, wait_on_rate_limit=True)
-    #
-    # # Debugging purposes
-    # if "Windows" in platform.platform():
-    #     list_members.append(dict(screen_name="ayy_gbr", id_str="15899943"))
-    #
-    # # Block16
-    # list_members.append(
-    #     dict(screen_name=TWITTER_BLOCK16_SCREENANME, id_str=TWITTER_BLOCK16_ID_STR)
-    # )
-    #
-    # # Pull members from Twitter list
-    # for member in tweepy.Cursor(
-    #     api.get_list_members, list_id=TWITTER_HUSKER_MEDIA_LIST_ID
-    # ).items():
-    #     list_members.append(dict(screen_name=member.screen_name, id_str=member.id_str))
-
     tweeter_client = tweepy.Client(TWITTER_BEARER)
+    logger.info("Getting Husker Media Twitter list")
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
     rule_query = ""
 
+    logger.info("Creating stream rule")
     for member in list_members[0]:
-        append_str = f"from:{member['name']} OR "
+        append_str = f"from:{member['username']} OR "
+
         if len(rule_query) + len(append_str) < TWITTER_QUERY_MAX:
             rule_query += append_str
         else:
@@ -160,7 +134,9 @@ def start_twitter_stream() -> None:
 
     rule_query = rule_query[:-4]  # Get rid of ' OR '
     rule = tweepy.StreamRule(value=rule_query)
+    logger.info(f"Created stream rule:\n\t{rule_query}")
 
+    logger.info("Creating a stream client")
     tweeter_stream = TwitterStreamListenerV2(
         bearer_token=TWITTER_BEARER,
         wait_on_rate_limit=True,
@@ -168,11 +144,10 @@ def start_twitter_stream() -> None:
     )
     logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
-    tweeter_stream.add_rules(
-        rule,
-        dry_run=True,
-    )
-    tweeter_stream.filter(backfill_minutes=5)
+    tweeter_stream.add_rules(rule)
+    logger.info(f"Stream filter rules:\n\t{tweeter_stream.get_rules()}")
+
+    tweeter_stream.filter(threaded=True)
     logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
 
@@ -337,7 +312,8 @@ class HuskerClient(Bot):
         await self.create_welcome_message(guild_member)
 
     async def on_error(self, event_method, *args, **kwargs) -> None:  # TODO
-        logger.info(f"On Error\n{event_method}\n{args}\n{kwargs}")
+        # logger.info(f"On Error\n{event_method}\n{args}\n{kwargs}")
+        ...
 
     async def on_command_error(self, context, exception) -> None:  # TODO
         logger.info(f"On Command Error\n{context}{exception}")
