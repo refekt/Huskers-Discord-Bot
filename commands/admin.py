@@ -1,9 +1,9 @@
-import enum
 import logging
 import pathlib
 import platform
 import socket
 from datetime import datetime, timedelta
+from enum import Enum
 from typing import Any
 
 import discord.ext.commands
@@ -11,30 +11,30 @@ import paramiko
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 from paramiko.ssh_exception import (
-    BadHostKeyException,
     AuthenticationException,
+    BadHostKeyException,
     SSHException,
 )
 
 from __version__ import _version
 from helpers.constants import (
-    DISCORD_USER_TYPES,
-    SSH_HOST,
-    SSH_USERNAME,
-    SSH_PASSWORD,
-    GUILD_PROD,
-    ROLE_TIME_OUT,
-    CHAN_IOWA,
+    BOT_FOOTER_SECRET,
     CAT_GAMEDAY,
     CAT_GENERAL,
-    ROLE_EVERYONE_PROD,
-    CHAN_HYPE_GROUP,
-    CHAN_GENERAL,
+    CHAN_ADMIN,
     CHAN_DISCUSSION_LIVE,
     CHAN_DISCUSSION_STREAMING,
+    CHAN_GENERAL,
+    CHAN_HYPE_GROUP,
+    CHAN_IOWA,
     CHAN_RECRUITING,
-    CHAN_ADMIN,
-    BOT_FOOTER_SECRET,
+    DISCORD_USER_TYPES,
+    GUILD_PROD,
+    ROLE_EVERYONE_PROD,
+    ROLE_TIME_OUT,
+    SSH_HOST,
+    SSH_PASSWORD,
+    SSH_USERNAME,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -65,11 +65,7 @@ class Confirm(discord.ui.View):
 
 
 class AdminCog(commands.Cog, name="Admin Commands"):
-    def __init__(self, client: discord.ext.commands.Bot) -> None:
-        self.client: discord.ext.commands.Bot = client
-        super().__init__()
-
-    class MammaleChannels(enum.Enum):
+    class MammaleChannels(Enum):
         general = 1
         recruiting = 2
         admin = 3

@@ -152,9 +152,6 @@ def start_twitter_stream() -> None:
 
 
 class TwitterButtons(discord.ui.View):
-    def __init__(self):
-        super().__init__()
-
     @discord.ui.button(
         label="Send to General",
         custom_id="send_to_general",
@@ -175,6 +172,8 @@ class TwitterButtons(discord.ui.View):
 
 
 class HuskerClient(Bot):
+    CommandEnums = None
+
     add_extensions = [
         "commands.admin",
         "commands.football_stats",
