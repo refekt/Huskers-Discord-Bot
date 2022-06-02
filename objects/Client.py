@@ -21,7 +21,7 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException, ExtensionException
-from objects.TweepyStreamListener import TwitterStreamListenerV2
+from objects.TweepyStreamListener import StreamClientV2
 
 logger = logging.getLogger(__name__)
 
@@ -41,19 +41,6 @@ reaction_threshold = 3  # Used for Hall of Fame/Shame
 #     f"• __Boost Count:__ {guild.premium_subscription_count}\n"
 #     f"• __Rules Channel:__ {getChannelMention(CHAN_ANNOUNCEMENT)}"
 # )
-
-
-# async def send_tweet_alert(message: str):
-#     logger.info(f"Twitter Alert: {message}")
-#
-#     chan_twitter: discord.TextChannel = get_channel(CHAN_TWITTERVERSE)
-#     embed = buildEmbed(
-#         title="Husker Twitter",
-#         fields=[
-#             dict(name="Twitter Stream Listener Alert", value=message, inline=False)
-#         ],
-#     )
-#     await chan_twitter.send(embed=embed)
 
 
 # async def send_tweet(tweet):
@@ -136,7 +123,7 @@ def start_twitter_stream() -> None:
     rule_query = rule_query[:-4]  # Get rid of ' OR '
 
     logger.info("Creating a stream client")
-    tweeter_stream = TwitterStreamListenerV2(
+    tweeter_stream = StreamClientV2(
         bearer_token=TWITTER_BEARER,
         wait_on_rate_limit=True,
         max_retries=3,
@@ -368,7 +355,7 @@ class HuskerClient(Bot):
         logger.info("All extensions loaded")
 
         chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
-        await chan_botspam.send(embed=await self.create_online_message())  # noqa
+        # await chan_botspam.send(embed=await self.create_online_message())  # noqa
 
         logger.info("The bot is ready!")
 
