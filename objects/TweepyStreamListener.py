@@ -1,8 +1,16 @@
+import ast
 import logging
 
 import tweepy
 
 logger = logging.getLogger(__name__)
+
+
+class MyTweet(tweepy.Tweet):
+    def __init__(self, data):
+        super().__init__(data)
+        for key, value in data.items():
+            setattr(self, key, value)
 
 
 class TwitterStreamListenerV2(tweepy.StreamingClient):
@@ -38,6 +46,8 @@ class TwitterStreamListenerV2(tweepy.StreamingClient):
         logger.info(f"Twitter Stream Listener v2 Response\n{response}")
 
     def on_data(self, raw_data):
+        processed_data = ast.literal_eval(raw_data)
+        tweet = MyTweet()
         logger.info(f"Twitter Stream Listener v2 Raw Data\n{raw_data}")
 
     def on_connection_error(self):

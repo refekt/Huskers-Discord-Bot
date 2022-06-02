@@ -118,12 +118,14 @@ reaction_threshold = 3  # Used for Hall of Fame/Shame
 def start_twitter_stream() -> None:
     logger.info("Bot is starting the Twitter stream")
 
-    tweeter_client = tweepy.Client(TWITTER_BEARER)
     logger.info("Getting Husker Media Twitter list")
+    tweeter_client = tweepy.Client(TWITTER_BEARER)
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
-    rule_query = ""
 
     logger.info("Creating stream rule")
+    rule_query = ""
+    if "Windows" in platform.platform():
+        rule_query = "from:ayy_gbr OR "
     for member in list_members[0]:
         append_str = f"from:{member['username']} OR "
 
@@ -131,10 +133,7 @@ def start_twitter_stream() -> None:
             rule_query += append_str
         else:
             break
-
     rule_query = rule_query[:-4]  # Get rid of ' OR '
-    rule = tweepy.StreamRule(value=rule_query)
-    logger.info(f"Created stream rule:\n\t{rule_query}")
 
     logger.info("Creating a stream client")
     tweeter_stream = TwitterStreamListenerV2(
@@ -142,12 +141,87 @@ def start_twitter_stream() -> None:
         wait_on_rate_limit=True,
         max_retries=3,
     )
-    logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
-    tweeter_stream.add_rules(rule)
+    logger.info(f"Created stream rule:\n\t{rule_query}")
+    tweeter_stream.add_rules(tweepy.StreamRule(value=rule_query))
     logger.info(f"Stream filter rules:\n\t{tweeter_stream.get_rules()}")
 
-    tweeter_stream.filter(threaded=True)
+    tweeter_stream.filter(
+        expansions=[
+            "attachments.media_keys",
+            "attachments.poll_ids",
+            "author_id",
+            "entities.mentions.username",
+            "geo.place_id",
+            "in_reply_to_user_id",
+            "referenced_tweets.id",
+            "referenced_tweets.id.author_id",
+        ],
+        media_fields=[
+            "alt_text",
+            "duration_ms",
+            "height",
+            "media_key",
+            "preview_image_url",
+            "public_metrics",
+            "type",
+            "url",
+            "width",
+        ],
+        place_fields=[
+            "contained_within",
+            "country",
+            "country_code",
+            "full_name",
+            "geo",
+            "id",
+            "name",
+            "place_type",
+        ],
+        poll_fields=[
+            "duration_minutes",
+            "end_datetime",
+            "id",
+            "options",
+            "voting_status",
+        ],
+        tweet_fields=[
+            "attachments",
+            "author_id",
+            "context_annotations",
+            "conversation_id",
+            "created_at",
+            "entities",
+            "geo",
+            "id",
+            "in_reply_to_user_id",
+            "lang",
+            "possibly_sensitive",
+            "public_metrics",
+            "referenced_tweets",
+            "reply_settings",
+            "source",
+            "text",
+            "withheld",
+        ],
+        user_fields=[
+            "created_at",
+            "description",
+            "entities",
+            "id",
+            "location",
+            "name",
+            "pinned_tweet_id",
+            "profile_image_url",
+            "protected",
+            "public_metrics",
+            "url",
+            "username",
+            "verified",
+            "withheld",
+        ],
+        threaded=True,
+    )
     logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
 
