@@ -3,6 +3,7 @@ import random
 import re
 
 import discord.ext.commands
+import markovify
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
@@ -72,17 +73,18 @@ class TextCog(commands.Cog, name="Text Commands"):
     ) -> None:
         await interaction.response.defer()
 
-        combined_sourced: list = []
+        channel_history_limit: int = 1000
+        combined_sources: list = []
+        message_history: list = []
+        source_conent: str = ""
+
         if source_channel is not None:
-            combined_sourced.append(source_channel)
+            combined_sources.append(source_channel)
 
         if source_member is not None:
-            combined_sourced.append(source_member)
+            combined_sources.append(source_member)
 
-        source_conent: str = ""
-        channel_history_limit: int = 1000
-
-        def check_message(message: discord.Message):
+        def check_message(message: discord.Message) -> str:
             if (
                 message.channel.id in CHAN_BANNED
                 or message.author.bot
@@ -92,7 +94,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
             return f"\n{message.content.capitalize()}"
 
-        def cleanup_source_conent(check_source_conent: str):
+        def cleanup_source_conent(check_source_conent: str) -> str:
             output = check_source_conent
 
             regex_discord_http = [
@@ -111,9 +113,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
             return output
 
-        message_history = []
-        source_conent = ""
-        if not combined_sourced:  # Nothing was provided
+        if not combined_sources:  # Nothing was provided
             try:
                 message_history = [
                     message
@@ -127,15 +127,39 @@ class TextCog(commands.Cog, name="Text Commands"):
             for message in message_history:
                 source_conent += check_message(message)
         else:
-            ...
+            for source in combined_sources:
+                if type(source) == discord.Member:
+                    message_member_history = [
+                        message
+                        async for message in interaction.channel.history(
+                            limit=channel_history_limit
+                        )
+                    ]
+                    for message in message_member_history:
+                        if message.author == source:
+                            source_conent += check_message(message)
+                elif type(source) == discord.TextChannel:
+                    ...
+                else:
+                    logger.exception("Unexpected source type!")
+                    continue
 
         if not source_conent == "":
             source_conent = cleanup_source_conent(source_conent)
-            await interaction.response.send_message(source_conent)
         else:
             logger.exception(
                 f"There was not enough information available to make a Markov chain.",
             )
+
+        markvov_response = markovify.NewlineText(source_conent, well_formed=True)
+        markov_output = markvov_response.make_sentence(
+            max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
+        )
+
+        if markov_output is None:
+            logger.exception("Markovify failed to create an output!")
+        else:
+            await interaction.response.send_message(source_conent)
 
     @commands.command()
     async def police(self, interaction: discord.Interaction):
