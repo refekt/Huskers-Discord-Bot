@@ -81,6 +81,9 @@ REDDIT_PW = env_vars["reddit_pw"]
 CFBD_KEY = env_vars["cfbd_api"]
 logger.info("CFBD key loaded")
 
+# DEBUG
+DEBUGGING_CODE = "Windows" in platform.platform()
+
 # Twitter variables
 TWITTER_HUSKER_MEDIA_LIST_ID = 1307680291285278720
 TWITTER_BLOCK16_ID_STR = "457066083"

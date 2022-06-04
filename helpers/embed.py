@@ -92,8 +92,8 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
                 inline=field["inline"],
             )
     if len(e) > embed_max:
-        logger.error("Embed is too big!")
-        return None
+        logger.exception("Embed is too big!")
+        raise
     else:
         logger.info("Returning a normal embed")
         return e

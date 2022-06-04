@@ -497,10 +497,10 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #         search_results = requests.get(url=_247_search, headers=HEADERS)
 #         search_results = json.loads(search_results.text)
 #     else:
-#         raise UserError(f"Error occurred attempting to create 247sports search URL.")
+#         logger.exception(f"Error occurred attempting to create 247sports search URL.")
 #
 #     if not search_results:
-#         raise UserError(
+#         logger.exception(
 #             f"Unable to find [{name[0] if len(name) <= 1 else name[0] + ' ' + name[1]}] in the [{year}] class. Please try again!"
 #         )
 #

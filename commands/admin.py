@@ -39,7 +39,7 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
-from objects.Exceptions import CommandException, UserInputException
+from objects.Exceptions import CommandException, UserInputException, MySQLException
 
 logger = logging.getLogger(__name__)
 
@@ -197,9 +197,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     continue
                 logger.info(f"Changed permissions for [{channel}] to [{mode}]")
             except discord.errors.Forbidden:
-                raise CommandException(
-                    "The bot does not have access to change permissions!"
-                )
+                logger.exception("The bot does not have access to change permissions!")
             except:  # noqa
                 continue
 
@@ -222,11 +220,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     msgs.append(message)
 
         except discord.ClientException:
-            logger.warning("Cannot delete more than 100 messages at a time.")
+            logger.exception("Cannot delete more than 100 messages at a time.")
         except discord.Forbidden:
-            logger.error("Missing permissions.")
+            logger.exception("Missing permissions.")
         except discord.HTTPException:
-            logger.error(
+            logger.exception(
                 "Deleting messages failed. Bulk messages possibly include messages over 14 days old."
             )
 
@@ -443,8 +441,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             SSHException,
             socket.error,
         ):
-            logger.error("SSH Client was unable to connect to host")
-            raise CommandException("Unable to restart the bot!")
+            logger.exception("Unable to restart the bot!")
 
         logger.info("SSH Client connected to host")
 
@@ -542,9 +539,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         try:
             await who.add_roles(role_timeout, reason=full_reason)
         except (discord.Forbidden, discord.HTTPException):
-            raise CommandException(
-                f"Unable to add role to {who.name}#{who.discriminator}!"
-            )
+            logger.exception(f"Unable to add role to {who.name}#{who.discriminator}!")
 
         logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
 
@@ -585,7 +580,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         try:
             await who.remove_roles(role_timeout)
         except (Forbidden, HTTPException) as e:
-            raise CommandException(f"Unable to remove the timeout role!\n{e}")
+            logger.exception(f"Unable to remove the timeout role!\n{e}")
 
         logger.info(f"Removed [{role_timeout}] role")
 

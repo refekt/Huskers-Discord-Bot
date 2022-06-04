@@ -5,6 +5,7 @@ from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 logger = logging.getLogger(__name__)
 
 __all__ = [
+    "ChangelogException",
     "CommandException",
     "ExtensionException",
     "MySQLException",
@@ -37,4 +38,9 @@ class ExtensionException(Exception):
 
 @dataclass()
 class TwitterStreamException(Exception):
+    message: str
+
+
+@dataclass()
+class ChangelogException(Exception):
     message: str

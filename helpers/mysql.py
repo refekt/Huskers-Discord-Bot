@@ -254,6 +254,7 @@ DELETE FROM iowa WHERE user_id = %s
 
 def processMySQL(query: str, **kwargs):
     logger.info(f"Starting a MySQL query")
+    sqlConnection = None
     try:
         sqlConnection = pymysql.connect(
             host=SQL_HOST,
@@ -265,7 +266,7 @@ def processMySQL(query: str, **kwargs):
         )
         logger.info(f"Connected to the MySQL Database!")
     except OperationalError:  # Unsure if this is the correct exception
-        raise MySQLException(f"Unable to connect to the `{SQL_DB}` database.")
+        logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
 
     result = None
 
@@ -279,13 +280,13 @@ def processMySQL(query: str, **kwargs):
                 else:
                     cursor.execute(query=query, args=kwargs["values"])
             else:
-                if not "values" in kwargs.keys():
+                if "values" not in kwargs.keys():
                     if kwargs["fetch"] == "one":
                         cursor.execute(query=query)
                         result = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
-                            raise ValueError("Fetching many requires a `size` kwargs.")
+                            logger.exception("Fetching many requires a `size` kwargs.")
                         cursor.execute(query=query)
                         result = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
@@ -297,7 +298,7 @@ def processMySQL(query: str, **kwargs):
                         result = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
-                            raise ValueError("Fetching many requires a `size` kwargs.")
+                            logger.exception("Fetching many requires a `size` kwargs.")
                         cursor.execute(query=query, args=kwargs["values"])
                         result = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
@@ -305,8 +306,8 @@ def processMySQL(query: str, **kwargs):
                         result = cursor.fetchall()
 
         sqlConnection.commit()
-    except:
-        raise ConnectionError("Error occurred opening the MySQL database.")
+    except Exception as e:  # noqa
+        logger.exception("Error occurred opening the MySQL database.")
     finally:
         logger.info(f"Closing connection to the MySQL Database")
         sqlConnection.close()

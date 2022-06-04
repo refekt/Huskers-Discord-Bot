@@ -157,7 +157,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #     )
 #
 #     if not reqs.status_code == 200:
-#         raise ConnectionError("Unable to retrieve schedule from Huskers.com.")
+#         logger.exception("Unable to retrieve schedule from Huskers.com.")
 #
 #     soup = BeautifulSoup(reqs.content, "html.parser")
 #     games_raw = soup.find_all(attrs={"class": "sidearm-schedule-game"})

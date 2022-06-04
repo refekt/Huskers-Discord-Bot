@@ -13,15 +13,15 @@ from __version__ import _version
 from helpers.constants import (
     CHAN_BOT_SPAM,
     CHAN_GENERAL,
+    DEBUGGING_CODE,
     DISCORD_CHANNEL_TYPES,
     GUILD_PROD,
     TWITTER_BEARER,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_QUERY_MAX,
-    CHAN_TWITTERVERSE,
 )
 from helpers.embed import buildEmbed
-from objects.Exceptions import CommandException, ExtensionException
+from objects.Exceptions import ChangelogException
 from objects.TweepyStreamListener import StreamClientV2
 
 logger = logging.getLogger(__name__)
@@ -106,14 +106,16 @@ reaction_threshold = 3  # Used for Hall of Fame/Shame
 def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
-    logger.info("Getting Husker Media Twitter list")
+    logger.info("Collecting Husker Media Twitter list")
     tweeter_client = tweepy.Client(TWITTER_BEARER)
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
 
     logger.info("Creating stream rule")
     rule_query = ""
-    if "Windows" in platform.platform():
+
+    if DEBUGGING_CODE:
         rule_query = "from:ayy_gbr OR "
+
     for member in list_members[0]:
         append_str = f"from:{member['username']} OR "
 
@@ -121,6 +123,7 @@ def start_twitter_stream(client: discord.Client) -> None:
             rule_query += append_str
         else:
             break
+
     rule_query = rule_query[:-4]  # Get rid of ' OR '
 
     logger.info("Creating a stream client")
@@ -247,12 +250,12 @@ class HuskerClient(Bot):
     ]
 
     # noinspection PyMethodMayBeStatic
-    def get_change_log(self) -> [str, CommandException]:
+    def get_change_log(self) -> [str, ChangelogException]:
         try:
             changelog_path = None
             changelog_file = "changelog.md"
 
-            if "Windows" in platform.platform():
+            if DEBUGGING_CODE:
                 changelog_path = pathlib.PurePath(
                     f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
                 )
@@ -260,6 +263,8 @@ class HuskerClient(Bot):
                 changelog_path = pathlib.PurePosixPath(
                     f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
                 )
+            else:
+                logger.exception("Unknown platform. Exiting")
 
             changelog = open(changelog_path, "r")
             lines = changelog.readlines()
@@ -271,10 +276,10 @@ class HuskerClient(Bot):
             return lines_str
         except OSError:
             logger.warning("Error loading the changelog!")
-            raise CommandException("Error loading the changelog!")
+            logger.exception("Error loading the changelog!")
 
     # noinspection PyMethodMayBeStatic
-    async def create_welcome_message(
+    async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
         channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
@@ -344,22 +349,22 @@ class HuskerClient(Bot):
                 await self.load_extension(extension)
                 logger.info(f"Loaded the {extension} extension")
             except Exception as e:  # noqa
-                logger.error(f"ERROR: Unable to laod the {extension} extension\n{e}")
-                raise ExtensionException(
+                logger.exception(
                     f"ERROR: Unable to laod the {extension} extension\n{e}"
                 )
 
         logger.info("All extensions loaded")
 
-        chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
-        # await chan_botspam.send(embed=await self.create_online_message())  # noqa
+        if not DEBUGGING_CODE:
+            chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
+            await chan_botspam.send(embed=await self.create_online_message())  # noqa
 
         logger.info("The bot is ready!")
 
         try:
             await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
         except Exception as e:  # noqa
-            logger.error("Error syncing the tree!\n\n{e}")
+            logger.exception("Error syncing the tree!\n\n{e}")
 
         logger.info("The bot tree has synced!")
 
@@ -370,7 +375,7 @@ class HuskerClient(Bot):
     async def on_member_join(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
-        await self.create_welcome_message(guild_member)
+        await self.send_welcome_message(guild_member)
 
     async def on_error(self, event_method, *args, **kwargs) -> None:  # TODO
         # logger.info(f"On Error\n{event_method}\n{args}\n{kwargs}")
