@@ -5,8 +5,8 @@ import logging
 import discord
 import tweepy
 
-from helpers.constants import CHAN_TWITTERVERSE
-from helpers.embed import buildEmbed
+from helpers.constants import CHAN_TWITTERVERSE, DT_TWEET_FORMAT
+from helpers.embed import buildEmbed, buildTweetEmbed
 from objects.Exceptions import TwitterStreamException
 
 logger = logging.getLogger(__name__)
@@ -64,21 +64,19 @@ async def send_tweet(client: discord.Client, tweet: MyTweet):
         if tweet.data["author_id"] == user["id"]:
             author: TweetUserData = TweetUserData(user)
             break
-    embed: discord.Embed = buildEmbed(
-        title=f"{author.name} (@{author.username}{' ✅' if author.verified else ''}) via {tweet.data['source']}",
-        fields=[
-            dict(name="Message", value=tweet.data["text"], inline=False),
-            dict(
-                name="URL",
-                value=f"https://twitter.com/{author.username}/status/{tweet.data['id']}",
-                inline=False,
-            ),
-        ],
+    embed = buildTweetEmbed(
+        name=author.name,
+        username=author.username,
+        verified=author.verified,
+        source=tweet.data["source"],
+        text=tweet.data["text"],
+        tweet_id=tweet.data["id"],
+        tweet_created_at=tweet.data["created_at"].strftime(DT_TWEET_FORMAT),
+        profile_image_url=author.profile_image_url,
     )
-    embed.set_footer(
-        text=f"Tweet sent at {tweet.data['created_at']}",
-    )
-    embed.set_author(name=f"@{author.username}", icon_url=author.profile_image_url)
+
+    twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
+    await twitter_channel.send(embed=embed)
 
     logger.info(f"Tweet sent!")
 

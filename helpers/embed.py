@@ -97,6 +97,39 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
         return e
 
 
+def buildTweetEmbed(
+    name: str,
+    username: str,
+    verified: bool,
+    source: str,
+    text: str,
+    tweet_id: str,
+    tweet_created_at: str,
+    profile_image_url: str,
+):
+    embed = buildEmbed(
+        "Temp",
+        fields=[
+            dict(name="Message", value=text, inline=False),
+            dict(
+                name="URL",
+                value=f"https://twitter.com/{username}/status/{tweet_id}",
+                inline=False,
+            ),
+        ],
+    )
+    embed.set_author(
+        name=f"{name}{' ✅ ' if verified else ' '}(@{username}) via {source}",
+        url=f"https://twitter.com/{username}",
+        icon_url=profile_image_url,
+    )
+    embed.set_footer(
+        text=f"Tweet sent at {tweet_created_at}",
+    )
+    embed.set_thumbnail(url=profile_image_url)
+    return embed
+
+
 logger.info(f"{str(__name__).title()} module loaded!")
 
 # def build_countdown_embed(
