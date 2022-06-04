@@ -56,6 +56,29 @@ client = HuskerClient(
     owner_id=MEMBER_GEE,
 )
 
+tree = client.tree
+
+
+@tree.error
+async def on_app_command_error(
+    interaction: discord.Interaction, error: discord.app_commands.AppCommandError
+):
+    logger.info(f"Testing...{error}")
+    print()
+    embed = buildEmbed(
+        title="Command Error Received",
+        description=f"This error originated from '{error.command.qualified_name}'.",
+        fields=[
+            dict(
+                name=f"Error Type: {type(error.original.args[0])}",
+                value=error.original.args[0].message,
+                inline=False,
+            )
+        ],
+    )
+    await interaction.edit_original_message(content="", embed=embed)
+
+
 end = perf_counter()
 logger.info(f"The bot initialized in {end - start:,.2f} seconds")
 

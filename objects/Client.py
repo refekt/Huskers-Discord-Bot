@@ -283,12 +283,6 @@ class HuskerClient(Bot):
     ) -> None:
         await self.send_welcome_message(guild_member)
 
-    async def on_error(self, event_method, *args, **kwargs) -> None:  # TODO
-        logger.exception(f"On Error\n{event_method}\n{args}\n{kwargs}")
-
-    async def on_command_error(self, context, exception) -> None:  # TODO
-        logger.exception(f"On Command Error\n{context}{exception}")
-
     async def on_message_reaction_add(
         self,
         reaction: discord.Reaction,

@@ -325,6 +325,7 @@ class TextCog(commands.Cog, name="Text Commands"):
             )
 
         await interaction.edit_original_message(embed=pages[0])
+        # TODO Need to find or make a paginator
 
     @commands.command()
     async def survey(self, interaction: discord.Interaction):
