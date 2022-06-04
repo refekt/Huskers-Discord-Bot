@@ -196,9 +196,41 @@ class TextCog(commands.Cog, name="Text Commands"):
             await interaction.edit_original_message(content=markov_output)
             logger.info("Markov out sent")
 
-    @commands.command()
-    async def police(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="police",
+        description="Arrest a server member!",
+    )
+    @app_commands.describe(
+        arestee="A Discord member you want to arrest",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def police(
+        self, interaction: discord.Interaction, arestee: discord.Member
+    ) -> None:
+        embed = buildEmbed(
+            title="Wee woo, wee woo!",
+            fields=[
+                dict(
+                    name="Halt!",
+                    value=f"**"
+                    f"🚨 NANI 🚨\n"
+                    f"..🚨 THE 🚨\n"
+                    f"...🚨 FUCK 🚨\n"
+                    f"....🚨 DID 🚨\n"
+                    f".....🚨 YOU 🚨\n"
+                    f"....🚨 JUST 🚨\n"
+                    f"...🚨 SAY 🚨\n"
+                    f"..🚨 {arestee.mention} 🚨\n"
+                    f"🏃‍♀️💨 🔫🚓🔫🚓🔫🚓\n"
+                    f"\n"
+                    f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
+                    f"🙅‍♀️Thanks for your cooperation. 😍🤩😘"
+                    f"**",
+                    inline=False,
+                )
+            ],
+        )
+        await interaction.response.send_message(embed=embed)
 
     @commands.command()
     async def possum(self, interaction: discord.Interaction):
