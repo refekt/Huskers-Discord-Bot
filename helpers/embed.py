@@ -1,36 +1,38 @@
 import logging
 from datetime import datetime
-
-import validators
-import discord
-
 from typing import Union
+
+import discord
+import validators
+
 from helpers.constants import (
     BOT_DISPLAY_NAME,
+    BOT_FOOTER_BOT,
     BOT_GITHUB_URL,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
     TZ,
-    BOT_FOOTER_BOT,
+    DT_TWEET_FORMAT,
 )
+from helpers.misc import discordURLFormatter
 from objects.Exceptions import CommandException
 
 logger = logging.getLogger(__name__)
-__all__ = ["buildEmbed"]
+__all__ = ["buildEmbed", "buildTweetEmbed"]
+
+# https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
+title_limit = name_limit = field_name_limit = 256
+desc_limit = 4096
+footer_limit = 2048
+fields_limt = 25
+field_value_limit = 1024
+embed_max = 6000
 
 
 def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
     logger.info("Creating a normal embed")
 
     assert title is not None, CommandException("Title must not be blank!")
-
-    # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
-    title_limit = name_limit = field_name_limit = 256
-    desc_limit = 4096
-    footer_limit = 2048
-    fields_limt = 25
-    field_value_limit = 1024
-    embed_max = 6000
 
     dtNow = datetime.now().astimezone(tz=TZ)  # .isoformat()
 
@@ -100,31 +102,45 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
 def buildTweetEmbed(
     name: str,
     username: str,
+    author_metrics: dict,
     verified: bool,
     source: str,
     text: str,
     tweet_id: str,
-    tweet_created_at: str,
+    tweet_created_at: datetime,
     profile_image_url: str,
+    tweet_metrics: dict,
+    urls: dict = None,
 ):
     embed = buildEmbed(
-        "Temp",
+        "",
         fields=[
             dict(name="Message", value=text, inline=False),
             dict(
-                name="URL",
+                name="Tweet URL",
                 value=f"https://twitter.com/{username}/status/{tweet_id}",
                 inline=False,
             ),
         ],
     )
+    if urls:
+        for url in urls["urls"]:
+            embed.add_field(
+                name="Embeded URL",
+                value=discordURLFormatter(
+                    display_text=url["title"], url=url["expanded_url"]
+                ),
+                inline=False,
+            )
     embed.set_author(
-        name=f"{name}{' ✅ ' if verified else ' '}(@{username}) via {source}",
+        name=f"{name}{' ☑️' if verified else ' '}(@{username}) • Followers: {author_metrics['followers_count']} • Tweets: {author_metrics['tweet_count']}",
         url=f"https://twitter.com/{username}",
         icon_url=profile_image_url,
     )
     embed.set_footer(
-        text=f"Tweet sent at {tweet_created_at}",
+        text=f"Tweet sent {source} at {tweet_created_at.strftime(DT_TWEET_FORMAT)} • Retweets: {tweet_metrics['retweet_count']} • Replies: {tweet_metrics['reply_count']} • Likes: {tweet_metrics['like_count']} • Quotes: {tweet_metrics['quote_count']}"[
+            :footer_limit
+        ],
     )
     embed.set_thumbnail(url=profile_image_url)
     return embed

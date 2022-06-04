@@ -227,7 +227,8 @@ DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TBA_TIME = "10:58 PM"
-DT_TWEET_FORMAT = "%Y-%m-%d %H:%M:%S"
+DT_TWEET_FORMAT_OLD = "%Y-%m-%d %H:%M:%S"
+DT_TWEET_FORMAT = "%H:%M:%S %d %M %Y"
 logger.info("Datetime formatting variables loaded")
 
 # States
