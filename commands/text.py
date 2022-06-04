@@ -7,8 +7,9 @@ import markovify
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, CHAN_BANNED
+from helpers.constants import GUILD_PROD, CHAN_BANNED, CHAN_POSSUMS
 from helpers.embed import buildEmbed
+from objects.Exceptions import CommandException
 
 logger = logging.getLogger(__name__)
 
@@ -232,9 +233,31 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
         await interaction.response.send_message(embed=embed)
 
-    @commands.command()
-    async def possum(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="possum",
+        description="The message you want to pass along for the possum",
+    )
+    @app_commands.describe(
+        message="Share possum droppings for to the server",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def possum(self, interaction: discord.Interaction, message: str):
+        assert interaction.channel.id == CHAN_POSSUMS, CommandException(
+            "You can only use this in the possum droppings channel!"
+        )
+        assert message, CommandException("You cannot have an empty message!")
+
+        await interaction.response.defer(ephemeral=True)
+
+        embed = buildEmbed(
+            title="Possum Droppings",
+            thumbnail="https://cdn.discordapp.com/attachments/593984711706279937/875162041818693632/unknown.jpeg",
+            footer="Created by a sneaky possum",
+            fields=[dict(name="Dropping", value=message, inline=False)],
+        )
+        chan = await interaction.client.fetch_channel(CHAN_POSSUMS)
+        await chan.send(embed=embed)
+        await interaction.followup.send("Possum dropping sent!")
 
     @commands.command()
     async def survey(self, interaction: discord.Interaction):
