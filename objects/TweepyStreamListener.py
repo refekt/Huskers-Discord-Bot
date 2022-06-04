@@ -29,6 +29,14 @@ class MyTweet(object):
             setattr(self, key, tweet_data[key])
 
 
+class TweetMediaData(object):
+    def __init__(self, tweet_data):
+        self.url = None
+
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
+
+
 class TweetUserData(object):
     def __init__(self, data):
         self.public_metrics = None
@@ -63,6 +71,13 @@ async def send_tweet(client: discord.Client, tweet: MyTweet):
         if tweet.data["author_id"] == user["id"]:
             author: TweetUserData = TweetUserData(user)
             break
+
+    medias = []
+    if "media" in tweet.includes:
+        for item in tweet.includes["media"]:
+            medias.append(TweetMediaData(item))
+    print(medias)
+
     embed = buildTweetEmbed(
         name=author.name,
         username=author.username,
@@ -72,12 +87,10 @@ async def send_tweet(client: discord.Client, tweet: MyTweet):
         text=tweet.data["text"],
         tweet_metrics=tweet.data["public_metrics"],
         tweet_id=tweet.data["id"],
-        # tweet_created_at=str(
-        #     datetime.strptime(tweet.data["created_at"], DT_TWEET_FORMAT)
-        # ),
         tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]),
         profile_image_url=author.profile_image_url,
         urls=tweet.data["entities"],
+        medias=medias,
     )
 
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)

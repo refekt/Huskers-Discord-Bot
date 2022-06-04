@@ -111,9 +111,10 @@ def buildTweetEmbed(
     profile_image_url: str,
     tweet_metrics: dict,
     urls: dict = None,
+    medias: list = None,
 ):
     embed = buildEmbed(
-        "",
+        title="",
         fields=[
             dict(name="Message", value=text, inline=False),
             dict(
@@ -125,11 +126,26 @@ def buildTweetEmbed(
     )
     if urls:
         for url in urls["urls"]:
+            if (
+                medias
+            ):  # Avoid duplicating media embeds. Also, there's no "title" field when the URL is from a media embed
+                if url["media_key"] in [media.media_key for media in medias]:
+                    logger.info("Skipping duplicate media_key from URLs")
+                    break
+            else:
+                embed.add_field(
+                    name="Embeded URL",
+                    value=discordURLFormatter(
+                        display_text=url["title"], url=url["expanded_url"]
+                    ),
+                    inline=False,
+                )
+
+    if medias:
+        for index, item in enumerate(medias):
             embed.add_field(
-                name="Embeded URL",
-                value=discordURLFormatter(
-                    display_text=url["title"], url=url["expanded_url"]
-                ),
+                name="Embeded Image",
+                value=discordURLFormatter(f"Image #{index+1}", item.url),
                 inline=False,
             )
     embed.set_author(

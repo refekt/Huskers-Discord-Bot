@@ -130,6 +130,127 @@ test_2 = {
     "text": "asdfasf sfsadfsafjsd;lkf Test of a tweet with links. https://t.co/5csNvIlRFK https://t.co/MVVdTA7Bvf https://t.co/70oQ1m6IsN",
 }
 
+test_3 = {
+    "data": {
+        "attachments": {
+            "media_keys": [
+                "3_1533105263263244296",
+                "3_1533105263825326080",
+                "3_1533105269856735232",
+                "3_1533105270150385664",
+            ]
+        },
+        "author_id": "15899943",
+        "conversation_id": "1533105294837964800",
+        "created_at": "2022-06-04T15:16:00.000Z",
+        "entities": {
+            "urls": [
+                {
+                    "start": 16,
+                    "end": 39,
+                    "url": "https://t.co/kbAC9vW2UE",
+                    "expanded_url": "https://twitter.com/ayy_gbr/status/1533105294837964800/photo/1",
+                    "display_url": "pic.twitter.com/kbAC9vW2UE",
+                    "media_key": "3_1533105263263244296",
+                },
+                {
+                    "start": 16,
+                    "end": 39,
+                    "url": "https://t.co/kbAC9vW2UE",
+                    "expanded_url": "https://twitter.com/ayy_gbr/status/1533105294837964800/photo/1",
+                    "display_url": "pic.twitter.com/kbAC9vW2UE",
+                    "media_key": "3_1533105263825326080",
+                },
+                {
+                    "start": 16,
+                    "end": 39,
+                    "url": "https://t.co/kbAC9vW2UE",
+                    "expanded_url": "https://twitter.com/ayy_gbr/status/1533105294837964800/photo/1",
+                    "display_url": "pic.twitter.com/kbAC9vW2UE",
+                    "media_key": "3_1533105269856735232",
+                },
+                {
+                    "start": 16,
+                    "end": 39,
+                    "url": "https://t.co/kbAC9vW2UE",
+                    "expanded_url": "https://twitter.com/ayy_gbr/status/1533105294837964800/photo/1",
+                    "display_url": "pic.twitter.com/kbAC9vW2UE",
+                    "media_key": "3_1533105270150385664",
+                },
+            ]
+        },
+        "geo": {},
+        "id": "1533105294837964800",
+        "lang": "en",
+        "possibly_sensitive": False,
+        "public_metrics": {
+            "retweet_count": 0,
+            "reply_count": 0,
+            "like_count": 0,
+            "quote_count": 0,
+        },
+        "reply_settings": "everyone",
+        "source": "Twitter Web App",
+        "text": "Testing images. https://t.co/kbAC9vW2UE",
+    },
+    "includes": {
+        "media": [
+            {
+                "height": 1331,
+                "media_key": "3_1533105263263244296",
+                "public_metrics": {},
+                "type": "photo",
+                "url": "https://pbs.twimg.com/media/FUavHTwWYAgXHqw.jpg",
+                "width": 2000,
+            },
+            {
+                "height": 1331,
+                "media_key": "3_1533105263825326080",
+                "public_metrics": {},
+                "type": "photo",
+                "url": "https://pbs.twimg.com/media/FUavHV2XEAAbXRi.jpg",
+                "width": 2000,
+            },
+            {
+                "height": 1331,
+                "media_key": "3_1533105269856735232",
+                "public_metrics": {},
+                "type": "photo",
+                "url": "https://pbs.twimg.com/media/FUavHsUXEAArMae.jpg",
+                "width": 2000,
+            },
+            {
+                "height": 1331,
+                "media_key": "3_1533105270150385664",
+                "public_metrics": {},
+                "type": "photo",
+                "url": "https://pbs.twimg.com/media/FUavHtaX0AAoFj6.jpg",
+                "width": 2000,
+            },
+        ],
+        "users": [
+            {
+                "created_at": "2008-08-19T03:09:46.000Z",
+                "description": "GBR",
+                "id": "15899943",
+                "name": "Aaron",
+                "profile_image_url": "https://pbs.twimg.com/profile_images/1206047447451086848/GEMbd3wB_normal.jpg",
+                "protected": False,
+                "public_metrics": {
+                    "followers_count": 39,
+                    "following_count": 563,
+                    "tweet_count": 1155,
+                    "listed_count": 0,
+                },
+                "url": "",
+                "username": "ayy_gbr",
+                "verified": False,
+            }
+        ],
+    },
+    "matching_rules": [{"id": "1532102238562402312", "tag": ""}],
+}
+
 
 class TweetUserData(object):
     def __init__(self, data):
