@@ -64,7 +64,6 @@ async def on_app_command_error(
     interaction: discord.Interaction, error: discord.app_commands.AppCommandError
 ):
     logger.info(f"Testing...{error}")
-    print()
     embed = buildEmbed(
         title="Command Error Received",
         description=f"This error originated from '{error.command.qualified_name}'.",
