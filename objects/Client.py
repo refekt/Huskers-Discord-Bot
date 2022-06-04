@@ -62,9 +62,9 @@ def start_twitter_stream(client: discord.Client) -> None:
         max_retries=3,
     )
 
-    logger.info(f"Created stream rule:\n\t{rule_query}")
+    logger.debug(f"Created stream rule:\n\t{rule_query}")
     tweeter_stream.add_rules(tweepy.StreamRule(value=rule_query))
-    logger.info(f"Stream filter rules:\n\t{tweeter_stream.get_rules()}")
+    logger.debug(f"Stream filter rules:\n\t{tweeter_stream.get_rules()}")
 
     tweeter_stream.filter(
         expansions=[

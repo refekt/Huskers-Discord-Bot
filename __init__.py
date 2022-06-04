@@ -50,7 +50,7 @@ intents.typing = False
 intents.presences = False
 
 client = HuskerClient(
-    command_prefix=None,
+    command_prefix="$",
     fetch_offline_members=True,
     intents=intents,
     owner_id=MEMBER_GEE,

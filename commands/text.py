@@ -71,30 +71,36 @@ class TextCog(commands.Cog, name="Text Commands"):
         source_channel: discord.TextChannel = None,
         source_member: discord.Member = None,
     ) -> None:
+        logger.info("Attempting to create a markov chain")
         await interaction.response.defer()
 
         channel_history_limit: int = 1000
         combined_sources: list = []
         message_history: list = []
         source_conent: str = ""
+        message_channel_history = None
+        message_member_history = None
 
         if source_channel is not None:
+            logger.info("Adding channel to sources")
             combined_sources.append(source_channel)
 
         if source_member is not None:
+            logger.info("Adding member to sources")
             combined_sources.append(source_member)
 
         def check_message(message: discord.Message) -> str:
             if (
                 message.channel.id in CHAN_BANNED
                 or message.author.bot
-                or message.content is ""
+                or message.content == ""
             ):
                 return ""
 
             return f"\n{message.content.capitalize()}"
 
         def cleanup_source_conent(check_source_conent: str) -> str:
+            logger.info("Cleaning source conent")
             output = check_source_conent
 
             regex_discord_http = [
@@ -106,14 +112,16 @@ class TextCog(commands.Cog, name="Text Commands"):
                 output = re.sub(regex, "", output, flags=re.IGNORECASE)
 
             regex_new_lines = r"(\r\n|\r|\n){1,}"  # All line breaks
-            output = re.sub(regex_new_lines, "", output, flags=re.IGNORECASE)
+            output = re.sub(regex_new_lines, "\n", output, flags=re.IGNORECASE)
 
             regex_multiple_whitespace = r"\s{2,}"
             output = re.sub(regex_multiple_whitespace, "", output, flags=re.IGNORECASE)
 
+            logger.info("Source content cleaned")
             return output
 
         if not combined_sources:  # Nothing was provided
+            logger.info("No sources provided")
             try:
                 message_history = [
                     message
@@ -123,12 +131,16 @@ class TextCog(commands.Cog, name="Text Commands"):
                 ]
             except (Forbidden, HTTPException) as e:
                 logger.exception(f"Unable to collect message history!\n{e}")
+                raise
 
             for message in message_history:
                 source_conent += check_message(message)
+            logger.info("Compiled message content from current channel")
         else:
+            logger.info("A source was provided")
             for source in combined_sources:
                 if type(source) == discord.Member:
+                    logger.info("Discord member source provided")
                     message_member_history = [
                         message
                         async for message in interaction.channel.history(
@@ -138,8 +150,16 @@ class TextCog(commands.Cog, name="Text Commands"):
                     for message in message_member_history:
                         if message.author == source:
                             source_conent += check_message(message)
+                    logger.info("Discord member source compiled")
                 elif type(source) == discord.TextChannel:
-                    ...
+                    logger.info("Discord text channel source provided")
+                    message_channel_history = [
+                        message
+                        async for message in source.history(limit=channel_history_limit)
+                    ]
+                    for message in message_channel_history:
+                        source_conent += check_message(message)
+                    logger.info("Discord text channel source compiled")
                 else:
                     logger.exception("Unexpected source type!")
                     continue
@@ -150,16 +170,31 @@ class TextCog(commands.Cog, name="Text Commands"):
             logger.exception(
                 f"There was not enough information available to make a Markov chain.",
             )
+            raise
 
+        logger.info("Cleaning up variables")
+        del (
+            combined_sources,
+            message_channel_history,
+            message_history,
+            message_member_history,
+            source_channel,
+            source_member,
+        )
+
+        logger.info("Creating a markov chain")
         markvov_response = markovify.NewlineText(source_conent, well_formed=True)
+        logger.info("Creating a markov response")
         markov_output = markvov_response.make_sentence(
             max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
         )
 
         if markov_output is None:
             logger.exception("Markovify failed to create an output!")
+            raise
         else:
-            await interaction.response.send_message(source_conent)
+            await interaction.edit_original_message(content=markov_output)
+            logger.info("Markov out sent")
 
     @commands.command()
     async def police(self, interaction: discord.Interaction):
