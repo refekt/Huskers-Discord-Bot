@@ -1,4 +1,3 @@
-import ast
 import asyncio
 import json
 import logging
@@ -6,37 +5,110 @@ import logging
 import discord
 import tweepy
 
+from helpers.constants import CHAN_TWITTERVERSE
 from helpers.embed import buildEmbed
+from objects.Exceptions import TwitterStreamException
 
 logger = logging.getLogger(__name__)
 
 
-async def send_tweet_alert(channel: discord.TextChannel, message: str):
-    logger.info(f"Twitter Alert: {message}")
+# Example
+# task = asyncio.run_coroutine_threadsafe(
+#     send_tweet_alert(self.client, "Connected!"), self.client.loop
+# )
+# task.result()
+
+
+class MyTweet(object):
+    def __init__(self, tweet_data):
+        self.data = None
+        self.includes = None
+        self.matching_rules = None
+
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
+
+
+class TweetUserData(object):
+    def __init__(self, data):
+        self.verified = None
+        self.profile_image_url = None
+        self.name = None
+        self.username = None
+        for key in data:
+            setattr(self, key, data[key])
+
+
+async def send_tweet_alert(client: discord.Client, message):
+    logger.info(f"Tweet alert received: {message}")
     embed = buildEmbed(
         title="Husker Twitter",
         fields=[
-            dict(name="Twitter Stream Listener Alert", value=message, inline=False)
+            dict(name="Twitter Stream Listener Alert", value=str(message), inline=False)
         ],
     )
-    await channel.send(embed=embed)
+    twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
+    await twitter_channel.send(embed=embed)
+    logger.info(f"Twitter alert sent!")
+
+
+async def send_tweet(client: discord.Client, tweet: MyTweet):
+    logger.info(f"Sending tweet")
+
+    # Embed title: display_name (@handle) via source
+    # Field: name=Message, value=contents
+    # Field: name=URL, value=URL
+    # Footer: Tweet sent created_at
+    author = None
+    for user in tweet.includes["users"]:
+        if tweet.data["author_id"] == user["id"]:
+            author: TweetUserData = TweetUserData(user)
+            break
+    embed: discord.Embed = buildEmbed(
+        title=f"{author.name} (@{author.username}{' ✅' if author.verified else ''}) via {tweet.data['source']}",
+        fields=[
+            dict(name="Message", value=tweet.data["text"], inline=False),
+            dict(
+                name="URL",
+                value=f"https://twitter.com/{author.username}/status/{tweet.data['id']}",
+                inline=False,
+            ),
+        ],
+    )
+    embed.set_footer(
+        text=f"Tweet sent at {tweet.data['created_at']}",
+    )
+    embed.set_author(name=f"@{author.username}", icon_url=author.profile_image_url)
+
+    logger.info(f"Tweet sent!")
 
 
 class StreamClientV2(tweepy.StreamingClient):
-    def __init__(self, bearer_token, twitter_channel: discord.TextChannel, **kwargs):
+    def __init__(
+        self,
+        bearer_token,
+        client: discord.Client,
+        **kwargs,
+    ):
         super().__init__(bearer_token, **kwargs)
-        self.twitter_channel = twitter_channel
+        self.client = client
         logger.info("StreamClientV2 Initialized")
 
     def on_connect(self):
         logger.info("Connected")
-        asyncio.run(send_tweet_alert(self.twitter_channel, "Twitter stream connected!"))
+        debug = False
+        if debug:
+            task = asyncio.run_coroutine_threadsafe(
+                send_tweet_alert(self.client, "Connected!"), self.client.loop
+            )
+            task.result()
 
     def on_disconnect(self):
         logger.info("Disconnected")
-        asyncio.run(
-            send_tweet_alert(self.twitter_channel, "Twitter stream disconnected!")
+        task = asyncio.run_coroutine_threadsafe(
+            send_tweet_alert(self.client, "Disconnected!"), self.client.loop
         )
+        task.result()
 
     def on_keep_alive(self):
         logger.info("Keep alive")
@@ -52,6 +124,10 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_exception(self, exception):
         logger.info(f"Exception\n{exception}")
+        task = asyncio.run_coroutine_threadsafe(
+            send_tweet_alert(self.client, "Exception received!"), self.client.loop
+        )
+        task.result()
 
     def on_includes(self, includes):
         logger.info(f"Includes\n{includes}")
@@ -62,6 +138,10 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_data(self, raw_data):
         logger.info(f"Raw Data\n{raw_data}")
         processed_data = json.loads(raw_data)
+        task = asyncio.run_coroutine_threadsafe(
+            send_tweet(self.client, MyTweet(processed_data)), self.client.loop
+        )
+        task.result()
 
     def on_connection_error(self):
         logger.info(f"Connection Error")

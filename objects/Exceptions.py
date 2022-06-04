@@ -8,6 +8,7 @@ __all__ = [
     "CommandException",
     "ExtensionException",
     "MySQLException",
+    "TwitterStreamException",
     "UserInputException",
 ]
 
@@ -31,4 +32,9 @@ class MySQLException(Exception):
 
 @dataclass()
 class ExtensionException(Exception):
+    message: str
+
+
+@dataclass()
+class TwitterStreamException(Exception):
     message: str

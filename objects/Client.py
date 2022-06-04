@@ -18,6 +18,7 @@ from helpers.constants import (
     TWITTER_BEARER,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_QUERY_MAX,
+    CHAN_TWITTERVERSE,
 )
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException, ExtensionException
@@ -102,7 +103,7 @@ reaction_threshold = 3  # Used for Hall of Fame/Shame
 #         await chan.send(view=view, embed=embed)
 
 
-def start_twitter_stream() -> None:
+def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
     logger.info("Getting Husker Media Twitter list")
@@ -125,6 +126,7 @@ def start_twitter_stream() -> None:
     logger.info("Creating a stream client")
     tweeter_stream = StreamClientV2(
         bearer_token=TWITTER_BEARER,
+        client=client,
         wait_on_rate_limit=True,
         max_retries=3,
     )
@@ -244,11 +246,6 @@ class HuskerClient(Bot):
         "commands.text",
     ]
 
-    async def setup_hook(self) -> None:
-        logger.info("Starting Twitter stream")
-        start_twitter_stream()
-        logger.info("Twitter stream started")
-
     # noinspection PyMethodMayBeStatic
     def get_change_log(self) -> [str, CommandException]:
         try:
@@ -365,6 +362,10 @@ class HuskerClient(Bot):
             logger.error("Error syncing the tree!\n\n{e}")
 
         logger.info("The bot tree has synced!")
+
+        logger.info("Starting Twitter stream")
+        start_twitter_stream(self)
+        logger.info("Twitter stream started")
 
     async def on_member_join(
         self, guild_member: Union[discord.Member, discord.User]
