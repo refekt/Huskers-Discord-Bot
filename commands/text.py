@@ -10,15 +10,21 @@
 # TODO
 
 
-import discord.ext.commands
-from discord.ext import commands
 import random
+
+import discord.ext.commands
+from discord import app_commands
+from discord.ext import commands
+
 from helpers.constants import GUILD_PROD
 from helpers.embed import buildEmbed
 
 
 class TextCog(commands.Cog, name="Text Commands"):
-    @commands.command()
+    @app_commands.command(
+        name="eightball", description="Ask the Magic 8-Ball a question"
+    )
+    @app_commands.guilds(GUILD_PROD)
     async def eightball(self, interaction: discord.Interaction, question: str):
         responses = [
             "As I see it, yes.",
@@ -33,7 +39,7 @@ class TextCog(commands.Cog, name="Text Commands"):
             "Fuck Iowa!",
             "It is certain.",
             "It is decidedly so.",
-            +"Most likely...",
+            "Most likely...",
             "My reply is no.",
             "My sources say no.",
             "Outlook not so good and reply hazy",
