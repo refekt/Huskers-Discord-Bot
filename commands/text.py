@@ -4,6 +4,8 @@ import re
 
 import discord.ext.commands
 import markovify
+import requests
+from bs4 import BeautifulSoup
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
@@ -241,7 +243,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         message="Share possum droppings for to the server",
     )
     @app_commands.guilds(GUILD_PROD)
-    async def possum(self, interaction: discord.Interaction, message: str):
+    async def possum(self, interaction: discord.Interaction, message: str) -> None:
         assert interaction.channel.id == CHAN_POSSUMS, CommandException(
             "You can only use this in the possum droppings channel!"
         )
@@ -259,12 +261,73 @@ class TextCog(commands.Cog, name="Text Commands"):
         await chan.send(embed=embed)
         await interaction.followup.send("Possum dropping sent!")
 
-    @commands.command()
-    async def survey(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="urban-dictionary",
+        description="Look up a word on Urban Dictionary",
+    )
+    @app_commands.describe(
+        word="The word to look up",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def urban_dictionary(
+        self, interaction: discord.Interaction, word: str
+    ) -> None:
+        await interaction.response.defer()
+
+        class UrbanDictDefinition:
+            def __init__(self, lookup_word, meaning, example, contributor):
+                self.lookup_word = lookup_word
+                self.meaning = meaning
+                self.example = example
+                self.contributor = contributor
+
+        r = requests.get(f"https://www.urbandictionary.com/define.php?term={word}")
+        soup = BeautifulSoup(r.content, features="html.parser")
+
+        try:
+            definitions = soup.find_all(
+                name="div", attrs={"class": re.compile("definition.*")}
+            )
+        except AttributeError:
+            raise CommandException(f"Unable to find [{word}] in the Urban Dictionary.")
+
+        assert definitions, CommandException(
+            f"Unable to find [{word}] in the Urban Dictionary."
+        )
+
+        del r, soup
+
+        results = []
+        for definition in definitions:
+            results.append(
+                UrbanDictDefinition(
+                    lookup_word=definition.contents[0].contents[0].text,
+                    meaning=definition.contents[0].contents[1].text,
+                    example=definition.contents[0].contents[2].text,
+                    contributor=definition.contents[0].contents[3].text,
+                )
+            )
+
+        pages = []
+        for index, result in enumerate(results):
+            pages.append(
+                buildEmbed(
+                    title=f"Searched for: {result.lookup_word}",
+                    description=f"Definition #{index + 1} from Urban Dictionary",
+                    fields=[
+                        dict(name="Meaning", value=result.meaning, inline=False),
+                        dict(name="Example", value=result.example, inline=False),
+                        dict(
+                            name="Contributor", value=result.contributor, inline=False
+                        ),
+                    ],
+                )
+            )
+
+        await interaction.edit_original_message(embed=pages[0])
 
     @commands.command()
-    async def urbandictionary(self, interaction: discord.Interaction):
+    async def survey(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
