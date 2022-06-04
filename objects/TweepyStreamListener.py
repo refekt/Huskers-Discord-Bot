@@ -38,6 +38,15 @@ class TweetMediaData(object):
             setattr(self, key, tweet_data[key])
 
 
+class TweetQuoteData(object):
+    def __init__(self, tweet_data) -> None:
+        self.id = None
+        self.text = None
+        self.author_id = None
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
+
+
 class TweetUserData(object):
     def __init__(self, data) -> None:
         self.public_metrics = None
@@ -55,6 +64,7 @@ class TweetUserData(object):
 
 async def send_tweet_alert(client: discord.Client, message) -> None:
     if debugging:
+        logger.info("Skipping alert because debugging")
         return
 
     logger.info(f"Tweet alert received: {message}")
@@ -80,7 +90,11 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
     if "media" in tweet.includes:
         for item in tweet.includes["media"]:
             medias.append(TweetMediaData(item))
-    print(medias)
+
+    quotes = []
+    if "tweets" in tweet.includes:
+        for item in tweet.includes["tweets"]:
+            quotes.append(TweetQuoteData(item))
 
     embed = buildTweetEmbed(
         name=author.name,
@@ -95,6 +109,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         profile_image_url=author.profile_image_url,
         urls=tweet.data["entities"],
         medias=medias,
+        quotes=quotes,
     )
 
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
@@ -122,38 +137,26 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_disconnect(self) -> None:
-        logger.info("Disconnected")
+        logger.warning("Disconnected")
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, "The Twitter Stream has been disconnected!"),
             self.client.loop,
         )
         task.result()
 
-    # def on_keep_alive(self) -> None:
-    # logger.info("Keep alive")
-
-    # def on_tweet(self, tweet) -> None:
-    #     logger.info(f"Tweet received\n{tweet}")
-
     def on_errors(self, errors) -> None:
-        logger.info(f"Error received\n{errors}")
+        logger.error(f"Error received\n{errors}")
 
     def on_closed(self, response) -> None:
-        logger.info(f"Closed\n{response}")
+        logger.warning(f"Closed: {response}")
 
     def on_exception(self, exception) -> None:
-        logger.info(f"Exception\n{exception}")
+        logger.error(f"Exception: {type(exception)} -- {exception}")
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, "The Twitter Stream received an exception!"),
             self.client.loop,
         )
         task.result()
-
-    # def on_includes(self, includes) -> None:
-    #     logger.info(f"Includes\n{includes}")
-
-    # def on_response(self, response) -> None:
-    #     logger.info(f"Response\n{response}")
 
     def on_data(self, raw_data) -> None:
         logger.info(f"Raw Data\n{raw_data}")
@@ -164,7 +167,7 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_connection_error(self) -> None:
-        logger.info(f"Connection Error")
+        logger.error(f"Connection Error")
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(
                 self.client, "The Twitter Stream had an error connecting!"
@@ -173,8 +176,5 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    # def on_matching_rules(self, matching_rules) -> None:
-    #     logger.info(f"Matching Rules\n{matching_rules}")
-
     def on_request_error(self, status_code) -> None:
-        logger.info(f"Request Error\n{status_code}")
+        logger.error(f"Request Error: {status_code}")

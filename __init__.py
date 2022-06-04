@@ -8,7 +8,7 @@ import discord  # noqa # Beta version thing
 from objects.Client import HuskerClient
 
 logging.basicConfig(
-    format="%(asctime)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
+    format="%(asctime)s :: %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
     datefmt="%Y-%m-%d-%H%M%z",
     level=logging.INFO,
     encoding="utf-8",

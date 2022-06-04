@@ -11,8 +11,8 @@ from helpers.constants import (
     BOT_GITHUB_URL,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
-    TZ,
     DT_TWEET_FORMAT,
+    TZ,
 )
 from helpers.misc import discordURLFormatter
 from objects.Exceptions import CommandException
@@ -100,18 +100,19 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
 
 
 def buildTweetEmbed(
-    name: str,
-    username: str,
     author_metrics: dict,
-    verified: bool,
+    name: str,
+    profile_image_url: str,
     source: str,
     text: str,
-    tweet_id: str,
     tweet_created_at: datetime,
-    profile_image_url: str,
+    tweet_id: str,
     tweet_metrics: dict,
-    urls: dict = None,
+    username: str,
+    verified: bool,
     medias: list = None,
+    quotes: list = None,
+    urls: dict = None,
 ):
     embed = buildEmbed(
         title="",
@@ -124,22 +125,30 @@ def buildTweetEmbed(
             ),
         ],
     )
+
     if urls:
         for url in urls["urls"]:
             if (
                 medias
             ):  # Avoid duplicating media embeds. Also, there's no "title" field when the URL is from a media embed
+                if not url.get("media_key"):
+                    logger.info("Skipping url because media_key does not exist")
+                    break
                 if url["media_key"] in [media.media_key for media in medias]:
                     logger.info("Skipping duplicate media_key from URLs")
                     break
-            else:
-                embed.add_field(
-                    name="Embeded URL",
-                    value=discordURLFormatter(
-                        display_text=url["title"], url=url["expanded_url"]
-                    ),
-                    inline=False,
-                )
+
+            # Quote tweets don't have title in the url item
+            if not url.get("title"):
+                break
+
+            embed.add_field(
+                name="Embeded URL",
+                value=discordURLFormatter(
+                    display_text=url["title"], url=url["expanded_url"]
+                ),
+                inline=False,
+            )
 
     if medias:
         for index, item in enumerate(medias):
@@ -148,6 +157,15 @@ def buildTweetEmbed(
                 value=discordURLFormatter(f"Image #{index+1}", item.url),
                 inline=False,
             )
+
+    if quotes:
+        for item in quotes:
+            embed.add_field(
+                name="Quoted Tweet",
+                value=item.text,
+                inline=False,
+            )
+
     embed.set_author(
         name=f"{name}{' ☑️' if verified else ' '}(@{username}) • Followers: {author_metrics['followers_count']} • Tweets: {author_metrics['tweet_count']}",
         url=f"https://twitter.com/{username}",

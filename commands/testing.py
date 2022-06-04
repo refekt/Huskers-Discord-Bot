@@ -251,6 +251,265 @@ test_3 = {
     "matching_rules": [{"id": "1532102238562402312", "tag": ""}],
 }
 
+test_4 = {
+    "data": {
+        "attachments": {},
+        "author_id": "538207435",
+        "conversation_id": "1533117750285049860",
+        "created_at": "2022-06-04T16:06:36.000Z",
+        "entities": {
+            "annotations": [
+                {
+                    "start": 118,
+                    "end": 127,
+                    "probability": 0.992,
+                    "type": "Person",
+                    "normalized_text": "Jack Stoll",
+                },
+                {
+                    "start": 158,
+                    "end": 162,
+                    "probability": 0.9615,
+                    "type": "Person",
+                    "normalized_text": "Stoll",
+                },
+            ]
+        },
+        "geo": {},
+        "id": "1533118028954624000",
+        "in_reply_to_user_id": "538207435",
+        "lang": "en",
+        "possibly_sensitive": False,
+        "public_metrics": {
+            "retweet_count": 0,
+            "reply_count": 0,
+            "like_count": 0,
+            "quote_count": 0,
+        },
+        "referenced_tweets": [{"type": "replied_to", "id": "1533117750285049860"}],
+        "reply_settings": "everyone",
+        "source": "TweetDeck",
+        "text": "Every year, our staff breaks down each position group and highlights players to watch. "
+        "\\n\\nThe 2018 edition highlighted Jack Stoll as the \xe2\x80\x9cPlayer on the Rise.\\ Stoll was transitioning from a backup to starter while sharpening his ability to receive the ball down the field.",
+    },
+    "includes": {
+        "users": [
+            {
+                "created_at": "2012-03-27T14:33:45.000Z",
+                "description": "The official Twitter account of Hail Varsity, the voice of Husker Nation. #GBR | Magazine | Web | Radio | Podcasts",
+                "entities": {
+                    "url": {
+                        "urls": [
+                            {
+                                "start": 0,
+                                "end": 23,
+                                "url": "https://t.co/OzX6Gv01oK",
+                                "expanded_url": "http://hailvarsity.com",
+                                "display_url": "hailvarsity.com",
+                            }
+                        ]
+                    },
+                    "description": {
+                        "hashtags": [{"start": 74, "end": 78, "tag": "GBR"}]
+                    },
+                },
+                "id": "538207435",
+                "location": "Lincoln, NE",
+                "name": "Hail Varsity",
+                "pinned_tweet_id": "1532014324536967169",
+                "profile_image_url": "https://pbs.twimg.com/profile_images/994270366330753025/f_Dfdk4M_normal.jpg",
+                "protected": False,
+                "public_metrics": {
+                    "followers_count": 40931,
+                    "following_count": 902,
+                    "tweet_count": 54675,
+                    "listed_count": 409,
+                },
+                "url": "https://t.co/OzX6Gv01oK",
+                "username": "HailVarsity",
+                "verified": False,
+            }
+        ],
+        "tweets": [
+            {
+                "attachments": {"media_keys": ["3_1533117649718325249"]},
+                "author_id": "538207435",
+                "context_annotations": [
+                    {
+                        "domain": {
+                            "id": "3",
+                            "name": "TV Shows",
+                            "description": "Television shows from around the world",
+                        },
+                        "entity": {
+                            "id": "10000611558",
+                            "name": "College Football",
+                            "description": "All the action from NCAA college football.",
+                        },
+                    },
+                    {
+                        "domain": {"id": "6", "name": "Sports Event"},
+                        "entity": {
+                            "id": "1526526336893714432",
+                            "name": "Sint Maarten vs Virgin Islands, U.S.",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "11",
+                            "name": "Sport",
+                            "description": "Types of sports, like soccer and basketball",
+                        },
+                        "entity": {
+                            "id": "689566306014617600",
+                            "name": "American football",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "11",
+                            "name": "Sport",
+                            "description": "Types of sports, like soccer and basketball",
+                        },
+                        "entity": {"id": "733756536430809088", "name": "Soccer"},
+                    },
+                    {
+                        "domain": {
+                            "id": "12",
+                            "name": "Sports Team",
+                            "description": "A sports team organization, like Arsenal and the Boston Celtics",
+                        },
+                        "entity": {
+                            "id": "898300546498445312",
+                            "name": "Nebraska Cornhuskers",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "26",
+                            "name": "Sports League",
+                            "description": "",
+                        },
+                        "entity": {
+                            "id": "731226237394243584",
+                            "name": "International - Soccer",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "26",
+                            "name": "Sports League",
+                            "description": "",
+                        },
+                        "entity": {
+                            "id": "892080380425125890",
+                            "name": "NCAA Football",
+                            "description": "NCAA Men's Football",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "26",
+                            "name": "Sports League",
+                            "description": "",
+                        },
+                        "entity": {
+                            "id": "898300606468702211",
+                            "name": "Big 10 football",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "26",
+                            "name": "Sports League",
+                            "description": "",
+                        },
+                        "entity": {
+                            "id": "1526520711380054016",
+                            "name": "CONCACAF Nations League",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "29",
+                            "name": "Events [Entity Service]",
+                            "description": "Entity Service related Events domain",
+                        },
+                        "entity": {
+                            "id": "1526526336893714432",
+                            "name": "Sint Maarten vs Virgin Islands, U.S.",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "43",
+                            "name": "Soccer Match",
+                            "description": "Sports Event specific to Soccer matches",
+                        },
+                        "entity": {
+                            "id": "1526526336893714432",
+                            "name": "Sint Maarten vs Virgin Islands, U.S.",
+                        },
+                    },
+                    {
+                        "domain": {
+                            "id": "157",
+                            "name": "Colleges & Universities",
+                            "description": "Colleges & universities around the world",
+                        },
+                        "entity": {
+                            "id": "1286377759992766469",
+                            "name": "University of Nebraska\xe2\x80\x93Lincoln",
+                        },
+                    },
+                ],
+                "conversation_id": "1533117750285049860",
+                "created_at": "2022-06-04T16:05:30.000Z",
+                "entities": {
+                    "annotations": [
+                        {
+                            "start": 151,
+                            "end": 162,
+                            "probability": 0.5645,
+                            "type": "Organization",
+                            "normalized_text": "Hail Varsity",
+                        }
+                    ],
+                    "hashtags": [{"start": 9, "end": 17, "tag": "Huskers"}],
+                    "urls": [
+                        {
+                            "start": 168,
+                            "end": 191,
+                            "url": "https://t.co/1BGAHOfW4Q",
+                            "expanded_url": "https://twitter.com/HailVarsity/status/1533117750285049860/photo/1",
+                            "display_url": "pic.twitter.com/1BGAHOfW4Q",
+                            "media_key": "3_1533117649718325249",
+                        }
+                    ],
+                },
+                "geo": {},
+                "id": "1533117750285049860",
+                "lang": "en",
+                "possibly_sensitive": False,
+                "public_metrics": {
+                    "retweet_count": 0,
+                    "reply_count": 1,
+                    "like_count": 0,
+                    "quote_count": 0,
+                },
+                "reply_settings": "everyone",
+                "source": "TweetDeck",
+                "text": "The 2022 #Huskers Football Yearbook will be off to print soon, which has us flipping through the everything-you-need-to-know 2018 preseason edition of Hail Varsity. \xe2\xac\x87\xef\xb8\x8f https://t.co/1BGAHOfW4Q",
+            }
+        ],
+    },
+    "matching_rules": [
+        {"id": "1532102238562402312", "tag": ""},
+        {"id": "1531812826058215424", "tag": ""},
+        {"id": "1532096607239430145", "tag": ""},
+    ],
+}
+
 
 class TweetUserData(object):
     def __init__(self, data):
