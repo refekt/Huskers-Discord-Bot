@@ -15,19 +15,19 @@ from helpers.constants import GUILD_PROD
 
 class StatsCog(commands.Cog, name="Stats Commands"):
     @commands.command()
-    async def countdown(self, ctx: discord.interactions.Interaction):
+    async def countdown(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def compare(self, ctx: discord.interactions.Interaction):
+    async def compare(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def schedule(self, ctx: discord.interactions.Interaction):
+    async def schedule(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def stats(self, ctx: discord.interactions.Interaction):  # Team and season
+    async def stats(self, interaction: discord.Interaction):  # Team and season
         ...
 
 

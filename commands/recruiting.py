@@ -10,12 +10,12 @@ from helpers.constants import GUILD_PROD
 
 class RecruitingCog(commands.Cog, name="Recruiting Commands"):
     @commands.command()
-    async def crootbot(self, ctx: discord.interactions.Interaction):
+    async def crootbot(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
     async def fap(
-        self, ctx: discord.interactions.Interaction
+        self, interaction: discord.Interaction
     ):  # predict, stats, leaderboard, user
         ...
 

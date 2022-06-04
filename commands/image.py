@@ -14,24 +14,24 @@ from helpers.constants import GUILD_PROD
 
 class ImageCog(commands.Cog, name="Image Commands"):
     @commands.command()
-    async def deepfry(self, ctx: discord.interactions.Interaction):
+    async def deepfry(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def hypeme(self, ctx: discord.interactions.Interaction):
+    async def hypeme(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def inspireme(self, ctx: discord.interactions.Interaction):
+    async def inspireme(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def slowking(self, ctx: discord.interactions.Interaction):
+    async def slowking(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
     async def img(
-        self, ctx: discord.interactions.Interaction
+        self, interaction: discord.Interaction
     ):  # create, list, delete, random
         ...
 

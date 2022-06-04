@@ -12,37 +12,72 @@
 
 import discord.ext.commands
 from discord.ext import commands
-
+import random
 from helpers.constants import GUILD_PROD
+from helpers.embed import buildEmbed
 
 
 class TextCog(commands.Cog, name="Text Commands"):
     @commands.command()
-    async def eightball(self, ctx: discord.interactions.Interaction):
+    async def eightball(self, interaction: discord.Interaction, question: str):
+        responses = [
+            "As I see it, yes.",
+            "Ask again later.",
+            "Better not tell you now.",
+            "Cannot predict now.",
+            "Coach V's cigar would like this!",
+            "Concentrate and ask again.",
+            "Definitely yes!",
+            "Don’t count on it...",
+            "Frosty!",
+            "Fuck Iowa!",
+            "It is certain.",
+            "It is decidedly so.",
+            +"Most likely...",
+            "My reply is no.",
+            "My sources say no.",
+            "Outlook not so good and reply hazy",
+            "Scott Frost approves!",
+            "These are the affirmative answers.",
+            "Try again...",
+            "Without a doubt.",
+            "Yes – definitely!",
+            "You may rely on it.",
+        ]
+
+        reply = random.choice(responses)
+        embed = buildEmbed(
+            title="Eight Ball Response",
+            description="These are all 100% accurate. No exceptions! Unless an answer says anyone other than Nebraska is good.",
+            fields=[
+                dict(name="Question Asked", value=question.capitalize(), inline=False),
+                dict(name="Response", value=reply, inline=False),
+            ],
+        )
+        await interaction.response.send_message(embed=embed)
+
+    @commands.command()
+    async def markov(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def markov(self, ctx: discord.interactions.Interaction):
+    async def police(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def police(self, ctx: discord.interactions.Interaction):
+    async def possum(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def possum(self, ctx: discord.interactions.Interaction):
+    async def survey(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def survey(self, ctx: discord.interactions.Interaction):
+    async def urbandictionary(self, interaction: discord.Interaction):
         ...
 
     @commands.command()
-    async def urbandictionary(self, ctx: discord.interactions.Interaction):
-        ...
-
-    @commands.command()
-    async def weather(self, ctx: discord.interactions.Interaction):
+    async def weather(self, interaction: discord.Interaction):
         ...
 
 

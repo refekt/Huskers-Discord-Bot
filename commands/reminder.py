@@ -10,7 +10,7 @@ from helpers.constants import GUILD_PROD
 
 class ReminderCog(commands.Cog, name="Reminder Commands"):
     @commands.command()
-    async def remindme(self, ctx: discord.interactions.Interaction):
+    async def remindme(self, interaction: discord.Interaction):
         ...
 
 

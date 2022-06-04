@@ -30,8 +30,6 @@ __all__ = ["HuskerClient"]
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
-reaction_threshold = 3  # Used for Hall of Fame/Shame
-
 
 def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
@@ -148,8 +146,6 @@ def start_twitter_stream(client: discord.Client) -> None:
 
 
 class HuskerClient(Bot):
-    CommandEnums = None
-
     add_extensions = [
         "commands.admin",
         "commands.football_stats",
@@ -288,11 +284,10 @@ class HuskerClient(Bot):
         await self.send_welcome_message(guild_member)
 
     async def on_error(self, event_method, *args, **kwargs) -> None:  # TODO
-        # logger.info(f"On Error\n{event_method}\n{args}\n{kwargs}")
-        ...
+        logger.exception(f"On Error\n{event_method}\n{args}\n{kwargs}")
 
     async def on_command_error(self, context, exception) -> None:  # TODO
-        logger.info(f"On Command Error\n{context}{exception}")
+        logger.exception(f"On Command Error\n{context}{exception}")
 
     async def on_message_reaction_add(
         self,

@@ -39,7 +39,7 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
-from objects.Exceptions import CommandException, UserInputException, MySQLException
+from objects.Exceptions import CommandException, UserInputException
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     )
 
     # noinspection PyMethodMayBeStatic
-    async def alert_gameday_channels(self, client: discord.ext.commands.Bot, on: bool):
+    async def alert_gameday_channels(
+        self, client: discord.ext.commands.Bot, on: bool
+    ) -> None:
         chan_general = await client.fetch_channel(CHAN_GENERAL)
         chan_live = await client.fetch_channel(CHAN_DISCUSSION_LIVE)
         chan_streaming = await client.fetch_channel(CHAN_DISCUSSION_STREAMING)
@@ -134,7 +136,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await chan_streaming.send(embed=embed)
 
     # noinspection PyMethodMayBeStatic
-    async def process_gameday(self, mode: bool, guild: discord.Guild):
+    async def process_gameday(self, mode: bool, guild: discord.Guild) -> None:
         gameday_category = guild.get_channel(CAT_GAMEDAY)
         general_category = guild.get_channel(CAT_GENERAL)
         everyone = guild.get_role(ROLE_EVERYONE_PROD)
@@ -204,7 +206,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"All permissions changes applied")
 
     # noinspection PyMethodMayBeStatic
-    async def college_purge_messages(self, channel: Any, all_messages: bool = False):
+    async def college_purge_messages(
+        self, channel: Any, all_messages: bool = False
+    ) -> None:
         msgs = []
         max_age = datetime.now() - timedelta(
             days=13, hours=23, minutes=59
@@ -231,7 +235,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         return msgs
 
     # noinspection PyMethodMayBeStatic
-    async def confirm_purge(self, interaction: discord.Interaction):
+    async def confirm_purge(self, interaction: discord.Interaction) -> None:
 
         view = Confirm()
         await interaction.response.send_message(
