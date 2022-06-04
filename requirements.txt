@@ -1,6 +1,7 @@
 black==22.3.0
 cryptography==37.0.2
 discord.py>=1.7.3
+markovify=0.9.4
 paramiko==2.11.0
 pymysql==1.0.2
 python-dateutil==2.8.2

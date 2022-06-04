@@ -1,31 +1,24 @@
-# TODO
-# * Eightball
-# * Markov
-# * Police
-# * Possumdroppings
-# * Survey
-# * Urbandictionary
-# * Vote
-# * Weather
-# TODO
-
-
+import logging
 import random
+import re
 
 import discord.ext.commands
-from discord import app_commands
+from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD
+from helpers.constants import GUILD_PROD, CHAN_BANNED
 from helpers.embed import buildEmbed
+
+logger = logging.getLogger(__name__)
 
 
 class TextCog(commands.Cog, name="Text Commands"):
     @app_commands.command(
         name="eightball", description="Ask the Magic 8-Ball a question"
     )
+    @app_commands.describe(question="The question you want to ask the Magic 8-Ball")
     @app_commands.guilds(GUILD_PROD)
-    async def eightball(self, interaction: discord.Interaction, question: str):
+    async def eightball(self, interaction: discord.Interaction, question: str) -> None:
         responses = [
             "As I see it, yes.",
             "Ask again later.",
@@ -62,9 +55,87 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
         await interaction.response.send_message(embed=embed)
 
-    @commands.command()
-    async def markov(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="markov",
+        description="Generate an AI-created message from the server's messages!",
+    )
+    @app_commands.describe(
+        source_channel="A Discord text channel you want to use as a source",
+        source_member="A Discord server member you want to use as a source",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def markov(
+        self,
+        interaction: discord.Interaction,
+        source_channel: discord.TextChannel = None,
+        source_member: discord.Member = None,
+    ) -> None:
+        await interaction.response.defer()
+
+        combined_sourced: list = []
+        if source_channel is not None:
+            combined_sourced.append(source_channel)
+
+        if source_member is not None:
+            combined_sourced.append(source_member)
+
+        source_conent: str = ""
+        channel_history_limit: int = 1000
+
+        def check_message(message: discord.Message):
+            if (
+                message.channel.id in CHAN_BANNED
+                or message.author.bot
+                or message.content is ""
+            ):
+                return ""
+
+            return f"\n{message.content.capitalize()}"
+
+        def cleanup_source_conent(check_source_conent: str):
+            output = check_source_conent
+
+            regex_discord_http = [
+                r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
+                r"((Http|Https|http|ftp|https)://|)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  # All URLs
+            ]
+
+            for regex in regex_discord_http:
+                output = re.sub(regex, "", output, flags=re.IGNORECASE)
+
+            regex_new_lines = r"(\r\n|\r|\n){1,}"  # All line breaks
+            output = re.sub(regex_new_lines, "", output, flags=re.IGNORECASE)
+
+            regex_multiple_whitespace = r"\s{2,}"
+            output = re.sub(regex_multiple_whitespace, "", output, flags=re.IGNORECASE)
+
+            return output
+
+        message_history = []
+        source_conent = ""
+        if not combined_sourced:  # Nothing was provided
+            try:
+                message_history = [
+                    message
+                    async for message in interaction.channel.history(
+                        limit=channel_history_limit
+                    )
+                ]
+            except (Forbidden, HTTPException) as e:
+                logger.exception(f"Unable to collect message history!\n{e}")
+
+            for message in message_history:
+                source_conent += check_message(message)
+        else:
+            ...
+
+        if not source_conent == "":
+            source_conent = cleanup_source_conent(source_conent)
+            await interaction.response.send_message(source_conent)
+        else:
+            logger.exception(
+                f"There was not enough information available to make a Markov chain.",
+            )
 
     @commands.command()
     async def police(self, interaction: discord.Interaction):
