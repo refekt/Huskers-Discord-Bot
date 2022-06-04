@@ -33,76 +33,6 @@ logger.info(f"{str(__name__).title()} module loaded!")
 reaction_threshold = 3  # Used for Hall of Fame/Shame
 
 
-# server_stats = (
-#     f"• __Onwer:__ {guild.owner_id}\n"
-#     f"• __Description:__ {guild.description}\n"
-#     f"• __Server Features:__ {features}\n"
-#     f"• __Server Region:__ {guild.region}\n"
-#     f"• __Vanity URL:__ {f'https://discord.gg/{guild.vanity_url_code}' if guild.vanity_url_code else 'N/A'}\n"
-#     f"• __Boost Count:__ {guild.premium_subscription_count}\n"
-#     f"• __Rules Channel:__ {getChannelMention(CHAN_ANNOUNCEMENT)}"
-# )
-
-
-# async def send_tweet(tweet):
-#     if tweet.author.id_str not in [member["id_str"] for member in list_members]:
-#         return
-#
-#     direct_url = f"https://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}"
-#
-#     if hasattr(tweet, "extended_tweet"):
-#         fields = [
-#             dict(
-#                 name="Message",
-#                 value=tweet.extended_tweet["full_text"],
-#                 inline=False,
-#             )
-#         ]
-#     else:
-#         fields = [dict(name="Message", value=tweet.text, inline=False)]
-#
-#     fields.append(dict(name="URL", value=direct_url, inline=False))
-#
-#     embed = buildEmbed(
-#         title="Husker Tweet",
-#         url="https://twitter.com/i/lists/1307680291285278720",
-#         fields=fields,
-#         footer=f"Tweet sent {tweet.created_at.strftime(DT_TWEET_FORMAT)}",
-#     )
-#
-#     embed.set_author(
-#         name=f"{tweet.author.name} (@{tweet.author.screen_name}) via {tweet.source}",
-#         icon_url=tweet.author.profile_image_url_https,
-#     )
-#
-#     # TODO Work in Progress to capture all attached media
-#     if hasattr(tweet, "extended_entities"):
-#         try:
-#             for index, media in enumerate(tweet.extended_entities["media"]):
-#                 if index == 0:
-#                     embed.set_image(
-#                         url=tweet.extended_entities["media"][index]["media_url"]
-#                     )
-#                 embed.add_field(
-#                     name=f"Media #{index + 1}",
-#                     value=f"[Link #{index + 1}]({media['media_url']})",
-#                     inline=False,
-#                 )
-#         except Exception as e:  # noqa
-#             logger.warning(f"send_tweet exceptoin\n{e}")
-#             pass
-#
-#     logger.info(f"Sending tweet from @{tweet.author.screen_name}")
-#
-#     if tweet.author.screen_name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
-#         chan: discord.TextChannel = self.get_channel(CHAN_FOOD)
-#         await chan.send(embed=embed)
-#     else:
-#         view = TwitterButtons()
-#         chan: discord.TextChannel = self.get_channel(CHAN_TWITTERVERSE)
-#         await chan.send(view=view, embed=embed)
-
-
 def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
@@ -217,26 +147,6 @@ def start_twitter_stream(client: discord.Client) -> None:
     logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
 
-class TwitterButtons(discord.ui.View):
-    @discord.ui.button(
-        label="Send to General",
-        custom_id="send_to_general",
-        style=discord.ButtonStyle.gray,
-    )
-    async def send_to_general(self):
-        ...
-
-    @discord.ui.button(
-        label="Send to Recruiting",
-        custom_id="send_to_recruiting",
-        style=discord.ButtonStyle.gray,
-    )
-    async def send_to_general(self):
-        ...
-
-    # NOTE Discord API preventing creating a URL button at this scope
-
-
 class HuskerClient(Bot):
     CommandEnums = None
 
@@ -275,13 +185,13 @@ class HuskerClient(Bot):
 
             return lines_str
         except OSError:
-            logger.warning("Error loading the changelog!")
             logger.exception("Error loading the changelog!")
 
     # noinspection PyMethodMayBeStatic
     async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
+        # TODO Figure out how to handle this, if neeeded. May need to add something to bot logs.
         channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
             title="New Husker fan!",

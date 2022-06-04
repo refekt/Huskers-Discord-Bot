@@ -6,7 +6,12 @@ import dateutil.parser
 import discord
 import tweepy
 
-from helpers.constants import CHAN_TWITTERVERSE, DEBUGGING_CODE
+from helpers.constants import (
+    CHAN_TWITTERVERSE,
+    DEBUGGING_CODE,
+    CHAN_GENERAL,
+    CHAN_RECRUITING,
+)
 from helpers.embed import buildEmbed, buildTweetEmbed
 
 logger = logging.getLogger(__name__)
@@ -70,12 +75,50 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
         title="Husker Twitter",
         fields=[dict(name="Twitter Stream Alert", value=str(message), inline=False)],
     )
+
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
     await twitter_channel.send(embed=embed)
+
     logger.info(f"Twitter alert sent!")
 
 
 async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
+    class TwitterButtons(discord.ui.View):
+        def __init__(self):
+            super().__init__()
+
+        @discord.ui.button(
+            label="Send to General",
+            custom_id="send_to_general",
+            style=discord.ButtonStyle.gray,
+        )
+        async def send_to_general(
+            self, interaction: discord.Interaction, button: discord.ui.Button
+        ):
+            chan = await client.fetch_channel(CHAN_GENERAL)
+            await chan.send(
+                f"Tweet forwarded by {interaction.user.mention}",
+                embed=interaction.message.embeds[0],
+            )
+            await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
+
+        @discord.ui.button(
+            label="Send to Recruiting",
+            custom_id="send_to_recruiting",
+            style=discord.ButtonStyle.gray,
+        )
+        async def send_to_recruiting(
+            self, interaction: discord.Interaction, button: discord.ui.Button
+        ):
+            chan = await client.fetch_channel(CHAN_RECRUITING)
+            await chan.send(
+                f"Tweet forwarded by {interaction.user.mention}",
+                embed=interaction.message.embeds[0],
+            )
+            await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
+
+        # NOTE Discord API preventing creating a URL button at this scope
+
     logger.info(f"Sending tweet")
 
     author = None  # noqa
@@ -110,8 +153,9 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         quotes=quotes,
     )
 
+    view = TwitterButtons()
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
-    await twitter_channel.send(embed=embed)
+    await twitter_channel.send(embed=embed, view=view)
 
     logger.info(f"Tweet sent!")
 
