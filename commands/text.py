@@ -466,7 +466,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         embed = buildEmbed(
-            title=f"Weather conditions for {city.title()}, {state}",
+            title=f"Weather conditions for {city.title()}, {state.upper()}",
             description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state} is located at {weather.coord.lat}, {weather.coord.lon}.",
             fields=[
                 dict(name="Temperature", value=temp_str, inline=False),
