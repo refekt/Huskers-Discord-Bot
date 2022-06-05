@@ -1,6 +1,7 @@
-import discord
-from typing import List
 from collections import deque
+from typing import List
+
+import discord
 
 
 class EmbedPaginatorView(discord.ui.View):
