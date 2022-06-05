@@ -4,7 +4,7 @@ import platform
 import socket
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any
+from typing import Any, Union
 
 import discord.ext.commands
 import paramiko
@@ -88,7 +88,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     # noinspection PyMethodMayBeStatic
     async def alert_gameday_channels(
-        self, client: discord.ext.commands.Bot, on: bool
+        self, client: Union[discord.ext.commands.Bot, discord.Client], on: bool
     ) -> None:
         chan_general = await client.fetch_channel(CHAN_GENERAL)
         chan_live = await client.fetch_channel(CHAN_DISCUSSION_LIVE)
@@ -353,7 +353,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 value=cmd.description if cmd.description else "TBD",
                 inline=False,
             )
-            for cmd in self.client.commands
+            for cmd in interaction.client.commands
         ]
         embed = buildEmbed(title="Bot Commands", fields=embed_fields_commands)
         await interaction.response.send_message(embed=embed)
@@ -411,7 +411,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.send_message(
             f"Goodbye for now! {interaction.user.mention} has turned me off!"
         )
-        await self.client.close()
+        await interaction.client.close()
         logger.info(
             f"User {interaction.user.name}#{interaction.user.discriminator} turned off the bot."
         )
@@ -643,7 +643,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("Processing!")
         await self.process_gameday(True, interaction.guild)
-        await self.alert_gameday_channels(self.client, True)
+        await self.alert_gameday_channels(client=interaction.client, on=True)
 
     @group_gameday.command(
         name="off",
@@ -655,7 +655,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("Processing!")
         await self.process_gameday(False, interaction.guild)
-        await self.alert_gameday_channels(self.client, False)
+        await self.alert_gameday_channels(client=interaction.client, on=False)
 
     @app_commands.command(name="smms", description="Tee hee")  # TODO Make hidden
     @app_commands.default_permissions(manage_messages=True)
