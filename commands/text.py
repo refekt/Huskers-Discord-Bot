@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, CHAN_BANNED, CHAN_POSSUMS
+from helpers.constants import GUILD_PROD, CHAN_BANNED, CHAN_POSSUMS, GLOBAL_TIMEOUT
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException
 from objects.Paginator import EmbedPaginatorView
@@ -344,7 +344,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         interaction: discord.Interaction,
         question: str,
         options: str,
-        timeout: int = 60 * 60 * 24,
+        timeout: int = GLOBAL_TIMEOUT,
     ):
         survey = Survey(
             client=interaction.client,

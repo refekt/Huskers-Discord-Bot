@@ -234,6 +234,8 @@ DT_TWEET_FORMAT_OLD = "%Y-%m-%d %H:%M:%S"
 DT_TWEET_FORMAT = "%H:%M:%S %d %b %Y"
 logger.info("Datetime formatting variables loaded")
 
+GLOBAL_TIMEOUT = 3600
+
 # States
 US_STATES = [
     {"State": "Alabama", "Abbrev": "Ala.", "Code": "AL"},

@@ -13,11 +13,11 @@ from discord import (
     Forbidden,
     HTTPException,
     Interaction,
-    NotFound,
 )
 from discord.ext.commands import Bot
 from discord.ui import View, Button
 
+from helpers.constants import GLOBAL_TIMEOUT
 from helpers.misc import formatPrettyTimeDelta
 from objects.Exceptions import SurveyException
 
@@ -49,7 +49,7 @@ class Survey:
         interaction: Interaction,
         options: Union[AnyStr, List[Any], List[SurveyOption]],
         question: AnyStr,
-        timeout: Optional[int] = 60 * 60 * 24,
+        timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
         # Space deliminated options
         options = options.strip()

@@ -4,6 +4,8 @@ from typing import List
 
 import discord
 
+from helpers.constants import GLOBAL_TIMEOUT
+
 logger = logging.getLogger(__name__)
 
 
@@ -12,7 +14,7 @@ class EmbedPaginatorView(discord.ui.View):
         self,
         embeds: List[discord.Embed],
         response: discord.InteractionMessage,
-        timeout: int = None,
+        timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
         """
 
