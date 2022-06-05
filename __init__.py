@@ -63,7 +63,6 @@ tree = client.tree
 async def on_app_command_error(
     interaction: discord.Interaction, error: discord.app_commands.AppCommandError
 ):
-    logger.info(f"Testing...{error}")
     embed = buildEmbed(
         title="Command Error Received",
         description=f"This error originated from '{error.command.qualified_name}'.",
@@ -76,6 +75,7 @@ async def on_app_command_error(
         ],
     )
     await interaction.edit_original_message(content="", embed=embed)
+    logger.exception(error)
 
 
 end = perf_counter()

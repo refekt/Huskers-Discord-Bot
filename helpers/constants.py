@@ -3,7 +3,8 @@
 # TODO
 import logging
 import platform
-from typing import Union, Any
+from enum import Enum
+from typing import Union
 
 import discord
 import pytz
@@ -102,7 +103,6 @@ TWITTER_V2_CLIENT_ID = env_vars["twitter_v2_client_id"]
 TWITTER_V2_CLIENT_SECRET = env_vars["twitter_v2_client_secret"]
 
 logger.info("Twitter variables loaded")
-
 
 # Weather API
 WEATHER_API_KEY = env_vars["openweather_key"]
@@ -236,6 +236,7 @@ logger.info("Datetime formatting variables loaded")
 
 GLOBAL_TIMEOUT = 3600
 
+
 # States
 US_STATES = [
     {"State": "Alabama", "Abbrev": "Ala.", "Code": "AL"},
@@ -289,23 +290,21 @@ US_STATES = [
     {"State": "West Virginia", "Abbrev": "W.Va.", "Code": "WV"},
     {"State": "Wisconsin", "Abbrev": "Wis.", "Code": "WI"},
     {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},
-    {"State": "Puerto Rico", "Code": "PR"},
+    {"State": "Puerto Rico", "Abbrev": "PR", "Code": "PR"},
 ]
 
-
 DISCORD_CHANNEL_TYPES = Union[
-    VoiceChannel,
+    CategoryChannel,
+    ForumChannel,
+    PartialMessageable,
     StageChannel,
     TextChannel,
-    ForumChannel,
-    CategoryChannel,
     Thread,
-    PartialMessageable,
+    VoiceChannel,
 ]
 DISCORD_USER_TYPES = Union[discord.Member, discord.User]
 
 logger.info("Discord Union group variables loaded")
-
 
 __all__ = [
     item

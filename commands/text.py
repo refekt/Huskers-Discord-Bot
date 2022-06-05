@@ -1,6 +1,9 @@
+import json
 import logging
 import random
 import re
+from datetime import timedelta
+from typing import List
 
 import discord.ext.commands
 import markovify
@@ -9,11 +12,22 @@ from bs4 import BeautifulSoup
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, CHAN_BANNED, CHAN_POSSUMS, GLOBAL_TIMEOUT
+from helpers.constants import (
+    GUILD_PROD,
+    CHAN_BANNED,
+    CHAN_POSSUMS,
+    GLOBAL_TIMEOUT,
+    WEATHER_API_KEY,
+    HEADERS,
+    DT_OPENWEATHER_UTC,
+    TZ,
+    US_STATES,
+)
 from helpers.embed import buildEmbed
-from objects.Exceptions import CommandException
+from objects.Exceptions import CommandException, WeatherException
 from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
+from objects.Weather import WeatherResponse, WeatherHour
 
 logger = logging.getLogger(__name__)
 
@@ -355,9 +369,121 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
         await survey.send()
 
-    @commands.command()
-    async def weather(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="weather",
+        description="Show the weather for a given location",
+    )
+    @app_commands.describe(
+        city="The name of the city you are searching",
+        state="The name of the states the city is in",
+        country="The two digit abbreviation of the country the state is in",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def weather(
+        self,
+        interaction: discord.Interaction,
+        city: str,
+        state: str,
+        country: str = "US",
+    ):
+        await interaction.response.defer()
+
+        try:
+            formatted_state = next(
+                (
+                    search_state
+                    for search_state in US_STATES
+                    if (
+                        search_state["State"].lower() == state.lower()
+                        or search_state["Abbrev"][:-1].lower() == state.lower()
+                        or search_state["Code"].lower() == state.lower()
+                    )
+                ),
+                None,
+            )
+        except StopIteration as e:
+            raise WeatherException("Unable to find state. Please try again!")
+
+        def shift_utc_tz(dt, shift):
+            return dt + timedelta(seconds=shift)
+
+        weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
+        response = requests.get(weather_url, headers=HEADERS)
+        j = json.loads(response.content)
+
+        weather = WeatherResponse(j)
+        if weather.cod == "404":
+            raise WeatherException(
+                f"Unable to find {city.title()}, {state}. Try again!"
+            )
+
+        temp_str = (
+            f"Temperature: {weather.main.temp}℉\n"
+            f"Feels Like: {weather.main.feels_like}℉\n"
+            f"Humidity: {weather.main.humidity}%\n"
+            f"Max: {weather.main.temp_max}℉\n"
+            f"Min: {weather.main.temp_min}℉"
+        )
+
+        if len(weather.wind) == 2:
+            wind_str = (
+                f"Speed: {weather.wind.speed} MPH\n" f"Direction: {weather.wind.deg} °"
+            )
+        elif len(weather.wind) == 3:
+            wind_str = (
+                f"Speed: {weather.wind.speed} MPH\n"
+                f"Gusts: {weather.wind.gust} MPH\n"
+                f"Direction: {weather.wind.deg} °"
+            )
+        else:
+            wind_str = f"Speed: {weather.wind.speed} MPH"
+
+        hourly_url = f"https://api.openweathermap.org/data/2.5/onecall?lat={weather.coord.lat}&lon={weather.coord.lon}&appid={WEATHER_API_KEY}&units=imperial"
+        response = requests.get(hourly_url, headers=HEADERS)
+        j = json.loads(response.content)
+        hours: List[WeatherHour] = []
+        for index, item in enumerate(j["hourly"]):
+            hours.append(WeatherHour(item))
+            if index == 3:
+                break
+
+        hour_temp_str = ""
+        hour_wind_str = ""
+        for index, hour in enumerate(hours):
+            if index < len(hours) - 1:
+                hour_temp_str += f"{hour.temp}℉ » "
+                hour_wind_str += f"{hour.wind_speed} MPH » "
+            else:
+                hour_temp_str += f"{hour.temp}℉"
+                hour_wind_str += f"{hour.wind_speed} MPH"
+
+        sunrise = shift_utc_tz(weather.sys.sunrise, weather.timezone)
+        sunset = shift_utc_tz(weather.sys.sunset, weather.timezone)
+
+        sun_str = (
+            f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n"
+            f"Sunset: {sunset.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}"
+        )
+
+        embed = buildEmbed(
+            title=f"Weather conditions for {city.title()}, {state}",
+            description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state} is located at {weather.coord.lat}, {weather.coord.lon}.",
+            fields=[
+                dict(name="Temperature", value=temp_str, inline=False),
+                dict(
+                    name="Clouds",
+                    value=f"Coverage: {weather.clouds.all}%",
+                    inline=False,
+                ),
+                dict(name="Wind", value=wind_str, inline=False),
+                dict(name="Temp Next 4 Hours", value=hour_temp_str, inline=False),
+                dict(name="Wind Next 4 Hours", value=hour_wind_str, inline=False),
+                dict(name="Sun", value=sun_str, inline=False),
+            ],
+            thumbnail=f"https://openweathermap.org/img/wn/{weather.weather[0].icon}@4x.png",
+        )
+
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:

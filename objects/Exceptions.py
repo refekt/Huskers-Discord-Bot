@@ -12,6 +12,7 @@ __all__ = [
     "SurveyException",
     "TwitterStreamException",
     "UserInputException",
+    "WeatherException",
 ]
 
 logger.info(f"{str(__name__).title()} module loaded!")
@@ -49,4 +50,9 @@ class ChangelogException(Exception):
 
 @dataclass()
 class SurveyException(Exception):
+    message: str
+
+
+@dataclass()
+class WeatherException(Exception):
     message: str
