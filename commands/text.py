@@ -325,7 +325,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 )
             )
 
-        view = EmbedPaginatorView(pages)
+        view = EmbedPaginatorView(pages, await interaction.original_message())
         await interaction.edit_original_message(embed=view.initial, view=view)
 
     @commands.command()
