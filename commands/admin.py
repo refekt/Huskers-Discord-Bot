@@ -44,7 +44,7 @@ from objects.Exceptions import CommandException, UserInputException
 logger = logging.getLogger(__name__)
 
 
-class Confirm(discord.ui.View):
+class ConfirmButtons(discord.ui.View):
     def __init__(self):
         super().__init__()
         self.value = None
@@ -53,13 +53,11 @@ class Confirm(discord.ui.View):
     async def confirm(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
-        await interaction.response.send_message("Confirmed!", ephemeral=True)
         self.value = True
         self.stop()
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("Cancelling", ephemeral=True)
         self.value = False
         self.stop()
 
@@ -208,7 +206,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     # noinspection PyMethodMayBeStatic
     async def college_purge_messages(
         self, channel: Any, all_messages: bool = False
-    ) -> None:
+    ) -> list:
         msgs = []
         max_age = datetime.now() - timedelta(
             days=13, hours=23, minutes=59
@@ -235,28 +233,25 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         return msgs
 
     # noinspection PyMethodMayBeStatic
-    async def confirm_purge(self, interaction: discord.Interaction) -> None:
+    async def confirm_purge(self, interaction: discord.Interaction) -> bool:
 
-        view = Confirm()
+        view = ConfirmButtons()
         await interaction.response.send_message(
             "Do you want to continue?", view=view, ephemeral=True
         )
         await view.wait()
 
         if view.value is None:
-            logger.info("Purge confirmation timed out!")
+            logger.exception("Purge confirmation timed out!")
         elif view.value:
-            logger.info("Purge confirmed. Continuing!")
             return True
         else:
-            logger.info("Purge cancelled. Halting!")
             return False
 
     @app_commands.command(name="about", description="Learn all about Bot Frost")
     @app_commands.guilds(GUILD_PROD)
     async def about(self, interaction: discord.Interaction) -> None:
         """All about Bot Frost"""
-        import platform
 
         await interaction.response.send_message(
             embed=buildEmbed(
@@ -270,7 +265,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     },
                     {
                         "name": "Source Code",
-                        # "value": "[GitHub](https://www.github.com/refekt/Husker-Bot)",
                         "value": discordURLFormatter(
                             "GitHub", "https://www.github.com/refekt/Husker-Bot"
                         ),
@@ -289,12 +283,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     },
                     {
                         "name": "Latency",
-                        "value": f"{self.client.latency * 1000:.2f} ms",
+                        "value": f"{interaction.client.latency * 1000:.2f} ms",
                         "inline": False,
                     },
                     {
                         "name": "Username",
-                        "value": self.client.user.mention,
+                        "value": interaction.client.user.mention,
                         "inline": False,
                     },
                     {
@@ -373,15 +367,18 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         if not await self.confirm_purge(interaction):
+            await interaction.edit_original_message(content="Purge declined", view=None)
             return
+
+        await interaction.edit_original_message(content="Working...")
 
         msgs = await self.college_purge_messages(
             channel=interaction.channel, all_messages=False
         )
 
         await interaction.channel.delete_messages(msgs)
-        await interaction.followup.send(
-            f"Bulk delete of {len(msgs)} messages successful.", ephemeral=True
+        await interaction.edit_original_message(
+            content=f"Bulk delete of {len(msgs)} messages successful.", view=None
         )
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
@@ -392,15 +389,18 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         if not await self.confirm_purge(interaction):
+            await interaction.edit_original_message(content="Purge declined", view=None)
             return
+
+        await interaction.edit_original_message(content="Working...")
 
         msgs = await self.college_purge_messages(
             channel=interaction.channel, all_messages=True
         )
 
         await interaction.channel.delete_messages(msgs)
-        await interaction.followup.send(
-            f"Bulk delete of {len(msgs)} messages successful.", ephemeral=True
+        await interaction.edit_original_message(
+            content=f"Bulk delete of {len(msgs)} messages successful.", view=None
         )
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
