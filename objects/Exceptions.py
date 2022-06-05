@@ -9,6 +9,7 @@ __all__ = [
     "CommandException",
     "ExtensionException",
     "MySQLException",
+    "SurveyException",
     "TwitterStreamException",
     "UserInputException",
 ]
@@ -43,4 +44,9 @@ class TwitterStreamException(Exception):
 
 @dataclass()
 class ChangelogException(Exception):
+    message: str
+
+
+@dataclass()
+class SurveyException(Exception):
     message: str

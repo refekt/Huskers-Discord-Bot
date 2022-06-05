@@ -13,6 +13,7 @@ from helpers.constants import GUILD_PROD, CHAN_BANNED, CHAN_POSSUMS
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException
 from objects.Paginator import EmbedPaginatorView
+from objects.Survey import Survey
 
 logger = logging.getLogger(__name__)
 
@@ -328,9 +329,31 @@ class TextCog(commands.Cog, name="Text Commands"):
         view = EmbedPaginatorView(pages, await interaction.original_message())
         await interaction.edit_original_message(embed=view.initial, view=view)
 
-    @commands.command()
-    async def survey(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="survey",
+        description="Create a survey for the server",
+    )
+    @app_commands.describe(
+        question="The question you want to ask",
+        options="A maximum of three space deliminated set of options; e.g., 'one two three'",
+        timeout="Number of seconds to run the survey.",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def survey(
+        self,
+        interaction: discord.Interaction,
+        question: str,
+        options: str,
+        timeout: int = 60 * 60 * 24,
+    ):
+        survey = Survey(
+            client=interaction.client,
+            interaction=interaction,
+            question=question,
+            options=options,
+            timeout=timeout,
+        )
+        await survey.send()
 
     @commands.command()
     async def weather(self, interaction: discord.Interaction):

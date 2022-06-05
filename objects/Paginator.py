@@ -14,6 +14,12 @@ class EmbedPaginatorView(discord.ui.View):
         response: discord.InteractionMessage,
         timeout: int = None,
     ) -> None:
+        """
+
+        :param embeds:
+        :param response:
+        :param timeout:
+        """
         super().__init__(timeout=timeout)
         self._embeds: List[discord.Embed] = embeds
         self._queue = deque(embeds)  # collections.deque
@@ -22,7 +28,7 @@ class EmbedPaginatorView(discord.ui.View):
         self.current_index: int = 1
         self.response: discord.InteractionMessage = response
 
-        try:
+        try:  # TODO Make this show up in the middle.
             self.add_item(
                 discord.ui.Button(
                     label=f"Page {self.current_index}/{self._len}",

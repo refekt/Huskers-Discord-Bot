@@ -70,7 +70,7 @@ async def on_app_command_error(
         fields=[
             dict(
                 name=f"Error Type: {type(error.original.args[0])}",
-                value=error.original.args[0].message,
+                value=str(error.original.args[0]),
                 inline=False,
             )
         ],
