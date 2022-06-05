@@ -89,7 +89,7 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
             e.add_field(
                 name=field["name"][:field_name_limit],
                 value=field["value"][:field_value_limit],
-                inline=field["inline"],
+                inline=field.get("inline", False),
             )
     if len(e) > embed_max:
         logger.exception("Embed is too big!")
@@ -117,11 +117,13 @@ def buildTweetEmbed(
     embed = buildEmbed(
         title="",
         fields=[
-            dict(name="Message", value=text, inline=False),
+            dict(
+                name="Message",
+                value=text,
+            ),
             dict(
                 name="Tweet URL",
                 value=f"https://twitter.com/{username}/status/{tweet_id}",
-                inline=False,
             ),
         ],
     )
@@ -147,7 +149,6 @@ def buildTweetEmbed(
                 value=discordURLFormatter(
                     display_text=url["title"], url=url["expanded_url"]
                 ),
-                inline=False,
             )
 
     if medias:
@@ -155,7 +156,6 @@ def buildTweetEmbed(
             embed.add_field(
                 name="Embeded Image",
                 value=discordURLFormatter(f"Image #{index+1}", item.url),
-                inline=False,
             )
 
     if quotes:
@@ -163,7 +163,6 @@ def buildTweetEmbed(
             embed.add_field(
                 name="Quoted Tweet",
                 value=item.text,
-                inline=False,
             )
 
     embed.set_author(
@@ -197,7 +196,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #     ):  # Place holder hour and minute to signify TBA games
 #         return build_embed(
 #             title="Countdown until...",
-#             inline=False,
+#             ,
 #             thumbnail=thumbnail,
 #             fields=[
 #                 ["Opponent", opponent],
@@ -210,7 +209,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #     else:
 #         return build_embed(
 #             title="Countdown until...",
-#             inline=False,
+#             ,
 #             thumbnail=thumbnail,
 #             fields=[
 #                 ["Opponent", opponent],
@@ -370,7 +369,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #
 #     embed = build_embed(
 #         title=f"Nebraska's {year} Schedule ({season_stats.wins} - {season_stats.losses})",
-#         inline=False,
+#         ,
 #         fields=fields,
 #     )
 #
@@ -388,7 +387,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #             build_embed(
 #                 title=f"{game.opponent.title()}",
 #                 description=f"Nebraska's {year}'s Record: {season_stats.wins} - {season_stats.losses}",
-#                 inline=False,
+#                 ,
 #                 thumbnail=game.icon,
 #                 fields=[
 #                     [

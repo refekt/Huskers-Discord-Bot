@@ -69,8 +69,14 @@ class TextCog(commands.Cog, name="Text Commands"):
             title="Eight Ball Response",
             description="These are all 100% accurate. No exceptions! Unless an answer says anyone other than Nebraska is good.",
             fields=[
-                dict(name="Question Asked", value=question.capitalize(), inline=False),
-                dict(name="Response", value=reply, inline=False),
+                dict(
+                    name="Question Asked",
+                    value=question.capitalize(),
+                ),
+                dict(
+                    name="Response",
+                    value=reply,
+                ),
             ],
         )
         await interaction.response.send_message(embed=embed)
@@ -245,7 +251,6 @@ class TextCog(commands.Cog, name="Text Commands"):
                     f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
                     f"🙅‍♀️Thanks for your cooperation. 😍🤩😘"
                     f"**",
-                    inline=False,
                 )
             ],
         )
@@ -271,7 +276,12 @@ class TextCog(commands.Cog, name="Text Commands"):
             title="Possum Droppings",
             thumbnail="https://cdn.discordapp.com/attachments/593984711706279937/875162041818693632/unknown.jpeg",
             footer="Created by a sneaky possum",
-            fields=[dict(name="Dropping", value=message, inline=False)],
+            fields=[
+                dict(
+                    name="Dropping",
+                    value=message,
+                )
+            ],
         )
         chan = await interaction.client.fetch_channel(CHAN_POSSUMS)
         await chan.send(embed=embed)
@@ -331,10 +341,17 @@ class TextCog(commands.Cog, name="Text Commands"):
                     title=f"Searched for: {result.lookup_word}",
                     description=f"Definition #{index + 1} from Urban Dictionary",
                     fields=[
-                        dict(name="Meaning", value=result.meaning, inline=False),
-                        dict(name="Example", value=result.example, inline=False),
                         dict(
-                            name="Contributor", value=result.contributor, inline=False
+                            name="Meaning",
+                            value=result.meaning,
+                        ),
+                        dict(
+                            name="Example",
+                            value=result.example,
+                        ),
+                        dict(
+                            name="Contributor",
+                            value=result.contributor,
                         ),
                     ],
                 )
@@ -469,16 +486,30 @@ class TextCog(commands.Cog, name="Text Commands"):
             title=f"Weather conditions for {city.title()}, {state.upper()}",
             description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state} is located at {weather.coord.lat}, {weather.coord.lon}.",
             fields=[
-                dict(name="Temperature", value=temp_str, inline=False),
+                dict(
+                    name="Temperature",
+                    value=temp_str,
+                ),
                 dict(
                     name="Clouds",
                     value=f"Coverage: {weather.clouds.all}%",
-                    inline=False,
                 ),
-                dict(name="Wind", value=wind_str, inline=False),
-                dict(name="Temp Next 4 Hours", value=hour_temp_str, inline=False),
-                dict(name="Wind Next 4 Hours", value=hour_wind_str, inline=False),
-                dict(name="Sun", value=sun_str, inline=False),
+                dict(
+                    name="Wind",
+                    value=wind_str,
+                ),
+                dict(
+                    name="Temp Next 4 Hours",
+                    value=hour_temp_str,
+                ),
+                dict(
+                    name="Wind Next 4 Hours",
+                    value=hour_wind_str,
+                ),
+                dict(
+                    name="Sun",
+                    value=sun_str,
+                ),
             ],
             thumbnail=f"https://openweathermap.org/img/wn/{weather.weather[0].icon}@4x.png",
         )

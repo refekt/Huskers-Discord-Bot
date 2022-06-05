@@ -53,13 +53,13 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #
 #         embed = build_embed(
 #             title="Bot Frost Reminder",
-#             inline=False,
+#             ,
 #             fields=[["Author", source.mention], [f"Reminder!", message]],
 #         )
 #     else:
 #         embed = build_embed(
 #             title="Missed Bot Frost Reminder",
-#             inline=False,
+#             ,
 #             fields=[
 #                 ["Original Reminder Date Time", alert_when],
 #                 ["Author", source],

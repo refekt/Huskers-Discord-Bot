@@ -102,17 +102,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     dict(
                         name="Live TV",
                         value=f"{chan_live.mention} text and voice channels are for users who are watching live.",
-                        inline=False,
                     ),
                     dict(
                         name="Streaming",
                         value=f"{chan_streaming.mention} text and voice channels are for users who are streaming the game.",
-                        inline=False,
                     ),
                     dict(
                         name="Info",
                         value="All channels in the Huskers category will be turned off until the game day mode is disabled.",
-                        inline=False,
                     ),
                 ],
             )
@@ -124,7 +121,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     dict(
                         name="Info",
                         value=f"Game day channels have been disabled and General categories channels have been enabled. Regular discussion may continue in {chan_general.mention}.",
-                        inline=False,
                     )
                 ],
             )
@@ -254,47 +250,40 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         """All about Bot Frost"""
 
         await interaction.response.send_message(
+            # TODO Change this to use dict()
             embed=buildEmbed(
                 title="About Me",
-                inline=False,
                 fields=[
                     {
                         "name": "History",
                         "value": "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
-                        "inline": False,
                     },
                     {
                         "name": "Source Code",
                         "value": discordURLFormatter(
                             "GitHub", "https://www.github.com/refekt/Husker-Bot"
                         ),
-                        "inline": False,
                     },
                     {"name": "Version", "value": _version, "inline": False},
                     {
                         "name": "Hosting Location",
                         "value": f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}",
-                        "inline": False,
                     },
                     {
                         "name": "Hosting Status",
                         "value": "https://status.hyperexpert.com/",
-                        "inline": False,
                     },
                     {
                         "name": "Latency",
                         "value": f"{interaction.client.latency * 1000:.2f} ms",
-                        "inline": False,
                     },
                     {
                         "name": "Username",
                         "value": interaction.client.user.mention,
-                        "inline": False,
                     },
                     {
                         "name": "Feeling generous?",
                         "value": f"Check out `/donate` to help out the production and upkeep of the bot.",
-                        "inline": False,
                     },
                 ],
             )
@@ -308,15 +297,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         """Contribute to the development of Bot Frost"""
 
         await interaction.response.send_message(
+            # TODO change this to use dict()
             embed=buildEmbed(
                 title="Donation Information",
-                inline=False,
                 thumbnail="https://i.imgur.com/53GeCvm.png",
                 fields=[
                     {
                         "name": "About",
                         "value": "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs.",
-                        "inline": False,
                     },
                     {
                         "name": "Terms",
@@ -326,16 +314,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         "(4) Monthly subscriptions can be terminated by either party at any time. "
                         "(5) These terms can be changed at any time. Please read before each donation. "
                         "(6) Clicking the donation link signifies your agreement to these terms.",
-                        "inline": False,
                     },
                     {
                         "name": "Donation Link",
-                        # "value": "[Click Me](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url)",
                         "value": discordURLFormatter(
                             "click me",
                             "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url",
                         ),
-                        "inline": False,
                     },
                 ],
             )
@@ -351,7 +336,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             dict(
                 name=cmd.name,
                 value=cmd.description if cmd.description else "TBD",
-                inline=False,
             )
             for cmd in interaction.client.commands
         ]
@@ -555,7 +539,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 {
                     "name": "Statement",
                     "value": f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server.",
-                    "inline": False,
                 },
                 {"name": "Reason", "value": full_reason, "inline": False},
             ],
@@ -620,12 +603,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 {
                     "name": "Welcome back!",
                     "value": f"[{who.mention}] is welcomed back to Nebraska!",
-                    "inline": False,
                 },
                 {
                     "name": "Welcomed by",
                     "value": interaction.user.mention,
-                    "inline": False,
                 },
             ],
         )
@@ -683,7 +664,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             thumbnail="https://i.imgur.com/EGC1qNt.jpg",
             footer=BOT_FOOTER_SECRET,
             fields=[
-                dict(name="Back Channel Communication", value=message, inline=False)
+                dict(
+                    name="Back Channel Communication",
+                    value=message,
+                )
             ],
         )
         await chan.send(embed=embed)

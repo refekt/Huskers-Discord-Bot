@@ -73,7 +73,12 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     logger.info(f"Tweet alert received: {message}")
     embed = buildEmbed(
         title="Husker Twitter",
-        fields=[dict(name="Twitter Stream Alert", value=str(message), inline=False)],
+        fields=[
+            dict(
+                name="Twitter Stream Alert",
+                value=str(message),
+            )
+        ],
     )
 
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)

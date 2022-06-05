@@ -193,11 +193,13 @@ class HuskerClient(Bot):
             title="New Husker fan!",
             description="Welcome the new member to the server!",
             fields=[
-                dict(name="New Member", value=guild_member.mention, inline=False),
+                dict(
+                    name="New Member",
+                    value=guild_member.mention,
+                ),
                 dict(
                     name="Info",
                     value=f"Be sure to check out `/commands` for how to use the bot!",
-                    inline=False,
                 ),
             ],
         )
@@ -213,24 +215,26 @@ class HuskerClient(Bot):
                 dict(
                     name="Rules",
                     value=f"Please be sure to check out the rules channel to catch up on server rules.",
-                    inline=False,
                 ),
                 dict(
                     name="Commands",
                     value=f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
-                    inline=False,
                 ),
                 dict(
                     name="Hall of Fame & Shame Reaaction Threshold",
                     value="TBD",
-                    inline=False,
                 ),
-                dict(name="Version", value=_version, inline=False),
-                dict(name="Changelong", value=self.get_change_log(), inline=False),
+                dict(
+                    name="Version",
+                    value=_version,
+                ),
+                dict(
+                    name="Changelong",
+                    value=self.get_change_log(),
+                ),
                 dict(
                     name="Support Bot Frost",
                     value="Check out `/donate` to see how you can support the project!",
-                    inline=False,
                 ),
             ],
         )

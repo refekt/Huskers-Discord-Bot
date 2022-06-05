@@ -154,7 +154,10 @@ class Survey:
             color=0xD00000,
         )
         embed.set_footer(text="Users: ")
-        embed.add_field(name="Survey Question", value=self.question, inline=False)
+        embed.add_field(
+            name="Survey Question",
+            value=self.question,
+        )
         for index, opt in enumerate(self.options):
             embed.add_field(
                 name=f"Tally for: {opt.label.upper()}",
