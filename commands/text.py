@@ -12,6 +12,7 @@ from discord.ext import commands
 from helpers.constants import GUILD_PROD, CHAN_BANNED, CHAN_POSSUMS
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException
+from objects.Paginator import EmbedPaginatorView
 
 logger = logging.getLogger(__name__)
 
@@ -324,8 +325,8 @@ class TextCog(commands.Cog, name="Text Commands"):
                 )
             )
 
-        await interaction.edit_original_message(embed=pages[0])
-        # TODO Need to find or make a paginator
+        view = EmbedPaginatorView(pages)
+        await interaction.edit_original_message(embed=view.initial, view=view)
 
     @commands.command()
     async def survey(self, interaction: discord.Interaction):
