@@ -8,6 +8,7 @@ __all__ = [
     "ChangelogException",
     "CommandException",
     "ExtensionException",
+    "ImageException",
     "MySQLException",
     "SurveyException",
     "TwitterStreamException",
@@ -55,4 +56,9 @@ class SurveyException(Exception):
 
 @dataclass()
 class WeatherException(Exception):
+    message: str
+
+
+@dataclass()
+class ImageException(Exception):
     message: str
