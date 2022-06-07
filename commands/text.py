@@ -516,6 +516,53 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         await interaction.followup.send(embed=embed)
 
+    @app_commands.command(
+        name="hype-me",
+        description="Get hype from Husk",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def hypeme(self, interaction: discord.Interaction):
+        class Scroll:
+            def __init__(self, message: str):
+                self.headder: str = "  _______________________\n=(__    ___      __     _)=\n  |                     |\n"
+                self.message_layer: str = "  |                     |\n"
+                self.footer: str = "\n  |                     |\n  |__    ___   __    ___|\n=(_______________________)=\n"
+                self.max_line_len: int = 19
+                self.message: str = message
+
+            def compile(self):
+                new_line: str = "\n"
+                lines = [
+                    f"  | {str(self.message[i : i + self.max_line_len]).ljust(self.max_line_len, ' ')} |"
+                    for i in range(0, len(self.message), self.max_line_len)
+                ]
+
+                return f"{self.headder}{new_line.join([line for line in lines])}{self.footer}"
+
+        logger.info("Creating a Husk markov chain")
+        await interaction.response.defer()
+
+        with open("resources/husk_messages.txt", encoding="UTF-8") as f:
+            source_data = f.read()
+
+        text_model = markovify.NewlineText(source_data)
+
+        output = (
+            str(text_model.make_short_sentence(min_chars=20, max_chars=50))
+            .lower()
+            .capitalize()
+        )
+
+        processed_output = Scroll(output).compile()
+
+        if not output == "None":
+            await interaction.followup.send(f"```\n{processed_output}```")
+            logger.info("Husk markov chain created!")
+        else:
+            await interaction.followup.send(
+                "Unable to make a Husk Chain!", ephemeral=True
+            )
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(TextCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
