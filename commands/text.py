@@ -13,15 +13,15 @@ from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
 from helpers.constants import (
-    GUILD_PROD,
     CHAN_BANNED,
     CHAN_POSSUMS,
-    GLOBAL_TIMEOUT,
-    WEATHER_API_KEY,
-    HEADERS,
     DT_OPENWEATHER_UTC,
+    GLOBAL_TIMEOUT,
+    GUILD_PROD,
+    HEADERS,
     TZ,
     US_STATES,
+    WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException, WeatherException
@@ -376,7 +376,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         question: str,
         options: str,
         timeout: int = GLOBAL_TIMEOUT,
-    ):
+    ) -> None:
         survey = Survey(
             client=interaction.client,
             interaction=interaction,
@@ -402,7 +402,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         city: str,
         state: str,
         country: str = "US",
-    ):
+    ) -> None:
         await interaction.response.defer()
 
         try:
@@ -521,7 +521,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         description="Get hype from Husk",
     )
     @app_commands.guilds(GUILD_PROD)
-    async def hypeme(self, interaction: discord.Interaction):
+    async def hypeme(self, interaction: discord.Interaction) -> None:
         class Scroll:
             def __init__(self, message: str):
                 self.headder: str = "  _______________________\n=(__    ___      __     _)=\n  |                     |\n"

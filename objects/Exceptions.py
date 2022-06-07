@@ -10,6 +10,8 @@ __all__ = [
     "ExtensionException",
     "ImageException",
     "MySQLException",
+    "ScheduleException",
+    "StatsException",
     "SurveyException",
     "TwitterStreamException",
     "UserInputException",
@@ -61,4 +63,14 @@ class WeatherException(Exception):
 
 @dataclass()
 class ImageException(Exception):
+    message: str
+
+
+@dataclass()
+class ScheduleException(Exception):
+    message: str
+
+
+@dataclass()
+class StatsException(Exception):
     message: str
