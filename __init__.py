@@ -3,6 +3,7 @@ import sys
 from time import perf_counter
 
 import discord  # noqa # Beta version thing
+from discord.app_commands import CommandInvokeError
 
 from objects.Client import HuskerClient
 
@@ -62,14 +63,14 @@ tree = client.tree
 
 @tree.error
 async def on_app_command_error(
-    interaction: discord.Interaction, error: discord.app_commands.AppCommandError
-):
+    interaction: discord.Interaction, error: CommandInvokeError
+) -> None:
     embed = buildEmbed(
         title="Command Error Received",
-        description=f"This error originated from '{error.command.qualified_name}'.",
+        description=f"This error originated from '{error.command.qualified_name}' with the following data passed: {interaction.data['options']}",
         fields=[
             dict(
-                name=f"Error Type: {type(error.original.args[0])}",
+                name=f"Error Type: {type(error.original)}",
                 value=str(error.original.args[0]),
             )
         ],
