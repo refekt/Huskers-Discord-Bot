@@ -17,23 +17,23 @@ logger = logging.getLogger(__name__)
 # from helpers.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
 #
 
-# # Image Command
-# sqlCreateImageCommand = """
-# INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
-# """
-#
-# sqlSelectImageCommand = """
-# SELECT author, img_name, img_url FROM img_cmd_db WHERE img_name = %s
-# """
-#
-# sqlSelectAllImageCommand = """
-# SELECT author, img_name, img_url, created_at FROM img_cmd_db
-# """
-#
-# sqlDeleteImageCommand = """
-# DELETE FROM img_cmd_db WHERE img_name = %s AND author = %s
-# """
-#
+# Image Command
+sqlCreateImageCommand = """
+INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
+"""
+
+sqlSelectImageCommand = """
+SELECT author, img_name, img_url FROM img_cmd_db WHERE img_name = %s
+"""
+
+sqlSelectAllImageCommand = """
+SELECT author, img_name, img_url, created_at FROM img_cmd_db
+"""
+
+sqlDeleteImageCommand = """
+DELETE FROM img_cmd_db WHERE img_name = %s AND author = %s
+"""
+
 # # Croot Bot
 # sqlTeamIDs = """
 # SELECT id, school from botfrost.team_ids
@@ -313,7 +313,7 @@ def processMySQL(query: str, **kwargs):
         sqlConnection.close()
 
         if result:
-            logger.info(f"MySQL query finished", 0)
+            logger.info(f"MySQL query finished")
             return result
 
 
