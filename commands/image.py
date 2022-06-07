@@ -17,10 +17,10 @@ from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
 from helpers.mysql import (
     processMySQL,
-    sqlSelectImageCommand,
-    sqlSelectAllImageCommand,
     sqlCreateImageCommand,
     sqlDeleteImageCommand,
+    sqlSelectAllImageCommand,
+    sqlSelectImageCommand,
 )
 from objects.Exceptions import ImageException
 
