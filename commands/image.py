@@ -1,6 +1,8 @@
+import io
 import logging
 import pathlib
 import platform
+import random
 from typing import Optional, Any, Union
 
 import discord.ext.commands
@@ -10,8 +12,9 @@ from PIL import Image, ImageOps
 from discord import app_commands
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD
+from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD, HEADERS
 from helpers.embed import buildEmbed
+from helpers.fryer import fry_image
 from helpers.mysql import (
     processMySQL,
     sqlSelectImageCommand,
@@ -77,9 +80,83 @@ class ImageCog(commands.Cog, name="Image Commands"):
         guild_ids=[GUILD_PROD],
     )
 
-    @commands.command()
-    async def deepfry(self, interaction: discord.Interaction) -> None:
-        ...
+    @app_commands.command(
+        name="deep-fry",
+        description="Deep fry a picture into a unique creation",
+    )
+    @app_commands.describe(
+        source_url="URL of an iamge you want to deepfry",
+        source_avatar="Avatar of member you want to deefry",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def deepfry(
+        self,
+        interaction: discord.Interaction,
+        source_url: str = None,
+        source_avatar: discord.Member = None,
+    ) -> None:
+        logger.info("Attempting to create a deep fried image!")
+        await interaction.response.defer()
+
+        if source_url is not None and source_avatar is not None:
+            raise ImageException("You can only provide one source!")
+
+        if source_url is not None:
+            assert validators.url(source_url) and any(
+                sub_str in source_url for sub_str in image_formats
+            ), ImageException("You must provide a valid URL!")
+
+        def load_image_from_url(url: str):
+            image_response = requests.get(url=url, stream=True, headers=HEADERS)
+            return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
+
+        # TODO Play with these variables to see if we can improve the output
+        emote_amount = random.randrange(1, 6)
+        noise = random.uniform(0.4, 0.65)
+        contrast = random.randrange(1, 99)
+        layers = random.randrange(1, 3)
+
+        image = None
+
+        if source_url:
+            logger.info("Loading image from URL")
+            image = load_image_from_url(source_url)
+        elif source_avatar:
+            logger.info("Loading image from member avatar")
+            image = load_image_from_url(source_avatar.avatar.url)
+        else:
+            ImageException("Unknown source used!")
+
+        assert image, ImageException("Unable to load image")
+
+        try:
+            logger.info("Frying loaded image")
+            fried = fry_image(image, emote_amount, noise, contrast)
+
+            logger.info("Adding emotes, noise, and contrast")
+            for layer in range(layers):
+                emote_amount = random.randrange(1, 6)
+                noise = random.uniform(0.4, 0.65)
+                contrast = random.randrange(1, 99)
+
+                fried = fry_image(fried, emote_amount, noise, contrast)
+
+            logger.info("Saving file")
+            with io.BytesIO() as image_binary:
+                fried.save(image_binary, "PNG")
+                if image_binary.tell() > 8000000:
+                    image_binary = io.BytesIO()
+                    fried.convert("RGB").save(
+                        image_binary, "JPEG", quality=90, optimize=True
+                    )
+                image_binary.seek(0)
+
+                await interaction.followup.send(
+                    file=discord.File(fp=image_binary, filename="deepfry.png")
+                )
+            image_binary.close()
+        except Exception:
+            raise ImageException("Something went wrong. Blame my creators.")
 
     @app_commands.command(
         name="inspire-me",
@@ -145,7 +222,29 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
         file.close()
 
+    @group_img.command(name="show", description="Show a server image")
+    @app_commands.describe(image_name="A keyword for the new image")
+    async def img_show(self, interaction: discord.Interaction, image_name: str) -> None:
+        await interaction.response.defer()
+
+        image = retrieve_img(image_name)
+
+        assert image, ImageException(
+            f"Unable to locate an image command named [{image_name}]."
+        )
+
+        author = interaction.guild.get_member(int(image["author"]))
+        if author is None:
+            author = "Unknown"
+
+        await interaction.followup.send(
+            content=f"{interaction.user.mention} used [{image_name}]: \n{image['img_url']}"
+        )
+
     @group_img.command(name="create", description="Create a server image")
+    @app_commands.describe(
+        image_name="A keyword for the new image", image_url="A valid URL for the iamge"
+    )
     async def img_create(
         self, interaction: discord.Interaction, image_name: str, image_url: str
     ) -> None:
@@ -187,6 +286,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         )
 
     @group_img.command(name="delete", description="Delete a server image")
+    @app_commands.describe(image_name="A keyword for the new image")
     async def img_delete(
         self, interaction: discord.Interaction, image_name: str
     ) -> None:
@@ -207,7 +307,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
             admin_delete = True
         elif not interaction.user.id == img_author:
             raise ImageException(  # TODO Verify img_author works here...
-                f"This command was created by [{interaction.guild.get_member(img_author).mention}] and can only be deleted by them"
+                f"This command was created by [{interaction.guild.get_member(int(img_author)).mention}] and can only be deleted by them"
             )
 
         try:
@@ -235,10 +335,20 @@ class ImageCog(commands.Cog, name="Image Commands"):
         await interaction.followup.send(embed=embed)
 
     @group_img.command(name="random", description="Send a random a server image")
-    async def img_random(
-        self, interaction: discord.Interaction, image_url: str
-    ) -> None:
-        ...
+    async def img_random(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+
+        global all_imgs
+        all_imgs = retrieve_all_img()
+        image = random.choice(all_imgs)
+
+        author = interaction.guild.get_member(int(image["author"]))
+        if author is None:
+            author = "Unknown"
+
+        await interaction.followup.send(content=f"{image['img_url']}")
+
+        del image
 
 
 async def setup(bot: commands.Bot) -> None:

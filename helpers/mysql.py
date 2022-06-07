@@ -2,12 +2,12 @@
 # * Review
 # TODO
 import logging
+from typing import Union, Any
 
 import pymysql
 from pymysql import OperationalError
 
 from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
-from objects.Exceptions import MySQLException
 
 logger = logging.getLogger(__name__)
 
@@ -252,7 +252,7 @@ DELETE FROM iowa WHERE user_id = %s
 # # """
 
 
-def processMySQL(query: str, **kwargs):
+def processMySQL(query: str, **kwargs) -> Union[list, None, Any]:
     logger.info(f"Starting a MySQL query")
     sqlConnection = None
     try:
