@@ -67,16 +67,18 @@ async def on_app_command_error(
 ) -> None:
     embed = buildEmbed(
         title="Command Error Received",
-        description=f"This error originated from '{error.command.qualified_name}' with the following data passed: {interaction.data['options']}",
         fields=[
             dict(
                 name=f"Error Type: {type(error.original)}",
                 value=str(error.original.args[0]),
-            )
+            ),
+            dict(
+                name="Input",
+                value=f"This error originated from '{error.command.qualified_name}' with the following data passed: {interaction.data['options']}",
+            ),
         ],
     )
     await interaction.edit_original_message(content="", embed=embed)
-    logger.exception(error)
 
 
 end = perf_counter()
@@ -86,7 +88,7 @@ __all__ = ["client"]
 
 
 # v2.0 loop
-async def main():
+async def main() -> None:
     async with client:
         await client.start(PROD_TOKEN)
 

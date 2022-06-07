@@ -129,7 +129,7 @@ def buildTweetEmbed(
     )
 
     if urls:
-        for url in urls["urls"]:
+        for url in urls["urls"]:  # TODO KeyError is raising
             if (
                 medias
             ):  # Avoid duplicating media embeds. Also, there's no "title" field when the URL is from a media embed
