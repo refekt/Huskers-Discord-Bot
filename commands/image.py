@@ -28,6 +28,16 @@ image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 __all__ = ["ImageCog"]
 
 
+def retrieve_all_img():
+    try:
+        return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
+    except:  # noqa
+        raise ImageException(f"Unable to retrieve image commands.")
+
+
+all_imgs = retrieve_all_img()
+
+
 def retrieve_img(image_name: str) -> Union[None, Any]:
     try:
         return processMySQL(query=sqlSelectImageCommand, values=image_name, fetch="one")
@@ -165,7 +175,16 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
     @group_img.command(name="list", description="List all the server images")
     async def img_list(self, interaction: discord.Interaction) -> None:
-        ...
+        await interaction.response.defer(ephemeral=True)
+
+        global all_imgs
+        all_imgs = retrieve_all_img()
+        img_list = [img["img_name"] for img in all_imgs]
+        img_list.sort()
+
+        await interaction.followup.send(
+            f"There are {len(img_list)} images listed below:\n{', '.join(img_list)}"
+        )
 
     @group_img.command(name="delete", description="Delete a server image")
     async def img_delete(
