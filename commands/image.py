@@ -5,8 +5,10 @@
 # * Inspireme
 # * Slowking
 # TODO
+from typing import Optional
 
 import discord.ext.commands
+import requests
 from discord import app_commands
 from discord.ext import commands
 
@@ -18,9 +20,24 @@ class ImageCog(commands.Cog, name="Image Commands"):
     async def deepfry(self, interaction: discord.Interaction):
         ...
 
-    @commands.command()
-    async def inspireme(self, interaction: discord.Interaction):
-        ...
+    @app_commands.command(
+        name="inspire-me",
+        description="Get random inspiration",
+    )
+    @app_commands.describe(person="Person you want to inspire")
+    @app_commands.guilds(GUILD_PROD)
+    async def inspireme(
+        self, interaction: discord.Interaction, person: Optional[discord.Member] = None
+    ):
+        image = requests.get("https://inspirobot.me/api?generate=true")
+
+        if person:
+            await interaction.response.send_message(
+                f"{interaction.user.mention} wants to inspire {person.mention}\n"
+                f"{image.text}"
+            )
+        else:
+            await interaction.response.send_message(image.text)
 
     @commands.command()
     async def slowking(self, interaction: discord.Interaction):
