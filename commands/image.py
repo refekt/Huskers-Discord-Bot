@@ -3,6 +3,8 @@ import logging
 import pathlib
 import platform
 import random
+from os import listdir
+from os.path import isfile, join
 from typing import Optional, Any, Union
 
 import discord.ext.commands
@@ -178,7 +180,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
             await interaction.response.send_message(image.text)
 
     @app_commands.command(
-        name="slowking",
+        name="slow-king",
         description="Crown someone as a Slowking",
     )
     @app_commands.describe(person="Person you want to inspire")
@@ -351,6 +353,28 @@ class ImageCog(commands.Cog, name="Image Commands"):
         await interaction.followup.send(content=f"{image['img_url']}")
 
         del image
+
+    @app_commands.command(name="twos", description="Random Tunnel Walk of Shame image")
+    @app_commands.guilds(GUILD_PROD)
+    async def tunnel_walk(self, interaction: discord.Interaction):
+        logger.info("Grabbing a random TWOS image")
+        await interaction.response.defer()
+
+        if "Windows" in platform.platform():
+            twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
+        else:
+            twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/TWOS/"
+
+        twos_files = [
+            file for file in listdir(twos_path) if isfile(join(twos_path, file))
+        ]
+
+        random.shuffle(twos_files)
+
+        with open(f"{twos_path}{random.choice(twos_files)}", "rb") as f:
+            file = discord.File(f)
+
+        await interaction.followup.send(file=file)
 
 
 async def setup(bot: commands.Bot) -> None:
