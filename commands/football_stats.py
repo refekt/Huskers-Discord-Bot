@@ -21,6 +21,7 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from objects.Exceptions import StatsException
 from objects.Schedule import HuskerSchedule
+from objects.Winsipedia import CompareWinsipedia
 
 logger = logging.getLogger(__name__)
 
@@ -324,6 +325,60 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         await interaction.followup.send(embed=embed)
         logger.info(f"Lines completed")
+
+    @app_commands.command(
+        name="compare-teams-stats", description="Compare two team's season stats"
+    )
+    @app_commands.describe(
+        team_for="The main team",
+        team_against="The team you want to compare the main team against",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def compare_team_stats(
+        self, interaction: discord.Interaction, team_for: str, team_against: str
+    ):
+        logger.info(f"Comparing {team_for} against {team_against} stats")
+        await interaction.response.defer()
+
+        team_for = team_for.replace(" ", "-")
+        team_against = team_against.replace(" ", "-")
+
+        logger.info("Creating a comparison object")
+        comparison = CompareWinsipedia(compare=team_for, against=team_against)
+
+        embed = buildEmbed(
+            title=f"Historical records for [{team_for.title()}] vs. [{team_against.title()}]",
+            inline=False,
+            fields=[
+                dict(
+                    name="Links",
+                    value="[All Games ]({comparison.full_games_url}) | "
+                    f"[{team_for.title()}'s Games]({'http://www.winsipedia.com/' + team_for.lower()}) |     "
+                    f"[{team_against.title()}'s Games]({'http://www.winsipedia.com/' + team_against.lower()})",
+                ),
+                dict(
+                    name=f"{team_for.title()}'s Recoard vs. {team_against.title()}",
+                    value=comparison.all_time_record,
+                ),
+                dict(
+                    name=f"{team_for.title()}'s Largest MOV",
+                    value=f"{comparison.compare.largest_mov} ({comparison.compare.largest_mov_date})",
+                ),
+                dict(
+                    name=f"{team_for.title()}'s Longest Win Streak",
+                    value=f"{comparison.compare.longest_win_streak} ({comparison.compare.largest_win_streak_date})",
+                ),
+                dict(
+                    name=f"{team_against.title()}'s Largest MOV",
+                    value=f"{comparison.against.largest_mov} ({comparison.against.largest_mov_date})",
+                ),
+                dict(
+                    name=f"{team_against.title()}'s Longest Win Streak",
+                    value=f"{comparison.against.longest_win_streak} ({comparison.against.largest_win_streak_date})",
+                ),
+            ],
+        )
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
