@@ -46,12 +46,15 @@ def get_current_week(year: int, team: str) -> int:
     api = GamesApi(ApiClient(cfbd_config))
 
     try:
-        games = api.get_games(year=year, team=team)
+        games = api.get_games(
+            year=year, team="nebraska"
+        )  # We only care about Nebraska's schedule
     except ApiException:
         logger.exception("CFBD API unable to get games", exc_info=True)
         raise StatsException("CFBD API unable to get games")
 
     for index, game in enumerate(games):
+        logger.info(f"Checking the Week {game.week} game.")
         if team.lower() == "nebraska":
             if game.week == games[1].week:  # Week 0 game
                 return 0
@@ -63,22 +66,16 @@ def get_current_week(year: int, team: str) -> int:
                     "Unknown error occured when getting week for Nebraska game",
                     exc_info=True,
                 )
-        else:
-            if any(
-                [
-                    game.away_team.lower() == "nebraska",
-                    game.home_team.lower() == "nebraska",
-                ]
-            ) and any(
-                [
-                    game.away_team.lower() == team.lower(),
-                    game.home_team.lower() == team.lower(),
-                ]
-            ):
-                return game.week
-            else:
-                logger.exception(f"Unable to find week for {team}")
-                raise StatsException(f"Unable to find week for {team}")
+        elif (
+            game.away_team.lower() == "nebraska" or game.home_team.lower() == "nebraska"
+        ) and (
+            game.away_team.lower() == team.lower()
+            or game.home_team.lower() == team.lower()
+        ):
+            return game.week
+
+    logger.exception(f"Unable to find week for {team}")
+    raise StatsException(f"Unable to find week for {team}")
 
 
 def get_consensus_line(
@@ -91,29 +88,29 @@ def get_consensus_line(
     if week is None:
         week = get_current_week(year=year, team=team_name)
 
-    # if week == -1:
-    #     week = 0
-
     try:
         api_response = cfb_api.get_lines(team=team_name, year=year, week=week)
     except (ApiException, TypeError):
         return None
 
-    # logger.info(f"API Response: {api_response}")
+    logger.info(f"Results: {api_response}")
 
     try:
-        # Hard code Week 0
-        lines = None
-        if len(api_response) > 1:
-            for resp in api_response:
-                if resp.away_team == "Nebraska":
-                    lines = resp.lines[0]
-                    break
-        else:
-            lines = api_response[0].lines[0]
-
-        if lines is None:
-            return None
+        lines = None  # Hard code Week 0
+        # if len(api_response) > 1:
+        #     for game in api_response:
+        #         if game.away_team == "Nebraska":
+        #             lines = game.lines[0]
+        #             break
+        # else:
+        #     lines = api_response[0].lines[0]
+        #
+        # if lines is None:
+        #     return None
+        for game in api_response:
+            if game.away_score is None and game.home_score is None:
+                lines = game.lines[0]
+                break
 
         logger.info(f"Lines: {lines}")
 
@@ -289,7 +286,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         if week is None:
             week = get_current_week(year=year, team=team_name)
 
-        week += 1  # account for week 0
+        week = 1 if week == 0 else week
         logger.info(f"Current week: {week}")
 
         games, _ = HuskerSchedule(year=year)
@@ -299,11 +296,17 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         icon = None
 
         for game in games:
-            if game.week == week:
-                # if game.opponent.lower() == team_name.lower():
-                lines = get_consensus_line(
-                    team_name=team_name, year=year, week=week - 1 if week > 0 else 1
-                )
+            if (
+                not team_name.lower() == "nebraska"
+                and team_name.lower() == game.opponent.lower()
+            ):  # When a team_name is provided
+                lines = get_consensus_line(team_name=team_name, year=year, week=week)
+                icon = game.icon
+                break
+            elif (
+                game.week == week and game.outcome == ""
+            ):  # When a team_name is omitted
+                lines = get_consensus_line(team_name=team_name, year=year, week=week)
                 icon = game.icon
                 break
 
