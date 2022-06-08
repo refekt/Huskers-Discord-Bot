@@ -528,7 +528,8 @@ class TextCog(commands.Cog, name="Text Commands"):
             def __init__(self, message: str):
                 self.headder: str = "  _______________________\n=(__    ___      __     _)=\n  |                     |\n"
                 self.message_layer: str = "  |                     |\n"
-                self.footer: str = "\n  |                     |\n  |__    ___   __    ___|\n=(_______________________)=\n"
+                self.signature: str = "\n  |   ~*~ Husk          |\n"
+                self.footer: str = "  |                     |\n  |__    ___   __    ___|\n=(_______________________)=\n"
                 self.max_line_len: int = 19
                 self.message: str = message
 
@@ -539,7 +540,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     for i in range(0, len(self.message), self.max_line_len)
                 ]
 
-                return f"{self.headder}{new_line.join([line for line in lines])}{self.footer}"
+                return f"{self.headder}{new_line.join([line for line in lines])}{self.signature}{self.footer}"
 
         logger.info("Creating a Husk markov chain")
         await interaction.response.defer()
