@@ -23,7 +23,7 @@ eye_cascade = cv2.CascadeClassifier(
 deepfry_path = "resources/deepfry/"
 
 
-# Pass an image to fry, pretty self explanatory
+# Pass an image to fry, pretty self-explanatory
 def fry_image(image, emote_amount, noise, contrast):
     gray = numpy.array(image.convert("L"))
 
@@ -106,8 +106,8 @@ def add_chars(image, coords):
     return image
 
 
-def add_emotes(image, max):
-    for i in range(max):
+def add_emotes(image, max_emotes):
+    for i in range(max_emotes):
         emote = Image.open(random_file(f"{deepfry_path}/emotes/")).convert("RGBA")
 
         coord = numpy.random.random(2) * numpy.array([image.width, image.height])

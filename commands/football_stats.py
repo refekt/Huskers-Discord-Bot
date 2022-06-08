@@ -268,7 +268,6 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ],
             )
 
-        # await interaction.followup.send(embed=embed)
         await interaction.response.send_message(embed=embed)
         logger.info(f"Countdown done")
 
@@ -280,7 +279,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         team_name: str = "Nebraska",
         week: int = None,
         year: int = datetime.now().year,
-    ):
+    ) -> None:
         logger.info(f"Gathering info for lines")
 
         await interaction.response.defer()
@@ -337,7 +336,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.guilds(GUILD_PROD)
     async def compare_team_stats(
         self, interaction: discord.Interaction, team_for: str, team_against: str
-    ):
+    ) -> None:
         logger.info(f"Comparing {team_for} against {team_against} stats")
         await interaction.response.defer()
 
@@ -388,7 +387,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.guilds(GUILD_PROD)
     async def taem_schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
-    ):
+    ) -> None:
         await interaction.response.defer()
 
         pages = collectScheduleEmbeds(year)
@@ -397,6 +396,10 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
 
         await interaction.followup.send(embed=view.initial, view=view)
+
+    # TODO team-stats
+
+    # TODO season-stats
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -9,7 +9,6 @@ from objects.Client import HuskerClient
 
 logging.basicConfig(
     format="[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
-    # datefmt="%Y-%b-%d %H:%M:%S",
     datefmt="%X %x",
     level=logging.INFO,
     encoding="utf-8",
@@ -36,6 +35,7 @@ logger.info("Helpers laoded. Loading objects")
 from objects.Bets import *  # noqa
 from objects.Exceptions import *  # noqa
 from objects.Karma import *  # noqa
+from objects.Paginator import *  # noqa
 from objects.Prediction import *  # noqa
 from objects.Recruits import *  # noqa
 from objects.Schedule import *  # noqa

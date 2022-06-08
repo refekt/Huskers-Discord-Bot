@@ -420,7 +420,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 ),
                 None,
             )
-        except StopIteration as e:
+        except StopIteration:
             raise WeatherException("Unable to find state. Please try again!")
 
         def shift_utc_tz(dt, shift):

@@ -3,19 +3,18 @@
 # TODO
 import logging
 import platform
-from enum import Enum
 from typing import Union
 
 import discord
 import pytz
 from discord import (
-    VoiceChannel,
+    CategoryChannel,
+    ForumChannel,
+    PartialMessageable,
     StageChannel,
     TextChannel,
-    ForumChannel,
-    CategoryChannel,
     Thread,
-    PartialMessageable,
+    VoiceChannel,
 )
 from dotenv import load_dotenv
 

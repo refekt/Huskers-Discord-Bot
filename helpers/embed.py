@@ -11,10 +11,10 @@ from helpers.constants import (
     BOT_GITHUB_URL,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
-    DT_TWEET_FORMAT,
-    TZ,
     DT_OBJ_FORMAT,
     DT_OBJ_FORMAT_TBA,
+    DT_TWEET_FORMAT,
+    TZ,
 )
 from helpers.misc import discordURLFormatter
 from objects.Exceptions import CommandException
@@ -24,12 +24,12 @@ logger = logging.getLogger(__name__)
 __all__ = ["buildEmbed", "buildTweetEmbed", "collectScheduleEmbeds"]
 
 # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
-title_limit = name_limit = field_name_limit = 256
 desc_limit = 4096
-footer_limit = 2048
-fields_limt = 25
-field_value_limit = 1024
 embed_max = 6000
+field_value_limit = 1024
+fields_limt = 25
+footer_limit = 2048
+title_limit = name_limit = field_name_limit = 256
 
 
 def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:

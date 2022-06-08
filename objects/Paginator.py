@@ -9,6 +9,9 @@ from helpers.constants import GLOBAL_TIMEOUT
 logger = logging.getLogger(__name__)
 
 
+__all__ = ["EmbedPaginatorView"]
+
+
 class EmbedPaginatorView(discord.ui.View):
     def __init__(
         self,
