@@ -18,7 +18,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #         avatar_thumbnail.thumbnail(resize, Image.ANTIALIAS)
 #         # avatar_thumbnail.save("resources/images/avatar_thumbnail.png", "PNG")
 #     except IOError:
-#         logger.exception("Unable to create a Slow King avatar for user!")
+#         logger.exception("Unable to create a Slow King avatar for user!", exc_info=True)
 #
 #     paste_pos = (250, 250)
 #     make_slowking_filename = "make_slowking.png"

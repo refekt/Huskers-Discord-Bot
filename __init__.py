@@ -65,6 +65,7 @@ tree = client.tree
 async def on_app_command_error(
     interaction: discord.Interaction, error: CommandInvokeError
 ) -> None:
+    logger.exception(str(error.original.args[0]), exc_info=True)
     embed = buildEmbed(
         title="Command Error Received",
         fields=[
@@ -74,7 +75,7 @@ async def on_app_command_error(
             ),
             dict(
                 name="Input",
-                value=f"This error originated from '{error.command.qualified_name}' with the following data passed: {interaction.data['options']}",
+                value=f"This error originated from '{error.command.qualified_name}'{' with the following data passed: ' + interaction.data['options'] if interaction.data.get('options', False) else ''}",
             ),
         ],
     )

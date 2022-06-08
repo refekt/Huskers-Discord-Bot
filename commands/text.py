@@ -186,7 +186,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                         source_conent += check_message(message)
                     logger.info("Discord text channel source compiled")
                 else:
-                    logger.exception("Unexpected source type!")
+                    logger.exception("Unexpected source type!", exc_info=True)
                     continue
 
         if not source_conent == "":
@@ -215,7 +215,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         if markov_output is None:
-            logger.exception("Markovify failed to create an output!")
+            logger.exception("Markovify failed to create an output!", exc_info=True)
             raise
         else:
             await interaction.edit_original_message(content=markov_output)

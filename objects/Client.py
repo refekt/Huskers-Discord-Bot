@@ -170,7 +170,7 @@ class HuskerClient(Bot):
                     f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
                 )
             else:
-                logger.exception("Unknown platform. Exiting")
+                logger.exception("Unknown platform. Exiting", exc_info=True)
 
             changelog = open(changelog_path, "r")
             lines = changelog.readlines()
@@ -181,7 +181,7 @@ class HuskerClient(Bot):
 
             return lines_str
         except OSError:
-            logger.exception("Error loading the changelog!")
+            logger.exception("Error loading the changelog!", exc_info=True)
 
     # noinspection PyMethodMayBeStatic
     async def send_welcome_message(
@@ -274,7 +274,7 @@ class HuskerClient(Bot):
         try:
             await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
         except Exception as e:  # noqa
-            logger.exception("Error syncing the tree!\n\n{e}")
+            logger.exception("Error syncing the tree!\n\n{e}", exc_info=True)
 
         logger.info("The bot tree has synced!")
 

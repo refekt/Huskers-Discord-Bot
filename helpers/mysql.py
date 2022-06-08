@@ -286,7 +286,9 @@ def processMySQL(query: str, **kwargs) -> Union[list, None, Any]:
                         result = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
-                            logger.exception("Fetching many requires a `size` kwargs.")
+                            logger.exception(
+                                "Fetching many requires a `size` kwargs.", exc_info=True
+                            )
                         cursor.execute(query=query)
                         result = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
@@ -298,7 +300,9 @@ def processMySQL(query: str, **kwargs) -> Union[list, None, Any]:
                         result = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
-                            logger.exception("Fetching many requires a `size` kwargs.")
+                            logger.exception(
+                                "Fetching many requires a `size` kwargs.", exc_info=True
+                            )
                         cursor.execute(query=query, args=kwargs["values"])
                         result = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
@@ -307,7 +311,7 @@ def processMySQL(query: str, **kwargs) -> Union[list, None, Any]:
 
         sqlConnection.commit()
     except Exception as e:  # noqa
-        logger.exception("Error occurred opening the MySQL database.")
+        logger.exception("Error occurred opening the MySQL database.", exc_info=True)
     finally:
         logger.info(f"Closing connection to the MySQL Database")
         sqlConnection.close()

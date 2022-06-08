@@ -1,6 +1,8 @@
 Pillow==9.1.1
 beautifulsoup4==4.11.1
+cfbd>=4.3.2
 cryptography==37.0.2
+discord>=2.0.0
 markovify==0.9.4
 numpy==1.22.4
 opencv-python==4.5.5.64
@@ -9,7 +11,6 @@ pymysql==1.0.2
 python-dateutil==2.8.2
 python-dotenv==0.20.0
 pytz==2022.1
+requests>=2.27.1
 tweepy==4.10.0
 validators==0.19.0
-requests>=2.27.1
-cfbd>=4.3.2

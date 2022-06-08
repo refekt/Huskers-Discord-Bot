@@ -11,12 +11,12 @@ from discord.ext import commands
 
 from helpers.constants import (
     CFBD_KEY,
-    GUILD_PROD,
-    TZ,
+    DT_OBJ_FORMAT,
+    DT_OBJ_FORMAT_TBA,
     DT_TBA_HR,
     DT_TBA_MIN,
-    DT_OBJ_FORMAT_TBA,
-    DT_OBJ_FORMAT,
+    GUILD_PROD,
+    TZ,
 )
 from helpers.embed import buildEmbed
 from objects.Exceptions import StatsException
@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 cfbd_config = Configuration()
 cfbd_config.api_key["Authorization"] = CFBD_KEY
 cfbd_config.api_key_prefix["Authorization"] = "Bearer"
+
+__all__ = ["FootballStatsCog"]
 
 
 def convert_seconds(n) -> Union[int, Any]:
@@ -46,17 +48,37 @@ def get_current_week(year: int, team: str) -> int:
     try:
         games = api.get_games(year=year, team=team)
     except ApiException:
-        return -1
+        logger.exception("CFBD API unable to get games", exc_info=True)
+        raise StatsException("CFBD API unable to get games")
 
     for index, game in enumerate(games):
-        if team == "Nebraska":
-            if game.away_points is None and game.home_points is None:
+        if team.lower() == "nebraska":
+            if game.week == games[1].week:  # Week 0 game
+                return 0
+
+            if not (game.away_points and game.home_points):
                 return game.week
+            else:
+                logger.exception(
+                    "Unknown error occured when getting week for Nebraska game",
+                    exc_info=True,
+                )
         else:
             if any(
-                [game.away_team == "Nebraska", game.home_team == "Nebraska"]
-            ) and any([game.away_team == team, game.home_team == team]):
+                [
+                    game.away_team.lower() == "nebraska",
+                    game.home_team.lower() == "nebraska",
+                ]
+            ) and any(
+                [
+                    game.away_team.lower() == team.lower(),
+                    game.home_team.lower() == team.lower(),
+                ]
+            ):
                 return game.week
+            else:
+                logger.exception(f"Unable to find week for {team}")
+                raise StatsException(f"Unable to find week for {team}")
 
 
 def get_consensus_line(
@@ -69,12 +91,15 @@ def get_consensus_line(
     if week is None:
         week = get_current_week(year=year, team=team_name)
 
+    # if week == -1:
+    #     week = 0
+
     try:
         api_response = cfb_api.get_lines(team=team_name, year=year, week=week)
     except (ApiException, TypeError):
         return None
 
-    logger.info(f"API Response: {api_response}")
+    # logger.info(f"API Response: {api_response}")
 
     try:
         # Hard code Week 0
@@ -116,13 +141,15 @@ def get_consensus_line(
         )
 
     except IndexError:
-        consensus_line = None
+        return None
 
     return consensus_line
 
 
 class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
-    @app_commands.command(name="countdown")
+    @app_commands.command(
+        name="countdown", description="Get the time until the next game!"
+    )
     @app_commands.describe(
         opponent="Name of opponent to lookup", year="Year of the game to look up"
     )
@@ -132,17 +159,18 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         interaction: discord.Interaction,
         opponent: str = None,
         year: int = datetime.now().year,
-    ):
+    ) -> None:
         logger.info(f"Starting countdown")
-        await interaction.response.defer()
+        # await interaction.response.defer()
 
         now_cst = datetime.now().astimezone(tz=TZ)
         logger.info(f"Now CST is... {now_cst}")
 
         games, stats = HuskerSchedule(year=year)
 
-        if not games:
-            raise StatsException("No games found!")
+        assert games, StatsException("No games found!")
+        # if not games:
+        #     raise StatsException("No games found!")
 
         last_game = len(games) - 1
         now_cst_orig = None
@@ -241,8 +269,58 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ],
             )
 
-        await interaction.followup.send(embed=embed)
+        # await interaction.followup.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
         logger.info(f"Countdown done")
+
+    @app_commands.command(name="lines", description="Get the betting lines for a game")
+    @app_commands.guilds(GUILD_PROD)
+    async def lines(
+        self,
+        interaction: discord.Interaction,
+        team_name: str = "Nebraska",
+        week: int = None,
+        year: int = datetime.now().year,
+    ):
+        logger.info(f"Gathering info for lines")
+
+        await interaction.response.defer()
+
+        if week is None:
+            week = get_current_week(year=year, team=team_name)
+
+        week += 1  # account for week 0
+        logger.info(f"Current week: {week}")
+
+        games, _ = HuskerSchedule(year=year)
+        del _
+
+        lines = None
+        icon = None
+
+        for game in games:
+            if game.week == week:
+                # if game.opponent.lower() == team_name.lower():
+                lines = get_consensus_line(
+                    team_name=team_name, year=year, week=week - 1 if week > 0 else 1
+                )
+                icon = game.icon
+                break
+
+        lines = "TBD" if lines is None else lines
+
+        embed = buildEmbed(
+            title=f"Betting lines for [{team_name.title()}]",
+            fields=[
+                dict(name="Year", value=f"{year}"),
+                dict(name="Week", value=f"{week - 1}"),
+                dict(name="Lines", value=lines),
+            ],
+            thumbnail=icon,
+        )
+
+        await interaction.followup.send(embed=embed)
+        logger.info(f"Lines completed")
 
 
 async def setup(bot: commands.Bot) -> None:

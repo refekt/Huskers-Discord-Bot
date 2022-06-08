@@ -35,6 +35,6 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #         elif react and not msg:
 #             value = self.weight_react
 #         else:
-#             logger.exception("Unable to update karma.")
+#             logger.exception("Unable to update karma.", exc_info=True)
 #
 #         Process_MySQL(query=sqlUpdateKarma, values=value)
