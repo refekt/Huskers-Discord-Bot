@@ -96,7 +96,7 @@ class Survey:
             )
 
             await interaction.response.send_message(
-                "Processing response!", ephemeral=True
+                "Processing original_message!", ephemeral=True
             )
 
             embed: discord.Embed = interaction.message.embeds[0]

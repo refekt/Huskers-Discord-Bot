@@ -18,8 +18,9 @@ from helpers.constants import (
     GUILD_PROD,
     TZ,
 )
-from helpers.embed import buildEmbed
+from helpers.embed import buildEmbed, collectScheduleEmbeds
 from objects.Exceptions import StatsException
+from objects.Paginator import EmbedPaginatorView
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia
 
@@ -159,7 +160,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         year: int = datetime.now().year,
     ) -> None:
         logger.info(f"Starting countdown")
-        # await interaction.response.defer()
+        # await interaction.original_message.defer()
 
         now_cst = datetime.now().astimezone(tz=TZ)
         logger.info(f"Now CST is... {now_cst}")
@@ -379,6 +380,23 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             ],
         )
         await interaction.followup.send(embed=embed)
+
+    @app_commands.command(
+        name="team-schedule", description="Retrieve the team's schedule"
+    )
+    @app_commands.describe(year="The year of the schedule")
+    @app_commands.guilds(GUILD_PROD)
+    async def taem_schedule(
+        self, interaction: discord.Interaction, year: int = datetime.now().year
+    ):
+        await interaction.response.defer()
+
+        pages = collectScheduleEmbeds(year)
+        view = EmbedPaginatorView(
+            embeds=pages, original_message=await interaction.original_message()
+        )
+
+        await interaction.followup.send(embed=view.initial, view=view)
 
 
 async def setup(bot: commands.Bot) -> None:

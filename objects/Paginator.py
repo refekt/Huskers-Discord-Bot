@@ -13,13 +13,13 @@ class EmbedPaginatorView(discord.ui.View):
     def __init__(
         self,
         embeds: List[discord.Embed],
-        response: discord.InteractionMessage,
+        original_message: discord.InteractionMessage,
         timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
         """
 
         :param embeds:
-        :param response:
+        :param original_message:
         :param timeout:
         """
         super().__init__(timeout=timeout)
@@ -28,7 +28,7 @@ class EmbedPaginatorView(discord.ui.View):
         self._initial: discord.Embed = embeds[0]
         self._len: int = len(embeds)
         self.current_index: int = 1
-        self.response: discord.InteractionMessage = response
+        self.response: discord.InteractionMessage = original_message
 
         try:  # TODO Make this show up in the middle.
             self.add_item(

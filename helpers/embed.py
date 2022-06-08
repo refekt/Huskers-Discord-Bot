@@ -13,12 +13,15 @@ from helpers.constants import (
     BOT_THUMBNAIL_URL,
     DT_TWEET_FORMAT,
     TZ,
+    DT_OBJ_FORMAT,
+    DT_OBJ_FORMAT_TBA,
 )
 from helpers.misc import discordURLFormatter
 from objects.Exceptions import CommandException
+from objects.Schedule import HuskerSchedule
 
 logger = logging.getLogger(__name__)
-__all__ = ["buildEmbed", "buildTweetEmbed"]
+__all__ = ["buildEmbed", "buildTweetEmbed", "collectScheduleEmbeds"]
 
 # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
 title_limit = name_limit = field_name_limit = 256
@@ -177,6 +180,39 @@ def buildTweetEmbed(
     )
     embed.set_thumbnail(url=profile_image_url)
     return embed
+
+
+def collectScheduleEmbeds(year):
+    scheduled_games, season_stats = HuskerSchedule(year=year)
+
+    new_line_char = "\n"
+    embeds = []
+
+    for game in scheduled_games:
+        embeds.append(
+            buildEmbed(
+                title=f"{game.opponent.title()}",
+                description=f"Nebraska's {year}'s Record: {season_stats.wins} - {season_stats.losses}",
+                thumbnail=game.icon,
+                fields=[
+                    dict(
+                        name="Opponent",
+                        value=f"{game.ranking + ' ' if game.ranking else ''}{game.opponent}",
+                    ),
+                    dict(
+                        name="Conference Game", value="Yes" if game.conference else "No"
+                    ),
+                    dict(
+                        name="Date/Time",
+                        value=f"{game.game_date_time.strftime(DT_OBJ_FORMAT) if not game.game_date_time.hour == 21 else game.game_date_time.strftime(DT_OBJ_FORMAT_TBA)}{new_line_char}",
+                    ),
+                    dict(name="Location", value=game.location),
+                    dict(name="Outcome", value=game.outcome if game.outcome else "TBD"),
+                ],
+            )
+        )
+
+    return embeds
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
