@@ -220,6 +220,7 @@ BOT_FOOTER_BOT = "Created by Bot Frost"
 logger.info("Bot info variables loaded")
 
 # DateTime format
+DT_FAP_RECRUIT = "%Y-%m-%d %H:%M:%S"
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
 DT_OBJ_FORMAT_TBA = "%d %b %Y"
 DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
@@ -229,11 +230,13 @@ DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 DT_TBA_HR = 10
 DT_TBA_MIN = 58
 DT_TBA_TIME = "10:58 PM"
-DT_TWEET_FORMAT_OLD = "%Y-%m-%d %H:%M:%S"
 DT_TWEET_FORMAT = "%H:%M:%S %d %b %Y"
+DT_TWEET_FORMAT_OLD = "%Y-%m-%d %H:%M:%S"
 logger.info("Datetime formatting variables loaded")
 
 GLOBAL_TIMEOUT = 3600
+
+CROOT_SEARCH_LIMIT = 5
 
 
 # States
@@ -291,6 +294,92 @@ US_STATES = [
     {"State": "Wyoming", "Abbrev": "Wyo.", "Code": "WY"},
     {"State": "Puerto Rico", "Abbrev": "PR", "Code": "PR"},
 ]
+
+RECRUIT_STATES = {
+    "Alabama": "AL",
+    "Alaska": "AK",
+    "American Samoa": "AS",
+    "Arizona": "AZ",
+    "Arkansas": "AR",
+    "British Columbia": "BC",
+    "California": "CA",
+    "Colorado": "CO",
+    "Connecticut": "CT",
+    "Delaware": "DE",
+    "District Of Columbia": "DC",
+    "Florida": "FL",
+    "Georgia": "GA",
+    "Hawaii": "HI",
+    "Idaho": "ID",
+    "Illinois": "IL",
+    "Indiana": "IN",
+    "Iowa": "IA",
+    "Kansas": "KS",
+    "Kentucky": "KY",
+    "Louisiana": "LA",
+    "Maine": "ME",
+    "Maryland": "MD",
+    "Massachusetts": "MA",
+    "Michigan": "MI",
+    "Minnesota": "MN",
+    "Mississippi": "MS",
+    "Missouri": "MO",
+    "Montana": "MT",
+    "Nebraska": "NE",
+    "Nevada": "NV",
+    "New Hampshire": "NH",
+    "New Jersey": "NJ",
+    "New Mexico": "NM",
+    "New York": "NY",
+    "North Carolina": "NC",
+    "North Dakota": "ND",
+    "Ohio": "OH",
+    "Oklahoma": "OK",
+    "Oregon": "OR",
+    "Pennsylvania": "PA",
+    "Rhode Island": "RI",
+    "South Carolina": "SC",
+    "South Dakota": "SD",
+    "Tennessee": "TN",
+    "Texas": "TX",
+    "Utah": "UT",
+    "Vermont": "VT",
+    "Virginia": "VA",
+    "Washington": "WA",
+    "West Virginia": "WV",
+    "Wisconsin": "WI",
+    "Wyoming": "WY",
+}
+
+RECRUIT_POSITIONS = {
+    "APB": "All-Purpose Back",
+    "ATH": "Athlete",
+    "CB": "Cornerback",
+    "DL": "Defensive Lineman",
+    "DT": "Defensive Tackle",
+    "DUAL": "Dual-Threat Quarterback",
+    "Edge": "Edge",
+    "FB": "Fullback",
+    "ILB": "Inside Linebacker",
+    "IOL": "Interior Offensive Lineman",
+    "K": "Kicker",
+    "LB": "Linebacker",
+    "LS": "Long Snapper",
+    "OC": "Center",
+    "OG": "Offensive Guard",
+    "OLB": "Outside Linebacker",
+    "OT": "Offensive Tackle",
+    "P": "Punter",
+    "PRO": "Pro-Style Quarterback",
+    "QB": "Quarterback",
+    "RB": "Running Back",
+    "RET": "Returner",
+    "S": "Safety",
+    "SDE": "Strong-Side Defensive End",
+    "TE": "Tight End",
+    "WDE": "Weak-Side Defensive End",
+    "WR": "Wide Receiver",
+}
 
 DISCORD_CHANNEL_TYPES = Union[
     CategoryChannel,

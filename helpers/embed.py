@@ -5,6 +5,7 @@ from typing import Union
 import discord
 import validators
 
+# from commands.recruiting import get_faps, get_croot_predictions
 from helpers.constants import (
     BOT_DISPLAY_NAME,
     BOT_FOOTER_BOT,
@@ -15,13 +16,20 @@ from helpers.constants import (
     DT_OBJ_FORMAT_TBA,
     DT_TWEET_FORMAT,
     TZ,
+    DT_STR_RECRUIT,
 )
 from helpers.misc import discordURLFormatter
+from helpers.mysql import processMySQL, sqlGetCrootPredictions
 from objects.Exceptions import CommandException
 from objects.Schedule import HuskerSchedule
 
 logger = logging.getLogger(__name__)
-__all__ = ["buildEmbed", "buildTweetEmbed", "collectScheduleEmbeds"]
+__all__ = [
+    "buildEmbed",
+    "buildRecruitEmbed",
+    "buildTweetEmbed",
+    "collectScheduleEmbeds",
+]
 
 # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
 desc_limit = 4096
@@ -116,7 +124,7 @@ def buildTweetEmbed(
     medias: list = None,
     quotes: list = None,
     urls: dict = None,
-):
+) -> discord.Embed:
     embed = buildEmbed(
         title="",
         fields=[
@@ -182,7 +190,7 @@ def buildTweetEmbed(
     return embed
 
 
-def collectScheduleEmbeds(year):
+def collectScheduleEmbeds(year) -> list[discord.Embed]:
     scheduled_games, season_stats = HuskerSchedule(year=year)
 
     new_line_char = "\n"
@@ -213,6 +221,136 @@ def collectScheduleEmbeds(year):
         )
 
     return embeds
+
+
+def buildRecruitEmbed(recruit) -> discord.Embed:
+    def get_all_predictions() -> str:
+        get_croot_preds_response = processMySQL(
+            query=sqlGetCrootPredictions,
+            values=recruit.twofourseven_profile,
+            fetch="all",
+        )
+
+        if get_croot_preds_response is None:
+            return "There are no predictions for this recruit."
+        else:
+            prediction_str = f"Team: Percent (Avg Confidence)"
+            for predictions in get_croot_preds_response:
+                prediction_str += f"\n{predictions['team']}: {predictions['percent']:.0f}% ({predictions['confidence']:.1f})"
+            prediction_str += (
+                f"\nTotal Predictions: {get_croot_preds_response[0]['total']}"
+            )
+            return prediction_str
+
+    def prettify_predictions():
+        pretty = ""
+        for item in recruit.cb_predictions:
+            pretty += f"{item}\n"
+        return pretty
+
+    def prettify_experts():
+        pretty = ""
+        for item in recruit.cb_experts:
+            pretty += f"{item}\n"
+        return pretty
+
+    def prettify_offers():
+        pretty = ""
+        for index, item in enumerate(recruit.recruit_interests):
+            if index > 9:
+                return pretty + discordURLFormatter(
+                    "View remaining offers...", recruit.recruit_interests_url
+                )
+
+            pretty += f"{item.school}{' - ' + item.status if not item.status == 'None' else ''}\n"
+
+        return pretty
+
+    nl = "\n"
+    embed = buildEmbed(
+        title=f"{str(recruit.rating_stars) + '⭐ ' if recruit.rating_stars else ''}{recruit.year} {recruit.position}, {recruit.name}",
+        description=f"{recruit.committed if recruit.committed is not None else ''}"
+        f"{': ' + recruit.committed_school if recruit.committed_school is not None else ''} "
+        f"{': ' + str(datetime.strptime(recruit.commitment_date, DT_STR_RECRUIT)) if recruit.commitment_date is not None else ''}",
+        fields=[
+            dict(
+                name="**Biography**",
+                value=f"{recruit.city}, {recruit.state}\n"
+                f"School: {recruit.school}\n"
+                f"School Type: {recruit.school_type}\n"
+                f"Height: {recruit.height}\n"
+                f"Weight: {recruit.weight}\n",
+            ),
+            dict(
+                name="**Social Media**",
+                value=f"{'[@' + recruit.twitter + '](' + 'https://twitter.com/' + recruit.twitter + ')' if not recruit.twitter == 'N/A' else 'N/A'}",
+            ),
+            dict(
+                name="**Highlights**",
+                value=f"{'[247Sports](' + recruit.twofourseven_highlights + ')' if recruit.twofourseven_highlights else '247Sports N/A'}",
+            ),
+            dict(
+                name="**Recruit Info**",
+                value=f"[247Sports Profile]({recruit.twofourseven_profile})\n"
+                f"Comp. Rating: {recruit.rating_numerical if recruit.rating_numerical else 'N/A'} \n"
+                f"Nat. Ranking: [{recruit.ranking_national:,}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup"
+                f"={recruit.school_type.replace(' ', '')})\n"
+                f"State Ranking: [{recruit.ranking_state}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup={recruit.school_type.replace(' ', '')}&State"
+                f"={recruit.state_abbr})\n"
+                f"Pos. Ranking: [{recruit.ranking_position}](https://247sports.com/Season/{recruit.year}-Football/CompositeRecruitRankings/?InstitutionGroup="
+                f"{recruit.school_type.replace(' ', '')}&Position={recruit.position})\n"
+                f"{'All Time Ranking: [' + recruit.ranking_all_time + '](https://247sports.com/Sport/Football/AllTimeRecruitRankings/)' + nl if recruit.ranking_all_time else ''}"
+                f"{'Early Enrollee' + nl if recruit.early_enrollee else ''}"
+                f"{'Early Signee' + nl if recruit.early_signee else ''}"
+                f"{'Walk-On' + nl if recruit.walk_on else ''}",
+            ),
+            dict(
+                name="**Expert Averages**",
+                value=f"{prettify_predictions() if recruit.cb_predictions else 'N/A'}",
+            ),
+            dict(
+                name="**Lead Expert Picks**",
+                value=f"{prettify_experts() if recruit.cb_experts else 'N/A'}",
+            ),
+            dict(
+                name="**Offers**",
+                value=f"{prettify_offers() if recruit.recruit_interests else 'N/A'}",
+            ),
+            dict(name="**FAP Predictions**", value=get_all_predictions()),
+        ],
+    )
+
+    # TODO Work on the 'get_croot_predictions' and figure out where it went
+    # if (recruit.committed.lower() if recruit.committed is not None else None) not in [
+    #     "signed",
+    #     "enrolled",
+    # ]:
+    #     if (get_croot_predictions(recruit)) is not None:
+    #         embed.set_footer(
+    #             text=BOT_FOOTER_BOT
+    #             + "\nClick the 🔮 to predict what school you think this recruit will commit to."
+    #             "\nClick the 📜 to get the individual predictions for this recruit."
+    #         )
+    #     else:
+    #         embed.set_footer(
+    #             text=BOT_FOOTER_BOT
+    #             + "\nClick the 🔮 to predict what school you think this recruit will commit to."
+    #         )
+    # else:
+    #     if (get_croot_predictions(recruit)) is not None:
+    #         embed.set_footer(
+    #             text=BOT_FOOTER_BOT
+    #             + "\nClick the 📜 to get the individual predictions for this recruit."
+    #         )
+    #     else:
+    #         embed.set_footer(text=BOT_FOOTER_BOT)
+    embed.set_footer(text=BOT_FOOTER_BOT)
+
+    if recruit.thumbnail and not recruit.thumbnail == "/.":
+        embed.set_thumbnail(url=recruit.thumbnail)
+    else:
+        embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
+    return embed
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

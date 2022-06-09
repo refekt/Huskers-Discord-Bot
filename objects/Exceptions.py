@@ -10,6 +10,7 @@ __all__ = [
     "ExtensionException",
     "ImageException",
     "MySQLException",
+    "RecruitException",
     "ScheduleException",
     "StatsException",
     "SurveyException",
@@ -73,4 +74,8 @@ class ScheduleException(Exception):
 
 @dataclass()
 class StatsException(Exception):
+    message: str
+
+
+class RecruitException(Exception):
     message: str
