@@ -58,16 +58,34 @@ class RecruitListView(discord.ui.View):
     The View for each search button 1-5
     """
 
-    def __init__(self) -> None:
+    def __init__(self, recruit_search: list[Recruit]) -> None:
         super().__init__()
-        for index in range(0, 4):
+        self.croot_search: list[Recruit] = recruit_search
+
+        for index, reaction in enumerate(search_reactions):
             self.add_item(
                 discord.ui.Button(
-                    label=str(index),
-                    custom_id=search_reactions[index],
-                    style=discord.ButtonStyle.blurple,
+                    label=reaction,
+                    custom_id=f"search_reaction_{index}",
+                    style=discord.ButtonStyle.gray,
                 )
             )
+        pass
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        await interaction.response.defer()
+
+        reaction_pressed = int(interaction.data["custom_id"][-1])
+
+        logger.info(f"Croot-bot search button #{reaction_pressed + 1} pressed")
+
+        embed = buildRecruitEmbed(croot_search[reaction_pressed])
+        view = createPredictionView(croot_search[reaction_pressed])
+
+        logger.info("Sending a new recruit embed")
+        await interaction.edit_original_message(embed=embed, view=view)
+
+        return True
 
 
 class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
@@ -75,23 +93,17 @@ class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
     The Modal for receiving text input to search a school
     """
 
-    def __init__(self, recruit):
+    def __init__(self, recruit: Recruit) -> None:
         super().__init__()
-        self.recruit = recruit
+        self.recruit: Recruit = recruit
 
     prediction_school = discord.ui.TextInput(label="School Prediction")
     prediction_confidence = discord.ui.TextInput(
         label="Confidence in prediction from 1 (low) to 10 (high)"[:44]
     )
-    # prediction_confidence = discord.ui.Select(
-    #     options=[
-    #         discord.SelectOption(label="Low", value="1"),
-    #         discord.SelectOption(label="Medium", value="5"),
-    #         discord.SelectOption(label="High", value="10"),
-    #     ]
-    # )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        logger.info("Prediction modal initiated")
         await interaction.response.defer(ephemeral=True)
 
         global user_prediction
@@ -99,6 +111,7 @@ class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
         user_prediction.confidence = self.prediction_confidence
         self.stop()
 
+        logger.info("Confirming if recruit is already committed to a school")
         formatted_team_list = [team.lower() for team in get_teams()]
         if user_prediction.school.value.lower() in formatted_team_list:
             teamm_index = formatted_team_list.index(
@@ -130,18 +143,11 @@ class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
             ),
         )
 
-        if user_prediction.confidence.value == "1":
-            conf_level = "low"
-        elif user_prediction.confidence.value == "5":
-            conf_level = "medium"
-        elif user_prediction.confidence.value == "10":
-            conf_level = "high"
-        else:
-            conf_level = "unknown"
         await interaction.followup.send(
-            f"Your prediction of [{self.recruit.name}] to [{str(user_prediction.school.value).capitalize()}] has been logged!",
+            f"Your prediction of [{self.recruit.name}] to [{str(user_prediction.school.value).capitalize()}] with a [{user_prediction.confidence}] level has been logged!",
             ephemeral=True,
         )
+        logger.info("Prediction was recorded!")
 
 
 class PredictionView(discord.ui.View):
@@ -149,7 +155,7 @@ class PredictionView(discord.ui.View):
     The View to manage submitting and retrieving predictions
     """
 
-    def __init__(self, recruit) -> None:
+    def __init__(self, recruit: Recruit) -> None:
         super().__init__()
         self.recruit = recruit
 
@@ -158,7 +164,6 @@ class PredictionView(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.Button
     ) -> None:
         logger.info("Starting a crystal ball prediction")
-        # await interaction.response.defer(ephemeral=True)
 
         if (
             self.recruit.committed.lower()
@@ -177,20 +182,6 @@ class PredictionView(discord.ui.View):
                 f"You cannot make predictions on recruits from before the [{NO_MORE_PREDS}] class. [{self.recruit.name}] was in the [{self.recruit.year}] recruiting class.",
             )
 
-        # await interaction.followup.send(
-        #     "Initiating FAP! Your inputs will be deleted, but may appear to remain on the screen. They will disappear on reloading of Discord (Ctrl + R).",
-        #     ephemeral=True,
-        # )
-
-        # previous_prediction = get_individual_predictions(
-        #     interaction.user.id, self.recruit
-        # )
-        # first_msg = ""
-        # if previous_prediction is not None:
-        #     first_msg = f"It appears that you've previously predicted [{self.recruit.name}] to [{previous_prediction['team']}] with confidence [{previous_prediction['confidence']}]. You can answer the prompts to update your prediction.\n"
-        # first_msg = f"Please predict which team you think [{self.recruit.name}] will commit to. [247Sports Profile]({self.recruit.twofourseven_profile}])"
-        # await interaction.followup.send(first_msg)
-
         logger.info("Collecting team and confidence predictions")
         modal = PredictionTeamModal(self.recruit)
         await interaction.response.send_modal(modal)
@@ -198,6 +189,7 @@ class PredictionView(discord.ui.View):
 
     @discord.ui.button(label="📜", disabled=True)
     async def scroll(self, interaction: discord.Interaction, button: discord.Button):
+        logger.info(f"Retrieving predictions for {self.recruit.name}...")
         await interaction.response.defer()
 
         individual_preds = processMySQL(
@@ -206,8 +198,9 @@ class PredictionView(discord.ui.View):
             values=(self.recruit.twofourseven_profile,),
         )
         if individual_preds is None:
-            await interaction.followup.send("This recruit has no predictions.")
+            raise RecruitException("This recruit has no predictions.")
 
+        logger.info(f"Compilining {len(individual_preds)} predictions")
         predictions = []
         for index, prediction in enumerate(individual_preds):
             try:
@@ -246,41 +239,43 @@ class PredictionView(discord.ui.View):
         await interaction.followup.send(embed=embed)
 
 
-def is_walk_on(soup) -> bool:
+def is_walk_on(soup: BeautifulSoup) -> bool:
     icon = soup.find_all(attrs={"class": "icon-walkon"})
-
-    if icon:
-        return True
-    else:
-        return False
+    return True if icon else False
 
 
-def is_early_enrolee(soup) -> bool:
+def is_early_enrolee(soup: BeautifulSoup) -> bool:
     icon = soup.find_all(attrs={"class": "icon-time"})
     return True if icon else False
 
 
-def is_early_signee(soup) -> bool:
+def is_early_signee(soup: BeautifulSoup) -> bool:
     icon = soup.find_all(attrs={"class": "signee-icon"})
     return True if icon else False
 
 
 def reformat_weight(weight: str) -> str:
+    try:
+        int(weight)
+    except TypeError:
+        return "N/A"
+
     return f"{int(weight)} lbs."
 
 
-def reformat_commitment_string(search_player) -> Union[str, None]:
+def reformat_commitment_string(search_player: dict) -> Union[str, None]:
     if search_player["HighestRecruitInterestEventType"] == "HardCommit":
         return "Hard Commit"
-    elif search_player["HighestRecruitInterestEventType"] == "OfficialVisit":
-        return None
-    elif search_player["HighestRecruitInterestEventType"] == "0":
+    elif (
+        search_player["HighestRecruitInterestEventType"] == "OfficialVisit"
+        or search_player["HighestRecruitInterestEventType"] == "0"
+    ):
         return None
     else:
         return search_player["HighestRecruitInterestEventType"].strip()
 
 
-def reformat_composite_rating(cur_player) -> str:
+def reformat_composite_rating(cur_player: dict) -> str:
     if cur_player.get("CompositeRating", None) is None:
         return "0"
     else:
@@ -290,37 +285,37 @@ def reformat_composite_rating(cur_player) -> str:
 def reformat_height(height: str) -> str:
     if height is None:
         return "N/A"
-    else:
-        double_apo = '" '
-        height = f"{height.replace('-', double_apo)}{double_apo}"
+
+    double_apo = '" '
+    height = f"{height.replace('-', double_apo)}{double_apo}"
     return height
 
 
-def get_team_id(search_player) -> int:
-    if search_player["CommitedInstitutionTeamImage"] is not None:
-        return int(
-            search_player["CommitedInstitutionTeamImage"]
-            .split("/")[-1]
-            .split("_")[-1]
-            .split(".")[0]
-        )
-    else:
+def get_team_id(search_player: dict) -> int:
+    if search_player["CommitedInstitutionTeamImage"] is None:
         return 0
 
+    return int(
+        search_player["CommitedInstitutionTeamImage"]
+        .split("/")[-1]
+        .split("_")[-1]
+        .split(".")[0]
+    )
 
-def get_committed_school(all_team_ids, team_id) -> Union[str, None]:
+
+def get_committed_school(all_team_ids: list[dict], team_id: int) -> Union[str, None]:
     try:
         if team_id > 0:
             for entry in all_team_ids:
                 if team_id == entry[team_id]:
-                    return all_team_ids[team_id]
+                    return all_team_ids[team_id]["school"]
         else:
             return None
     except KeyError:
         return None
 
 
-def get_cb_experts(soup, team_ids) -> list:
+def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
     experts = []
 
     try:
@@ -372,7 +367,7 @@ def get_cb_experts(soup, team_ids) -> list:
     return experts
 
 
-def get_cb_predictions(soup) -> list:
+def get_cb_predictions(soup: BeautifulSoup) -> list:
     crystal_balls = []
 
     predictions_header = soup.find_all(attrs={"class": "list-header-item"})
@@ -427,7 +422,7 @@ def get_cb_predictions(soup) -> list:
     return crystal_balls
 
 
-def get_all_time_ranking(soup) -> int:
+def get_all_time_ranking(soup: BeautifulSoup) -> int:
     recruit_rank = soup.find_all(
         attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"}
     )
@@ -443,28 +438,28 @@ def get_all_time_ranking(soup) -> int:
         return 0
 
 
-def get_national_ranking(cur_player) -> int:
-    if cur_player["NationalRank"] is not None:
-        return cur_player["NationalRank"]
-    else:
+def get_national_ranking(cur_player: dict) -> int:
+    if cur_player["NationalRank"] is None:
         return 0
 
+    return cur_player["NationalRank"]
 
-def get_position_ranking(cur_player) -> int:
-    if cur_player["PositionRank"] is not None:
-        return cur_player["PositionRank"]
-    else:
+
+def get_position_ranking(cur_player: dict) -> int:
+    if cur_player["PositionRank"] is None:
         return 0
 
+    return cur_player["PositionRank"]
 
-def get_state_ranking(cur_player) -> str:
-    if cur_player["StateRank"] is not None:
-        return cur_player["StateRank"]
-    else:
+
+def get_state_ranking(cur_player: dict) -> str:
+    if cur_player["StateRank"] is None:
         return "0"
 
+    return cur_player["StateRank"]
 
-def get_recruit_interests(search_player) -> list[RecruitInterest]:
+
+def get_recruit_interests(search_player: dict) -> list[RecruitInterest]:
     reqs = requests.get(url=search_player["RecruitInterestsUrl"], headers=HEADERS)
     interests_soup = BeautifulSoup(reqs.content, "html.parser")
     interests = interests_soup.find(
@@ -499,31 +494,31 @@ def get_recruit_interests(search_player) -> list[RecruitInterest]:
     return all_interests
 
 
-def get_school_type(soup) -> str:
+def get_school_type(soup: BeautifulSoup) -> str:
     institution_type = soup.find_all(attrs={"data-js": "institution-selector"})
 
-    if not len(institution_type) == 0:
-        institution_type = str(institution_type[0].text).strip()
-        return institution_type
-    else:
+    if len(institution_type) == 0:
         return "High School"
 
+    institution_type = str(institution_type[0].text).strip()
+    return institution_type
 
-def get_state_abbr(cur_player) -> str:
+
+def get_state_abbr(cur_player: dict) -> str:
     try:
         return RECRUIT_STATES[cur_player["Hometown"]["State"]]
     except KeyError:
         return cur_player["Hometown"]["State"]
 
 
-def get_thumbnail(cur_player) -> Union[None, str]:
+def get_thumbnail(cur_player: dict) -> Union[None, str]:
     if cur_player["DefaultAssetUrl"] == "/.":
         return None
     else:
         return cur_player["DefaultAssetUrl"]
 
 
-def get_twitter_handle(soup) -> str:
+def get_twitter_handle(soup: BeautifulSoup) -> str:
     twitter = soup.find_all(attrs={"class": "tweets-comp"})
     try:
         twitter = twitter[0].attrs["data-username"]
@@ -533,7 +528,7 @@ def get_twitter_handle(soup) -> str:
         return "N/A"
 
 
-def get_teams() -> list:
+def get_teams() -> list[str]:
     sql_teams = processMySQL(query=sqlTeamIDs, fetch="all")
     teams_list = [t["school"] for t in sql_teams]
     return teams_list
@@ -548,7 +543,7 @@ def get_individual_predictions(user_id: int, recruit):  # TODO Figure out the ty
     return sql_response
 
 
-def search_result_info(new_search) -> str:
+def search_result_info(new_search: list[Recruit]) -> str:
     result_info = ""
     for index, recruit in enumerate(new_search):
         if index < CROOT_SEARCH_LIMIT:
@@ -562,20 +557,16 @@ def search_result_info(new_search) -> str:
     return result_info
 
 
-def createPredictionView(target_recruit) -> PredictionView:
+def createPredictionView(target_recruit: Recruit) -> PredictionView:
     view = PredictionView(target_recruit)
     if not target_recruit.committed == "Enrolled":
         view.crystal_ball.disabled = False
+    view.scroll.disabled = False
 
     return view
 
 
-def checking_reaction(reaction_used, user_initiated: discord.Member) -> bool:
-    if not user_initiated.bot:
-        return reaction_used.emoji in search_reactions
-
-
-def buildFootballRecruit(year, name) -> list[Recruit]:
+def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
     all_team_ids = processMySQL(fetch="all", query=sqlTeamIDs)
     name = name.split(" ")
 
@@ -711,7 +702,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
     )
     async def croot_bot(
         self, interaction: discord.Interaction, year: int, search_name: str
-    ):
+    ) -> None:
         logger.info(f"Searching for {year} {search_name.capitalize()}")
         await interaction.response.defer()
 
@@ -751,7 +742,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         else:
             result_info = search_result_info(croot_search)
 
-            view = RecruitListView()
+            view = RecruitListView(croot_search)
             embed = buildEmbed(
                 title=f"Search Results for [{year} {search_name.capitalize()}]",
                 fields=[dict(name="Search Results", value=result_info)],
@@ -764,7 +755,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
     @commands.command()
     async def fap(
         self, interaction: discord.Interaction
-    ):  # predict, stats, leaderboard, user
+    ) -> None:  # predict, stats, leaderboard, user
         ...
 
 
