@@ -31,7 +31,7 @@ from objects.Recruits import RecruitInterest, Recruit
 logger = logging.getLogger(__name__)
 
 croot_search = []
-fap_search = []
+prediction_search = []
 search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4}
 
 CURRENT_CLASS = datetime.now().year
@@ -689,11 +689,11 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
 
 
 class RecruitingCog(commands.Cog, name="Recruiting Commands"):
-    # group_recruit = app_commands.Group(
-    #     name="crootbot",
-    #     description="Recruiting commands",
-    #     guild_ids=[GUILD_PROD],
-    # )
+    group_recruit = app_commands.Group(
+        name="predict",
+        description="Recruiting prediction commands",
+        guild_ids=[GUILD_PROD],
+    )
 
     @app_commands.command(name="croot-bot", description="Look up a recruit")
     @app_commands.describe(
@@ -752,11 +752,55 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
 
         logger.info(f"Sent search results for [{year} {search_name.capitalize()}]")
 
-    @commands.command()
-    async def fap(
-        self, interaction: discord.Interaction
+    @group_recruit.command(
+        name="submit", description="Submit a prediction for a recruit"
+    )
+    @app_commands.describe(
+        year="The year of the recruit's recruitting class",
+        search_name="Name of the recruit",
+    )
+    async def predict_submit(
+        self, interaction: discord.Interaction, year: int, search_recruit: str
     ) -> None:  # predict, stats, leaderboard, user
-        ...
+        logger.info(f"Starting a prediction for [{year}] [{search_recruit}]")
+        if len(str(year)) == 2:
+            year += 2000
+
+        if year > datetime.now().year + 5:
+            raise RecruitException(
+                "The search year must be within five years of the current class."
+            )
+
+        if year < 1869:
+            raise RecruitException(
+                "The search year must be after the first season of college football--1869."
+            )
+
+        await interaction.response.defer(hidden=True)
+
+        global prediction_search
+        prediction_search = buildFootballRecruit(year, search_recruit)
+        # TODO Left off here...
+        if type(prediction_search) == commands.UserInputError:
+            return await ctx.send(content=prediction_search, hidden=True)
+
+        async def send_fap_convo(target_recruit):
+            await initiate_fap(
+                ctx=ctx, user=ctx.author, recruit=target_recruit, client=ctx.bot
+            )
+
+        if len(prediction_search) == 1:
+            return await send_fap_convo(prediction_search[0])
+
+        result_info = search_result_info(prediction_search)
+        action_row = create_actionrow(*search_buttons)
+
+        embed = build_embed(
+            title=f"Search Results for [{year} {search_name.capitalize()}]",
+            fields=[["Search Results", result_info]],
+        )
+
+        await ctx.send(embed=embed, components=[action_row], hidden=True)
 
 
 async def setup(bot: commands.Bot) -> None:
