@@ -65,7 +65,7 @@ def get_current_week(year: int, team: str) -> int:
                 return game.week
             else:
                 logger.exception(
-                    "Unknown error occured when getting week for Nebraska game",
+                    "Unknown error ocurred when getting week for Nebraska game",
                     exc_info=True,
                 )
         elif (
@@ -83,7 +83,7 @@ def get_current_week(year: int, team: str) -> int:
 def get_consensus_line(
     team_name: str, year: int = datetime.now().year, week: int = None
 ) -> Union[None, str]:
-    logger.info(f"Getting the conensus line for {year} Week {week} {team_name} game")
+    logger.info(f"Getting the concensus line for {year} Week {week} {team_name} game")
 
     cfb_api = BettingApi(ApiClient(cfbd_config))
 
@@ -385,7 +385,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     )
     @app_commands.describe(year="The year of the schedule")
     @app_commands.guilds(GUILD_PROD)
-    async def taem_schedule(
+    async def team_schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
         await interaction.response.defer()

@@ -187,7 +187,7 @@ class HuskerClient(Bot):
     async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
-        # TODO Figure out how to handle this, if neeeded. May need to add something to bot logs.
+        # TODO Figure out how to handle this, if needed. May need to add something to bot logs.
         channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
             title="New Husker fan!",
@@ -221,7 +221,7 @@ class HuskerClient(Bot):
                     value=f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
                 ),
                 dict(
-                    name="Hall of Fame & Shame Reaaction Threshold",
+                    name="Hall of Fame & Shame Reaction Threshold",
                     value="TBD",
                 ),
                 dict(
@@ -229,7 +229,7 @@ class HuskerClient(Bot):
                     value=_version,
                 ),
                 dict(
-                    name="Changelong",
+                    name="Changelog",
                     value=self.get_change_log(),
                 ),
                 dict(
@@ -254,13 +254,13 @@ class HuskerClient(Bot):
             try:
                 # NOTE Extensions will fail to load when runtime errors exist in the code.
                 # It will also NOT currently output a traceback. You MUST investigate
-                # mannually by stepping through code until I find a way to capture these
+                # manually by stepping through code until I find a way to capture these
                 # exceptions.
                 await self.load_extension(extension)
                 logger.info(f"Loaded the {extension} extension")
             except Exception as e:  # noqa
                 logger.exception(
-                    f"ERROR: Unable to laod the {extension} extension\n{e}"
+                    f"ERROR: Unable to load the {extension} extension\n{e}"
                 )
 
         logger.info("All extensions loaded")

@@ -29,7 +29,7 @@ from helpers.misc import *  # noqa
 from helpers.mysql import *  # noqa
 from helpers.slowking import *  # noqa
 
-logger.info("Helpers laoded. Loading objects")
+logger.info("Helpers loaded. Loading objects")
 
 # Objects/classes
 from objects.Bets import *  # noqa

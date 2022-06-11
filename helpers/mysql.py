@@ -52,7 +52,7 @@ UPDATE fap_predictions SET team = %s, confidence = %s, prediction_date = NOW() W
 """
 
 sqlGetCrootPredictions = """
-SELECT f.recruit_name, f.team, avg(f.confidence) as 'confidence', (count(f.team) / t.sumr) * 100 as 'percent', t.sumr as 'total' FROM fap_predictions as f JOIN (SELECT recruit_profile, COUNT(recruit_profile) as sumr FROM fap_predictions GROUP BY recruit_profile) as t on t.recruit_profile = f.recruit_profile WHERE f.recruit_profile = %s GROUP BY f.recruit_profile, f.recruit_name, f.team ORDER BY percent DESC;
+SELECT f.recruit_name, f.team, avg(f.confidence) as 'confidence', (count(f.team) / t.sum) * 100 as 'percent', t.sumr as 'total' FROM fap_predictions as f JOIN (SELECT recruit_profile, COUNT(recruit_profile) as sumr FROM fap_predictions GROUP BY recruit_profile) as t on t.recruit_profile = f.recruit_profile WHERE f.recruit_profile = %s GROUP BY f.recruit_profile, f.recruit_name, f.team ORDER BY percent DESC;
 """
 
 sqlGetIndividualPrediction = "SELECT * FROM fap_predictions WHERE recruit_profile = %s ORDER BY prediction_date ASC"
@@ -138,7 +138,7 @@ DELETE FROM iowa WHERE user_id = %s
 # # SELECT * FROM custom_lines WHERE result = 'tbd'
 # # """
 #
-# # sqlRetreiveCustomLinesForAgainst = """
+# # sqlRetrieveCustomLinesForAgainst = """
 # # SELECT source, _for, against, value FROM custom_lines_bets WHERE keyword = %s
 # # """
 #

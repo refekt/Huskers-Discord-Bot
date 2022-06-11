@@ -102,7 +102,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         channel_history_limit: int = 1000
         combined_sources: list = []
         message_history: list = []
-        source_conent: str = ""
+        source_content: str = ""
         message_channel_history = None
         message_member_history = None
 
@@ -124,9 +124,9 @@ class TextCog(commands.Cog, name="Text Commands"):
 
             return f"\n{message.content.capitalize()}"
 
-        def cleanup_source_conent(check_source_conent: str) -> str:
-            logger.info("Cleaning source conent")
-            output = check_source_conent
+        def cleanup_source_content(check_source_content: str) -> str:
+            logger.info("Cleaning source content")
+            output = check_source_content
 
             regex_discord_http = [
                 r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
@@ -159,7 +159,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 raise
 
             for message in message_history:
-                source_conent += check_message(message)
+                source_content += check_message(message)
             logger.info("Compiled message content from current channel")
         else:
             logger.info("A source was provided")
@@ -174,7 +174,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     ]
                     for message in message_member_history:
                         if message.author == source:
-                            source_conent += check_message(message)
+                            source_content += check_message(message)
                     logger.info("Discord member source compiled")
                 elif type(source) == discord.TextChannel:
                     logger.info("Discord text channel source provided")
@@ -183,14 +183,14 @@ class TextCog(commands.Cog, name="Text Commands"):
                         async for message in source.history(limit=channel_history_limit)
                     ]
                     for message in message_channel_history:
-                        source_conent += check_message(message)
+                        source_content += check_message(message)
                     logger.info("Discord text channel source compiled")
                 else:
                     logger.exception("Unexpected source type!", exc_info=True)
                     continue
 
-        if not source_conent == "":
-            source_conent = cleanup_source_conent(source_conent)
+        if not source_content == "":
+            source_content = cleanup_source_content(source_content)
         else:
             logger.exception(
                 f"There was not enough information available to make a Markov chain.",
@@ -208,7 +208,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         logger.info("Creating a markov chain")
-        markvov_response = markovify.NewlineText(source_conent, well_formed=True)
+        markvov_response = markovify.NewlineText(source_content, well_formed=True)
         logger.info("Creating a markov original_message")
         markov_output = markvov_response.make_sentence(
             max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
@@ -230,7 +230,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(GUILD_PROD)
     async def police(
-        self, interaction: discord.Interaction, arestee: discord.Member
+        self, interaction: discord.Interaction, arrestee: discord.Member
     ) -> None:
         embed = buildEmbed(
             title="Wee woo, wee woo!",
@@ -245,7 +245,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     f".....🚨 YOU 🚨\n"
                     f"....🚨 JUST 🚨\n"
                     f"...🚨 SAY 🚨\n"
-                    f"..🚨 {arestee.mention} 🚨\n"
+                    f"..🚨 {arrestee.mention} 🚨\n"
                     f"🏃‍♀️💨 🔫🚓🔫🚓🔫🚓\n"
                     f"\n"
                     f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
@@ -526,7 +526,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     async def hypeme(self, interaction: discord.Interaction) -> None:
         class Scroll:
             def __init__(self, message: str):
-                self.headder: str = "  _______________________\n=(__    ___      __     _)=\n  |                     |\n"
+                self.header: str = "  _______________________\n=(__    ___      __     _)=\n  |                     |\n"
                 self.message_layer: str = "  |                     |\n"
                 self.signature: str = "\n  |   ~*~ Husk          |\n"
                 self.footer: str = "  |                     |\n  |__    ___   __    ___|\n=(_______________________)=\n"
@@ -540,7 +540,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     for i in range(0, len(self.message), self.max_line_len)
                 ]
 
-                return f"{self.headder}{new_line.join([line for line in lines])}{self.signature}{self.footer}"
+                return f"{self.header}{new_line.join([line for line in lines])}{self.signature}{self.footer}"
 
         logger.info("Creating a Husk markov chain")
         await interaction.response.defer()

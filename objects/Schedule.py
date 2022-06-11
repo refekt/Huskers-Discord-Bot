@@ -63,7 +63,7 @@ class HuskerDotComSchedule:
 def collect_opponent(game, year, week) -> Union[HuskerOpponent, str]:
     # This is the culmination of going line by line through Huskers.com HTML and CSS.
     # If the website changes, this will more than likely need to change.
-    logger.info(f"Collecting opponent informaitn for Week {week} {year}")
+    logger.info(f"Collecting opponent information for Week {week} {year}")
     game = game.contents[1]
     try:
         name = (
@@ -218,7 +218,7 @@ def HuskerSchedule(
             ).astimezone(tz=TZ)
             opponent.date_time += timedelta(hours=1)
 
-        conferance_teams = (
+        conference_teams = (
             "Illinois",
             "Iowa",
             "Maryland",
@@ -232,7 +232,7 @@ def HuskerSchedule(
             "Rutgers",
             "Wisconsin",
         )
-        conference: bool = opponent.name in conferance_teams
+        conference: bool = opponent.name in conference_teams
         home: bool = "Lincoln, Neb." in opponent.location
 
         games.append(

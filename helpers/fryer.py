@@ -27,10 +27,10 @@ deepfry_path = "resources/deepfry/"
 def fry_image(image, emote_amount, noise, contrast):
     gray = numpy.array(image.convert("L"))
 
-    eye_coods = find_eyes(gray)
+    eye_coords = find_eyes(gray)
     char_coords = find_chars(gray)
 
-    add_flares(image, eye_coods)
+    add_flares(image, eye_coords)
     add_emotes(image, emote_amount)
     add_chars(image, char_coords)
     image = add_noise(image, random.random() * noise)

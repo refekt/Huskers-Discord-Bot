@@ -62,7 +62,7 @@ def create_img(author: int, image_name: str, image_url: str) -> Union[bool, Any]
         processMySQL(
             query=sqlCreateImageCommand, values=[author, image_name, image_url]
         )
-        logger.info(f"Image {image_name} sucessfully created!")
+        logger.info(f"Image {image_name} successfully created!")
         return True
     except:  # noqa
         raise ImageException("Unable to create image command in MySQL database!")
@@ -87,8 +87,8 @@ class ImageCog(commands.Cog, name="Image Commands"):
         description="Deep fry a picture into a unique creation",
     )
     @app_commands.describe(
-        source_url="URL of an iamge you want to deepfry",
-        source_avatar="Avatar of member you want to deefry",
+        source_url="URL of an image you want to deepfry",
+        source_avatar="Avatar of member you want to deepfry",
     )
     @app_commands.guilds(GUILD_PROD)
     async def deepfry(
@@ -247,7 +247,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
     @group_img.command(name="create", description="Create a server image")
     @app_commands.describe(
-        image_name="A keyword for the new image", image_url="A valid URL for the iamge"
+        image_name="A keyword for the new image", image_url="A valid URL for the image"
     )
     async def img_create(
         self, interaction: discord.Interaction, image_name: str, image_url: str

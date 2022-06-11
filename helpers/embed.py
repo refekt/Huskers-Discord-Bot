@@ -35,7 +35,7 @@ __all__ = [
 desc_limit = 4096
 embed_max = 6000
 field_value_limit = 1024
-fields_limt = 25
+fields_limit = 25
 footer_limit = 2048
 title_limit = name_limit = field_name_limit = 256
 
@@ -94,7 +94,7 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
 
     if "fields" in kwargs.keys():
         for index, field in enumerate(kwargs.get("fields")):
-            if index == fields_limt:
+            if index == fields_limit:
                 break
 
             e.add_field(

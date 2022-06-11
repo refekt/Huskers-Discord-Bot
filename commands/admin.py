@@ -54,7 +54,7 @@ class ConfirmButtons(discord.ui.View):
 
 
 class AdminCog(commands.Cog, name="Admin Commands"):
-    class MammaleChannels(Enum):
+    class MammalChannels(Enum):
         general = 1
         recruiting = 2
         admin = 3
@@ -67,7 +67,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     )
     group_submit = app_commands.Group(
         name="submit",
-        description="Sbumit a bug or feature request for the bot",
+        description="Submit a bug or feature request for the bot",
         guild_ids=[GUILD_PROD],
     )
     group_gameday = app_commands.Group(
@@ -630,7 +630,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def smms(
         self,
         interaction: discord.Interaction,
-        destination: MammaleChannels,
+        destination: MammalChannels,
         message: str,
     ) -> None:
         assert message, CommandException("You cannot have a blank message!")

@@ -105,10 +105,8 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
         logger.info("Confirming if recruit is already committed to a school")
         formatted_team_list = [team.lower() for team in get_teams()]
         if user_prediction.school.value.lower() in formatted_team_list:
-            teamm_index = formatted_team_list.index(
-                user_prediction.school.value.lower()
-            )
-            team_prediction = get_teams()[teamm_index]
+            team_index = formatted_team_list.index(user_prediction.school.value.lower())
+            team_prediction = get_teams()[team_index]
 
             if self.recruit.committed_school == team_prediction:
                 raise RecruitException(
@@ -196,7 +194,7 @@ class PredictionView(discord.ui.View):
         if individual_preds is None:
             raise RecruitException("This recruit has no predictions.")
 
-        logger.info(f"Compilining {len(individual_preds)} predictions")
+        logger.info(f"Compiling {len(individual_preds)} predictions")
         predictions = []
         for index, prediction in enumerate(individual_preds):
             try:
@@ -630,7 +628,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
 
     for index, search_player in enumerate(search_results):
         if index + 1 > CROOT_SEARCH_LIMIT:
-            logger.info("Stoppping search because search limit reached")
+            logger.info("Stopping search because search limit reached")
             break
 
         logger.info(f"Compiling search result #{index} of {len(search_results)}")
@@ -793,7 +791,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         name="submit", description="Submit a prediction for a recruit"
     )
     @app_commands.describe(
-        year="The year of the recruit's recruitting class",
+        year="The year of the recruit's recruiting class",
         search_name="Name of the recruit",
     )
     async def predict_submit(  # predict, stats, leaderboard, user
