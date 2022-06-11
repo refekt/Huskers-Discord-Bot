@@ -1,3 +1,4 @@
+import logging
 import math
 import os
 
@@ -5,6 +6,12 @@ import cv2
 import numpy
 from PIL import Image
 from numpy import random
+
+logger = logging.getLogger(__name__)
+
+__all__ = ["fry_image"]
+
+logger.info(f"{str(__name__).title()} module loaded!")
 
 face_cascade = cv2.CascadeClassifier(
     os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
@@ -16,8 +23,8 @@ eye_cascade = cv2.CascadeClassifier(
 deepfry_path = "resources/deepfry/"
 
 
-# Pass an image to fry, pretty self explanatory
-def fry(image, emote_amount, noise, contrast):
+# Pass an image to fry, pretty self-explanatory
+def fry_image(image, emote_amount, noise, contrast):
     gray = numpy.array(image.convert("L"))
 
     eye_coods = find_eyes(gray)
@@ -99,8 +106,8 @@ def add_chars(image, coords):
     return image
 
 
-def add_emotes(image, max):
-    for i in range(max):
+def add_emotes(image, max_emotes):
+    for i in range(max_emotes):
         emote = Image.open(random_file(f"{deepfry_path}/emotes/")).convert("RGBA")
 
         coord = numpy.random.random(2) * numpy.array([image.width, image.height])
@@ -170,44 +177,6 @@ def bulge(img, f, r, a, h, ior):
     if isinstance(y_max, type(numpy.array([]))):
         y_max = y_max[0]
 
-    # # array for holding bulged image
-    # bulged = numpy.copy(img_data)
-    # time_start = time.time()
-    # for y in range(y_min, y_max):
-    # for x in range(x_min, x_max):
-    # ray = numpy.array([x, y])
-
-    # # find the magnitude of displacement in the xy plane between the ray and focus
-    # s = length(ray - f)
-
-    # # if the ray is in the centre of the bulge or beyond the radius it doesn't need to be modified
-    # if 0 < s < r:
-    # # slope of the bulge relative to xy plane at (x, y) of the ray
-    # m = -s / (a * math.sqrt(r ** 2 - s ** 2))
-
-    # # find the angle between the ray and the normal of the bulge
-    # theta = numpy.pi / 2 + numpy.arctan(1 / m)
-
-    # # find the magnitude of the angle between xy plane and refracted ray using snell's law
-    # # s >= 0 -> m <= 0 -> arctan(-1/m) > 0, but ray is below xy plane so we want a negative angle
-    # # arctan(-1/m) is therefore negated
-    # phi = numpy.abs(numpy.arctan(1 / m) - numpy.arcsin(numpy.sin(theta) / ior))
-
-    # # find length the ray travels in xy plane before hitting z=0
-    # k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
-
-    # # find intersection point
-    # intersect = ray + (normalise(f - ray)) * k
-
-    # # assign pixel with ray's coordinates the colour of pixel at intersection
-    # if 0 < intersect[0] < width - 1 and 0 < intersect[1] < height - 1:
-    # bulged[y][x] = img_data[int(intersect[1])][int(intersect[0])]
-    # else:
-    # bulged[y][x] = [0, 0, 0, 0]
-    # else:
-    # bulged[y][x] = img_data[y][x]
-    # time_end = time.time()
-
     f_new = f
     bulge_square = numpy.copy(img_data)  # img_data[x_min:x_max, y_min:y_max]
 
@@ -221,7 +190,7 @@ def bulge(img, f, r, a, h, ior):
     # following is equivalent to m = -s / (a * math.sqrt(r ** 2 - s ** 2))
     bulge_m = numpy.copy(bulge_s)
     bulge_m[circle] = (-1 * bulge_m[circle]) / (
-        a * numpy.sqrt(r ** 2 - bulge_m[circle] ** 2)
+        a * numpy.sqrt(r**2 - bulge_m[circle] ** 2)
     )
 
     # following is equivalent to theta = numpy.pi / 2 + numpy.arctan(1 / m)
@@ -237,7 +206,7 @@ def bulge(img, f, r, a, h, ior):
 
     # following is equivalent to k = (h + (math.sqrt(r ** 2 - s ** 2) / a)) / numpy.sin(phi)
     bulge_k = numpy.copy(bulge_s)
-    bulge_k[circle] = (h + (numpy.sqrt(r ** 2 - bulge_s[circle] ** 2) / a)) / numpy.sin(
+    bulge_k[circle] = (h + (numpy.sqrt(r**2 - bulge_s[circle] ** 2) / a)) / numpy.sin(
         bulge_phi[circle]
     )
 

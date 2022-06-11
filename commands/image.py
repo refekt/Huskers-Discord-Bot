@@ -1,316 +1,118 @@
 import io
+import logging
 import pathlib
 import platform
 import random
 from os import listdir
 from os.path import isfile, join
+from typing import Optional, Any, Union
 
-import discord
-import markovify
+import discord.ext.commands
 import requests
 import validators
-from PIL import Image
+from PIL import Image, ImageOps
+from discord import app_commands
 from discord.ext import commands
-from discord_slash import cog_ext
-from discord_slash.context import SlashContext
-from discord_slash.utils.manage_commands import create_option
 
-import utilities.fryer as fryer
-from utilities.constants import (
-    CommandError,
-    HEADERS,
-    ROLE_ADMIN_PROD,
-    UserError,
-    guild_id_list,
-    make_slowking,
-)
-from utilities.embed import build_embed
-from utilities.mysql import (
-    Process_MySQL,
+from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD, HEADERS
+from helpers.embed import buildEmbed
+from helpers.fryer import fry_image
+from helpers.mysql import (
+    processMySQL,
     sqlCreateImageCommand,
     sqlDeleteImageCommand,
     sqlSelectAllImageCommand,
     sqlSelectImageCommand,
 )
+from objects.Exceptions import ImageException
+
+logger = logging.getLogger(__name__)
 
 image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
-
-def create_img(author: int, image_name: str, image_url: str):
-    if not validators.url(image_url):
-        raise UserError(
-            "Invalid image URL format. The URL must begin with 'http' or 'https'."
-        )
-
-    if not any(sub_str in image_url for sub_str in image_formats):
-        raise UserError(
-            f"Invalid image URL format. The URL must end with a [{', '.join(image_formats)}] extension."
-        )
-
-    try:
-        Process_MySQL(
-            query=sqlCreateImageCommand, values=[author, image_name, image_url]
-        )
-    except:  # noqa
-        raise CommandError("Unable to create image command in MySQL database!")
-
-
-def retrieve_img(image_name: str):
-    try:
-        return Process_MySQL(
-            query=sqlSelectImageCommand, values=image_name, fetch="one"
-        )
-    except:  # noqa
-        raise UserError(f"Unable to locate an image command named [{image_name}].")
+__all__ = ["ImageCog"]
 
 
 def retrieve_all_img():
     try:
-        return Process_MySQL(query=sqlSelectAllImageCommand, fetch="all")
+        return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
     except:  # noqa
-        raise CommandError(f"Unable to retrieve image commands.")
+        raise ImageException(f"Unable to retrieve image commands.")
 
 
 all_imgs = retrieve_all_img()
 
-image_options = []
-for img in all_imgs:
-    image_options.append(
-        create_option(
-            name=img["img_name"],
-            description="Custom image command",
-            required=False,
-            option_type=1,
-        )
+
+def retrieve_img(image_name: str) -> Union[None, Any]:
+    try:
+        return processMySQL(query=sqlSelectImageCommand, values=image_name, fetch="one")
+    except:  # noqa
+        raise ImageException(f"Unable to locate an image command named [{image_name}].")
+
+
+def create_img(author: int, image_name: str, image_url: str) -> Union[bool, Any]:
+    assert validators.url(image_url), ImageException(
+        "Invalid image URL format. The URL must begin with 'http' or 'https'."
+    )
+    assert any(sub_str in image_url for sub_str in image_formats), ImageException(
+        f"Invalid image URL format. The URL must end with a [{', '.join(image_formats)}] extension."
     )
 
-
-def is_valid(image):
-    if image is None:
-        return False
-    else:
+    try:
+        processMySQL(
+            query=sqlCreateImageCommand, values=[author, image_name, image_url]
+        )
+        logger.info(f"Image {image_name} sucessfully created!")
         return True
+    except:  # noqa
+        raise ImageException("Unable to create image command in MySQL database!")
 
 
-class ImageCommands(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+def retrieve_all_img() -> None:
+    try:
+        return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
+    except:  # noqa
+        raise ImageException(f"Unable to retrieve image commands.")
 
-    @cog_ext.cog_slash(
-        name="imgcreate",
-        description="Create an image command",
-        guild_ids=guild_id_list(),
+
+class ImageCog(commands.Cog, name="Image Commands"):
+    group_img = app_commands.Group(
+        name="img",
+        description="Get creative with images",
+        guild_ids=[GUILD_PROD],
     )
-    async def _imgcreate(self, ctx: SlashContext, image_name: str, image_url: str):
-        if is_valid(retrieve_img(image_name)):
-            raise UserError("An image with that name already exists. Try again!")
 
-        image_name = image_name.replace(" ", "")
-
-        create_img(ctx.author_id, image_name, image_url)
-
-        embed = build_embed(
-            title="Create an Image Command",
-            image=image_url,
-            fields=[
-                [
-                    "Image Created!",
-                    f"Congratulations, [{ctx.author.mention}] created the [{image_name}] command!",
-                ]
-            ],
-        )
-        await ctx.send(embed=embed)
-
-    @cog_ext.cog_slash(
-        name="imgdelete",
-        description="Delete image commands you've created",
-        guild_ids=guild_id_list(),
+    @app_commands.command(
+        name="deep-fry",
+        description="Deep fry a picture into a unique creation",
     )
-    async def _imgdelete(self, ctx: SlashContext, image_name: str):
-        try:
-            img_author = int(retrieve_img(image_name)["author"])
-        except TypeError:
-            raise UserError(f"Unable to locate image [{image_name}]")
-
-        if not is_valid(img_author):
-            raise UserError(f"Unable to locate image [{image_name}]")
-
-        admin = ctx.guild.get_role(ROLE_ADMIN_PROD)
-        admin_delete = False
-
-        if admin in ctx.author.roles:
-            admin_delete = True
-        elif not ctx.author_id == img_author:
-            raise UserError(
-                f"This command was created by [{ctx.guild.get_member(img_author).mention}] and can only be deleted by them"
-            )
-
-        try:
-            if admin_delete:
-                Process_MySQL(
-                    query=sqlDeleteImageCommand, values=[image_name, str(img_author)]
-                )
-            else:
-                Process_MySQL(
-                    query=sqlDeleteImageCommand, values=[image_name, str(ctx.author_id)]
-                )
-        except:  # noqa
-            raise CommandError("Unable to delete this image command!")
-
-        embed = build_embed(
-            title="Delete Image Command",
-            fields=[["Deleted", f"You have deleted the image command [{image_name}]."]],
-        )
-        await ctx.send(embed=embed)
-
-    @cog_ext.cog_slash(
-        name="imglist",
-        description="Show a list of all available image commands",
-        guild_ids=guild_id_list(),
+    @app_commands.describe(
+        source_url="URL of an iamge you want to deepfry",
+        source_avatar="Avatar of member you want to deefry",
     )
-    async def _imglist(self, ctx: SlashContext):
-        global all_imgs
-        all_imgs = retrieve_all_img()
+    @app_commands.guilds(GUILD_PROD)
+    async def deepfry(
+        self,
+        interaction: discord.Interaction,
+        source_url: str = None,
+        source_avatar: discord.Member = None,
+    ) -> None:
+        logger.info("Attempting to create a deep fried image!")
+        await interaction.response.defer()
 
-        img_list = []
-        for img in all_imgs:
-            img_list.append(img["img_name"])
+        if source_url is not None and source_avatar is not None:
+            raise ImageException("You can only provide one source!")
 
-        img_list.sort()
+        if source_url is not None:
+            assert validators.url(source_url) and any(
+                sub_str in source_url for sub_str in image_formats
+            ), ImageException("You must provide a valid URL!")
 
-        await ctx.send(", ".join(img_list), hidden=True)
-
-        # pages = []
-        #
-        # for image in all_imgs:
-        #     try:
-        #         author = ctx.guild.get_member(user_id=int(image["author"])).mention
-        #     except:  # noqa
-        #         author = "N/A"
-        #
-        #     created_at = image["created_at"]
-        #
-        #     pages.append(
-        #         build_embed(
-        #             title=f"Image: {image['img_name']}",
-        #             inline=False,
-        #             image=image["img_url"],
-        #             fields=[
-        #                 ["Command Name", f"`/img img_name:{image['img_name']}`"],
-        #                 ["Image URL", f"[URL]({image['img_url']})"],
-        #                 ["Author", f"{author}"],
-        #                 ["Created At", f"{created_at.strftime(DT_OBJ_FORMAT)}"],
-        #             ],
-        #         )
-        #     )
-        #
-        # await Paginator(
-        #     bot=ctx.bot,
-        #     ctx=ctx,
-        #     pages=pages,
-        #     useIndexButton=True,
-        #     useSelect=False,
-        #     firstStyle=ButtonStyle.gray,
-        #     nextStyle=ButtonStyle.gray,
-        #     prevStyle=ButtonStyle.gray,
-        #     lastStyle=ButtonStyle.gray,
-        #     indexStyle=ButtonStyle.gray,
-        #     hidden=True,
-        # ).run()
-
-    @cog_ext.cog_slash(
-        name="imgrandom",
-        description="Show a random image",
-        guild_ids=guild_id_list(),
-    )
-    async def _imgrandom(self, ctx: SlashContext):
-        global all_imgs
-        all_imgs = retrieve_all_img()
-        image = random.choice(all_imgs)
-
-        author = ctx.guild.get_member(user_id=int(image["author"]))
-        if author is None:
-            author = "Unknown"
-
-        await ctx.send(content=f"{image['img_url']}")
-
-        del image
-
-    @cog_ext.cog_slash(
-        name="img", description="Use an image command", guild_ids=guild_id_list()
-    )
-    async def _img(self, ctx: SlashContext, image_name: str):
-        # TODO Attempt to download image files upon creation in a way that Discord plays nicely
-
-        image = retrieve_img(image_name)
-
-        if not is_valid(image):
-            raise UserError(f"Unable to locate an image command named [{image_name}].")
-
-        author = ctx.guild.get_member(user_id=int(image["author"]))
-        if author is None:
-            author = "Unknown"
-
-        await ctx.send(
-            content=f"{ctx.author.mention} used [{image_name}]: \n{image['img_url']}"
-        )
-
-    @cog_ext.cog_slash(
-        name="slowking",
-        description="Turn a user into Slow King",
-        guild_ids=guild_id_list(),
-        options=[
-            create_option(
-                name="user",
-                description="User you want to turn into Slow King",
-                option_type=6,
-                required=True,
-            )
-        ],
-    )
-    async def _slowking(self, ctx: SlashContext, user: discord.Member):
-        await ctx.defer()
-
-        await ctx.send(file=make_slowking(user))
-
-    @cog_ext.cog_slash(
-        name="deepfry",
-        description="Deep fry an image",
-        guild_ids=guild_id_list(),
-        options=[
-            create_option(
-                name="url",
-                description="The URL of the image you want to deep fry.",
-                option_type=3,
-                required=False,
-            ),
-            create_option(
-                name="avatar",
-                description="The avatar you want to deep fry.",
-                option_type=6,
-                required=False,
-            ),
-        ],
-    )
-    async def _deepfry(
-        self, ctx: SlashContext, url: str = None, avatar: discord.Member = None
-    ):
-        if url == avatar:
-            raise UserError("You must provide either a URL or an avatar!")
-
-        if (
-            url is not None
-            and not validators.url(url)
-            and not any(sub_str in url for sub_str in image_formats)
-        ):
-            raise UserError("You must provide a valid URL!")
-
-        await ctx.defer()
-
-        def load(url):
+        def load_image_from_url(url: str):
             image_response = requests.get(url=url, stream=True, headers=HEADERS)
             return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
 
+        # TODO Play with these variables to see if we can improve the output
         emote_amount = random.randrange(1, 6)
         noise = random.uniform(0.4, 0.65)
         contrast = random.randrange(1, 99)
@@ -318,24 +120,30 @@ class ImageCommands(commands.Cog):
 
         image = None
 
-        if url:
-            image = load(url)
-        elif avatar:
-            image = load(avatar.avatar_url)
+        if source_url:
+            logger.info("Loading image from URL")
+            image = load_image_from_url(source_url)
+        elif source_avatar:
+            logger.info("Loading image from member avatar")
+            image = load_image_from_url(source_avatar.avatar.url)
+        else:
+            ImageException("Unknown source used!")
 
-        if image is None:
-            raise CommandError("Unable to load image")
+        assert image, ImageException("Unable to load image")
 
         try:
-            fried = fryer.fry(image, emote_amount, noise, contrast)
+            logger.info("Frying loaded image")
+            fried = fry_image(image, emote_amount, noise, contrast)
 
+            logger.info("Adding emotes, noise, and contrast")
             for layer in range(layers):
                 emote_amount = random.randrange(1, 6)
                 noise = random.uniform(0.4, 0.65)
                 contrast = random.randrange(1, 99)
 
-                fried = fryer.fry(fried, emote_amount, noise, contrast)
+                fried = fry_image(fried, emote_amount, noise, contrast)
 
+            logger.info("Saving file")
             with io.BytesIO() as image_binary:
                 fried.save(image_binary, "PNG")
                 if image_binary.tell() > 8000000:
@@ -345,67 +153,213 @@ class ImageCommands(commands.Cog):
                     )
                 image_binary.seek(0)
 
-                await ctx.send(
+                await interaction.followup.send(
                     file=discord.File(fp=image_binary, filename="deepfry.png")
                 )
+            image_binary.close()
         except Exception:
-            raise CommandError("Something went wrong. Blame my creators.")
+            raise ImageException("Something went wrong. Blame my creators.")
 
-    @cog_ext.cog_slash(
-        name="inspireme",
-        description="The bot will send you an inspirational message",
-        guild_ids=guild_id_list(),
-        options=[
-            create_option(
-                name="person",
-                description="Person you want to inspire",
-                required=False,
-                option_type=6,
-            )
-        ],
+    @app_commands.command(
+        name="inspire-me",
+        description="Get random inspiration",
     )
-    async def _inspireme(self, ctx: SlashContext, person: discord.Member = None):
+    @app_commands.describe(person="Person you want to inspire")
+    @app_commands.guilds(GUILD_PROD)
+    async def inspireme(
+        self, interaction: discord.Interaction, person: Optional[discord.Member] = None
+    ) -> None:
         image = requests.get("https://inspirobot.me/api?generate=true")
 
         if person:
-            try:
-                await ctx.send(
-                    f"{ctx.author.mention} wants to inspire {person.mention}\n{image.text}"
-                )
-            except:  # noqa
-                await ctx.send(f"{ctx.author} wants to inspire {person}")
+            await interaction.response.send_message(
+                f"{interaction.user.mention} wants to inspire {person.mention}\n"
+                f"{image.text}"
+            )
         else:
-            await ctx.send(image.text)
+            await interaction.response.send_message(image.text)
 
-    @cog_ext.cog_slash(
-        name="hypeme",
-        description="Husk's wise words of wisdom in meme format",
-        guild_ids=guild_id_list(),
+    @app_commands.command(
+        name="slow-king",
+        description="Crown someone as a Slowking",
     )
-    async def _hypeme(self, ctx: SlashContext):
-        await ctx.defer()
-        with open("resources/husk_messages.txt", encoding="UTF-8") as f:
-            source_data = f.read()
+    @app_commands.describe(person="Person you want to inspire")
+    @app_commands.guilds(GUILD_PROD)
+    async def slowking(
+        self, interaction: discord.Interaction, person: discord.Member
+    ) -> None:
+        await interaction.response.defer()
 
-        text_model = markovify.NewlineText(source_data)
+        try:
+            avatar_thumbnail = Image.open(
+                requests.get(person.avatar.url, stream=True).raw
+            ).convert("RGBA")
+        except IOError:
+            logger.exception(
+                "Unable to create a Slow King avatar for user!", exc_info=True
+            )
+            raise ImageException("Unable to create a Slow King avatar for user!")
 
-        output = (
-            str(text_model.make_short_sentence(min_chars=20, max_chars=50))
-            .lower()
-            .capitalize()
+        base_mask = Image.open("resources/images/mask.png").convert("L")
+        avatar_thumbnail = ImageOps.fit(
+            avatar_thumbnail, base_mask.size, centering=(0.5, 0.5)
+        )
+        avatar_thumbnail.putalpha(base_mask)
+
+        paste_pos = (265, 250)
+        slowking_filename = "make_slowking.png"
+
+        base_img = Image.open("resources/images/slowking.png").convert("RGBA")
+        base_img.paste(avatar_thumbnail, paste_pos, avatar_thumbnail)
+
+        base_img.save(f"resources/images/{slowking_filename}", "PNG")
+
+        if "Windows" in platform.platform():
+            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\{slowking_filename}"
+        else:
+            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/{slowking_filename}"
+
+        with open(slowking_path, "rb") as f:
+            file = discord.File(f)
+
+        await interaction.followup.send(content=person.mention, file=file)
+
+        file.close()
+
+    @group_img.command(name="show", description="Show a server image")
+    @app_commands.describe(image_name="A keyword for the new image")
+    async def img_show(self, interaction: discord.Interaction, image_name: str) -> None:
+        await interaction.response.defer()
+
+        image = retrieve_img(image_name)
+
+        assert image, ImageException(
+            f"Unable to locate an image command named [{image_name}]."
         )
 
-        if not output == "None":
-            await ctx.send(f'_"{output}"_ - Husk')
-        else:
-            await ctx.send("Unable to generate a Markov chain")
+        author = interaction.guild.get_member(int(image["author"]))
+        if author is None:
+            author = "Unknown"
 
-    @cog_ext.cog_slash(
-        name="twos",
-        description="Send a randomly selected TWOS image",
-        guild_ids=guild_id_list(),
+        await interaction.followup.send(
+            content=f"{interaction.user.mention} used [{image_name}]: \n{image['img_url']}"
+        )
+
+    @group_img.command(name="create", description="Create a server image")
+    @app_commands.describe(
+        image_name="A keyword for the new image", image_url="A valid URL for the iamge"
     )
-    async def _twos(self, ctx: SlashContext):
+    async def img_create(
+        self, interaction: discord.Interaction, image_name: str, image_url: str
+    ) -> None:
+        logger.info(f"Attempting to create new server image '{image_name}'")
+        await interaction.response.defer(ephemeral=True)
+
+        assert not retrieve_img(image_name), ImageException(
+            "An image with that name already exists. Try again!"
+        )
+
+        image_name = image_name.replace(" ", "_")  # Replace spaces with undescores
+
+        if not create_img(interaction.user.id, image_name, image_url):
+            raise ImageException("Unable to create the image in the MySQL database!")
+
+        embed = buildEmbed(
+            title="Create an Image Command",
+            image=image_url,
+            fields=[
+                dict(
+                    name="Image Created!",
+                    value=f"Congratulations, [{interaction.user.mention}] created the [{image_name}] command!",
+                )
+            ],
+        )
+        await interaction.followup.send(embed=embed)
+
+    @group_img.command(name="list", description="List all the server images")
+    async def img_list(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
+
+        global all_imgs
+        all_imgs = retrieve_all_img()
+        img_list = [img["img_name"] for img in all_imgs]
+        img_list.sort()
+
+        await interaction.followup.send(
+            f"There are {len(img_list)} images listed below:\n{', '.join(img_list)}"
+        )
+
+    @group_img.command(name="delete", description="Delete a server image")
+    @app_commands.describe(image_name="A keyword for the new image")
+    async def img_delete(
+        self, interaction: discord.Interaction, image_name: str
+    ) -> None:
+        logger.info(f"Attempting to delete '{image_name}'!")
+        await interaction.response.defer(ephemeral=True)
+
+        try:
+            img_author = int(retrieve_img(image_name)["author"])
+        except TypeError:
+            raise ImageException(f"Unable to locate image [{image_name}]")
+
+        assert img_author, ImageException(f"Unable to locate image [{image_name}]")
+
+        admin = interaction.guild.get_role(ROLE_ADMIN_PROD)
+        admin_delete = False
+
+        if admin in interaction.user.roles:
+            admin_delete = True
+        elif not interaction.user.id == img_author:
+            raise ImageException(  # TODO Verify img_author works here...
+                f"This command was created by [{interaction.guild.get_member(int(img_author)).mention}] and can only be deleted by them"
+            )
+
+        try:
+            if admin_delete:
+                processMySQL(
+                    query=sqlDeleteImageCommand, values=[image_name, str(img_author)]
+                )
+            else:
+                processMySQL(
+                    query=sqlDeleteImageCommand,
+                    values=[image_name, str(interaction.user.id)],
+                )
+        except:  # noqa
+            raise ImageException("Unable to delete this image command!")
+
+        embed = buildEmbed(
+            title="Delete Image Command",
+            fields=[
+                dict(
+                    name="Deleted",
+                    value=f"You have deleted the image command [{image_name}].",
+                )
+            ],
+        )
+        await interaction.followup.send(embed=embed)
+
+    @group_img.command(name="random", description="Send a random a server image")
+    async def img_random(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+
+        global all_imgs
+        all_imgs = retrieve_all_img()
+        image = random.choice(all_imgs)
+
+        author = interaction.guild.get_member(int(image["author"]))
+        if author is None:
+            author = "Unknown"
+
+        await interaction.followup.send(content=f"{image['img_url']}")
+
+        del image
+
+    @app_commands.command(name="twos", description="Random Tunnel Walk of Shame image")
+    @app_commands.guilds(GUILD_PROD)
+    async def tunnel_walk(self, interaction: discord.Interaction):
+        logger.info("Grabbing a random TWOS image")
+        await interaction.response.defer()
+
         if "Windows" in platform.platform():
             twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
         else:
@@ -419,8 +373,9 @@ class ImageCommands(commands.Cog):
 
         with open(f"{twos_path}{random.choice(twos_files)}", "rb") as f:
             file = discord.File(f)
-        await ctx.send(file=file)
+
+        await interaction.followup.send(file=file)
 
 
-def setup(bot):
-    bot.add_cog(ImageCommands(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(ImageCog(bot), guilds=[discord.Object(id=GUILD_PROD)])

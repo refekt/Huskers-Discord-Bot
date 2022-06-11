@@ -1,7 +1,18 @@
+# TODO
+# * Modernize and revamp
+# TODO
+import logging
+
 import requests
 from bs4 import BeautifulSoup
 
-from utilities.constants import HEADERS
+from helpers.constants import HEADERS
+
+logger = logging.getLogger(__name__)
+
+__all__ = ["TeamStatsWinsipediaTeam", "CompareWinsipediaTeam", "CompareWinsipedia"]
+
+logger.info(f"{str(__name__).title()} module loaded!")
 
 
 class TeamStatsWinsipediaTeam:

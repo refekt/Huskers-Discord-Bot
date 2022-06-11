@@ -1,8 +1,5 @@
 # TODO
-# * Bet
-# * Bets
-# * Line
-# * Lines
+# * Everything... lol
 # TODO
 import logging
 

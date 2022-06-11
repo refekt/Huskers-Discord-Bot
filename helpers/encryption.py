@@ -1,34 +1,19 @@
 import json
+import logging
 import pathlib
-import platform
 
 from cryptography.fernet import Fernet
 
+logger = logging.getLogger(__name__)
 
-def log(message: str, level: int):
-    import datetime
-
-    if level == 0:
-        print(f"[{datetime.datetime.now()}] ### Encryption: {message}")
-    elif level == 1:
-        print(f"[{datetime.datetime.now()}] ### ~~~ Encryption: {message}")
-
-
-if "Windows" in platform.platform():
-    log(f"Windows encryption key set", 0)
-    key_path = pathlib.PurePath(
-        f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
-    )
-elif "Linux" in platform.platform():
-    log(f"Windows encryption key set", 0)
-    key_path = pathlib.PurePosixPath(
-        f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
-    )
+key_path = pathlib.PurePath(
+    f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
+)
 
 
 def write_key():
     """
-    Generates a image_name and save it into a file
+    Generates an image_name and save it into a file
     """
     key = Fernet.generate_key()
     with open(key_path, "wb") as key_file:
@@ -85,3 +70,6 @@ def decrypt(filename, key):
     # write the original file
     with open(filename, "wb") as file:
         file.write(decrypted_data)
+
+
+logger.info(f"{str(__name__).title()} module loaded!")
