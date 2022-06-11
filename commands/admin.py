@@ -328,13 +328,30 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         self, interaction: discord.Interaction
     ) -> None:  # TODO All of this apparently
         """Lists all commands within the bot"""
-        embed_fields_commands = [
-            dict(
-                name=cmd.name,
-                value=cmd.description if cmd.description else "TBD",
-            )
-            for cmd in interaction.client.commands
-        ]
+        app_cmds = self.__cog_app_commands__
+        embed_fields_commands = []
+        for cmd in app_cmds:
+            if cmd.name == "smms":
+                continue
+
+            if type(cmd) == discord.app_commands.Command:
+                embed_fields_commands.append(
+                    dict(
+                        name=str(cmd.name).capitalize(),
+                        value=cmd.description if cmd.description else "TBD",
+                    )
+                )
+            elif type(cmd) == discord.app_commands.Group:
+                for sub_cmd in cmd.commands:
+                    embed_fields_commands.append(
+                        dict(
+                            name=f"{cmd.name.title()} {sub_cmd.name.title()}",
+                            value=sub_cmd.description if sub_cmd.description else "TBD",
+                        )
+                    )
+            else:
+                pass
+
         embed = buildEmbed(title="Bot Commands", fields=embed_fields_commands)
         await interaction.response.send_message(embed=embed)
 
@@ -398,7 +415,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @app_commands.command(
         name="restart", description="Restart the bot (Linux host only)"
-    )  # TODO Test on Linux
+    )
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def restart(self, interaction: discord.Interaction) -> None:
@@ -586,7 +603,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @group_gameday.command(
         name="on",
-        description="WIP: Turn game day mode on. Restricts access to server channels.",
+        description="Turn game day mode on. Restricts access to server channels.",
     )
     @app_commands.default_permissions(manage_messages=True)
     async def gameday_on(self, interaction: discord.Interaction) -> None:
@@ -598,7 +615,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @group_gameday.command(
         name="off",
-        description="WIP: Turn game day mode off. Restores access to server channels.",
+        description="Turn game day mode off. Restores access to server channels.",
     )
     @app_commands.default_permissions(manage_messages=True)
     async def gameday_off(self, interaction: discord.Interaction) -> None:
