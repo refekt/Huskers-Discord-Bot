@@ -40,19 +40,6 @@ NO_MORE_PREDS = datetime.now().year
 __all__ = [""]
 
 
-class UserPrediction:
-    def __init__(
-        self,
-        school: Any,
-        confidence: Any,
-    ) -> None:
-        self.school: discord.ui.TextInput = school
-        self.confidence: discord.ui.Select = confidence
-
-
-user_prediction: UserPrediction = UserPrediction(None, None)
-
-
 class RecruitListView(discord.ui.View):
     """
     The View for each search button 1-5
@@ -62,6 +49,7 @@ class RecruitListView(discord.ui.View):
         super().__init__()
         self.croot_search: list[Recruit] = recruit_search
 
+        logger.info("Creating recruit search buttons")
         for index, reaction in enumerate(search_reactions):
             self.add_item(
                 discord.ui.Button(
@@ -88,7 +76,7 @@ class RecruitListView(discord.ui.View):
         return True
 
 
-class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
+class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[:45]):
     """
     The Modal for receiving text input to search a school
     """
@@ -97,9 +85,12 @@ class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
         super().__init__()
         self.recruit: Recruit = recruit
 
-    prediction_school = discord.ui.TextInput(label="School Prediction")
+    max_len = 44
+    prediction_school = discord.ui.TextInput(
+        label="What is your school prediction?"[:max_len]
+    )
     prediction_confidence = discord.ui.TextInput(
-        label="Confidence in prediction from 1 (low) to 10 (high)"[:44]
+        label="Prediction confidence 1 (low) to 10 (high)"[:max_len]
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
@@ -148,6 +139,11 @@ class PredictionTeamModal(discord.ui.Modal, title="School Prediction"):
             ephemeral=True,
         )
         logger.info("Prediction was recorded!")
+
+    async def on_error(
+        self, interaction: discord.Interaction, error: Exception
+    ) -> None:
+        raise RecruitException(str(error))
 
 
 class PredictionView(discord.ui.View):
@@ -239,6 +235,19 @@ class PredictionView(discord.ui.View):
         await interaction.followup.send(embed=embed)
 
 
+class UserPrediction:
+    def __init__(
+        self,
+        school: Any,
+        confidence: Any,
+    ) -> None:
+        self.school: discord.ui.TextInput = school
+        self.confidence: discord.ui.Select = confidence
+
+
+user_prediction: UserPrediction = UserPrediction(None, None)
+
+
 def is_walk_on(soup: BeautifulSoup) -> bool:
     icon = soup.find_all(attrs={"class": "icon-walkon"})
     return True if icon else False
@@ -316,6 +325,7 @@ def get_committed_school(all_team_ids: list[dict], team_id: int) -> Union[str, N
 
 
 def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
+    logger.info("Collecting expert crystal ball predictions")
     experts = []
 
     try:
@@ -324,9 +334,13 @@ def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
         return experts
 
     if len(cbs_long_expert) == 0:
+        logger.info("Returning single expert")
         return experts
 
-    for expert in cbs_long_expert[0].contents:
+    for index, expert in enumerate(cbs_long_expert[0].contents):
+        logger.info(
+            f"Searching expert #{index} out of {len(cbs_long_expert[0].contents)}"
+        )
         try:
             expert_name = expert.contents[1].string
             predicted_team = None
@@ -364,15 +378,18 @@ def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
         except:  # noqa
             continue
 
+    logger.info("Returning list of crystal ball predictions")
     return experts
 
 
 def get_cb_predictions(soup: BeautifulSoup) -> list:
+    logger.info("Getting crystal ball predictions")
     crystal_balls = []
 
     predictions_header = soup.find_all(attrs={"class": "list-header-item"})
 
     if len(predictions_header) == 0:
+        logger.info("No crystal ball predictions found")
         return crystal_balls
 
     cbs_long = cbs_one = None
@@ -389,7 +406,10 @@ def get_cb_predictions(soup: BeautifulSoup) -> list:
         pass
 
     if len(cbs_long) > 0:
-        for cb in cbs_long[0].contents:
+        for index, cb in enumerate(cbs_long[0].contents):
+            logger.info(
+                f"Searching long list of predictions #{index} out of {len(cbs_long[0].contents)}"
+            )
             try:
                 school_name = cb.contents[3].text.strip()
                 school_weight = cb.contents[5].text.strip()
@@ -404,6 +424,7 @@ def get_cb_predictions(soup: BeautifulSoup) -> list:
 
         return crystal_balls
     elif len(cbs_one) > 0:
+        logger.info(f"Searching short list of crystal ball predictions")
         single_school = cbs_one[0].contents[1]
         single_school_name = single_school.contents[3].text.strip()
         single_school_weight = single_school.contents[5].text.strip()
@@ -419,6 +440,7 @@ def get_cb_predictions(soup: BeautifulSoup) -> list:
     else:
         return ["N/A"]
 
+    logger.info("Returning crystal ball results")
     return crystal_balls
 
 
@@ -460,6 +482,8 @@ def get_state_ranking(cur_player: dict) -> str:
 
 
 def get_recruit_interests(search_player: dict) -> list[RecruitInterest]:
+    logger.info("Getting recruit interests")
+
     reqs = requests.get(url=search_player["RecruitInterestsUrl"], headers=HEADERS)
     interests_soup = BeautifulSoup(reqs.content, "html.parser")
     interests = interests_soup.find(
@@ -491,6 +515,7 @@ def get_recruit_interests(search_player: dict) -> list[RecruitInterest]:
 
     del reqs, interests, interests_soup
 
+    logger.info("Returning recruit interests")
     return all_interests
 
 
@@ -544,6 +569,7 @@ def get_individual_predictions(user_id: int, recruit):  # TODO Figure out the ty
 
 
 def search_result_info(new_search: list[Recruit]) -> str:
+    logger.info("Building search result string")
     result_info = ""
     for index, recruit in enumerate(new_search):
         if index < CROOT_SEARCH_LIMIT:
@@ -567,10 +593,14 @@ def createPredictionView(target_recruit: Recruit) -> PredictionView:
 
 
 def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
+    logger.info("Building Football Recruit object")
+
+    logger.info("Collecting team IDs")
     all_team_ids = processMySQL(fetch="all", query=sqlTeamIDs)
     name = name.split(" ")
 
     if len(name) == 1:
+        logger.info("Searching the single name for first and last name")
         _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}"
         first_name = requests.get(url=_247_search, headers=HEADERS)
         first_name = json.loads(first_name.text)
@@ -581,6 +611,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
 
         search_results = first_name + last_name
     elif len(name) == 2:
+        logger.info("Searching the combined name for first and last name")
         _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}&Player.LastName={name[1]}"
 
         search_results = requests.get(url=_247_search, headers=HEADERS)
@@ -598,6 +629,11 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
     search_result_players = []
 
     for index, search_player in enumerate(search_results):
+        if index + 1 > CROOT_SEARCH_LIMIT:
+            logger.info("Stoppping search because search limit reached")
+            break
+
+        logger.info(f"Compiling search result #{index} of {len(search_results)}")
         cur_player = search_player["Player"]
 
         reqs = requests.get(url=search_player["Player"]["Url"], headers=HEADERS)
@@ -683,6 +719,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
         )
 
         if index == CROOT_SEARCH_LIMIT - 1:
+            logger.info("Stopping loop because too many results found")
             break
 
     return search_result_players
@@ -760,9 +797,13 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         search_name="Name of the recruit",
     )
     async def predict_submit(
-        self, interaction: discord.Interaction, year: int, search_recruit: str
+        self, interaction: discord.Interaction, year: int, search_name: str
     ) -> None:  # predict, stats, leaderboard, user
-        logger.info(f"Starting a prediction for [{year}] [{search_recruit}]")
+        logger.info(f"Starting a prediction for [{year}] [{search_name}]")
+
+        if not len(search_name.split(" ")) == 2:
+            raise RecruitException("You can only search by full name.")
+
         if len(str(year)) == 2:
             year += 2000
 
@@ -776,31 +817,12 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
                 "The search year must be after the first season of college football--1869."
             )
 
-        await interaction.response.defer(hidden=True)
-
         global prediction_search
-        prediction_search = buildFootballRecruit(year, search_recruit)
-        # TODO Left off here...
-        if type(prediction_search) == commands.UserInputError:
-            return await ctx.send(content=prediction_search, hidden=True)
+        prediction_search = buildFootballRecruit(year, search_name)
 
-        async def send_fap_convo(target_recruit):
-            await initiate_fap(
-                ctx=ctx, user=ctx.author, recruit=target_recruit, client=ctx.bot
-            )
-
-        if len(prediction_search) == 1:
-            return await send_fap_convo(prediction_search[0])
-
-        result_info = search_result_info(prediction_search)
-        action_row = create_actionrow(*search_buttons)
-
-        embed = build_embed(
-            title=f"Search Results for [{year} {search_name.capitalize()}]",
-            fields=[["Search Results", result_info]],
-        )
-
-        await ctx.send(embed=embed, components=[action_row], hidden=True)
+        modal = PredictionTeamModal(prediction_search[0])
+        await interaction.response.send_modal(modal)
+        await modal.wait()
 
 
 async def setup(bot: commands.Bot) -> None:
