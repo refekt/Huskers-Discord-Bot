@@ -195,7 +195,7 @@ class HuskerClient(Bot):
             fields=[
                 dict(
                     name="New Member",
-                    value=guild_member.mention,
+                    value=f"{guild_member.display_name}#{guild_member.discriminator}",
                 ),
                 dict(
                     name="Info",
@@ -282,9 +282,7 @@ class HuskerClient(Bot):
         start_twitter_stream(self)
         logger.info("Twitter stream started")
 
-    async def on_member_join(
-        self, guild_member: Union[discord.Member, discord.User]
-    ) -> None:
+    async def on_member_join(self, guild_member: discord.Member) -> None:
         await self.send_welcome_message(guild_member)
 
     async def on_message_reaction_add(
