@@ -402,35 +402,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def restart(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.send_message(
+            "Bot will restart shortly!", ephemeral=True
+        )
 
         assert "Windows" not in platform.platform(), CommandException(
             "Cannot run this command while hosted on Windows"
         )
-
-        # logger.info("Restarting the bot via SSH")
-        #
-        # client = paramiko.SSHClient()
-        # client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        #
-        # logger.info("SSH Client established")
-        #
-        # try:
-        #     logger.info(
-        #         f"Attempting to connect to SSH client with credentials: {SSH_HOST}, {SSH_USERNAME}:{SSH_PASSWORD}"
-        #     )
-        #     client.connect(
-        #         hostname=SSH_HOST, username=SSH_USERNAME, password=SSH_PASSWORD
-        #     )
-        # except (
-        #     BadHostKeyException,
-        #     AuthenticationException,
-        #     SSHException,
-        #     socket.error,
-        # ):
-        #     raise SSHException("Unable to restart the bot!")
-        #
-        # logger.info("SSH Client connected to host")
 
         logger.info("Starting to update the changelog")
         bash_script_path = pathlib.PurePosixPath(
@@ -442,16 +420,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         except subprocess.CalledProcessError as e:
             raise SSHException(e)
 
-        # bash_script = open(bash_script_path).read()
-        #
-        # logger.info("Collecting stdin, stdout, stderr")
-        # stdin, stdout, stderr = client.exec_command(bash_script)
-        # logger.info(stdout.read().decode())
-
-        # logger.info("Checking for stderr")
-        # err = stderr.read().decode()
-        # assert err is None, SSHException(str(err))
-
         logger.info("Starting to restart the bot")
         bash_script_path = pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/restart.sh"
@@ -461,20 +429,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             subprocess.run([bash_script_path], check=True)
         except subprocess.CalledProcessError as e:
             raise SSHException(e)
-        # bash_script = open(bash_script_path).read()
-        #
-        # logger.info("Collecting stdin, stdout, stderr")
-        # stdin, stdout, stderr = client.exec_command(bash_script)
-        # logger.info(stdout.read().decode())
-        #
-        # logger.info("Checking for stderr")
-        # err = stderr.read().decode()
-        # assert err is None, SSHException(str(err))
-
-        # client.close()
-        logger.info("SSH Client is closed.")
-
-        await interaction.channel.send("Bot restart complete!")
 
     @group_submit.command(name="bug", description="Submit a bug")
     async def submit_bug(self, interaction: discord.Interaction) -> None:
