@@ -335,7 +335,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         name="commands", description="Lists all commands within the bot"
     )
     @app_commands.guilds(GUILD_PROD)
-    async def commands(self, interaction: discord.Interaction) -> None:
+    async def commands(
+        self, interaction: discord.Interaction
+    ) -> None:  # TODO All of this apparently
         """Lists all commands within the bot"""
         embed_fields_commands = [
             dict(
