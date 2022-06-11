@@ -255,41 +255,40 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         """All about Bot Frost"""
 
         await interaction.response.send_message(
-            # TODO Change this to use dict()
             embed=buildEmbed(
                 title="About Me",
                 fields=[
-                    {
-                        "name": "History",
-                        "value": "Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
-                    },
-                    {
-                        "name": "Source Code",
-                        "value": discordURLFormatter(
+                    dict(
+                        name="History",
+                        value="Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
+                    ),
+                    dict(
+                        name="Source Code",
+                        value=discordURLFormatter(
                             "GitHub", "https://www.github.com/refekt/Husker-Bot"
                         ),
-                    },
-                    {"name": "Version", "value": _version, "inline": False},
-                    {
-                        "name": "Hosting Location",
-                        "value": f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}",
-                    },
-                    {
-                        "name": "Hosting Status",
-                        "value": "https://status.hyperexpert.com/",
-                    },
-                    {
-                        "name": "Latency",
-                        "value": f"{interaction.client.latency * 1000:.2f} ms",
-                    },
-                    {
-                        "name": "Username",
-                        "value": interaction.client.user.mention,
-                    },
-                    {
-                        "name": "Feeling generous?",
-                        "value": f"Check out `/donate` to help out the production and upkeep of the bot.",
-                    },
+                    ),
+                    dict(name="Version", value=_version),
+                    dict(
+                        name="Hosting Location",
+                        value=f"{'Local Machine' if 'Windows' in platform.platform() else 'Virtual Private Server'}",
+                    ),
+                    dict(
+                        name="Hosting Status",
+                        value="https://status.hyperexpert.com/",
+                    ),
+                    dict(
+                        name="Latency",
+                        value=f"{interaction.client.latency * 1000:.2f} ms",
+                    ),
+                    dict(
+                        name="Username",
+                        value=interaction.client.user.mention,
+                    ),
+                    dict(
+                        name="Feeling generous?",
+                        value=f"Check out `/donate` to help out the production and upkeep of the bot.",
+                    ),
                 ],
             )
         )
@@ -302,31 +301,30 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         """Contribute to the development of Bot Frost"""
 
         await interaction.response.send_message(
-            # TODO change this to use dict()
             embed=buildEmbed(
                 title="Donation Information",
                 thumbnail="https://i.imgur.com/53GeCvm.png",
                 fields=[
-                    {
-                        "name": "About",
-                        "value": "I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs.",
-                    },
-                    {
-                        "name": "Terms",
-                        "value": "(1) Final discretion of donation usage is up to the creator(s). "
+                    dict(
+                        name="About",
+                        value="I hate asking for donations; however, the bot has grown to the point where official server hosting is required. Server hosting provides 99% uptime and hardware performance I cannot provide with my own hardware. I will be paying for upgraded hosting but donations will help offset any costs.",
+                    ),
+                    dict(
+                        name="Terms",
+                        value="(1) Final discretion of donation usage is up to the creator(s). "
                         "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
                         "(3) No refunds. "
                         "(4) Monthly subscriptions can be terminated by either party at any time. "
                         "(5) These terms can be changed at any time. Please read before each donation. "
                         "(6) Clicking the donation link signifies your agreement to these terms.",
-                    },
-                    {
-                        "name": "Donation Link",
-                        "value": discordURLFormatter(
+                    ),
+                    dict(
+                        name="Donation Link",
+                        value=discordURLFormatter(
                             "click me",
                             "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=refekt%40gmail.com&currency_code=USD&source=url",
                         ),
-                    },
+                    ),
                 ],
             )
         )
@@ -413,7 +411,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def restart(self, interaction: discord.Interaction) -> None:
-        interaction.response.defer(ephemeral=True, thinking=True)
+        interaction.response.defer(ephemeral=True)
 
         assert "Windows" not in platform.platform(), CommandException(
             "Cannot run this command while hosted on Windows"
@@ -450,7 +448,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(stdout.read().decode())
 
         err = stderr.read().decode()
-        assert err is None, CommandException(err)
+        assert err is None, CommandException(str(err))
 
         # Restart
         bash_script_path = pathlib.PurePosixPath(
@@ -462,7 +460,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(stdout.read().decode())
 
         err = stderr.read().decode()
-        assert err is None, CommandException(err)
+        assert err is None, CommandException(str(err))
 
         client.close()
         logger.info("SSH Client is closed.")
