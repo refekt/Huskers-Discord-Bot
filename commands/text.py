@@ -226,7 +226,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         description="Arrest a server member!",
     )
     @app_commands.describe(
-        arestee="A Discord member you want to arrest",
+        arrestee="A Discord member you want to arrest",
     )
     @app_commands.guilds(GUILD_PROD)
     async def police(
