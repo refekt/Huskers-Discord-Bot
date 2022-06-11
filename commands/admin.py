@@ -39,7 +39,7 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
-from objects.Exceptions import CommandException, UserInputException
+from objects.Exceptions import CommandException, UserInputException, SSHException
 
 logger = logging.getLogger(__name__)
 
@@ -425,6 +425,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info("SSH Client established")
 
         try:
+            logger.info(
+                f"Attempting to connect to SSH client with credentials: {SSH_HOST}, {SSH_USERNAME}:{SSH_PASSWORD}"
+            )
             client.connect(
                 hostname=SSH_HOST, username=SSH_USERNAME, password=SSH_PASSWORD
             )
@@ -434,33 +437,37 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             SSHException,
             socket.error,
         ):
-            logger.exception("Unable to restart the bot!", exc_info=True)
+            raise SSHException("Unable to restart the bot!")
 
         logger.info("SSH Client connected to host")
 
-        # Update change log
+        logger.info("Starting to update the changelog")
         bash_script_path = pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/changelog.sh"
         )
         bash_script = open(bash_script_path).read()
 
+        logger.info("Collecting stdin, stdout, stderr")
         stdin, stdout, stderr = client.exec_command(bash_script)
         logger.info(stdout.read().decode())
 
+        logger.info("Checking for stderr")
         err = stderr.read().decode()
-        assert err is None, CommandException(str(err))
+        assert err is None, SSHException(str(err))
 
-        # Restart
+        logger.info("Starting to restart the bot")
         bash_script_path = pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/restart.sh"
         )
         bash_script = open(bash_script_path).read()
 
+        logger.info("Collecting stdin, stdout, stderr")
         stdin, stdout, stderr = client.exec_command(bash_script)
         logger.info(stdout.read().decode())
 
+        logger.info("Checking for stderr")
         err = stderr.read().decode()
-        assert err is None, CommandException(str(err))
+        assert err is None, SSHException(str(err))
 
         client.close()
         logger.info("SSH Client is closed.")
