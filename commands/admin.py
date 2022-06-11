@@ -435,7 +435,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         try:
             subprocess.run([bash_script_path], check=True)
         except subprocess.CalledProcessError as e:
-            raise SSHException(e)
+            logger.exception(
+                f"Status Code: {e.returncode}, Output: {e.output}", exc_info=True
+            )
+            pass
 
         logger.info("Starting to restart the bot")
         bash_script_path = pathlib.PurePosixPath(
@@ -445,7 +448,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         try:
             subprocess.run([bash_script_path], check=True)
         except subprocess.CalledProcessError as e:
-            raise SSHException(e)
+            raise SSHException(f"Status Code: {e.returncode}, Output: {e.output}")
 
     @group_submit.command(name="bug", description="Submit a bug")
     async def submit_bug(self, interaction: discord.Interaction) -> None:
