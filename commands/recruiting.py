@@ -796,9 +796,9 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         year="The year of the recruit's recruitting class",
         search_name="Name of the recruit",
     )
-    async def predict_submit(
+    async def predict_submit(  # predict, stats, leaderboard, user
         self, interaction: discord.Interaction, year: int, search_name: str
-    ) -> None:  # predict, stats, leaderboard, user
+    ) -> None:
         logger.info(f"Starting a prediction for [{year}] [{search_name}]")
 
         if not len(search_name.split(" ")) == 2:

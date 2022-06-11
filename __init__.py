@@ -79,8 +79,8 @@ async def on_app_command_error(
             ),
         ],
     )
-    if interaction.message:
-        await interaction.edit_original_message(content="", embed=embed)
+    if interaction.response.is_done():
+        await interaction.followup.send(content="", embed=embed)
     else:
         await interaction.response.send_message(content="", embed=embed, ephemeral=True)
 

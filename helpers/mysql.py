@@ -270,7 +270,7 @@ DELETE FROM iowa WHERE user_id = %s
 # # """
 
 
-def processMySQL(query: str, **kwargs) -> Union[list, None, Any]:
+def processMySQL(query: str, **kwargs) -> Union[list[dict], None]:
     logger.info(f"Starting a MySQL query")
     sqlConnection = None
     try:
