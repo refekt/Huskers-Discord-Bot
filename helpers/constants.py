@@ -235,6 +235,15 @@ GLOBAL_TIMEOUT = 3600
 
 CROOT_SEARCH_LIMIT = 5
 
+# Embed limitations
+# https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
+DESC_LIMIT = 4096
+EMBED_MAX = 6000
+FIELD_VALUE_LIMIT = 1024
+FIELDS_LIMIT = 25
+FOOTER_LIMIT = 2048
+TITLE_LIMIT = NAME_LIMIT = FIELD_NAME_LIMIT = 256
+
 # States
 US_STATES = [
     {"State": "Alabama", "Abbrev": "Ala.", "Code": "AL"},

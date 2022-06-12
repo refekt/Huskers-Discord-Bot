@@ -7,6 +7,7 @@ from enum import Enum
 from typing import Any, Union
 
 import discord.ext.commands
+import numpy as np
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
@@ -26,11 +27,13 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
+    FIELDS_LIMIT,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Exceptions import CommandException, UserInputException, SSHException
+from objects.Paginator import EmbedPaginatorView
 
 logger = logging.getLogger(__name__)
 
@@ -326,32 +329,78 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.guilds(GUILD_PROD)
     async def commands(self, interaction: discord.Interaction) -> None:
         """Lists all commands within the bot"""
-        app_cmds = self.__cog_app_commands__
-        embed_fields_commands = []
-        for cmd in app_cmds:
-            if cmd.name == "smms":
+
+        await interaction.response.defer()
+
+        app_cmds: dict[
+            Union[discord.app_commands.Group, discord.app_commands.Command]
+        ] = [
+            bot_guild_command
+            for bot_guild_command in interaction.client.tree._guild_commands.items()  # noqa
+        ][
+            0
+        ][
+            1
+        ]
+        # Don't judge me for the craziness above
+
+        embed_fields_commands: list[dict] = []
+
+        for cmd in app_cmds.items():
+            cmd_name = cmd[0]
+            cmd_command = cmd[1]
+            if str(cmd_name).lower() == "smms":
                 continue
 
-            if type(cmd) == discord.app_commands.Command:
+            if type(cmd_command) == discord.app_commands.Command:
                 embed_fields_commands.append(
                     dict(
-                        name=str(cmd.name).capitalize(),
-                        value=cmd.description if cmd.description else "TBD",
+                        name=str(cmd_name).capitalize(),
+                        value=cmd_command.description
+                        if cmd_command.description
+                        else "TBD",
                     )
                 )
             elif type(cmd) == discord.app_commands.Group:
-                for sub_cmd in cmd.commands:
+                for sub_cmd in cmd_command.commands:
                     embed_fields_commands.append(
                         dict(
-                            name=f"{cmd.name.title()} {sub_cmd.name.title()}",
+                            name=f"{str(cmd_name).title()} {sub_cmd.name.title()}",
                             value=sub_cmd.description if sub_cmd.description else "TBD",
                         )
                     )
-            else:
-                pass
 
-        embed = buildEmbed(title="Bot Commands", fields=embed_fields_commands)
-        await interaction.response.send_message(embed=embed)
+        embed_fields_commands = sorted(embed_fields_commands, key=lambda x: x["name"])
+
+        embeds: list[discord.Embed] = list()
+        limit = 10  # Arbitary limit
+        if len(embed_fields_commands) > limit:
+            logger.info("Number of commands surprasses Discord embed field limitations")
+            temp = []
+            for i in range(0, len(embed_fields_commands), limit):
+                temp.append(embed_fields_commands[i : i + limit])
+            embeds = [
+                buildEmbed(
+                    title="Bot Frost Commands",
+                    description=f"There are {len(embed_fields_commands)} commands",
+                    fields=array,
+                )
+                for array in temp
+            ]
+        else:
+            embeds.append(
+                buildEmbed(
+                    title="Bot Frost Commands",
+                    description=f"There are {len(embed_fields_commands)} commands",
+                    fields=embed_fields_commands,
+                )
+            )
+
+        view = EmbedPaginatorView(
+            embeds=embeds, original_message=await interaction.original_message()
+        )
+
+        await interaction.followup.send(embed=view.initial, view=view)
 
     @group_purge.command(
         name="bot", description="Purge the 100 most recent bot messages"

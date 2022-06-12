@@ -16,6 +16,14 @@ from helpers.constants import (
     DT_TWEET_FORMAT,
     TZ,
     DT_STR_RECRUIT,
+    TITLE_LIMIT,
+    DESC_LIMIT,
+    FOOTER_LIMIT,
+    NAME_LIMIT,
+    FIELDS_LIMIT,
+    FIELD_NAME_LIMIT,
+    FIELD_VALUE_LIMIT,
+    EMBED_MAX,
 )
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
@@ -30,14 +38,6 @@ __all__ = [
     "collectScheduleEmbeds",
 ]
 
-# https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
-desc_limit = 4096
-embed_max = 6000
-field_value_limit = 1024
-fields_limit = 25
-footer_limit = 2048
-title_limit = name_limit = field_name_limit = 256
-
 
 def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
     logger.info("Creating a normal embed")
@@ -49,30 +49,30 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
     if "color" in kwargs.keys():
         if "description" in kwargs.keys():
             e = discord.Embed(
-                title=title[:title_limit],
-                description=kwargs["description"][:desc_limit],
+                title=title[:TITLE_LIMIT],
+                description=kwargs["description"][:DESC_LIMIT],
                 color=kwargs["color"],
                 timestamp=dtNow,
             )
         else:
             e = discord.Embed(
-                title=title[:title_limit], color=kwargs["color"], timestamp=dtNow
+                title=title[:TITLE_LIMIT], color=kwargs["color"], timestamp=dtNow
             )
     else:
         if "description" in kwargs.keys():
             e = discord.Embed(
-                title=title[:title_limit],
-                description=kwargs["description"][:desc_limit],
+                title=title[:TITLE_LIMIT],
+                description=kwargs["description"][:DESC_LIMIT],
                 color=0xD00000,
             )
         else:
-            e = discord.Embed(title=title[:title_limit], color=0xD00000)
+            e = discord.Embed(title=title[:TITLE_LIMIT], color=0xD00000)
 
     if "footer" in kwargs.keys():
-        e.set_footer(text=kwargs.get("footer")[:footer_limit], icon_url=BOT_ICON_URL)
+        e.set_footer(text=kwargs.get("footer")[:FOOTER_LIMIT], icon_url=BOT_ICON_URL)
     else:
         e.set_footer(
-            text=BOT_FOOTER_BOT[:footer_limit],
+            text=BOT_FOOTER_BOT[:FOOTER_LIMIT],
             icon_url=BOT_ICON_URL,
         )
 
@@ -80,10 +80,10 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
         e.set_image(url=kwargs.get("image"))
 
     if "author" in kwargs.keys():
-        e.set_author(name=kwargs.get("author")[:name_limit], url="", icon_url="")
+        e.set_author(name=kwargs.get("author")[:NAME_LIMIT], url="", icon_url="")
     else:
         e.set_author(
-            name=BOT_DISPLAY_NAME[:name_limit], url=BOT_GITHUB_URL, icon_url=""
+            name=BOT_DISPLAY_NAME[:NAME_LIMIT], url=BOT_GITHUB_URL, icon_url=""
         )
 
     if "thumbnail" in kwargs.keys() and validators.url(kwargs.get("thumbnail")):
@@ -93,15 +93,15 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
 
     if "fields" in kwargs.keys():
         for index, field in enumerate(kwargs.get("fields")):
-            if index == fields_limit:
+            if index == FIELDS_LIMIT:
                 break
 
             e.add_field(
-                name=field["name"][:field_name_limit],
-                value=field["value"][:field_value_limit],
+                name=field["name"][:FIELD_NAME_LIMIT],
+                value=field["value"][:FIELD_VALUE_LIMIT],
                 inline=field.get("inline", False),
             )
-    if len(e) > embed_max:
+    if len(e) > EMBED_MAX:
         logger.exception("Embed is too big!", exc_info=True)
         raise
     else:
