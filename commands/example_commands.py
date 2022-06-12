@@ -22,7 +22,9 @@ class MyCog(commands.Cog):
         ...
 
     @app_commands.command(name="command-1", description="Descript #1")
-    @app_commands.describe(example="Description for example variable")
+    @app_commands.describe(
+        example="Description for example variable"
+    )  # Typos here will cause the cog not to load
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(
         manage_messages=True

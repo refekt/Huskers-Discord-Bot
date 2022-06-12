@@ -17,6 +17,7 @@ from discord.ext import commands
 from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD, HEADERS
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
+from helpers.misc import makeSlowking
 from helpers.mysql import (
     processMySQL,
     sqlCreateImageCommand,
@@ -189,42 +190,8 @@ class ImageCog(commands.Cog, name="Image Commands"):
         self, interaction: discord.Interaction, person: discord.Member
     ) -> None:
         await interaction.response.defer()
-
-        try:
-            avatar_thumbnail = Image.open(
-                requests.get(person.avatar.url, stream=True).raw
-            ).convert("RGBA")
-        except IOError:
-            logger.exception(
-                "Unable to create a Slow King avatar for user!", exc_info=True
-            )
-            raise ImageException("Unable to create a Slow King avatar for user!")
-
-        base_mask = Image.open("resources/images/mask.png").convert("L")
-        avatar_thumbnail = ImageOps.fit(
-            avatar_thumbnail, base_mask.size, centering=(0.5, 0.5)
-        )
-        avatar_thumbnail.putalpha(base_mask)
-
-        paste_pos = (265, 250)
-        slowking_filename = "make_slowking.png"
-
-        base_img = Image.open("resources/images/slowking.png").convert("RGBA")
-        base_img.paste(avatar_thumbnail, paste_pos, avatar_thumbnail)
-
-        base_img.save(f"resources/images/{slowking_filename}", "PNG")
-
-        if "Windows" in platform.platform():
-            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\{slowking_filename}"
-        else:
-            slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/{slowking_filename}"
-
-        with open(slowking_path, "rb") as f:
-            file = discord.File(f)
-
+        file = makeSlowking(person)
         await interaction.followup.send(content=person.mention, file=file)
-
-        file.close()
 
     @group_img.command(name="show", description="Show a server image")
     @app_commands.describe(image_name="A keyword for the new image")

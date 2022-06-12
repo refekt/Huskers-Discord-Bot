@@ -19,8 +19,11 @@ from helpers.constants import (
     TWITTER_BEARER,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_QUERY_MAX,
+    CHAN_HOF,
+    CHAN_HOS,
 )
 from helpers.embed import buildEmbed
+from helpers.misc import makeSlowking
 from objects.Exceptions import ChangelogException
 from objects.TweepyStreamListener import StreamClientV2
 
@@ -154,6 +157,113 @@ class HuskerClient(Bot):
         "commands.reminder",
         "commands.text",
     ]
+    guild_user_len: int = 0
+    reaction_threshold: int = 0
+
+    async def check_reaction(self, payload: discord.RawReactionActionEvent) -> None:
+        if not payload.guild_id == GUILD_PROD or payload.channel_id in (
+            CHAN_HOF,
+            CHAN_HOS,
+        ):  # Stay out of HOF and HOS
+            return None
+
+        slowpoke_emoji = "<:slowpoke:758361250048245770>"
+        reaction_channel: discord.TextChannel = await self.fetch_channel(
+            payload.channel_id
+        )
+        reaction_message: discord.Message = await reaction_channel.fetch_message(
+            payload.message_id
+        )
+
+        reactions_over_threshold: list[discord.Reaction] = [
+            reaction
+            for reaction in reaction_message.reactions
+            if reaction.count >= self.reaction_threshold
+        ]
+
+        if not reactions_over_threshold:
+            logger.info("No reactions found over threshold")
+            return None
+
+        logger.info(
+            f"Reaction threshold broken with [{reactions_over_threshold[0].count}] [{reactions_over_threshold[0].emoji}] reactions"
+        )
+        hof_channel = hos_channel = None
+        if str(reactions_over_threshold[0].emoji) == slowpoke_emoji:
+            logger.info("Hall of Shame threshold breached")
+            hof = False
+            hos_channel: Union[discord.TextChannel, None] = await self.fetch_channel(
+                CHAN_HOS
+            )
+            raw_message_history: list[discord.Message] = [
+                message async for message in hos_channel.history(limit=123)
+            ]
+        else:
+            logger.info("Hall of Fame threshold breached")
+            hof = True
+            hof_channel: Union[discord.TextChannel, None] = await self.fetch_channel(
+                CHAN_HOF
+            )
+            raw_message_history: list[discord.Message] = [
+                message async for message in hof_channel.history(limit=123)
+            ]
+
+        logger.info("Checking for duplicate messages")
+        duplicate = False
+        for raw_message in raw_message_history:
+            if (
+                len(raw_message.embeds) > 0
+                and str(reaction_message.id) in raw_message.embeds[0].footer.text
+            ):
+                logger.info("Duplicate message found")
+                duplicate = True
+                break
+        del raw_message_history
+
+        file = None
+
+        if not duplicate:
+            if not hof:
+                logger.info("Creating Hall of Shame Embed")
+                embed_title = (
+                    f"{slowpoke_emoji * 3} Hall of Shame Message {slowpoke_emoji * 3}"
+                )
+                embed_description = (
+                    "Messages so shameful they had to be memorialized forever!"
+                )
+                channel = hos_channel
+
+                file = makeSlowking(payload.member)
+            else:
+                logger.info("Creating Hall of Fame Embed")
+                embed_title = f"{'🏆' * 3} Hall of Shame Message {'🏆' * 3}"
+                embed_description = (
+                    "Messages so amazing they had to be memorialized forever!"
+                )
+                channel = hof_channel
+
+            avatar_url = (
+                str(reaction_message.author.avatar_url)
+                .split("?")[0]
+                .replace("webp", "png")
+            )
+
+            embed = buildEmbed(
+                title=embed_title,
+                description=embed_description,
+                # thumbnail=slowking_path if not None else None,
+                file=file if file else None,
+                fields=[
+                    ["Author", reaction_message.author.mention],
+                    ["Message", reaction_message.content],
+                    [
+                        "Message Link",
+                        f"[Click to view message]({reaction_message.jump_url})",
+                    ],
+                ],
+                footer=f"Message ID: {reaction_message.id} | Hall of Shame message created at {reaction_message.created_at.strftime('%B %d, %Y at %H:%M%p')}",
+            )
+            await channel.send(embed=embed)
 
     # noinspection PyMethodMayBeStatic
     def get_change_log(self) -> [str, ChangelogException]:
@@ -239,15 +349,18 @@ class HuskerClient(Bot):
             ],
         )
 
-    # async def check_reaction(self, reaction: discord.Reaction):
-    #     ...
-
     # noinspection PyMethodMayBeStatic
     async def on_connect(self) -> None:
         logger.info("The bot has connected!")
 
     # noinspection PyMethodMayBeStatic
     async def on_ready(self) -> None:
+        self.guild_user_len = len(self.users)
+        self.reaction_threshold = int(0.0047 * self.guild_user_len)
+        logger.info(
+            f"Reaction threshold for HOF and HOS messages set to [{self.reaction_threshold}]"
+        )
+
         logger.info("Loading extensions")
 
         for extension in self.add_extensions:
@@ -285,8 +398,5 @@ class HuskerClient(Bot):
     async def on_member_join(self, guild_member: discord.Member) -> None:
         await self.send_welcome_message(guild_member)
 
-    async def on_message_reaction_add(
-        self,
-        reaction: discord.Reaction,
-    ) -> None:  # TODO
-        ...  # await self.check_reaction(reaction)
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        await self.check_reaction(payload)
