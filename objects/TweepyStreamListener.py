@@ -179,7 +179,8 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_connect(self) -> None:
         logger.info("Connected")
         task = asyncio.run_coroutine_threadsafe(
-            send_tweet_alert(self.client, "Connected!"), self.client.loop
+            send_tweet_alert(self.client, f"Connected! Following: {self.get_rules()}"),
+            self.client.loop,
         )
         task.result()
 
