@@ -23,7 +23,7 @@ from helpers.constants import (
     CHAN_HOS,
 )
 from helpers.embed import buildEmbed
-from helpers.misc import makeSlowking
+from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException
 from objects.TweepyStreamListener import StreamClientV2
 
