@@ -62,7 +62,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     group_purge = app_commands.Group(
         name="purge",
         description="Purge messages from channel",
-        default_permissions=discord.Permissions(manage_messages=True),
+        default_permissions=discord.Permissions(administration=True),
         guild_ids=[GUILD_PROD],
     )
     group_submit = app_commands.Group(
@@ -324,9 +324,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         name="commands", description="Lists all commands within the bot"
     )
     @app_commands.guilds(GUILD_PROD)
-    async def commands(
-        self, interaction: discord.Interaction
-    ) -> None:  # TODO All of this apparently
+    async def commands(self, interaction: discord.Interaction) -> None:
         """Lists all commands within the bot"""
         app_cmds = self.__cog_app_commands__
         embed_fields_commands = []
@@ -402,7 +400,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
     @app_commands.command(name="quit", description="Turn off Bot Frost")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administration=True)
     @app_commands.guilds(GUILD_PROD)
     async def quit(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
@@ -417,7 +415,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         name="restart", description="Restart the bot (Linux host only)"
     )
     @app_commands.guilds(GUILD_PROD)
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administration=True)
     async def restart(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             "Bot will restart shortly!", ephemeral=True
@@ -629,7 +627,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await self.alert_gameday_channels(client=interaction.client, on=False)
 
     @app_commands.command(name="smms", description="Tee hee")  # TODO Make hidden
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def smms(
         self,
         interaction: discord.Interaction,
