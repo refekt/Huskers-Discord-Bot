@@ -199,6 +199,10 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_disconnect(self) -> None:
         logger.warning("Disconnected")
+        # _: dict[dict[list[dict]]] = self.get_rules()
+        # rules = [rule["id"] for rule in _]
+        #
+        # self.delete_rules(self.get_rules())
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, "The Twitter Stream has been disconnected!"),
             self.client.loop,

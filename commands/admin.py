@@ -455,6 +455,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.send_message(
             f"Goodbye for now! {interaction.user.mention} has turned me off!"
         )
+
         await interaction.client.close()
         logger.info(
             f"User {interaction.user.name}#{interaction.user.discriminator} turned off the bot."
