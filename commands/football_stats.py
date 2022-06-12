@@ -1,10 +1,17 @@
 import calendar
 import logging
 from datetime import datetime
-from typing import Union, Any
+from typing import Union, Any, Optional
 
+import cfbd
 import discord
-from cfbd import ApiClient, BettingApi, Configuration, GamesApi
+from cfbd import (
+    ApiClient,
+    BettingApi,
+    Configuration,
+    GamesApi,
+    PlayersApi,
+)
 from cfbd.rest import ApiException
 from discord import app_commands
 from discord.ext import commands
@@ -393,6 +400,145 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         pages = collectScheduleEmbeds(year)
         view = EmbedPaginatorView(
             embeds=pages, original_message=await interaction.original_message()
+        )
+
+        await interaction.followup.send(embed=view.initial, view=view)
+
+    @app_commands.command(
+        name="player-stats", description="Display players stats for the year"
+    )
+    @app_commands.describe(
+        year="The year you want stats",
+        player_name="Full name of the player you want to display",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def player_stats(
+        self, interaction: discord.Interaction, year: int, player_name: str
+    ):
+        logger.info(f"Starting player stat search for {year} {player_name.upper()}")
+        await interaction.response.defer()
+
+        if len(player_name.split(" ")) == 0:
+            raise StatsException(
+                "A player's first and/or last search_name is required."
+            )
+        if len(str(year)) == 2:
+            year += 2000
+        elif 1 < len(str(year)) < 4:
+            raise StatsException("The search year must be two or four digits long.")
+        if year > datetime.now().year + 5:
+            raise StatsException(
+                "The search year must be within five years of the current class."
+            )
+        if year < 1869:
+            raise StatsException(
+                "The search year must be after the first season of college football--1869."
+            )
+
+        api = PlayersApi(ApiClient(cfbd_config))
+        api_player_search_result: list[cfbd.PlayerSearchResult] = api.player_search(
+            search_term=player_name, team="nebraska", year=year
+        )
+
+        if not api_player_search_result:
+            raise StatsException(f"Unable to find {player_name}. Please try again!")
+        api_player_search_result: cfbd.PlayerSearchResult = api_player_search_result[0]
+        logger.info(f"Found player {player_name.upper()}")
+
+        api_season_stat_result: list[
+            cfbd.PlayerSeasonStat
+        ] = api.get_player_season_stats(year=year, team="nebraska", season_type="both")
+        logger.info(f"Pulled raw season stats for {player_name.upper()}")
+
+        stat_type_descriptions = {
+            "ATT": "Attempts",
+            "AVG": "Average",
+            "CAR": "Carries",
+            "COMPLETIONS": "Completions",
+            "FGA": "Field Goals Attempted",
+            "FGM": "Field Goals Made",
+            "FUM": "Fumbles",
+            "INT": "Interceptions",
+            "In 20": "Inside 20 Yards",
+            "LONG": "Longest",
+            "LOST": "Lost",
+            "NO": "Number",
+            "PCT": "Completion Percent",
+            "PD": "Passes Defended",
+            "PTS": "Points",
+            "QB HUR": "Quarterback Hurries",
+            "REC": "Receptions",
+            "SACKS": "Sacks",
+            "SOLO": "Solo Tackles",
+            "TB": "Touchback",
+            "TD": "Touchdowns",
+            "TFL": "Tackles For Loss",
+            "TOT": "Total Tackles",
+            "XPA": "Extra Point Attempt",
+            "XPM": "Extra Point Made",
+            "YDS": "Total Yards",
+            "YPA": "Yards Per Attempt",
+            "YPC": "Yards Per Carry",
+            "YPP": "Yards Per Play",
+            "YPR": "Yards Per Reception",
+        }
+
+        desc = (
+            f"Position: {api_player_search_result.position}\n"
+            f"Height: {int(api_player_search_result.height /12)}'{api_player_search_result.height % 12}\"\n"
+            f"Weight: {api_player_search_result.weight} lbs.\n"
+            f"Hometown: {api_player_search_result.hometown}"
+        )
+
+        logger.info("Building cateorgy embeds")
+        stat_categories: dict[str, Optional[discord.Embed]] = {
+            "defensive": buildEmbed(
+                title=f"{player_name.title()}'s Defense Stats", description=desc
+            ),
+            "fumbles": buildEmbed(
+                title=f"{player_name.title()}'s Fumble Stats", description=desc
+            ),
+            "interceptions": buildEmbed(
+                title=f"{player_name.title()}'s Interception Stats", description=desc
+            ),
+            "kickReturns": buildEmbed(
+                title=f"{player_name.title()}'s Kick Return Stats", description=desc
+            ),
+            "kicking": buildEmbed(
+                title=f"{player_name.title()}'s Kicking Stats", description=desc
+            ),
+            "passing": buildEmbed(
+                title=f"{player_name.title()}'s Passing Stats", description=desc
+            ),
+            "puntReturns": buildEmbed(
+                title=f"{player_name.title()}'s Punt Return Stats", description=desc
+            ),
+            "punting": buildEmbed(
+                title=f"{player_name.title()}'s Punting Stats", description=desc
+            ),
+            "receiving": buildEmbed(
+                title=f"{player_name.title()}'s Receiving Stats", description=desc
+            ),
+            "rushing": buildEmbed(
+                title=f"{player_name.title()}'s Rushing Stats", description=desc
+            ),
+        }
+
+        logger.info("Updating embeds")
+        for stat in api_season_stat_result:
+            if not stat.player.lower() == player_name:  # Filter out only the player
+                continue
+
+            stat_categories[stat.category].add_field(
+                name=stat_type_descriptions[stat.stat_type],
+                value=str(stat.stat),
+                inline=False,
+            )
+
+        logger.info("Creating Paginator")
+        view = EmbedPaginatorView(
+            embeds=[embed for embed in stat_categories.values() if embed.fields],
+            original_message=await interaction.original_message(),
         )
 
         await interaction.followup.send(embed=view.initial, view=view)

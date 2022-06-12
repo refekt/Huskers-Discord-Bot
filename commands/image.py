@@ -1,4 +1,6 @@
+import ast
 import io
+import json
 import logging
 import pathlib
 import platform
@@ -323,7 +325,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
     @app_commands.command(name="twos", description="Random Tunnel Walk of Shame image")
     @app_commands.guilds(GUILD_PROD)
-    async def tunnel_walk(self, interaction: discord.Interaction):
+    async def tunnel_walk(self, interaction: discord.Interaction) -> None:
         logger.info("Grabbing a random TWOS image")
         await interaction.response.defer()
 
@@ -342,6 +344,29 @@ class ImageCog(commands.Cog, name="Image Commands"):
             file = discord.File(f)
 
         await interaction.followup.send(file=file)
+
+    # TODO Either find or build an alternative to avoid spending money
+    # @app_commands.command(
+    #     name="text-to-image", description="Use AI ML to generate an image from text"
+    # )
+    # @app_commands.guilds(GUILD_PROD)
+    # async def text_to_image(self, interaction: discord.Interaction, text: str) -> None:
+    #     await interaction.response.defer()
+    #
+    #     raw_response = requests.post(
+    #         "https://api.deepai.org/api/text2img",
+    #         data={
+    #             "text": text,
+    #         },
+    #         headers={"api-key": "quickstart-QUdJIGlzIGNvbWluZy4uLi4K"},
+    #     )
+    #     ai_image = json.loads(raw_response.content.decode("utf-8"))
+    #
+    #     embed = buildEmbed(
+    #         title=f"AI Generated Image from [{text}]", image=ai_image["output_url"]
+    #     )
+    #
+    #     await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
