@@ -1,2 +1,2 @@
-_version = "3.5.0.b"
+_version = "3.5.0"
 _author = "u/refekt"
