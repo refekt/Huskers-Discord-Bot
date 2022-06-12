@@ -36,7 +36,6 @@ from objects.Bets import *  # noqa
 from objects.Exceptions import *  # noqa
 from objects.Karma import *  # noqa
 from objects.Paginator import *  # noqa
-from objects.Prediction import *  # noqa
 from objects.Recruits import *  # noqa
 from objects.Schedule import *  # noqa
 from objects.Thread import *  # noqa

@@ -21,7 +21,6 @@ from helpers.embed import buildEmbed, buildRecruitEmbed
 from helpers.mysql import (
     processMySQL,
     sqlGetIndividualPrediction,
-    sqlGetPrediction,
     sqlInsertPrediction,
     sqlTeamIDs,
 )
@@ -37,7 +36,7 @@ search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5�
 CURRENT_CLASS = datetime.now().year
 NO_MORE_PREDS = datetime.now().year
 
-__all__ = [""]
+__all__ = ["RecruitingCog"]
 
 
 class RecruitListView(discord.ui.View):
@@ -557,13 +556,14 @@ def get_teams() -> list[str]:
     return teams_list
 
 
-def get_individual_predictions(user_id: int, recruit):  # TODO Figure out the type hint
-    sql_response = processMySQL(
-        query=sqlGetPrediction,
-        values=(user_id, recruit.twofourseven_profile),
-        fetch="one",  # TODO Check on renaming variables
-    )
-    return sql_response
+# TODO Check if this is needed. No code calls it.
+# def get_individual_predictions(user_id: int, recruit) -> Optional[list[dict]]:
+#     sql_response = processMySQL(
+#         query=sqlGetPrediction,
+#         values=(user_id, recruit.twofourseven_profile),
+#         fetch="one",
+#     )
+#     return sql_response
 
 
 def search_result_info(new_search: list[Recruit]) -> str:
@@ -574,7 +574,7 @@ def search_result_info(new_search: list[Recruit]) -> str:
             result_info += (
                 f"{list(search_reactions.keys())[index]}: "
                 f"{recruit.year} - "
-                f"{'⭐' * recruit.rating_stars if recruit.rating_stars else 'N/R'} - "
+                f"{'⭐' * int(recruit.rating_stars) if recruit.rating_stars else 'N/R'} - "
                 f"{recruit.position} - "
                 f"{recruit.name}\n"
             )

@@ -106,16 +106,7 @@ def get_consensus_line(
 
     try:
         lines = None  # Hard code Week 0
-        # if len(api_response) > 1:
-        #     for game in api_response:
-        #         if game.away_team == "Nebraska":
-        #             lines = game.lines[0]
-        #             break
-        # else:
-        #     lines = api_response[0].lines[0]
-        #
-        # if lines is None:
-        #     return None
+
         for game in api_response:
             if game.away_score is None and game.home_score is None:
                 lines = game.lines[0]
@@ -167,7 +158,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         year: int = datetime.now().year,
     ) -> None:
         logger.info(f"Starting countdown")
-        # await interaction.original_message.defer()
+        await interaction.response.defer()
 
         now_cst = datetime.now().astimezone(tz=TZ)
         logger.info(f"Now CST is... {now_cst}")
@@ -175,8 +166,6 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         games, stats = HuskerSchedule(year=year)
 
         assert games, StatsException("No games found!")
-        # if not games:
-        #     raise StatsException("No games found!")
 
         last_game = len(games) - 1
         now_cst_orig = None
@@ -198,6 +187,8 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             elif game.game_date_time > now_cst:  # Next future game
                 game_compared = game
                 break
+
+        logger.info(f"Found game to compare: {game_compared}")
 
         if game_compared is None:
             raise StatsException(
@@ -221,6 +212,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         if dt_game_time_diff.days < 0:
             if calendar.isleap(now_cst.year):
+                logger.info("Accounting for leap year")
                 year_days = 366
             else:
                 year_days = 365
@@ -237,6 +229,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         location = game_compared.location
 
         if date_time.hour == DT_TBA_HR and date_time.minute == DT_TBA_MIN:
+            logger.info("Building a TBA game time embed")
             embed = buildEmbed(
                 title="Countdown town...",
                 thumbnail=thumbnail,
@@ -255,6 +248,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ],
             )
         else:
+            logger.info("Building embed")
             embed = buildEmbed(
                 title="Countdown town...",
                 thumbnail=thumbnail,
@@ -414,7 +408,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.guilds(GUILD_PROD)
     async def player_stats(
         self, interaction: discord.Interaction, year: int, player_name: str
-    ):
+    ) -> None:
         logger.info(f"Starting player stat search for {year} {player_name.upper()}")
         await interaction.response.defer()
 
@@ -526,7 +520,9 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         logger.info("Updating embeds")
         for stat in api_season_stat_result:
-            if not stat.player.lower() == player_name:  # Filter out only the player
+            if (
+                not stat.player.lower() == player_name
+            ):  # Filter out only the player we're looking for
                 continue
 
             stat_categories[stat.category].add_field(

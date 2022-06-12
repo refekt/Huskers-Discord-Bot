@@ -44,8 +44,14 @@ class MyCog(commands.Cog):
     @app_commands.command(name="sub-1")
     async def my_sub_command_1(self, interaction: discord.Interaction) -> None:
         """/parent sub-1"""
-        await interaction.response.send_message(
-            "Hello from sub command 1", ephemeral=True  # ephemeral hides messages
+        await interaction.response.defer(
+            ephemeral=True
+        )  # Send a private/hidden thinking message
+
+        # Do some work...
+
+        await interaction.followup.send(
+            "Hello from sub command 1",
         )
 
     @app_commands.command(name="sub-2")

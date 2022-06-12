@@ -1,6 +1,4 @@
-import ast
 import io
-import json
 import logging
 import pathlib
 import platform
@@ -12,14 +10,13 @@ from typing import Optional, Any, Union
 import discord.ext.commands
 import requests
 import validators
-from PIL import Image, ImageOps
+from PIL import Image
 from discord import app_commands
 from discord.ext import commands
 
 from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD, HEADERS
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
-from helpers.misc import makeSlowking
 from helpers.mysql import (
     processMySQL,
     sqlCreateImageCommand,
@@ -27,6 +24,7 @@ from helpers.mysql import (
     sqlSelectAllImageCommand,
     sqlSelectImageCommand,
 )
+from helpers.slowking import makeSlowking
 from objects.Exceptions import ImageException
 
 logger = logging.getLogger(__name__)
@@ -192,8 +190,9 @@ class ImageCog(commands.Cog, name="Image Commands"):
         self, interaction: discord.Interaction, person: discord.Member
     ) -> None:
         await interaction.response.defer()
-        file = makeSlowking(person)
-        await interaction.followup.send(content=person.mention, file=file)
+        await interaction.followup.send(
+            content=person.mention, file=makeSlowking(person)
+        )
 
     @group_img.command(name="show", description="Show a server image")
     @app_commands.describe(image_name="A keyword for the new image")

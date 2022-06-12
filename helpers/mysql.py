@@ -1,8 +1,5 @@
-# TODO
-# * Review
-# TODO
 import logging
-from typing import Union, Any
+from typing import Union
 
 import pymysql
 from pymysql import OperationalError

@@ -1,6 +1,6 @@
 # TODO
 # This is for server karma
-# TODO
+
 import logging
 
 logger = logging.getLogger(__name__)

@@ -158,7 +158,7 @@ def collect_opponent(game, year, week) -> Union[HuskerOpponent, str]:
             outcome=outcome,
         )
     except IndexError:
-        return "Unknown Opponent"  # TODO Should this be a HuskerOpponent object?
+        return "Unknown Opponent"
 
 
 def HuskerSchedule(

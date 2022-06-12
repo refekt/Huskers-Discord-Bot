@@ -297,7 +297,6 @@ class HuskerClient(Bot):
     async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
-        # TODO Figure out how to handle this, if needed. May need to add something to bot logs.
         channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
             title="New Husker fan!",

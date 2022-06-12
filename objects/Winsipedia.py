@@ -1,6 +1,3 @@
-# TODO
-# * Modernize and revamp
-# TODO
 import logging
 
 import requests

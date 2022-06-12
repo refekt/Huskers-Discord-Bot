@@ -5,7 +5,6 @@ from typing import Union
 import discord
 import validators
 
-# from commands.recruiting import get_faps, get_croot_predictions
 from helpers.constants import (
     BOT_DISPLAY_NAME,
     BOT_FOOTER_BOT,
@@ -139,8 +138,8 @@ def buildTweetEmbed(
         ],
     )
     # b'{"data":{"attachments":{},"author_id":"15899943","context_annotations":[{"domain":{"id":"46","name":"Brand Category","description":"Categories within Brand Verticals that narrow down the scope of Brands"},"entity":{"id":"781974596752842752","name":"Services"}},{"domain":{"id":"47","name":"Brand","description":"Brands and Companies"},"entity":{"id":"10045225402","name":"Twitter"}}],"conversation_id":"1534359106945003520","created_at":"2022-06-08T02:18:12.000Z","entities":{"urls":[{"start":27,"end":50,"url":"https://t.co/FcWRxe2bsw","expanded_url":"https://www.google.com","display_url":"google.com","status":200,"title":"Google","description":"Search the world\'s information, including webpages, images, videos and more. Google has many special features to help you find exactly what you\'re looking for.","unwound_url":"https://www.google.com"},{"start":51,"end":74,"url":"https://t.co/0H5vssRWaK","expanded_url":"http://www.yahoo.com","display_url":"yahoo.com","status":400,"unwound_url":"http://www.yahoo.com"},{"start":75,"end":98,"url":"https://t.co/aSHcc1XbiN","expanded_url":"http://bing.com","display_url":"bing.com","status":200,"title":"The beauty that lies below","description":"Marovo Lagoon in the Solomon Islands is the larges","unwound_url":"http://www.bing.com/"}]},"geo":{},"id":"1534359106945003520","lang":"en","possibly_sensitive":false,"public_metrics":{"retweet_count":0,"reply_count":0,"like_count":0,"quote_count":0},"reply_settings":"everyone","source":"Twitter Web App","text":"Testing tweets with links. https://t.co/FcWRxe2bsw https://t.co/0H5vssRWaK https://t.co/aSHcc1XbiN"},"includes":{"users":[{"created_at":"2008-08-19T03:09:46.000Z","description":"GBR","id":"15899943","name":"Aaron","profile_image_url":"https://pbs.twimg.com/profile_images/1206047447451086848/GEMbd3wB_normal.jpg","protected":false,"public_metrics":{"followers_count":39,"following_count":563,"tweet_count":1154,"listed_count":0},"url":"","username":"ayy_gbr","verified":false}]},"matching_rules":[{"id":"1532102238562402312","tag":""}]}'
-    if urls.get("urls"):
-        for url in urls["urls"]:  # TODO KeyError is raising
+    if urls.get("urls"):  # TODO KeyError is raising
+        for url in urls["urls"]:
             if (
                 medias
             ):  # Avoid duplicating media embeds. Also, there's no "title" field when the URL is from a media embed
@@ -320,30 +319,6 @@ def buildRecruitEmbed(recruit) -> discord.Embed:
         ],
     )
 
-    # TODO Work on the 'get_croot_predictions' and figure out where it went
-    # if (recruit.committed.lower() if recruit.committed is not None else None) not in [
-    #     "signed",
-    #     "enrolled",
-    # ]:
-    #     if (get_croot_predictions(recruit)) is not None:
-    #         embed.set_footer(
-    #             text=BOT_FOOTER_BOT
-    #             + "\nClick the 🔮 to predict what school you think this recruit will commit to."
-    #             "\nClick the 📜 to get the individual predictions for this recruit."
-    #         )
-    #     else:
-    #         embed.set_footer(
-    #             text=BOT_FOOTER_BOT
-    #             + "\nClick the 🔮 to predict what school you think this recruit will commit to."
-    #         )
-    # else:
-    #     if (get_croot_predictions(recruit)) is not None:
-    #         embed.set_footer(
-    #             text=BOT_FOOTER_BOT
-    #             + "\nClick the 📜 to get the individual predictions for this recruit."
-    #         )
-    #     else:
-    #         embed.set_footer(text=BOT_FOOTER_BOT)
     embed.set_footer(text=BOT_FOOTER_BOT)
 
     if recruit.thumbnail and not recruit.thumbnail == "/.":

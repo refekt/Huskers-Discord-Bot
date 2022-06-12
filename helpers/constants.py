@@ -1,6 +1,3 @@
-# TODO
-# * update and modernize
-# TODO
 import logging
 import platform
 from typing import Union
@@ -237,7 +234,6 @@ logger.info("Datetime formatting variables loaded")
 GLOBAL_TIMEOUT = 3600
 
 CROOT_SEARCH_LIMIT = 5
-
 
 # States
 US_STATES = [
