@@ -62,7 +62,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     group_purge = app_commands.Group(
         name="purge",
         description="Purge messages from channel",
-        default_permissions=discord.Permissions(administration=True),
+        default_permissions=discord.Permissions(administrator=True),
         guild_ids=[GUILD_PROD],
     )
     group_submit = app_commands.Group(
@@ -400,7 +400,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
     @app_commands.command(name="quit", description="Turn off Bot Frost")
-    @app_commands.default_permissions(administration=True)
+    @app_commands.default_permissions(administrator=True)
     @app_commands.guilds(GUILD_PROD)
     async def quit(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
@@ -415,7 +415,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         name="restart", description="Restart the bot (Linux host only)"
     )
     @app_commands.guilds(GUILD_PROD)
-    @app_commands.default_permissions(administration=True)
+    @app_commands.default_permissions(administrator=True)
     async def restart(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             "Bot will restart shortly!", ephemeral=True

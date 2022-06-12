@@ -27,7 +27,7 @@ class MyCog(commands.Cog):
     )  # Typos here will cause the cog not to load
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(
-        administration=True
+        administrator=True
     )  # https://discordpy.readthedocs.io/en/latest/api.html#discord.Permissions
     async def my_command(self, interaction: discord.Interaction, example: str) -> None:
         """/command-1"""
