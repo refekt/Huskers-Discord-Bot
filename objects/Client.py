@@ -332,7 +332,7 @@ class HuskerClient(Bot):
                 ),
                 dict(
                     name="Hall of Fame & Shame Reaction Threshold",
-                    value="TBD",
+                    value=self.reaction_threshold,
                 ),
                 dict(
                     name="Version",
