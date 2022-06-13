@@ -269,7 +269,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ],
             )
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
         logger.info(f"Countdown done")
 
     @app_commands.command(name="lines", description="Get the betting lines for a game")
