@@ -43,7 +43,7 @@ def start_twitter_stream(client: discord.Client) -> None:
         bearer_token=TWITTER_BEARER,
         client=client,
         wait_on_rate_limit=True,
-        max_retries=5,
+        # max_retries=5,
     )
 
     logger.info("Looking for any lingering stream rules")
