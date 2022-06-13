@@ -8,6 +8,7 @@ import tweepy
 from discord.ext.commands import (
     Bot,
 )
+from tweepy import Response
 
 from __version__ import _version
 from helpers.constants import (
@@ -37,12 +38,30 @@ logger.info(f"{str(__name__).title()} module loaded!")
 def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
+    logger.info("Creating a stream client")
+    tweeter_stream = StreamClientV2(
+        bearer_token=TWITTER_BEARER,
+        client=client,
+        wait_on_rate_limit=True,
+        max_retries=5,
+    )
+
+    logger.info("Looking for any lingering stream rules")
+    raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
+    if raw_rules.data is not None:
+        ids = [rule.id for rule in raw_rules.data]
+        logger.info(f"Deleting rule ids: {' '.join(ids)}")
+        tweeter_stream.delete_rules(ids)
+    logger.info(f"Number of stream rules: {len(raw_rules.data)}")
+
     logger.info("Collecting Husker Media Twitter list")
     tweeter_client = tweepy.Client(TWITTER_BEARER)
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
 
     logger.info("Creating stream rule")
     rule_query = ""
+    rules: list[str] = []
+    append_str: str = ""
 
     if DEBUGGING_CODE:
         rule_query = "from:ayy_gbr OR "
@@ -50,24 +69,28 @@ def start_twitter_stream(client: discord.Client) -> None:
     for member in list_members[0]:
         append_str = f"from:{member['username']} OR "
 
-        if len(rule_query) + len(append_str) < TWITTER_QUERY_MAX:
-            rule_query += append_str
-        else:
-            break
+        if len(rule_query) + len(append_str) > TWITTER_QUERY_MAX:
+            rule_query = rule_query[:-4]  # Get rid of ' OR '
+            rules.append(rule_query)
+            rule_query = ""
+
+        rule_query += append_str
 
     rule_query = rule_query[:-4]  # Get rid of ' OR '
+    rules.append(rule_query)
 
-    logger.info("Creating a stream client")
-    tweeter_stream = StreamClientV2(
-        bearer_token=TWITTER_BEARER,
-        client=client,
-        wait_on_rate_limit=True,
-        max_retries=3,
-    )
+    del list_members, member, tweeter_client, append_str
 
-    logger.debug(f"Created stream rule:\n\t{rule_query}")
-    tweeter_stream.add_rules(tweepy.StreamRule(value=rule_query))
-    logger.debug(f"Stream filter rules:\n\t{tweeter_stream.get_rules()}")
+    for stream_rule in rules:
+        logger.debug(f"Adding stream rule: {stream_rule}")
+        tweeter_stream.add_rules(tweepy.StreamRule(stream_rule))
+
+    raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
+    logger.info(f"Number of rules: {len(raw_rules.data)}")
+    if raw_rules.data is not None:
+        logger.info(f"Number of rules: {len(raw_rules.data)}")
+    else:
+        logger.info("No rules found")
 
     tweeter_stream.filter(
         expansions=[
