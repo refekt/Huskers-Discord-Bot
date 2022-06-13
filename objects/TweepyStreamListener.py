@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+from typing import Union
 
 import dateutil.parser
 import discord
@@ -178,8 +179,20 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_connect(self) -> None:
         logger.info("Connected")
+
+        raw_rules = self.get_rules()
+        auths: Union[str, list[str]] = ""
+
+        for rule in raw_rules.data:
+            auths += rule.value + " OR "
+
+        auths = auths[:-4]
+        auths = auths.replace("from:", "@")
+        auths = auths.split(" OR ")
+        auths = ", ".join(auths)
+
         task = asyncio.run_coroutine_threadsafe(
-            send_tweet_alert(self.client, f"Connected! Following: {self.get_rules()}"),
+            send_tweet_alert(self.client, f"Connected! Following: {auths}"),
             self.client.loop,
         )
         task.result()
@@ -199,10 +212,6 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_disconnect(self) -> None:
         logger.warning("Disconnected")
-        # _: dict[dict[list[dict]]] = self.get_rules()
-        # rules = [rule["id"] for rule in _]
-        #
-        # self.delete_rules(self.get_rules())
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, "The Twitter Stream has been disconnected!"),
             self.client.loop,

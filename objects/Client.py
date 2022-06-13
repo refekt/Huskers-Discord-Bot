@@ -86,7 +86,17 @@ def start_twitter_stream(client: discord.Client) -> None:
         tweeter_stream.add_rules(tweepy.StreamRule(stream_rule))
 
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
-    logger.info(f"Number of rules: {len(raw_rules.data)}")
+
+    auths: str = ""
+
+    for rule in raw_rules.data:
+        auths += rule.value + " OR "
+
+    auths = auths[:-4]
+    auths = auths.replace("from:", "@")
+    auths = auths.split(" OR ")
+    auths = ", ".join(auths)
+
     if raw_rules.data is not None:
         logger.info(f"Number of rules: {len(raw_rules.data)}")
     else:
@@ -413,8 +423,8 @@ class HuskerClient(Bot):
 
         logger.info("The bot tree has synced!")
 
-        if DEBUGGING_CODE:
-            return
+        # if DEBUGGING_CODE:
+        #     return
 
         logger.info("Starting Twitter stream")
         start_twitter_stream(self)
