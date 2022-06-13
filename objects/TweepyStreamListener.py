@@ -218,10 +218,15 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code) -> None:
-        time.sleep(self.cooldown)
-        self.cooldown = max(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
         logger.exception(f"Request Error: {status_code}")
         self.remove_all_rules()
+
+        logger.info(
+            f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
+        )
+        time.sleep(self.cooldown)
+        self.cooldown = max(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
+        logger.info("Sleep is over")
 
     def on_connection_error(self) -> None:
         logger.exception(f"Connection Error")
