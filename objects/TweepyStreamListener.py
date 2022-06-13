@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 from pprint import pprint
 from typing import Union
 
@@ -185,6 +186,7 @@ class StreamClientV2(tweepy.StreamingClient):
     ) -> None:
         super().__init__(bearer_token, **kwargs)
         self.client = client
+        self.cooldown = 5
 
     def remove_all_rules(self) -> None:
         raw_rules: Union[dict, Response, Response] = self.get_rules()
@@ -194,6 +196,8 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_connect(self) -> None:
         logger.info("Connected!")
+
+        self.cooldown = 5
 
         raw_rules = self.get_rules()
         auths: Union[str, list[str]] = ""
@@ -214,6 +218,8 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code) -> None:
+        time.sleep(self.cooldown)
+        self.cooldown = max(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
         logger.exception(f"Request Error: {status_code}")
         self.remove_all_rules()
 
