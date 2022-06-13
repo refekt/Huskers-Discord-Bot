@@ -182,7 +182,7 @@ def buildTweetEmbed(
     )
     embed.set_footer(
         text=f"Sent via {source} at {tweet_created_at.strftime(DT_TWEET_FORMAT)} • Retweets: {tweet_metrics['retweet_count']} • Replies: {tweet_metrics['reply_count']} • Likes: {tweet_metrics['like_count']} • Quotes: {tweet_metrics['quote_count']}"[
-            :footer_limit
+            :FOOTER_LIMIT
         ],
     )
     embed.set_thumbnail(url=profile_image_url)

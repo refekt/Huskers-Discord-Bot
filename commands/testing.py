@@ -14,18 +14,17 @@ from helpers.constants import (
 )
 
 logging.basicConfig(
-    format="[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
+    # format="[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
     datefmt="%X %x",
-    level=logging.INFO,
+    level=logging.DEBUG,
     encoding="utf-8",
     stream=sys.stdout,
 )
-# logger = logging.getLogger(__name__)
 tweepy_logger = logging.getLogger("tweepy")
-# tweepy_logger.setLevel(logging.DEBUG)
+tweepy_logger.setLevel(logging.DEBUG)
 
-handler = logging.FileHandler(filename="tweepy.log")
-tweepy_logger.addHandler(handler)
+# handler = logging.FileHandler(filename="tweepy.log")
+# tweepy_logger.addHandler(handler)
 
 
 class MyTweet(object):
@@ -71,14 +70,10 @@ class TweetUserData(object):
 
 
 def send_tweet_alert(message) -> None:
-    pass
-    # logger.info(f"Tweet alert received: {message}")
+    print("send_tweet_alert", message)
 
 
 def send_tweet(tweet: MyTweet) -> None:
-    pass
-    # logger.info(f"Sending tweet")
-
     author = None  # noqa
     for user in tweet.includes["users"]:
         if tweet.data["author_id"] == user["id"]:
@@ -95,12 +90,7 @@ def send_tweet(tweet: MyTweet) -> None:
         for item in tweet.includes["tweets"]:
             quotes.append(TweetQuoteData(item))
 
-    pass
-    # logger.info(
-    #     f"Author: {pprint(author)}\n"
-    #     f"Medias: {pprint(medias)}\n"
-    #     f"Quotes: {pprint(quotes)}\n"
-    # )
+    print("send_tweet", tweet)
 
 
 class TestStreamClient(tweepy.StreamingClient):
@@ -112,56 +102,61 @@ class TestStreamClient(tweepy.StreamingClient):
         super().__init__(bearer_token, **kwargs)
         pass
 
-    # logger.info("TestStreamClient Initialized")
+    def remove_all_rules(self) -> None:
+        raw_rules: Union[dict, Response, Response] = self.get_rules()
+        if raw_rules.data is not None:
+            ids = [rule.id for rule in raw_rules.data]
+            self.delete_rules(ids)
 
-    # def remove_rules(self):
-    # self.remove_rules()
-    # pass
+    def on_keep_alive(self):
+        print("on_keep_alive")
+
+    def on_tweet(self, tweet):
+        print("on_tweet", tweet)
+
+    def on_response(self, response):
+        print("on_response", response)
+
+    def on_includes(self, includes):
+        print("on_includes", includes)
+
+    def on_matching_rules(self, matching_rules):
+        print("on_matching_rules", matching_rules)
 
     def on_connect(self) -> None:
         pass
 
-    # logger.info(f"Connected with these rules:\n{self.get_rules()}")
-
     def on_request_error(self, status_code) -> None:
-        pass
-        # logger.exception(f"Request Error: {status_code}")
+        self.remove_all_rules()
+        print("on_request_error", status_code)
 
     def on_connection_error(self) -> None:
-        pass
-        # logger.exception(f"Connection Error")
+        self.remove_all_rules()
+        print("on_connection_error")
 
     def on_disconnect(self) -> None:
-        self.remove_rules()
-        pass
-        # logger.warning("Disconnected")
+        self.remove_all_rules()
+        print("on_disconnect")
 
     def on_errors(self, errors) -> None:
-        pass
-        # logger.exception(f"Error received\n{errors}")
+        self.remove_all_rules()
+        print("on_errors", errors)
 
     def on_closed(self, response) -> None:
-        self.remove_rules()
-        pass
-        # logger.warning(f"Closed: {response}")
+        self.remove_all_rules()
+        print("on_closed", response)
 
     def on_exception(self, exception) -> None:
-        pass
-        # logger.exception(f"Exception: {type(exception)} -- {exception}")
+        self.remove_all_rules()
+        print("on_exception", exception)
 
     def on_data(self, raw_data) -> None:
-        pass
-        # logger.info(f"Raw Data\n{raw_data}")
         processed_data = json.loads(raw_data)
         send_tweet(MyTweet(processed_data))
+        print("on_data")
 
 
 def start_twitter_stream() -> None:
-    pass
-    # logger.info("Bot is starting the Twitter stream")
-
-    pass
-    # logger.info("Creating a stream client")
     tweeter_stream = TestStreamClient(
         bearer_token=TWITTER_BEARER,
         wait_on_rate_limit=True,
@@ -171,13 +166,10 @@ def start_twitter_stream() -> None:
     if raw_rules.data is not None:
         ids = [rule.id for rule in raw_rules.data]
         tweeter_stream.delete_rules(ids)
-    pprint(tweeter_stream.get_rules())
 
-    # logger.info("Collecting Husker Media Twitter list")
     tweeter_client = tweepy.Client(TWITTER_BEARER)
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
 
-    # logger.info("Creating stream rule")
     rule_query = "from:ayy_gbr OR "
 
     rules: list[str] = []
@@ -199,17 +191,9 @@ def start_twitter_stream() -> None:
     del list_members, member, tweeter_client, append_str
 
     for stream_rule in rules:
-        # logger.debug(f"Created stream rule:\n\t{rule_query}")
         tweeter_stream.add_rules(tweepy.StreamRule(stream_rule))
 
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
-    if raw_rules.data is not None:
-        pprint(raw_rules.data)
-        print(f"Number of rules: {len(raw_rules.data)}")
-    else:
-        print("No rules")
-
-    # logger.debug(f"Stream filter rules:\n\t{tweeter_stream.get_rules()}")
 
     tweeter_stream.filter(
         expansions=[
@@ -288,7 +272,6 @@ def start_twitter_stream() -> None:
         threaded=True,
     )
     pass
-    # logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
 
 if __name__ == "__main__":

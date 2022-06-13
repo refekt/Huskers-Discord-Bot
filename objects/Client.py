@@ -52,7 +52,6 @@ def start_twitter_stream(client: discord.Client) -> None:
         ids = [rule.id for rule in raw_rules.data]
         logger.info(f"Deleting rule ids: {' '.join(ids)}")
         tweeter_stream.delete_rules(ids)
-    logger.info(f"Number of stream rules: {len(raw_rules.data)}")
 
     logger.info("Collecting Husker Media Twitter list")
     tweeter_client = tweepy.Client(TWITTER_BEARER)
@@ -87,7 +86,7 @@ def start_twitter_stream(client: discord.Client) -> None:
 
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
 
-    auths: str = ""
+    auths: Union[str, list[str]] = ""
 
     for rule in raw_rules.data:
         auths += rule.value + " OR "
