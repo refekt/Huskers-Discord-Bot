@@ -20,6 +20,7 @@ from helpers.embed import buildEmbed, buildTweetEmbed
 
 logger = logging.getLogger(__name__)
 handler = logging.FileHandler(filename="twitter_stream.log")
+logger.addHandler(handler)
 
 # Example
 # task = asyncio.run_coroutine_threadsafe(
