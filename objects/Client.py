@@ -422,8 +422,8 @@ class HuskerClient(Bot):
 
         logger.info("The bot tree has synced!")
 
-        # if DEBUGGING_CODE:
-        #     return
+        if DEBUGGING_CODE:
+            return
 
         logger.info("Starting Twitter stream")
         start_twitter_stream(self)

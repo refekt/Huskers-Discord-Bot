@@ -52,6 +52,7 @@ class Survey:
         timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
         # Space deliminated options
+        self.max_options = 3
         options = options.strip()
         if " " in options:
             options = options.split()
@@ -65,14 +66,12 @@ class Survey:
         for index, opt in enumerate(options):
             options[index] = SurveyOption(opt)  # noqa
 
-        max_options = 3
-
         assert isinstance(question, str), SurveyException("Question must be a string!")
         assert [isinstance(opt, SurveyOption) for opt in options], SurveyException(
             "Options must be a SurveyOption object!"
         )
-        assert 2 <= len(options) <= max_options, SurveyException(
-            f"You must have between 2 and {max_options} options!"
+        assert 2 <= len(options) <= self.max_options, SurveyException(
+            f"You must have between 2 and {self.max_options} options!"
         )
         assert timeout is not None, SurveyException("You must provide a timeout value!")
 
@@ -120,12 +119,6 @@ class Survey:
                     )
                     break
 
-            # try:
-            #     await interaction.followup.send_message(content="Response recorded!")
-            # except (HTTPException, NotFound, Forbidden, TypeError, ValueError) as e:
-            #     logger.info(e)
-            #     return
-
             try:
                 await interaction.message.edit(embed=embed)
             except (HTTPException, Forbidden, TypeError) as e:
@@ -140,7 +133,7 @@ class Survey:
         async def option_two(self, interaction: discord.Interaction, button: Button):
             await self.process_button(interaction=interaction, button=button)
 
-        @discord.ui.button(label="three", custom_id="opt_four", style=ButtonStyle.gray)
+        @discord.ui.button(label="three", custom_id="opt_three", style=ButtonStyle.gray)
         async def option_three(self, interaction: discord.Interaction, button: Button):
             await self.process_button(interaction=interaction, button=button)
 
@@ -157,6 +150,7 @@ class Survey:
         embed.add_field(
             name="Survey Question",
             value=self.question,
+            inline=False,
         )
         for index, opt in enumerate(self.options):
             embed.add_field(
@@ -182,18 +176,22 @@ class Survey:
         self.embed.set_footer(text=f"{footer_text} {hashed_user} ")
 
     async def send(self) -> None:
-        await self.interaction.response.defer()
+        if not self.interaction.response.is_done():
+            await self.interaction.response.defer()
 
         self.create_embed()
 
         view = self.SurviewButtons(self.options)
         for index, child in enumerate(view.children):
-            if index > len(self.options):
-                del child
+            if index >= self.max_options:
+                view.remove_item(view.option_three)
                 break
             child.label = self.options[index].label
 
-        await self.interaction.followup.send(embed=self.embed, view=view)
+        if self.interaction.response.is_done():
+            await self.interaction.channel.send(embed=self.embed, view=view)
+        else:
+            await self.interaction.followup.send(embed=self.embed, view=view)
 
     async def close_survey(self) -> None:
         await self.interaction.edit_original_message(view=None)

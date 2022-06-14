@@ -379,6 +379,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         options: str,
         timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
+        await interaction.response.defer()
         survey = Survey(
             client=interaction.client,
             interaction=interaction,
