@@ -220,7 +220,7 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_request_error(self, status_code) -> None:
         logger.exception(f"Request Error: {status_code}")
-        self.remove_all_rules()
+        # self.remove_all_rules()
 
         logger.info(
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
@@ -238,28 +238,29 @@ class StreamClientV2(tweepy.StreamingClient):
             self.client.loop,
         )
         task.result()
-        self.remove_all_rules()
+        # self.remove_all_rules()
 
-    def on_disconnect(self) -> None:
+    def on_disconnect(self) -> bool:
         logger.warning("Disconnected")
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, "The Twitter Stream has been disconnected!"),
             self.client.loop,
         )
         task.result()
-        self.remove_all_rules()
+        # self.remove_all_rules()
+        return True
 
     def on_errors(self, errors) -> None:
         logger.exception(f"Error received: {errors}")
-        self.remove_all_rules()
+        # self.remove_all_rules()
 
     def on_closed(self, response) -> None:
         logger.warning(f"Closed: {response}")
-        self.remove_all_rules()
+        # self.remove_all_rules()
 
     def on_exception(self, exception) -> None:
         logger.exception(f"Exception: {exception}")
-        self.remove_all_rules()
+        # self.remove_all_rules()
 
     def on_data(self, raw_data) -> None:
         logger.info(pprint(json.loads(raw_data)))
