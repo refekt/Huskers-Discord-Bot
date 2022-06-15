@@ -160,7 +160,7 @@ def start_twitter_stream() -> None:
     tweeter_stream = TestStreamClient(
         bearer_token=TWITTER_BEARER,
         wait_on_rate_limit=True,
-        max_retries=3,
+        # max_retries=3,
     )
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
     if raw_rules.data is not None:
@@ -207,7 +207,7 @@ def start_twitter_stream() -> None:
             "referenced_tweets.id.author_id",
         ],
         media_fields=[
-            "alt_text",
+            # "alt_text",
             "duration_ms",
             "height",
             "media_key",
@@ -217,23 +217,23 @@ def start_twitter_stream() -> None:
             "url",
             "width",
         ],
-        place_fields=[
-            "contained_within",
-            "country",
-            "country_code",
-            "full_name",
-            "geo",
-            "id",
-            "name",
-            "place_type",
-        ],
-        poll_fields=[
-            "duration_minutes",
-            "end_datetime",
-            "id",
-            "options",
-            "voting_status",
-        ],
+        # place_fields=[
+        #     "contained_within",
+        #     "country",
+        #     "country_code",
+        #     "full_name",
+        #     "geo",
+        #     "id",
+        #     "name",
+        #     "place_type",
+        # ],
+        # poll_fields=[
+        #     "duration_minutes",
+        #     "end_datetime",
+        #     "id",
+        #     "options",
+        #     "voting_status",
+        # ],
         tweet_fields=[
             "attachments",
             "author_id",

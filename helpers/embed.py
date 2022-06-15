@@ -123,7 +123,14 @@ def buildTweetEmbed(
     medias: list = None,
     quotes: list = None,
     urls: dict = None,
+    b16: bool = False,
 ) -> discord.Embed:
+    if b16:
+        embed = buildEmbed(title="Block 16 Tweet", description="Back by popular demand")
+        if medias:
+            embed.set_image(url=medias[0].url)
+        return embed
+
     embed = buildEmbed(
         title="",
         description=f"Followers: {author_metrics['followers_count']} • Tweets: {author_metrics['tweet_count']}",

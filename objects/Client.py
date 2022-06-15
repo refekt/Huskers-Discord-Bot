@@ -65,6 +65,8 @@ def start_twitter_stream(client: discord.Client) -> None:
     if DEBUGGING_CODE:
         rule_query = "from:ayy_gbr OR "
 
+    rule_query += "from:Block16Omaha OR "
+
     for member in list_members[0]:
         append_str = f"from:{member['username']} OR "
 
@@ -422,8 +424,8 @@ class HuskerClient(Bot):
 
         logger.info("The bot tree has synced!")
 
-        if DEBUGGING_CODE:
-            return
+        # if DEBUGGING_CODE:
+        #     return
 
         logger.info("Starting Twitter stream")
         start_twitter_stream(self)

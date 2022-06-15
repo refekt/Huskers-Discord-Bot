@@ -15,6 +15,7 @@ from helpers.constants import (
     DEBUGGING_CODE,
     CHAN_GENERAL,
     CHAN_RECRUITING,
+    CHAN_FOOD,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 
@@ -148,6 +149,31 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         for item in tweet.includes["tweets"]:
             quotes.append(TweetQuoteData(item))
 
+    if (
+        author.username.lower() == "Block16Omaha".lower()
+        and tweet.data.get("referenced_tweets", False)
+        and tweet.data.get("in_reply_to_user_id", False)
+    ):
+        embed = buildTweetEmbed(
+            name=author.name,
+            username=author.username,
+            author_metrics=author.public_metrics,
+            verified=author.verified,
+            source=tweet.data["source"],
+            text=tweet.data["text"],
+            tweet_metrics=tweet.data["public_metrics"],
+            tweet_id=tweet.data["id"],
+            tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]),
+            profile_image_url=author.profile_image_url,
+            urls=tweet.data["entities"],
+            medias=medias,
+            quotes=quotes,
+            b16=True,
+        )
+
+        food_channel: discord.TextChannel = await client.fetch_channel(CHAN_FOOD)
+        await food_channel.send(embed=embed)
+
     embed = buildTweetEmbed(
         name=author.name,
         username=author.username,
@@ -226,7 +252,7 @@ class StreamClientV2(tweepy.StreamingClient):
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
         )
         time.sleep(self.cooldown)
-        self.cooldown = max(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
+        self.cooldown = min(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
         logger.info("Sleep is over")
 
     def on_connection_error(self) -> None:

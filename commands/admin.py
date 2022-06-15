@@ -452,14 +452,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.default_permissions(administrator=True)
     @app_commands.guilds(GUILD_PROD)
     async def quit(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_message(
+        await interaction.response.defer()
+        await interaction.followup.send(
             f"Goodbye for now! {interaction.user.mention} has turned me off!"
         )
 
         await interaction.client.close()
-        logger.info(
-            f"User {interaction.user.name}#{interaction.user.discriminator} turned off the bot."
-        )
 
     @app_commands.command(
         name="restart", description="Restart the bot (Linux host only)"
