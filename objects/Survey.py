@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import math
 import random
 import string
@@ -20,8 +19,9 @@ from discord.ui import View, Button
 from helpers.constants import GLOBAL_TIMEOUT
 from helpers.misc import formatPrettyTimeDelta
 from objects.Exceptions import SurveyException
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 __all__ = ["Survey"]
 

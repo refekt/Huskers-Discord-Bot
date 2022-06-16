@@ -1,9 +1,9 @@
 # TODO
 # * Modernize and revamp
 
-import logging
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 # __all__ = [""]
 

@@ -1,11 +1,10 @@
-import logging
-
 import requests
 from bs4 import BeautifulSoup
 
 from helpers.constants import HEADERS
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 __all__ = ["TeamStatsWinsipediaTeam", "CompareWinsipediaTeam", "CompareWinsipedia"]
 

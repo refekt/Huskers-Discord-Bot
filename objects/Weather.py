@@ -1,7 +1,8 @@
-import logging
 from datetime import datetime, timezone
 
-logger = logging.getLogger(__name__)
+from objects.Logger import discordLogger
+
+logger = discordLogger(__name__)
 
 __all__ = ["WeatherResponse", "WeatherHour"]
 #

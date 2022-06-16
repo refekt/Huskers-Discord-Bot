@@ -1,4 +1,3 @@
-import logging
 import pathlib
 import platform
 from typing import Union
@@ -26,9 +25,10 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException
+from objects.Logger import discordLogger
 from objects.TweepyStreamListener import StreamClientV2
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 __all__ = ["HuskerClient"]
 

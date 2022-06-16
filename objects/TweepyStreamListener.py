@@ -18,10 +18,12 @@ from helpers.constants import (
     CHAN_FOOD,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 handler = logging.FileHandler(filename="twitter_stream.log")
 logger.addHandler(handler)
+
 
 # Example
 # task = asyncio.run_coroutine_threadsafe(
@@ -266,7 +268,7 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
         # self.remove_all_rules()
 
-    def on_disconnect(self) -> bool:
+    def on_disconnect(self) -> None:
         logger.warning("Disconnected")
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, "The Twitter Stream has been disconnected!"),
@@ -274,7 +276,6 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
         # self.remove_all_rules()
-        return True
 
     def on_errors(self, errors) -> None:
         logger.exception(f"Error received: {errors}")

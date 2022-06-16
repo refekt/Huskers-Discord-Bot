@@ -1,22 +1,14 @@
-import logging
-import sys
 from time import perf_counter
 
 import discord  # noqa # Beta version thing
 from discord.app_commands import CommandInvokeError
 
 from objects.Client import HuskerClient
-
-logging.basicConfig(
-    format="[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s",
-    datefmt="%X %x",
-    level=logging.INFO,
-    encoding="utf-8",
-    stream=sys.stdout,
-)
-logger = logging.getLogger(__name__)
+from objects.Logger import discordLogger
 
 start = perf_counter()
+
+logger = discordLogger(__name__)
 
 logger.info("Loading helpers")
 

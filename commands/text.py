@@ -1,5 +1,4 @@
 import json
-import logging
 import random
 import re
 from datetime import timedelta
@@ -25,11 +24,12 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from objects.Exceptions import CommandException, WeatherException
+from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
 from objects.Weather import WeatherResponse, WeatherHour
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 
 class TextCog(commands.Cog, name="Text Commands"):

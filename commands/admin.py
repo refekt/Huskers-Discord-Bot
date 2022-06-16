@@ -1,4 +1,3 @@
-import logging
 import pathlib
 import platform
 import subprocess
@@ -7,7 +6,6 @@ from enum import Enum
 from typing import Any, Union
 
 import discord.ext.commands
-import numpy as np
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
@@ -27,15 +25,15 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
-    FIELDS_LIMIT,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Exceptions import CommandException, UserInputException, SSHException
+from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 
 class ConfirmButtons(discord.ui.View):

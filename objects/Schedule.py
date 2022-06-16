@@ -1,4 +1,3 @@
-import logging
 import urllib.parse
 from datetime import datetime, timedelta
 from typing import Union
@@ -8,8 +7,9 @@ from bs4 import BeautifulSoup
 
 from helpers.constants import HEADERS, DT_TBA_TIME, DT_STR_FORMAT, TZ
 from objects.Exceptions import ScheduleException
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 __all__ = ["HuskerSchedule"]
 

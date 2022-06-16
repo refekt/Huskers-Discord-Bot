@@ -1,12 +1,12 @@
-import logging
 from collections import deque
 from typing import List
 
 import discord
 
 from helpers.constants import GLOBAL_TIMEOUT
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 
 __all__ = ["EmbedPaginatorView"]

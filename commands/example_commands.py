@@ -6,6 +6,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from helpers.constants import GUILD_PROD
+from objects.Logger import discordLogger
+
+logger = discordLogger(__name__)
 
 
 class MyCog(commands.Cog):

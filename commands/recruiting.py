@@ -1,5 +1,4 @@
 import json
-import logging
 import re
 from datetime import datetime
 from typing import Union, Any
@@ -25,9 +24,10 @@ from helpers.mysql import (
     sqlTeamIDs,
 )
 from objects.Exceptions import RecruitException
+from objects.Logger import discordLogger
 from objects.Recruits import RecruitInterest, Recruit
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 croot_search = []
 prediction_search = []

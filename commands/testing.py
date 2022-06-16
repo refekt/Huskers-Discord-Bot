@@ -1,7 +1,6 @@
 import json
 import logging
 import sys
-from pprint import pprint
 from typing import Union
 
 import tweepy

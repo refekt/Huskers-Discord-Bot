@@ -1,5 +1,4 @@
 import calendar
-import logging
 from datetime import datetime
 from typing import Union, Any, Optional
 
@@ -27,11 +26,12 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed, collectScheduleEmbeds
 from objects.Exceptions import StatsException
+from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 
 cfbd_config = Configuration()

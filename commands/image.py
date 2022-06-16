@@ -1,5 +1,4 @@
 import io
-import logging
 import pathlib
 import platform
 import random
@@ -26,8 +25,9 @@ from helpers.mysql import (
 )
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ImageException
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(__name__)
 
 image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
