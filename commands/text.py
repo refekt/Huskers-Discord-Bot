@@ -265,9 +265,9 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(GUILD_PROD)
     async def possum(self, interaction: discord.Interaction, message: str) -> None:
-        assert interaction.channel.id == CHAN_POSSUMS, CommandException(
-            "You can only use this in the possum droppings channel!"
-        )
+        # assert interaction.channel.id == CHAN_POSSUMS, CommandException(
+        #     "You can only use this in the possum droppings channel!"
+        # )
         assert message, CommandException("You cannot have an empty message!")
 
         await interaction.response.defer(ephemeral=True)
@@ -285,7 +285,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
         chan = await interaction.client.fetch_channel(CHAN_POSSUMS)
         await chan.send(embed=embed)
-        await interaction.followup.send("Possum dropping sent!")
+        # await interaction.followup.send("Possum dropping sent!")
 
     @app_commands.command(
         name="urban-dictionary",
