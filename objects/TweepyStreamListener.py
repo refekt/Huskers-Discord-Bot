@@ -3,7 +3,7 @@ import json
 import logging
 import time
 from pprint import pprint
-from typing import Union
+from typing import Union, Optional
 
 import dateutil.parser
 import discord
@@ -98,8 +98,10 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
 
 async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
     class TwitterButtons(discord.ui.View):
-        def __init__(self):
-            super().__init__()
+        def __init__(self, timeout=600):
+            super(TwitterButtons, self).__init__()
+            self.message: Optional[discord.Message, None] = None
+            self.timeout = timeout
 
         @discord.ui.button(
             label="Send to General",
@@ -109,6 +111,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         async def send_to_general(
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
+            logger.info("Sending tweet to general channel")
             chan = await client.fetch_channel(CHAN_GENERAL)
             await chan.send(
                 f"Tweet forwarded by {interaction.user.mention}",
@@ -124,6 +127,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         async def send_to_recruiting(
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
+            logger.info("Sending tweet to recruiting channel")
             chan = await client.fetch_channel(CHAN_RECRUITING)
             await chan.send(
                 f"Tweet forwarded by {interaction.user.mention}",
@@ -131,9 +135,14 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             )
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
-        # NOTE Discord API preventing creating a URL button at this scope
+        async def on_timeout(self) -> None:
+            self.clear_items()
+            await self.message.edit(view=self)
 
-    logger.info(f"Sending tweet")
+        async def callback(self, interaction: discord.Interaction):
+            pass
+
+    logger.info(f"Sending a tweet")
 
     author = None  # noqa
     for user in tweet.includes["users"]:
@@ -201,7 +210,8 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         )
     )
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
-    await twitter_channel.send(embed=embed, view=view)
+    view.message = await twitter_channel.send(embed=embed, view=view)
+    await view.wait()
 
     logger.info(f"Tweet sent!")
 
@@ -299,4 +309,4 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_keep_alive(self):
-        logger.info("Keep Alive signal received")
+        logger.debug("Keep Alive signal received")
