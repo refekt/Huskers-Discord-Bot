@@ -675,7 +675,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await self.alert_gameday_channels(client=interaction.client, on=False)
 
     @app_commands.command(name="smms", description="Tee hee")  # TODO Make hidden
-    @app_commands.default_permissions(administrator=True)
+    @app_commands.default_permissions(manage_messages=True)
     async def smms(
         self,
         interaction: discord.Interaction,
