@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import platform
 import sys
 
 __all__ = ["discordLogger"]
@@ -17,11 +18,20 @@ def discordLogger(name: str, level: int = logging.INFO) -> logging.Logger:
     )
     logger = logging.getLogger(name)
     path = pathlib.Path("bot.log")
-    handler = logging.FileHandler(
-        filename=f"{path.parent.absolute()}\\{path}",
-        mode="a",
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    if "Windows" in platform.platform():
+        handler = logging.FileHandler(
+            filename=f"{path.parent.absolute()}\\{path}",
+            mode="a",
+        )
+    elif "Linux" in platform.platform():
+        handler = logging.FileHandler(
+            filename=f"{path.parent.absolute()}/{path}",
+            mode="a",
+        )
+    else:
+        handler = None
+    if handler:
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
     return logger
