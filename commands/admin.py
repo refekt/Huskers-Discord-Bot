@@ -520,11 +520,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def proess_nebraska(
         self, interaction: discord.Interaction, who: discord.Member
     ) -> None:
-        logger.info(f"Starting Nebraska for {who.display_name}")
+        logger.info(f"Starting Nebraska for {who.name}#{who.discriminator}")
 
         assert who, UserInputException("You must include a user!")
 
-        await interaction.response.defer(thinking=True)
+        if not interaction.response.is_done():
+            await interaction.response.defer(thinking=True)
 
         role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
         try:
@@ -573,10 +574,17 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 },
             ],
         )
-        await interaction.followup.send(embed=embed)
+        if interaction.response.is_done():
+            await interaction.followup.send(embed=embed)
+        else:
+            await interaction.channel.send(embed=embed)
 
     @app_commands.command(name="iowa", description="Send someone to Iowa")
-    @app_commands.describe(who="User to send to Iowa", reason="The reason why")
+    @app_commands.describe(
+        who="User to send to Iowa",
+        reason="The reason why",
+        duration="Number of seconds to send user to Iowa. 3600 = 1 hour, 86400 = 1 day",
+    )
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
     async def iowa(
@@ -644,7 +652,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         if duration is not None:
-            wait_and_run(
+            await wait_and_run(
                 duration=duration,
                 func=self.proess_nebraska(interaction=interaction, who=who),
             )

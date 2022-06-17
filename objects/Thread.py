@@ -1,5 +1,5 @@
 import asyncio
-from typing import Coroutine, Any
+from typing import Coroutine
 
 from objects.Logger import discordLogger
 
@@ -10,8 +10,9 @@ __all__ = ["wait_and_run"]
 logger.info(f"{str(__name__).title()} module loaded!")
 
 
-def wait_and_run(duration: float, func: Coroutine[Any, Any, None]) -> None:
+async def wait_and_run(duration: float, func: Coroutine) -> None:
     logger.info(f"Waiting {duration} seconds to run {func.__name__}")
-    asyncio.sleep(delay=duration)
+    await asyncio.sleep(delay=duration)
     logger.info(f"{func.__name__} waiting complete. Calling funciton")
-    asyncio.run(func)
+
+    result = await func
