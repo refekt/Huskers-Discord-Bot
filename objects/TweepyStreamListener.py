@@ -136,6 +136,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         async def on_timeout(self) -> None:
+            logger.info("Twitter buttons have timed out. Removing options")
             self.clear_items()
             await self.message.edit(view=self)
 

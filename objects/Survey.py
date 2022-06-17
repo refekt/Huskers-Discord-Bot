@@ -83,15 +83,19 @@ class Survey:
         self.timeout: int = math.ceil(timeout)
 
     class SurviewButtons(View):
-        def __init__(self, options: List[SurveyOption], timeout: int = None) -> None:
+        def __init__(
+            self, options: List[SurveyOption], closer, timeout: int = None
+        ) -> None:
             super().__init__(timeout=timeout)
             self.options: List[SurveyOption] = options
             self.tally_str: str = "Tally for: "
             self.footer_str: str = "Users: "
+            self.closer = closer
+            self.message: Optional[discord.Message, None] = None
 
         async def process_button(self, interaction: Interaction, button: Button):
             logger.info(
-                f"{interaction.user.display_name} selected option '{button.label.upper()}'"
+                f"{interaction.user.name}#{interaction.user.discriminator} selected option '{button.label.upper()}'"
             )
 
             await interaction.response.send_message(
@@ -138,7 +142,9 @@ class Survey:
             await self.process_button(interaction=interaction, button=button)
 
         async def on_timeout(self) -> None:
-            self.stop()
+            logger.info("Survey has timed out. Removing options")
+            self.clear_items()
+            await self.message.edit(view=self)
 
     def create_embed(self) -> None:
         embed = Embed(
@@ -176,22 +182,19 @@ class Survey:
         self.embed.set_footer(text=f"{footer_text} {hashed_user} ")
 
     async def send(self) -> None:
-        if not self.interaction.response.is_done():
-            await self.interaction.response.defer()
+        await self.interaction.response.defer()
 
         self.create_embed()
 
-        view = self.SurviewButtons(self.options)
+        view = self.SurviewButtons(self.options, self.close_survey())
         for index, child in enumerate(view.children):
             if index >= self.max_options:
                 view.remove_item(view.option_three)
                 break
             child.label = self.options[index].label
 
-        if self.interaction.response.is_done():
-            await self.interaction.channel.send(embed=self.embed, view=view)
-        else:
-            await self.interaction.followup.send(embed=self.embed, view=view)
+        view.message = await self.interaction.followup.send(embed=self.embed, view=view)
+        await view.wait()
 
     async def close_survey(self) -> None:
         await self.interaction.edit_original_message(view=None)

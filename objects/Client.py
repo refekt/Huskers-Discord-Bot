@@ -216,7 +216,9 @@ class HuskerClient(Bot):
         ]
 
         if not reactions_over_threshold:
-            logger.info("No reactions found over threshold")
+            logger.debug(
+                f"No reactions found over threshold found in {reaction_channel}."
+            )
             return None
 
         logger.info(
