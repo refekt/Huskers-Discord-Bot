@@ -10,6 +10,7 @@ __all__ = ["wait_and_run"]
 logger.info(f"{str(__name__).title()} module loaded!")
 
 
+# TODO Make this into a class and add other functions.
 async def wait_and_run(duration: float, func: Coroutine) -> None:
     logger.info(f"Waiting {duration} seconds to run {func.__name__}")
     await asyncio.sleep(delay=duration)
