@@ -32,6 +32,7 @@ from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemov
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
+from objects.Thread import wait_and_run
 
 logger = discordLogger(__name__)
 
@@ -516,6 +517,64 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         await interaction.response.send_message(embed=embed)
 
+    async def proess_nebraska(
+        self, interaction: discord.Interaction, who: discord.Member
+    ) -> None:
+        logger.info(f"Starting Nebraska for {who.display_name}")
+
+        assert who, UserInputException("You must include a user!")
+
+        await interaction.response.defer(thinking=True)
+
+        role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
+        try:
+            await who.remove_roles(role_timeout)
+        except (Forbidden, HTTPException) as e:
+            logger.exception(f"Unable to remove the timeout role!\n{e}", exc_info=True)
+
+        logger.info(f"Removed [{role_timeout}] role")
+
+        previous_roles_raw = processMySQL(
+            query=sqlRetrieveIowa, values=who.id, fetch="all"
+        )
+
+        processMySQL(query=sqlRemoveIowa, values=who.id)
+
+        if previous_roles_raw is not None:
+            previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+            logger.info(f"Gathered all the roles to store")
+
+            if previous_roles:
+                for role in previous_roles:
+                    try:
+                        new_role = interaction.guild.get_role(int(role))
+                        logger.info(f"Attempting to add [{new_role}] role...")
+                        await who.add_roles(new_role, reason="Returning from Iowa")
+                    except (
+                        discord.Forbidden,
+                        discord.HTTPException,
+                        discord.ext.commands.MissingPermissions,
+                    ) as e:
+                        logger.info(f"Unable to add role!\n{e}")
+                        continue
+
+                    logger.info(f"Added [{new_role}] role")
+
+        embed = buildEmbed(
+            title="Return to Nebraska",
+            fields=[
+                {
+                    "name": "Welcome back!",
+                    "value": f"[{who.mention}] is welcomed back to Nebraska!",
+                },
+                {
+                    "name": "Welcomed by",
+                    "value": interaction.user.mention,
+                },
+            ],
+        )
+        await interaction.followup.send(embed=embed)
+
     @app_commands.command(name="iowa", description="Send someone to Iowa")
     @app_commands.describe(who="User to send to Iowa", reason="The reason why")
     @app_commands.guilds(GUILD_PROD)
@@ -525,6 +584,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         interaction: discord.Interaction,
         who: DISCORD_USER_TYPES,
         reason: str,
+        duration: int = None,
     ) -> None:
         await interaction.response.defer(thinking=True)
 
@@ -582,6 +642,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await who.send(
             f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
         )
+
+        if duration is not None:
+            wait_and_run(
+                duration=duration,
+                func=self.proess_nebraska(interaction=interaction, who=who),
+            )
+
         logger.info("Iowa command complete")
 
     @app_commands.command(name="nebraska", description="Bring someone back to Nebraska")
@@ -593,58 +660,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         interaction: discord.Interaction,
         who: DISCORD_USER_TYPES,
     ) -> None:
-        assert who, UserInputException("You must include a user!")
 
-        await interaction.response.defer(thinking=True)
-
-        role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
-        try:
-            await who.remove_roles(role_timeout)
-        except (Forbidden, HTTPException) as e:
-            logger.exception(f"Unable to remove the timeout role!\n{e}", exc_info=True)
-
-        logger.info(f"Removed [{role_timeout}] role")
-
-        previous_roles_raw = processMySQL(
-            query=sqlRetrieveIowa, values=who.id, fetch="all"
-        )
-
-        processMySQL(query=sqlRemoveIowa, values=who.id)
-
-        if previous_roles_raw is not None:
-            previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
-            logger.info(f"Gathered all the roles to store")
-
-            if previous_roles:
-                for role in previous_roles:
-                    try:
-                        new_role = interaction.guild.get_role(int(role))
-                        logger.info(f"Attempting to add [{new_role}] role...")
-                        await who.add_roles(new_role, reason="Returning from Iowa")
-                    except (
-                        discord.Forbidden,
-                        discord.HTTPException,
-                        discord.ext.commands.MissingPermissions,
-                    ) as e:
-                        logger.info(f"Unable to add role!\n{e}")
-                        continue
-
-                    logger.info(f"Added [{new_role}] role")
-
-        embed = buildEmbed(
-            title="Return to Nebraska",
-            fields=[
-                {
-                    "name": "Welcome back!",
-                    "value": f"[{who.mention}] is welcomed back to Nebraska!",
-                },
-                {
-                    "name": "Welcomed by",
-                    "value": interaction.user.mention,
-                },
-            ],
-        )
-        await interaction.followup.send(embed=embed)
+        await self.proess_nebraska(interaction=interaction, who=who)
 
         logger.info("Nebraska command complete")
 
