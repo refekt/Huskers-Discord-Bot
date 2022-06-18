@@ -285,20 +285,30 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info(f"Countdown done")
 
     @app_commands.command(name="lines", description="Get the betting lines for a game")
+    @app_commands.describe(
+        team_name="Name of the opponent you want to look up lines for",
+        # week="Which week you want to search"
+    )
     @app_commands.guilds(GUILD_PROD)
     async def lines(
         self,
         interaction: discord.Interaction,
         team_name: str = "Nebraska",
-        week: int = None,
-        year: int = datetime.now().year,
+        # week: int = None,
+        # year: int = datetime.now().year,
     ) -> None:
         logger.info(f"Gathering info for lines")
 
         await interaction.response.defer()
 
-        if week is None:
-            week = get_current_week(year=year, team=team_name)
+        year = datetime.now().year
+
+        assert checkYearValid(year), StatsException(
+            f"The provided year is not valid: {year}"
+        )
+
+        # if week is None:
+        week = get_current_week(year=year, team=team_name)
 
         week = 1 if week == 0 else week
         logger.info(f"Current week: {week}")
