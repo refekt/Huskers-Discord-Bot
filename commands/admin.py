@@ -336,7 +336,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def commands(self, interaction: discord.Interaction) -> None:
         """Lists all commands within the bot"""
 
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
 
         app_cmds: dict[
             Union[discord.app_commands.Group, discord.app_commands.Command]
@@ -352,13 +352,29 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         embed_fields_commands: list[dict] = []
 
+        def commandHasPerms(
+            command: Union[discord.app_commands.Command, discord.app_commands.Group]
+        ) -> bool:
+            if command.default_permissions is None:
+                return True
+
+            if (
+                command.default_permissions.administrator
+                or command.default_permissions.manage_messages
+            ) and not interaction.user.resolved_permissions.manage_messages:
+                return False
+            else:
+                return True
+
         for cmd in app_cmds.items():
             cmd_name = cmd[0]
             cmd_command = cmd[1]
             if str(cmd_name).lower() == "smms":
                 continue
 
-            if type(cmd_command) == discord.app_commands.Command:
+            if type(cmd_command) == discord.app_commands.Command and commandHasPerms(
+                cmd_command
+            ):
                 embed_fields_commands.append(
                     dict(
                         name=str(cmd_name).capitalize(),
@@ -367,8 +383,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         else "TBD",
                     )
                 )
-            elif type(cmd) == discord.app_commands.Group:
+            elif type(cmd_command) == discord.app_commands.Group and commandHasPerms(
+                cmd_command
+            ):
                 for sub_cmd in cmd_command.commands:
+                    if not commandHasPerms(sub_cmd):
+                        continue
+
                     embed_fields_commands.append(
                         dict(
                             name=f"{str(cmd_name).title()} {sub_cmd.name.title()}",
