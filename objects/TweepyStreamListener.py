@@ -113,10 +113,16 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         ):
             logger.info("Sending tweet to general channel")
             chan = await client.fetch_channel(CHAN_GENERAL)
-            await chan.send(
-                f"Tweet forwarded by {interaction.user.mention}",
-                embed=interaction.message.embeds[0],
-            )
+            # await chan.send(
+            #     f"Tweet forwarded by {interaction.user.mention}",
+            #     embed=interaction.message.embeds[0],
+            # )
+            link = [
+                field.value
+                for field in interaction.message.embeds[0].fields
+                if field.name == "Link to Tweet"
+            ]
+            await chan.send(str(link))
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         @discord.ui.button(

@@ -139,10 +139,10 @@ def buildTweetEmbed(
                 name="Message",
                 value=text,
             ),
-            # dict(
-            #     name="Link to Tweet",
-            #     value=f"https://twitter.com/{username}/status/{tweet_id}",
-            # ),
+            dict(
+                name="Link to Tweet",
+                value=f"https://twitter.com/{username}/status/{tweet_id}",
+            ),
         ],
     )
     if urls.get("urls"):  # TODO KeyError is raising
