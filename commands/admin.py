@@ -501,7 +501,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @group_restart.command(name="twitter", description="Restart the twitter stream")
     async def twitter(self, interaction: discord.Interaction) -> None:
         logger.info("Restarting the twitter bot")
+        await interaction.response.defer(ephemeral=True)
         start_twitter_stream(client=interaction.client)
+        await interaction.followup.send("Twitter stream has been restarted!")
         logger.info("Twitter stream restarted!")
 
     @group_submit.command(name="bug", description="Submit a bug")
