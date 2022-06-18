@@ -498,7 +498,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         except subprocess.CalledProcessError as e:
             raise SSHException(f"Status Code: {e.returncode}, Output: {e.output}")
 
-    @group_restart.command(name="twitter", description="Restart the bot")
+    @group_restart.command(name="twitter", description="Restart the twitter stream")
     async def twitter(self, interaction: discord.Interaction) -> None:
         logger.info("Restarting the twitter bot")
         start_twitter_stream(client=interaction.client)
