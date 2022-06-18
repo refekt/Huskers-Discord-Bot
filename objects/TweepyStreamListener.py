@@ -98,7 +98,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
 
 async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
     class TwitterButtons(discord.ui.View):
-        def __init__(self, timeout=600):
+        def __init__(self, timeout=1200):
             super(TwitterButtons, self).__init__()
             self.message: Optional[discord.Message, None] = None
             self.timeout = timeout
