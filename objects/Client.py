@@ -1,5 +1,6 @@
 import pathlib
 import platform
+from os import listdir
 from typing import Union
 
 import discord
@@ -399,18 +400,30 @@ class HuskerClient(Bot):
 
         logger.info("Loading extensions")
 
-        for extension in self.add_extensions:
+        path = pathlib.Path(
+            f"{pathlib.Path(__file__).parent.parent.resolve()}/commands"
+        ).resolve()  # Get path for /commands
+        files = [
+            f"commands.{file[:len(file)-3]}"
+            for file in listdir(path)
+            if ".py" in str(file)
+            and "testing" not in str(file)
+            and "example" not in str(file)
+        ]  # Get list of files that are not testing or example files and have .py extensions
+        for extension in files:
             try:
                 # NOTE Extensions will fail to load when runtime errors exist in the code.
                 # It will also NOT currently output a traceback. You MUST investigate
                 # manually by stepping through code until I find a way to capture these
                 # exceptions.
+
                 await self.load_extension(extension)
-                logger.info(f"Loaded the {extension} extension")
+                logger.info(f"Loaded the [{extension}] extension")
             except Exception as e:  # noqa
                 logger.exception(
                     f"ERROR: Unable to load the {extension} extension\n{e}"
                 )
+                continue
 
         logger.info("All extensions loaded")
 

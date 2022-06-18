@@ -10,6 +10,7 @@ from objects.Exceptions import CommandException, StatsException
 logger = logging.getLogger(__name__)
 
 __all__ = [
+    "checkYearValid",
     "createComponentKey",
     "discordURLFormatter",
     "formatPrettyTimeDelta",

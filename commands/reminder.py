@@ -1,4 +1,5 @@
 import discord.ext.commands
+from discord import app_commands
 from discord.ext import commands
 
 from helpers.constants import GUILD_PROD
@@ -8,8 +9,9 @@ logger = discordLogger(__name__)
 
 
 class ReminderCog(commands.Cog, name="Reminder Commands"):
-    @commands.command()
-    async def remindme(self, interaction: discord.Interaction) -> None:
+    @app_commands.command(name="remind-me", description="TBD")
+    @app_commands.guilds(GUILD_PROD)
+    async def remind_me(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message("Not implemented yet!", ephemeral=True)
 
 
