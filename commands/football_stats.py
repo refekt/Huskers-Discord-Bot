@@ -403,12 +403,10 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(
-        name="team-schedule", description="Retrieve the team's schedule"
-    )
+    @app_commands.command(name="schedule", description="Retrieve the team's schedule")
     @app_commands.describe(year="The year of the schedule")
     @app_commands.guilds(GUILD_PROD)
-    async def team_schedule(
+    async def schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
         await interaction.response.defer()
