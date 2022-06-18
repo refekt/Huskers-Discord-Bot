@@ -21,6 +21,7 @@ from helpers.constants import (
     TWITTER_QUERY_MAX,
     CHAN_HOF,
     CHAN_HOS,
+    TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed
 from helpers.slowking import makeSlowking
@@ -65,7 +66,7 @@ def start_twitter_stream(client: discord.Client) -> None:
     if DEBUGGING_CODE:
         rule_query = "from:ayy_gbr OR "
 
-    rule_query += "from:Block16Omaha OR "
+    rule_query += f"from:{TWITTER_BLOCK16_SCREENANME} OR "
 
     for member in list_members[0]:
         append_str = f"from:{member['username']} OR "

@@ -16,6 +16,7 @@ from helpers.constants import (
     CHAN_GENERAL,
     CHAN_RECRUITING,
     CHAN_FOOD,
+    TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from objects.Logger import discordLogger
@@ -167,11 +168,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         for item in tweet.includes["tweets"]:
             quotes.append(TweetQuoteData(item))
 
-    if (
-        author.username.lower() == "Block16Omaha".lower()
-        and tweet.data.get("referenced_tweets", False)
-        and tweet.data.get("in_reply_to_user_id", False)
-    ):
+    if author.username.lower() == TWITTER_BLOCK16_SCREENANME.lower():
         embed = buildTweetEmbed(
             name=author.name,
             username=author.username,
