@@ -17,6 +17,7 @@ from helpers.constants import (
     RECRUIT_STATES,
 )
 from helpers.embed import buildEmbed, buildRecruitEmbed
+from helpers.misc import checkYearValid
 from helpers.mysql import (
     processMySQL,
     sqlGetIndividualPrediction,
@@ -746,21 +747,24 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
                 "A player's first and/or last search_name is required."
             )
 
-        if len(str(year)) == 2:
-            year += 2000
-        # elif len(str(year)) == 1 or len(str(year)) == 3:
-        elif 1 < len(str(year)) < 4:
-            raise RecruitException("The search year must be two or four digits long.")
+        # if len(str(year)) == 2:
+        #     year += 2000
+        # # elif len(str(year)) == 1 or len(str(year)) == 3:
+        # elif 1 < len(str(year)) < 4:
+        #     raise RecruitException("The search year must be two or four digits long.")
+        #
+        # if year > datetime.now().year + 5:
+        #     raise RecruitException(
+        #         "The search year must be within five years of the current class."
+        #     )
+        # if year < 1869:
+        #     raise RecruitException(
+        #         "The search year must be after the first season of college football--1869."
+        #     )
 
-        if year > datetime.now().year + 5:
-            raise RecruitException(
-                "The search year must be within five years of the current class."
-            )
-
-        if year < 1869:
-            raise RecruitException(
-                "The search year must be after the first season of college football--1869."
-            )
+        assert checkYearValid(year), RecruitException(
+            f"The provided year is not valid: {year}"
+        )
 
         logger.info(f"Searching for [{year} {search_name.capitalize()}]")
 
@@ -802,18 +806,19 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         if not len(search_name.split(" ")) == 2:
             raise RecruitException("You can only search by full name.")
 
-        if len(str(year)) == 2:
-            year += 2000
-
-        if year > datetime.now().year + 5:
-            raise RecruitException(
-                "The search year must be within five years of the current class."
-            )
-
-        if year < 1869:
-            raise RecruitException(
-                "The search year must be after the first season of college football--1869."
-            )
+        # if len(str(year)) == 2:
+        #     year += 2000
+        # if year > datetime.now().year + 5:
+        #     raise RecruitException(
+        #         "The search year must be within five years of the current class."
+        #     )
+        # if year < 1869:
+        #     raise RecruitException(
+        #         "The search year must be after the first season of college football--1869."
+        #     )
+        assert checkYearValid(year), RecruitException(
+            f"The provided year is not valid: {year}"
+        )
 
         global prediction_search
         prediction_search = buildFootballRecruit(year, search_name)

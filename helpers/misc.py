@@ -3,8 +3,9 @@ import pathlib
 import platform
 import random
 import string
+from datetime import datetime
 
-from objects.Exceptions import CommandException
+from objects.Exceptions import CommandException, StatsException
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,22 @@ def createComponentKey() -> str:
 
 def discordURLFormatter(display_text: str, url: str) -> str:
     return f"[{display_text}]({url})"
+
+
+def checkYearValid(year: int) -> bool:
+    if len(str(year)) == 2:
+        year += 2000
+    elif 1 < len(str(year)) < 4:
+        raise StatsException("The search year must be two or four digits long.")
+    if year > datetime.now().year + 5:
+        raise StatsException(
+            "The search year must be within five years of the current class."
+        )
+    if year < 1869:
+        raise StatsException(
+            "The search year must be after the first season of college football--1869."
+        )
+    return True
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

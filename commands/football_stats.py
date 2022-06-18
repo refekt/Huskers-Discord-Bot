@@ -25,6 +25,7 @@ from helpers.constants import (
     TZ,
 )
 from helpers.embed import buildEmbed, collectScheduleEmbeds
+from helpers.misc import checkYearValid
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
@@ -148,17 +149,28 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         name="countdown", description="Get the time until the next game!"
     )
     @app_commands.describe(
-        opponent="Name of opponent to lookup", year="Year of the game to look up"
+        opponent="Name of opponent to lookup",
+        # year="Year of the game to look up"
     )
     @app_commands.guilds(GUILD_PROD)
     async def countdown(
         self,
         interaction: discord.Interaction,
         opponent: str = None,
-        year: int = datetime.now().year,
+        # year: int = datetime.now().year,
     ) -> None:
         logger.info(f"Starting countdown")
         await interaction.response.defer()
+
+        if opponent:
+            assert opponent.replace(" ", "").replace("-", "").isalpha(), StatsException(
+                "Team names must only contain alphabet letters."
+            )
+
+        year = datetime.now().year
+        assert checkYearValid(year), StatsException(
+            f"The provided year is not valid: {year}"
+        )
 
         now_cst = datetime.now().astimezone(tz=TZ)
         logger.info(f"Now CST is... {now_cst}")
@@ -416,18 +428,21 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             raise StatsException(
                 "A player's first and/or last search_name is required."
             )
-        if len(str(year)) == 2:
-            year += 2000
-        elif 1 < len(str(year)) < 4:
-            raise StatsException("The search year must be two or four digits long.")
-        if year > datetime.now().year + 5:
-            raise StatsException(
-                "The search year must be within five years of the current class."
-            )
-        if year < 1869:
-            raise StatsException(
-                "The search year must be after the first season of college football--1869."
-            )
+        # if len(str(year)) == 2:
+        #     year += 2000
+        # elif 1 < len(str(year)) < 4:
+        #     raise StatsException("The search year must be two or four digits long.")
+        # if year > datetime.now().year + 5:
+        #     raise StatsException(
+        #         "The search year must be within five years of the current class."
+        #     )
+        # if year < 1869:
+        #     raise StatsException(
+        #         "The search year must be after the first season of college football--1869."
+        #     )
+        assert checkYearValid(year), StatsException(
+            f"The provided year is not valid: {year}"
+        )
 
         api = PlayersApi(ApiClient(cfbd_config))
         api_player_search_result: list[cfbd.PlayerSearchResult] = api.player_search(
