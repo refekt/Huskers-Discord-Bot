@@ -104,6 +104,14 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             self.message: Optional[discord.Message, None] = None
             self.timeout = timeout
 
+        def grabTwitterLink(self, tweet_embed: discord.Embed) -> str:
+            link = [
+                field.value
+                for field in tweet_embed.fields
+                if field.name == "Link to Tweet"
+            ]
+            return "".join(link)
+
         @discord.ui.button(
             label="Send to General",
             custom_id="send_to_general",
@@ -114,16 +122,9 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         ):
             logger.info("Sending tweet to general channel")
             chan = await client.fetch_channel(CHAN_GENERAL)
-            # await chan.send(
-            #     f"Tweet forwarded by {interaction.user.mention}",
-            #     embed=interaction.message.embeds[0],
-            # )
-            link = [
-                field.value
-                for field in interaction.message.embeds[0].fields
-                if field.name == "Link to Tweet"
-            ]
-            await chan.send(str(link))
+            await chan.send(
+                f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
+            )
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         @discord.ui.button(
@@ -137,8 +138,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             logger.info("Sending tweet to recruiting channel")
             chan = await client.fetch_channel(CHAN_RECRUITING)
             await chan.send(
-                f"Tweet forwarded by {interaction.user.mention}",
-                embed=interaction.message.embeds[0],
+                f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
             )
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
