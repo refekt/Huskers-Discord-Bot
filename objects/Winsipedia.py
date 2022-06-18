@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from helpers.constants import HEADERS
+from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
@@ -187,8 +188,16 @@ class CompareWinsipedia:
 
             return f"{wins} wins - {ties} ties - {losses} losses"
 
+        assert (
+            compare.replace(" ", "").isalpha() and against.replace(" ", "").isalpha()
+        ), StatsException("Team names must only contain alphabet letters.")
+
         re = requests.get(url=self.url, headers=HEADERS)
         soup = BeautifulSoup(re.content, features="html.parser")
+
+        assert not re.status_code == 404, StatsException(
+            f"Unable to find provided teams: {compare}, {against}"
+        )
 
         margin_of_victory = mov(1)
         win_stream = win(2)
