@@ -353,7 +353,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             fields=[
                 dict(
                     name="Links",
-                    value="[All Games ]({comparison.full_games_url}) | "
+                    value=f"[All Games ]({comparison.full_games_url}) | "
                     f"[{team_for.title()}'s Games]({'http://www.winsipedia.com/' + team_for.lower()}) |     "
                     f"[{team_against.title()}'s Games]({'http://www.winsipedia.com/' + team_against.lower()})",
                 ),
