@@ -29,6 +29,7 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
+from objects.Client import start_twitter_stream
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
@@ -75,6 +76,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     group_gameday = app_commands.Group(
         name="gameday",
         description="Turn game day mode on or off",
+        default_permissions=discord.Permissions(manage_messages=True),
+        guild_ids=[GUILD_PROD],
+    )
+    group_restart = app_commands.Group(
+        name="restart",
+        description="Restart elements of the bot",
         default_permissions=discord.Permissions(manage_messages=True),
         guild_ids=[GUILD_PROD],
     )
@@ -458,12 +465,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.client.close()
 
-    @app_commands.command(
-        name="restart", description="Restart the bot (Linux host only)"
-    )
-    @app_commands.guilds(GUILD_PROD)
-    @app_commands.default_permissions(administrator=True)
-    async def restart(self, interaction: discord.Interaction) -> None:
+    @group_restart.command(name="bot", description="Restart the bot")
+    async def bot(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             "Bot will restart shortly!", ephemeral=True
         )
@@ -494,6 +497,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             subprocess.run([bash_script_path], check=True)
         except subprocess.CalledProcessError as e:
             raise SSHException(f"Status Code: {e.returncode}, Output: {e.output}")
+
+    @group_restart.command(name="twitter", description="Restart the bot")
+    async def twitter(self, interaction: discord.Interaction) -> None:
+        logger.info("Restarting the twitter bot")
+        start_twitter_stream(client=interaction.client)
+        logger.info("Twitter stream restarted!")
 
     @group_submit.command(name="bug", description="Submit a bug")
     async def submit_bug(self, interaction: discord.Interaction) -> None:
