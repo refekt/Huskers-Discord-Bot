@@ -109,7 +109,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
                 sub_str in source_url for sub_str in image_formats
             ), ImageException("You must provide a valid URL!")
 
-        def load_image_from_url(url: str):
+        def load_image_from_url(url: str) -> Image:
             image_response = requests.get(url=url, stream=True, headers=HEADERS)
             return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
 

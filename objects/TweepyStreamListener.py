@@ -99,7 +99,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
 
 async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
     class TwitterButtons(discord.ui.View):
-        def __init__(self, timeout=1200):
+        def __init__(self, timeout=1200) -> None:
             super(TwitterButtons, self).__init__()
             self.message: Optional[discord.Message, None] = None
             self.timeout = timeout
@@ -147,7 +147,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             self.clear_items()
             await self.message.edit(view=self)
 
-        async def callback(self, interaction: discord.Interaction):
+        async def callback(self, interaction: discord.Interaction) -> None:
             pass
 
     logger.info(f"Sending a tweet")
@@ -312,5 +312,5 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_keep_alive(self):
+    def on_keep_alive(self) -> None:
         logger.debug("Keep Alive signal received")

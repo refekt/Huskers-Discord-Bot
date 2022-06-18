@@ -13,7 +13,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 
 
 class TeamStatsWinsipediaTeam:
-    def __init__(self, *, team_name: str):
+    def __init__(self, *, team_name: str) -> None:
         def all_time_record():
             atr = soup.find_all(attrs={"class": "ranking span2 item2"})
             try:
@@ -161,23 +161,23 @@ class CompareWinsipediaTeam:
 
 
 class CompareWinsipedia:
-    def __init__(self, compare: str, against: str):
+    def __init__(self, compare: str, against: str) -> None:
         self.url = f"http://www.winsipedia.com/{compare.lower()}/vs/{against.lower()}"
         self.full_games_url = (
             f"http://www.winsipedia.com/games/{compare.lower()}/vs/{against.lower()}"
         )
 
-        def mov(which: int):
+        def mov(which: int) -> list:
             raw_mov = soup.find_all(attrs={"class": f"ranking span2 item{which}"})
             raw_mov = raw_mov[0].contents[3].text.replace("\n \n", ":").strip()
             return raw_mov.split(":")
 
-        def win(which: int):
+        def win(which: int) -> list:
             raw_win = soup.find_all(attrs={"class": f"ranking span2 item{which}"})
             raw_win = raw_win[0].contents[3].text.replace("\n \n", ":").strip()
             return raw_win.split(":")
 
-        def all_time_wins():
+        def all_time_wins() -> str:
             wins = soup.find_all(attrs={"class": "titleItem left"})[0].contents[1].text
             ties = (
                 soup.find_all(attrs={"class": "titleItem center"})[0].contents[1].text

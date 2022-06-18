@@ -107,19 +107,19 @@ class TestStreamClient(tweepy.StreamingClient):
             ids = [rule.id for rule in raw_rules.data]
             self.delete_rules(ids)
 
-    def on_keep_alive(self):
+    def on_keep_alive(self) -> None:
         print("on_keep_alive")
 
-    def on_tweet(self, tweet):
+    def on_tweet(self, tweet) -> None:
         print("on_tweet", tweet)
 
-    def on_response(self, response):
+    def on_response(self, response) -> None:
         print("on_response", response)
 
-    def on_includes(self, includes):
+    def on_includes(self, includes) -> None:
         print("on_includes", includes)
 
-    def on_matching_rules(self, matching_rules):
+    def on_matching_rules(self, matching_rules) -> None:
         print("on_matching_rules", matching_rules)
 
     def on_connect(self) -> None:

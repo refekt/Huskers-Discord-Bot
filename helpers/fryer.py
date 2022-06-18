@@ -1,10 +1,12 @@
 import logging
 import math
 import os
+from typing import List, Tuple, Any, Union
 
 import cv2
 import numpy
 from PIL import Image
+from PIL.Image import Image
 from numpy import random
 
 logger = logging.getLogger(__name__)
@@ -24,7 +26,7 @@ deepfry_path = "resources/deepfry/"
 
 
 # Pass an image to fry, pretty self-explanatory
-def fry_image(image, emote_amount, noise, contrast):
+def fry_image(image, emote_amount, noise, contrast) -> Image:
     gray = numpy.array(image.convert("L"))
 
     eye_coords = find_eyes(gray)
@@ -51,7 +53,7 @@ def fry_image(image, emote_amount, noise, contrast):
     return image
 
 
-def find_chars(gray):
+def find_chars(gray) -> list[tuple[Any, Any, Any, Any]]:
     ret, mask = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
     image_final = cv2.bitwise_and(gray, gray, mask=mask)
     ret, new_img = cv2.threshold(image_final, 180, 255, cv2.THRESH_BINARY_INV)
@@ -70,7 +72,7 @@ def find_chars(gray):
     return coords
 
 
-def find_eyes(gray):
+def find_eyes(gray) -> list[tuple[Union[float, Any], Union[float, Any]]]:
     coords = []
 
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -84,7 +86,7 @@ def find_eyes(gray):
     return coords
 
 
-def add_flares(image, coords):
+def add_flares(image, coords) -> Image:
     flare = Image.open(random_file(f"{deepfry_path}flares/")).convert("RGBA")
     for coord in coords:
         image.paste(
@@ -95,7 +97,7 @@ def add_flares(image, coords):
     return image
 
 
-def add_chars(image, coords):
+def add_chars(image, coords) -> Image:
     char = Image.open(random_file(f"{deepfry_path}chars/")).convert("RGBA")
     for coord in coords:
         if numpy.random.random(1)[0] > 0.1:
@@ -106,7 +108,7 @@ def add_chars(image, coords):
     return image
 
 
-def add_emotes(image, max_emotes):
+def add_emotes(image, max_emotes) -> None:
     for i in range(max_emotes):
         emote = Image.open(random_file(f"{deepfry_path}/emotes/")).convert("RGBA")
 
@@ -117,17 +119,17 @@ def add_emotes(image, max_emotes):
         image.paste(emote, (int(coord[0]), int(coord[1])), emote)
 
 
-def change_contrast(image, level):
+def change_contrast(image, level) -> Image:
     factor = (259 * (level + 255)) / (255 * (259 - level))
 
-    def contrast(c):
+    def contrast(c) -> float:
         return 128 + factor * (c - 128)
 
     return image.point(contrast)
 
 
-def add_noise(image, factor):
-    def noise(c):
+def add_noise(image: Image, factor) -> Image:
+    def noise(c) -> float:
         return c * (1 + numpy.random.random(1)[0] * factor - factor / 2)
 
     return image.point(noise)
@@ -141,7 +143,7 @@ def add_noise(image, factor):
 #   a   = flatness of the bulge, 1 = spherical, > 1 increases flatness
 #   h   = height of the bulge
 #   ior = index of refraction of the bulge material
-def bulge(img, f, r, a, h, ior):
+def bulge(img, f, r, a, h, ior) -> Image:
     # print("Creating a bulge at ({0}, {1}) with radius {2}... ".format(f[0], f[1], r))
 
     # load image to numpy array
@@ -279,14 +281,14 @@ def replace_values(
 
 
 # return the length of vector v
-def length(v):
+def length(v):  # TODO Figure out type hinting
     return numpy.sqrt(numpy.sum(numpy.square(v)))
 
 
 # returns the unit vector in the direction of v
-def normalise(v):
+def normalise(v) -> float:
     return v / (length(v))
 
 
-def random_file(path):
+def random_file(path) -> str:
     return path + numpy.random.choice(os.listdir(path))

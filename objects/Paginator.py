@@ -47,7 +47,7 @@ class EmbedPaginatorView(discord.ui.View):
                 f"Error creating ud_current_page button: {e}", exc_info=True
             )
 
-    async def update_current_page(self):
+    async def update_current_page(self) -> None:
         logger.info(f"Current index is: {self.current_index}")
 
         for button in self.children:

@@ -301,7 +301,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         await interaction.response.defer()
 
         class UrbanDictDefinition:
-            def __init__(self, lookup_word, meaning, example, contributor):
+            def __init__(self, lookup_word, meaning, example, contributor) -> None:
                 self.lookup_word = lookup_word
                 self.meaning = meaning
                 self.example = example
@@ -423,7 +423,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         except StopIteration:
             raise WeatherException("Unable to find state. Please try again!")
 
-        def shift_utc_tz(dt, shift):
+        def shift_utc_tz(dt, shift):  # TODO Figure out what is being returned here
             return dt + timedelta(seconds=shift)
 
         weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
@@ -525,7 +525,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     @app_commands.guilds(GUILD_PROD)
     async def hypeme(self, interaction: discord.Interaction) -> None:
         class Scroll:
-            def __init__(self, message: str):
+            def __init__(self, message: str) -> None:
                 self.header: str = "  _______________________\n=(__    ___      __     _)=\n  |                     |\n"
                 self.message_layer: str = "  |                     |\n"
                 self.signature: str = "\n  |   ~*~ Husk          |\n"
@@ -533,7 +533,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 self.max_line_len: int = 19
                 self.message: str = message
 
-            def compile(self):
+            def compile(self) -> str:
                 new_line: str = "\n"
                 lines = [
                     f"  | {str(self.message[i : i + self.max_line_len]).ljust(self.max_line_len, ' ')} |"

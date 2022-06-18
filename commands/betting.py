@@ -9,7 +9,7 @@ logger = discordLogger(__name__)
 
 class BettingCog(commands.Cog, name="Betting Commands"):
     @commands.command()
-    async def remindme(self, interaction: discord.Interaction):
+    async def remindme(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message("Not implemented yet!", ephemeral=True)
 
 

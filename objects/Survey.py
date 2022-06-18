@@ -34,7 +34,7 @@ def generate_random_key() -> str:
 
 
 class SurveyOption:
-    def __init__(self, label: AnyStr):
+    def __init__(self, label: AnyStr) -> None:
         assert isinstance(label, str), SurveyException("Label must be a string!")
 
         self.custom_id: AnyStr = f"{generate_random_key()}_survey_option"
@@ -93,7 +93,9 @@ class Survey:
             self.closer = closer
             self.message: Optional[discord.Message, None] = None
 
-        async def process_button(self, interaction: Interaction, button: Button):
+        async def process_button(
+            self, interaction: Interaction, button: Button
+        ) -> None:
             logger.info(
                 f"{interaction.user.name}#{interaction.user.discriminator} selected option '{button.label.upper()}'"
             )
@@ -130,15 +132,21 @@ class Survey:
                 return
 
         @discord.ui.button(label="one", custom_id="opt_one", style=ButtonStyle.gray)
-        async def option_one(self, interaction: discord.Interaction, button: Button):
+        async def option_one(
+            self, interaction: discord.Interaction, button: Button
+        ) -> None:
             await self.process_button(interaction=interaction, button=button)
 
         @discord.ui.button(label="two", custom_id="opt_two", style=ButtonStyle.gray)
-        async def option_two(self, interaction: discord.Interaction, button: Button):
+        async def option_two(
+            self, interaction: discord.Interaction, button: Button
+        ) -> None:
             await self.process_button(interaction=interaction, button=button)
 
         @discord.ui.button(label="three", custom_id="opt_three", style=ButtonStyle.gray)
-        async def option_three(self, interaction: discord.Interaction, button: Button):
+        async def option_three(
+            self, interaction: discord.Interaction, button: Button
+        ) -> None:
             await self.process_button(interaction=interaction, button=button)
 
         async def on_timeout(self) -> None:

@@ -24,7 +24,7 @@ class WeatherMain:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -34,7 +34,7 @@ class WeatherCoord:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -53,7 +53,7 @@ class WeatherSys:
                 setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -63,7 +63,7 @@ class WeatherWeather:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -73,7 +73,7 @@ class WeatherWind:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -83,7 +83,7 @@ class WeatherClouds:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -93,7 +93,7 @@ class WeatherRain:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 
@@ -103,7 +103,7 @@ class WeatherSnow:
             setattr(self, key, value)
         self._data_len = len(dictionary)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._data_len
 
 

@@ -437,5 +437,7 @@ class HuskerClient(Bot):
     async def on_member_join(self, guild_member: discord.Member) -> None:
         await self.send_welcome_message(guild_member)
 
-    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+    async def on_raw_reaction_add(
+        self, payload: discord.RawReactionActionEvent
+    ) -> None:
         await self.check_reaction(payload)

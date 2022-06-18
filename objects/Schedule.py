@@ -20,13 +20,15 @@ class SeasonStats:
     losses = None
     wins = None
 
-    def __init__(self, wins=0, losses=0):
+    def __init__(self, wins=0, losses=0) -> None:
         self.losses = losses
         self.wins = wins
 
 
 class HuskerOpponent:
-    def __init__(self, name, ranking, icon, date_time, week, location, outcome=None):
+    def __init__(
+        self, name, ranking, icon, date_time, week, location, outcome=None
+    ) -> None:
         self.date_time = date_time
         self.icon = icon
         self.location = location

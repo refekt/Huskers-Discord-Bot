@@ -39,7 +39,7 @@ logger = discordLogger(__name__)
 
 
 class ConfirmButtons(discord.ui.View):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.value = None
 
@@ -51,7 +51,9 @@ class ConfirmButtons(discord.ui.View):
         self.stop()
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
-    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def cancel(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
         self.value = False
         self.stop()
 

@@ -8,7 +8,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 
 
 class RecruitInterest:
-    def __init__(self, school: str, offered: str, status: str = None):
+    def __init__(self, school: str, offered: str, status: str = None) -> None:
         self.offered = offered
         self.school = school
         self.status = status

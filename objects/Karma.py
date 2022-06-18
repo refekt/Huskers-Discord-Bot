@@ -28,7 +28,7 @@ logger.info(f"{str(__name__).title()} module loaded!")
 #         self.negative = negative
 #         self.total = positive * negative
 #
-#     def update(self, msg: bool = False, react: bool = False):
+#     def update(self, msg: bool = False, react: bool = False) -> None:
 #
 #         if msg and not react:
 #             value = self.weight_msg

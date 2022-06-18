@@ -182,7 +182,9 @@ class PredictionView(discord.ui.View):
         await modal.wait()
 
     @discord.ui.button(label="📜", disabled=True)
-    async def scroll(self, interaction: discord.Interaction, button: discord.Button):
+    async def scroll(
+        self, interaction: discord.Interaction, button: discord.Button
+    ) -> None:
         logger.info(f"Retrieving predictions for {self.recruit.name}...")
         await interaction.response.defer()
 

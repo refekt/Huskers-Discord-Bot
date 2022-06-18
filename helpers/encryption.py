@@ -27,7 +27,7 @@ def load_key():
     return open(key_path, "rb").read()
 
 
-def encrypt(filename, key):
+def encrypt(filename, key) -> None:
     """
     Given a filename (str) and image_name (bytes), it encrypts the file and write it
     """
@@ -42,7 +42,7 @@ def encrypt(filename, key):
         file.write(encrypted_data)
 
 
-def decrypt_return_data(filename, key):
+def decrypt_return_data(filename, key) -> dict:
     """
     Given a filename (str) and image_name (bytes), it decrypts the file and write it
     """
@@ -57,7 +57,7 @@ def decrypt_return_data(filename, key):
     return decrypted_data
 
 
-def decrypt(filename, key):
+def decrypt(filename, key) -> None:
     """
     Given a filename (str) and image_name (bytes), it decrypts the file and write it
     """
