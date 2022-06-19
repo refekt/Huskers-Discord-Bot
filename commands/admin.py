@@ -33,7 +33,7 @@ from objects.Client import start_twitter_stream
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
-from objects.Thread import wait_and_run
+from objects.Thread import wait_and_run, DateTimeChars, getDateTimeValue
 
 logger = discordLogger(__name__)
 
@@ -551,7 +551,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         await interaction.response.send_message(embed=embed)
 
-    async def proess_nebraska(
+    async def proess_nebraska(  # noqa
         self, interaction: discord.Interaction, who: discord.Member
     ) -> None:
         logger.info(f"Starting Nebraska for {who.name}#{who.discriminator}")
@@ -617,7 +617,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.describe(
         who="User to send to Iowa",
         reason="The reason why",
-        duration="Number of seconds to send user to Iowa. 3600 = 1 hour, 86400 = 1 day",
+        duration="Duration in ##d##h##m##s format. E.g.; 30m, 1d6h, 6h30s.",
     )
     @app_commands.guilds(GUILD_PROD)
     @app_commands.default_permissions(manage_messages=True)
@@ -626,7 +626,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         interaction: discord.Interaction,
         who: DISCORD_USER_TYPES,
         reason: str,
-        duration: int = None,
+        duration: str = None,
     ) -> None:
         await interaction.response.defer(thinking=True)
 
@@ -636,6 +636,19 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         assert who, UserInputException("You must include a user!")
         assert reason, UserInputException("You must include a reason why!")
+        assert True in [
+            dt.__str__() in duration for dt in DateTimeChars
+        ], UserInputException(
+            "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
+        )
+
+        dt_days, dt_hours, dt_minutes, dt_seconds = [
+            getDateTimeValue(dt.__str__(), duration) for dt in DateTimeChars
+        ]
+
+        dt_duration = timedelta(
+            days=dt_days, hours=dt_hours, minutes=dt_minutes, seconds=dt_seconds
+        )
 
         role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
         channel_iowa = interaction.guild.get_channel(CHAN_IOWA)
@@ -675,7 +688,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 {
                     "name": "Statement",
                     "value": f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
-                    + f"This will be reverted in {duration} seconds."
+                    + f"This will be reverted in {duration}."
                     if duration is not None
                     else "",
                 },
@@ -686,14 +699,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.followup.send(embed=embed)
         await who.send(
             f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
-            + f"This will be reverted in {duration} seconds."
+            + f"This will be reverted in {duration}."
             if duration is not None
             else ""
         )
 
         if duration is not None:
             await wait_and_run(
-                duration=duration,
+                duration=dt_duration,
                 func=self.proess_nebraska(interaction=interaction, who=who),
             )
 
