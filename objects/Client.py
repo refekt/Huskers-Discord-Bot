@@ -8,9 +8,7 @@ from typing import Union
 import discord
 import tweepy
 from discord import NotFound
-from discord.ext.commands import (
-    Bot,
-)
+from discord.ext.commands import Bot
 from tweepy import Response
 
 from __version__ import _version
@@ -447,12 +445,10 @@ class HuskerClient(Bot):
 
         logger.info("The bot tree has synced!")
 
-        # if DEBUGGING_CODE:
-        #     return
-
-        logger.info("Starting Twitter stream")
-        start_twitter_stream(self)
-        logger.info("Twitter stream started")
+        if not DEBUGGING_CODE:
+            logger.info("Starting Twitter stream")
+            start_twitter_stream(self)
+            logger.info("Twitter stream started")
 
         logger.info("Collecting open reminders")
         open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
@@ -546,17 +542,23 @@ class HuskerClient(Bot):
         else:
             logger.info("No open reminders found")
 
-        # TODO This is blocking all code below
         logger.info("Processing task lists")
         if DEBUGGING_CODE:
             embed = buildEmbed(
                 title="Reminders",
-                description=f"There were {len(open_reminders) + 1} loaded!",
+                description=f"There were {len(open_reminders)} tasks/reminders loaded!",
+                fields=[
+                    dict(
+                        name=f"Reminder #{index + 1}",
+                        value=f"Author:\n{reminder['author'].encode('utf-8')}\nMessage:\n{reminder['message'].encode('utf-8')}",
+                    )
+                    for index, reminder in enumerate(open_reminders)
+                ],
             )
             await chan_botspam.send(embed=embed)
-        await asyncio.gather(
-            *tasks
-        )  # Has to be the last line of code because I don't know how to make code run after it
+
+        await asyncio.gather(*tasks)
+        # Has to be the last line of code because I don't know how to make code run after it
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
         await self.send_welcome_message(guild_member)

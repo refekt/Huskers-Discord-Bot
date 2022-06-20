@@ -43,11 +43,10 @@ class MissedReminder:
         self.remind_who = remind_who
         self.missed_reminder = missed_reminder
 
-    # @tasks.loop(seconds=dt_duration.total_seconds())
     async def run(self):
         logger.info(f"Sleeping for {self.duration.total_seconds():,} seconds")
         await asyncio.sleep(self.duration.total_seconds())
-        logger.info("Sleep complete!")
+        logger.info("Sleep complete. Sending reminder!")
 
         await send_reminder(
             author=self.author,
@@ -55,6 +54,16 @@ class MissedReminder:
             message=self.message,
             remind_who=self.remind_who,
             missed_reminder=self.missed_reminder,
+        )
+
+        processMySQL(
+            query=sqlUpdateReminder,
+            values=(
+                0,  # False
+                self.destination,
+                self.message,
+                self.author,
+            ),
         )
 
         logger.info("Self destructing MissedReminder")

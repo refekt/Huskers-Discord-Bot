@@ -83,10 +83,11 @@ __all__ = ["client"]
 
 
 # v2.0 loop
-async def main() -> None:
-    async with client:
-        await client.start(PROD_TOKEN)
+# async def main():
+#     async with client:
+#         await client.start(PROD_TOKEN)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # asyncio.run(main())
+    client.run(PROD_TOKEN, log_handler=None)
