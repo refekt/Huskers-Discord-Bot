@@ -1,5 +1,5 @@
 import asyncio
-import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Union
 
 import discord.ext.commands
@@ -20,13 +20,16 @@ from objects.Thread import (
 
 logger = discordLogger(__name__)
 
-__all__ = ["send_reminder"]
+__all__ = [
+    "MissedReminder",
+    "send_reminder",
+]
 
 
 class MissedReminder:
     def __init__(
         self,
-        duration: datetime.timedelta,
+        duration: timedelta,
         author: Union[discord.Member, str],
         destination: discord.TextChannel,
         message: str,
@@ -40,6 +43,7 @@ class MissedReminder:
         self.remind_who = remind_who
         self.missed_reminder = missed_reminder
 
+    # @tasks.loop(seconds=dt_duration.total_seconds())
     async def run(self):
         logger.info(f"Sleeping for {self.duration.total_seconds():,} seconds")
         await asyncio.sleep(self.duration.total_seconds())

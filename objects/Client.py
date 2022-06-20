@@ -1,5 +1,4 @@
 import asyncio
-import collections
 import pathlib
 import platform
 from datetime import timedelta
@@ -15,7 +14,7 @@ from discord.ext.commands import (
 from tweepy import Response
 
 from __version__ import _version
-from commands.reminder import send_reminder, MissedReminder
+from commands.reminder import MissedReminder, send_reminder
 from helpers.constants import (
     CHAN_BOT_SPAM,
     CHAN_GENERAL,
@@ -451,6 +450,10 @@ class HuskerClient(Bot):
         # if DEBUGGING_CODE:
         #     return
 
+        logger.info("Starting Twitter stream")
+        start_twitter_stream(self)
+        logger.info("Twitter stream started")
+
         logger.info("Collecting open reminders")
         open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
 
@@ -483,7 +486,7 @@ class HuskerClient(Bot):
 
             return send_to
 
-        tasks: list[MissedReminder] = []
+        tasks = []
         if open_reminders:
             logger.info(f"There are {len(open_reminders)} to be loaded")
             for index, reminder in enumerate(open_reminders):
@@ -537,28 +540,23 @@ class HuskerClient(Bot):
                             message=reminder["message"],
                             remind_who=remind_who,
                             missed_reminder=True,
-                        )
+                        ).run()
                     )
             logger.info("Compiled all open tasks")
         else:
             logger.info("No open reminders found")
 
         # TODO This is blocking all code below
-        # logger.info("Processing task lists")
-        # [await task.run() for task in tasks]
-
+        logger.info("Processing task lists")
         if DEBUGGING_CODE:
             embed = buildEmbed(
                 title="Reminders",
                 description=f"There were {len(open_reminders) + 1} loaded!",
             )
             await chan_botspam.send(embed=embed)
-
-        logger.info("Open reminders restarted")
-
-        logger.info("Starting Twitter stream")
-        start_twitter_stream(self)
-        logger.info("Twitter stream started")
+        await asyncio.gather(
+            *tasks
+        )  # Has to be the last line of code because I don't know how to make code run after it
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
         await self.send_welcome_message(guild_member)
