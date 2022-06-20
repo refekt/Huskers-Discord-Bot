@@ -17,71 +17,177 @@ logger = logging.getLogger(__name__)
 
 # Image Command
 sqlCreateImageCommand = """
-INSERT INTO img_cmd_db (author, img_name, img_url) VALUES (%s, %s, %s)
+INSERT INTO img_cmd_db (author, img_name, img_url)
+VALUES
+  (% s, % s, % s)
 """
 
 sqlSelectImageCommand = """
-SELECT author, img_name, img_url FROM img_cmd_db WHERE img_name = %s
+SELECT
+  author,
+  img_name,
+  img_url
+FROM
+  img_cmd_db
+WHERE
+  img_name = % s
 """
 
 sqlSelectAllImageCommand = """
-SELECT author, img_name, img_url, created_at FROM img_cmd_db
+SELECT
+  author,
+  img_name,
+  img_url,
+  created_at
+FROM
+  img_cmd_db
 """
 
 sqlDeleteImageCommand = """
-DELETE FROM img_cmd_db WHERE img_name = %s AND author = %s
+DELETE FROM
+  img_cmd_db
+WHERE
+  img_name = % s
+  AND author = % s
 """
 
 # Croot Bot
 sqlTeamIDs = """
-SELECT id, school from botfrost.team_ids
+SELECT
+  id,
+  school
+FROM
+  botfrost.team_ids
 """
 
 sqlGetPrediction = """
-SELECT * FROM fap_predictions WHERE user_id = %s AND recruit_profile = %s;
+SELECT
+  *
+FROM
+  fap_predictions
+WHERE
+  user_id = % s
+  AND recruit_profile = % s;
 """
 
 sqlInsertPrediction = """
-INSERT INTO fap_predictions (user, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW());
+INSERT INTO fap_predictions (
+  USER, user_id, recruit_name, recruit_profile,
+  recruit_class, team, confidence,
+  prediction_date
+)
+VALUES
+  (% s, % s, % s, % s, % s, % s, % s, Now());
 """
 
 sqlUpdatePrediction = """
-UPDATE fap_predictions SET team = %s, confidence = %s, prediction_date = NOW() WHERE user_id = %s and recruit_profile = %s;
+UPDATE
+  fap_predictions
+SET
+  team = % s,
+  confidence = % s,
+  prediction_date = Now()
+WHERE
+  user_id = % s
+  AND recruit_profile = % s;
 """
 
+# Way to go psys
 sqlGetCrootPredictions = """
-SELECT f.recruit_name, f.team, avg(f.confidence) as 'confidence', (count(f.team) / t.sum) * 100 as 'percent', t.sumr as 'total' FROM fap_predictions as f JOIN (SELECT recruit_profile, COUNT(recruit_profile) as sumr FROM fap_predictions GROUP BY recruit_profile) as t on t.recruit_profile = f.recruit_profile WHERE f.recruit_profile = %s GROUP BY f.recruit_profile, f.recruit_name, f.team ORDER BY percent DESC;
+SELECT
+  f.recruit_name,
+  f.team,
+  Avg(f.confidence) AS 'confidence',
+  (
+    Count(f.team) / t.SUM
+  ) * 100 AS 'percent',
+  t.SUM AS 'total'
+FROM
+  fap_predictions AS f
+  join (
+    SELECT
+      recruit_profile,
+      Count(recruit_profile) AS SUM
+    FROM
+      fap_predictions
+    GROUP BY
+      recruit_profile
+  ) AS t ON t.recruit_profile = f.recruit_profile
+WHERE
+  f.recruit_profile = % s
+GROUP BY
+  f.recruit_profile,
+  f.recruit_name,
+  f.team
+ORDER BY
+  percent DESC;
 """
 
-sqlGetIndividualPrediction = "SELECT * FROM fap_predictions WHERE recruit_profile = %s ORDER BY prediction_date ASC"
+sqlGetIndividualPrediction = """
+SELECT
+  *
+FROM
+  fap_predictions
+WHERE
+  recruit_profile = % s
+ORDER BY
+  prediction_date ASC
+"""
 
 # Iowa Command
 sqlInsertIowa = """
-INSERT INTO iowa (user_id, reason, previous_roles) VALUES (%s, %s, %s)
+INSERT INTO iowa (user_id, reason, previous_roles)
+VALUES
+  (% s, % s, % s)
 """
 
 sqlRetrieveIowa = """
-SELECT previous_roles FROM iowa WHERE user_id = %s
+SELECT
+  previous_roles
+FROM
+  iowa
+WHERE
+  user_id = % s
 """
 
 sqlRemoveIowa = """
-DELETE FROM iowa WHERE user_id = %s
+DELETE FROM
+  iowa
+WHERE
+  user_id = % s
 """
 
 # Tasks
 sqlRetrieveReminders = """
-SELECT * FROM tasks_repo WHERE is_open = 1
-ORDER BY send_when ASC
+SELECT
+  *
+FROM
+  tasks_repo
+WHERE
+  is_open = 1
+ORDER BY
+  send_when ASC
 """
 
 sqlRecordReminder = """
-INSERT INTO tasks_repo (send_to, message, send_when, is_open, author) VALUES (%s, %s, %s, %s, %s)
+INSERT INTO tasks_repo (
+  send_to, message, send_when, is_open,
+  author
+)
+VALUES
+  (% s, % s, % s, % s, % s)
 """
 
 sqlUpdateReminder = """
-UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND author = %s
+UPDATE
+  tasks_repo
+SET
+  is_open = % s
+WHERE
+  send_to = % s
+  AND message = % s
+  AND author = % s
 """
-
 
 # # Karma
 # sqlUpdateKarma = """

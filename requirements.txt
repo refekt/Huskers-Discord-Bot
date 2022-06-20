@@ -6,7 +6,6 @@ discord>=2.0.0
 markovify==0.9.4
 numpy==1.22.4
 opencv-python==4.5.5.64
-paramiko==2.11.0
 pymysql==1.0.2
 python-dateutil==2.8.2
 python-dotenv==0.20.0

@@ -616,6 +616,8 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
         _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}&Player.LastName={name[1]}"
 
         search_results = requests.get(url=_247_search, headers=HEADERS)
+        if not search_results.status_code == 200:
+            raise RecruitException(f"No results found from search.")
         search_results = json.loads(search_results.text)
     else:
         raise RecruitException(

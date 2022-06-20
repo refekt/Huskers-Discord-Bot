@@ -56,7 +56,7 @@ tree = client.tree
 async def on_app_command_error(
     interaction: discord.Interaction, error: CommandInvokeError
 ) -> None:
-    logger.exception(str(error.original.args[0]), exc_info=False)
+    logger.exception(str(error.original.args[0]), exc_info=True)
     embed = buildEmbed(
         title="Command Error Received",
         fields=[

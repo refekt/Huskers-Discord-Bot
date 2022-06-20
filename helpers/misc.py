@@ -14,6 +14,7 @@ __all__ = [
     "checkYearValid",
     "createComponentKey",
     "discordURLFormatter",
+    "getModuleMethod",
     "loadVarPath",
 ]
 
