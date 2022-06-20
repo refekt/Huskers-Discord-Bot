@@ -1,3 +1,4 @@
+import inspect
 import logging
 from datetime import datetime
 from typing import Union
@@ -25,7 +26,7 @@ from helpers.constants import (
     FIELD_VALUE_LIMIT,
     EMBED_MAX,
 )
-from helpers.misc import discordURLFormatter
+from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
 from objects.Exceptions import CommandException
 from objects.Schedule import HuskerSchedule
@@ -40,7 +41,8 @@ __all__ = [
 
 
 def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
-    logger.info("Creating a normal embed")
+    module, method = getModuleMethod(inspect.stack())
+    logger.info(f"Creating a normal embed from [{module}-{method}]")
 
     assert title is not None, CommandException("Title must not be blank!")
 
@@ -80,7 +82,11 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
         e.set_image(url=kwargs.get("image"))
 
     if "author" in kwargs.keys():
-        e.set_author(name=kwargs.get("author")[:NAME_LIMIT], url="", icon_url="")
+        e.set_author(
+            name=kwargs.get("author")[:NAME_LIMIT],
+            url="",
+            icon_url=kwargs.get("icon_url", ""),
+        )
     else:
         e.set_author(
             name=BOT_DISPLAY_NAME[:NAME_LIMIT], url=BOT_GITHUB_URL, icon_url=""
@@ -105,7 +111,7 @@ def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
         logger.exception("Embed is too big!", exc_info=True)
         raise
     else:
-        logger.info("Returning a normal embed")
+        logger.info(f"Returning a normal embed from [{module}-{method}]")
         return e
 
 
@@ -125,10 +131,14 @@ def buildTweetEmbed(
     urls: dict = None,
     b16: bool = False,
 ) -> discord.Embed:
+    module, method = getModuleMethod(inspect.stack())
+    logger.info(f"Creating a tweet embed from [{module}-{method}]")
+
     if b16:
         embed = buildEmbed(title="Block 16 Tweet", description="Back by popular demand")
         if medias:
             embed.set_image(url=medias[0].url)
+        logger.info(f"Creating a Block 16 embed from [{module}-{method}]")
         return embed
 
     embed = buildEmbed(
@@ -195,10 +205,15 @@ def buildTweetEmbed(
         ],
     )
     embed.set_thumbnail(url=profile_image_url)
+
+    logger.info(f"Creating a tweet embed from [{module}-{method}]")
     return embed
 
 
 def collectScheduleEmbeds(year) -> list[discord.Embed]:
+    module, method = getModuleMethod(inspect.stack())
+    logger.info(f"Creating schedule embeds from [{module}-{method}]")
+
     scheduled_games, season_stats = HuskerSchedule(year=year)
 
     new_line_char = "\n"
@@ -224,10 +239,14 @@ def collectScheduleEmbeds(year) -> list[discord.Embed]:
             )
         )
 
+    logger.info(f"Returning schedule embeds from [{module}-{method}]")
     return embeds
 
 
 def buildRecruitEmbed(recruit) -> discord.Embed:
+    module, method = getModuleMethod(inspect.stack())
+    logger.info(f"Creating a recruit embed from [{module}-{method}]")
+
     def get_all_predictions() -> str:
         get_croot_preds_response = processMySQL(
             query=sqlGetCrootPredictions,
@@ -330,6 +349,8 @@ def buildRecruitEmbed(recruit) -> discord.Embed:
         embed.set_thumbnail(url=recruit.thumbnail)
     else:
         embed.set_thumbnail(url=BOT_THUMBNAIL_URL)
+
+    logger.info(f"Creating a recruit embed from [{module}-{method}]")
     return embed
 
 

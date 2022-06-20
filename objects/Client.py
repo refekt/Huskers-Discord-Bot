@@ -1,38 +1,44 @@
+import asyncio
 import pathlib
 import platform
+from datetime import timedelta
 from os import listdir
 from typing import Union
 
 import discord
 import tweepy
+from discord import NotFound
 from discord.ext.commands import (
     Bot,
 )
 from tweepy import Response
 
 from __version__ import _version
+from commands.reminder import send_reminder
 from helpers.constants import (
     CHAN_BOT_SPAM,
     CHAN_GENERAL,
+    CHAN_HOF,
+    CHAN_HOS,
     DEBUGGING_CODE,
     DISCORD_CHANNEL_TYPES,
     GUILD_PROD,
     TWITTER_BEARER,
+    TWITTER_BLOCK16_SCREENANME,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_QUERY_MAX,
-    CHAN_HOF,
-    CHAN_HOS,
-    TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed
+from helpers.mysql import processMySQL, sqlRetrieveReminders, sqlUpdateReminder
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException
 from objects.Logger import discordLogger
+from objects.Thread import convert_duration
 from objects.TweepyStreamListener import StreamClientV2
 
 logger = discordLogger(__name__)
 
-__all__ = ["HuskerClient"]
+__all__ = ["HuskerClient", "start_twitter_stream"]
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
@@ -280,11 +286,11 @@ class HuskerClient(Bot):
                 )
                 channel = hof_channel
 
-            avatar_url = (
-                str(reaction_message.author.avatar_url)
-                .split("?")[0]
-                .replace("webp", "png")
-            )
+            # avatar_url = (
+            #     str(reaction_message.author.avatar_url)
+            #     .split("?")[0]
+            #     .replace("webp", "png")
+            # )
 
             embed = buildEmbed(
                 title=embed_title,
@@ -394,11 +400,11 @@ class HuskerClient(Bot):
     async def on_ready(self) -> None:
         self.guild_user_len = len(self.users)
         self.reaction_threshold = int(0.0047 * self.guild_user_len)
+        chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
+
         logger.info(
             f"Reaction threshold for HOF and HOS messages set to [{self.reaction_threshold}]"
         )
-
-        logger.info("Loading extensions")
 
         path = pathlib.Path(
             f"{pathlib.Path(__file__).parent.parent.resolve()}/commands"
@@ -410,6 +416,8 @@ class HuskerClient(Bot):
             and "testing" not in str(file)
             and "example" not in str(file)
         ]  # Get list of files that are not testing or example files and have .py extensions
+
+        logger.info(f"Loading {len(files)} extensions")
         for extension in files:
             try:
                 # NOTE Extensions will fail to load when runtime errors exist in the code.
@@ -420,28 +428,132 @@ class HuskerClient(Bot):
                 await self.load_extension(extension)
                 logger.info(f"Loaded the [{extension}] extension")
             except Exception as e:  # noqa
-                logger.exception(
-                    f"ERROR: Unable to load the {extension} extension\n{e}"
-                )
+                logger.exception(f"Unable to load the {extension} extension\n{e}")
                 continue
 
         logger.info("All extensions loaded")
 
         if not DEBUGGING_CODE:
-            chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
+            logger.info("Hiding online message because debugging")
             await chan_botspam.send(embed=await self.create_online_message())  # noqa
 
         logger.info("The bot is ready!")
 
         try:
+            logger.info("Attempting to sync the bot tree")
             await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
         except Exception as e:  # noqa
-            logger.exception("Error syncing the tree!\n\n{e}", exc_info=True)
+            logger.exception("Error syncing the tree!")
 
         logger.info("The bot tree has synced!")
 
-        if DEBUGGING_CODE:
-            return
+        # if DEBUGGING_CODE:
+        #     return
+
+        logger.info("Collecting open reminders")
+        open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
+
+        async def convertDestination(raw_send_to: str) -> discord.TextChannel:
+            logger.info("Attempting to fetch destination")
+            try:
+                dest: Union[discord.TextChannel, None] = await self.fetch_channel(
+                    int(raw_send_to)
+                )
+            except NotFound:
+                dest = await self.fetch_channel(CHAN_BOT_SPAM)
+                pass
+
+            logger.info(f"destination is {dest.name.encode('utf-8')}")
+            return dest
+
+        async def convertSentTo(raw_send_to: str) -> Union[discord.User, None]:
+            logger.info("Attempting to fetch send_to")
+            try:
+                send_to: Union[discord.User, None] = await self.fetch_user(
+                    int(raw_send_to)
+                )
+                logger.info(
+                    f"remind_who is {send_to.name.encode('utf-8')}#{send_to.discriminator}"
+                )
+            except NotFound:
+                send_to = None
+                logger.info("remind_who is None")
+                pass
+
+            return send_to
+
+        async def processTask(_task: asyncio.Task) -> None:
+            try:
+                logger.info(f"Attempting to yield {_task}")
+                yield _task
+            finally:
+                logger.info(f"Awaiting {_task}")
+                await _task
+
+        if open_reminders:
+            logger.info(f"There are {len(open_reminders)} to be loaded")
+            for index, reminder in enumerate(open_reminders):
+                logger.info(
+                    f"Processing reminder #{index + 1}. Author = {reminder['author']}, Message = {reminder['message'][:128]}"
+                )
+
+                destination = await convertDestination(reminder["send_to"])
+                remind_who = await convertSentTo(reminder["send_to"])
+
+                if convert_duration(reminder["send_when"]) == timedelta(seconds=0):
+                    logger.info(
+                        f"Reminder exceeded original send datetime. Sending now!"
+                    )
+
+                    if destination == remind_who:
+                        logger.error(
+                            "destination and remind_who are both None. Skipping!"
+                        )
+                        continue
+
+                    await send_reminder(
+                        author=reminder["author"],
+                        destination=destination,
+                        message=reminder["message"],
+                        remind_who=remind_who,
+                    )
+
+                    processMySQL(
+                        query=sqlUpdateReminder,
+                        values=(
+                            0,  # False
+                            reminder["send_to"],
+                            reminder["message"],
+                            reminder["author"],
+                        ),
+                    )
+
+                    del reminder  # Get rid of for accounting purposes
+                else:
+                    logger.info(
+                        f"Adding reminder for/to [{reminder['send_to']}] to queue."
+                    )
+
+                    task = asyncio.create_task(
+                        send_reminder(
+                            author=reminder["author"],
+                            destination=destination,
+                            message=reminder["message"],
+                            remind_who=remind_who,
+                        )
+                    )
+
+                    processTask(task)
+        else:
+            logger.info("No open reminders found")
+
+        embed = buildEmbed(
+            title="Reminders",
+            description=f"There were {len(open_reminders) + 1} loaded!",
+        )
+        await chan_botspam.send(embed=embed)
+
+        logger.info("Open reminders restarted")
 
         logger.info("Starting Twitter stream")
         start_twitter_stream(self)

@@ -33,7 +33,12 @@ from objects.Client import start_twitter_stream
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
-from objects.Thread import wait_and_run, DateTimeChars, getDateTimeValue
+from objects.Thread import (
+    wait_and_run,
+    DateTimeChars,
+    convertDateTimeString,
+    prettifyTimeDateValue,
+)
 
 logger = discordLogger(__name__)
 
@@ -439,6 +444,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             "Unable to run this command outside text channels."
         )
 
+        if interaction.response.is_done():  # Trying to fix "Unknown interaction" errors
+            await interaction.response.defer(ephemeral=True)
+
         if not await self.confirm_purge(interaction):
             await interaction.edit_original_message(content="Purge declined", view=None)
             return
@@ -642,13 +650,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
         )
 
-        dt_days, dt_hours, dt_minutes, dt_seconds = [
-            getDateTimeValue(dt.__str__(), duration) for dt in DateTimeChars
-        ]
-
-        dt_duration = timedelta(
-            days=dt_days, hours=dt_hours, minutes=dt_minutes, seconds=dt_seconds
-        )
+        dt_duration = convertDateTimeString(duration)
 
         role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
         channel_iowa = interaction.guild.get_channel(CHAN_IOWA)
@@ -699,7 +701,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.followup.send(embed=embed)
         await who.send(
             f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
-            + f"This will be reverted in {duration}."
+            + f"This will be reverted in {prettifyTimeDateValue(dt_duration.total_seconds)}."
             if duration is not None
             else ""
         )

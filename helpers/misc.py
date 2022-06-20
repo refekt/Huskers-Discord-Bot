@@ -1,3 +1,4 @@
+import inspect
 import logging
 import pathlib
 import platform
@@ -13,24 +14,8 @@ __all__ = [
     "checkYearValid",
     "createComponentKey",
     "discordURLFormatter",
-    "formatPrettyTimeDelta",
     "loadVarPath",
 ]
-
-
-def formatPrettyTimeDelta(seconds) -> str:
-    seconds = int(seconds)
-    days, seconds = divmod(seconds, 86400)
-    hours, seconds = divmod(seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    if days > 0:
-        return f"{days:,}D {hours}H, {minutes}M, and {seconds}S"
-    elif hours > 0:
-        return f"{hours}H, {minutes}M, and {seconds}S"
-    elif minutes > 0:
-        return f"{minutes}M and {seconds}S"
-    else:
-        return f"{seconds}S"
 
 
 def loadVarPath() -> [str, CommandException]:
@@ -74,6 +59,13 @@ def checkYearValid(year: int) -> bool:
             "The search year must be after the first season of college football--1869."
         )
     return True
+
+
+def getModuleMethod(stack) -> tuple:
+    frm: inspect.FrameInfo = stack[1]
+    mod = inspect.getmodule(frm[0]).__name__
+    method = frm[3]
+    return mod, method
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

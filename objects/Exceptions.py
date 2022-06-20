@@ -11,6 +11,7 @@ __all__ = [
     "ImageException",
     "MySQLException",
     "RecruitException",
+    "ReminderException",
     "SSHException",
     "ScheduleException",
     "StatsException",
@@ -83,4 +84,8 @@ class RecruitException(Exception):
 
 
 class SSHException(Exception):
+    message: str
+
+
+class ReminderException(Exception):
     message: str

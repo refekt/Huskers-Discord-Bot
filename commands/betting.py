@@ -9,10 +9,11 @@ logger = discordLogger(__name__)
 
 
 class BettingCog(commands.Cog, name="Betting Commands"):
-    @app_commands.command(name="bet", description="TBD")
-    @app_commands.guilds(GUILD_PROD)
-    async def bet(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_message("Not implemented yet!", ephemeral=True)
+    # @app_commands.command(name="bet", description="TBD")
+    # @app_commands.guilds(GUILD_PROD)
+    # async def bet(self, interaction: discord.Interaction) -> None:
+    #     await interaction.response.send_message("Not implemented yet!", ephemeral=True)
+    pass
 
 
 async def setup(bot: commands.Bot) -> None:

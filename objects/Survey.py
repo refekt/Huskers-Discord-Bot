@@ -17,9 +17,9 @@ from discord.ext.commands import Bot
 from discord.ui import View, Button
 
 from helpers.constants import GLOBAL_TIMEOUT
-from helpers.misc import formatPrettyTimeDelta
 from objects.Exceptions import SurveyException
 from objects.Logger import discordLogger
+from objects.Thread import prettifyTimeDateValue
 
 logger = discordLogger(__name__)
 
@@ -157,7 +157,7 @@ class Survey:
     def create_embed(self) -> None:
         embed = Embed(
             title="Survey",
-            description=f"Please provide your feedback. This survey timesout in {formatPrettyTimeDelta(self.timeout)} seconds.",
+            description=f"Please provide your feedback. This survey timesout in {prettifyTimeDateValue(self.timeout)} seconds.",
             color=0xD00000,
         )
         embed.set_footer(text="Users: ")

@@ -1,3 +1,4 @@
+import inspect
 import logging
 from typing import Union
 
@@ -5,9 +6,9 @@ import pymysql
 from pymysql import OperationalError
 
 from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
+from helpers.misc import getModuleMethod
 
 logger = logging.getLogger(__name__)
-
 
 # import pymysql.cursors
 #
@@ -54,7 +55,7 @@ SELECT f.recruit_name, f.team, avg(f.confidence) as 'confidence', (count(f.team)
 
 sqlGetIndividualPrediction = "SELECT * FROM fap_predictions WHERE recruit_profile = %s ORDER BY prediction_date ASC"
 
-# # Iowa Command
+# Iowa Command
 sqlInsertIowa = """
 INSERT INTO iowa (user_id, reason, previous_roles) VALUES (%s, %s, %s)
 """
@@ -66,20 +67,22 @@ SELECT previous_roles FROM iowa WHERE user_id = %s
 sqlRemoveIowa = """
 DELETE FROM iowa WHERE user_id = %s
 """
-#
-# # Tasks
-# sqlRetrieveTasks = """
-# SELECT * FROM tasks_repo WHERE is_open = 1
-# """
-#
-# sqlRecordTasks = """
-# INSERT INTO tasks_repo (send_to, message, send_when, is_open, author) VALUES (%s, %s, %s, %s, %s)
-# """
-#
-# sqlUpdateTasks = """
-# UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND send_when = %s AND author = %s
-# """
-#
+
+# Tasks
+sqlRetrieveReminders = """
+SELECT * FROM tasks_repo WHERE is_open = 1
+ORDER BY send_when ASC
+"""
+
+sqlRecordReminder = """
+INSERT INTO tasks_repo (send_to, message, send_when, is_open, author) VALUES (%s, %s, %s, %s, %s)
+"""
+
+sqlUpdateReminder = """
+UPDATE tasks_repo SET is_open = %s WHERE send_to = %s AND message = %s AND author = %s
+"""
+
+
 # # Karma
 # sqlUpdateKarma = """
 # INSERT INTO karma (positive, negative, total)
@@ -268,7 +271,8 @@ DELETE FROM iowa WHERE user_id = %s
 
 
 def processMySQL(query: str, **kwargs) -> Union[list[dict], None]:
-    logger.info(f"Starting a MySQL query")
+    module, method = getModuleMethod(inspect.stack())
+    logger.info(f"Starting a MySQL query called from [{module}-{method}]")
     sqlConnection = None
     try:
         sqlConnection = pymysql.connect(
@@ -332,7 +336,7 @@ def processMySQL(query: str, **kwargs) -> Union[list[dict], None]:
         sqlConnection.close()
 
         if result:
-            logger.info(f"MySQL query finished")
+            logger.info(f"Ending a MySQL query called from [{module}-{method}]")
             return result
 
 
