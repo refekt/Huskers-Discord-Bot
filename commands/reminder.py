@@ -23,6 +23,40 @@ logger = discordLogger(__name__)
 __all__ = ["send_reminder"]
 
 
+class MissedReminder:
+    def __init__(
+        self,
+        duration: datetime.timedelta,
+        author: Union[discord.Member, str],
+        destination: discord.TextChannel,
+        message: str,
+        remind_who: Union[discord.Member, int, None] = None,
+        missed_reminder: bool = False,
+    ):
+        self.duration = duration
+        self.author = author
+        self.destination = destination
+        self.message = message
+        self.remind_who = remind_who
+        self.missed_reminder = missed_reminder
+
+    async def run(self):
+        logger.info(f"Sleeping for {self.duration.total_seconds():,} seconds")
+        await asyncio.sleep(self.duration.total_seconds())
+        logger.info("Sleep complete!")
+
+        await send_reminder(
+            author=self.author,
+            destination=self.destination,
+            message=self.message,
+            remind_who=self.remind_who,
+            missed_reminder=self.missed_reminder,
+        )
+
+        logger.info("Self destructing MissedReminder")
+        del self
+
+
 async def send_reminder(
     author: Union[discord.Member, str],
     destination: discord.TextChannel,

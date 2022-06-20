@@ -1,4 +1,5 @@
 import asyncio
+import collections
 import pathlib
 import platform
 from datetime import timedelta
@@ -14,7 +15,7 @@ from discord.ext.commands import (
 from tweepy import Response
 
 from __version__ import _version
-from commands.reminder import send_reminder
+from commands.reminder import send_reminder, MissedReminder
 from helpers.constants import (
     CHAN_BOT_SPAM,
     CHAN_GENERAL,
@@ -410,7 +411,7 @@ class HuskerClient(Bot):
             f"{pathlib.Path(__file__).parent.parent.resolve()}/commands"
         ).resolve()  # Get path for /commands
         files = [
-            f"commands.{file[:len(file)-3]}"
+            f"commands.{file[:len(file) - 3]}"
             for file in listdir(path)
             if ".py" in str(file)
             and "testing" not in str(file)
@@ -467,7 +468,7 @@ class HuskerClient(Bot):
             return dest
 
         async def convertSentTo(raw_send_to: str) -> Union[discord.User, None]:
-            logger.info("Attempting to fetch send_to")
+            logger.info("Attempting to fetch remind_who")
             try:
                 send_to: Union[discord.User, None] = await self.fetch_user(
                     int(raw_send_to)
@@ -482,25 +483,19 @@ class HuskerClient(Bot):
 
             return send_to
 
-        async def processTask(_task: asyncio.Task) -> None:
-            try:
-                logger.info(f"Attempting to yield {_task}")
-                yield _task
-            finally:
-                logger.info(f"Awaiting {_task}")
-                await _task
-
+        tasks: list[MissedReminder] = []
         if open_reminders:
             logger.info(f"There are {len(open_reminders)} to be loaded")
             for index, reminder in enumerate(open_reminders):
-                logger.info(
-                    f"Processing reminder #{index + 1}. Author = {reminder['author']}, Message = {reminder['message'][:128]}"
-                )
-
                 destination = await convertDestination(reminder["send_to"])
                 remind_who = await convertSentTo(reminder["send_to"])
+                duration = convert_duration(reminder["send_when"])
 
-                if convert_duration(reminder["send_when"]) == timedelta(seconds=0):
+                logger.info(
+                    f"Processing reminder #{index + 1}. Destination = {destination}, remind_who = {remind_who}, Message = {reminder['message'][:128]}"
+                )
+
+                if duration == timedelta(seconds=0):
                     logger.info(
                         f"Reminder exceeded original send datetime. Sending now!"
                     )
@@ -531,27 +526,33 @@ class HuskerClient(Bot):
                     del reminder  # Get rid of for accounting purposes
                 else:
                     logger.info(
-                        f"Adding reminder for/to [{reminder['send_to']}] to queue."
+                        f"Adding reminder for/to [{reminder['send_to']}] to task list."
                     )
 
-                    task = asyncio.create_task(
-                        send_reminder(
+                    tasks.append(
+                        MissedReminder(
+                            duration=duration,
                             author=reminder["author"],
                             destination=destination,
                             message=reminder["message"],
                             remind_who=remind_who,
+                            missed_reminder=True,
                         )
                     )
-
-                    processTask(task)
+            logger.info("Compiled all open tasks")
         else:
             logger.info("No open reminders found")
 
-        embed = buildEmbed(
-            title="Reminders",
-            description=f"There were {len(open_reminders) + 1} loaded!",
-        )
-        await chan_botspam.send(embed=embed)
+        # TODO This is blocking all code below
+        # logger.info("Processing task lists")
+        # [await task.run() for task in tasks]
+
+        if not DEBUGGING_CODE:
+            embed = buildEmbed(
+                title="Reminders",
+                description=f"There were {len(open_reminders) + 1} loaded!",
+            )
+            await chan_botspam.send(embed=embed)
 
         logger.info("Open reminders restarted")
 
