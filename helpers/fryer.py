@@ -1,12 +1,12 @@
 import logging
 import math
 import os
-from typing import List, Tuple, Any, Union
+from typing import Any, Union
 
 import cv2
 import numpy
 from PIL import Image
-from PIL.Image import Image
+from PIL.Image import Image as ImgImg
 from numpy import random
 
 logger = logging.getLogger(__name__)
@@ -26,8 +26,11 @@ deepfry_path = "resources/deepfry/"
 
 
 # Pass an image to fry, pretty self-explanatory
-def fry_image(image, emote_amount, noise, contrast) -> Image:
-    gray = numpy.array(image.convert("L"))
+def fry_image(image: ImgImg, emote_amount: int, noise: float, contrast: int) -> ImgImg:
+    logger.debug(
+        f"Frying an image with {emote_amount} emotes, {noise} noise, and {contrast} contrast."
+    )
+    gray = numpy.array(image.convert("L"))  # noqa
 
     eye_coords = find_eyes(gray)
     char_coords = find_chars(gray)
@@ -50,10 +53,13 @@ def fry_image(image, emote_amount, noise, contrast) -> Image:
             img=image, f=numpy.array([int(w), int(h)]), r=r, a=3, h=6, ior=2.25
         )
 
+    logger.debug("Frying completed")
     return image
 
 
 def find_chars(gray) -> list[tuple[Any, Any, Any, Any]]:
+    logger.debug("Looking for characters")
+
     ret, mask = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
     image_final = cv2.bitwise_and(gray, gray, mask=mask)
     ret, new_img = cv2.threshold(image_final, 180, 255, cv2.THRESH_BINARY_INV)
@@ -69,10 +75,14 @@ def find_chars(gray) -> list[tuple[Any, Any, Any, Any]]:
         if w > 70 and h > 70:
             continue
         coords.append((x, y, w, h))
+
+    logger.debug(f"Characters, if found, are here: {coords}")
     return coords
 
 
 def find_eyes(gray) -> list[tuple[Union[float, Any], Union[float, Any]]]:
+    logger.debug("Looking for eyes")
+
     coords = []
 
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -83,10 +93,16 @@ def find_eyes(gray) -> list[tuple[Union[float, Any], Union[float, Any]]]:
             coords.append((x + ex + ew / 2, y + ey + eh / 2))
     if len(coords) == 0:
         pass
+
+    logger.debug(f"Eyes, if found, are here: {coords}")
     return coords
 
 
-def add_flares(image, coords) -> Image:
+def add_flares(
+    image: ImgImg, coords: list[tuple[Union[float, Any], Union[float, Any]]]
+) -> ImgImg:
+    logger.debug(f"Adding flares at: {coords}")
+
     flare = Image.open(random_file(f"{deepfry_path}flares/")).convert("RGBA")
     for coord in coords:
         image.paste(
@@ -94,10 +110,14 @@ def add_flares(image, coords) -> Image:
             (int(coord[0] - flare.size[0] / 2), int(coord[1] - flare.size[1] / 2)),
             flare,
         )
+
+    logger.debug("Flares added")
     return image
 
 
-def add_chars(image, coords) -> Image:
+def add_chars(image: ImgImg, coords: list[tuple[Any, Any, Any, Any]]) -> ImgImg:
+    logger.debug(f"Adding characters at {coords}")
+
     char = Image.open(random_file(f"{deepfry_path}chars/")).convert("RGBA")
     for coord in coords:
         if numpy.random.random(1)[0] > 0.1:
@@ -105,33 +125,44 @@ def add_chars(image, coords) -> Image:
         resized = char.copy()
         resized.thumbnail((coord[2], coord[3]), Image.ANTIALIAS)
         image.paste(resized, (int(coord[0]), int(coord[1])), resized)
+
+    logger.debug("Characters added")
     return image
 
 
 def add_emotes(image, max_emotes) -> None:
+    logger.debug(f"Adding {max_emotes} emotes")
+
     for i in range(max_emotes):
         emote = Image.open(random_file(f"{deepfry_path}/emotes/")).convert("RGBA")
-
         coord = numpy.random.random(2) * numpy.array([image.width, image.height])
-
         size = int((image.width / 10) * (numpy.random.random(1)[0] + 1))
         emote.thumbnail((size, size), Image.ANTIALIAS)
         image.paste(emote, (int(coord[0]), int(coord[1])), emote)
 
+    logger.debug("Emotes added")
+    return
 
-def change_contrast(image, level) -> Image:
+
+def change_contrast(image: ImgImg, level: int) -> ImgImg:
+    logger.debug(f"Changing contracts to {level} level")
+
     factor = (259 * (level + 255)) / (255 * (259 - level))
 
     def contrast(c) -> float:
         return 128 + factor * (c - 128)
 
+    logger.debug("Contrast changed")
     return image.point(contrast)
 
 
-def add_noise(image: Image, factor) -> Image:
+def add_noise(image: ImgImg, factor) -> ImgImg:
+    logger.debug(f"Adding {factor} noise")
+
     def noise(c) -> float:
         return c * (1 + numpy.random.random(1)[0] * factor - factor / 2)
 
+    logger.debug("Noise added")
     return image.point(noise)
 
 
@@ -143,13 +174,14 @@ def add_noise(image: Image, factor) -> Image:
 #   a   = flatness of the bulge, 1 = spherical, > 1 increases flatness
 #   h   = height of the bulge
 #   ior = index of refraction of the bulge material
-def bulge(img, f, r, a, h, ior) -> Image:
+def bulge(img: ImgImg, f: numpy.ndarray, r: int, a: int, h: int, ior: float) -> ImgImg:
+    logger.debug(f"Creating a buldge at {f[0]}, {f[1]} with a {r} radius. ior = {ior}")
     # print("Creating a bulge at ({0}, {1}) with radius {2}... ".format(f[0], f[1], r))
 
     # load image to numpy array
     width = img.width
     height = img.height
-    img_data = numpy.array(img)
+    img_data = numpy.array(img)  # noqa
 
     # ignore too large images
     if width * height > 3000 * 3000:
@@ -256,39 +288,33 @@ def bulge(img, f, r, a, h, ior) -> Image:
     bulged = bulge_square
 
     img = Image.fromarray(bulged)
+    logger.debug("Bulge created")
     return img
 
 
 def replace_values(
-    orig_image_square,
-    bulge_square,
-    circle,
-    intersect_area,
-    bulge_intersect_x,
-    bulge_intersect_y,
-):
+    orig_image_square: numpy.ndarray,
+    bulge_square: numpy.ndarray,
+    circle: numpy.ndarray,
+    intersect_area: numpy.ndarray,
+    bulge_intersect_x: numpy.ndarray,
+    bulge_intersect_y: numpy.ndarray,
+) -> numpy.ndarray:
     indices = numpy.transpose(numpy.nonzero(intersect_area & circle))
 
     img_ix = (
-        bulge_intersect_y[[*indices.T]].astype(int),
-        bulge_intersect_x[[*indices.T]].astype(int),
+        # bulge_intersect_y[[*indices.T]].astype(int),
+        # bulge_intersect_x[[*indices.T]].astype(int),
+        bulge_intersect_y[tuple(indices.T)].astype(int),
+        bulge_intersect_x[tuple(indices.T)].astype(int),
     )
     orig_img_ix = numpy.transpose(img_ix)
 
-    bulge_square[[*indices.T]] = orig_image_square[[*orig_img_ix.T]]
+    # bulge_square[[*indices.T]] = orig_image_square[[*orig_img_ix.T]]
+    bulge_square[tuple(indices.T)] = orig_image_square[tuple(orig_img_ix.T)]
 
     return bulge_square
 
 
-# return the length of vector v
-def length(v):  # TODO Figure out type hinting
-    return numpy.sqrt(numpy.sum(numpy.square(v)))
-
-
-# returns the unit vector in the direction of v
-def normalise(v) -> float:
-    return v / (length(v))
-
-
-def random_file(path) -> str:
+def random_file(path: str) -> str:
     return path + numpy.random.choice(os.listdir(path))

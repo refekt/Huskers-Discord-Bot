@@ -154,6 +154,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
                     )
                 image_binary.seek(0)
 
+                logger.info("Sending deep fried image")
                 await interaction.followup.send(
                     file=discord.File(fp=image_binary, filename="deepfry.png")
                 )
