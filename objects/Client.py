@@ -547,7 +547,7 @@ class HuskerClient(Bot):
         # logger.info("Processing task lists")
         # [await task.run() for task in tasks]
 
-        if not DEBUGGING_CODE:
+        if DEBUGGING_CODE:
             embed = buildEmbed(
                 title="Reminders",
                 description=f"There were {len(open_reminders) + 1} loaded!",
