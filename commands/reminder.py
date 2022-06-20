@@ -131,7 +131,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
             "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
         )
 
-        dt_duration: datetime.timedelta = convertDateTimeString(duration)
+        dt_duration: timedelta = convertDateTimeString(duration)
 
         await interaction.followup.send(
             f"Reminder set and will be sent in {prettifyTimeDateValue(dt_duration.total_seconds())}",
@@ -143,7 +143,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
             values=(
                 destination.id if remind_who is None else remind_who.id,
                 message,
-                dt_duration + datetime.datetime.now(),
+                dt_duration + datetime.now(),
                 1,  # True
                 f"{interaction.user.name}#{interaction.user.discriminator}",
             ),
