@@ -1,6 +1,8 @@
 import base64
 import io
 
+import discord
+import pandas as pandas
 import requests
 from PIL import Image
 from requests import Response
@@ -38,7 +40,10 @@ def gatherAiImageResults(_prompt: str) -> Response:
     results: Response = requests.post(url=request_url, headers=headers, json=json_input)
     logger.info("Images loaded!")
 
-    return results
+    if results.status_code == 200:
+        return results
+    else:
+        raise Exception(f"API Returned {results.status_code}: {results.reason}")
 
 
 def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
@@ -58,38 +63,44 @@ def convertBytesToImages(_decoded_images: list[bytes]) -> list[Image]:
     return files
 
 
+def createCollageImage(_converted_files: list[Image]) -> Image:
+    logger.info("Creating photo collage")
+    columns = 3
+    rows = 3
+    width = height = 256 * 3
+
+    thumbnail_width = width // columns
+    thumbnail_height = height // rows
+
+    size = thumbnail_width, thumbnail_height
+    collage_image = Image.new("RGB", (width, height))
+
+    imgs = []
+    for file in _converted_files:
+        file.thumbnail(size)
+        imgs.append(file)
+
+    i = x = y = 0
+    for col in range(columns):
+        for row in range(rows):
+            collage_image.paste(imgs[i], (x, y))
+            i += 1
+            y += thumbnail_height
+        x += thumbnail_width
+        y = 0
+
+    return collage_image
+
+
 prompt: str = "funny signs that are upside down"
-# api_results_images: dict = images_result  # Testing
-api_results = gatherAiImageResults(prompt)
-api_results_images = api_results.json()
+# api_results: Response = gatherAiImageResults(prompt)
+# api_results_images: dict = api_results.json()
+api_results_images: dict = images_result
 decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
 converted_files: list[Image] = convertBytesToImages(decoded_images)
+collage_image: Image = createCollageImage(converted_files)
 
-logger.info("Creating photo collage")
-columns = 3
-rows = 3
-width = height = 256 * 3
-
-thumbnail_width = width // columns
-thumbnail_height = height // rows
-
-size = thumbnail_width, thumbnail_height
-collage_image = Image.new("RGB", (width, height))
-
-imgs = []
-for file in converted_files:
-    file.thumbnail(size)
-    imgs.append(file)
-
-i = 0
-x = 0
-y = 0
-for col in range(columns):
-    for row in range(rows):
-        collage_image.paste(imgs[i], (x, y))
-        i += 1
-        y += thumbnail_height
-    x += thumbnail_width
-    y = 0
-
-collage_image.show()
+# collage_image.show()
+collage_image.seek(0)
+data = pandas.read_csv(collage_image.tobytes(), encoding="unicode_escape")
+discord_file = discord.File(data)

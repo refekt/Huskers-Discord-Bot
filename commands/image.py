@@ -1,6 +1,5 @@
 import base64
 import io
-import json
 import pathlib
 import platform
 import random
@@ -88,7 +87,7 @@ def gatherAiImageResults(_prompt: str) -> Response:
     }
     json_input: dict[str] = {"prompt": _prompt}
 
-    logger.info(f"Loading results for [{_prompt}]...")
+    logger.info("Loading results...")
     results: Response = requests.post(url=request_url, headers=headers, json=json_input)
     logger.info("Images loaded!")
 
@@ -101,8 +100,10 @@ def gatherAiImageResults(_prompt: str) -> Response:
 def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
     logger.info("Decoding images")
     decoded = []
-    for image in _images:
-        decoded.append(base64.decodebytes(bytes(image, encoding="utf-8")) + b"==")
+    for image in _images["images"]:
+        decoded.append(
+            base64.decodebytes(bytes(image, encoding="utf-8")) + b"=="
+        )  # Added b"==" for padding, but I had `images` instead of `images["images"]` so may not need
     return decoded
 
 
@@ -432,7 +433,13 @@ class ImageCog(commands.Cog, name="Image Commands"):
         converted_files: list[Image] = convertBytesToImages(decoded_images)
         collage_image: Image = createCollageImage(converted_files)
 
-        await interaction.channel.send(fp=collage_image, filename="ai-image.jpg")
+        buffer = io.BytesIO()
+        collage_image.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        await interaction.channel.send(
+            file=discord.File(fp=buffer, filename="ai-image.jpg")
+        )
 
 
 async def setup(bot: commands.Bot) -> None:
