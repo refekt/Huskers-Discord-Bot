@@ -5,6 +5,7 @@ from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 logger = logging.getLogger(__name__)
 
 __all__ = [
+    "BettingException",
     "ChangelogException",
     "CommandException",
     "ExtensionException",
@@ -79,13 +80,21 @@ class StatsException(Exception):
     message: str
 
 
+@dataclass()
 class RecruitException(Exception):
     message: str
 
 
+@dataclass()
 class SSHException(Exception):
     message: str
 
 
+@dataclass()
 class ReminderException(Exception):
+    message: str
+
+
+@dataclass()
+class BettingException(Exception):
     message: str

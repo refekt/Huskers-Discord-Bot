@@ -1,3 +1,4 @@
+import functools
 import inspect
 import logging
 import pathlib
@@ -5,12 +6,14 @@ import platform
 import random
 import string
 from datetime import datetime
+from typing import Callable
 
 from objects.Exceptions import CommandException, StatsException
 
 logger = logging.getLogger(__name__)
 
 __all__ = [
+    "alias_param",
     "checkYearValid",
     "createComponentKey",
     "discordURLFormatter",
@@ -67,6 +70,30 @@ def getModuleMethod(stack) -> tuple:
     mod = inspect.getmodule(frm[0]).__name__
     method = frm[3]
     return mod, method
+
+
+# https://stackoverflow.com/questions/41784308/keyword-arguments-aliases-in-python
+def alias_param(param_name: str, param_alias: str) -> Callable:
+    """
+    Decorator for aliasing a param in a function
+
+    Args:
+        param_name: name of param in function to alias
+        param_alias: alias that can be used for this param
+    Returns:
+    """
+
+    def decorator(func: Callable):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            alias_param_value = kwargs.get(param_alias)
+            if alias_param_value:
+                kwargs[param_name] = alias_param_value
+                del kwargs[param_alias]
+            result = func(*args, **kwargs)
+            return result
+
+        return wrapper
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

@@ -6,17 +6,13 @@ import cfbd
 import discord
 from cfbd import (
     ApiClient,
-    BettingApi,
-    Configuration,
-    GamesApi,
     PlayersApi,
 )
-from cfbd.rest import ApiException
 from discord import app_commands
 from discord.ext import commands
 
+from helpers.betting import get_consensus_line, get_current_week, cfbd_config
 from helpers.constants import (
-    CFBD_KEY,
     DT_OBJ_FORMAT,
     DT_OBJ_FORMAT_TBA,
     DT_TBA_HR,
@@ -34,11 +30,6 @@ from objects.Winsipedia import CompareWinsipedia
 
 logger = discordLogger(__name__)
 
-
-cfbd_config = Configuration()
-cfbd_config.api_key["Authorization"] = CFBD_KEY
-cfbd_config.api_key_prefix["Authorization"] = "Bearer"
-
 __all__ = ["FootballStatsCog"]
 
 
@@ -51,113 +42,18 @@ def convert_seconds(n) -> Union[int, Any]:
     return hour, mins
 
 
-def get_current_week(year: int, team: str) -> int:
-    logger.info(f"Getting the current week for the {year} {team} game")
-    api = GamesApi(ApiClient(cfbd_config))
-
-    try:
-        games = api.get_games(
-            year=year, team="nebraska"
-        )  # We only care about Nebraska's schedule
-    except ApiException:
-        logger.exception("CFBD API unable to get games", exc_info=True)
-        raise StatsException("CFBD API unable to get games")
-
-    for index, game in enumerate(games):
-        logger.info(f"Checking the Week {game.week} game.")
-        if team.lower() == "nebraska":
-            if game.week == games[1].week:  # Week 0 game
-                return 0
-
-            if not (game.away_points and game.home_points):
-                return game.week
-            else:
-                logger.exception(
-                    "Unknown error ocurred when getting week for Nebraska game",
-                    exc_info=True,
-                )
-        elif (
-            game.away_team.lower() == "nebraska" or game.home_team.lower() == "nebraska"
-        ) and (
-            game.away_team.lower() == team.lower()
-            or game.home_team.lower() == team.lower()
-        ):
-            return game.week
-
-    logger.exception(f"Unable to find week for {team}")
-    raise StatsException(f"Unable to find week for {team}")
-
-
-def get_consensus_line(
-    team_name: str, year: int = datetime.now().year, week: int = None
-) -> Union[None, str]:
-    logger.info(f"Getting the concensus line for {year} Week {week} {team_name} game")
-
-    cfb_api = BettingApi(ApiClient(cfbd_config))
-
-    if week is None:
-        week = get_current_week(year=year, team=team_name)
-
-    try:
-        api_response = cfb_api.get_lines(team=team_name, year=year, week=week)
-    except (ApiException, TypeError):
-        return None
-
-    logger.info(f"Results: {api_response}")
-
-    try:
-        lines = None  # Hard code Week 0
-
-        for game in api_response:
-            if game.away_score is None and game.home_score is None:
-                lines = game.lines[0]
-                break
-
-        logger.info(f"Lines: {lines}")
-
-        formattedSpread = (
-            lines.get("formattedSpread") if lines.get("formattedSpread", None) else ""
-        )
-        spreadOpen = lines.get("spreadOpen") if lines.get("spreadOpen", None) else "N/A"
-        overUnder = lines.get("overUnder") if lines.get("overUnder", None) else ""
-        overUnderOpen = (
-            lines.get("overUnderOpen") if lines.get("overUnderOpen", None) else "N/A"
-        )
-        homeMoneyline = (
-            str(lines.get("homeMoneyline")) if lines.get("homeMoneyline", None) else ""
-        )
-        awayMoneyline = (
-            str(lines.get("awayMoneyline")) if lines.get("awayMoneyline", None) else ""
-        )
-
-        new_line = "\n"
-        consensus_line = (
-            f"{'Spread: ' + formattedSpread + ' (Opened: ' + spreadOpen + ')' + new_line}"
-            f"{'Over/Under:  ' + overUnder + ' (Opened: ' + overUnderOpen + ')' + new_line}"
-            f"{'Home Moneyline: ' + homeMoneyline + new_line}"
-            f"{'Away Moneyline: ' + awayMoneyline + new_line }"
-        )
-
-    except IndexError:
-        return None
-
-    return consensus_line
-
-
 class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.command(
         name="countdown", description="Get the time until the next game!"
     )
     @app_commands.describe(
         opponent="Name of opponent to lookup",
-        # year="Year of the game to look up"
     )
     @app_commands.guilds(GUILD_PROD)
     async def countdown(
         self,
         interaction: discord.Interaction,
         opponent: str = None,
-        # year: int = datetime.now().year,
     ) -> None:
         logger.info(f"Starting countdown")
         await interaction.response.defer()
@@ -287,15 +183,12 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.command(name="lines", description="Get the betting lines for a game")
     @app_commands.describe(
         team_name="Name of the opponent you want to look up lines for",
-        # week="Which week you want to search"
     )
     @app_commands.guilds(GUILD_PROD)
     async def lines(
         self,
         interaction: discord.Interaction,
         team_name: str = "Nebraska",
-        # week: int = None,
-        # year: int = datetime.now().year,
     ) -> None:
         logger.info(f"Gathering info for lines")
 
@@ -436,18 +329,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             raise StatsException(
                 "A player's first and/or last search_name is required."
             )
-        # if len(str(year)) == 2:
-        #     year += 2000
-        # elif 1 < len(str(year)) < 4:
-        #     raise StatsException("The search year must be two or four digits long.")
-        # if year > datetime.now().year + 5:
-        #     raise StatsException(
-        #         "The search year must be within five years of the current class."
-        #     )
-        # if year < 1869:
-        #     raise StatsException(
-        #         "The search year must be after the first season of college football--1869."
-        #     )
+
         assert checkYearValid(year), StatsException(
             f"The provided year is not valid: {year}"
         )
@@ -502,7 +384,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         desc = (
             f"Position: {api_player_search_result.position}\n"
-            f"Height: {int(api_player_search_result.height /12)}'{api_player_search_result.height % 12}\"\n"
+            f"Height: {int(api_player_search_result.height / 12)}'{api_player_search_result.height % 12}\"\n"
             f"Weight: {api_player_search_result.weight} lbs.\n"
             f"Hometown: {api_player_search_result.hometown}"
         )

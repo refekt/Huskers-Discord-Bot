@@ -26,7 +26,6 @@ logger.info("Helpers loaded. Loading objects")
 # Objects/classes
 from objects.Bets import *  # noqa
 from objects.Exceptions import *  # noqa
-from objects.Karma import *  # noqa
 from objects.Logger import *  # noqa
 from objects.Paginator import *  # noqa
 from objects.Schedule import *  # noqa

@@ -51,6 +51,25 @@ WHERE
   AND author = % s
 """
 
+# Betting
+
+sqlGetTeamInfoByID = """
+SELECT
+  id,
+  school,
+  alt_name,
+  conference,
+  division,
+  logos1,
+  location_name,
+  location_city,
+  location_state
+FROM
+  botfrost.team_ids
+WHERE
+  id = % s
+"""
+
 # Croot Bot
 sqlTeamIDs = """
 SELECT
