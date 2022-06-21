@@ -1,10 +1,13 @@
+import base64
 import io
+import json
+import os
 import pathlib
 import platform
 import random
 from os import listdir
 from os.path import isfile, join
-from typing import Optional, Any, Union
+from typing import Optional, Any, Union, BinaryIO
 
 import discord.ext.commands
 import requests
@@ -12,6 +15,7 @@ import validators
 from PIL import Image
 from discord import app_commands
 from discord.ext import commands
+from requests import Response
 
 from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD, HEADERS
 from helpers.embed import buildEmbed
@@ -74,6 +78,47 @@ def retrieve_all_img() -> None:
         return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
     except:  # noqa
         raise ImageException(f"Unable to retrieve image commands.")
+
+
+def gatherAiImageResults(prompt: str) -> Response:
+    request_url: str = "https://backend.craiyon.com/generate"
+    headers: dict[str] = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Host": "backend.craiyon.com",
+    }
+    json_input: dict[str] = {"prompt": prompt}
+
+    logger.info("Loading results...")
+    results: Response = requests.post(url=request_url, headers=headers, json=json_input)
+    logger.info("Images loaded!")
+
+    return results
+
+
+def decodeImagesToBytes(images: dict[str]) -> list[bytes]:
+    logger.info("Decoding images")
+    decoded = []
+    for image in images["images"]:
+        decoded.append(base64.decodebytes(bytes(image, encoding="utf-8")))
+    return decoded
+
+
+def convertBytesToImages(decoded_images: list[bytes]) -> list[Image]:
+    logger.info("Converting decoded images to image object")
+    files: list[Image] = []
+    # path = pathlib.Path(__name__)
+    # for index, dec in enumerate(decoded):
+    #     full_path = os.path.join(
+    #         path.parent.parent.resolve(), f"img_{index}.png"
+    #     )
+    #     with open(full_path, "wb") as fh:
+    #         # fh.write(dec)
+    #         # files.append(discord.File(fh))  # noqa
+    #         files.append(fh)
+    for dec in decoded_images:
+        files.append(Image.open(io.BytesIO(dec)))
+    return files
 
 
 class ImageCog(commands.Cog, name="Image Commands"):
@@ -345,28 +390,66 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
         await interaction.followup.send(file=file)
 
-    # TODO Either find or build an alternative to avoid spending money
-    # @app_commands.command(
-    #     name="text-to-image", description="Use AI ML to generate an image from text"
-    # )
-    # @app_commands.guilds(GUILD_PROD)
-    # async def text_to_image(self, interaction: discord.Interaction, text: str) -> None:
-    #     await interaction.response.defer()
-    #
-    #     raw_response = requests.post(
-    #         "https://api.deepai.org/api/text2img",
-    #         data={
-    #             "text": text,
-    #         },
-    #         headers={"api-key": "quickstart-QUdJIGlzIGNvbWluZy4uLi4K"},
-    #     )
-    #     ai_image = json.loads(raw_response.content.decode("utf-8"))
-    #
-    #     embed = buildEmbed(
-    #         title=f"AI Generated Image from [{text}]", image=ai_image["output_url"]
-    #     )
-    #
-    #     await interaction.followup.send(embed=embed)
+    @app_commands.command(
+        name="ai-image",
+        description="Use craiyon services to generate an AI generated image.",
+    )
+    @app_commands.guilds(GUILD_PROD)
+    async def ai_image(self, interaction: discord.Interaction, prompt: str) -> None:
+        await interaction.response.send_message(
+            "This may take up to 3 minutes to process. Your message will be sent when ready.",
+            ephemeral=True,
+        )
+
+        api_results = gatherAiImageResults(
+            prompt
+        )  # TODO Send this to a new thread and get results when completed.
+
+        if api_results.status_code == 200:
+            logger.info("Converting results to json")
+            api_results_images: dict = json.loads(api_results.text)
+        else:
+            raise ImageException("No images returned.")
+
+        decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
+        converted_files: list[Image] = convertBytesToImages(decoded_images)
+
+        await interaction.channel.send(file=converted_files[0])
+        return
+
+        logger.info("Creating photo collage")
+        columns = 3
+        rows = 2
+        width = height = 256 * 3
+
+        thumbnail_width = width // columns
+        thumbnail_height = height // rows
+
+        size = thumbnail_width, thumbnail_height
+        collage_image = Image.new("RGB", (width, height))
+        imgs = []
+        for file in converted_files:
+            img = Image.open(file)  # Breaks here...
+            img.thumbnail(size)
+            imgs.append(img)
+
+        i = x = y = 0
+        for col in range(columns):
+            for row in range(rows):
+                print(i, x, y)
+                collage_image.paste(imgs[i], (x, y))
+                i += 1
+                y += thumbnail_height
+            x += thumbnail_width
+            y = 0
+
+        # path = pathlib.Path(__name__)
+        # full_path = os.path.join(
+        #     path.parent.parent.resolve(),
+        #     f"collage_{interaction.user.name}#{interaction.user.discriminator}.png",
+        # )
+        # collage_image.save(full_path)
+        await interaction.channel.send(file=collage_image)
 
 
 async def setup(bot: commands.Bot) -> None:

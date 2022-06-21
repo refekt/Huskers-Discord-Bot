@@ -6,10 +6,7 @@
 .gitignore
 .idea
 /changelog.md
-/discord_surveys/
 /husk_messages.txt
 __pycache__
-discord_surveys/__init__.py
-discord_surveys/survey.py
+commands/testing.py
 resources/*
-survey_chart.jpg

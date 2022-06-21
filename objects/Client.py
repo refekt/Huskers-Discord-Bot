@@ -8,7 +8,7 @@ from typing import Union
 import discord
 import tweepy
 from discord import NotFound
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, ExtensionAlreadyLoaded
 from tweepy import Response
 
 from __version__ import _version
@@ -425,6 +425,9 @@ class HuskerClient(Bot):
 
                 await self.load_extension(extension)
                 logger.info(f"Loaded the [{extension}] extension")
+            except ExtensionAlreadyLoaded:
+                logger.info(f"The [{extension}] is already loaded. Skipping")
+                continue
             except Exception as e:  # noqa
                 logger.exception(f"Unable to load the {extension} extension\n{e}")
                 continue
