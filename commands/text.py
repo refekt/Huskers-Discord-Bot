@@ -2,7 +2,7 @@ import json
 import random
 import re
 from datetime import timedelta
-from typing import List
+from typing import List, Optional
 
 import discord.ext.commands
 import markovify
@@ -97,14 +97,15 @@ class TextCog(commands.Cog, name="Text Commands"):
         source_member: discord.Member = None,
     ) -> None:
         logger.info("Attempting to create a markov chain")
-        await interaction.response.defer()
+        if interaction.response.is_done():
+            await interaction.response.defer()
 
         channel_history_limit: int = 1000
         combined_sources: list = []
         message_history: list = []
         source_content: str = ""
-        message_channel_history = None
-        message_member_history = None
+        message_channel_history: list[Optional[discord.Message]] = [None]
+        message_member_history: list[Optional[discord.Message]] = [None]
 
         if source_channel is not None:
             logger.info("Adding channel to sources")
