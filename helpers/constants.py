@@ -387,13 +387,14 @@ RECRUIT_POSITIONS = {
 }
 
 DISCORD_CHANNEL_TYPES = Union[
-    CategoryChannel,
-    ForumChannel,
-    PartialMessageable,
+    VoiceChannel,
     StageChannel,
     TextChannel,
+    ForumChannel,
+    CategoryChannel,
     Thread,
-    VoiceChannel,
+    PartialMessageable,
+    None,
 ]
 DISCORD_USER_TYPES = Union[discord.Member, discord.User]
 

@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import io
 import pathlib
@@ -5,6 +6,7 @@ import platform
 import random
 from os import listdir
 from os.path import isfile, join
+from threading import Thread
 from typing import Optional, Any, Union
 
 import discord.ext.commands
@@ -15,7 +17,11 @@ from discord import app_commands
 from discord.ext import commands
 from requests import Response
 
-from helpers.constants import GUILD_PROD, ROLE_ADMIN_PROD, HEADERS
+from helpers.constants import (
+    GUILD_PROD,
+    ROLE_ADMIN_PROD,
+    HEADERS,
+)
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
 from helpers.mysql import (
@@ -145,7 +151,33 @@ def createCollageImage(_converted_files: list[Image]) -> Image:
     return collage_image
 
 
+def getBuffer(_collage_image: Image) -> io.BytesIO:
+    buffer: io.BytesIO = io.BytesIO()
+    _collage_image.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    return buffer
+
+
+async def sendAiImage(_prompt: str, _author: discord.Member, _channel: Any) -> None:
+    api_results: Response = gatherAiImageResults(_prompt)
+    api_results_images: dict = api_results.json()
+    decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
+    converted_files: list[Image] = convertBytesToImages(decoded_images)
+    collage_image: Image = createCollageImage(converted_files)
+    buffer: io.BytesIO = getBuffer(collage_image)
+
+    await _channel.send(
+        content=f"An AI generated image was created by {_author.mention} with the following prompt: {_prompt}",
+        file=discord.File(fp=buffer, filename="ai-image.jpg"),
+    )
+
+
 class ImageCog(commands.Cog, name="Image Commands"):
+    def __init__(self, loop):
+        super(ImageCog, self).__init__()
+        self.threads: list[Thread] = []
+
     group_img = app_commands.Group(
         name="img",
         description="Get creative with images",
@@ -424,22 +456,17 @@ class ImageCog(commands.Cog, name="Image Commands"):
             "This may take up to 3 minutes to process. Your message will be sent when ready.",
             ephemeral=True,
         )
-
-        api_results: Response = gatherAiImageResults(
-            prompt
-        )  # TODO Put this into a thread so it's non-blocking and prevents heartbeat warnings
-        api_results_images: dict = api_results.json()
-        decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
-        converted_files: list[Image] = convertBytesToImages(decoded_images)
-        collage_image: Image = createCollageImage(converted_files)
-
-        buffer = io.BytesIO()
-        collage_image.save(buffer, format="PNG")
-        buffer.seek(0)
-
-        await interaction.channel.send(
-            file=discord.File(fp=buffer, filename="ai-image.jpg")
+        # task = asyncio.run_coroutine_threadsafe(
+        #     coro=sendAiImage(
+        #         _prompt=prompt, _author=interaction.user, _channel=interaction.channel
+        #     ),
+        #     loop=interaction.client.loop,
+        # )
+        # task.result(timeout=5 * 60)
+        task = sendAiImage(
+            _prompt=prompt, _author=interaction.user, _channel=interaction.channel
         )
+        await asyncio.gather(task, loop=interaction.client.loop)
 
 
 async def setup(bot: commands.Bot) -> None:

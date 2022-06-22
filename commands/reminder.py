@@ -12,7 +12,7 @@ from helpers.mysql import processMySQL, sqlRecordReminder, sqlUpdateReminder
 from objects.Exceptions import ReminderException
 from objects.Logger import discordLogger
 from objects.Thread import (
-    wait_and_run,
+    background_run_function,
     convertDateTimeString,
     DateTimeChars,
     prettifyTimeDateValue,
@@ -152,14 +152,14 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
         logger.info(
             f"Sleeping for {prettifyTimeDateValue(dt_duration.total_seconds())}"
         )
-        await wait_and_run(
-            duration=dt_duration,
+        await background_run_function(
             func=send_reminder(
                 author=interaction.user,
                 destination=destination,
                 message=message,
                 remind_who=remind_who,
             ),
+            duration=dt_duration,
         )
 
         logger.info("Updating MySQL to set to reminder is_opent o False")

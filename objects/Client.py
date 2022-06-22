@@ -546,20 +546,6 @@ class HuskerClient(Bot):
             logger.info("No open reminders found")
 
         logger.info("Processing task lists")
-        # if DEBUGGING_CODE:
-        #     embed = buildEmbed(
-        #         title="Reminders",
-        #         description=f"There were {len(open_reminders)} tasks/reminders loaded!",
-        #         fields=[
-        #             dict(
-        #                 name=f"Reminder #{index + 1}",
-        #                 value=f"Author:\n{reminder['author'].encode('utf-8')}\nMessage:\n{reminder['message'].encode('utf-8')}",
-        #             )
-        #             for index, reminder in enumerate(open_reminders)
-        #         ],
-        #     )
-        #     await chan_botspam.send(embed=embed)
-
         await asyncio.gather(*tasks)
         # Has to be the last line of code because I don't know how to make code run after it
 

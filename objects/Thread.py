@@ -2,7 +2,7 @@ import asyncio
 import enum
 import re
 from datetime import datetime, timedelta
-from typing import Coroutine
+from typing import Coroutine, Optional, Callable, Union
 
 from helpers.constants import DT_TASK_FORMAT
 from objects.Logger import discordLogger
@@ -14,7 +14,7 @@ __all__ = [
     "convertDateTimeString",
     "convert_duration",
     "prettifyTimeDateValue",
-    "wait_and_run",
+    "background_run_function",
 ]
 
 logger.info(f"{str(__name__).title()} module loaded!")
@@ -77,8 +77,14 @@ def convert_duration(value: str) -> timedelta:
     return timedelta(seconds=0)
 
 
-async def wait_and_run(duration: timedelta, func: Coroutine) -> None:
-    logger.info(f"Waiting {duration.total_seconds()} seconds to run {func.__name__}")
-    await asyncio.sleep(delay=duration.total_seconds())
-    logger.info(f"{func.__name__} waiting complete. Calling funciton!")
+async def background_run_function(
+    func: Union[Coroutine, Callable], duration: Optional[timedelta] = None
+) -> None:
+    if duration:
+        logger.info(
+            f"Waiting {duration.total_seconds()} seconds to run {func.__name__}"
+        )
+        await asyncio.sleep(delay=duration.total_seconds())
+        logger.info(f"{func.__name__} waiting complete. Calling funciton!")
+
     result = await func

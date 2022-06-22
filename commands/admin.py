@@ -34,7 +34,7 @@ from objects.Exceptions import CommandException, UserInputException, SSHExceptio
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 from objects.Thread import (
-    wait_and_run,
+    background_run_function,
     DateTimeChars,
     convertDateTimeString,
     prettifyTimeDateValue,
@@ -707,9 +707,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         if duration is not None:
-            await wait_and_run(
-                duration=dt_duration,
+            await background_run_function(
                 func=self.proess_nebraska(interaction=interaction, who=who),
+                duration=dt_duration,
             )
 
         logger.info("Iowa command complete")
