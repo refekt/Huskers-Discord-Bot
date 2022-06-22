@@ -227,22 +227,24 @@ class TextCog(commands.Cog, name="Text Commands"):
                 else source_channel.name.replace("-", " ").title().replace(" ", "-")
             )
 
-        embed = buildEmbed(
-            title="",
-            author=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})",
-            icon_url=interaction.user.avatar.url,
-            footer=f"Markov chain crated by Bot Frost",
-            fields=[
-                dict(
-                    name=f"{source_name} said...",
-                    value=markov_output,
-                )
-            ],
-        )
-
         if markov_output is None:
-            raise TextException("Markovify failed to create an output!")
+            raise TextException(
+                "Markovify failed to create an output! Mor than likely, there is not enough source material available to create a markov chain."
+            )
         else:
+            embed = buildEmbed(
+                title="",
+                author=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})",
+                icon_url=interaction.user.avatar.url,
+                footer=f"Markov chain crated by Bot Frost",
+                fields=[
+                    dict(
+                        name=f"{source_name} said...",
+                        value=markov_output,
+                    )
+                ],
+            )
+
             if interaction.response.is_done():
                 await interaction.edit_original_message(embed=embed)
             else:
