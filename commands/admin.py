@@ -491,7 +491,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def quit(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
         await interaction.followup.send(
-            f"Goodbye for now! {interaction.user.mention} has turned me off!"
+            f"So long suckers! {interaction.user.mention} has fired me after a 9-win season!"
         )
 
         await interaction.client.close()
