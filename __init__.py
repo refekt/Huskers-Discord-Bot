@@ -55,22 +55,25 @@ tree = client.tree
 async def on_app_command_error(
     interaction: discord.Interaction, error: CommandInvokeError
 ) -> None:
-    logger.exception(str(error.original.args[0]), exc_info=True)
+    err = DiscordError(error, interaction.data["options"])
+    logger.exception(error, exc_info=True)
     embed = buildEmbed(
-        title="Command Error Received",
+        title="",
         fields=[
             dict(
-                name=f"Error Type: {type(error.original)}",
-                value=str(error.original.args[0]),
+                name=f"Error Type: {err.error_type}",
+                value=f"{err.message}",
             ),
             dict(
-                name="Input",
-                value=f"This error originated from '{error.command.qualified_name}'{' with the following data passed: ' + str(interaction.data['options']) if interaction.data.get('options', False) else ''}",
+                name="Command",
+                value=f"{'/' + err.command if not err.parent else '/' + err.parent + ' ' + err.command}",
             ),
+            dict(name="Command Input", value=f"{''.join(err.options)}"),
+            dict(name="Originating Module", value=f"{err.modeule}"),
         ],
     )
     if interaction.response.is_done():
-        await interaction.followup.send(content="", embed=embed)
+        await interaction.followup.send(content="", embed=embed, ephemeral=True)
     else:
         await interaction.response.send_message(content="", embed=embed, ephemeral=True)
 
@@ -79,7 +82,6 @@ end = perf_counter()
 logger.info(f"The bot initialized in {end - start:,.2f} seconds")
 
 __all__ = ["client"]
-
 
 # v2.0 loop
 # async def main():

@@ -1,6 +1,10 @@
 # Global Errors
 import logging
+import traceback
 from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
+from typing import Optional
+
+from discord.app_commands import CommandInvokeError
 
 logger = logging.getLogger(__name__)
 
@@ -8,6 +12,7 @@ __all__ = [
     "BettingException",
     "ChangelogException",
     "CommandException",
+    "DiscordError",
     "ExtensionException",
     "ImageException",
     "MySQLException",
@@ -24,6 +29,21 @@ __all__ = [
 ]
 
 logger.info(f"{str(__name__).title()} module loaded!")
+
+
+class DiscordError:
+    def __init__(self, original: CommandInvokeError, options: dict) -> None:
+        self.command: Optional[str] = original.command.qualified_name
+        self.error_type: str = type(original).__name__
+        self.message: str = original.original.message
+        self.modeule: Optional[str] = original.command.module
+        self.original: ALL_EXCEPTIONS = original.original
+        self.options: list[str] = [f"{opt['name']}:{opt['value']}" for opt in options]
+        self.parent: Optional[str] = original.command.parent
+        self.traceback: traceback = original.__traceback__
+
+    def __str__(self) -> str:
+        return f"{self.error_type}: {self.message}"
 
 
 @dataclass()
@@ -104,3 +124,6 @@ class BettingException(Exception):
 @dataclass()
 class TextException(Exception):
     message: str
+
+
+ALL_EXCEPTIONS = [globals()[_exc] for _exc in globals() if "Exception" in _exc]
