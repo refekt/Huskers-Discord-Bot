@@ -77,10 +77,10 @@ class TweetUserData(object):
 
 async def send_tweet_alert(client: discord.Client, message) -> None:
     if DEBUGGING_CODE:
-        logger.info("Skipping tweet alert because debugging is on")
+        logger.debug("Skipping tweet alert because debugging is on")
         return
 
-    logger.info(f"Tweet alert received: {message}")
+    logger.debug(f"Tweet alert received: {message}")
     embed = buildEmbed(
         title="Husker Twitter",
         fields=[
@@ -94,7 +94,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
     await twitter_channel.send(embed=embed)
 
-    logger.info(f"Twitter alert sent!")
+    logger.debug(f"Twitter alert sent!")
 
 
 async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
@@ -150,7 +150,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         async def callback(self, interaction: discord.Interaction) -> None:
             pass
 
-    logger.info(f"Sending a tweet")
+    logger.debug(f"Sending a tweet")
 
     author = None  # noqa
     for user in tweet.includes["users"]:
@@ -262,7 +262,6 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_request_error(self, status_code) -> None:
         logger.exception(f"Request Error: {status_code}")
-        # self.remove_all_rules()
 
         logger.info(
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
@@ -280,7 +279,6 @@ class StreamClientV2(tweepy.StreamingClient):
             self.client.loop,
         )
         task.result()
-        # self.remove_all_rules()
 
     def on_disconnect(self) -> None:
         logger.warning("Disconnected")
@@ -289,19 +287,15 @@ class StreamClientV2(tweepy.StreamingClient):
             self.client.loop,
         )
         task.result()
-        # self.remove_all_rules()
 
     def on_errors(self, errors) -> None:
         logger.exception(f"Error received: {errors}")
-        # self.remove_all_rules()
 
     def on_closed(self, response) -> None:
         logger.warning(f"Closed: {response}")
-        # self.remove_all_rules()
 
     def on_exception(self, exception) -> None:
         logger.exception(f"Exception: {exception}")
-        # self.remove_all_rules()
 
     def on_data(self, raw_data) -> None:
         logger.info(pprint(json.loads(raw_data)))
