@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import pathlib
@@ -7,9 +8,12 @@ __all__ = ["discordLogger"]
 
 from logging.handlers import RotatingFileHandler
 
+from helpers.misc import getModuleMethod
+
 
 def discordLogger(name: str, level: int = logging.INFO) -> logging.Logger:
-    path = pathlib.Path(f"{__name__}.log")
+    module, method = getModuleMethod(inspect.stack())
+    path = pathlib.Path(f"{module}.log")
     full_path = os.path.join(path.parent.resolve(), "logs", path)
 
     format_string = "[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s"
