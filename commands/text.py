@@ -215,11 +215,16 @@ class TextCog(commands.Cog, name="Text Commands"):
             max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
         )
 
-        source_name: Union[discord.Member, discord.Text] = (
-            source_member.name.replace("-", " ").title().replace(" ", "-")
-            if source_member
-            else source_channel.name.replace("-", " ").title().replace(" ", "-")
-        )
+        if not combined_sources:
+            source_name: Union[discord.Member, discord.Text] = (
+                interaction.channel.name.replace("-", " ").title().replace(" ", "-")
+            )
+        else:
+            source_name = (
+                source_member.name.replace("-", " ").title().replace(" ", "-")
+                if source_member
+                else source_channel.name.replace("-", " ").title().replace(" ", "-")
+            )
 
         embed = buildEmbed(
             title="",
