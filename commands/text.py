@@ -209,9 +209,9 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         logger.info("Creating a markov chain")
-        markvov_response = markovify.NewlineText(source_content, well_formed=True)
+        markov_response = markovify.NewlineText(source_content, well_formed=True)
         logger.info("Creating a markov original_message")
-        markov_output = markvov_response.make_sentence(
+        markov_output = markov_response.make_sentence(
             max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
         )
 
@@ -239,10 +239,8 @@ class TextCog(commands.Cog, name="Text Commands"):
             raise
         else:
             if interaction.response.is_done():
-                # await interaction.edit_original_message(content=markov_output)
                 await interaction.edit_original_message(embed=embed)
             else:
-                # await interaction.channel.send(content=markov_output)
                 await interaction.channel.send(embed=embed)
             logger.info("Markov out sent")
 
