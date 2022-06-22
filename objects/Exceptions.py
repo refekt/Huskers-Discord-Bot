@@ -17,6 +17,7 @@ __all__ = [
     "ScheduleException",
     "StatsException",
     "SurveyException",
+    "TextException",
     "TwitterStreamException",
     "UserInputException",
     "WeatherException",
@@ -97,4 +98,9 @@ class ReminderException(Exception):
 
 @dataclass()
 class BettingException(Exception):
+    message: str
+
+
+@dataclass()
+class TextException(Exception):
     message: str

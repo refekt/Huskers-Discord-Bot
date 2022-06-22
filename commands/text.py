@@ -23,7 +23,7 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
-from objects.Exceptions import CommandException, WeatherException
+from objects.Exceptions import CommandException, WeatherException, TextException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
@@ -110,6 +110,10 @@ class TextCog(commands.Cog, name="Text Commands"):
         message_member_history: list[Optional[discord.Message]] = [None]
 
         if source_channel is not None:
+            if source_channel.id in CHAN_BANNED:
+                raise TextException(
+                    f"You cannot use this command with {source_channel.mention}!"
+                )
             logger.info("Adding channel to sources")
             combined_sources.append(source_channel)
 
@@ -158,8 +162,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     )
                 ]
             except (Forbidden, HTTPException) as e:
-                logger.exception(f"Unable to collect message history!\n{e}")
-                raise
+                raise TextException(f"Unable to collect message history!\n{e}")
 
             for message in message_history:
                 source_content += check_message(message)
@@ -195,10 +198,9 @@ class TextCog(commands.Cog, name="Text Commands"):
         if not source_content == "":
             source_content = cleanup_source_content(source_content)
         else:
-            logger.exception(
-                f"There was not enough information available to make a Markov chain.",
+            raise TextException(
+                f"There was not enough information available in {[source.mention for source in combined_sources]} to make a Markov chain."
             )
-            raise
 
         logger.info("Cleaning up variables")
         del (
@@ -239,8 +241,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         if markov_output is None:
-            logger.exception("Markovify failed to create an output!", exc_info=True)
-            raise
+            raise TextException("Markovify failed to create an output!")
         else:
             if interaction.response.is_done():
                 await interaction.edit_original_message(embed=embed)
@@ -341,7 +342,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 name="div", attrs={"class": re.compile("definition.*")}
             )
         except AttributeError:
-            raise CommandException(f"Unable to find [{word}] in the Urban Dictionary.")
+            raise TextException(f"Unable to find [{word}] in the Urban Dictionary.")
 
         assert definitions, CommandException(
             f"Unable to find [{word}] in the Urban Dictionary."
