@@ -202,7 +202,6 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         logger.info("Cleaning up variables")
         del (
-            combined_sources,
             message_channel_history,
             message_history,
             message_member_history,
