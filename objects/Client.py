@@ -1,6 +1,7 @@
 import asyncio
 import pathlib
 import platform
+import sys
 from datetime import timedelta
 from os import listdir
 from typing import Union
@@ -434,8 +435,10 @@ class HuskerClient(Bot):
 
         logger.info("All extensions loaded")
 
-        if not DEBUGGING_CODE:
-            logger.info("Hiding online message because debugging")
+        if (
+            not DEBUGGING_CODE or len(sys.argv) == 1
+        ):  # When bot restarts, no system argument
+            logger.info("Hiding online message because debugging or rebooted")
             await chan_botspam.send(embed=await self.create_online_message())  # noqa
 
         logger.info("The bot is ready!")
