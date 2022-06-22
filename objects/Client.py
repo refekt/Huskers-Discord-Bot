@@ -438,7 +438,9 @@ class HuskerClient(Bot):
         if (
             not DEBUGGING_CODE or len(sys.argv) == 1
         ):  # When bot restarts, no system argument
-            logger.info("Hiding online message because debugging or rebooted")
+            logger.info(
+                f"Hiding online message because debugging or rebooted; {sys.argv}"
+            )
             await chan_botspam.send(embed=await self.create_online_message())  # noqa
 
         logger.info("The bot is ready!")

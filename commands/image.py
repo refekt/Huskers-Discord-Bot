@@ -1,12 +1,10 @@
-import asyncio
-import base64
 import io
 import pathlib
 import platform
 import random
+from asyncio import Task
 from os import listdir
 from os.path import isfile, join
-from threading import Thread
 from typing import Optional, Any, Union
 
 import discord.ext.commands
@@ -15,7 +13,6 @@ import validators
 from PIL import Image
 from discord import app_commands
 from discord.ext import commands
-from requests import Response
 
 from helpers.constants import (
     GUILD_PROD,
@@ -84,99 +81,99 @@ def retrieve_all_img() -> None:
         raise ImageException(f"Unable to retrieve image commands.")
 
 
-def gatherAiImageResults(_prompt: str) -> Response:
-    request_url: str = "https://backend.craiyon.com/generate"
-    headers: dict[str] = {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Host": "backend.craiyon.com",
-    }
-    json_input: dict[str] = {"prompt": _prompt}
-
-    logger.info("Loading results...")
-    results: Response = requests.post(url=request_url, headers=headers, json=json_input)
-    logger.info("Images loaded!")
-
-    if results.status_code == 200:
-        return results
-    else:
-        raise ImageException(f"API Returned {results.status_code}: {results.reason}")
-
-
-def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
-    logger.info("Decoding images")
-    decoded = []
-    for image in _images["images"]:
-        decoded.append(
-            base64.decodebytes(bytes(image, encoding="utf-8")) + b"=="
-        )  # Added b"==" for padding, but I had `images` instead of `images["images"]` so may not need
-    return decoded
+# def gatherAiImageResults(_prompt: str) -> Response:
+#     request_url: str = "https://backend.craiyon.com/generate"
+#     headers: dict[str] = {
+#         "Accept": "application/json",
+#         "Content-Type": "application/json",
+#         "Host": "backend.craiyon.com",
+#     }
+#     json_input: dict[str] = {"prompt": _prompt}
+#
+#     logger.info("Loading results...")
+#     results: Response = requests.post(url=request_url, headers=headers, json=json_input)
+#     logger.info("Images loaded!")
+#
+#     if results.status_code == 200:
+#         return results
+#     else:
+#         raise ImageException(f"API Returned {results.status_code}: {results.reason}")
 
 
-def convertBytesToImages(_decoded_images: list[bytes]) -> list[Image]:
-    logger.info("Converting decoded images to image object")
-    files: list[Image] = []
-
-    for dec in _decoded_images:
-        files.append(Image.open(io.BytesIO(dec)))
-    return files
-
-
-def createCollageImage(_converted_files: list[Image]) -> Image:
-    logger.info("Creating photo collage")
-    columns = 3
-    rows = 3
-    width = height = 256 * 3
-
-    thumbnail_width = width // columns
-    thumbnail_height = height // rows
-
-    size = thumbnail_width, thumbnail_height
-    collage_image = Image.new("RGB", (width, height))
-
-    imgs = []
-    for file in _converted_files:
-        file.thumbnail(size)
-        imgs.append(file)
-
-    i = x = y = 0
-    for col in range(columns):
-        for row in range(rows):
-            collage_image.paste(imgs[i], (x, y))
-            i += 1
-            y += thumbnail_height
-        x += thumbnail_width
-        y = 0
-
-    return collage_image
+# def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
+#     logger.info("Decoding images")
+#     decoded = []
+#     for image in _images["images"]:
+#         decoded.append(
+#             base64.decodebytes(bytes(image, encoding="utf-8")) + b"=="
+#         )  # Added b"==" for padding, but I had `images` instead of `images["images"]` so may not need
+#     return decoded
 
 
-def getBuffer(_collage_image: Image) -> io.BytesIO:
+# def convertBytesToImages(_decoded_images: list[bytes]) -> list[Image]:
+#     logger.info("Converting decoded images to image object")
+#     files: list[Image] = []
+#
+#     for dec in _decoded_images:
+#         files.append(Image.open(io.BytesIO(dec)))
+#     return files
+
+
+# def createCollageImage(_converted_files: list[Image]) -> Image:
+#     logger.info("Creating photo collage")
+#     columns = 3
+#     rows = 3
+#     width = height = 256 * 3
+#
+#     thumbnail_width = width // columns
+#     thumbnail_height = height // rows
+#
+#     size = thumbnail_width, thumbnail_height
+#     collage_image = Image.new("RGB", (width, height))
+#
+#     imgs = []
+#     for file in _converted_files:
+#         file.thumbnail(size)
+#         imgs.append(file)
+#
+#     i = x = y = 0
+#     for col in range(columns):
+#         for row in range(rows):
+#             collage_image.paste(imgs[i], (x, y))
+#             i += 1
+#             y += thumbnail_height
+#         x += thumbnail_width
+#         y = 0
+#
+#     return collage_image
+
+
+def getBuffer(_buffer: Image) -> io.BytesIO:
     buffer: io.BytesIO = io.BytesIO()
-    _collage_image.save(buffer, format="PNG")
+    _buffer.save(buffer, format="PNG")
     buffer.seek(0)
 
     return buffer
 
 
-async def sendAiImage(_prompt: str, _author: discord.Member, _channel: Any) -> None:
-    api_results: Response = gatherAiImageResults(_prompt)
-    api_results_images: dict = api_results.json()
-    decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
-    converted_files: list[Image] = convertBytesToImages(decoded_images)
-    collage_image: Image = createCollageImage(converted_files)
-    buffer: io.BytesIO = getBuffer(collage_image)
-
-    await _channel.send(
-        content=f"An AI generated image was created by {_author.mention} with the following prompt: {_prompt}",
-        file=discord.File(fp=buffer, filename="ai-image.jpg"),
-    )
+# async def sendAiImage(_prompt: str, _author: discord.Member, _channel: Any) -> None:
+#     api_results: Response = gatherAiImageResults(_prompt)
+#     api_results_images: dict = api_results.json()
+#     decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
+#     converted_files: list[Image] = convertBytesToImages(decoded_images)
+#     collage_image: Image = createCollageImage(converted_files)
+#     buffer: io.BytesIO = getBuffer(collage_image)
+#
+#     await _channel.send(
+#         content=f"An AI generated image was created by {_author.mention} with the following prompt: {_prompt}",
+#         file=discord.File(fp=buffer, filename="ai-image.jpg"),
+#     )
 
 
 class ImageCog(commands.Cog, name="Image Commands"):
     def __init__(self, loop):
         super(ImageCog, self).__init__()
-        self.threads: list[Thread] = []
+        self.tasks: list[Task] = []
 
     group_img = app_commands.Group(
         name="img",
@@ -453,20 +450,25 @@ class ImageCog(commands.Cog, name="Image Commands"):
     @app_commands.guilds(GUILD_PROD)
     async def ai_image(self, interaction: discord.Interaction, prompt: str) -> None:
         await interaction.response.send_message(
-            "This may take up to 3 minutes to process. Your message will be sent when ready.",
+            "This was a fun command to make, but it's really taxing on the bot and I need to turn it off.",
             ephemeral=True,
         )
-        # task = asyncio.run_coroutine_threadsafe(
-        #     coro=sendAiImage(
-        #         _prompt=prompt, _author=interaction.user, _channel=interaction.channel
-        #     ),
-        #     loop=interaction.client.loop,
+        # await interaction.response.send_message(
+        #     "This may take up to 3 minutes to process. Your message will be sent when ready.",
+        #     ephemeral=True,
         # )
-        # task.result(timeout=5 * 60)
-        task = sendAiImage(
-            _prompt=prompt, _author=interaction.user, _channel=interaction.channel
-        )
-        await asyncio.gather(task, loop=interaction.client.loop)
+        # alert = asyncio.Event()
+        # alert.last_event = None
+        # self.tasks.append(
+        #     asyncio.create_task(
+        #         sendAiImage(
+        #             _prompt=prompt,
+        #             _author=interaction.user,
+        #             _channel=interaction.channel,
+        #         )
+        #     )
+        # )
+        # await asyncio.gather(*self.tasks)
 
 
 async def setup(bot: commands.Bot) -> None:
