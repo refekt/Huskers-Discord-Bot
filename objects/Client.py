@@ -1,6 +1,6 @@
 import asyncio
+import os
 import pathlib
-import platform
 import sys
 from datetime import timedelta
 from os import listdir
@@ -313,18 +313,9 @@ class HuskerClient(Bot):
         try:
             changelog_path = None
             changelog_file = "changelog.md"
-
-            if DEBUGGING_CODE:
-                changelog_path = pathlib.PurePath(
-                    f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
-                )
-            elif "Linux" in platform.platform():
-                changelog_path = pathlib.PurePosixPath(
-                    f"{pathlib.Path(__file__).parent.parent.resolve()}/{changelog_file}"
-                )
-            else:
-                logger.exception("Unknown platform. Exiting", exc_info=True)
-
+            changelog_path = os.path.join(
+                pathlib.Path(__file__).parent.parent.resolve(), changelog_file
+            )
             changelog = open(changelog_path, "r")
             lines = changelog.readlines()
             lines_str = ""
@@ -358,7 +349,7 @@ class HuskerClient(Bot):
         await channel_general.send(embed=embed)
 
     # noinspection PyMethodMayBeStatic
-    async def create_online_message(self) -> None:
+    async def create_online_message(self) -> discord.Embed:
         return buildEmbed(
             title="Welcome to the Huskers server!",
             description="The official Husker football discord server",
@@ -435,13 +426,12 @@ class HuskerClient(Bot):
 
         logger.info("All extensions loaded")
 
-        if (
-            not DEBUGGING_CODE or len(sys.argv) == 1
-        ):  # When bot restarts, no system argument
+        if len(sys.argv) > 1:  # When bot restarts, no system argument
+            await chan_botspam.send(embed=await self.create_online_message())
+        else:
             logger.info(
                 f"Hiding online message because debugging or rebooted; {sys.argv}"
             )
-            await chan_botspam.send(embed=await self.create_online_message())  # noqa
 
         logger.info("The bot is ready!")
 
