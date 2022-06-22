@@ -436,7 +436,7 @@ class HuskerClient(Bot):
         logger.info("All extensions loaded")
 
         if (
-            not DEBUGGING_CODE or len(sys.argv) == 0
+            not DEBUGGING_CODE or len(sys.argv) == 1
         ):  # When bot restarts, no system argument
             logger.info(
                 f"Hiding online message because debugging or rebooted; {sys.argv}"
