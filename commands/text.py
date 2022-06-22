@@ -2,13 +2,13 @@ import json
 import random
 import re
 from datetime import timedelta
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import discord.ext.commands
 import markovify
 import requests
 from bs4 import BeautifulSoup
-from discord import app_commands, Forbidden, HTTPException
+from discord import app_commands, Forbidden, HTTPException, NotFound
 from discord.ext import commands
 
 from helpers.constants import (
@@ -97,8 +97,10 @@ class TextCog(commands.Cog, name="Text Commands"):
         source_member: discord.Member = None,
     ) -> None:
         logger.info("Attempting to create a markov chain")
-        if interaction.response.is_done():
-            await interaction.response.defer()
+        try:
+            await interaction.response.defer(thinking=True)
+        except NotFound:
+            pass
 
         channel_history_limit: int = 1000
         combined_sources: list = []
@@ -204,8 +206,6 @@ class TextCog(commands.Cog, name="Text Commands"):
             message_channel_history,
             message_history,
             message_member_history,
-            source_channel,
-            source_member,
         )
 
         logger.info("Creating a markov chain")
@@ -215,11 +215,35 @@ class TextCog(commands.Cog, name="Text Commands"):
             max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
         )
 
+        source_name: Union[discord.Member, discord.Text] = (
+            source_member.name.replace("-", " ").title().replace(" ", "-")
+            if source_member
+            else source_channel.name.replace("-", " ").title().replace(" ", "-")
+        )
+
+        embed = buildEmbed(
+            title="",
+            author=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})",
+            icon_url=interaction.user.avatar.url,
+            footer=f"Markov chain crated by Bot Frost",
+            fields=[
+                dict(
+                    name=f"{source_name} said...",
+                    value=markov_output,
+                )
+            ],
+        )
+
         if markov_output is None:
             logger.exception("Markovify failed to create an output!", exc_info=True)
             raise
         else:
-            await interaction.edit_original_message(content=markov_output)
+            if interaction.response.is_done():
+                # await interaction.edit_original_message(content=markov_output)
+                await interaction.edit_original_message(embed=embed)
+            else:
+                # await interaction.channel.send(content=markov_output)
+                await interaction.channel.send(embed=embed)
             logger.info("Markov out sent")
 
     @app_commands.command(
@@ -286,7 +310,6 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
         chan = await interaction.client.fetch_channel(CHAN_POSSUMS)
         await chan.send(embed=embed)
-        # await interaction.followup.send("Possum dropping sent!")
 
     @app_commands.command(
         name="urban-dictionary",
@@ -537,7 +560,7 @@ class TextCog(commands.Cog, name="Text Commands"):
             def compile(self) -> str:
                 new_line: str = "\n"
                 lines = [
-                    f"  | {str(self.message[i : i + self.max_line_len]).ljust(self.max_line_len, ' ')} |"
+                    f"  | {str(self.message[i: i + self.max_line_len]).ljust(self.max_line_len, ' ')} |"
                     for i in range(0, len(self.message), self.max_line_len)
                 ]
 

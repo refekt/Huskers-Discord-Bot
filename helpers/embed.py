@@ -1,7 +1,7 @@
 import inspect
 import logging
 from datetime import datetime
-from typing import Union
+from typing import Union, Optional
 
 import discord
 import validators
@@ -40,11 +40,11 @@ __all__ = [
 ]
 
 
-def buildEmbed(title: str, **kwargs) -> Union[discord.Embed, None]:
+def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Creating a normal embed from [{module}-{method}]")
 
-    assert title is not None, CommandException("Title must not be blank!")
+    # assert title is not None, CommandException("Title must not be blank!")
 
     dtNow = datetime.now().astimezone(tz=TZ)  # .isoformat()
 
