@@ -1,6 +1,9 @@
 import asyncio
+import inspect
 import json
 import logging
+import os
+import pathlib
 import time
 from pprint import pprint
 from typing import Union, Optional
@@ -19,10 +22,15 @@ from helpers.constants import (
     TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
+from helpers.misc import getModuleMethod
 from objects.Logger import discordLogger
 
+module, method = getModuleMethod(inspect.stack())
+path = pathlib.Path(f"twitter_stream.log")
+full_path = os.path.join(path.parent.resolve(), "logs", path)
+
 logger = discordLogger(__name__)
-handler = logging.FileHandler(filename="twitter_stream.log")
+handler = logging.FileHandler(filename=full_path)
 logger.addHandler(handler)
 
 

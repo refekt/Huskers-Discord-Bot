@@ -8,7 +8,7 @@ import discord.ext.commands
 import markovify
 import requests
 from bs4 import BeautifulSoup
-from discord import app_commands, Forbidden, HTTPException, NotFound
+from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
 from helpers.constants import (
@@ -97,10 +97,8 @@ class TextCog(commands.Cog, name="Text Commands"):
         source_member: discord.Member = None,
     ) -> None:
         logger.info("Attempting to create a markov chain")
-        try:
+        if interaction.response.is_done():
             await interaction.response.defer(thinking=True)
-        except NotFound:
-            pass
 
         channel_history_limit: int = 1000
         combined_sources: list = []
