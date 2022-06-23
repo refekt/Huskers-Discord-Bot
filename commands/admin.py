@@ -690,7 +690,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 {
                     "name": "Statement",
                     "value": f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
-                    + f"This will be reverted in {duration}."
+                    + f" This will be reverted in {duration}."
                     if duration is not None
                     else "",
                 },
@@ -701,7 +701,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.followup.send(embed=embed)
         await who.send(
             f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
-            + f"This will be reverted in {prettifyTimeDateValue(dt_duration.total_seconds)}."
+            + f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
             if duration is not None
             else ""
         )
