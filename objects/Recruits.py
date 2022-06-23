@@ -51,7 +51,7 @@ class Recruit:
         walk_on: bool,
         weight: str,
         year: int,
-    ):
+    ) -> None:
         self.bio = bio
         self.cb_experts = cb_experts
         self.cb_predictions = cb_predictions

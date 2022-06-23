@@ -35,10 +35,13 @@ class DiscordError:
     def __init__(self, original: CommandInvokeError, options: dict) -> None:
         self.command: Optional[str] = original.command.qualified_name
         self.error_type: str = type(original).__name__
-        self.message: str = original.original.message
+        if hasattr(original, "message"):
+            self.message: str = original.original.message
+        elif hasattr(original, "args"):
+            self.message = original.args[0]
         self.modeule: Optional[str] = original.command.module
         self.original: ALL_EXCEPTIONS = original.original
-        self.options: list[str] = [f"{opt['name']}:{opt['value']}" for opt in options]
+        self.options: list[str] = [f"{opt['name']} : {opt['value']}" for opt in options]
         self.parent: Optional[str] = original.command.parent
         self.traceback: traceback = original.__traceback__
 

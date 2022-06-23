@@ -1,13 +1,14 @@
 import json
 import re
 from datetime import datetime
-from typing import Union, Any
+from typing import Union, Any, Optional
 
 import discord.ext.commands
 import requests
 from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands
+from requests import Response, JSONDecodeError
 
 from helpers.constants import (
     CROOT_SEARCH_LIMIT,
@@ -63,12 +64,12 @@ class RecruitListView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         await interaction.response.defer()
 
-        reaction_pressed = int(interaction.data["custom_id"][-1])
+        reaction_pressed: int = int(interaction.data["custom_id"][-1])
 
         logger.info(f"Croot-bot search button #{reaction_pressed + 1} pressed")
 
-        embed = buildRecruitEmbed(croot_search[reaction_pressed])
-        view = createPredictionView(croot_search[reaction_pressed])
+        embed: discord.Embed = buildRecruitEmbed(croot_search[reaction_pressed])
+        view: discord.ui.View = createPredictionView(croot_search[reaction_pressed])
 
         logger.info("Sending a new recruit embed")
         await interaction.edit_original_message(embed=embed, view=view)
@@ -85,11 +86,11 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
         super().__init__()
         self.recruit: Recruit = recruit
 
-    max_len = 44
-    prediction_school = discord.ui.TextInput(
+    max_len: int = 44
+    prediction_school: discord.ui.TextInput = discord.ui.TextInput(
         label="What is your school prediction?"[:max_len]
     )
-    prediction_confidence = discord.ui.TextInput(
+    prediction_confidence: discord.ui.TextInput = discord.ui.TextInput(
         label="Prediction confidence 1 (low) to 10 (high)"[:max_len]
     )
 
@@ -103,10 +104,12 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
         self.stop()
 
         logger.info("Confirming if recruit is already committed to a school")
-        formatted_team_list = [team.lower() for team in get_teams()]
+        formatted_team_list: list[str] = [team.lower() for team in get_teams()]
         if user_prediction.school.value.lower() in formatted_team_list:
-            team_index = formatted_team_list.index(user_prediction.school.value.lower())
-            team_prediction = get_teams()[team_index]
+            team_index: int = formatted_team_list.index(
+                user_prediction.school.value.lower()
+            )
+            team_prediction: str = get_teams()[team_index]
 
             if self.recruit.committed_school == team_prediction:
                 raise RecruitException(
@@ -177,7 +180,7 @@ class PredictionView(discord.ui.View):
             )
 
         logger.info("Collecting team and confidence predictions")
-        modal = PredictionTeamModal(self.recruit)
+        modal: discord.ui.Modal = PredictionTeamModal(self.recruit)
         await interaction.response.send_modal(modal)
         await modal.wait()
 
@@ -188,7 +191,7 @@ class PredictionView(discord.ui.View):
         logger.info(f"Retrieving predictions for {self.recruit.name}...")
         await interaction.response.defer()
 
-        individual_preds = processMySQL(
+        individual_preds: Optional[list[dict]] = processMySQL(
             query=sqlGetIndividualPrediction,
             fetch="all",
             values=(self.recruit.twofourseven_profile,),
@@ -197,10 +200,12 @@ class PredictionView(discord.ui.View):
             raise RecruitException("This recruit has no predictions.")
 
         logger.info(f"Compiling {len(individual_preds)} predictions")
-        predictions = []
+        predictions: list[Optional[dict]] = []
         for index, prediction in enumerate(individual_preds):
             try:
-                prediction_user = interaction.guild.get_member(prediction["user_id"])
+                prediction_user: Union[
+                    discord.Member, str
+                ] = interaction.guild.get_member(prediction["user_id"])
                 prediction_user = prediction_user.display_name
             except:  # noqa
                 prediction_user = prediction["user"]
@@ -208,12 +213,12 @@ class PredictionView(discord.ui.View):
             if prediction_user is None:
                 prediction_user = prediction["user"]
 
-            prediction_datetime = prediction["prediction_date"]
+            prediction_datetime: Union[datetime, str] = prediction["prediction_date"]
             if isinstance(prediction_datetime, str):
                 prediction_datetime = datetime.strptime(
                     prediction["prediction_date"], DT_FAP_RECRUIT
                 )
-            pred_field = [
+            pred_field: list[str] = [
                 f"{prediction_user}",
                 f"{prediction['team']} ({prediction['confidence']}) - {prediction_datetime.month}/{prediction_datetime.day}/{prediction_datetime.year}",
             ]
@@ -227,7 +232,7 @@ class PredictionView(discord.ui.View):
 
             predictions.append(dict(name=pred_field[0], value=pred_field[1]))
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title=f"Predictions for {self.recruit.name}", fields=predictions
         )
         embed.set_footer(text="✅ = Correct, ❌ = Wrong, ⌛ = TBD")
@@ -596,24 +601,51 @@ def createPredictionView(target_recruit: Recruit) -> PredictionView:
 def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
     logger.info("Building Football Recruit object")
 
+    if len(str(year)) == 2:
+        year += 2000
+
+    assert checkYearValid(year), RecruitException(
+        f"The provided year is not valid: {year}"
+    )
+
     logger.info("Collecting team IDs")
-    all_team_ids = processMySQL(fetch="all", query=sqlTeamIDs)
-    name = name.split(" ")
+    all_team_ids: Optional[list[dict]] = processMySQL(fetch="all", query=sqlTeamIDs)
+    name: list[str] = name.split(" ")
 
     if len(name) == 1:
         logger.info("Searching the single name for first and last name")
-        _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}"
-        first_name = requests.get(url=_247_search, headers=HEADERS)
-        first_name = json.loads(first_name.text)
 
-        _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.LastName={name[0]}"
-        last_name = requests.get(url=_247_search, headers=HEADERS)
-        last_name = json.loads(last_name.text)
+        _247_search: str = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=5&Page=1&Player.FirstName={name[0]}"
+        first_name: Union[Response, list[dict]] = requests.get(
+            url=_247_search, headers=HEADERS
+        )
+
+        if first_name.status_code == 200:
+            try:
+                first_name = first_name.json()
+            except JSONDecodeError:
+                pass
+
+        _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=5&Page=1&Player.LastName={name[0]}"
+        last_name: Union[Response, list[dict]] = requests.get(
+            url=_247_search, headers=HEADERS
+        )
+        if last_name.status_code == 200:
+            try:
+                last_name = last_name.json()
+            except JSONDecodeError:
+                pass
+
+        assert isinstance(first_name, list) and isinstance(
+            last_name, list
+        ), RecruitException(
+            f"Unable to find {year} {' '.join(name)}. Please try again!"
+        )
 
         search_results = first_name + last_name
     elif len(name) == 2:
         logger.info("Searching the combined name for first and last name")
-        _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}&Player.LastName={name[1]}"
+        _247_search = f"https://247sports.com/college/nebraska/Season/{year}-Football/Recruits/?&Player.FirstName={name[0]}&Player.LastName={name[1]}"
 
         search_results = requests.get(url=_247_search, headers=HEADERS)
         if not search_results.status_code == 200:
@@ -659,7 +691,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
         early_signee = is_early_signee(soup)
         height = reformat_height(cur_player.get("Height", None))
         key = cur_player.get("Key", None)
-        name = cur_player.get("FullName", None)
+        _name = cur_player.get("FullName", None)
         position = cur_player["PrimaryPlayerPosition"].get("Abbreviation", None)
         ranking_all_time = get_all_time_ranking(soup)
         ranking_national = get_national_ranking(cur_player)
@@ -679,7 +711,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
         twitter = get_twitter_handle(soup)
         walk_on = is_walk_on(soup)
         weight = reformat_weight(cur_player.get("Weight", None))
-        year = search_player.get("Year", None)
+        _year = search_player.get("Year", None)
 
         search_result_players.append(
             Recruit(
@@ -696,7 +728,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
                 early_signee=early_signee,
                 height=height,
                 key=key,
-                name=name,
+                name=_name,
                 position=position,
                 ranking_all_time=ranking_all_time,
                 ranking_national=ranking_national,
@@ -717,7 +749,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
                 twitter=twitter,
                 walk_on=walk_on,
                 weight=weight,
-                year=year,
+                year=_year,
             )
         )
 
@@ -750,21 +782,6 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
             raise RecruitException(
                 "A player's first and/or last search_name is required."
             )
-
-        # if len(str(year)) == 2:
-        #     year += 2000
-        # # elif len(str(year)) == 1 or len(str(year)) == 3:
-        # elif 1 < len(str(year)) < 4:
-        #     raise RecruitException("The search year must be two or four digits long.")
-        #
-        # if year > datetime.now().year + 5:
-        #     raise RecruitException(
-        #         "The search year must be within five years of the current class."
-        #     )
-        # if year < 1869:
-        #     raise RecruitException(
-        #         "The search year must be after the first season of college football--1869."
-        #     )
 
         assert checkYearValid(year), RecruitException(
             f"The provided year is not valid: {year}"
@@ -810,16 +827,8 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         if not len(search_name.split(" ")) == 2:
             raise RecruitException("You can only search by full name.")
 
-        # if len(str(year)) == 2:
-        #     year += 2000
-        # if year > datetime.now().year + 5:
-        #     raise RecruitException(
-        #         "The search year must be within five years of the current class."
-        #     )
-        # if year < 1869:
-        #     raise RecruitException(
-        #         "The search year must be after the first season of college football--1869."
-        #     )
+        if len(str(year)) == 2:
+            year += 2000
         assert checkYearValid(year), RecruitException(
             f"The provided year is not valid: {year}"
         )
