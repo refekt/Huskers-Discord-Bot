@@ -41,7 +41,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 dict(name="Placed Bet", value=str(bet)),
                 dict(name="Betting Lines", value=str(bet.bet_lines)),
             ],
-            author=interaction.user,
+            author=bet.author_str,
             icon_url=interaction.user.display_avatar.url,
         )
 
