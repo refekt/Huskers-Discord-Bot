@@ -285,12 +285,6 @@ class HuskerClient(Bot):
                 )
                 channel = hof_channel
 
-            # avatar_url = (
-            #     str(reaction_message.author.avatar_url)
-            #     .split("?")[0]
-            #     .replace("webp", "png")
-            # )
-
             embed = buildEmbed(
                 title=embed_title,
                 description=embed_description,

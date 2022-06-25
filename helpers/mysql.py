@@ -52,7 +52,6 @@ WHERE
 """
 
 # Betting
-
 sqlGetTeamInfoByID = """
 SELECT
   id,
@@ -68,6 +67,50 @@ FROM
   botfrost.team_ids
 WHERE
   id = % s
+"""
+
+sqlInsertGameBet = """
+INSERT INTO botfrost.bets (
+  author, author_str, created, created_str,
+  opponent, week, game_datetime, game_datetime_passed,
+  which_team, resolved
+)
+VALUES
+  (
+    % s, % s, % s, % s, % s, % s, % s,
+    % s, % s, % s
+  )
+"""
+
+sqlUpdateGameBet = """
+UPDATE
+  bets
+SET
+  which_team = % s,
+  created = % s,
+  created_str = % s
+WHERE
+  id = %s
+"""
+
+sqlSelectGameBetbyAuthor = """
+SELECT
+  id,
+  author,
+  author_str,
+  created,
+  created_str,
+  opponent,
+  week,
+  game_datetime,
+  game_datetime_passed,
+  which_team,
+  resolved
+FROM
+  bets
+WHERE
+  author_str = % s
+  AND opponent = % s
 """
 
 # Croot Bot
@@ -207,6 +250,7 @@ WHERE
   AND message = % s
   AND author = % s
 """
+
 
 # # Karma
 # sqlUpdateKarma = """

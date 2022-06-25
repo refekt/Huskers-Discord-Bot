@@ -41,7 +41,11 @@ class DiscordError:
             self.message = original.args[0]
         self.modeule: Optional[str] = original.command.module
         self.original: ALL_EXCEPTIONS = original.original
-        self.options: list[str] = [f"{opt['name']} : {opt['value']}" for opt in options]
+        self.options: list[str] = (
+            [f"{opt['name']} : {opt['value']}" for opt in options]
+            if options is not None
+            else None
+        )
         self.parent: Optional[str] = original.command.parent
         self.traceback: traceback = original.__traceback__
 

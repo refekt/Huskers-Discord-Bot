@@ -6,7 +6,7 @@ import platform
 import random
 import string
 from datetime import datetime
-from typing import Callable
+from typing import Callable, Union, Any
 
 from objects.Exceptions import CommandException, StatsException
 
@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 __all__ = [
     "alias_param",
     "checkYearValid",
+    "convertSeconds",
     "createComponentKey",
     "discordURLFormatter",
     "getModuleMethod",
@@ -94,6 +95,15 @@ def alias_param(param_name: str, param_alias: str) -> Callable:
             return result
 
         return wrapper
+
+
+def convertSeconds(n) -> Union[int, Any]:
+    logger.info(f"Converting {n:,} seconds to hours and minutes")
+    secs = n % (24 * 3600)
+    hour = secs // 3600
+    secs %= 3600
+    mins = secs // 60
+    return hour, mins
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

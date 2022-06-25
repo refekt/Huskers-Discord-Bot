@@ -1,6 +1,6 @@
 import calendar
 from datetime import datetime
-from typing import Union, Any, Optional
+from typing import Optional
 
 import cfbd
 import discord
@@ -11,8 +11,8 @@ from cfbd import (
 from discord import app_commands
 from discord.ext import commands
 
-from helpers.betting import get_consensus_line, get_current_week, cfbd_config
 from helpers.constants import (
+    CFBD_CONFIG,
     DT_OBJ_FORMAT,
     DT_OBJ_FORMAT_TBA,
     DT_TBA_HR,
@@ -21,25 +21,20 @@ from helpers.constants import (
     TZ,
 )
 from helpers.embed import buildEmbed, collectScheduleEmbeds
-from helpers.misc import checkYearValid
+from helpers.misc import checkYearValid, convertSeconds
+from objects.Bets_Stats_Schedule import (
+    getConsensusLineByOpponent,
+    getCurrentWeekByOpponent,
+    HuskerSchedule,
+)
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
-from objects.Schedule import HuskerSchedule
 from objects.Winsipedia import CompareWinsipedia
 
 logger = discordLogger(__name__)
 
 __all__ = ["FootballStatsCog"]
-
-
-def convert_seconds(n) -> Union[int, Any]:
-    logger.info(f"Converting {n:,} seconds to hours and minutes")
-    secs = n % (24 * 3600)
-    hour = secs // 3600
-    secs %= 3600
-    mins = secs // 60
-    return hour, mins
 
 
 class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
@@ -55,6 +50,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         interaction: discord.Interaction,
         opponent: str = None,
     ) -> None:
+        # TODO Use getNebraskaGameByOpponent() instead of HuskerSchedule()
         logger.info(f"Starting countdown")
         await interaction.response.defer()
 
@@ -110,7 +106,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             dt_game_time_diff = game_compared.game_date_time - now_cst_orig
         else:
             dt_game_time_diff = game_compared.game_date_time - now_cst
-        diff_hours_minutes = convert_seconds(
+        diff_hours_minutes = convertSeconds(
             dt_game_time_diff.seconds
         )  # datetime object does not have hours or minutes
         year_days = 0
@@ -131,7 +127,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         opponent = game_compared.opponent
         thumbnail = game_compared.icon
         date_time = game_compared.game_date_time
-        consensus = get_consensus_line(
+        consensus = getConsensusLineByOpponent(
             team_name=game_compared.opponent, year=now_cst.year
         )
         location = game_compared.location
@@ -151,7 +147,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                     dict(name="Time Remaining", value=days),
                     dict(
                         name="Betting Info",
-                        value=consensus if consensus else "Line TBD",
+                        value=str(consensus) if consensus else "Line TBD",
                     ),
                 ],
             )
@@ -172,7 +168,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                     ),
                     dict(
                         name="Betting Info",
-                        value=consensus if consensus else "Line TBD",
+                        value=str(consensus) if consensus else "Line TBD",
                     ),
                 ],
             )
@@ -201,7 +197,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
 
         # if week is None:
-        week = get_current_week(year=year, team=team_name)
+        week = getCurrentWeekByOpponent(year=year, team=team_name)
 
         week = 1 if week == 0 else week
         logger.info(f"Current week: {week}")
@@ -217,13 +213,17 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 not team_name.lower() == "nebraska"
                 and team_name.lower() == game.opponent.lower()
             ):  # When a team_name is provided
-                lines = get_consensus_line(team_name=team_name, year=year, week=week)
+                lines = getConsensusLineByOpponent(
+                    team_name=team_name, year=year, week=week
+                )
                 icon = game.icon
                 break
             elif (
                 game.week == week and game.outcome == ""
             ):  # When a team_name is omitted
-                lines = get_consensus_line(team_name=team_name, year=year, week=week)
+                lines = getConsensusLineByOpponent(
+                    team_name=team_name, year=year, week=week
+                )
                 icon = game.icon
                 break
 
@@ -234,7 +234,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             fields=[
                 dict(name="Year", value=f"{year}"),
                 dict(name="Week", value=f"{week - 1}"),
-                dict(name="Lines", value=lines),
+                dict(name="Lines", value=str(lines)),
             ],
             thumbnail=icon,
         )
@@ -334,7 +334,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             f"The provided year is not valid: {year}"
         )
 
-        api = PlayersApi(ApiClient(cfbd_config))
+        api = PlayersApi(ApiClient(CFBD_CONFIG))
         api_player_search_result: list[cfbd.PlayerSearchResult] = api.player_search(
             search_term=player_name, team="nebraska", year=year
         )

@@ -4,6 +4,7 @@ from typing import Union
 
 import discord
 import pytz
+from cfbd import Configuration
 from discord import (
     CategoryChannel,
     ForumChannel,
@@ -103,6 +104,11 @@ logger.info("Twitter variables loaded")
 # Weather API
 WEATHER_API_KEY = env_vars["openweather_key"]
 logger.info("Weather API key loaded")
+
+# cfbd
+CFBD_CONFIG = Configuration()
+CFBD_CONFIG.api_key["Authorization"] = CFBD_KEY
+CFBD_CONFIG.api_key_prefix["Authorization"] = "Bearer"
 
 del env_vars, env_file, key
 logger.info("Deleted environment variables, files, and key")
@@ -217,7 +223,9 @@ BOT_FOOTER_BOT = "Created by Bot Frost"
 logger.info("Bot info variables loaded")
 
 # DateTime format
+DT_CFBD_GAMES = "%Y-%m-%dT%H:%M:%S.%f%z"
 DT_FAP_RECRUIT = "%Y-%m-%d %H:%M:%S"
+DT_MYSQL_FORMAT = "%Y-%m-%d %H:%M:%S"
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
 DT_OBJ_FORMAT_TBA = "%d %b %Y"
 DT_OPENWEATHER_UTC = "%H:%M:%S %Z"

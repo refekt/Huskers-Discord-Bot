@@ -28,8 +28,7 @@ from helpers.constants import (
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
-from objects.Exceptions import CommandException
-from objects.Schedule import HuskerSchedule
+from objects.Bets_Stats_Schedule import HuskerSchedule
 
 logger = logging.getLogger(__name__)
 __all__ = [
@@ -184,7 +183,7 @@ def buildTweetEmbed(
                 embed.set_image(url=item.url)
             embed.add_field(
                 name="Embeded Image",
-                value=discordURLFormatter(f"Image #{index+1}", item.url),
+                value=discordURLFormatter(f"Image #{index + 1}", item.url),
             )
 
     if quotes:
