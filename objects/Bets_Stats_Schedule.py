@@ -39,6 +39,7 @@ __all__ = [
     "BetLines",
     "BetTeam",
     "BigTenTeams",
+    "HuskerSched2022",
     "HuskerSchedule",
     "WhichTeamChoice",
     "getConsensusLineByOpponent",
@@ -110,6 +111,21 @@ class BigTenTeams(str, enum.Enum):
     Purdue = "Purdue"
     Rutgers = "Rutgers"
     Wisconsin = "Wisconsin"
+
+
+class HuskerSched2022(str, enum.Enum):
+    Northwestern = "Northwestern"
+    North_Dakota = "North Dakota"
+    Georgia_Southern = "Georgia Southern"
+    Oklahoma = "Oklahoma"
+    Indiana = "Indiana"
+    Rutgers = "Rutgers"
+    Purdue = "Purdue"
+    Illinois = "Illinois"
+    Minnesota = "Minnesota"
+    Michigan = "Michigan"
+    Wisconsin = "Wisconsin"
+    Iowa = "Iowa"
 
     def __str__(self):
         return self.value
@@ -216,7 +232,7 @@ class Bet:
     def __init__(
         self,
         author: Union[discord.Member, discord.User],
-        opponent: BigTenTeams,
+        opponent: Union[BigTenTeams, HuskerSched2022],
         which_team: WhichTeamChoice,
     ) -> None:
         logger.info("Creating a Bet object")

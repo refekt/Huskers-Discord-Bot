@@ -3,7 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 
 from helpers.constants import GUILD_PROD
-from objects.Bets_Stats_Schedule import Bet, BigTenTeams, WhichTeamChoice
+from helpers.embed import buildEmbed
+from objects.Bets_Stats_Schedule import Bet, WhichTeamChoice, HuskerSched2022
 from objects.Exceptions import BettingException
 from objects.Logger import discordLogger
 
@@ -11,15 +12,21 @@ logger = discordLogger(__name__)
 
 
 class BettingCog(commands.Cog, name="Betting Commands"):
-    @app_commands.command(name="bet", description="TBD")
+    @app_commands.command(
+        name="bet", description="Place a bet against a Nebraska game."
+    )
+    @app_commands.describe(
+        opponent="Name of the opponent for the Husker game.",
+        which_team="Which team you predict to win.",
+    )
     @app_commands.guilds(GUILD_PROD)
     async def bet(
         self,
         interaction: discord.Interaction,
-        opponent: BigTenTeams,
+        opponent: HuskerSched2022,
         which_team: WhichTeamChoice,
     ) -> None:
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
 
         bet = Bet(author=interaction.user, opponent=opponent, which_team=which_team)
         try:
@@ -28,7 +35,17 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             logger.exception("Error submitting the bet to the MySQL database.")
             return
 
-        await interaction.followup.send(f"{bet} {str(bet.bet_lines)}")
+        embed = buildEmbed(
+            title="Husker Schedule Betting",
+            fields=[
+                dict(name="Placed Bet", value=str(bet)),
+                dict(name="Betting Lines", value=str(bet.bet_lines)),
+            ],
+            author=interaction.user,
+            icon_url=interaction.user.display_avatar.url,
+        )
+
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
