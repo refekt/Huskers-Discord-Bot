@@ -76,6 +76,30 @@ WHERE
   id = % s
 """
 
+sqlGetTeamInfoByESPNID = """
+SELECT
+  id,
+  espn_id,
+  school,
+  alt_name,
+  alt_name2,
+  conference,
+  division,
+  color,
+  alt_color,
+  logos1,
+  logos2,
+  location_name,
+  location_city,
+  location_state,
+  location_capacity,
+  location_grass
+FROM
+  team_ids
+WHERE
+  espn_id = % s
+"""
+
 sqlInsertGameBet = """
 INSERT INTO botfrost.bets (
   author, author_str, created, created_str,

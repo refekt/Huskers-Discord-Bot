@@ -27,6 +27,7 @@ from helpers.mysql import (
     sqlSelectGameBetbyOpponent,
     sqlTeamIDs,
     sqlUpdateGameBet,
+    sqlGetTeamInfoByESPNID,
 )
 from objects.Exceptions import BettingException, ScheduleException
 from objects.Logger import discordLogger
@@ -399,6 +400,11 @@ def buildTeam(id_str: str) -> BetTeam:
     logger.info("Building a BetTeam")
 
     query: dict = processMySQL(query=sqlGetTeamInfoByID, fetch="one", values=id_str)
+    if query is None:
+        query: dict = processMySQL(
+            query=sqlGetTeamInfoByESPNID, fetch="one", values=id_str
+        )
+
     if query:
         return BetTeam(from_dict=query)
     else:
