@@ -12,9 +12,9 @@ from helpers.mysql import processMySQL, sqlRecordReminder, sqlUpdateReminder
 from objects.Exceptions import ReminderException
 from objects.Logger import discordLogger
 from objects.Thread import (
+    DateTimeChars,
     background_run_function,
     convertDateTimeString,
-    DateTimeChars,
     prettifyTimeDateValue,
 )
 
@@ -97,7 +97,7 @@ async def send_reminder(
         else author,  # A str may be passed from loading reminders/tasks
         icon_url=author.display_avatar if isinstance(author, discord.Member) else None,
         description=f"Missed reminder! {message}" if missed_reminder else message,
-        footer=f"Reminder was created on {datetime.datetime.now(tz=TZ).strftime(DT_OBJ_FORMAT)}",
+        footer=f"Reminder was created on {datetime.now(tz=TZ).strftime(DT_OBJ_FORMAT)}",
     )
     await destination.send(
         embed=embed, content=f"Paging {remind_who.mention}" if remind_who else ""
@@ -162,13 +162,13 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
             duration=dt_duration,
         )
 
-        logger.info("Updating MySQL to set to reminder is_opent o False")
-        print(
-            0,  # False
-            destination.id if remind_who is None else remind_who.id,
-            message,
-            interaction.user.id,
-        )
+        logger.info("Updating MySQL to set to reminder is_open to False")
+        # print(
+        #     0,  # False
+        #     destination.id if remind_who is None else remind_who.id,
+        #     message,
+        #     interaction.user.id,
+        # )
         processMySQL(
             query=sqlUpdateReminder,
             values=(

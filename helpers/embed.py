@@ -10,25 +10,26 @@ from helpers.constants import (
     BOT_FOOTER_BOT,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
+    DESC_LIMIT,
     DT_OBJ_FORMAT,
     DT_OBJ_FORMAT_TBA,
-    DT_TWEET_FORMAT,
-    TZ,
     DT_STR_RECRUIT,
-    TITLE_LIMIT,
-    DESC_LIMIT,
-    FOOTER_LIMIT,
-    NAME_LIMIT,
+    DT_TWEET_FORMAT,
+    EMBED_MAX,
     FIELDS_LIMIT,
     FIELD_NAME_LIMIT,
     FIELD_VALUE_LIMIT,
-    EMBED_MAX,
+    FOOTER_LIMIT,
+    NAME_LIMIT,
+    TITLE_LIMIT,
+    TZ,
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
 from objects.Bets_Stats_Schedule import HuskerSchedule
 
 logger = logging.getLogger(__name__)
+
 __all__ = [
     "buildEmbed",
     "buildRecruitEmbed",

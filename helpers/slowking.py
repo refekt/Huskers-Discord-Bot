@@ -42,7 +42,7 @@ def makeSlowking(person: discord.Member) -> discord.File:
         slowking_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/{slowking_filename}"
 
     with open(slowking_path, "rb") as f:
-        file = discord.File(f)
+        file = discord.File(f)  # noqa
 
     file.close()
 

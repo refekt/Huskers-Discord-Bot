@@ -88,7 +88,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                     value=getHuskerOpponent(game)["opponent"].title(),
                 ),
                 dict(
-                    name="Scheudled Date & Time",
+                    name="Scheduled Date & Time",
                     value=start_date.strftime(DT_CFBD_GAMES_DISPLAY),
                 ),
                 dict(name="Location", value=game.venue),
@@ -130,7 +130,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             f"The provided year is not valid: {year}"
         )
 
-        # TODO Switch to getNebraskaGameByOpponent() instead of HuskerScheudle()
+        # TODO Switch to getNebraskaGameByOpponent() instead of HuskerSchedule()
         games, _ = HuskerSchedule(year=year)
         del _
 
@@ -203,7 +203,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                     f"[{team_against.title()}'s Games]({'http://www.winsipedia.com/' + team_against.lower()})",
                 ),
                 dict(
-                    name=f"{team_for.title()}'s Recoard vs. {team_against.title()}",
+                    name=f"{team_for.title()}'s Record vs. {team_against.title()}",
                     value=comparison.all_time_record,
                 ),
                 dict(
@@ -319,7 +319,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             f"Hometown: {api_player_search_result.hometown}"
         )
 
-        logger.info("Building cateorgy embeds")
+        logger.info("Building category embeds")
         stat_categories: dict[str, Optional[discord.Embed]] = {
             "defensive": buildEmbed(
                 title=f"{player_name.title()}'s Defense Stats", description=desc

@@ -39,7 +39,7 @@ class DiscordError:
             self.message: str = original.original.message
         elif hasattr(original, "args"):
             self.message = original.args[0]
-        self.modeule: Optional[str] = original.command.module
+        self.module: Optional[str] = original.command.module
         self.original: ALL_EXCEPTIONS = original.original
         self.options: list[str] = (
             [f"{opt['name']} : {opt.get('value', 'N/A')}" for opt in options]

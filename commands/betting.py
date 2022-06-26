@@ -9,7 +9,7 @@ from objects.Bets_Stats_Schedule import (
     Bet,
     WhichTeamChoice,
     HuskerSched2022,
-    retrieveGameBetIs,
+    retrieveGameBets,
     BigTenTeams,
 )
 from objects.Exceptions import BettingException
@@ -62,7 +62,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     ):
         await interaction.response.defer()
 
-        opponent_bets = retrieveGameBetIs(school_name=opponent, _all=True)
+        opponent_bets = retrieveGameBets(school_name=opponent, _all=True)
 
         embed = buildEmbed(
             title=f"{BigTenTeams.Nebraska} vs. {opponent.value} Bets",

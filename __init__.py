@@ -65,7 +65,7 @@ async def on_app_command_error(
                 name="Command Input",
                 value=f"{', '.join(err.options) if err.options else 'None'}",
             ),
-            dict(name="Originating Module", value=f"{err.modeule}"),
+            dict(name="Originating Module", value=f"{err.module}"),
         ],
     )
 

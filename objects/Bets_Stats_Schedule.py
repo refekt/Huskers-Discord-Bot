@@ -24,9 +24,9 @@ from helpers.mysql import (
     sqlGetTeamInfoByID,
     sqlInsertGameBet,
     sqlSelectGameBetbyAuthor,
+    sqlSelectGameBetbyOpponent,
     sqlTeamIDs,
     sqlUpdateGameBet,
-    sqlSelectGameBetbyOpponent,
 )
 from objects.Exceptions import BettingException, ScheduleException
 from objects.Logger import discordLogger
@@ -48,6 +48,7 @@ __all__ = [
     "getCurrentWeekByOpponent",
     "getHuskerOpponent",
     "getNebraskaGameByOpponent",
+    "retrieveGameBets",
 ]
 
 logger.info(f"{str(__name__).title()} module loaded!")
@@ -277,7 +278,7 @@ class Bet:
 
     def submitRecord(self) -> None:
         logger.info("Submitting MySQL entry for bet")
-        previous_bet = retrieveGameBetIs(
+        previous_bet = retrieveGameBets(
             author_str=self.author_str, school_name=self.opponent.school_name
         )
 
@@ -321,7 +322,7 @@ class Bet:
                 BettingException("Was not able to create bet in MySQL database.")
 
 
-def retrieveGameBetIs(
+def retrieveGameBets(
     school_name: str, author_str: str = None, _all: bool = False
 ) -> Union[list[dict], dict, None]:
     logger.info(
@@ -405,27 +406,18 @@ def buildTeam(id_str: str) -> BetTeam:
 
 
 def getConsensusLineByOpponent(
-    # team_name: str,
     away_team: str,
     home_team: str,
     year: int = datetime.now().year,
-    # week: int = None,
-) -> Optional[BetLines]:  # Union[None, str]:
-    # logger.info(f"Getting the concensus line for {year} Week {week} {team_name} game")
+) -> Optional[BetLines]:
     logger.info(
-        f"Getting the concensus line for {year} {away_team} and {home_team} game"
+        f"Getting the consensus line for {year} {away_team} and {home_team} game"
     )
 
     betting_api = BettingApi(ApiClient(CFBD_CONFIG))
 
-    # if week is None:
-    #     week = getCurrentWeekByOpponent(year=year, team=team_name)
-
     try:
-        # api_response = betting_api.get_lines(team=team_name, year=year)  # , week=week)
-        api_response = betting_api.get_lines(
-            away=away_team, home=home_team, year=year
-        )  # , week=week)
+        api_response = betting_api.get_lines(away=away_team, home=home_team, year=year)
     except (ApiException, TypeError):
         return None
 
@@ -436,17 +428,6 @@ def getConsensusLineByOpponent(
         return None
 
     return BetLines(from_dict=lines)
-
-    # try:
-    #     lines = None  # Hard code Week 0
-    #
-    #     for game in api_response:
-    #         if game.away_score is None and game.home_score is None:
-    #             lines = game.lines[0]
-    #             break
-    #     logger.debug(f"Lines: {lines}")
-    # except IndexError:
-    #     return None
 
 
 def collect_opponent(game, year, week) -> Union[HuskerOpponent, str]:
@@ -672,7 +653,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
                 return game.week
             else:
                 logger.exception(
-                    "Unknown error ocurred when getting week for Nebraska game",
+                    "Unknown error occurred when getting week for Nebraska game",
                     exc_info=True,
                 )
         elif (

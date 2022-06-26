@@ -51,7 +51,7 @@ class Survey:
         question: AnyStr,
         timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
-        # Space deliminated options
+        # Space delimited options
         self.max_options = 3
         options = options.strip()
         if " " in options:
@@ -82,7 +82,7 @@ class Survey:
         self.question: Optional[AnyStr] = question
         self.timeout: int = math.ceil(timeout)
 
-    class SurviewButtons(View):
+    class SurveyButtons(View):
         def __init__(
             self, options: List[SurveyOption], closer, timeout: int = None
         ) -> None:
@@ -157,7 +157,7 @@ class Survey:
     def create_embed(self) -> None:
         embed = Embed(
             title="Survey",
-            description=f"Please provide your feedback. This survey timesout in {prettifyTimeDateValue(self.timeout)} seconds.",
+            description=f"Please provide your feedback. This survey expires in {prettifyTimeDateValue(self.timeout)} seconds.",
             color=0xD00000,
         )
         embed.set_footer(text="Users: ")
@@ -194,7 +194,7 @@ class Survey:
 
         self.create_embed()
 
-        view = self.SurviewButtons(self.options, self.close_survey())
+        view = self.SurveyButtons(self.options, self.close_survey())
         for index, child in enumerate(view.children):
             if index >= self.max_options:
                 view.remove_item(view.option_three)

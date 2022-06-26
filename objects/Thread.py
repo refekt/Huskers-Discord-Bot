@@ -85,6 +85,6 @@ async def background_run_function(
             f"Waiting {duration.total_seconds()} seconds to run {func.__name__}"
         )
         await asyncio.sleep(delay=duration.total_seconds())
-        logger.info(f"{func.__name__} waiting complete. Calling funciton!")
+        logger.info(f"{func.__name__} waiting complete. Calling function!")
 
     result = await func
