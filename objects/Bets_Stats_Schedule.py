@@ -11,21 +11,22 @@ from cfbd import ApiClient, BettingApi, GamesApi, Game
 from cfbd.rest import ApiException
 
 from helpers.constants import (
-    DT_CFBD_GAMES,
     CFBD_CONFIG,
-    HEADERS,
-    DT_TBA_TIME,
-    DT_STR_FORMAT,
-    TZ,
+    DT_CFBD_GAMES,
     DT_MYSQL_FORMAT,
+    DT_STR_FORMAT,
+    DT_TBA_TIME,
+    HEADERS,
+    TZ,
 )
 from helpers.mysql import (
-    sqlInsertGameBet,
     processMySQL,
-    sqlTeamIDs,
     sqlGetTeamInfoByID,
+    sqlInsertGameBet,
     sqlSelectGameBetbyAuthor,
+    sqlTeamIDs,
     sqlUpdateGameBet,
+    sqlSelectGameBetbyOpponent,
 )
 from objects.Exceptions import BettingException, ScheduleException
 from objects.Logger import discordLogger
@@ -42,8 +43,10 @@ __all__ = [
     "HuskerSched2022",
     "HuskerSchedule",
     "WhichTeamChoice",
+    "buildTeam",
     "getConsensusLineByOpponent",
     "getCurrentWeekByOpponent",
+    "getHuskerOpponent",
     "getNebraskaGameByOpponent",
 ]
 
@@ -54,9 +57,9 @@ class SeasonStats:
     losses = None
     wins = None
 
-    def __init__(self, wins=0, losses=0) -> None:
-        self.losses = losses
-        self.wins = wins
+    def __init__(self, wins: int = 0, losses: int = 0) -> None:
+        self.losses: int = losses
+        self.wins: int = wins
 
 
 class HuskerOpponent:
@@ -64,12 +67,12 @@ class HuskerOpponent:
         self, name, ranking, icon, date_time, week, location, outcome=None
     ) -> None:
         self.date_time = date_time
-        self.icon = icon
-        self.location = location
-        self.name = name
+        self.icon: str = icon
+        self.location: str = location
+        self.name: str = name
         self.outcome = outcome
         self.ranking = ranking
-        self.week = week
+        self.week: int = week
 
 
 class HuskerDotComSchedule:
@@ -173,6 +176,7 @@ class BetTeam(JSONEncoder):
     __slots__ = [
         "alt_name",
         "city",
+        "color",
         "conference",
         "division",
         "id_str",
@@ -182,7 +186,7 @@ class BetTeam(JSONEncoder):
         "state",
     ]
 
-    def __init__(self, from_dict: dict = None, *args, **kwargs) -> None:
+    def __init__(self, from_dict: dict = Optional[dict], *args, **kwargs) -> None:
         super().__init__()
         if from_dict:
             from_dict["city"] = from_dict["location_city"]
@@ -223,6 +227,7 @@ class Bet:
         "created_str",
         "game_datetime",
         "game_datetime_passed",
+        "home_game",
         "opponent",
         "resolved",
         "week",
@@ -248,53 +253,54 @@ class Bet:
         self.game_datetime_passed: bool = (
             datetime.now(tz=TZ) >= self.game_datetime or False
         )
-        logger.info(f"Game DateTime passed: {self.game_datetime_passed}")
-        self.resolved: bool = False
+        self.home_game: bool = (
+            True if self._raw.home_team == BigTenTeams.Nebraska else False
+        )
         self.opponent = buildTeam(id_str=getTeamIdByName(opponent))
+        self.resolved: bool = False
         self.week = self._raw.week
         self.which_team = which_team
 
-        self.bet_lines: BetLines = getConsensusLineByOpponent(
-            team_name=self.opponent.school_name, week=self.week
-        )
-        logger.info(f"Bet lines: {self.bet_lines}")
+        if self.home_game:
+            self.bet_lines: BetLines = getConsensusLineByOpponent(
+                away_team=self.opponent.school_name.lower(),
+                home_team=BigTenTeams.Nebraska.lower(),
+            )
+        else:
+            self.bet_lines: BetLines = getConsensusLineByOpponent(
+                away_team=BigTenTeams.Nebraska.lower(),
+                home_team=self.opponent.school_name.lower(),
+            )
 
     def __str__(self):
         return f"{self.author.mention} ({self.author_str}) says that {self.which_team} will win the {WhichTeamChoice.Nebraska} vs. {self.opponent.school_name.title()} game."
 
-    def retrieveGameBetID(self) -> Optional[int]:
-        logger.info(
-            f"Looking to see if a bet already exists for {self.author_str} and {self.opponent}"
-        )
-        results = processMySQL(
-            query=sqlSelectGameBetbyAuthor,
-            values=(self.author_str, self.opponent.school_name),
-            fetch="all",
-        )
-        if results:
-            return int(results[0]["id"])
-        else:
-            return None
-
     def submitRecord(self) -> None:
         logger.info("Submitting MySQL entry for bet")
-        previous_bet_id = self.retrieveGameBetID()
+        previous_bet = retrieveGameBetIs(
+            author_str=self.author_str, school_name=self.opponent.school_name
+        )
 
-        if previous_bet_id:
-            logger.info("Updating previously entered bet")
-            try:
-                processMySQL(
-                    query=sqlUpdateGameBet,
-                    values=(
-                        self.which_team,
-                        self.created,
-                        self.created_str,
-                        previous_bet_id,
-                    ),
-                )
-            except BettingException:
-                BettingException("Was not able to create bet in MySQL database.")
+        if previous_bet:
+            if previous_bet["which_team"] == self.which_team:
+                logger.info("Previous bet matches current bet")
+                return
+            else:
+                logger.info("Updating previously entered bet")
+                try:
+                    processMySQL(
+                        query=sqlUpdateGameBet,
+                        values=(
+                            self.which_team,
+                            self.created,
+                            self.created_str,
+                            previous_bet["id"],
+                        ),
+                    )
+                except BettingException:
+                    BettingException("Was not able to create bet in MySQL database.")
         else:
+            logger.info("New bet being placed")
             try:
                 processMySQL(
                     query=sqlInsertGameBet,
@@ -313,6 +319,31 @@ class Bet:
                 )
             except BettingException:
                 BettingException("Was not able to create bet in MySQL database.")
+
+
+def retrieveGameBetIs(
+    school_name: str, author_str: str = None, _all: bool = False
+) -> Union[list[dict], dict, None]:
+    logger.info(
+        f"Looking to see if a bet already exists for {author_str} and {school_name}"
+    )
+    if author_str:
+        results = processMySQL(
+            query=sqlSelectGameBetbyAuthor,
+            values=(author_str, school_name),
+            fetch="one",
+        )
+    else:
+        results = processMySQL(
+            query=sqlSelectGameBetbyOpponent, values=school_name, fetch="all"
+        )
+    if results:
+        if _all:
+            return results
+        else:
+            return results
+    else:
+        return None
 
 
 def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> Game:
@@ -343,12 +374,20 @@ def getTeamIdByName(team_name: str) -> str:
     logger.info(f"Getting Team ID by Name: {team_name}")
 
     sql_teams = processMySQL(query=sqlTeamIDs, fetch="all")
+    _id = ""
+
     if team_name.lower() in [team["school"].lower() for team in sql_teams]:
-        return [
-            team["id"]
-            for team in sql_teams
-            if team["school"].lower() == team_name.lower()
-        ][0]
+        for team in sql_teams:
+            if team["school"] == team_name:
+                _id = team["id"]
+                break
+    else:
+        raise BettingException(
+            f"Not able to locate {team_name} in team list. Try again!"
+        )
+
+    if _id:
+        return _id
     else:
         raise BettingException(
             f"Not able to locate {team_name} in team list. Try again!"
@@ -358,40 +397,56 @@ def getTeamIdByName(team_name: str) -> str:
 def buildTeam(id_str: str) -> BetTeam:
     logger.info("Building a BetTeam")
 
-    query = processMySQL(query=sqlGetTeamInfoByID, fetch="one", values=id_str)
-    return BetTeam(from_dict=query)
+    query: dict = processMySQL(query=sqlGetTeamInfoByID, fetch="one", values=id_str)
+    if query:
+        return BetTeam(from_dict=query)
+    else:
+        raise BettingException("Unable to create BetTeam because query is None.")
 
 
 def getConsensusLineByOpponent(
-    team_name: str, year: int = datetime.now().year, week: int = None
+    # team_name: str,
+    away_team: str,
+    home_team: str,
+    year: int = datetime.now().year,
+    # week: int = None,
 ) -> Optional[BetLines]:  # Union[None, str]:
-    logger.info(f"Getting the concensus line for {year} Week {week} {team_name} game")
+    # logger.info(f"Getting the concensus line for {year} Week {week} {team_name} game")
+    logger.info(
+        f"Getting the concensus line for {year} {away_team} and {home_team} game"
+    )
 
     betting_api = BettingApi(ApiClient(CFBD_CONFIG))
 
-    if week is None:
-        week = getCurrentWeekByOpponent(year=year, team=team_name)
+    # if week is None:
+    #     week = getCurrentWeekByOpponent(year=year, team=team_name)
 
     try:
-        api_response = betting_api.get_lines(team=team_name, year=year, week=week)
+        # api_response = betting_api.get_lines(team=team_name, year=year)  # , week=week)
+        api_response = betting_api.get_lines(
+            away=away_team, home=home_team, year=year
+        )  # , week=week)
     except (ApiException, TypeError):
         return None
 
     logger.debug(f"Results: {api_response}")
-
     try:
-        lines = None  # Hard code Week 0
-
-        for game in api_response:
-            if game.away_score is None and game.home_score is None:
-                lines = game.lines[0]
-                break
-
-        logger.debug(f"Lines: {lines}")
+        lines = api_response[0].lines[0]
     except IndexError:
         return None
 
     return BetLines(from_dict=lines)
+
+    # try:
+    #     lines = None  # Hard code Week 0
+    #
+    #     for game in api_response:
+    #         if game.away_score is None and game.home_score is None:
+    #             lines = game.lines[0]
+    #             break
+    #     logger.debug(f"Lines: {lines}")
+    # except IndexError:
+    #     return None
 
 
 def collect_opponent(game, year, week) -> Union[HuskerOpponent, str]:
@@ -601,7 +656,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
 
     try:
         games = games_api.get_games(
-            year=year, team=BigTenTeams.Nebraska
+            year=year, team=BigTenTeams.Nebraska.lower()
         )  # We only care about Nebraska's schedule
     except ApiException:
         logger.exception("CFBD API unable to get games", exc_info=True)
@@ -631,3 +686,10 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
 
     logger.exception(f"Unable to find week for {team}")
     raise BettingException(f"Unable to find week for {team}")
+
+
+def getHuskerOpponent(_game: Game) -> dict[str, str]:
+    if _game.away_team.lower() == BigTenTeams.Nebraska.lower():
+        return {"opponent": _game.home_team, "id": str(_game.home_id)}
+    elif _game.home_team.lower() == BigTenTeams.Nebraska.lower():
+        return {"opponent": _game.away_team, "id": str(_game.away_id)}

@@ -55,16 +55,23 @@ WHERE
 sqlGetTeamInfoByID = """
 SELECT
   id,
+  espn_id,
   school,
   alt_name,
+  alt_name2,
   conference,
   division,
+  color,
+  alt_color,
   logos1,
+  logos2,
   location_name,
   location_city,
-  location_state
+  location_state,
+  location_capacity,
+  location_grass
 FROM
-  botfrost.team_ids
+  team_ids
 WHERE
   id = % s
 """
@@ -113,13 +120,32 @@ WHERE
   AND opponent = % s
 """
 
+sqlSelectGameBetbyOpponent = """
+SELECT
+  id,
+  author,
+  author_str,
+  created,
+  created_str,
+  opponent,
+  week,
+  game_datetime,
+  game_datetime_passed,
+  which_team,
+  resolved
+FROM
+  bets
+WHERE
+  opponent = % s
+"""
+
 # Croot Bot
 sqlTeamIDs = """
 SELECT
   id,
   school
 FROM
-  botfrost.team_ids
+  team_ids
 """
 
 sqlGetPrediction = """
@@ -439,7 +465,7 @@ WHERE
 # # """
 
 
-def processMySQL(query: str, **kwargs) -> Union[list[dict], None]:
+def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Starting a MySQL query called from [{module}-{method}]")
     sqlConnection = None
@@ -456,7 +482,7 @@ def processMySQL(query: str, **kwargs) -> Union[list[dict], None]:
     except OperationalError:  # Unsure if this is the correct exception
         logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
 
-    result = None
+    result: Union[dict, list[dict], None] = None
 
     try:
         with sqlConnection.cursor() as cursor:
@@ -471,31 +497,31 @@ def processMySQL(query: str, **kwargs) -> Union[list[dict], None]:
                 if "values" not in kwargs.keys():
                     if kwargs["fetch"] == "one":
                         cursor.execute(query=query)
-                        result = cursor.fetchone()
+                        result: dict = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
                             logger.exception(
                                 "Fetching many requires a `size` kwargs.", exc_info=True
                             )
                         cursor.execute(query=query)
-                        result = cursor.fetchmany(many=kwargs["size"])
+                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
                         cursor.execute(query=query)
-                        result = cursor.fetchall()
+                        result: list[dict] = cursor.fetchall()
                 else:
                     if kwargs["fetch"] == "one":
                         cursor.execute(query=query, args=kwargs["values"])
-                        result = cursor.fetchone()
+                        result: dict = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
                             logger.exception(
                                 "Fetching many requires a `size` kwargs.", exc_info=True
                             )
                         cursor.execute(query=query, args=kwargs["values"])
-                        result = cursor.fetchmany(many=kwargs["size"])
+                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
                     elif kwargs["fetch"] == "all":
                         cursor.execute(query=query, args=kwargs["values"])
-                        result = cursor.fetchall()
+                        result: list[dict] = cursor.fetchall()
 
         sqlConnection.commit()
     except Exception as e:  # noqa

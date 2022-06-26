@@ -11,7 +11,6 @@ from helpers.constants import *  # noqa
 from helpers.embed import *  # noqa
 from helpers.encryption import *  # noqa
 from helpers.fryer import *  # noqa
-from helpers.game_stats_bets import *  # noqa
 from helpers.misc import *  # noqa
 from helpers.mysql import *  # noqa
 from helpers.slowking import *  # noqa
@@ -60,7 +59,7 @@ async def on_app_command_error(
             ),
             dict(
                 name="Command",
-                value=f"{'/' + err.command if not err.parent else '/' + err.parent + ' ' + err.command}",
+                value=f"{'/' + err.command if not err.parent else '/' + err.parent.name + ' ' + err.command}",
             ),
             dict(
                 name="Command Input",
@@ -69,10 +68,11 @@ async def on_app_command_error(
             dict(name="Originating Module", value=f"{err.modeule}"),
         ],
     )
+
     if interaction.response.is_done():
         await interaction.followup.send(content="", embed=embed, ephemeral=True)
     else:
-        await interaction.response.send_message(content="", embed=embed, ephemeral=True)
+        await interaction.channel.send(content="", embed=embed)
 
 
 if __name__ == "__main__":

@@ -30,19 +30,19 @@ class DateTimeChars(enum.Enum):
     SECOND = "s"
 
 
-def prettifyTimeDateValue(seconds) -> str:
-    seconds = int(seconds)
-    days, seconds = divmod(seconds, 86400)
-    hours, seconds = divmod(seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
+def prettifyTimeDateValue(total_seconds: float) -> str:
+    total_seconds: int = int(total_seconds)
+    days, total_seconds = divmod(total_seconds, 86400)
+    hours, total_seconds = divmod(total_seconds, 3600)
+    minutes, total_seconds = divmod(total_seconds, 60)
     if days > 0:
-        return f"{days:,}D {hours}H, {minutes}M, and {seconds}S"
+        return f"{days:,}d, {hours}h, {minutes}m, and {total_seconds}s"
     elif hours > 0:
-        return f"{hours}H, {minutes}M, and {seconds}S"
+        return f"{hours}h, {minutes}m, and {total_seconds}s"
     elif minutes > 0:
-        return f"{minutes}M and {seconds}S"
+        return f"{minutes}m and {total_seconds}s"
     else:
-        return f"{seconds}S"
+        return f"{total_seconds}s"
 
 
 def getDateTimeValue(dt_get: str, dt_string: str) -> int:

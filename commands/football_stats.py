@@ -1,4 +1,3 @@
-import calendar
 from datetime import datetime
 from typing import Optional
 
@@ -13,23 +12,26 @@ from discord.ext import commands
 
 from helpers.constants import (
     CFBD_CONFIG,
-    DT_OBJ_FORMAT,
-    DT_OBJ_FORMAT_TBA,
-    DT_TBA_HR,
-    DT_TBA_MIN,
+    DT_CFBD_GAMES,
+    DT_CFBD_GAMES_DISPLAY,
     GUILD_PROD,
     TZ,
 )
 from helpers.embed import buildEmbed, collectScheduleEmbeds
-from helpers.misc import checkYearValid, convertSeconds
+from helpers.misc import checkYearValid
 from objects.Bets_Stats_Schedule import (
-    getConsensusLineByOpponent,
-    getCurrentWeekByOpponent,
+    BigTenTeams,
+    HuskerSched2022,
     HuskerSchedule,
+    buildTeam,
+    getConsensusLineByOpponent,
+    getHuskerOpponent,
+    getNebraskaGameByOpponent,
 )
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
+from objects.Thread import prettifyTimeDateValue
 from objects.Winsipedia import CompareWinsipedia
 
 logger = discordLogger(__name__)
@@ -48,129 +50,61 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def countdown(
         self,
         interaction: discord.Interaction,
-        opponent: str = None,
+        opponent: HuskerSched2022,
     ) -> None:
-        # TODO Use getNebraskaGameByOpponent() instead of HuskerSchedule()
         logger.info(f"Starting countdown")
         await interaction.response.defer()
-
-        if opponent:
-            assert opponent.replace(" ", "").replace("-", "").isalpha(), StatsException(
-                "Team names must only contain alphabet letters."
-            )
 
         year = datetime.now().year
         assert checkYearValid(year), StatsException(
             f"The provided year is not valid: {year}"
         )
 
-        now_cst = datetime.now().astimezone(tz=TZ)
-        logger.info(f"Now CST is... {now_cst}")
+        game = getNebraskaGameByOpponent(opponent_name=opponent)
 
-        games, stats = HuskerSchedule(year=year)
+        start_date: datetime = datetime.strptime(
+            game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
+            if game.start_time_tbd
+            else game.start_date,
+            DT_CFBD_GAMES,
+        ).astimezone(tz=TZ)
 
-        assert games, StatsException("No games found!")
-
-        last_game = len(games) - 1
-        now_cst_orig = None
-
-        if games[last_game].game_date_time < now_cst:
-            logger.info("The current season is over! Looking to next year...")
-            del games, stats
-            games, stats = HuskerSchedule(year=now_cst.year + 1)
-            now_cst_orig = now_cst
-            now_cst = datetime(datetime.now().year + 1, 3, 1).astimezone(tz=TZ)
-
-        game_compared = None
-
-        for game in games:
-            if opponent:  # Specific team
-                if game.opponent.lower() == opponent.lower():
-                    game_compared = game
-                    break
-            elif game.game_date_time > now_cst:  # Next future game
-                game_compared = game
-                break
-
-        logger.info(f"Found game to compare: {game_compared}")
-
-        if game_compared is None:
-            raise StatsException(
-                f"Unable to find the {year} {opponent.capitalize()} game!"
-            )
-
-        logger.info(f"Game compared: {game_compared.opponent}")
-        del games, opponent, game, stats
-
-        if now_cst_orig:
-            dt_game_time_diff = game_compared.game_date_time - now_cst_orig
-        else:
-            dt_game_time_diff = game_compared.game_date_time - now_cst
-        diff_hours_minutes = convertSeconds(
-            dt_game_time_diff.seconds
-        )  # datetime object does not have hours or minutes
-        year_days = 0
-
-        logger.info(f"Time diff: {dt_game_time_diff}")
-        logger.info(f"Time diff mins: {diff_hours_minutes}")
-
-        if dt_game_time_diff.days < 0:
-            if calendar.isleap(now_cst.year):
-                logger.info("Accounting for leap year")
-                year_days = 366
-            else:
-                year_days = 365
-
-        days = dt_game_time_diff.days + year_days
-        hours = diff_hours_minutes[0]
-        minutes = diff_hours_minutes[1]
-        opponent = game_compared.opponent
-        thumbnail = game_compared.icon
-        date_time = game_compared.game_date_time
         consensus = getConsensusLineByOpponent(
-            team_name=game_compared.opponent, year=now_cst.year
+            away_team=game.away_team,
+            home_team=game.home_team,
+            year=datetime.now().year,
         )
-        location = game_compared.location
 
-        if date_time.hour == DT_TBA_HR and date_time.minute == DT_TBA_MIN:
-            logger.info("Building a TBA game time embed")
-            embed = buildEmbed(
-                title="Countdown town...",
-                thumbnail=thumbnail,
-                fields=[
-                    dict(name="Opponent", value=opponent),
-                    dict(
-                        name="Scheduled Time",
-                        value=date_time.strftime(DT_OBJ_FORMAT_TBA),
-                    ),
-                    dict(name="Location", value=location),
-                    dict(name="Time Remaining", value=days),
-                    dict(
-                        name="Betting Info",
-                        value=str(consensus) if consensus else "Line TBD",
-                    ),
-                ],
-            )
-        else:
-            logger.info("Building embed")
-            embed = buildEmbed(
-                title="Countdown town...",
-                thumbnail=thumbnail,
-                fields=[
-                    dict(name="Opponent", value=opponent),
-                    dict(
-                        name="Scheduled Time", value=date_time.strftime(DT_OBJ_FORMAT)
-                    ),
-                    dict(name="Location", value=location),
-                    dict(
-                        name="Time Remaining",
-                        value=f"{days} days, {hours} hours, and {minutes} minutes",
-                    ),
-                    dict(
-                        name="Betting Info",
-                        value=str(consensus) if consensus else "Line TBD",
-                    ),
-                ],
+        opponent_info = buildTeam(getHuskerOpponent(game)["id"])
+        dt_difference = start_date - datetime.now(tz=TZ)
+
+        embed = buildEmbed(
+            title="",
+            color=opponent_info.color,
+            thumbnail=opponent_info.logo,
+            fields=[
+                dict(
+                    name="Opponent",
+                    value=getHuskerOpponent(game)["opponent"].title(),
+                ),
+                dict(
+                    name="Scheudled Date & Time",
+                    value=start_date.strftime(DT_CFBD_GAMES_DISPLAY),
+                ),
+                dict(name="Location", value=game.venue),
+                dict(
+                    name="Countdown",
+                    value=prettifyTimeDateValue(dt_difference.total_seconds()),
+                ),
+                dict(
+                    name="Betting Info",
+                    value=str(consensus) if consensus else "Line TBD",
+                ),
+            ],
+        )
+        if game.start_time_tbd:
+            embed.set_footer(
+                text="Note: Times are set to 11:00 A.M. Central until the API is updated."
             )
 
         await interaction.followup.send(embed=embed)
@@ -184,7 +118,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def lines(
         self,
         interaction: discord.Interaction,
-        team_name: str = "Nebraska",
+        team_name: HuskerSched2022,
     ) -> None:
         logger.info(f"Gathering info for lines")
 
@@ -196,36 +130,32 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             f"The provided year is not valid: {year}"
         )
 
-        # if week is None:
-        week = getCurrentWeekByOpponent(year=year, team=team_name)
-
-        week = 1 if week == 0 else week
-        logger.info(f"Current week: {week}")
-
+        # TODO Switch to getNebraskaGameByOpponent() instead of HuskerScheudle()
         games, _ = HuskerSchedule(year=year)
         del _
+
+        week = [game.week for game in games if game.opponent == team_name][0]
+        logger.info(f"Current week: {week}")
 
         lines = None
         icon = None
 
         for game in games:
-            if (
-                not team_name.lower() == "nebraska"
-                and team_name.lower() == game.opponent.lower()
-            ):  # When a team_name is provided
-                lines = getConsensusLineByOpponent(
-                    team_name=team_name, year=year, week=week
-                )
-                icon = game.icon
-                break
-            elif (
-                game.week == week and game.outcome == ""
-            ):  # When a team_name is omitted
-                lines = getConsensusLineByOpponent(
-                    team_name=team_name, year=year, week=week
-                )
-                icon = game.icon
-                break
+            if not game.opponent.lower() == team_name.lower():
+                continue
+            home_team = (
+                BigTenTeams.Nebraska.lower() if game.home else game.opponent.lower()
+            )
+            away_team = (
+                BigTenTeams.Nebraska.lower() if not game.home else game.opponent.lower()
+            )
+
+            lines = getConsensusLineByOpponent(
+                away_team=home_team,
+                home_team=away_team,
+            )
+            icon = game.icon
+            break
 
         lines = "TBD" if lines is None else lines
 

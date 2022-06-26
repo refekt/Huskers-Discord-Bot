@@ -42,7 +42,7 @@ class DiscordError:
         self.modeule: Optional[str] = original.command.module
         self.original: ALL_EXCEPTIONS = original.original
         self.options: list[str] = (
-            [f"{opt['name']} : {opt['value']}" for opt in options]
+            [f"{opt['name']} : {opt.get('value', 'N/A')}" for opt in options]
             if options is not None
             else None
         )

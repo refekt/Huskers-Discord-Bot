@@ -7,9 +7,7 @@ import discord
 import validators
 
 from helpers.constants import (
-    BOT_DISPLAY_NAME,
     BOT_FOOTER_BOT,
-    BOT_GITHUB_URL,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
     DT_OBJ_FORMAT,
@@ -52,12 +50,14 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
             e = discord.Embed(
                 title=title[:TITLE_LIMIT],
                 description=kwargs["description"][:DESC_LIMIT],
-                color=kwargs["color"],
+                color=discord.Color.from_str(kwargs["color"]),
                 timestamp=dtNow,
             )
         else:
             e = discord.Embed(
-                title=title[:TITLE_LIMIT], color=kwargs["color"], timestamp=dtNow
+                title=title[:TITLE_LIMIT],
+                color=discord.Color.from_str(kwargs["color"]),
+                timestamp=dtNow,
             )
     else:
         if "description" in kwargs.keys():
@@ -86,10 +86,10 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
             url="",
             icon_url=kwargs.get("icon_url", ""),
         )
-    else:
-        e.set_author(
-            name=BOT_DISPLAY_NAME[:NAME_LIMIT], url=BOT_GITHUB_URL, icon_url=""
-        )
+    # else:
+    #     e.set_author(
+    #         name=BOT_DISPLAY_NAME[:NAME_LIMIT], url=BOT_GITHUB_URL, icon_url=""
+    #     )
 
     if "thumbnail" in kwargs.keys() and validators.url(kwargs.get("thumbnail")):
         e.set_thumbnail(url=kwargs.get("thumbnail"))
