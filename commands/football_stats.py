@@ -6,6 +6,7 @@ import discord
 from cfbd import (
     ApiClient,
     PlayersApi,
+    Game,
 )
 from discord import app_commands
 from discord.ext import commands
@@ -22,11 +23,11 @@ from helpers.misc import checkYearValid
 from objects.Bets_Stats_Schedule import (
     BigTenTeams,
     HuskerSched2022,
-    HuskerSchedule,
     buildTeam,
     getConsensusLineByOpponent,
     getHuskerOpponent,
     getNebraskaGameByOpponent,
+    BetTeam,
 )
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
@@ -44,13 +45,13 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         name="countdown", description="Get the time until the next game!"
     )
     @app_commands.describe(
-        opponent="Name of opponent to lookup",
+        opponent_name="Name of opponent_name to lookup",
     )
     @app_commands.guilds(GUILD_PROD)
     async def countdown(
         self,
         interaction: discord.Interaction,
-        opponent: HuskerSched2022,
+        opponent_name: HuskerSched2022,
     ) -> None:
         logger.info(f"Starting countdown")
         await interaction.response.defer()
@@ -61,7 +62,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             f"The provided year is not valid: {year}"
         )
 
-        game = getNebraskaGameByOpponent(opponent_name=opponent)
+        game = getNebraskaGameByOpponent(opponent_name=opponent_name)
 
         start_date: datetime = datetime.strptime(
             game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
@@ -73,7 +74,6 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         consensus = getConsensusLineByOpponent(
             away_team=game.away_team,
             home_team=game.home_team,
-            year=datetime.now().year,
         )
 
         opponent_info = buildTeam(getHuskerOpponent(game)["id"])
@@ -86,7 +86,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             fields=[
                 dict(
                     name="Opponent",
-                    value=getHuskerOpponent(game)["opponent"].title(),
+                    value=getHuskerOpponent(game)["opponent_name"].title(),
                 ),
                 dict(
                     name="Scheduled Date & Time",
@@ -113,13 +113,13 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
     @app_commands.command(name="lines", description="Get the betting lines for a game")
     @app_commands.describe(
-        team_name="Name of the opponent you want to look up lines for",
+        opponent_name="Name of the opponent_name you want to look up lines for",
     )
     @app_commands.guilds(GUILD_PROD)
     async def lines(
         self,
         interaction: discord.Interaction,
-        team_name: HuskerSched2022,
+        opponent_name: HuskerSched2022,
     ) -> None:
         logger.info(f"Gathering info for lines")
 
@@ -131,43 +131,27 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             f"The provided year is not valid: {year}"
         )
 
-        # TODO Switch to getNebraskaGameByOpponent() instead of HuskerSchedule()
-        games, _ = HuskerSchedule(year=year)
-        del _
+        game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name.lower())
+        opponent_info: BetTeam = buildTeam(getHuskerOpponent(game)["id"])
 
-        week = [game.week for game in games if game.opponent == team_name][0]
-        logger.info(f"Current week: {week}")
-
-        lines = None
-        icon = None
-
-        for game in games:
-            if not game.opponent.lower() == team_name.lower():
-                continue
-            home_team = (
-                BigTenTeams.Nebraska.lower() if game.home else game.opponent.lower()
-            )
-            away_team = (
-                BigTenTeams.Nebraska.lower() if not game.home else game.opponent.lower()
-            )
-
-            lines = getConsensusLineByOpponent(
-                away_team=home_team,
-                home_team=away_team,
-            )
-            icon = game.icon
-            break
-
-        lines = "TBD" if lines is None else lines
+        lines = getConsensusLineByOpponent(
+            away_team=game.away_team, home_team=game.home_team
+        )
+        lines = lines or "TBD"
 
         embed = buildEmbed(
-            title=f"Betting lines for [{team_name.title()}]",
+            title=f"Opponent Betting Lines",
             fields=[
+                dict(name="Opponent Name", value=opponent_name.title()),
+                dict(
+                    name="Conference/Division",
+                    value=f"{opponent_info.conference}/{opponent_info.division}",
+                ),
                 dict(name="Year", value=f"{year}"),
-                dict(name="Week", value=f"{week - 1}"),
+                dict(name="Week", value=f"{game.week}"),
                 dict(name="Lines", value=str(lines)),
             ],
-            thumbnail=icon,
+            thumbnail=opponent_info.logo,
         )
 
         await interaction.followup.send(embed=embed)
@@ -233,7 +217,6 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
-        # TODO Added CFBD's excitement and other metrics to output
         await interaction.response.defer()
 
         pages = collectScheduleEmbeds(year)
