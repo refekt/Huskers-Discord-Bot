@@ -3,7 +3,7 @@ import platform
 import subprocess
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 import discord.ext.commands
 from discord import app_commands, Forbidden, HTTPException
@@ -652,13 +652,17 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         assert who, UserInputException("You must include a user!")
         assert reason, UserInputException("You must include a reason why!")
-        assert True in [
-            dt.__str__() in duration for dt in DateTimeChars
-        ], UserInputException(
-            "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
-        )
 
-        dt_duration = convertDateTimeString(duration)
+        if duration:
+            assert True in [
+                dt.__str__() in duration for dt in DateTimeChars
+            ], UserInputException(
+                "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
+            )
+
+            dt_duration: Optional[timedelta] = convertDateTimeString(duration)
+        else:
+            dt_duration = None
 
         role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
         channel_iowa = interaction.guild.get_channel(CHAN_IOWA)
@@ -691,28 +695,25 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
 
         processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
+        logger.debug("Saved old roles roles to MySQL database")
+
+        statement_str = f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
+        message_str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
+
+        if duration:
+            statement_str += f" This will be reverted in {duration}."
+            message_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
 
         embed = buildEmbed(
             title="Banished to Iowa",
             fields=[
-                {
-                    "name": "Statement",
-                    "value": f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
-                    + f" This will be reverted in {duration}."
-                    if duration is not None
-                    else "",
-                },
-                {"name": "Reason", "value": full_reason, "inline": False},
+                dict(name="Statement", value=statement_str),
+                dict(name="Reason", value=full_reason),
             ],
         )
 
         await interaction.followup.send(embed=embed)
-        await who.send(
-            f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
-            + f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
-            if duration is not None
-            else ""
-        )
+        await who.send(message_str)
 
         if duration is not None:
             await background_run_function(
