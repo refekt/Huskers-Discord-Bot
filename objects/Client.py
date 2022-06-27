@@ -405,10 +405,6 @@ class HuskerClient(Bot):
         for extension in files:
             try:
                 # NOTE Extensions will fail to load when runtime errors exist in the code.
-                # It will also NOT currently output a traceback. You MUST investigate
-                # manually by stepping through code until I find a way to capture these
-                # exceptions.
-
                 await self.load_extension(extension)
                 logger.info(f"Loaded the [{extension}] extension")
             except ExtensionAlreadyLoaded:
@@ -420,15 +416,6 @@ class HuskerClient(Bot):
 
         logger.info("All extensions loaded")
 
-        if len(sys.argv) > 1:  # When bot restarts, no system argument
-            await chan_botspam.send(embed=await self.create_online_message())
-        else:
-            logger.info(
-                f"Hiding online message because debugging or rebooted; {sys.argv}"
-            )
-
-        logger.info("The bot is ready!")
-
         try:
             logger.info("Attempting to sync the bot tree")
             await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
@@ -437,106 +424,119 @@ class HuskerClient(Bot):
 
         logger.info("The bot tree has synced!")
 
-        if not DEBUGGING_CODE:
+        logger.info(f"sys.arv = {sys.argv}")
+
+        if DEBUGGING_CODE:
+            logger.info("Skipping online message")
+        else:
+            await chan_botspam.send(embed=await self.create_online_message())
+
+        if DEBUGGING_CODE:
+            logger.info("Skipping Twitter stream")
+        else:
             logger.info("Starting Twitter stream")
             start_twitter_stream(self)
             logger.info("Twitter stream started")
 
-        logger.info("Collecting open reminders")
-        open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
+        if DEBUGGING_CODE:
+            logger.info("Skipping restarting reminders")
+        else:
+            logger.info("Collecting open reminders")
+            open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
 
-        async def convertDestination(raw_send_to: str) -> discord.TextChannel:
-            logger.info("Attempting to fetch destination")
-            try:
-                dest: Union[discord.TextChannel, None] = await self.fetch_channel(
-                    int(raw_send_to)
-                )
-            except NotFound:
-                dest = await self.fetch_channel(CHAN_BOT_SPAM)
-                pass
+            async def convertDestination(raw_send_to: str) -> discord.TextChannel:
+                logger.info("Attempting to fetch destination")
+                try:
+                    dest: Union[discord.TextChannel, None] = await self.fetch_channel(
+                        int(raw_send_to)
+                    )
+                except NotFound:
+                    dest = await self.fetch_channel(CHAN_BOT_SPAM)
+                    pass
 
-            logger.info(f"destination is {dest.name.encode('utf-8')}")
-            return dest
+                logger.info(f"destination is {dest.name.encode('utf-8')}")
+                return dest
 
-        async def convertSentTo(raw_send_to: str) -> Union[discord.User, None]:
-            logger.info("Attempting to fetch remind_who")
-            try:
-                send_to: Union[discord.User, None] = await self.fetch_user(
-                    int(raw_send_to)
-                )
-                logger.info(
-                    f"remind_who is {send_to.name.encode('utf-8')}#{send_to.discriminator}"
-                )
-            except NotFound:
-                send_to = None
-                logger.info("remind_who is None")
-                pass
-
-            return send_to
-
-        tasks = []
-        if open_reminders:
-            logger.info(f"There are {len(open_reminders)} to be loaded")
-            for index, reminder in enumerate(open_reminders):
-                destination = await convertDestination(reminder["send_to"])
-                remind_who = await convertSentTo(reminder["send_to"])
-                duration = convert_duration(reminder["send_when"])
-
-                logger.info(
-                    f"Processing reminder #{index + 1}. Destination = {destination}, remind_who = {remind_who}, Message = {reminder['message'][:128]}"
-                )
-
-                if duration == timedelta(seconds=0):
+            async def convertSentTo(raw_send_to: str) -> Union[discord.User, None]:
+                logger.info("Attempting to fetch remind_who")
+                try:
+                    send_to: Union[discord.User, None] = await self.fetch_user(
+                        int(raw_send_to)
+                    )
                     logger.info(
-                        f"Reminder exceeded original send datetime. Sending now!"
+                        f"remind_who is {send_to.name.encode('utf-8')}#{send_to.discriminator}"
+                    )
+                except NotFound:
+                    send_to = None
+                    logger.info("remind_who is None")
+                    pass
+
+                return send_to
+
+            tasks = []
+            if open_reminders:
+                logger.info(f"There are {len(open_reminders)} to be loaded")
+                for index, reminder in enumerate(open_reminders):
+                    destination = await convertDestination(reminder["send_to"])
+                    remind_who = await convertSentTo(reminder["send_to"])
+                    duration = convert_duration(reminder["send_when"])
+
+                    logger.info(
+                        f"Processing reminder #{index + 1}. Destination = {destination}, remind_who = {remind_who}, Message = {reminder['message'][:128]}"
                     )
 
-                    if destination == remind_who:
-                        logger.error(
-                            "destination and remind_who are both None. Skipping!"
+                    if duration == timedelta(seconds=0):
+                        logger.info(
+                            f"Reminder exceeded original send datetime. Sending now!"
                         )
-                        continue
 
-                    await send_reminder(
-                        author=reminder["author"],
-                        destination=destination,
-                        message=reminder["message"],
-                        remind_who=remind_who,
-                    )
+                        if destination == remind_who:
+                            logger.error(
+                                "destination and remind_who are both None. Skipping!"
+                            )
+                            continue
 
-                    processMySQL(
-                        query=sqlUpdateReminder,
-                        values=(
-                            0,  # False
-                            reminder["send_to"],
-                            reminder["message"],
-                            reminder["author"],
-                        ),
-                    )
-
-                    del reminder  # Get rid of for accounting purposes
-                else:
-                    logger.info(
-                        f"Adding reminder for/to [{reminder['send_to']}] to task list."
-                    )
-
-                    tasks.append(
-                        MissedReminder(
-                            duration=duration,
+                        await send_reminder(
                             author=reminder["author"],
                             destination=destination,
                             message=reminder["message"],
                             remind_who=remind_who,
-                            missed_reminder=True,
-                        ).run()
-                    )
-            logger.info("Compiled all open tasks")
-        else:
-            logger.info("No open reminders found")
+                        )
 
-        logger.info("Processing task lists")
-        await asyncio.gather(*tasks)
-        # Has to be the last line of code because I don't know how to make code run after it
+                        processMySQL(
+                            query=sqlUpdateReminder,
+                            values=(
+                                0,  # False
+                                reminder["send_to"],
+                                reminder["message"],
+                                reminder["author"],
+                            ),
+                        )
+
+                        del reminder  # Get rid of for accounting purposes
+                    else:
+                        logger.info(
+                            f"Adding reminder for/to [{reminder['send_to']}] to task list."
+                        )
+
+                        tasks.append(
+                            MissedReminder(
+                                duration=duration,
+                                author=reminder["author"],
+                                destination=destination,
+                                message=reminder["message"],
+                                remind_who=remind_who,
+                                missed_reminder=True,
+                            ).run()
+                        )
+                logger.info("Compiled all open tasks")
+            else:
+                logger.info("No open reminders found")
+
+            logger.info("Processing task lists")
+            await asyncio.gather(
+                *tasks
+            )  # Has to be the last line of code because I don't know how to make code run after it
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
         await self.send_welcome_message(guild_member)
