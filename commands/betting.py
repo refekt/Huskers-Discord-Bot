@@ -1,3 +1,5 @@
+from typing import Optional
+
 import discord.ext.commands
 from discord import app_commands
 from discord.app_commands import Group
@@ -32,12 +34,18 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         self,
         interaction: discord.Interaction,
         opponent_name: HuskerSched2022,
-        which_team: WhichTeamChoice,
+        which_team_wins: Optional[WhichTeamChoice],
+        which_team_overunder: Optional[WhichTeamChoice],
+        which_team_spread: Optional[WhichTeamChoice],
     ) -> None:
         await interaction.response.defer()
 
         bet = Bet(
-            author=interaction.user, opponent=opponent_name, which_team=which_team
+            author=interaction.user,
+            opponent_name=opponent_name,
+            which_team_wins=which_team_wins,
+            which_team_overunder=which_team_overunder,
+            which_team_spread=which_team_spread,
         )
         try:
             bet.submitRecord()

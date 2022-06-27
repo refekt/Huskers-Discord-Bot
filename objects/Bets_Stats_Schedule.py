@@ -233,14 +233,18 @@ class Bet:
         "opponent_name",
         "resolved",
         "week",
-        "which_team",
+        "which_team_wins",
+        "which_team_overunder",
+        "which_team_spread",
     ]
 
     def __init__(
         self,
         author: Union[discord.Member, discord.User],
         opponent_name: Union[BigTenTeams, HuskerSched2022],
-        which_team: WhichTeamChoice,
+        which_team_wins: Optional[WhichTeamChoice],
+        which_team_overunder: Optional[WhichTeamChoice],
+        which_team_spread: Optional[WhichTeamChoice],
     ) -> None:
         logger.info("Creating a Bet object")
 
@@ -261,7 +265,9 @@ class Bet:
         self.opponent_name = buildTeam(id_str=getTeamIdByName(opponent_name))
         self.resolved: bool = False
         self.week = self._raw.week
-        self.which_team = which_team
+        self.which_team_wins = which_team_wins
+        self.which_team_overunder = which_team_overunder
+        self.which_team_spread = which_team_spread
 
         if self.home_game:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
@@ -275,7 +281,7 @@ class Bet:
             )
 
     def __str__(self):
-        return f"{self.author.mention} ({self.author_str}) says that {self.which_team} will win the {WhichTeamChoice.Nebraska} vs. {self.opponent_name.school_name.title()} game."
+        return f"{self.author_str}: Wins-{self.which_team_wins}, OverUnder-{self.which_team_overunder}, Spread-{self.which_team_spread}"
 
     def submitRecord(self) -> None:
         logger.info("Submitting MySQL entry for bet")
@@ -284,7 +290,11 @@ class Bet:
         )
 
         if previous_bet:
-            if previous_bet["which_team"] == self.which_team:
+            if (
+                previous_bet["which_team_wins"] == self.which_team_wins
+                and previous_bet["which_team_overunder"] == self.which_team_overunder
+                and previous_bet["which_team_spread"] == self.which_team_spread
+            ):
                 logger.info("Previous bet matches current bet")
                 return
             else:
@@ -293,7 +303,9 @@ class Bet:
                     processMySQL(
                         query=sqlUpdateGameBet,
                         values=(
-                            self.which_team,
+                            self.which_team_wins,
+                            self.which_team_overunder,
+                            self.which_team_spread,
                             self.created,
                             self.created_str,
                             previous_bet["id"],
@@ -315,7 +327,9 @@ class Bet:
                         self.week,
                         self.game_datetime.strftime(DT_MYSQL_FORMAT),
                         self.game_datetime_passed,
-                        self.which_team,
+                        self.which_team_wins,
+                        self.which_team_overunder,
+                        self.which_team_spread,
                         self.resolved,
                     ),
                 )

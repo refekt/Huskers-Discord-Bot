@@ -101,10 +101,12 @@ WHERE
 """
 
 sqlInsertGameBet = """
-INSERT INTO botfrost.bets (
+INSERT INTO bets (
   author, author_str, created, created_str,
-  opponent_name, week, game_datetime, game_datetime_passed,
-  which_team, resolved
+  opponent, home_game, week, game_datetime,
+  game_datetime_passed, which_team_wins,
+  which_team_overunder, which_team_spread,
+  resolved
 )
 VALUES
   (
@@ -117,7 +119,9 @@ sqlUpdateGameBet = """
 UPDATE
   bets
 SET
-  which_team = % s,
+  which_team_wins = % s,
+  which_team_overunder = % s,
+  which_team_spread = % s,
   created = % s,
   created_str = % s
 WHERE
@@ -135,7 +139,9 @@ SELECT
   week,
   game_datetime,
   game_datetime_passed,
-  which_team,
+  which_team_wins,
+  which_team_overunder,
+  which_team_spread,
   resolved
 FROM
   bets
