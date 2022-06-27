@@ -56,6 +56,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         await interaction.response.defer()
 
         year = datetime.now().year
+
         assert checkYearValid(year), StatsException(
             f"The provided year is not valid: {year}"
         )
@@ -232,6 +233,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
+        # TODO Added CFBD's excitement and other metrics to output
         await interaction.response.defer()
 
         pages = collectScheduleEmbeds(year)
@@ -242,7 +244,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         await interaction.followup.send(embed=view.initial, view=view)
 
     @app_commands.command(
-        name="player-stats", description="Display players stats for the year"
+        name="player-stats", description="Display Husker stats for the year"
     )
     @app_commands.describe(
         year="The year you want stats",
@@ -260,24 +262,46 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 "A player's first and/or last search_name is required."
             )
 
+        if len(str(year)) == 2:
+            year += 2000
+
         assert checkYearValid(year), StatsException(
             f"The provided year is not valid: {year}"
         )
 
+        logger.debug(f"Searching for {player_name}")
         api = PlayersApi(ApiClient(CFBD_CONFIG))
         api_player_search_result: list[cfbd.PlayerSearchResult] = api.player_search(
-            search_term=player_name, team="nebraska", year=year
+            search_term=player_name,
+            year=year,
+            team=BigTenTeams.Nebraska,
         )
 
         if not api_player_search_result:
-            raise StatsException(f"Unable to find {player_name}. Please try again!")
-        api_player_search_result: cfbd.PlayerSearchResult = api_player_search_result[0]
+            raise StatsException(
+                f"Unable to find {player_name} on the Huskers. Please try again!"
+            )
+
+        if isinstance(api_player_search_result, list):
+            logger.debug("Retrieving list item")  # Only grabbing the Index 0
+            api_player_search_result: cfbd.PlayerSearchResult = (
+                api_player_search_result[0]
+            )
+
         logger.info(f"Found player {player_name.upper()}")
 
         api_season_stat_result: list[
             cfbd.PlayerSeasonStat
-        ] = api.get_player_season_stats(year=year, team="nebraska", season_type="both")
-        logger.info(f"Pulled raw season stats for {player_name.upper()}")
+        ] = api.get_player_season_stats(
+            year=year,
+            season_type="both",
+            team=BigTenTeams.Nebraska,
+        )
+
+        if api_season_stat_result:
+            logger.info(f"Pulled raw season stats for {player_name.upper()}")
+        else:
+            raise StatsException(f"Unable to locate stats for {player_name}")
 
         stat_type_descriptions = {
             "ATT": "Attempts",
