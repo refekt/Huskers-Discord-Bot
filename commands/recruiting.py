@@ -645,7 +645,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
         search_results = first_name + last_name
     elif len(name) == 2:
         logger.info("Searching the combined name for first and last name")
-        _247_search = f"https://247sports.com/college/nebraska/Season/{year}-Football/Recruits/?&Player.FirstName={name[0]}&Player.LastName={name[1]}"
+        _247_search = f"https://247sports.com/Season/{year}-Football/Recruits.json?&Items=15&Page=1&Player.FirstName={name[0]}&Player.LastName={name[1]}"
 
         search_results = requests.get(url=_247_search, headers=HEADERS)
         if not search_results.status_code == 200:
