@@ -192,7 +192,15 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 elif channel.type == discord.ChannelType.voice:
                     await channel.set_permissions(everyone, overwrite=perms_voice)
 
-                    # TODO Trying to kick people from voice channels if game day mode is turned off.
+                    # Disconnects embers from voice
+                    for member in channel.members:
+                        try:
+                            await member.move_to(channel=None)
+                        except (Forbidden, HTTPException, TypeError):
+                            logger.warning(
+                                f"Unable to disconnect {member.name}#{member.discriminator}"
+                            )
+                            continue
                 else:
                     logger.info(
                         f"Unable to change permissions for [{channel}] to [{mode}]"
@@ -752,7 +760,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await self.process_gameday(False, interaction.guild)
         await self.alert_gameday_channels(client=interaction.client, on=False)
 
-    @app_commands.command(name="smms", description="Tee hee")  # TODO Make hidden
+    # TODO Make SMMS hidden
+    @app_commands.command(name="smms", description="Tee hee")
     @app_commands.default_permissions(manage_messages=True)
     async def smms(
         self,
