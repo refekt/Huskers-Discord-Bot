@@ -13,6 +13,7 @@ from objects.Bets_Stats_Schedule import (
     HuskerSched2022,
     retrieveGameBets,
     BigTenTeams,
+    WhichOverUnderChoice,
 )
 from objects.Exceptions import BettingException
 from objects.Logger import discordLogger
@@ -37,7 +38,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         interaction: discord.Interaction,
         opponent_name: HuskerSched2022,
         which_team_wins: Optional[WhichTeamChoice],
-        which_team_overunder: Optional[WhichTeamChoice],
+        which_team_overunder: Optional[WhichOverUnderChoice],
         which_team_spread: Optional[WhichTeamChoice],
     ) -> None:
         await interaction.response.defer()
@@ -83,19 +84,25 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         opponent_bets = retrieveGameBets(school_name=opponent_name, _all=True)
 
-        embed = buildEmbed(
-            title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
-            description="",
-            fields=[
-                dict(
-                    name=f"{bet.get('author_str')}'s Bet",
-                    value=f"Wins: {bet.get('which_team_wins')}\n"
-                    f"Over/Under: {bet.get('which_team_overunder')}\n"
-                    f"Spread: {bet.get('which_team_spread')}",
-                )
-                for bet in opponent_bets
-            ],
-        )
+        if opponent_bets is None:
+            embed = buildEmbed(
+                title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
+                description=f"No bets found for {interaction.user.mention}",
+            )
+        else:
+            embed = buildEmbed(
+                title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
+                description="",
+                fields=[
+                    dict(
+                        name=f"{bet.get('author_str', 'N/A')}'s Bet",
+                        value=f"Wins: {bet.get('which_team_wins', 'N/A')}\n"
+                        f"Over/Under: {bet.get('which_team_overunder', 'N/A')}\n"
+                        f"Spread: {bet.get('which_team_spread', 'N/A')}",
+                    )
+                    for bet in opponent_bets
+                ],
+            )
 
         await interaction.followup.send(embed=embed)
 

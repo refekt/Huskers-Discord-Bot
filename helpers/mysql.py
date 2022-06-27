@@ -161,7 +161,9 @@ SELECT
   week,
   game_datetime,
   game_datetime_passed,
-  which_team,
+  which_team_wins,
+  which_team_overunder,
+  which_team_spread,
   resolved
 FROM
   bets

@@ -43,6 +43,7 @@ __all__ = [
     "BigTenTeams",
     "HuskerSched2022",
     "HuskerSchedule",
+    "WhichOverUnderChoice",
     "WhichTeamChoice",
     "buildTeam",
     "getConsensusLineByOpponent",
@@ -142,6 +143,14 @@ class HuskerSched2022(str, enum.Enum):
 class WhichTeamChoice(str, enum.Enum):
     Nebraska = "Nebraska"
     Opponent = "Opponent"
+
+    def __str__(self):
+        return self.value
+
+
+class WhichOverUnderChoice(str, enum.Enum):
+    Over = "Over"
+    Under = "Under"
 
     def __str__(self):
         return self.value
