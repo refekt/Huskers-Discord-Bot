@@ -122,8 +122,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
         remind_who: Optional[discord.Member] = None,
     ) -> None:
         logger.info("Creating a reminder!")
-        if interaction.response.is_done():
-            await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
 
         assert True in [
             dt.__str__() in duration for dt in DateTimeChars
@@ -138,6 +137,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
             ephemeral=True,
         )
 
+        logger.debug("Creating MySQL entry for reminder")
         processMySQL(
             query=sqlRecordReminder,
             values=(
@@ -162,13 +162,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
             duration=dt_duration,
         )
 
-        logger.info("Updating MySQL to set to reminder is_open to False")
-        # print(
-        #     0,  # False
-        #     destination.id if remind_who is None else remind_who.id,
-        #     message,
-        #     interaction.user.id,
-        # )
+        logger.debug("Updating MySQL to set to reminder is_open to False")
         processMySQL(
             query=sqlUpdateReminder,
             values=(
