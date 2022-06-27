@@ -451,7 +451,8 @@ class TextCog(commands.Cog, name="Text Commands"):
         except StopIteration:
             raise WeatherException("Unable to find state. Please try again!")
 
-        def shift_utc_tz(dt, shift):  # TODO Figure out what is being returned here
+        # TODO Figure out what Type is being returned here
+        def shift_utc_tz(dt, shift):
             return dt + timedelta(seconds=shift)
 
         weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
