@@ -222,7 +222,7 @@ def collectScheduleEmbeds(year) -> list[discord.Embed]:
     for index, game in enumerate(scheduled_games):
         embeds.append(
             buildEmbed(
-                title=f"Game #{index + 1} against {game.ranking + ' ' if game.ranking else ''}{game.opponent.title()}",
+                title=f"Game #{index + 1} against {game.ranking + ' ' if game.ranking else ''}{game.opponent_name.title()}",
                 description=f"Nebraska's {year}'s Record: {season_stats.wins} - {season_stats.losses}",
                 thumbnail=game.icon,
                 fields=[

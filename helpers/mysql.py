@@ -103,7 +103,7 @@ WHERE
 sqlInsertGameBet = """
 INSERT INTO botfrost.bets (
   author, author_str, created, created_str,
-  opponent, week, game_datetime, game_datetime_passed,
+  opponent_name, week, game_datetime, game_datetime_passed,
   which_team, resolved
 )
 VALUES
@@ -131,7 +131,7 @@ SELECT
   author_str,
   created,
   created_str,
-  opponent,
+  opponent_name,
   week,
   game_datetime,
   game_datetime_passed,
@@ -141,7 +141,7 @@ FROM
   bets
 WHERE
   author_str = % s
-  AND opponent = % s
+  AND opponent_name = % s
 """
 
 sqlSelectGameBetbyOpponent = """
@@ -151,7 +151,7 @@ SELECT
   author_str,
   created,
   created_str,
-  opponent,
+  opponent_name,
   week,
   game_datetime,
   game_datetime_passed,
@@ -160,7 +160,7 @@ SELECT
 FROM
   bets
 WHERE
-  opponent = % s
+  opponent_name = % s
 """
 
 # Croot Bot
@@ -397,15 +397,15 @@ WHERE
 # # """
 #
 # # sqlGetWinWinners = """
-# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.win = g.win AND g.opponent = %s;
+# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.win = g.win AND g.opponent_name = %s;
 # # """
 #
 # # sqlGetSpreadWinners = """
-# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.spread = g.spread AND g.opponent = %s;
+# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.spread = g.spread AND g.opponent_name = %s;
 # # """
 #
 # # sqlGetMoneylineWinners = """
-# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.moneyline = g.moneyline AND g.opponent = %s;
+# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.moneyline = g.moneyline AND g.opponent_name = %s;
 # # """
 #
 # # sqlInsertWinorlose = """
@@ -429,7 +429,7 @@ WHERE
 # # """
 #
 # # sqlRetrieveGameNumber = """
-# # SELECT g.game_number FROM games g WHERE g.opponent = %s;
+# # SELECT g.game_number FROM games g WHERE g.opponent_name = %s;
 # # """
 #
 # # sqlRetrieveAllBet = """

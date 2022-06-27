@@ -85,7 +85,7 @@ class HuskerDotComSchedule:
         home,
         icon,
         location,
-        opponent,
+        opponent_name,
         outcome,
         ranking,
         week,
@@ -95,7 +95,7 @@ class HuskerDotComSchedule:
         self.home = home
         self.icon = icon
         self.location = location
-        self.opponent = opponent
+        self.opponent_name = opponent_name
         self.outcome = outcome
         self.ranking = ranking
         self.week = week
@@ -230,7 +230,7 @@ class Bet:
         "game_datetime",
         "game_datetime_passed",
         "home_game",
-        "opponent",
+        "opponent_name",
         "resolved",
         "week",
         "which_team",
@@ -239,12 +239,12 @@ class Bet:
     def __init__(
         self,
         author: Union[discord.Member, discord.User],
-        opponent: Union[BigTenTeams, HuskerSched2022],
+        opponent_name: Union[BigTenTeams, HuskerSched2022],
         which_team: WhichTeamChoice,
     ) -> None:
         logger.info("Creating a Bet object")
 
-        self._raw = getNebraskaGameByOpponent(opponent)
+        self._raw = getNebraskaGameByOpponent(opponent_name)
         self.author: discord.Member = author
         self.author_str: str = f"{self.author.name}#{self.author.discriminator}"
         self.created: datetime = datetime.now(tz=TZ)
@@ -258,29 +258,29 @@ class Bet:
         self.home_game: bool = (
             True if self._raw.home_team == BigTenTeams.Nebraska else False
         )
-        self.opponent = buildTeam(id_str=getTeamIdByName(opponent))
+        self.opponent_name = buildTeam(id_str=getTeamIdByName(opponent_name))
         self.resolved: bool = False
         self.week = self._raw.week
         self.which_team = which_team
 
         if self.home_game:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
-                away_team=self.opponent.school_name.lower(),
+                away_team=self.opponent_name.school_name.lower(),
                 home_team=BigTenTeams.Nebraska.lower(),
             )
         else:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
                 away_team=BigTenTeams.Nebraska.lower(),
-                home_team=self.opponent.school_name.lower(),
+                home_team=self.opponent_name.school_name.lower(),
             )
 
     def __str__(self):
-        return f"{self.author.mention} ({self.author_str}) says that {self.which_team} will win the {WhichTeamChoice.Nebraska} vs. {self.opponent.school_name.title()} game."
+        return f"{self.author.mention} ({self.author_str}) says that {self.which_team} will win the {WhichTeamChoice.Nebraska} vs. {self.opponent_name.school_name.title()} game."
 
     def submitRecord(self) -> None:
         logger.info("Submitting MySQL entry for bet")
         previous_bet = retrieveGameBets(
-            author_str=self.author_str, school_name=self.opponent.school_name
+            author_str=self.author_str, school_name=self.opponent_name.school_name
         )
 
         if previous_bet:
@@ -311,7 +311,7 @@ class Bet:
                         self.author_str,
                         self.created,
                         self.created_str,
-                        self.opponent.school_name,
+                        self.opponent_name.school_name,
                         self.week,
                         self.game_datetime.strftime(DT_MYSQL_FORMAT),
                         self.game_datetime_passed,
@@ -567,32 +567,32 @@ def HuskerSchedule(
     for game in games_raw:
         week += 1
 
-        opponent = collect_opponent(game, year, week)
-        if opponent == "Unknown Opponent":  # TODO What am I doing here?
+        _opponent_name = collect_opponent(game, year, week)
+        if _opponent_name == "Unknown Opponent":  # TODO What am I doing here?
             continue
 
-        if "TBA" in opponent.date_time:
+        if "TBA" in _opponent_name.date_time:
             # Specific time to reference later for TBA games
-            gdt_string = f"{opponent.date_time[0:6]} {year} {DT_TBA_TIME}"
-            opponent.date_time = datetime.strptime(
+            gdt_string = f"{_opponent_name.date_time[0:6]} {year} {DT_TBA_TIME}"
+            _opponent_name.date_time = datetime.strptime(
                 gdt_string, DT_STR_FORMAT
             ).astimezone(tz=TZ)
         else:
-            if "or" in str(opponent.date_time).lower():
-                temp = str(opponent.date_time).split(" or ")
+            if "or" in str(_opponent_name.date_time).lower():
+                temp = str(_opponent_name.date_time).split(" or ")
                 if ":" in temp[0]:
-                    opponent.date_time = f"{temp[0]} {temp[1][-3:]}"
+                    _opponent_name.date_time = f"{temp[0]} {temp[1][-3:]}"
                 else:
-                    opponent.date_time = f"{temp[0]}:00 {temp[1][-3:]}"
+                    _opponent_name.date_time = f"{temp[0]}:00 {temp[1][-3:]}"
 
-            opponent.date_time = datetime.strptime(
-                opponent.date_time.replace("A.M.", "AM")
+            _opponent_name.date_time = datetime.strptime(
+                _opponent_name.date_time.replace("A.M.", "AM")
                 .replace("a.m.", "AM")
                 .replace("P.M.", "PM")
                 .replace("p.m.", "PM"),
                 DT_STR_FORMAT,
             ).astimezone(tz=TZ)
-            opponent.date_time += timedelta(hours=1)
+            _opponent_name.date_time += timedelta(hours=1)
 
         conference_teams = (
             "Illinois",
@@ -608,18 +608,18 @@ def HuskerSchedule(
             "Rutgers",
             "Wisconsin",
         )
-        conference: bool = opponent.name in conference_teams
-        home: bool = "Lincoln, Neb." in opponent.location
+        conference: bool = _opponent_name.name in conference_teams
+        home: bool = "Lincoln, Neb." in _opponent_name.location
 
         games.append(
             HuskerDotComSchedule(
-                location=opponent.location,
-                opponent=opponent.name,
-                outcome=opponent.outcome,
-                icon=opponent.icon,
-                ranking=opponent.ranking,
-                week=opponent.week,
-                game_date_time=opponent.date_time,
+                location=_opponent_name.location,
+                opponent_name=_opponent_name.name,
+                outcome=_opponent_name.outcome,
+                icon=_opponent_name.icon,
+                ranking=_opponent_name.ranking,
+                week=_opponent_name.week,
+                game_date_time=_opponent_name.date_time,
                 conference=conference,
                 home=home,
             )
