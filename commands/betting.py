@@ -28,7 +28,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     @bet_group.command(name="game", description="Place a bet against a Nebraska game.")
     @app_commands.describe(
         opponent_name="Name of the opponent_name for the Husker game.",
-        which_team="Which team you predict to win.",
+        which_team_wins="Which team you predict to win.",
+        which_team_overunder="Prediction for over/under.",
+        which_team_spread="Which team you predict to cover the spread.",
     )
     async def bet_game(
         self,
@@ -56,7 +58,12 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         embed = buildEmbed(
             title="Husker Schedule Betting",
             fields=[
-                dict(name="Placed Bet", value=str(bet)),
+                dict(
+                    name="Placed Bet",
+                    value=f"Wins: {bet.which_team_wins}\n"
+                    f"Over/Under: {bet.which_team_overunder}\n"
+                    f"Spread: {bet.which_team_spread}",
+                ),
                 dict(name="Betting Lines", value=str(bet.bet_lines)),
             ],
             author=bet.author_str,
@@ -82,7 +89,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             fields=[
                 dict(
                     name=f"{bet.get('author_str')}'s Bet",
-                    value=f"{bet.get('which_team')}",
+                    value=f"Wins: {bet.get('which_team_wins')}\n"
+                    f"Over/Under: {bet.get('which_team_overunder')}\n"
+                    f"Spread: {bet.get('which_team_spread')}",
                 )
                 for bet in opponent_bets
             ],

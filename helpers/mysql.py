@@ -135,7 +135,7 @@ SELECT
   author_str,
   created,
   created_str,
-  opponent_name,
+  opponent,
   week,
   game_datetime,
   game_datetime_passed,
@@ -147,7 +147,7 @@ FROM
   bets
 WHERE
   author_str = % s
-  AND opponent_name = % s
+  AND opponent = % s
 """
 
 sqlSelectGameBetbyOpponent = """
@@ -157,7 +157,7 @@ SELECT
   author_str,
   created,
   created_str,
-  opponent_name,
+  opponent,
   week,
   game_datetime,
   game_datetime_passed,
@@ -166,7 +166,7 @@ SELECT
 FROM
   bets
 WHERE
-  opponent_name = % s
+  opponent = % s
 """
 
 # Croot Bot
@@ -403,15 +403,15 @@ WHERE
 # # """
 #
 # # sqlGetWinWinners = """
-# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.win = g.win AND g.opponent_name = %s;
+# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.win = g.win AND g.opponent = %s;
 # # """
 #
 # # sqlGetSpreadWinners = """
-# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.spread = g.spread AND g.opponent_name = %s;
+# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.spread = g.spread AND g.opponent = %s;
 # # """
 #
 # # sqlGetMoneylineWinners = """
-# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.moneyline = g.moneyline AND g.opponent_name = %s;
+# # SELECT b.user FROM bets b INNER JOIN games g ON (b.game_number =  g.game_number) WHERE b.moneyline = g.moneyline AND g.opponent = %s;
 # # """
 #
 # # sqlInsertWinorlose = """
@@ -435,7 +435,7 @@ WHERE
 # # """
 #
 # # sqlRetrieveGameNumber = """
-# # SELECT g.game_number FROM games g WHERE g.opponent_name = %s;
+# # SELECT g.game_number FROM games g WHERE g.opponent = %s;
 # # """
 #
 # # sqlRetrieveAllBet = """
