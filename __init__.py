@@ -48,8 +48,10 @@ tree = client.tree
 async def on_app_command_error(
     interaction: discord.Interaction, error: CommandInvokeError
 ) -> None:
+    logger.info("app_command error detected!")
     err = DiscordError(error, interaction.data.get("options", None))
     logger.exception(error, exc_info=True)
+
     embed = buildEmbed(
         title="",
         fields=[

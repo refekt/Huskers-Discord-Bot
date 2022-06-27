@@ -274,7 +274,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     f"....🚨 JUST 🚨\n"
                     f"...🚨 SAY 🚨\n"
                     f"..🚨 {arrestee.mention} 🚨\n"
-                    f"🏃‍♀️💨 🔫🚓🔫🚓🔫🚓\n"
+                    f"🚨🚨🚨🚨🚨🚨🚨🚨\n"
                     f"\n"
                     f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
                     f"🙅‍♀️Thanks for your cooperation. 😍🤩😘"
@@ -282,7 +282,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 )
             ],
         )
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(content=arrestee.mention, embed=embed)
 
     @app_commands.command(
         name="possum",
@@ -406,6 +406,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         options: str,
         timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
+        # TODO Timeout is not working as intended.
         survey = Survey(
             client=interaction.client,
             interaction=interaction,

@@ -782,6 +782,8 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
             raise RecruitException(
                 "A player's first and/or last search_name is required."
             )
+        if len(str(year)) == 2:
+            year += 2000
 
         assert checkYearValid(year), RecruitException(
             f"The provided year is not valid: {year}"
@@ -829,6 +831,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
 
         if len(str(year)) == 2:
             year += 2000
+
         assert checkYearValid(year), RecruitException(
             f"The provided year is not valid: {year}"
         )
@@ -839,6 +842,10 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         modal = PredictionTeamModal(prediction_search[0])
         await interaction.response.send_modal(modal)
         await modal.wait()
+
+    # TODO predict_show
+
+    # TODO predict_leaderboard
 
 
 async def setup(bot: commands.Bot) -> None:
