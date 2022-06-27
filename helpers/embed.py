@@ -42,9 +42,7 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Creating a normal embed from [{module}-{method}]")
 
-    # assert title is not None, CommandException("Title must not be blank!")
-
-    dtNow = datetime.now().astimezone(tz=TZ)  # .isoformat()
+    dtNow = datetime.now().astimezone(tz=TZ)
 
     if "color" in kwargs.keys():
         if "description" in kwargs.keys():
@@ -211,6 +209,8 @@ def buildTweetEmbed(
 
 
 def collectScheduleEmbeds(year) -> list[discord.Embed]:
+    # TODO Added CFBD's excitement and other metrics to output
+
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Creating schedule embeds from [{module}-{method}]")
 

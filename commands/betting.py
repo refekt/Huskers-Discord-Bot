@@ -25,7 +25,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
     @bet_group.command(name="game", description="Place a bet against a Nebraska game.")
     @app_commands.describe(
-        opponent="Name of the opponent for the Husker game.",
+        opponent="Name of the opponent_name for the Husker game.",
         which_team="Which team you predict to win.",
     )
     async def bet_game(
@@ -56,7 +56,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         await interaction.followup.send(embed=embed)
 
     @bet_group.command(name="show", description="Show all bets for a specific game")
-    @app_commands.describe(opponent="Name of the opponent for the Husker game.")
+    @app_commands.describe(opponent="Name of the opponent_name for the Husker game.")
     async def bet_show(
         self, interaction: discord.Interaction, opponent: HuskerSched2022
     ):

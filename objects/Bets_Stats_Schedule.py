@@ -349,7 +349,7 @@ def retrieveGameBets(
 
 
 def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> Game:
-    logger.info(f"Getting Nebraska opponent by name: {opponent_name}")
+    logger.info(f"Getting Nebraska opponent_name by name: {opponent_name}")
 
     cfbd_api = GamesApi(ApiClient(CFBD_CONFIG))
     nebraska = BigTenTeams.Nebraska.lower()
@@ -439,7 +439,7 @@ def getConsensusLineByOpponent(
 def collect_opponent(game, year, week) -> Union[HuskerOpponent, str]:
     # This is the culmination of going line by line through Huskers.com HTML and CSS.
     # If the website changes, this will more than likely need to change.
-    logger.info(f"Collecting opponent information for Week {week} {year}")
+    logger.info(f"Collecting opponent_name information for Week {week} {year}")
     game = game.contents[1]
     try:
         name = (
@@ -677,6 +677,6 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
 
 def getHuskerOpponent(_game: Game) -> dict[str, str]:
     if _game.away_team.lower() == BigTenTeams.Nebraska.lower():
-        return {"opponent": _game.home_team, "id": str(_game.home_id)}
+        return {"opponent_name": _game.home_team, "id": str(_game.home_id)}
     elif _game.home_team.lower() == BigTenTeams.Nebraska.lower():
-        return {"opponent": _game.away_team, "id": str(_game.away_id)}
+        return {"opponent_name": _game.away_team, "id": str(_game.away_id)}
