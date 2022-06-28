@@ -226,25 +226,40 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
         team=BigTenTeams.Nebraska.value, year=year
     )
 
-    records = records[0]
-    records_str: str = f"Nebraska's {year} Record: {records.total['wins']} - {records.total['losses']}"  # noqa
+    try:
+        records = records[0]
+        records_str: str = f"Nebraska's {year} Record: {records.total['wins']} - {records.total['losses']}"  # noqa
+    except IndexError:
+        records_str = ""
 
     for index, game in enumerate(games):
         logger.info(
             f"Trying to create game embed for: {game.home_team}, {game.away_team}"
         )
 
-        outcome_max_len: int = 17  # arbitrary
-        outcome_home_len: int = outcome_max_len - (
-            len(game.home_team) + len(str(game.home_points))
-        )
-        outcome_away_len: int = outcome_max_len - (
-            len(game.away_team) + len(str(game.away_points))
-        )
-
         title_str: str = f"{year} Game #{index + 1}: {game.home_team.title()} vs. {game.away_team.title()}"
-        outcome_str: str = f"```\n{game.home_team}{' ':<{outcome_home_len}}{game.home_points}\n{game.away_team}{' ':<{outcome_away_len}}{game.away_points}\n```"
-        probability_str: str = f"```\n{game.home_team} {game.home_post_win_prob * 100:#.2f}%\n{game.away_team} {game.away_post_win_prob * 100:#.2f}%\n```"
+
+        if game.away_points is None and game.home_points is None:
+            outcome_str: str = "TBD"
+        else:
+            outcome_max_len: int = 17  # arbitrary
+            outcome_home_len: int = outcome_max_len - (
+                len(game.home_team) + len(str(game.home_points))
+            )
+            outcome_away_len: int = outcome_max_len - (
+                len(game.away_team) + len(str(game.away_points))
+            )
+            outcome_str = f"```\n{game.home_team}{' ':<{outcome_home_len}}{game.home_points}\n{game.away_team}{' ':<{outcome_away_len}}{game.away_points}\n```"
+
+        if game.home_post_win_prob is None and game.away_post_win_prob is None:
+            probability_str: str = "TBD"
+        else:
+            probability_str: str = f"```\n{game.home_team} {game.home_post_win_prob * 100:#.2f}%\n{game.away_team} {game.away_post_win_prob * 100:#.2f}%\n```"
+
+        if game.excitement_index is None:
+            excitement_str: str = "TBD"
+        else:
+            excitement_str = f"{game.excitement_index:#.4f}"
 
         try:  # Some opponents don't have records on CFBD
             opponent_info = buildTeam(getHuskerOpponent(game)["id"])
@@ -259,7 +274,7 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
                         dict(name="Win Probability", value=probability_str),
                         dict(
                             name="Excitement Index",
-                            value=f"{game.excitement_index:#.4f}",
+                            value=excitement_str,
                         ),
                     ],
                 )
@@ -268,25 +283,23 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
 
         if opponent_info.school_name.lower() == game.away_team.lower():
             away_alt: str = opponent_info.alt_name
-            away_boxes: list[int] = game.away_line_scores
-
             home_alt: str = "NEB"
-            home_boxes: list[int] = game.home_line_scores
         elif opponent_info.school_name.lower() == game.home_team.lower():
             away_alt = "NEB"
-            away_boxes: list[int] = game.away_line_scores
-
             home_alt = opponent_info.alt_name
-            home_boxes: list[int] = game.home_line_scores
         else:
             away_alt = "____"
             home_alt = "____"
 
-            away_boxes = [0, 0, 0, 0]
-            home_boxes = [0, 0, 0, 0]
+        if game.away_line_scores is None and game.home_line_scores is None:
+            away_boxes: list[int] = [0, 0, 0, 0]
+            home_boxes: list[int] = [0, 0, 0, 0]
+        else:
+            away_boxes = game.away_line_scores
+            home_boxes = game.home_line_scores
 
-        if away_alt is None and home_boxes is None:
-            boxscore_str: str = "N/A"
+        if sum(away_boxes) + sum(home_boxes) == 0:
+            boxscore_str: str = "TBD"
         else:
             boxscore_str = (
                 f"```\n"
@@ -295,12 +308,22 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
                 f" {away_alt[:3]:<3}| {away_boxes[0]:<3}| {away_boxes[1]:<3}| {away_boxes[2]:<3}| {away_boxes[3]:<3}| {game.away_points:<3}\n"
                 f"```"
             )
-        elo_str = (
-            f"```\n"
-            f"{game.home_team} {game.home_pregame_elo:,} -> {game.home_postgame_elo:,}\n"
-            f"{game.away_team} {game.away_pregame_elo:,} -> {game.away_postgame_elo:,}\n"
-            f"```"
-        )
+        if (
+            game.home_pregame_elo is None
+            and game.home_postgame_elo is None
+            and game.away_pregame_elo is None
+            and game.away_postgame_elo is None
+        ):
+            elo_str: str = "TBD"
+        elif (
+            game.home_pregame_elo
+            and game.home_postgame_elo is None
+            and game.away_pregame_elo
+            and game.away_postgame_elo is None
+        ):
+            elo_str = f"```\n{game.home_team} {game.home_pregame_elo:,}\n{game.away_team} {game.away_pregame_elo:,}\n```"
+        else:
+            elo_str = f"```\n{game.home_team} {game.home_pregame_elo:,} -> {game.home_postgame_elo:,}\n{game.away_team} {game.away_pregame_elo:,} -> {game.away_postgame_elo:,}\n```"
 
         embeds.append(
             buildEmbed(
@@ -319,7 +342,7 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
                     dict(name="Elo Rating", value=elo_str),
                     dict(
                         name="Excitement Index",
-                        value=f"{game.excitement_index:#.4f}",
+                        value=excitement_str,
                     ),
                 ],
             )
