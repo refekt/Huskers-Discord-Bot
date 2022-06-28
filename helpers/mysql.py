@@ -10,11 +10,6 @@ from helpers.misc import getModuleMethod
 
 logger = logging.getLogger(__name__)
 
-# import pymysql.cursors
-#
-# from helpers.constants import SQL_HOST, SQL_PASSWD, SQL_DB, SQL_USER
-#
-
 # Image Command
 sqlCreateImageCommand = """
 INSERT INTO img_cmd_db (author, img_name, img_url)
@@ -499,7 +494,7 @@ WHERE
 
 def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     module, method = getModuleMethod(inspect.stack())
-    logger.info(f"Starting a MySQL query called from [{module}-{method}]")
+    logger.debug(f"Starting a MySQL query called from [{module}-{method}]")
     sqlConnection = None
     try:
         sqlConnection = pymysql.connect(
@@ -510,7 +505,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
             charset="utf8mb4",
             cursorclass=pymysql.cursors.DictCursor,
         )
-        logger.info(f"Connected to the MySQL Database!")
+        logger.debug(f"Connected to the MySQL Database!")
     except OperationalError:  # Unsure if this is the correct exception
         logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
 
@@ -559,11 +554,11 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     except Exception as e:  # noqa
         logger.exception("Error occurred opening the MySQL database.", exc_info=True)
     finally:
-        logger.info(f"Closing connection to the MySQL Database")
+        logger.debug(f"Closing connection to the MySQL Database")
         sqlConnection.close()
 
         if result:
-            logger.info(f"Ending a MySQL query called from [{module}-{method}]")
+            logger.debug(f"Ending a MySQL query called from [{module}-{method}]")
             return result
 
 

@@ -21,13 +21,13 @@ from helpers.constants import (
 )
 from helpers.mysql import (
     processMySQL,
+    sqlGetTeamInfoByESPNID,
     sqlGetTeamInfoByID,
     sqlInsertGameBet,
     sqlSelectGameBetbyAuthor,
     sqlSelectGameBetbyOpponent,
     sqlTeamIDs,
     sqlUpdateGameBet,
-    sqlGetTeamInfoByESPNID,
 )
 from objects.Exceptions import BettingException, ScheduleException
 from objects.Logger import discordLogger
@@ -39,8 +39,8 @@ logger.info(f"{str(__name__).title()} module loaded!")
 __all__ = [
     "Bet",
     "BetLines",
-    "BetTeam",
     "BigTenTeams",
+    "FootballTeam",
     "HuskerSched2022",
     "HuskerSchedule",
     "WhichOverUnderChoice",
@@ -183,7 +183,7 @@ class BetLines:
         return [var for var in vars()]
 
 
-class BetTeam(JSONEncoder):
+class FootballTeam(JSONEncoder):
     __slots__ = [
         "alt_name",
         "city",
@@ -419,8 +419,8 @@ def getTeamIdByName(team_name: str) -> str:
         )
 
 
-def buildTeam(id_str: str) -> BetTeam:
-    logger.info("Building a BetTeam")
+def buildTeam(id_str: str) -> FootballTeam:
+    logger.debug("Building a FootballTeam")
 
     query: dict = processMySQL(query=sqlGetTeamInfoByID, fetch="one", values=id_str)
     if query is None:
@@ -429,9 +429,9 @@ def buildTeam(id_str: str) -> BetTeam:
         )
 
     if query:
-        return BetTeam(from_dict=query)
+        return FootballTeam(from_dict=query)
     else:
-        raise BettingException("Unable to create BetTeam because query is None.")
+        raise BettingException("Unable to create FootballTeam because query is None.")
 
 
 def getConsensusLineByOpponent(
@@ -591,7 +591,7 @@ def HuskerSchedule(
         week += 1
 
         _opponent_name = collect_opponent(game, year, week)
-        if _opponent_name == "Unknown Opponent":  # TODO What am I doing here?
+        if _opponent_name == "Unknown Opponent":  # What am I doing here?
             continue
 
         if "TBA" in _opponent_name.date_time:
@@ -660,7 +660,6 @@ def HuskerSchedule(
 
 
 def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
-    # TODO Redo using getNebraskaGameByOpponent()
     logger.info(f"Getting the current week for the {year} {team} game")
     games_api = GamesApi(ApiClient(CFBD_CONFIG))
 

@@ -5,14 +5,14 @@ from typing import Union, Optional
 
 import discord
 import validators
+from cfbd import ApiClient, GamesApi, Game, TeamRecord
 
 from helpers.constants import (
     BOT_FOOTER_BOT,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
+    CFBD_CONFIG,
     DESC_LIMIT,
-    DT_OBJ_FORMAT,
-    DT_OBJ_FORMAT_TBA,
     DT_STR_RECRUIT,
     DT_TWEET_FORMAT,
     EMBED_MAX,
@@ -26,7 +26,8 @@ from helpers.constants import (
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
-from objects.Bets_Stats_Schedule import HuskerSchedule
+from objects.Bets_Stats_Schedule import BigTenTeams, getHuskerOpponent, buildTeam
+from objects.Exceptions import BettingException
 
 logger = logging.getLogger(__name__)
 
@@ -208,33 +209,118 @@ def buildTweetEmbed(
     return embed
 
 
-def collectScheduleEmbeds(year) -> list[discord.Embed]:
+def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
     # TODO Added CFBD's excitement and other metrics to output
 
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Creating schedule embeds from [{module}-{method}]")
 
-    scheduled_games, season_stats = HuskerSchedule(year=year)
+    embeds: list[Optional[discord.Embed]] = []
 
-    new_line_char = "\n"
-    embeds = []
+    games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
+    # TODO /records/ API end point to get season stats
+    games: list[Game] = games_api.get_games(
+        year=year, team=BigTenTeams.Nebraska.lower(), season_type="both"
+    )
+    records: Union[list[TeamRecord], TeamRecord] = games_api.get_team_records(
+        team=BigTenTeams.Nebraska.value, year=year
+    )
 
-    for index, game in enumerate(scheduled_games):
+    records = records[0]
+    records_str: str = f"Nebraska's {year} Record: {records.total['wins']} - {records.total['losses']}"  # noqa
+
+    for index, game in enumerate(games):
+        logger.info(
+            f"Trying to create game embed for: {game.home_team}, {game.away_team}"
+        )
+
+        outcome_max_len: int = 17  # arbitrary
+        outcome_home_len: int = outcome_max_len - (
+            len(game.home_team) + len(str(game.home_points))
+        )
+        outcome_away_len: int = outcome_max_len - (
+            len(game.away_team) + len(str(game.away_points))
+        )
+
+        title_str: str = f"{year} Game #{index + 1}: {game.home_team.title()} vs. {game.away_team.title()}"
+        outcome_str: str = f"```\n{game.home_team}{' ':<{outcome_home_len}}{game.home_points}\n{game.away_team}{' ':<{outcome_away_len}}{game.away_points}\n```"
+        probability_str: str = f"```\n{game.home_team} {game.home_post_win_prob * 100:#.2f}%\n{game.away_team} {game.away_post_win_prob * 100:#.2f}%\n```"
+
+        try:  # Some opponents don't have records on CFBD
+            opponent_info = buildTeam(getHuskerOpponent(game)["id"])
+        except BettingException:
+            embeds.append(
+                buildEmbed(
+                    title=title_str,
+                    description=records_str,
+                    fields=[
+                        dict(name="Location", value=game.venue),
+                        dict(name="Outcome", value=outcome_str),
+                        dict(name="Win Probability", value=probability_str),
+                        dict(
+                            name="Excitement Index",
+                            value=f"{game.excitement_index:#.4f}",
+                        ),
+                    ],
+                )
+            )
+            continue
+
+        if opponent_info.school_name.lower() == game.away_team.lower():
+            away_alt: str = opponent_info.alt_name
+            away_boxes: list[int] = game.away_line_scores
+
+            home_alt: str = "NEB"
+            home_boxes: list[int] = game.home_line_scores
+        elif opponent_info.school_name.lower() == game.home_team.lower():
+            away_alt = "NEB"
+            away_boxes: list[int] = game.away_line_scores
+
+            home_alt = opponent_info.alt_name
+            home_boxes: list[int] = game.home_line_scores
+        else:
+            away_alt = "____"
+            home_alt = "____"
+
+            away_boxes = [0, 0, 0, 0]
+            home_boxes = [0, 0, 0, 0]
+
+        if away_alt is None and home_boxes is None:
+            boxscore_str: str = "N/A"
+        else:
+            boxscore_str = (
+                f"```\n"
+                f" TM | Q1 | Q2 | Q3 | Q4 | FIN \n"
+                f" {home_alt[:3]:<3}| {home_boxes[0]:<3}| {home_boxes[1]:<3}| {home_boxes[2]:<3}| {home_boxes[3]:<3}| {game.home_points:<3}\n"
+                f" {away_alt[:3]:<3}| {away_boxes[0]:<3}| {away_boxes[1]:<3}| {away_boxes[2]:<3}| {away_boxes[3]:<3}| {game.away_points:<3}\n"
+                f"```"
+            )
+        elo_str = (
+            f"```\n"
+            f"{game.home_team} {game.home_pregame_elo:,} -> {game.home_postgame_elo:,}\n"
+            f"{game.away_team} {game.away_pregame_elo:,} -> {game.away_postgame_elo:,}\n"
+            f"```"
+        )
+
         embeds.append(
             buildEmbed(
-                title=f"Game #{index + 1} against {game.ranking + ' ' if game.ranking else ''}{game.opponent_name.title()}",
-                description=f"Nebraska's {year}'s Record: {season_stats.wins} - {season_stats.losses}",
-                thumbnail=game.icon,
+                title=title_str,
+                description=records_str,  # noqa
+                thumbnail=opponent_info.logo,
                 fields=[
                     dict(
-                        name="Conference Game", value="Yes" if game.conference else "No"
+                        name="Conference/Division",
+                        value=f"{opponent_info.conference}/{opponent_info.division}",
                     ),
+                    dict(name="Location", value=game.venue),
+                    dict(name="Outcome", value=outcome_str),
+                    dict(name="Boxscore", value=boxscore_str),
+                    dict(name="Win Probability", value=probability_str),
+                    dict(name="Elo Rating", value=elo_str),
                     dict(
-                        name="Date/Time",
-                        value=f"{game.game_date_time.strftime(DT_OBJ_FORMAT) if not game.game_date_time.hour == 21 else game.game_date_time.strftime(DT_OBJ_FORMAT_TBA)}{new_line_char}",
+                        name="Excitement Index",
+                        value=f"{game.excitement_index:#.4f}",
                     ),
-                    dict(name="Location", value=game.location),
-                    dict(name="Outcome", value=game.outcome if game.outcome else "TBD"),
                 ],
             )
         )

@@ -5,8 +5,8 @@ import cfbd
 import discord
 from cfbd import (
     ApiClient,
-    PlayersApi,
     Game,
+    PlayersApi,
 )
 from discord import app_commands
 from discord.ext import commands
@@ -22,12 +22,12 @@ from helpers.embed import buildEmbed, collectScheduleEmbeds
 from helpers.misc import checkYearValid
 from objects.Bets_Stats_Schedule import (
     BigTenTeams,
+    FootballTeam,
     HuskerSched2022,
     buildTeam,
     getConsensusLineByOpponent,
     getHuskerOpponent,
     getNebraskaGameByOpponent,
-    BetTeam,
 )
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
@@ -132,7 +132,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
 
         game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name.lower())
-        opponent_info: BetTeam = buildTeam(getHuskerOpponent(game)["id"])
+        opponent_info: FootballTeam = buildTeam(getHuskerOpponent(game)["id"])
 
         lines = getConsensusLineByOpponent(
             away_team=game.away_team, home_team=game.home_team
@@ -217,7 +217,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
-        await interaction.response.defer()
+        await interaction.response.defer(thinking=True)
 
         pages = collectScheduleEmbeds(year)
         view = EmbedPaginatorView(
