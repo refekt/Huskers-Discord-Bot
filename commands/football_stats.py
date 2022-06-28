@@ -217,14 +217,18 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
-        await interaction.response.defer(thinking=True)
+        await interaction.response.send_message(
+            content="Loading schedule...this may take several seconds...",
+        )
 
-        pages = collectScheduleEmbeds(year)
+        pages = collectScheduleEmbeds(year=year)
         view = EmbedPaginatorView(
             embeds=pages, original_message=await interaction.original_message()
         )
 
-        await interaction.followup.send(embed=view.initial, view=view)
+        await interaction.edit_original_message(
+            content="", embed=view.initial, view=view
+        )
 
     @app_commands.command(
         name="player-stats", description="Display Husker stats for the year"

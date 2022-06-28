@@ -224,7 +224,7 @@ logger.info("Bot info variables loaded")
 
 # DateTime format
 DT_CFBD_GAMES = "%Y-%m-%dT%H:%M:%S.%f%z"
-DT_CFBD_GAMES_DISPLAY = "%H:%M %p %Z %B %d, %Y"
+DT_CFBD_GAMES_DISPLAY = "%B %d, %Y at %H:%M %p %Z"
 DT_FAP_RECRUIT = "%Y-%m-%d %H:%M:%S"
 DT_MYSQL_FORMAT = "%Y-%m-%d %H:%M:%S"
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"

@@ -48,7 +48,7 @@ class EmbedPaginatorView(discord.ui.View):
             )
 
     async def update_current_page(self) -> None:
-        logger.info(f"Current index is: {self.current_index}")
+        logger.debug(f"Current index is: {self.current_index}")
 
         for button in self.children:
             if button.custom_id == "ud_current_page":
@@ -75,7 +75,7 @@ class EmbedPaginatorView(discord.ui.View):
     async def next_embed(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        logger.info("Going to next embed")
+        logger.debug("Going to next embed")
         self._queue.rotate(-1)
         if self.current_index == len(self._queue):
             self.current_index = 1

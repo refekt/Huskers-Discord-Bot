@@ -23,6 +23,8 @@ from helpers.constants import (
     NAME_LIMIT,
     TITLE_LIMIT,
     TZ,
+    DT_CFBD_GAMES,
+    DT_CFBD_GAMES_DISPLAY,
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
@@ -41,7 +43,7 @@ __all__ = [
 
 def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
     module, method = getModuleMethod(inspect.stack())
-    logger.info(f"Creating a normal embed from [{module}-{method}]")
+    logger.debug(f"Creating a normal embed from [{module}-{method}]")
 
     dtNow = datetime.now().astimezone(tz=TZ)
 
@@ -86,10 +88,6 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
             url="",
             icon_url=kwargs.get("icon_url", ""),
         )
-    # else:
-    #     e.set_author(
-    #         name=BOT_DISPLAY_NAME[:NAME_LIMIT], url=BOT_GITHUB_URL, icon_url=""
-    #     )
 
     if "thumbnail" in kwargs.keys() and validators.url(kwargs.get("thumbnail")):
         e.set_thumbnail(url=kwargs.get("thumbnail"))
@@ -110,7 +108,7 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
         logger.exception("Embed is too big!", exc_info=True)
         raise
     else:
-        logger.info(f"Returning a normal embed from [{module}-{method}]")
+        logger.debug(f"Returning a normal embed from [{module}-{method}]")
         return e
 
 
@@ -213,12 +211,11 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
     # TODO Added CFBD's excitement and other metrics to output
 
     module, method = getModuleMethod(inspect.stack())
-    logger.info(f"Creating schedule embeds from [{module}-{method}]")
+    logger.info(f"Attempting to create schedule embeds from [{module}-{method}]")
 
     embeds: list[Optional[discord.Embed]] = []
 
     games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
-    # TODO /records/ API end point to get season stats
     games: list[Game] = games_api.get_games(
         year=year, team=BigTenTeams.Nebraska.lower(), season_type="both"
     )
@@ -238,6 +235,12 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
         )
 
         title_str: str = f"{year} Game #{index + 1}: {game.home_team.title()} vs. {game.away_team.title()}"
+
+        datetime_str = (
+            datetime.strptime(game.start_date, DT_CFBD_GAMES)
+            .astimezone(tz=TZ)
+            .strftime(DT_CFBD_GAMES_DISPLAY)
+        )
 
         if game.away_points is None and game.home_points is None:
             outcome_str: str = "TBD"
@@ -269,6 +272,10 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
                     title=title_str,
                     description=records_str,
                     fields=[
+                        dict(
+                            name="Date/Time",
+                            value=datetime_str,
+                        ),
                         dict(name="Location", value=game.venue),
                         dict(name="Outcome", value=outcome_str),
                         dict(name="Win Probability", value=probability_str),
@@ -331,6 +338,10 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
                 description=records_str,  # noqa
                 thumbnail=opponent_info.logo,
                 fields=[
+                    dict(
+                        name="Date/Time",
+                        value=datetime_str,
+                    ),
                     dict(
                         name="Conference/Division",
                         value=f"{opponent_info.conference}/{opponent_info.division}",
