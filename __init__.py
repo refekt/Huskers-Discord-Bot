@@ -73,4 +73,9 @@ async def on_app_command_error(
         await interaction.channel.send(content="", embed=embed)
 
 
+discord_loggers = ["discord", "discord.client", "discord.gateway"]
+for logger in discord_loggers:
+    _ = logging.getLogger(logger)
+    _.disabled = True
+
 client.run(PROD_TOKEN, log_handler=None)
