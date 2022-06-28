@@ -6,7 +6,6 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-logger.info("Loading helpers")
 from helpers.constants import *  # noqa
 from helpers.embed import *  # noqa
 from helpers.encryption import *  # noqa
@@ -15,7 +14,6 @@ from helpers.misc import *  # noqa
 from helpers.mysql import *  # noqa
 from helpers.slowking import *  # noqa
 
-logger.info("Loading objects")
 from objects.Bets_Stats_Schedule import *  # noqa
 from objects.Exceptions import *  # noqa
 from objects.Paginator import *  # noqa
@@ -27,8 +25,6 @@ from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa
 
 __all__ = ["client"]
-
-logger.info("Objects loaded. Starting the bot!")
 
 intents = discord.Intents.all()
 intents.typing = False
@@ -50,7 +46,7 @@ async def on_app_command_error(
 ) -> None:
     logger.info("app_command error detected!")
     err = DiscordError(error, interaction.data.get("options", None))
-    logger.exception(error, exc_info=True)
+    logger.error(error, exc_info=True)
 
     embed = buildEmbed(
         title="",
@@ -77,5 +73,4 @@ async def on_app_command_error(
         await interaction.channel.send(content="", embed=embed)
 
 
-if __name__ == "__main__":
-    client.run(PROD_TOKEN, log_handler=None)
+client.run(PROD_TOKEN, log_handler=None)

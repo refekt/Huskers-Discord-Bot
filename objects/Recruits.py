@@ -4,8 +4,6 @@ logger = discordLogger(__name__)
 
 __all__ = ["Recruit", "RecruitInterest"]
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 
 class RecruitInterest:
     def __init__(self, school: str, offered: str, status: str = None) -> None:
@@ -86,3 +84,6 @@ class Recruit:
         self.walk_on = walk_on
         self.weight = weight
         self.year = year
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

@@ -43,9 +43,7 @@ class EmbedPaginatorView(discord.ui.View):
                 )
             )
         except (TypeError, ValueError) as e:
-            logger.exception(
-                f"Error creating ud_current_page button: {e}", exc_info=True
-            )
+            logger.error(f"Error creating ud_current_page button: {e}", exc_info=True)
 
     async def update_current_page(self) -> None:
         logger.debug(f"Current index is: {self.current_index}")
@@ -89,3 +87,6 @@ class EmbedPaginatorView(discord.ui.View):
     @property
     def initial(self) -> discord.Embed:
         return self._initial
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

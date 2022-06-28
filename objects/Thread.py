@@ -17,8 +17,6 @@ __all__ = [
     "background_run_function",
 ]
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 
 class DateTimeChars(enum.Enum):
     def __str__(self):
@@ -88,3 +86,6 @@ async def background_run_function(
         logger.info(f"{func.__name__} waiting complete. Calling function!")
 
     result = await func
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

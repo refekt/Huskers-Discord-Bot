@@ -1,8 +1,5 @@
 import asyncio
 import json
-import logging
-import os
-import pathlib
 import time
 from pprint import pprint
 from typing import Union, Optional
@@ -13,22 +10,17 @@ import tweepy
 from tweepy import Response
 
 from helpers.constants import (
-    CHAN_TWITTERVERSE,
-    DEBUGGING_CODE,
+    CHAN_FOOD,
     CHAN_GENERAL,
     CHAN_RECRUITING,
-    CHAN_FOOD,
+    CHAN_TWITTERVERSE,
+    DEBUGGING_CODE,
     TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from objects.Logger import discordLogger
 
-path = pathlib.Path(f"twitter_stream.log")
-full_path = os.path.join(path.parent.resolve(), "logs", path)
-
 logger = discordLogger(__name__)
-handler = logging.FileHandler(filename=full_path)
-logger.addHandler(handler)
 
 
 # Example
@@ -266,7 +258,7 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code) -> None:
-        logger.exception(f"Request Error: {status_code}")
+        logger.error(f"Request Error: {status_code}")
 
         logger.info(
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
@@ -276,7 +268,7 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.info("Sleep is over")
 
     def on_connection_error(self) -> None:
-        logger.exception(f"Connection Error")
+        logger.error(f"Connection Error")
         task = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(
                 self.client, "The Twitter Stream had an error connecting!"
@@ -294,13 +286,13 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_errors(self, errors) -> None:
-        logger.exception(f"Error received: {errors}")
+        logger.error(f"Error received: {errors}")
 
     def on_closed(self, response) -> None:
         logger.warning(f"Closed: {response}")
 
     def on_exception(self, exception) -> None:
-        logger.exception(f"Exception: {exception}")
+        logger.error(f"Exception: {exception}")
 
     def on_data(self, raw_data) -> None:
         logger.info(pprint(json.loads(raw_data)))
@@ -313,3 +305,6 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_keep_alive(self) -> None:
         logger.debug("Keep Alive signal received")
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

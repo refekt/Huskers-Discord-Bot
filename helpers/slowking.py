@@ -19,7 +19,7 @@ def makeSlowking(person: discord.Member) -> discord.File:
             requests.get(person.avatar.url, stream=True).raw
         ).convert("RGBA")
     except IOError:
-        logger.exception("Unable to create a Slow King avatar for user!", exc_info=True)
+        logger.error("Unable to create a Slow King avatar for user!", exc_info=True)
         raise ImageException("Unable to create a Slow King avatar for user!")
 
     base_mask = Image.open("resources/images/mask.png").convert("L")

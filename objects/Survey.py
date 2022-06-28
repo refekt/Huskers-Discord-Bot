@@ -206,3 +206,6 @@ class Survey:
 
     async def close_survey(self) -> None:
         await self.interaction.edit_original_message(view=None)
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

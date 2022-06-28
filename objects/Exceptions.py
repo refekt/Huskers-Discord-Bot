@@ -28,8 +28,6 @@ __all__ = [
     "WeatherException",
 ]
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 
 class DiscordError:
     def __init__(self, original: CommandInvokeError, options: dict) -> None:
@@ -134,3 +132,5 @@ class TextException(Exception):
 
 
 ALL_EXCEPTIONS = [globals()[_exc] for _exc in globals() if "Exception" in _exc]
+
+logger.info(f"{str(__name__).title()} module loaded!")

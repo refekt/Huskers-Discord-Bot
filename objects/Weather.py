@@ -5,8 +5,6 @@ from objects.Logger import discordLogger
 logger = discordLogger(__name__)
 
 __all__ = ["WeatherResponse", "WeatherHour"]
-#
-logger.info(f"{str(__name__).title()} module loaded!")
 
 
 class WeatherHour:
@@ -137,3 +135,6 @@ class WeatherResponse:
                     )
                 else:
                     setattr(self, key, value)
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

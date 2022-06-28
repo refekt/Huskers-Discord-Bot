@@ -66,7 +66,7 @@ def checkYearValid(year: int) -> bool:
     return True
 
 
-def getModuleMethod(stack) -> tuple:
+def getModuleMethod(stack) -> tuple[str, str]:
     frm: inspect.FrameInfo = stack[1]
     mod = inspect.getmodule(frm[0]).__name__
     method = frm[3]

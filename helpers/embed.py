@@ -105,7 +105,7 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
                 inline=field.get("inline", False),
             )
     if len(e) > EMBED_MAX:
-        logger.exception("Embed is too big!", exc_info=True)
+        logger.error("Embed is too big!", exc_info=True)
         raise
     else:
         logger.debug(f"Returning a normal embed from [{module}-{method}]")
@@ -208,8 +208,6 @@ def buildTweetEmbed(
 
 
 def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
-    # TODO Added CFBD's excitement and other metrics to output
-
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Attempting to create schedule embeds from [{module}-{method}]")
 

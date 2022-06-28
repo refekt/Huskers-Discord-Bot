@@ -39,8 +39,6 @@ logger = discordLogger(__name__)
 
 __all__ = ["HuskerClient", "start_twitter_stream"]
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 
 def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
@@ -319,7 +317,7 @@ class HuskerClient(Bot):
 
             return lines_str
         except OSError:
-            logger.exception("Error loading the changelog!", exc_info=True)
+            logger.error("Error loading the changelog!", exc_info=True)
 
     # noinspection PyMethodMayBeStatic
     async def send_welcome_message(
@@ -411,7 +409,7 @@ class HuskerClient(Bot):
                 logger.info(f"The [{extension}] is already loaded. Skipping")
                 continue
             except Exception as e:  # noqa
-                logger.exception(f"Unable to load the {extension} extension\n{e}")
+                logger.error(f"Unable to load the {extension} extension\n{e}")
                 continue
 
         logger.info("All extensions loaded")
@@ -420,7 +418,7 @@ class HuskerClient(Bot):
             logger.info("Attempting to sync the bot tree")
             await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
         except Exception as e:  # noqa
-            logger.exception("Error syncing the tree!")
+            logger.error("Error syncing the tree!")
 
         logger.info("The bot tree has synced!")
 
@@ -545,3 +543,6 @@ class HuskerClient(Bot):
         self, payload: discord.RawReactionActionEvent
     ) -> None:
         await self.check_reaction(payload)
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

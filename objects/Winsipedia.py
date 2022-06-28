@@ -9,8 +9,6 @@ logger = discordLogger(__name__)
 
 __all__ = ["TeamStatsWinsipediaTeam", "CompareWinsipediaTeam", "CompareWinsipedia"]
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 
 class TeamStatsWinsipediaTeam:
     def __init__(self, *, team_name: str) -> None:
@@ -219,3 +217,6 @@ class CompareWinsipedia:
             longest_win_streak=win_stream[0],
             largest_win_streak_date=win_stream[1],
         )
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

@@ -13,8 +13,6 @@ logger = logging.getLogger(__name__)
 
 __all__ = ["fry_image"]
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 face_cascade = cv2.CascadeClassifier(
     os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
 )
@@ -318,3 +316,6 @@ def replace_values(
 
 def random_file(path: str) -> str:
     return path + numpy.random.choice(os.listdir(path))
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

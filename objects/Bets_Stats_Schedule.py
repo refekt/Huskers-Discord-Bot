@@ -34,8 +34,6 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-logger.info(f"{str(__name__).title()} module loaded!")
-
 __all__ = [
     "Bet",
     "BetLines",
@@ -52,8 +50,6 @@ __all__ = [
     "getNebraskaGameByOpponent",
     "retrieveGameBets",
 ]
-
-logger.info(f"{str(__name__).title()} module loaded!")
 
 
 class SeasonStats:
@@ -668,7 +664,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
             year=year, team=BigTenTeams.Nebraska.lower()
         )  # We only care about Nebraska's schedule
     except ApiException:
-        logger.exception("CFBD API unable to get games", exc_info=True)
+        logger.error("CFBD API unable to get games", exc_info=True)
         raise BettingException("CFBD API unable to get games")
 
     for index, game in enumerate(games):
@@ -680,7 +676,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
             if not (game.away_points and game.home_points):
                 return game.week
             else:
-                logger.exception(
+                logger.error(
                     "Unknown error occurred when getting week for Nebraska game",
                     exc_info=True,
                 )
@@ -693,7 +689,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
         ):
             return game.week
 
-    logger.exception(f"Unable to find week for {team}")
+    logger.error(f"Unable to find week for {team}")
     raise BettingException(f"Unable to find week for {team}")
 
 
@@ -702,3 +698,6 @@ def getHuskerOpponent(_game: Game) -> dict[str, str]:
         return {"opponent_name": _game.home_team, "id": str(_game.home_id)}
     elif _game.home_team.lower() == BigTenTeams.Nebraska.lower():
         return {"opponent_name": _game.away_team, "id": str(_game.away_id)}
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

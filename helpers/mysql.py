@@ -507,7 +507,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
         )
         logger.debug(f"Connected to the MySQL Database!")
     except OperationalError:  # Unsure if this is the correct exception
-        logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
+        logger.error(f"Unable to connect to the `{SQL_DB}` database.")
 
     result: Union[dict, list[dict], None] = None
 
@@ -527,7 +527,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
                         result: dict = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
-                            logger.exception(
+                            logger.error(
                                 "Fetching many requires a `size` kwargs.", exc_info=True
                             )
                         cursor.execute(query=query)
@@ -541,7 +541,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
                         result: dict = cursor.fetchone()
                     elif kwargs["fetch"] == "many":
                         if "size" not in kwargs.keys():
-                            logger.exception(
+                            logger.error(
                                 "Fetching many requires a `size` kwargs.", exc_info=True
                             )
                         cursor.execute(query=query, args=kwargs["values"])
@@ -552,7 +552,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
 
         sqlConnection.commit()
     except Exception as e:  # noqa
-        logger.exception("Error occurred opening the MySQL database.", exc_info=True)
+        logger.error("Error occurred opening the MySQL database.", exc_info=True)
     finally:
         logger.debug(f"Closing connection to the MySQL Database")
         sqlConnection.close()
