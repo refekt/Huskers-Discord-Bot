@@ -43,7 +43,7 @@ __all__ = ["HuskerClient", "start_twitter_stream"]
 def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
-    logger.info("Creating a stream client")
+    logger.debug("Creating a stream client")
     tweeter_stream = StreamClientV2(
         bearer_token=TWITTER_BEARER,
         client=client,
@@ -51,18 +51,18 @@ def start_twitter_stream(client: discord.Client) -> None:
         # max_retries=5,
     )
 
-    logger.info("Looking for any lingering stream rules")
+    logger.debug("Looking for any lingering stream rules")
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
     if raw_rules.data is not None:
         ids = [rule.id for rule in raw_rules.data]
-        logger.info(f"Deleting rule ids: {' '.join(ids)}")
+        logger.debug(f"Deleting rule ids: {' '.join(ids)}")
         tweeter_stream.delete_rules(ids)
 
-    logger.info("Collecting Husker Media Twitter list")
+    logger.debug("Collecting Husker Media Twitter list")
     tweeter_client = tweepy.Client(TWITTER_BEARER)
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
 
-    logger.info("Creating stream rule")
+    logger.debug("Creating stream rule")
     rule_query = ""
     rules: list[str] = []
     append_str: str = ""
@@ -104,9 +104,9 @@ def start_twitter_stream(client: discord.Client) -> None:
     auths = ", ".join(auths)
 
     if raw_rules.data is not None:
-        logger.info(f"Number of rules: {len(raw_rules.data)}")
+        logger.debug(f"Number of rules: {len(raw_rules.data)}")
     else:
-        logger.info("No rules found")
+        logger.debug("No rules found")
 
     tweeter_stream.filter(
         expansions=[
@@ -443,7 +443,7 @@ class HuskerClient(Bot):
             open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
 
             async def convertDestination(raw_send_to: str) -> discord.TextChannel:
-                logger.info("Attempting to fetch destination")
+                logger.debug("Attempting to fetch destination")
                 try:
                     dest: Union[discord.TextChannel, None] = await self.fetch_channel(
                         int(raw_send_to)
@@ -452,21 +452,21 @@ class HuskerClient(Bot):
                     dest = await self.fetch_channel(CHAN_BOT_SPAM)
                     pass
 
-                logger.info(f"destination is {dest.name.encode('utf-8')}")
+                logger.debug(f"destination is {dest.name.encode('utf-8')}")
                 return dest
 
             async def convertSentTo(raw_send_to: str) -> Union[discord.User, None]:
-                logger.info("Attempting to fetch remind_who")
+                logger.debug("Attempting to fetch remind_who")
                 try:
                     send_to: Union[discord.User, None] = await self.fetch_user(
                         int(raw_send_to)
                     )
-                    logger.info(
+                    logger.debug(
                         f"remind_who is {send_to.name.encode('utf-8')}#{send_to.discriminator}"
                     )
                 except NotFound:
                     send_to = None
-                    logger.info("remind_who is None")
+                    logger.debug("remind_who is None")
                     pass
 
                 return send_to
@@ -513,7 +513,7 @@ class HuskerClient(Bot):
 
                         del reminder  # Get rid of for accounting purposes
                     else:
-                        logger.info(
+                        logger.debug(
                             f"Adding reminder for/to [{reminder['send_to']}] to task list."
                         )
 

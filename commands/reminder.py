@@ -44,7 +44,7 @@ class MissedReminder:
         self.missed_reminder = missed_reminder
 
     async def run(self):
-        logger.info(f"Sleeping for {self.duration.total_seconds():,} seconds")
+        logger.debug(f"Sleeping for {self.duration.total_seconds():,} seconds")
         await asyncio.sleep(self.duration.total_seconds())
         logger.info("Sleep complete. Sending reminder!")
 
@@ -66,7 +66,7 @@ class MissedReminder:
             ),
         )
 
-        logger.info("Self destructing MissedReminder")
+        logger.debug("Self destructing MissedReminder")
         del self
 
 

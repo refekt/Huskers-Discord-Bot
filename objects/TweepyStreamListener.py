@@ -91,7 +91,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     twitter_channel: discord.TextChannel = await client.fetch_channel(CHAN_TWITTERVERSE)
     await twitter_channel.send(embed=embed)
 
-    logger.debug(f"Twitter alert sent!")
+    logger.info(f"Twitter alert sent!")
 
 
 async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
@@ -117,7 +117,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         async def send_to_general(
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
-            logger.info("Sending tweet to general channel")
+            logger.debug("Sending tweet to general channel")
             chan = await client.fetch_channel(CHAN_GENERAL)
             await chan.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
@@ -132,7 +132,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         async def send_to_recruiting(
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
-            logger.info("Sending tweet to recruiting channel")
+            logger.debug("Sending tweet to recruiting channel")
             chan = await client.fetch_channel(CHAN_RECRUITING)
             await chan.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
@@ -140,7 +140,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         async def on_timeout(self) -> None:
-            logger.info("Twitter buttons have timed out. Removing options")
+            logger.debug("Twitter buttons have timed out. Removing options")
             self.clear_items()
             await self.message.edit(view=self)
 
@@ -235,7 +235,7 @@ class StreamClientV2(tweepy.StreamingClient):
             self.delete_rules(ids)
 
     def on_connect(self) -> None:
-        logger.info("Connected!")
+        logger.debug("Connected!")
 
         self.cooldown = 5
 
@@ -260,12 +260,12 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_request_error(self, status_code) -> None:
         logger.error(f"Request Error: {status_code}")
 
-        logger.info(
+        logger.debug(
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
         )
         time.sleep(self.cooldown)
         self.cooldown = min(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
-        logger.info("Sleep is over")
+        logger.debug("Sleep is over")
 
     def on_connection_error(self) -> None:
         logger.error(f"Connection Error")
@@ -295,7 +295,7 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.error(f"Exception: {exception}")
 
     def on_data(self, raw_data) -> None:
-        logger.info(pprint(json.loads(raw_data)))
+        logger.debug(pprint(json.loads(raw_data)))
 
         processed_data = json.loads(raw_data)
         task = asyncio.run_coroutine_threadsafe(
@@ -307,4 +307,4 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.debug("Keep Alive signal received")
 
 
-logger.info(f"{str(__name__).title()} module loaded!")
+logger.debug(f"{str(__name__).title()} module loaded!")
