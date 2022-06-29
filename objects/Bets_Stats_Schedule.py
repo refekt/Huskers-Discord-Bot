@@ -177,8 +177,8 @@ class BetLines:
 
     def __str__(self):
         return (
-            f"Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
-            f"Points: {self.points} (Opened: {self.pointsOpen})"
+            f"Against the Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
+            f"Total Points: {self.points} (Opened: {self.pointsOpen})"
         )
 
     def __repr__(self):

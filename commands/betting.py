@@ -107,8 +107,8 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                     dict(
                         name=f"{bet.get('author_str', 'N/A')}'s Bet",
                         value=f"Wins: {bet.get('who_wins', 'N/A')}\n"
-                        f"Points: {bet.get('over_under_points', 'N/A')}\n"
-                        f"Spread: {bet.get('over_under_spread', 'N/A')}",
+                        f"Against the Spread: {bet.get('over_under_spread', 'N/A')}"
+                        f"Total Points: {bet.get('over_under_points', 'N/A')}\n",
                     )
                     for bet in opponent_bets
                 ],
