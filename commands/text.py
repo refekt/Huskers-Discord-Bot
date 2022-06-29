@@ -406,7 +406,6 @@ class TextCog(commands.Cog, name="Text Commands"):
         options: str,
         timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
-        # TODO Timeout is not working as intended.
         survey = Survey(
             client=interaction.client,
             interaction=interaction,

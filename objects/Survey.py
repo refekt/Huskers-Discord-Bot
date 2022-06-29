@@ -1,5 +1,4 @@
 import hashlib
-import math
 import random
 import string
 from typing import Optional, AnyStr, Union, List, Any
@@ -43,6 +42,7 @@ class SurveyOption:
 
 
 class Survey:
+    # TODO Timeout is not working as intended.
     def __init__(
         self,
         client: Union[Client, Bot],
@@ -51,6 +51,7 @@ class Survey:
         question: AnyStr,
         timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
+        super(Survey, self).__init__()
         # Space delimited options
         self.max_options = 3
         options = options.strip()
@@ -80,7 +81,7 @@ class Survey:
         self.embed: Optional[Embed] = None
         self.options: List[SurveyOption] = options
         self.question: Optional[AnyStr] = question
-        self.timeout: int = math.ceil(timeout)
+        self.timeout: int = timeout
 
     class SurveyButtons(View):
         def __init__(
