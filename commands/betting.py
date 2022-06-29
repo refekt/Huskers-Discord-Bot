@@ -29,26 +29,36 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     @bet_group.command(name="game", description="Place a bet against a Nebraska game.")
     @app_commands.describe(
         opponent_name="Name of the opponent_name for the Husker game.",
-        which_team_wins="Which team you predict to win.",
-        which_team_overunder="Prediction for over/under.",
-        which_team_spread="Which team you predict to cover the spread.",
+        who_wins="Whether you predict Nebraska or their opponent to win the game.",
+        over_under_points="Whether you predict the points to go over or under.",
+        over_under_spread="Whether you predict the spread to go over or under.",
     )
     async def bet_game(
         self,
         interaction: discord.Interaction,
         opponent_name: HuskerSched2022,
-        which_team_wins: Optional[WhichTeamChoice],
-        which_team_overunder: Optional[WhichOverUnderChoice],
-        which_team_spread: Optional[WhichTeamChoice],
+        who_wins: Optional[WhichTeamChoice],
+        over_under_points: Optional[WhichOverUnderChoice],
+        over_under_spread: Optional[WhichOverUnderChoice],
     ) -> None:
         await interaction.response.defer()
+
+        assert None not in (
+            who_wins,
+            over_under_points,
+            over_under_spread,
+        ), BettingException("You cannot submit a blank bet!")
+
+        assert who_wins is not None, BettingException(
+            "`who_wins` is the minimum bet and must be included."
+        )
 
         bet = Bet(
             author=interaction.user,
             opponent_name=opponent_name,
-            which_team_wins=which_team_wins,
-            which_team_overunder=which_team_overunder,
-            which_team_spread=which_team_spread,
+            who_wins=who_wins,
+            over_under_points=over_under_points,
+            over_under_spread=over_under_spread,
         )
         try:
             bet.submitRecord()
@@ -57,15 +67,15 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             return
 
         embed = buildEmbed(
-            title="Husker Schedule Betting",
+            title=f"Nebraska vs. {opponent_name} Bet",
+            description=str(bet.bet_lines),
             fields=[
                 dict(
-                    name="Placed Bet",
-                    value=f"Wins: {bet.which_team_wins}\n"
-                    f"Over/Under: {bet.which_team_overunder}\n"
-                    f"Spread: {bet.which_team_spread}",
-                ),
-                dict(name="Betting Lines", value=str(bet.bet_lines)),
+                    name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
+                    value=f"Wins: {bet.who_wins}\n"
+                    f"Over/Under: {bet.over_under_points}\n"
+                    f"Spread: {bet.over_under_spread}",
+                )
             ],
             author=bet.author_str,
             icon_url=interaction.user.display_avatar.url,
@@ -96,9 +106,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 fields=[
                     dict(
                         name=f"{bet.get('author_str', 'N/A')}'s Bet",
-                        value=f"Wins: {bet.get('which_team_wins', 'N/A')}\n"
-                        f"Over/Under: {bet.get('which_team_overunder', 'N/A')}\n"
-                        f"Spread: {bet.get('which_team_spread', 'N/A')}",
+                        value=f"Wins: {bet.get('who_wins', 'N/A')}\n"
+                        f"Over/Under: {bet.get('over_under_points', 'N/A')}\n"
+                        f"Spread: {bet.get('over_under_spread', 'N/A')}",
                     )
                     for bet in opponent_bets
                 ],
