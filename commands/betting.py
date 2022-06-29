@@ -73,8 +73,8 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 dict(
                     name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
                     value=f"Wins: {bet.who_wins}\n"
-                    f"Points: {bet.over_under_points}\n"
-                    f"Spread: {bet.over_under_spread}",
+                    f"Against the Spread: {bet.over_under_spread}"
+                    f"Total Points: {bet.over_under_points}\n",
                 )
             ],
             author=bet.author_str,
