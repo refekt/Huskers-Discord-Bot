@@ -74,8 +74,8 @@ async def on_app_command_error(
 
 
 discord_loggers = ["discord", "discord.client", "discord.gateway"]
-for logger in discord_loggers:
-    _ = logging.getLogger(logger)
+for d_l in discord_loggers:
+    _ = logging.getLogger(d_l)
     _.disabled = True
 
 client.run(PROD_TOKEN, log_handler=None)

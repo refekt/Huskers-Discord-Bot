@@ -166,6 +166,9 @@ class BetLines:
         self.pointsOpen = None
         self.spreadOpen = None
 
+        from_dict["points"] = from_dict["overUnder"]
+        from_dict["pointsOpen"] = from_dict["overUnderOpen"]
+
         for key, value in from_dict.items():
             try:
                 setattr(self, key, value)
