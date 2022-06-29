@@ -154,17 +154,17 @@ class WhichOverUnderChoice(str, enum.Enum):
 
 class BetLines:
     __slots__ = [
-        "overUnderOpen",
-        "overUnder",
+        "pointsOpen",
+        "points",
         "spreadOpen",
         "formattedSpread",
     ]
 
     def __init__(self, from_dict: dict) -> None:
-        self.overUnderOpen = None
-        self.overUnder = None
-        self.spreadOpen = None
         self.formattedSpread = None
+        self.points = None
+        self.pointsOpen = None
+        self.spreadOpen = None
 
         for key, value in from_dict.items():
             try:
@@ -175,7 +175,7 @@ class BetLines:
     def __str__(self):
         return (
             f"Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
-            f"Over/Under: {self.overUnder} (Opened: {self.overUnderOpen})"
+            f"Points: {self.points} (Opened: {self.pointsOpen})"
         )
 
     def __repr__(self):

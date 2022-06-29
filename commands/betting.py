@@ -73,7 +73,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 dict(
                     name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
                     value=f"Wins: {bet.who_wins}\n"
-                    f"Over/Under: {bet.over_under_points}\n"
+                    f"Points: {bet.over_under_points}\n"
                     f"Spread: {bet.over_under_spread}",
                 )
             ],
@@ -107,7 +107,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                     dict(
                         name=f"{bet.get('author_str', 'N/A')}'s Bet",
                         value=f"Wins: {bet.get('who_wins', 'N/A')}\n"
-                        f"Over/Under: {bet.get('over_under_points', 'N/A')}\n"
+                        f"Points: {bet.get('over_under_points', 'N/A')}\n"
                         f"Spread: {bet.get('over_under_spread', 'N/A')}",
                     )
                     for bet in opponent_bets
