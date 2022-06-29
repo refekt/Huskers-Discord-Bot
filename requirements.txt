@@ -1,5 +1,6 @@
 Pillow==9.1.1
 beautifulsoup4==4.11.1
+black==22.6.0
 cfbd>=4.3.2
 cryptography==37.0.2
 discord>=2.0.0

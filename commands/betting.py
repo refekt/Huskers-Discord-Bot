@@ -43,11 +43,8 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     ) -> None:
         await interaction.response.defer()
 
-        assert None not in (
-            who_wins,
-            over_under_points,
-            over_under_spread,
-        ), BettingException("You cannot submit a blank bet!")
+        if [_ for _ in (who_wins, over_under_points, over_under_spread) if _ is None]:
+            raise BettingException("You cannot submit a blank bet!")
 
         assert who_wins is not None, BettingException(
             "`who_wins` is the minimum bet and must be included."

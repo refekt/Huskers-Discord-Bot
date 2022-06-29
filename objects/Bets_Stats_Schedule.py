@@ -325,7 +325,7 @@ class Bet:
                 except BettingException:
                     BettingException("Was not able to create bet in MySQL database.")
         else:
-            logger.info("New bet being placed")
+            logger.info("Embedded placed")
             try:
                 processMySQL(
                     query=sqlInsertGameBet,
@@ -335,6 +335,7 @@ class Bet:
                         self.created,
                         self.created_str,
                         self.opponent_name.school_name,
+                        self.home_game,
                         self.week,
                         self.game_datetime.strftime(DT_MYSQL_FORMAT),
                         self.game_datetime_passed,

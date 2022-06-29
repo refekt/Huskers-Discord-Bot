@@ -7,8 +7,9 @@ from pymysql import OperationalError
 
 from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
 from helpers.misc import getModuleMethod
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(name=__name__, level=logging.DEBUG)
 
 # Image Command
 sqlCreateImageCommand = """
@@ -97,17 +98,18 @@ WHERE
 
 sqlInsertGameBet = """
 INSERT INTO bets (
-  author, author_str, created, created_str,
-  opponent, home_game, week, game_datetime,
-  game_datetime_passed, which_team_wins,
-  which_team_overunder, which_team_spread,
+  id, author, author_str, created, created_str, 
+  opponent, home_game, week, game_datetime, 
+  game_datetime_passed, which_team_wins, 
+  which_team_overunder, which_team_spread, 
   resolved
-)
-VALUES
+) 
+VALUES 
   (
-    % s, % s, % s, % s, % s, % s, % s,
-    % s, % s, % s
-  )
+    0, % s, % s, % s,
+    % s, % s, % s, % s, % s,
+    % s, % s, % s, % s, % s
+  );
 """
 
 sqlUpdateGameBet = """
@@ -305,6 +307,81 @@ WHERE
 """
 
 
+def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
+    module, method = getModuleMethod(inspect.stack())
+    logger.debug(
+        f"Starting a MySQL query called from [{module}-{method}] with query \n[{query}]\n"
+    )
+    sqlConnection = None
+    try:
+        sqlConnection = pymysql.connect(
+            host=SQL_HOST,
+            user=SQL_USER,
+            password=SQL_PASSWD,
+            db=SQL_DB,
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.DictCursor,
+        )
+        logger.debug(f"Connected to the MySQL Database!")
+    except OperationalError:  # Unsure if this is the correct exception
+        logger.error(f"Unable to connect to the `{SQL_DB}` database.")
+
+    result: Union[dict, list[dict], None] = None
+
+    try:
+        with sqlConnection.cursor() as cursor:
+            if (
+                "fetch" not in kwargs.keys()
+            ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
+                if "values" not in kwargs.keys():
+                    cursor.execute(query=query)
+                else:
+                    cursor.execute(query=query, args=kwargs["values"])
+            else:
+                if "values" not in kwargs.keys():
+                    if kwargs["fetch"] == "one":
+                        cursor.execute(query=query)
+                        result: dict = cursor.fetchone()
+                    elif kwargs["fetch"] == "many":
+                        if "size" not in kwargs.keys():
+                            logger.error(
+                                "Fetching many requires a `size` kwargs.", exc_info=True
+                            )
+                        cursor.execute(query=query)
+                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
+                    elif kwargs["fetch"] == "all":
+                        cursor.execute(query=query)
+                        result: list[dict] = cursor.fetchall()
+                else:
+                    if kwargs["fetch"] == "one":
+                        cursor.execute(query=query, args=kwargs["values"])
+                        result: dict = cursor.fetchone()
+                    elif kwargs["fetch"] == "many":
+                        if "size" not in kwargs.keys():
+                            logger.error(
+                                "Fetching many requires a `size` kwargs.", exc_info=True
+                            )
+                        cursor.execute(query=query, args=kwargs["values"])
+                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
+                    elif kwargs["fetch"] == "all":
+                        cursor.execute(query=query, args=kwargs["values"])
+                        result: list[dict] = cursor.fetchall()
+
+        sqlConnection.commit()
+    except TypeError as err:  # noqa
+        # logger.error("Error occurred opening the MySQL database.", exc_info=True)
+        raise err
+    finally:
+        logger.debug(f"Closing connection to the MySQL Database")
+        sqlConnection.close()
+
+        if result:
+            logger.debug(f"Ending a MySQL query called from [{module}-{method}]")
+            return result
+
+
+logger.info(f"{str(__name__).title()} module loaded!")
+
 # # Karma
 # sqlUpdateKarma = """
 # INSERT INTO karma (positive, negative, total)
@@ -490,76 +567,3 @@ WHERE
 # # sqlClearTriviaScore = """
 # # TRUNCATE TABLE trivia_scores
 # # """
-
-
-def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
-    module, method = getModuleMethod(inspect.stack())
-    logger.debug(f"Starting a MySQL query called from [{module}-{method}]")
-    sqlConnection = None
-    try:
-        sqlConnection = pymysql.connect(
-            host=SQL_HOST,
-            user=SQL_USER,
-            password=SQL_PASSWD,
-            db=SQL_DB,
-            charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor,
-        )
-        logger.debug(f"Connected to the MySQL Database!")
-    except OperationalError:  # Unsure if this is the correct exception
-        logger.error(f"Unable to connect to the `{SQL_DB}` database.")
-
-    result: Union[dict, list[dict], None] = None
-
-    try:
-        with sqlConnection.cursor() as cursor:
-            if (
-                "fetch" not in kwargs.keys()
-            ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
-                if "values" not in kwargs.keys():
-                    cursor.execute(query=query)
-                else:
-                    cursor.execute(query=query, args=kwargs["values"])
-            else:
-                if "values" not in kwargs.keys():
-                    if kwargs["fetch"] == "one":
-                        cursor.execute(query=query)
-                        result: dict = cursor.fetchone()
-                    elif kwargs["fetch"] == "many":
-                        if "size" not in kwargs.keys():
-                            logger.error(
-                                "Fetching many requires a `size` kwargs.", exc_info=True
-                            )
-                        cursor.execute(query=query)
-                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
-                    elif kwargs["fetch"] == "all":
-                        cursor.execute(query=query)
-                        result: list[dict] = cursor.fetchall()
-                else:
-                    if kwargs["fetch"] == "one":
-                        cursor.execute(query=query, args=kwargs["values"])
-                        result: dict = cursor.fetchone()
-                    elif kwargs["fetch"] == "many":
-                        if "size" not in kwargs.keys():
-                            logger.error(
-                                "Fetching many requires a `size` kwargs.", exc_info=True
-                            )
-                        cursor.execute(query=query, args=kwargs["values"])
-                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
-                    elif kwargs["fetch"] == "all":
-                        cursor.execute(query=query, args=kwargs["values"])
-                        result: list[dict] = cursor.fetchall()
-
-        sqlConnection.commit()
-    except Exception as e:  # noqa
-        logger.error("Error occurred opening the MySQL database.", exc_info=True)
-    finally:
-        logger.debug(f"Closing connection to the MySQL Database")
-        sqlConnection.close()
-
-        if result:
-            logger.debug(f"Ending a MySQL query called from [{module}-{method}]")
-            return result
-
-
-logger.info(f"{str(__name__).title()} module loaded!")

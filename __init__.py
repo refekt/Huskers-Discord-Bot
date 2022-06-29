@@ -73,7 +73,15 @@ async def on_app_command_error(
         await interaction.channel.send(content="", embed=embed)
 
 
-discord_loggers = ["discord", "discord.client", "discord.gateway"]
+discord_loggers = [
+    "asyncio",
+    "discord",
+    "discord.client",
+    "discord.gateway",
+    "discord.http",
+    "discord.state",
+    "discord.webhook.async_",
+]
 for d_l in discord_loggers:
     _ = logging.getLogger(d_l)
     _.disabled = True
