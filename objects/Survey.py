@@ -51,7 +51,6 @@ class Survey:
         question: AnyStr,
         timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
-        super(Survey, self).__init__()
         # Space delimited options
         self.max_options = 3
         options = options.strip()
@@ -87,7 +86,8 @@ class Survey:
         def __init__(
             self, options: List[SurveyOption], closer, timeout: int = None
         ) -> None:
-            super().__init__(timeout=timeout)
+            # super().__init__(timeout=timeout)
+            super(View, self).__init__(timeout=timeout)
             self.options: List[SurveyOption] = options
             self.tally_str: str = "Tally for: "
             self.footer_str: str = "Users: "
