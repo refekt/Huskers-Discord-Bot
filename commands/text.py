@@ -97,8 +97,8 @@ class TextCog(commands.Cog, name="Text Commands"):
         source_member: discord.Member = None,
     ) -> None:
         logger.info("Attempting to create a markov chain")
-        if interaction.response.is_done():
-            await interaction.response.defer(thinking=True)
+
+        await interaction.response.defer(thinking=True)
 
         channel_history_limit: int = 1000
         combined_sources: list = []
