@@ -173,7 +173,10 @@ class BetLines:
                 continue
 
     def __str__(self):
-        return f"Spread: {self.formattedSpread} (Opened: {self.spreadOpen}), Over/Under: {self.overUnder} (Opened: {self.overUnderOpen})"
+        return (
+            f"Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
+            f"Over/Under: {self.overUnder} (Opened: {self.overUnderOpen})"
+        )
 
     def __repr__(self):
         return [var for var in vars()]
