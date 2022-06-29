@@ -348,28 +348,24 @@ class HuskerClient(Bot):
             thumbnail="https://cdn.discordapp.com/icons/440632686185414677/a_061e9e57e43a5803e1d399c55f1ad1a4.gif",
             fields=[
                 dict(
-                    name="Rules",
-                    value=f"Please be sure to check out the rules channel to catch up on server rules.",
+                    name="Support Bot Frost",
+                    value="Check out `/donate` to see how you can support the project!",
                 ),
                 dict(
                     name="Commands",
                     value=f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
                 ),
                 dict(
-                    name="Hall of Fame & Shame Reaction Threshold",
-                    value=str(self.reaction_threshold),
-                ),
-                dict(
                     name="Version",
                     value=_version,
                 ),
                 dict(
-                    name="Changelog",
-                    value=self.get_change_log(),
+                    name="Hall of Fame & Shame Reaction Threshold",
+                    value=str(self.reaction_threshold),
                 ),
                 dict(
-                    name="Support Bot Frost",
-                    value="Check out `/donate` to see how you can support the project!",
+                    name="Changelog",
+                    value=self.get_change_log(),
                 ),
             ],
         )
