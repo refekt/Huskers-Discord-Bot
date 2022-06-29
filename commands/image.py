@@ -326,7 +326,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
             "An image with that name already exists. Try again!"
         )
 
-        image_name = image_name.replace(" ", "_")  # Replace spaces with undescores
+        image_name = image_name.replace(" ", "_")  # Replace spaces with underscores
 
         if not create_img(interaction.user.id, image_name, image_url):
             raise ImageException("Unable to create the image in the MySQL database!")

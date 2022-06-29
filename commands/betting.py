@@ -31,7 +31,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         opponent_name="Name of the opponent_name for the Husker game.",
         who_wins="Whether you predict Nebraska or their opponent to win the game.",
         over_under_points="Whether you predict the points to go over or under.",
-        over_under_spread="Whether you predict Nebraksa or their opponent to win against the spread.",
+        over_under_spread="Whether you predict Nebraska or their opponent to win against the spread.",
     )
     async def bet_game(
         self,
@@ -68,7 +68,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         embed = buildEmbed(
             title=f"Nebraska vs. {opponent_name} Bet",
-            description=str(bet.bet_lines),
+            description=str(bet.bet_lines)
+            if bet.bet_lines
+            else "Betting lines not available.",
             fields=[
                 dict(
                     name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
@@ -102,7 +104,6 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         else:
             embed = buildEmbed(
                 title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
-                description="",
                 fields=[
                     dict(
                         name=f"{bet.get('author_str', 'N/A')}'s Bet",

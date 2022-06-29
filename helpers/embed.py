@@ -169,7 +169,7 @@ def buildTweetEmbed(
                 break
 
             embed.add_field(
-                name="Embeded URL",
+                name="Embedded URL",
                 value=discordURLFormatter(
                     display_text=url["title"], url=url["expanded_url"]
                 ),
@@ -180,7 +180,7 @@ def buildTweetEmbed(
             if index == 0:
                 embed.set_image(url=item.url)
             embed.add_field(
-                name="Embeded Image",
+                name="Embedded Image",
                 value=discordURLFormatter(f"Image #{index + 1}", item.url),
             )
 
