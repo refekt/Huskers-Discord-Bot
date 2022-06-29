@@ -42,7 +42,6 @@ class SurveyOption:
 
 
 class Survey:
-    # TODO Timeout is not working as intended.
     def __init__(
         self,
         client: Union[Client, Bot],
@@ -51,8 +50,7 @@ class Survey:
         question: AnyStr,
         timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
-        # Space delimited options
-        self.max_options = 3
+        self.max_options = 3  # Space delimited options
         options = options.strip()
         if " " in options:
             options = options.split()
@@ -83,15 +81,11 @@ class Survey:
         self.timeout: int = timeout
 
     class SurveyButtons(View):
-        def __init__(
-            self, options: List[SurveyOption], closer, timeout: int = None
-        ) -> None:
-            # super().__init__(timeout=timeout)
-            super(View, self).__init__(timeout=timeout)
+        def __init__(self, options: List[SurveyOption], timeout: int = None) -> None:
+            super().__init__(timeout=timeout)
             self.options: List[SurveyOption] = options
             self.tally_str: str = "Tally for: "
             self.footer_str: str = "Users: "
-            self.closer = closer
             self.message: Optional[discord.Message, None] = None
 
         async def process_button(
@@ -195,7 +189,10 @@ class Survey:
 
         self.create_embed()
 
-        view = self.SurveyButtons(self.options, self.close_survey())
+        view = self.SurveyButtons(
+            options=self.options,
+            timeout=self.timeout,
+        )
         for index, child in enumerate(view.children):
             if index >= self.max_options:
                 view.remove_item(view.option_three)
@@ -204,9 +201,6 @@ class Survey:
 
         view.message = await self.interaction.followup.send(embed=self.embed, view=view)
         await view.wait()
-
-    async def close_survey(self) -> None:
-        await self.interaction.edit_original_message(view=None)
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
