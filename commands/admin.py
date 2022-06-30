@@ -25,7 +25,6 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
-    GUILD_TEST,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -800,11 +799,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.followup.send(
             f"Back channel communication successfully sent to {chan.mention}!"
         )
-
-    @app_commands.command(name="test", description="dsafasfasd")
-    @app_commands.guilds(discord.Object(id=GUILD_TEST))
-    async def test(self, interaction: discord.Interaction):
-        await interaction.response.send("test")
 
 
 async def setup(bot: commands.Bot) -> None:

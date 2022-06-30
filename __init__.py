@@ -149,9 +149,11 @@ for d_l in discord_loggers:
     _ = logging.getLogger(d_l)
     _.disabled = True
 
-if DEBUGGING_CODE:
-    logger.info("Attempting to connect to the test server")
-    client.run(TEST_TOKEN, log_handler=None)
-else:
-    logger.info("Attempting to connect to the production server")
-    client.run(PROD_TOKEN, log_handler=None)
+# if DEBUGGING_CODE:
+#     logger.info("Attempting to connect to the test server")
+#     client.run(TEST_TOKEN, log_handler=None)
+# else:
+#     logger.info("Attempting to connect to the production server")
+#     client.run(PROD_TOKEN, log_handler=None)
+
+client.run(PROD_TOKEN, log_handler=None)

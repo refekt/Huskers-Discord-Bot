@@ -8,7 +8,8 @@ from typing import Union
 
 import discord
 import tweepy
-from discord import NotFound
+from discord import NotFound, Forbidden, HTTPException
+from discord.app_commands import MissingApplicationID
 from discord.ext.commands import Bot, ExtensionAlreadyLoaded
 from tweepy import Response
 
@@ -16,7 +17,7 @@ from __version__ import _version
 from commands.reminder import MissedReminder, send_reminder
 from helpers.constants import (
     CHAN_BOT_SPAM,
-    CHAN_BOT_SPAM_TEST,
+    CHAN_BOT_SPAM_PRIVATE,
     CHAN_GENERAL,
     CHAN_HOF,
     CHAN_HOS,
@@ -375,6 +376,20 @@ class HuskerClient(Bot):
     async def on_connect(self) -> None:
         logger.info("The bot has connected!")
 
+        if len(self.guilds) > 1:
+            logger.info(
+                f"Bot is located in {len(self.guilds) - 1} other servers. Attempting to leave..."
+            )
+            for guild in self.guilds:
+                if guild.id != GUILD_PROD:
+                    try:
+                        logger.info(f"Trying to leave {guild.name}")
+                        await guild.leave()
+                    except HTTPException:
+                        logger.error(f"Leaving guild {guild.name} failed")
+        else:
+            logger.info("Bot is only located in Husker server")
+
     # noinspection PyMethodMayBeStatic
     async def on_ready(self) -> None:
         self.guild_user_len = len(self.users)
@@ -382,7 +397,7 @@ class HuskerClient(Bot):
 
         if DEBUGGING_CODE:
             chan_botspam: discord.TextChannel = await self.fetch_channel(
-                CHAN_BOT_SPAM_TEST
+                CHAN_BOT_SPAM_PRIVATE
             )
         else:
             chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
@@ -416,36 +431,25 @@ class HuskerClient(Bot):
                 continue
 
         logger.info("All extensions loaded")
-        # loaded_app_commands = None
-        # try:
-        #     if DEBUGGING_CODE:
-        #         logger.info("Attempting to sync the bot tree for the test server")
-        #         self.tree.copy_global_to(guild=discord.Object(id=GUILD_TEST))
-        #         loaded_app_commands = await self.tree.sync(
-        #             guild=discord.Object(id=GUILD_TEST)
-        #         )
-        #     else:
-        #         logger.info("Attempting to sync the bot tree for the production server")
-        #         loaded_app_commands = await self.tree.sync(
-        #             guild=discord.Object(id=GUILD_PROD)
-        #         )
-        # except Forbidden:
-        #     logger.error(
-        #         "The client does not have the ``applications.commands`` scope in the guild."
-        #     )
-        # except MissingApplicationID:
-        #     logger.error("The client does not have an application ID.")
-        # except HTTPException:
-        #     logger.error("Syncing the commands failed.")
-        #
-        # logger.info(f"The bot tree has synced with {len(loaded_app_commands)} commands")
+        loaded_app_commands = None
+        try:
+            loaded_app_commands = await self.tree.sync(
+                guild=discord.Object(id=GUILD_PROD)
+            )
+        except Forbidden:
+            logger.error(
+                "The client does not have the ``applications.commands`` scope in the guild."
+            )
+        except MissingApplicationID:
+            logger.error("The client does not have an application ID.")
+        except HTTPException:
+            logger.error("Syncing the commands failed.")
 
-        logger.info(f"sys.arv = {sys.argv}")
+        logger.info(f"The bot tree has synced with {len(loaded_app_commands)} commands")
 
-        if DEBUGGING_CODE:
-            logger.info("Skipping online message")
-        else:
-            await chan_botspam.send(embed=await self.create_online_message())
+        logger.info(f"sys.arv == {sys.argv}")
+
+        await chan_botspam.send(embed=await self.create_online_message())
 
         if DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
@@ -556,6 +560,7 @@ class HuskerClient(Bot):
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
         if guild_member.guild.id != GUILD_PROD:
+            logger.info("Skipping on_member_join because not Husker server")
             return
         await self.send_welcome_message(guild_member)
 
