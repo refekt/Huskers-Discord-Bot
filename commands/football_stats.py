@@ -477,24 +477,29 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 conference_wins += records[0].conference_games["wins"]  # noqa
                 conference_losses += records[0].conference_games["losses"]  # noqa
 
+        total_games = total_wins + total_losses
+        total_away_games = away_wins + away_losses
+        total_home_games = home_wins + home_losses
+        total_conference_games = conference_wins + conference_losses
+
         embed = buildEmbed(
             title=f"Nebraska's {str(year_start.value) + ' to ' + str(year_end.value) if (year_start is not None and year_end is not None) else year} Season Stats",
             fields=[
                 dict(
                     name="Wins-Losses",
-                    value=f"{total_wins}-{total_losses} ({total_wins / total_losses:0.4f})",
+                    value=f"{total_wins}-{total_losses} ({total_wins/total_games:0.4f})",
                 ),
                 dict(
                     name="Home Wins-Losses",
-                    value=f"{home_wins}-{home_losses} ({home_wins / home_losses:0.4f})",
+                    value=f"{home_wins}-{home_losses} ({home_wins/total_away_games:0.4f})",
                 ),
                 dict(
                     name="Away Wins-Losses",
-                    value=f"{away_wins}-{away_losses} ({away_wins / away_losses:0.4f})",
+                    value=f"{away_wins}-{away_losses} ({away_wins/total_home_games:0.4f})",
                 ),
                 dict(
                     name="Conference Wins-Losses",
-                    value=f"{conference_wins}-{conference_losses} ({conference_wins / conference_losses:0.4f})",
+                    value=f"{conference_wins}-{conference_losses} ({conference_wins/total_conference_games:0.4f})",
                 ),
             ],
         )
