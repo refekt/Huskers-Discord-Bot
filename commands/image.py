@@ -211,7 +211,6 @@ class ImageCog(commands.Cog, name="Image Commands"):
             image_response = requests.get(url=url, stream=True, headers=HEADERS)
             return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
 
-        # TODO Play with these variables to see if we can improve the output
         emote_amount = random.randrange(1, 6)
         noise = random.uniform(0.4, 0.65)
         contrast = random.randrange(1, 99)

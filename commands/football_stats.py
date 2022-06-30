@@ -7,8 +7,11 @@ from cfbd import (
     ApiClient,
     Game,
     PlayersApi,
+    TeamRecord,
+    GamesApi,
 )
 from discord import app_commands
+from discord.app_commands import Choice
 from discord.ext import commands
 
 from helpers.constants import (
@@ -17,6 +20,7 @@ from helpers.constants import (
     DT_CFBD_GAMES_DISPLAY,
     GUILD_PROD,
     TZ,
+    FIELDS_LIMIT,
 )
 from helpers.embed import buildEmbed, collectScheduleEmbeds
 from helpers.misc import checkYearValid
@@ -38,6 +42,11 @@ from objects.Winsipedia import CompareWinsipedia
 logger = discordLogger(__name__)
 
 __all__ = ["FootballStatsCog"]
+
+season_stats_year_choices: list[Choice] = []
+for _ in range(0, FIELDS_LIMIT - 1, 1):
+    cur_year: int = datetime.now().year - _
+    season_stats_year_choices.append(Choice(name=str(cur_year), value=cur_year))
 
 
 class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
@@ -387,7 +396,110 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
     # TODO team-stats
 
-    # TODO season-stats
+    @app_commands.command(name="season-stats", description="The Huskers season stats")
+    @app_commands.describe(year="The year you want to see stats")
+    @app_commands.choices(
+        year_start=season_stats_year_choices, year_end=season_stats_year_choices
+    )
+    async def season_stats(
+        self,
+        interaction: discord.Interaction,
+        year: int = datetime.now().year,
+        year_start: Choice[int] = None,
+        year_end: Choice[int] = None,
+    ):
+        logger.info(f"Retrieving Nebraska's {year} stats")
+        await interaction.response.defer()
+
+        if (year_start and year_end is None) or (
+            year_start is None and year_end
+        ):  # Both variables weren't selected
+            logger.error("Both year_start and year_end were not provided")
+
+            raise StatsException(
+                "If you must pick both year start and year end if choosing a date range."
+            )
+
+        games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
+        records: list[Optional[TeamRecord]] = []
+        total_wins = 0
+        total_losses = 0
+        home_wins = 0
+        home_losses = 0
+        away_wins = 0
+        away_losses = 0
+        conference_wins = 0
+        conference_losses = 0
+
+        if all(
+            _ is None for _ in (year_start, year_end)
+        ):  # Year provided, but year_start and year_end are None
+            logger.info("Generating a single year's stats")
+
+            records = games_api.get_team_records(
+                team=BigTenTeams.Nebraska.value, year=year
+            )
+
+            assert records, StatsException(
+                f"Unable to find records for the Husker's {year} season."
+            )
+
+            total_wins = records[0].total["wins"]  # noqa
+            total_losses = records[0].total["losses"]  # noqa
+            home_wins = records[0].home_games["wins"]  # noqa
+            home_losses = records[0].home_games["losses"]  # noqa
+            away_wins = records[0].away_games["wins"]  # noqa
+            away_losses = records[0].away_games["losses"]  # noqa
+            conference_wins = records[0].conference_games["wins"]  # noqa
+            conference_losses = records[0].conference_games["losses"]  # noqa
+        elif all(
+            _ is not None for _ in (year_start, year_end)
+        ):  # Both year_start and year_end provided
+            logger.info("Generating a range of year's stats")
+
+            for _year in range(  # To prevent year_start and year_end swap
+                min(year_start.value, year_end.value),
+                max(year_start.value, year_end.value),
+            ):
+                records = games_api.get_team_records(
+                    team=BigTenTeams.Nebraska.value, year=_year
+                )
+
+                if records is None:
+                    continue
+
+                total_wins += records[0].total["wins"]  # noqa
+                total_losses += records[0].total["losses"]  # noqa
+                home_wins += records[0].home_games["wins"]  # noqa
+                home_losses += records[0].home_games["losses"]  # noqa
+                away_wins += records[0].away_games["wins"]  # noqa
+                away_losses += records[0].away_games["losses"]  # noqa
+                conference_wins += records[0].conference_games["wins"]  # noqa
+                conference_losses += records[0].conference_games["losses"]  # noqa
+
+        embed = buildEmbed(
+            title=f"Nebraska's {str(year_start.value) + ' to ' + str(year_end.value) if (year_start is not None and year_end is not None) else year} Season Stats",
+            fields=[
+                dict(
+                    name="Wins-Losses",
+                    value=f"{total_wins}-{total_losses} ({total_wins / total_losses:0.4f})",
+                ),
+                dict(
+                    name="Home Wins-Losses",
+                    value=f"{home_wins}-{home_losses} ({home_wins / home_losses:0.4f})",
+                ),
+                dict(
+                    name="Away Wins-Losses",
+                    value=f"{away_wins}-{away_losses} ({away_wins / away_losses:0.4f})",
+                ),
+                dict(
+                    name="Conference Wins-Losses",
+                    value=f"{conference_wins}-{conference_losses} ({conference_wins / conference_losses:0.4f})",
+                ),
+            ],
+        )
+
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
