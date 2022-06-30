@@ -28,7 +28,7 @@ class MyCog(commands.Cog):
     @app_commands.describe(
         example="Description for example variable"
     )  # Typos here will cause the cog not to load
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     @app_commands.default_permissions(
         administrator=True
     )  # https://discordpy.readthedocs.io/en/latest/api.html#discord.Permissions

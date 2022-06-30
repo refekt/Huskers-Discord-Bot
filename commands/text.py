@@ -37,7 +37,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         name="eightball", description="Ask the Magic 8-Ball a question"
     )
     @app_commands.describe(question="The question you want to ask the Magic 8-Ball")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def eightball(self, interaction: discord.Interaction, question: str) -> None:
         responses = [
             "As I see it, yes.",
@@ -89,7 +89,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         source_channel="A Discord text channel you want to use as a source",
         source_member="A Discord server member you want to use as a source",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def markov(
         self,
         interaction: discord.Interaction,
@@ -256,7 +256,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     @app_commands.describe(
         arrestee="A Discord member you want to arrest",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def police(
         self, interaction: discord.Interaction, arrestee: discord.Member
     ) -> None:
@@ -291,7 +291,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     @app_commands.describe(
         message="Share possum droppings for to the server",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def possum(self, interaction: discord.Interaction, message: str) -> None:
         # assert interaction.channel.id == CHAN_POSSUMS, CommandException(
         #     "You can only use this in the possum droppings channel!"
@@ -321,7 +321,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     @app_commands.describe(
         word="The word to look up",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def urban_dictionary(
         self, interaction: discord.Interaction, word: str
     ) -> None:
@@ -398,7 +398,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         options="A maximum of three space deliminated set of options; e.g., 'one two three'",
         timeout="Number of seconds to run the survey.",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def survey(
         self,
         interaction: discord.Interaction,
@@ -424,7 +424,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         state="The name of the states the city is in",
         country="The two digit abbreviation of the country the state is in",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def weather(
         self,
         interaction: discord.Interaction,
@@ -550,7 +550,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         name="hype-me",
         description="Get hype from Husk",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def hypeme(self, interaction: discord.Interaction) -> None:
         class Scroll:
             def __init__(self, message: str) -> None:

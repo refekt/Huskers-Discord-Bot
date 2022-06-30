@@ -25,6 +25,7 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
+    GUILD_TEST,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -265,7 +266,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             return False
 
     @app_commands.command(name="about", description="Learn all about Bot Frost")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def about(self, interaction: discord.Interaction) -> None:
         """All about Bot Frost"""
 
@@ -311,7 +312,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.command(
         name="donate", description="Contribute to the development of Bot Frost"
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def donate(self, interaction: discord.Interaction) -> None:
         """Contribute to the development of Bot Frost"""
 
@@ -347,7 +348,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.command(
         name="commands", description="Lists all commands within the bot"
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def commands(self, interaction: discord.Interaction) -> None:
         """Lists all commands within the bot"""
 
@@ -495,7 +496,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @app_commands.command(name="quit", description="Turn off Bot Frost")
     @app_commands.default_permissions(administrator=True)
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def quit(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
         await interaction.followup.send(
@@ -635,7 +636,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         reason="The reason why",
         duration="Duration in ##d##h##m##s format. E.g.; 30m, 1d6h, 6h30s.",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     @app_commands.default_permissions(manage_messages=True)
     async def iowa(
         self,
@@ -725,7 +726,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @app_commands.command(name="nebraska", description="Bring someone back to Nebraska")
     @app_commands.describe(who="User to bring back to Nebraska")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     @app_commands.default_permissions(manage_messages=True)
     async def nebraska(
         self,
@@ -799,6 +800,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.followup.send(
             f"Back channel communication successfully sent to {chan.mention}!"
         )
+
+    @app_commands.command(name="test", description="dsafasfasd")
+    @app_commands.guilds(discord.Object(id=GUILD_TEST))
+    async def test(self, interaction: discord.Interaction):
+        await interaction.response.send("test")
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -189,7 +189,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         source_url="URL of an image you want to deepfry",
         source_avatar="Avatar of member you want to deepfry",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def deepfry(
         self,
         interaction: discord.Interaction,
@@ -265,7 +265,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         description="Get random inspiration",
     )
     @app_commands.describe(person="Person you want to inspire")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def inspireme(
         self, interaction: discord.Interaction, person: Optional[discord.Member] = None
     ) -> None:
@@ -284,7 +284,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         description="Crown someone as a Slowking",
     )
     @app_commands.describe(person="Person you want to inspire")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def slowking(
         self, interaction: discord.Interaction, person: discord.Member
     ) -> None:
@@ -422,7 +422,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         del image
 
     @app_commands.command(name="twos", description="Random Tunnel Walk of Shame image")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def tunnel_walk(self, interaction: discord.Interaction) -> None:
         logger.info("Grabbing a random TWOS image")
         await interaction.response.defer()
@@ -447,7 +447,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         name="ai-image",
         description="Use craiyon services to generate an AI generated image.",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def ai_image(self, interaction: discord.Interaction, prompt: str) -> None:
         await interaction.response.send_message(
             "This was a fun command to make, but it's really taxing on the bot and I need to turn it off.",

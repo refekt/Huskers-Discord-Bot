@@ -112,7 +112,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
         duration="Duration in ##d##h##m##s format. E.g.; 30m, 1d6h, 6h30s.",
         remind_who="The member to ping",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def remind_me(
         self,
         interaction: discord.Interaction,

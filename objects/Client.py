@@ -16,6 +16,7 @@ from __version__ import _version
 from commands.reminder import MissedReminder, send_reminder
 from helpers.constants import (
     CHAN_BOT_SPAM,
+    CHAN_BOT_SPAM_TEST,
     CHAN_GENERAL,
     CHAN_HOF,
     CHAN_HOS,
@@ -378,7 +379,13 @@ class HuskerClient(Bot):
     async def on_ready(self) -> None:
         self.guild_user_len = len(self.users)
         self.reaction_threshold = int(0.0047 * self.guild_user_len)
-        chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
+
+        if DEBUGGING_CODE:
+            chan_botspam: discord.TextChannel = await self.fetch_channel(
+                CHAN_BOT_SPAM_TEST
+            )
+        else:
+            chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
 
         logger.info(
             f"Reaction threshold for HOF and HOS messages set to [{self.reaction_threshold}]"
@@ -409,14 +416,29 @@ class HuskerClient(Bot):
                 continue
 
         logger.info("All extensions loaded")
-
-        try:
-            logger.info("Attempting to sync the bot tree")
-            await self.tree.sync(guild=discord.Object(id=GUILD_PROD))
-        except Exception as e:  # noqa
-            logger.error("Error syncing the tree!")
-
-        logger.info("The bot tree has synced!")
+        # loaded_app_commands = None
+        # try:
+        #     if DEBUGGING_CODE:
+        #         logger.info("Attempting to sync the bot tree for the test server")
+        #         self.tree.copy_global_to(guild=discord.Object(id=GUILD_TEST))
+        #         loaded_app_commands = await self.tree.sync(
+        #             guild=discord.Object(id=GUILD_TEST)
+        #         )
+        #     else:
+        #         logger.info("Attempting to sync the bot tree for the production server")
+        #         loaded_app_commands = await self.tree.sync(
+        #             guild=discord.Object(id=GUILD_PROD)
+        #         )
+        # except Forbidden:
+        #     logger.error(
+        #         "The client does not have the ``applications.commands`` scope in the guild."
+        #     )
+        # except MissingApplicationID:
+        #     logger.error("The client does not have an application ID.")
+        # except HTTPException:
+        #     logger.error("Syncing the commands failed.")
+        #
+        # logger.info(f"The bot tree has synced with {len(loaded_app_commands)} commands")
 
         logger.info(f"sys.arv = {sys.argv}")
 
@@ -428,7 +450,6 @@ class HuskerClient(Bot):
         if DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
         else:
-            logger.info("Starting Twitter stream")
             start_twitter_stream(self)
             logger.info("Twitter stream started")
 
@@ -531,8 +552,11 @@ class HuskerClient(Bot):
             await asyncio.gather(
                 *tasks
             )  # Has to be the last line of code because I don't know how to make code run after it
+        logger.info("Client on_ready completed")
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
+        if guild_member.guild.id != GUILD_PROD:
+            return
         await self.send_welcome_message(guild_member)
 
     async def on_raw_reaction_add(

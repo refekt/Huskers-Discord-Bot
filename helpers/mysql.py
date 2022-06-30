@@ -9,7 +9,7 @@ from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
 from helpers.misc import getModuleMethod
 from objects.Logger import discordLogger
 
-logger = discordLogger(name=__name__, level=logging.DEBUG)
+logger = discordLogger(name=__name__, level=logging.INFO)
 
 # Image Command
 sqlCreateImageCommand = """

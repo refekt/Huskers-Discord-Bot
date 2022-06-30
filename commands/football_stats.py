@@ -47,7 +47,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.describe(
         opponent_name="Name of opponent_name to lookup",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def countdown(
         self,
         interaction: discord.Interaction,
@@ -115,7 +115,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.describe(
         opponent_name="Name of the opponent_name you want to look up lines for",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def lines(
         self,
         interaction: discord.Interaction,
@@ -164,7 +164,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         team_for="The main team",
         team_against="The team you want to compare the main team against",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def compare_team_stats(
         self, interaction: discord.Interaction, team_for: str, team_against: str
     ) -> None:
@@ -213,7 +213,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
     @app_commands.command(name="schedule", description="Retrieve the team's schedule")
     @app_commands.describe(year="The year of the schedule")
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def schedule(
         self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
@@ -237,7 +237,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         year="The year you want stats",
         player_name="Full name of the player you want to display",
     )
-    @app_commands.guilds(GUILD_PROD)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def player_stats(
         self, interaction: discord.Interaction, year: int, player_name: str
     ) -> None:
