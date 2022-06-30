@@ -409,7 +409,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         year_end: Choice[int] = None,
     ):
         logger.info(f"Retrieving Nebraska's {year} stats")
-        await interaction.response.defer()
+        await interaction.response.defer(thinking=True)
 
         if (year_start and year_end is None) or (
             year_start is None and year_end
@@ -491,11 +491,11 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ),
                 dict(
                     name="Home Wins-Losses",
-                    value=f"{home_wins}-{home_losses} ({home_wins/total_away_games:0.4f})",
+                    value=f"{home_wins}-{home_losses} ({home_wins/total_home_games:0.4f})",
                 ),
                 dict(
                     name="Away Wins-Losses",
-                    value=f"{away_wins}-{away_losses} ({away_wins/total_home_games:0.4f})",
+                    value=f"{away_wins}-{away_losses} ({away_wins/total_away_games:0.4f})",
                 ),
                 dict(
                     name="Conference Wins-Losses",
