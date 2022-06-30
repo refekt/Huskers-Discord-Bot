@@ -288,7 +288,6 @@ class HuskerClient(Bot):
             embed = buildEmbed(
                 title=embed_title,
                 description=embed_description,
-                # thumbnail=slowking_path if not None else None,
                 file=file if file else None,
                 fields=[
                     ["Author", reaction_message.author.mention],
@@ -321,7 +320,6 @@ class HuskerClient(Bot):
         except OSError:
             logger.error("Error loading the changelog!", exc_info=True)
 
-    # noinspection PyMethodMayBeStatic
     async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
@@ -342,7 +340,6 @@ class HuskerClient(Bot):
         )
         await channel_general.send(embed=embed)
 
-    # noinspection PyMethodMayBeStatic
     async def create_online_message(self) -> discord.Embed:
         return buildEmbed(
             title="Welcome to the Huskers server!",
@@ -372,7 +369,6 @@ class HuskerClient(Bot):
             ],
         )
 
-    # noinspection PyMethodMayBeStatic
     async def on_connect(self) -> None:
         logger.info("The bot has connected!")
 
@@ -388,7 +384,7 @@ class HuskerClient(Bot):
                     except HTTPException:
                         logger.error(f"Leaving guild {guild.name} failed")
         else:
-            logger.info("Bot is only located in Husker server")
+            logger.info("Bot is only located in the Husker server")
 
     # noinspection PyMethodMayBeStatic
     async def on_ready(self) -> None:

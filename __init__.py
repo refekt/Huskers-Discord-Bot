@@ -50,11 +50,6 @@ async def on_app_command_error(
 ) -> None:
     logger.info("app_command error detected!")
 
-    try:
-        await interaction.delete_original_message()
-    except (HTTPException, NotFound, Forbidden):
-        pass
-
     err = DiscordError(error, interaction.data.get("options", None))
     logger.error(error, exc_info=True)
 
@@ -77,11 +72,14 @@ async def on_app_command_error(
         ],
     )
 
-    # if interaction.response.is_done():
-    if interaction.original_message() is not None:
+    if interaction.response.is_done():
+        # Make error message hidden
+        try:
+            await interaction.delete_original_message()
+        except (HTTPException, NotFound, Forbidden):
+            pass
         await interaction.followup.send(content="", embed=embed, ephemeral=True)
     else:
-        # await interaction.channel.send(content="", embed=embed)
         await interaction.followup.send(content="", embed=embed, ephemeral=True)
 
 
@@ -148,12 +146,5 @@ discord_loggers = [
 for d_l in discord_loggers:
     _ = logging.getLogger(d_l)
     _.disabled = True
-
-# if DEBUGGING_CODE:
-#     logger.info("Attempting to connect to the test server")
-#     client.run(TEST_TOKEN, log_handler=None)
-# else:
-#     logger.info("Attempting to connect to the production server")
-#     client.run(PROD_TOKEN, log_handler=None)
 
 client.run(PROD_TOKEN, log_handler=None)
