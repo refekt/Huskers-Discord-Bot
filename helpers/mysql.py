@@ -90,6 +90,7 @@ class SqlFetch(str, enum.Enum):
 
 class SqlQuery:
     __slots__ = [
+        "exploded",
         "fetch",
         "processed_query",
         "query",
@@ -129,6 +130,7 @@ class SqlQuery:
                 self.processed_query = self.processed_query.replace(
                     "% s", str(value), 1
                 )
+        self.exploded: list[str] = self.processed_query.replace(",", "").split(" ")
 
     def __str__(self) -> str:
         return self.processed_query

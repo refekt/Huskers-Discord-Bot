@@ -99,17 +99,40 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 description=f"No bets found for {interaction.user.mention}",
             )
         else:
-            embed = buildEmbed(
-                title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
-                fields=[
+            total_wins: dict[str, int] = {"Nebraska": 0, "Opponent": 0}
+            total_spread: dict[str, int] = {"Nebraska": 0, "Opponent": 0}
+            total_overunder: dict[str, int] = {"Over": 0, "Under": 0}
+            fields: list[dict[str, str]] = []
+
+            for bet in opponent_bets:
+                total_wins[bet.get("which_team_wins")] += 1
+                total_spread[bet.get("which_team_spread")] += 1
+                total_overunder[bet.get("which_team_overunder")] += 1
+
+                fields.append(
                     dict(
                         name=f"{bet.get('author_str', 'N/A')}'s Bet",
-                        value=f"Wins: {bet.get('who_wins', 'N/A')}\n"
-                        f"Against the Spread: {bet.get('over_under_spread', 'N/A')}\n"
-                        f"Total Points: {bet.get('over_under_points', 'N/A')}",
+                        value=(
+                            f"Wins: {bet.get('which_team_wins', 'N/A')}\n"
+                            f"Total Points: {bet.get('which_team_spread', 'N/A')}\n"
+                            f"Against the Spread: {bet.get('which_team_overunder', 'N/A')}\n"
+                        ),
                     )
-                    for bet in opponent_bets
-                ],
+                )
+
+            col_width: int = 6
+            totals_str: str = (
+                f"```\n"
+                f"{'Which':<8}|{'Wins':<4}|{'Spread':<6}|{' ' * 6}|{'Points':<{col_width}}\n"
+                f"{'Nebraska':<8}|{total_wins['Nebraska']:<4}|{total_spread['Nebraska']:<6}|{'Over':<6}|{total_overunder['Over']:<{col_width}}\n"
+                f"{'Opponent':<8}|{total_wins['Opponent']:<4}|{total_spread['Opponent']:<6}|{'Under':<6}|{total_overunder['Under']:<{col_width}}\n"
+                f"```"
+            )
+
+            embed = buildEmbed(
+                title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
+                description=totals_str,
+                fields=fields,
             )
 
         await interaction.followup.send(embed=embed)
