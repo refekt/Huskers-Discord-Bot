@@ -6,12 +6,15 @@ from typing import Union, Optional
 import pymysql
 from pymysql import OperationalError
 
-from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
+from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB, DEBUGGING_CODE
 from helpers.misc import getModuleMethod
 from objects.Exceptions import MySQLException
 from objects.Logger import discordLogger
 
-logger = discordLogger(name=__name__, level=logging.INFO)
+if DEBUGGING_CODE:
+    logger = discordLogger(name=__name__, level=logging.DEBUG)
+else:
+    logger = discordLogger(name=__name__, level=logging.INFO)
 
 # Image Command
 sqlCreateImageCommand = (
@@ -142,7 +145,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     )
 
     logger.debug(
-        f"Starting a MySQL query called from [{module}-{method}] with query \n{sql.processed_query}\n"
+        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql.processed_query}\n"
     )
 
     sqlConnection = None

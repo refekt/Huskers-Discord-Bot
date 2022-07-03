@@ -184,7 +184,9 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         )
 
         food_channel: discord.TextChannel = await client.fetch_channel(CHAN_FOOD)
-        await food_channel.send(embed=embed)
+        if food_channel:
+            await food_channel.send(embed=embed)
+        return
 
     embed = buildTweetEmbed(
         name=author.name,
