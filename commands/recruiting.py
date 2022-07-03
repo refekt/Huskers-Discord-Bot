@@ -16,6 +16,7 @@ from helpers.constants import (
     GUILD_PROD,
     HEADERS,
     RECRUIT_STATES,
+    TZ,
 )
 from helpers.embed import buildEmbed, buildRecruitEmbed
 from helpers.misc import checkYearValid
@@ -24,6 +25,7 @@ from helpers.mysql import (
     sqlGetIndividualPrediction,
     sqlInsertPrediction,
     sqlTeamIDs,
+    sqlGetPrediction,
 )
 from objects.Exceptions import RecruitException
 from objects.Logger import discordLogger
@@ -121,17 +123,31 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
                 "Your team choice was not a valid team. Please try again!"
             )
 
-        logger.info("Inserting prediction")
+        logger.info("Checking if a prediction exists already")
+        previous_prediciton: dict = get_individual_predictions(
+            user_id=interaction.user.id, recruit=self.recruit
+        )
+        if previous_prediciton:
+            table_id = previous_prediciton["id"]
+        else:
+            table_id = 0
+
+        logger.info("Inserting or updating prediction")
         processMySQL(
             query=sqlInsertPrediction,
             values=(
-                interaction.user.name,
-                interaction.user.id,
-                self.recruit.name,
-                self.recruit.twofourseven_profile,
-                self.recruit.year,
-                user_prediction.school.value,
-                int(user_prediction.confidence.value),
+                table_id,  # id
+                interaction.user.name,  # user
+                interaction.user.id,  # user_id
+                self.recruit.name,  # recruit_name
+                self.recruit.twofourseven_profile,  # recruit_profile
+                self.recruit.year,  # recruit_class
+                user_prediction.school.value,  # team
+                int(user_prediction.confidence.value),  # confidence
+                datetime.now(tz=TZ),  # prediction_date
+                user_prediction.school.value,  # team
+                int(user_prediction.confidence.value),  # confidence
+                datetime.now(tz=TZ),  # prediction_date
             ),
         )
 
@@ -344,7 +360,7 @@ def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
 
     for index, expert in enumerate(cbs_long_expert[0].contents):
         logger.info(
-            f"Searching expert #{index} out of {len(cbs_long_expert[0].contents)}"
+            f"Searching expert #{index + 1} out of {len(cbs_long_expert[0].contents)}"
         )
         try:
             expert_name = expert.contents[1].string
@@ -564,14 +580,13 @@ def get_teams() -> list[str]:
     return teams_list
 
 
-# TODO Check if this is needed. No code calls it.
-# def get_individual_predictions(user_id: int, recruit) -> Optional[list[dict]]:
-#     sql_response = processMySQL(
-#         query=sqlGetPrediction,
-#         values=(user_id, recruit.twofourseven_profile),
-#         fetch="one",
-#     )
-#     return sql_response
+def get_individual_predictions(user_id: int, recruit) -> Union[dict, list[dict]]:
+    sql_response = processMySQL(
+        query=sqlGetPrediction,
+        values=(user_id, recruit.twofourseven_profile),
+        fetch="one",
+    )
+    return sql_response
 
 
 def search_result_info(new_search: list[Recruit]) -> str:
@@ -668,7 +683,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
             logger.info("Stopping search because search limit reached")
             break
 
-        logger.info(f"Compiling search result #{index} of {len(search_results)}")
+        logger.info(f"Compiling search result #{index + 1} of {len(search_results)}")
         cur_player = search_player["Player"]
 
         reqs = requests.get(url=search_player["Player"]["Url"], headers=HEADERS)
