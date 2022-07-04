@@ -131,12 +131,33 @@ def buildTweetEmbed(
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Creating a tweet embed from [{module}-{method}]")
 
-    if b16:
-        embed = buildEmbed(title="Block 16 Tweet", description="Back by popular demand")
-        if medias:
-            embed.set_image(url=medias[0].url)
+    if b16 and medias:
         logger.info(f"Creating a Block 16 embed from [{module}-{method}]")
-        return embed
+        return buildEmbed(
+            author=f"{name} (@{username})",
+            title="Block 16 Tweet",
+            description=text if text else "",
+            image=medias[0].url,
+            fields=[
+                dict(
+                    name="Link to Tweet",
+                    value=f"https://twitter.com/{username}/status/{tweet_id}",
+                )
+            ],
+        )
+    elif b16:
+        logger.info(f"Creating a Block 16 embed from [{module}-{method}]")
+        return buildEmbed(
+            author=f"{name} (@{username})",
+            title="Block 16 Tweet",
+            description=text if text else "",
+            fields=[
+                dict(
+                    name="Link to Tweet",
+                    value=f"https://twitter.com/{username}/status/{tweet_id}",
+                )
+            ],
+        )
 
     embed = buildEmbed(
         title="",
@@ -152,7 +173,7 @@ def buildTweetEmbed(
             ),
         ],
     )
-    if urls.get("urls"):  # TODO KeyError is raising
+    if urls.get("urls", None):  # TODO KeyError is raising
         for url in urls["urls"]:
             if (
                 medias
