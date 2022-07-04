@@ -314,9 +314,9 @@ class HuskerClient(Bot):
             lines_str = ""
 
             for line in lines:
-                lines_str += f"* {str(line)}"
+                lines_str += f"* {str(line)}\n"
 
-            return lines_str
+            return f"```\n{lines_str}```"
         except OSError:
             logger.error("Error loading the changelog!", exc_info=True)
 
