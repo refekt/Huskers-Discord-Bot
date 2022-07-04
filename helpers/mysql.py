@@ -130,7 +130,12 @@ class SqlQuery:
                 self.processed_query = self.processed_query.replace(
                     "% s", str(value), 1
                 )
-        self.exploded: list[str] = self.processed_query.replace(",", "").split(" ")
+        self.exploded: list[str] = (
+            self.processed_query.replace(",", "")
+            .replace("(", "")
+            .replace(")", "")
+            .split(" ")
+        )
 
     def __str__(self) -> str:
         return self.processed_query
@@ -204,13 +209,13 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     try:
         with sqlConnection.cursor() as cursor:
             if not sql.fetch:
-                if sql.values:
+                if not sql.values:
                     cursor.execute(query=sql.query)
                 else:
                     cursor.execute(query=sql.query, args=sql.values)
             else:
                 if not sql.values:
-                    if sql.values == SqlFetch.one:
+                    if sql.fetch == SqlFetch.one:
                         cursor.execute(query=sql.query)
                         result: dict = cursor.fetchone()
                     elif sql.fetch == SqlFetch.many:
