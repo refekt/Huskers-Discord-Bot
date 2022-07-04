@@ -1,7 +1,7 @@
 import json
 import random
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import List, Optional, Union
 
 import discord.ext.commands
@@ -450,8 +450,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         except StopIteration:
             raise WeatherException("Unable to find state. Please try again!")
 
-        # TODO Figure out what Type is being returned here
-        def shift_utc_tz(dt, shift):
+        def shift_utc_tz(dt, shift: int) -> datetime:
             return dt + timedelta(seconds=shift)
 
         weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
