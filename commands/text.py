@@ -596,3 +596,6 @@ class TextCog(commands.Cog, name="Text Commands"):
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(TextCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

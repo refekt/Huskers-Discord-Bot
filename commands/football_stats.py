@@ -509,3 +509,6 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(FootballStatsCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

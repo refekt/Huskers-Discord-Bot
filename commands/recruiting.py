@@ -865,3 +865,6 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(RecruitingCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
+
+
+logger.info(f"{str(__name__).title()} module loaded!")

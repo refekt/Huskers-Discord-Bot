@@ -472,3 +472,6 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(ImageCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
+
+
+logger.info(f"{str(__name__).title()} module loaded!")
