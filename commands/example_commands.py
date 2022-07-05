@@ -10,6 +10,10 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
+__all__ = [
+    ""
+]  # Leaving blank but insert varaibles and functions that you want accessible to other files
+
 
 class MyCog(commands.Cog):
     # for simplicity, these commands are all global. You can add `guild=` or `guilds=` to `Bot.add_cog` in `setup` to add them to a guild.

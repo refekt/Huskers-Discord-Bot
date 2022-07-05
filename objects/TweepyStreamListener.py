@@ -22,6 +22,8 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
+__all__ = ["StreamClientV2"]
+
 
 # Example
 # task = asyncio.run_coroutine_threadsafe(

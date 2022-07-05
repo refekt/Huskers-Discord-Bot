@@ -10,6 +10,8 @@ key_path = pathlib.PurePath(
     f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
 )
 
+__all__ = ["decrypt", "decrypt_return_data", "encrypt", "load_key"]
+
 
 def write_key():
     """

@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
+__all__ = ["makeSlowking"]
+
 
 def makeSlowking(person: discord.Member) -> discord.File:
     try:

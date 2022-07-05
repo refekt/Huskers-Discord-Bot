@@ -1,7 +1,10 @@
-import asyncio
 import os
 import pathlib
 import sys
+import threading
+import time
+import tracemalloc
+from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from os import listdir
 from typing import Union
@@ -34,15 +37,20 @@ from helpers.mysql import processMySQL, sqlRetrieveReminders, sqlUpdateReminder
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException
 from objects.Logger import discordLogger
+from objects.Scheudle import ScheudlePosts
 from objects.Thread import convert_duration
 from objects.TweepyStreamListener import StreamClientV2
 
 logger = discordLogger(__name__)
 
-__all__ = ["HuskerClient", "start_twitter_stream"]
+__all__ = ["HuskerClient", "start_twitter_stream", "schedstop"]
+
+schedstop: threading.Event = threading.Event()
+
+tracemalloc.start()
 
 
-def start_twitter_stream(client: discord.Client) -> None:
+async def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
     logger.debug("Creating a stream client")
@@ -229,7 +237,7 @@ class HuskerClient(Bot):
             return None
 
         logger.info(
-            f"Reaction threshold broken with [{reactions_over_threshold[0].count}] [{reactions_over_threshold[0].emoji}] reactions"
+            f"Reaction threshold broken with [{reactions_over_threshold[0].count}] [{reactions_over_threshold[0].emoji.encode('utf-8')}] reactions"
         )
         hof_channel = hos_channel = None
         if str(reactions_over_threshold[0].emoji) == slowpoke_emoji:
@@ -392,11 +400,15 @@ class HuskerClient(Bot):
         self.reaction_threshold = int(0.0047 * self.guild_user_len)
 
         if DEBUGGING_CODE:
+            chan_general: discord.TextChannel = await self.fetch_channel(
+                CHAN_BOT_SPAM_PRIVATE
+            )
             chan_botspam: discord.TextChannel = await self.fetch_channel(
                 CHAN_BOT_SPAM_PRIVATE
             )
         else:
-            chan_botspam: discord.TextChannel = await self.fetch_channel(CHAN_BOT_SPAM)
+            chan_general = await self.fetch_channel(CHAN_GENERAL)
+            chan_botspam = await self.fetch_channel(CHAN_BOT_SPAM)
 
         logger.info(
             f"Reaction threshold for HOF and HOS messages set to [{self.reaction_threshold}]"
@@ -445,12 +457,16 @@ class HuskerClient(Bot):
 
         logger.info(f"sys.arv == {sys.argv}")
 
+        logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
+
+        # on_ready_tasks: list[Optional[Coroutine]] = []
+        on_ready_tasks = []
 
         if DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
         else:
-            start_twitter_stream(self)
+            await start_twitter_stream(self)
             logger.info("Twitter stream started")
 
         if DEBUGGING_CODE:
@@ -488,7 +504,6 @@ class HuskerClient(Bot):
 
                 return send_to
 
-            tasks = []
             if open_reminders:
                 logger.info(f"There are {len(open_reminders)} to be loaded")
                 for index, reminder in enumerate(open_reminders):
@@ -534,7 +549,7 @@ class HuskerClient(Bot):
                             f"Adding reminder for/to [{reminder['send_to']}] to task list."
                         )
 
-                        tasks.append(
+                        on_ready_tasks.append(
                             MissedReminder(
                                 duration=duration,
                                 author=reminder["author"],
@@ -548,11 +563,30 @@ class HuskerClient(Bot):
             else:
                 logger.info("No open reminders found")
 
-            logger.info("Processing task lists")
-            await asyncio.gather(
-                *tasks
-            )  # Has to be the last line of code because I don't know how to make code run after it
-        logger.info("Client on_ready completed")
+        logger.info("Gathering and running scheduled daily posts")
+
+        def scheudler():
+            while not schedstop.is_set():
+                # schedule.run_pending()
+                sched.setup_and_run_schedule()
+                time.sleep(3)
+
+        sched: ScheudlePosts = ScheudlePosts()
+        schedthread: threading.Thread = threading.Thread(target=scheudler)
+        schedthread.start()
+
+        logger.info("Scheduled daily posts started")
+
+        if on_ready_tasks:
+            logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
+            # await asyncio.gather(
+            #     *on_ready_tasks, return_exceptions=True
+            # )  # Has to be the last line of code because I don't know how to make code run after it
+
+            _executor = ThreadPoolExecutor()
+            await self.loop.run_in_executor(_executor, *on_ready_tasks)
+
+        logger.info("Finished on_ready_tasks stuff")
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
         if guild_member.guild.id != GUILD_PROD:

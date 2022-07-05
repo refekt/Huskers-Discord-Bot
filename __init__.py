@@ -1,11 +1,16 @@
-from typing import Literal
+import asyncio
+import logging
+from typing import Literal, Optional
 
 import discord  # noqa # Beta version thing
 from discord import HTTPException, NotFound, Forbidden
 from discord.app_commands import CommandInvokeError, commands, MissingApplicationID
 from discord.ext.commands import Context, Greedy
 
-from objects.Client import HuskerClient
+from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
+from helpers.embed import buildEmbed  # noqa
+from objects.Client import HuskerClient, schedstop
+from objects.Exceptions import DiscordError  # noqa
 from objects.Logger import discordLogger
 
 logger = discordLogger("__init__")
@@ -147,4 +152,16 @@ for d_l in discord_loggers:
     _ = logging.getLogger(d_l)
     _.disabled = True
 
-client.run(PROD_TOKEN, log_handler=None)
+
+async def main() -> None:
+    async with client:
+        await client.start(PROD_TOKEN)
+
+
+try:
+    asyncio.run(main())
+except (KeyboardInterrupt, RuntimeError):
+    schedstop.set()
+    pass
+
+logger.info("Closing the bot")
