@@ -9,17 +9,17 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-__all__ = [
+__all__: list[str] = [
     "DateTimeChars",
+    "background_run_function",
     "convertDateTimeString",
     "convert_duration",
     "prettifyTimeDateValue",
-    "background_run_function",
 ]
 
 
 class DateTimeChars(enum.Enum):
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.value)
 
     DAY = "d"
@@ -47,7 +47,7 @@ def getDateTimeValue(dt_get: str, dt_string: str) -> int:
     if dt_get not in dt_string:
         return 0
 
-    raw = dt_string.split(dt_get)[0]
+    raw: str = dt_string.split(dt_get)[0]
     if raw.isnumeric():
         return int(raw)
     else:
@@ -66,11 +66,11 @@ def convertDateTimeString(dt_string: str) -> timedelta:
 
 
 def convert_duration(value: str) -> timedelta:
-    imported_datetime = datetime.strptime(value, DT_TASK_FORMAT)
-    dt_now = datetime.now()
+    imported_datetime: datetime = datetime.strptime(value, DT_TASK_FORMAT)
+    dt_now: datetime = datetime.now()
 
     if imported_datetime > dt_now:
-        duration = imported_datetime - dt_now
+        duration: timedelta = imported_datetime - dt_now
         return duration
     return timedelta(seconds=0)
 
