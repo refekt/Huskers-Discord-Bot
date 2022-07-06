@@ -34,7 +34,7 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-__all__ = [
+__all__: list[str] = [
     "Bet",
     "BetLines",
     "BigTenTeams",
@@ -129,10 +129,10 @@ class HuskerSched2022(str, enum.Enum):
     Wisconsin = "Wisconsin"
     Iowa = "Iowa"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.value
 
 
@@ -140,7 +140,7 @@ class WhichTeamChoice(str, enum.Enum):
     Nebraska = "Nebraska"
     Opponent = "Opponent"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
@@ -148,7 +148,7 @@ class WhichOverUnderChoice(str, enum.Enum):
     Over = "Over"
     Under = "Under"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
@@ -175,13 +175,13 @@ class BetLines:
             except AttributeError as _err:
                 continue
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"Against the Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
             f"Total Points: {self.points} (Opened: {self.pointsOpen})"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return [var for var in vars()]
 
 
@@ -291,7 +291,7 @@ class Bet:
                 home_team=self.opponent_name.school_name.lower(),
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.author_str}: Wins-{self.who_wins}, OverUnder-{self.over_under_points}, Spread-{self.over_under_spread}"
 
     def submitRecord(self) -> None:
@@ -576,8 +576,8 @@ def HuskerSchedule(
         "Unable to retrieve schedule from Huskers.com."
     )
 
-    soup = BeautifulSoup(reqs.content, "html.parser")
-    games_raw = soup.find_all(attrs={"class": "sidearm-schedule-game"})
+    soup: BeautifulSoup = BeautifulSoup(reqs.content, "html.parser")
+    games_raw: ResultSet = soup.find_all(attrs={"class": "sidearm-schedule-game"})
 
     # Some games have a box around them and this removes that
     for index, game in enumerate(games_raw):
