@@ -414,7 +414,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         await interaction.response.defer()
 
         global all_imgs
-        all_imgs: Union[dict, list[dict], None] = retrieve_all_img()
+        all_imgs = retrieve_all_img()
         image: dict = random.choice(all_imgs)
 
         author: Optional[str] = interaction.guild.get_member(int(image["author"]))
