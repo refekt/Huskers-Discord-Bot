@@ -143,6 +143,7 @@ class ScheudlePosts:
                 await self.channel.send(
                     embed=self.schedule_daily_embeds[self.which_day]
                 )
+                self.send_message = False
             else:
                 asyncio_logger.debug("self.send_message == False")
 
