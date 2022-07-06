@@ -1,5 +1,5 @@
 from collections import deque
-from typing import List
+from typing import List, Optional
 
 import discord
 
@@ -8,11 +8,22 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-
-__all__ = ["EmbedPaginatorView"]
+__all__: list[str] = ["EmbedPaginatorView"]
 
 
 class EmbedPaginatorView(discord.ui.View):
+    __slots__ = [
+        "_embeds",
+        "_initial",
+        "_len",
+        "_queue",
+        "children",
+        "current_index",
+        "id",
+        "response",
+        "timeout",
+    ]
+
     def __init__(
         self,
         embeds: List[discord.Embed],
@@ -32,6 +43,7 @@ class EmbedPaginatorView(discord.ui.View):
         self._len: int = len(embeds)
         self.current_index: int = 1
         self.response: discord.InteractionMessage = original_message
+        self.children: Optional[list[discord.Button]] = None
 
         try:  # TODO Make this show up in the middle.
             self.add_item(
@@ -66,7 +78,7 @@ class EmbedPaginatorView(discord.ui.View):
             self.current_index -= 1
         await self.update_current_page()
 
-        embed = self._queue[0]
+        embed: discord.Embed = self._queue[0]
         await interaction.response.edit_message(embed=embed)
 
     @discord.ui.button(emoji="\N{BLACK RIGHTWARDS ARROW}", custom_id="ud_right")
@@ -81,7 +93,7 @@ class EmbedPaginatorView(discord.ui.View):
             self.current_index += 1
         await self.update_current_page()
 
-        embed = self._queue[0]
+        embed: discord.Embed = self._queue[0]
         await interaction.response.edit_message(embed=embed)
 
     @property
