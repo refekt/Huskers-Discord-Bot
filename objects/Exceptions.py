@@ -8,7 +8,7 @@ from discord.app_commands import CommandInvokeError
 
 logger = logging.getLogger(__name__)
 
-__all__ = [
+__all__: list[str] = [
     "BettingException",
     "ChangelogException",
     "CommandException",
@@ -131,6 +131,8 @@ class TextException(Exception):
     message: str
 
 
-ALL_EXCEPTIONS = [globals()[_exc] for _exc in globals() if "Exception" in _exc]
+ALL_EXCEPTIONS: list[object] = [
+    globals()[_exc] for _exc in globals() if "Exception" in _exc
+]
 
 logger.info(f"{str(__name__).title()} module loaded!")
