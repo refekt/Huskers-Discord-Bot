@@ -1,19 +1,19 @@
-from typing import Optional
+from typing import Optional, Union
 
 import discord.ext.commands
 from discord import app_commands
 from discord.app_commands import Group
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, GUILD_TEST
+from helpers.constants import GUILD_PROD
 from helpers.embed import buildEmbed
 from objects.Bets_Stats_Schedule import (
     Bet,
-    WhichTeamChoice,
-    HuskerSched2022,
-    retrieveGameBets,
     BigTenTeams,
+    HuskerSched2022,
     WhichOverUnderChoice,
+    WhichTeamChoice,
+    retrieveGameBets,
 )
 from objects.Exceptions import BettingException
 from objects.Logger import discordLogger
@@ -23,7 +23,7 @@ logger = discordLogger(__name__)
 
 class BettingCog(commands.Cog, name="Betting Commands"):
     bet_group: Group = app_commands.Group(
-        name="bet", description="Betting commands", guild_ids=[GUILD_PROD, GUILD_TEST]
+        name="bet", description="Betting commands", guild_ids=[GUILD_PROD]
     )
 
     @bet_group.command(name="game", description="Place a bet against a Nebraska game.")
@@ -50,7 +50,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             "`who_wins` is the minimum bet and must be included."
         )
 
-        bet = Bet(
+        bet: Bet = Bet(
             author=interaction.user,
             opponent_name=opponent_name,
             who_wins=who_wins,
@@ -63,7 +63,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             logger.error("Error submitting the bet to the MySQL database.")
             return
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title=f"Nebraska vs. {opponent_name} Bet",
             description=str(bet.bet_lines)
             if bet.bet_lines
@@ -91,10 +91,12 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     ):
         await interaction.response.defer()
 
-        opponent_bets = retrieveGameBets(school_name=opponent_name, _all=True)
+        opponent_bets: Union[list[dict], dict, None] = retrieveGameBets(
+            school_name=opponent_name, _all=True
+        )
 
         if opponent_bets is None:
-            embed = buildEmbed(
+            embed: discord.Embed = buildEmbed(
                 title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
                 description=f"No bets found for {interaction.user.mention}",
             )
