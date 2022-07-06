@@ -2,10 +2,12 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-__all__ = ["Recruit", "RecruitInterest"]
+__all__: list[str] = ["Recruit", "RecruitInterest"]
 
 
 class RecruitInterest:
+    __slots__ = ["offered", "school", "status"]
+
     def __init__(self, school: str, offered: str, status: str = None) -> None:
         self.offered = offered
         self.school = school
@@ -13,6 +15,43 @@ class RecruitInterest:
 
 
 class Recruit:
+    __slots__ = [
+        "bio",
+        "cb_experts",
+        "cb_predictions",
+        "city",
+        "commitment_date",
+        "committed",
+        "committed_school",
+        "early_enrollee",
+        "early_signee",
+        "height",
+        "key",
+        "name",
+        "position",
+        "ranking_all_time",
+        "ranking_national",
+        "ranking_position",
+        "ranking_state",
+        "rating_numerical",
+        "rating_stars",
+        "recruit_interests",
+        "recruit_interests_url",
+        "school",
+        "school_type",
+        "scout_evaluation",
+        "state",
+        "state_abbr",
+        "team_id",
+        "thumbnail",
+        "twitter",
+        "twofourseven_highlights",
+        "twofourseven_profile",
+        "walk_on",
+        "weight",
+        "year",
+    ]
+
     def __init__(
         self,
         bio: str,
