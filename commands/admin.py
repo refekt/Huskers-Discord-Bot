@@ -7,6 +7,7 @@ from typing import Any, Union, Optional
 
 import discord.ext.commands
 from discord import app_commands, Forbidden, HTTPException
+from discord.app_commands import Group, Command
 from discord.ext import commands
 
 from __version__ import _version
@@ -21,7 +22,6 @@ from helpers.constants import (
     CHAN_HYPE_GROUP,
     CHAN_IOWA,
     CHAN_RECRUITING,
-    DISCORD_USER_TYPES,
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
@@ -46,7 +46,7 @@ logger = discordLogger(__name__)
 class ConfirmButtons(discord.ui.View):
     def __init__(self) -> None:
         super().__init__()
-        self.value = None
+        self.value: Optional[bool] = None
 
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
     async def confirm(
@@ -69,24 +69,24 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         recruiting = 2
         admin = 3
 
-    group_purge = app_commands.Group(
+    group_purge: app_commands.Group = app_commands.Group(
         name="purge",
         description="Purge messages from channel",
         default_permissions=discord.Permissions(administrator=True),
         guild_ids=[GUILD_PROD],
     )
-    group_submit = app_commands.Group(
+    group_submit: app_commands.Group = app_commands.Group(
         name="submit",
         description="Submit a bug or feature request for the bot",
         guild_ids=[GUILD_PROD],
     )
-    group_gameday = app_commands.Group(
+    group_gameday: app_commands.Group = app_commands.Group(
         name="gameday",
         description="Turn game day mode on or off",
         default_permissions=discord.Permissions(manage_messages=True),
         guild_ids=[GUILD_PROD],
     )
-    group_restart = app_commands.Group(
+    group_restart: app_commands.Group = app_commands.Group(
         name="restart",
         description="Restart elements of the bot",
         default_permissions=discord.Permissions(manage_messages=True),
@@ -97,12 +97,16 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def alert_gameday_channels(
         self, client: Union[discord.ext.commands.Bot, discord.Client], on: bool
     ) -> None:
-        chan_general = await client.fetch_channel(CHAN_GENERAL)
-        chan_live = await client.fetch_channel(CHAN_DISCUSSION_LIVE)
-        chan_streaming = await client.fetch_channel(CHAN_DISCUSSION_STREAMING)
+        chan_general: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
+        chan_live: discord.TextChannel = await client.fetch_channel(
+            CHAN_DISCUSSION_LIVE
+        )
+        chan_streaming: discord.TextChannel = await client.fetch_channel(
+            CHAN_DISCUSSION_STREAMING
+        )
 
         if on:
-            embed = buildEmbed(
+            embed: discord.Embed = buildEmbed(
                 title="Game Day Mode",
                 description="Game day mode is now on!",
                 fields=[
@@ -138,22 +142,22 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     # noinspection PyMethodMayBeStatic
     async def process_gameday(self, mode: bool, guild: discord.Guild) -> None:
-        gameday_category = guild.get_channel(CAT_GAMEDAY)
-        general_category = guild.get_channel(CAT_GENERAL)
-        everyone = guild.get_role(ROLE_EVERYONE_PROD)
+        gameday_category: discord.CategoryChannel = guild.get_channel(CAT_GAMEDAY)
+        general_category: discord.CategoryChannel = guild.get_channel(CAT_GENERAL)
+        everyone: discord.Role = guild.get_role(ROLE_EVERYONE_PROD)
 
         logger.info(f"Creating permissions to be [{mode}]")
 
-        perms_text = discord.PermissionOverwrite()
+        perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite()
 
         perms_text.view_channel = mode  # noqa
         perms_text.send_messages = mode  # noqa
         perms_text.read_messages = mode  # noqa
 
-        perms_text_opposite = discord.PermissionOverwrite()
+        perms_text_opposite: discord.PermissionOverwrite = discord.PermissionOverwrite()
         perms_text_opposite.send_messages = not mode  # noqa
 
-        perms_voice = discord.PermissionOverwrite()
+        perms_voice: discord.PermissionOverwrite = discord.PermissionOverwrite()
         perms_voice.view_channel = mode  # noqa
         perms_voice.connect = mode  # noqa
         perms_voice.speak = mode  # noqa
@@ -220,8 +224,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def college_purge_messages(
         self, channel: Any, all_messages: bool = False
     ) -> list:
-        msgs = []
-        max_age = datetime.now() - timedelta(
+        msgs: list[discord.Message] = []
+        max_age: datetime = datetime.now() - timedelta(
             days=13, hours=23, minutes=59
         )  # Discord only lets you delete 14 day old messages
 
@@ -251,7 +255,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     # noinspection PyMethodMayBeStatic
     async def confirm_purge(self, interaction: discord.Interaction) -> bool:
 
-        view = ConfirmButtons()
+        view: ConfirmButtons = ConfirmButtons()
         await interaction.response.send_message(
             "Do you want to continue?", view=view, ephemeral=True
         )
@@ -365,7 +369,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         ]
         # Don't judge me for the craziness above
 
-        embed_fields_commands: list[dict] = []
+        embed_fields_commands: list[dict[str, str]] = []
 
         def commandHasPerms(
             command: Union[discord.app_commands.Command, discord.app_commands.Group]
@@ -382,8 +386,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 return True
 
         for cmd in app_cmds.items():
-            cmd_name = cmd[0]
-            cmd_command = cmd[1]
+            cmd_name: Union[Group, Command] = cmd[0]
+            cmd_command: Union[Group, Command] = cmd[1]
             if str(cmd_name).lower() == "smms":
                 continue
 
@@ -415,13 +419,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         embed_fields_commands = sorted(embed_fields_commands, key=lambda x: x["name"])
 
         embeds: list[discord.Embed] = list()
-        limit = 10  # Arbitary limit
+        limit: int = 10  # Arbitary limit
         if len(embed_fields_commands) > limit:
             logger.info("Number of commands surprasses Discord embed field limitations")
-            temp = []
+            temp: list = []
             for i in range(0, len(embed_fields_commands), limit):
                 temp.append(embed_fields_commands[i : i + limit])
-            embeds = [
+            embeds: list[discord.Embed] = [
                 buildEmbed(
                     title="Bot Frost Commands",
                     description=f"There are {len(embed_fields_commands)} commands",
@@ -438,7 +442,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 )
             )
 
-        view = EmbedPaginatorView(
+        view: EmbedPaginatorView = EmbedPaginatorView(
             embeds=embeds, original_message=await interaction.original_message()
         )
 
@@ -461,7 +465,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.edit_original_message(content="Working...")
 
-        msgs = await self.college_purge_messages(
+        msgs: list[discord.Message] = await self.college_purge_messages(
             channel=interaction.channel, all_messages=False
         )
 
@@ -483,7 +487,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.edit_original_message(content="Working...")
 
-        msgs = await self.college_purge_messages(
+        msgs: list[discord.Message] = await self.college_purge_messages(
             channel=interaction.channel, all_messages=True
         )
 
@@ -515,7 +519,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         logger.info("Starting to update the changelog")
-        bash_script_path = pathlib.PurePosixPath(
+        bash_script_path: pathlib.PurePosixPath = pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.parent.resolve()}/changelog.sh"
         )
         logger.info(f"Opening bash script: {bash_script_path}")
@@ -541,13 +545,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def twitter(self, interaction: discord.Interaction) -> None:
         logger.info("Restarting the twitter bot")
         await interaction.response.defer(ephemeral=True)
-        start_twitter_stream(client=interaction.client)
+        await start_twitter_stream(client=interaction.client)
         await interaction.followup.send("Twitter stream has been restarted!")
         logger.info("Twitter stream restarted!")
 
     @group_submit.command(name="bug", description="Submit a bug")
     async def submit_bug(self, interaction: discord.Interaction) -> None:
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Bug Reporter",
             description=discordURLFormatter(
                 "Submit a bug report here",
@@ -558,7 +562,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @group_submit.command(name="feature", description="Submit a feature")
     async def submit_feature(self, interaction: discord.Interaction) -> None:
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Feature Request",
             description=discordURLFormatter(
                 "Submit a feature request here",
@@ -577,7 +581,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         if not interaction.response.is_done():
             await interaction.response.defer(thinking=True)
 
-        role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
+        role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
         try:
             await who.remove_roles(role_timeout)
         except (Forbidden, HTTPException) as e:
@@ -585,20 +589,20 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Removed [{role_timeout}] role")
 
-        previous_roles_raw = processMySQL(
+        previous_roles_raw: Union[dict, list[dict], None] = processMySQL(
             query=sqlRetrieveIowa, values=who.id, fetch="all"
         )
 
         processMySQL(query=sqlRemoveIowa, values=who.id)
 
         if previous_roles_raw is not None:
-            previous_roles = previous_roles_raw[0]["previous_roles"].split(",")
+            previous_roles: str = previous_roles_raw[0]["previous_roles"].split(",")
             logger.info(f"Gathered all the roles to store")
 
             if previous_roles:
                 for role in previous_roles:
                     try:
-                        new_role = interaction.guild.get_role(int(role))
+                        new_role: discord.Role = interaction.guild.get_role(int(role))
                         logger.info(f"Attempting to add [{new_role}] role...")
                         await who.add_roles(new_role, reason="Returning from Iowa")
                     except (
@@ -611,7 +615,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
                     logger.info(f"Added [{new_role}] role")
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Return to Nebraska",
             fields=[
                 {
@@ -640,7 +644,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def iowa(
         self,
         interaction: discord.Interaction,
-        who: DISCORD_USER_TYPES,
+        who: Union[discord.Member, discord.User],
         reason: str,
         duration: str = None,
     ) -> None:
@@ -664,20 +668,20 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         else:
             dt_duration = None
 
-        role_timeout = interaction.guild.get_role(ROLE_TIME_OUT)
-        channel_iowa = interaction.guild.get_channel(CHAN_IOWA)
-        full_reason = (
+        role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
+        channel_iowa: discord.TextChannel = interaction.guild.get_channel(CHAN_IOWA)
+        full_reason: str = (
             f"Time Out by {interaction.user.name}#{interaction.user.discriminator}: "
             + reason
         )
 
-        previous_roles = [str(role.id) for role in who.roles[1:]]
+        previous_roles: Union[list[str], str] = [str(role.id) for role in who.roles[1:]]
         if previous_roles:
             previous_roles = ",".join(previous_roles)
 
         logger.info(f"Gathered all the roles to store")
 
-        roles = who.roles
+        roles: list[discord.Role] = who.roles
         for role in roles:
             try:
                 await who.remove_roles(role, reason=full_reason)
@@ -697,14 +701,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
         logger.debug("Saved old roles roles to MySQL database")
 
-        statement_str = f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
-        message_str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
+        statement_str: str = f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
+        message_str: str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
 
         if duration:
             statement_str += f" This will be reverted in {duration}."
             message_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Banished to Iowa",
             fields=[
                 dict(name="Statement", value=statement_str),
@@ -730,7 +734,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def nebraska(
         self,
         interaction: discord.Interaction,
-        who: DISCORD_USER_TYPES,
+        who: Union[discord.Member, discord.User],
     ) -> None:
 
         await self.proess_nebraska(interaction=interaction, who=who)
@@ -774,7 +778,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.response.defer(ephemeral=True, thinking=True)
 
-        chan = None
+        chan: Optional[discord.TextChannel] = None
         if destination.name == "general":
             chan = await interaction.guild.fetch_channel(CHAN_GENERAL)
         elif destination.name == "recruiting":
@@ -782,7 +786,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         elif destination.name == "admin":
             chan = await interaction.guild.fetch_channel(CHAN_ADMIN)
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Secret Mammal Message System (SMMS)",
             description="These messages have no way to be verified to be accurate.",
             thumbnail="https://i.imgur.com/EGC1qNt.jpg",
