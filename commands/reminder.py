@@ -20,7 +20,7 @@ from objects.Thread import (
 
 logger = discordLogger(__name__)
 
-__all__ = [
+__all__: list[str] = [
     "MissedReminder",
     "send_reminder",
 ]
@@ -35,15 +35,15 @@ class MissedReminder:
         message: str,
         remind_who: Union[discord.Member, int, None] = None,
         missed_reminder: bool = False,
-    ):
-        self.duration = duration
-        self.author = author
-        self.destination = destination
-        self.message = message
-        self.remind_who = remind_who
-        self.missed_reminder = missed_reminder
+    ) -> None:
+        self.duration: timedelta = duration
+        self.author: Union[discord.Member, str] = author
+        self.destination: discord.TextChannel = destination
+        self.message: str = message
+        self.remind_who: Union[discord.Member, int, None] = remind_who
+        self.missed_reminder: bool = missed_reminder
 
-    async def run(self):
+    async def run(self) -> None:
         logger.debug(f"Sleeping for {self.duration.total_seconds():,} seconds")
         await asyncio.sleep(self.duration.total_seconds())
         logger.info("Sleep complete. Sending reminder!")
@@ -76,7 +76,7 @@ async def send_reminder(
     message: str,
     remind_who: Union[discord.Member, int, None] = None,
     missed_reminder: bool = False,
-):
+) -> None:
     if missed_reminder:
         processMySQL(
             query=sqlUpdateReminder,
@@ -88,7 +88,7 @@ async def send_reminder(
             ),
         )
 
-    embed = buildEmbed(
+    embed: discord.Embed = buildEmbed(
         title=f"Reminder Message for {remind_who.name}#{remind_who.discriminator}"
         if isinstance(remind_who, discord.Member)
         else "Reminder Message",
