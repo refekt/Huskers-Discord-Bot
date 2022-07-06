@@ -468,7 +468,7 @@ class HuskerClient(Bot):
             await start_twitter_stream(self)
             logger.info("Twitter stream started")
 
-        if DEBUGGING_CODE:
+        if not DEBUGGING_CODE:
             logger.info("Skipping restarting reminders")
         else:
             logger.info("Collecting open reminders")
@@ -556,7 +556,7 @@ class HuskerClient(Bot):
                                 message=reminder["message"],
                                 remind_who=remind_who,
                                 missed_reminder=True,
-                            ).run()
+                            ).run
                         )
                 logger.info("Compiled all open tasks")
             else:
