@@ -1,6 +1,7 @@
 import hashlib
 import random
 import string
+from hashlib import _Hash
 from typing import Optional, AnyStr, Union, List, Any
 
 import discord
@@ -22,7 +23,7 @@ from objects.Thread import prettifyTimeDateValue
 
 logger = discordLogger(__name__)
 
-__all__ = ["Survey"]
+__all__: list[str] = ["Survey"]
 
 
 def generate_random_key() -> str:
@@ -33,6 +34,8 @@ def generate_random_key() -> str:
 
 
 class SurveyOption:
+    __slots__ = ["custom_id", "label", "value"]
+
     def __init__(self, label: AnyStr) -> None:
         assert isinstance(label, str), SurveyException("Label must be a string!")
 
@@ -42,6 +45,16 @@ class SurveyOption:
 
 
 class Survey:
+    __slots__ = [
+        "client",
+        "embed",
+        "interaction",
+        "max_options",
+        "options",
+        "question",
+        "timeout",
+    ]
+
     def __init__(
         self,
         client: Union[Client, Bot],
@@ -81,6 +94,8 @@ class Survey:
         self.timeout: int = timeout
 
     class SurveyButtons(View):
+        __slots__ = ["options", "tally_str", "footer_str", "message"]
+
         def __init__(self, options: List[SurveyOption], timeout: int = None) -> None:
             super().__init__(timeout=timeout)
             self.options: List[SurveyOption] = options
@@ -150,7 +165,7 @@ class Survey:
             await self.message.edit(view=self)
 
     def create_embed(self) -> None:
-        embed = Embed(
+        embed: discord.Embed = Embed(
             title="Survey",
             description=f"Please provide your feedback. This survey expires in {prettifyTimeDateValue(self.timeout)} seconds.",
             color=0xD00000,
@@ -171,7 +186,7 @@ class Survey:
         self.embed = embed
 
     def update_embed(self, user_id: str, opt: str) -> None:
-        hashed_user = hashlib.sha1(str(user_id).encode("UTF-8")).hexdigest()[:10]
+        hashed_user: _Hash = hashlib.sha1(str(user_id).encode("UTF-8")).hexdigest()[:10]
         if hashed_user in self.embed.footer.text:
             return
 
@@ -180,7 +195,7 @@ class Survey:
                 option.value += 1
                 break
 
-        footer_text = self.embed.footer.text
+        footer_text: str = self.embed.footer.text
         self.create_embed()
         self.embed.set_footer(text=f"{footer_text} {hashed_user} ")
 
