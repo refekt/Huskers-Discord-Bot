@@ -60,7 +60,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         try:
             bet.submitRecord()
         except BettingException:
-            logger.error("Error submitting the bet to the MySQL database.")
+            logger.exception("Error submitting the bet to the MySQL database.")
             return
 
         embed: discord.Embed = buildEmbed(

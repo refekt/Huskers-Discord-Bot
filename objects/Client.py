@@ -1,15 +1,15 @@
+import asyncio
 import os
 import pathlib
 import sys
-import threading
-import time
 import tracemalloc
-from concurrent.futures import ThreadPoolExecutor
+from asyncio import Future
 from datetime import timedelta
 from os import listdir
 from typing import Union
 
 import discord
+import schedule
 import tweepy
 from discord import NotFound, Forbidden, HTTPException
 from discord.app_commands import MissingApplicationID
@@ -42,9 +42,9 @@ from objects.TweepyStreamListener import StreamClientV2
 
 logger = discordLogger(__name__)
 
-__all__: list[str] = ["HuskerClient", "start_twitter_stream", "schedstop"]
+__all__: list[str] = ["HuskerClient", "start_twitter_stream"]
 
-schedstop: threading.Event = threading.Event()
+# schedstop: threading.Event = threading.Event()
 
 tracemalloc.start()
 
@@ -325,7 +325,7 @@ class HuskerClient(Bot):
 
             return f"```\n{lines_str}```\n[Full GitHub Changelog](https://github.com/refekt/Bot-Frost/commits/master)"
         except OSError:
-            logger.error("Error loading the changelog!", exc_info=True)
+            logger.exception("Error loading the changelog!", exc_info=True)
 
     async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
@@ -389,7 +389,7 @@ class HuskerClient(Bot):
                         logger.info(f"Trying to leave {guild.name}")
                         await guild.leave()
                     except HTTPException:
-                        logger.error(f"Leaving guild {guild.name} failed")
+                        logger.exception(f"Leaving guild {guild.name} failed")
         else:
             logger.info("Bot is only located in the Husker server")
 
@@ -434,7 +434,7 @@ class HuskerClient(Bot):
                 logger.info(f"The [{extension}] is already loaded. Skipping")
                 continue
             except Exception as e:  # noqa
-                logger.error(f"Unable to load the {extension} extension\n{e}")
+                logger.exception(f"Unable to load the {extension} extension\n{e}")
                 continue
 
         logger.info("All extensions loaded")
@@ -444,13 +444,13 @@ class HuskerClient(Bot):
                 guild=discord.Object(id=GUILD_PROD)
             )
         except Forbidden:
-            logger.error(
+            logger.exception(
                 "The client does not have the ``applications.commands`` scope in the guild."
             )
         except MissingApplicationID:
-            logger.error("The client does not have an application ID.")
+            logger.exception("The client does not have an application ID.")
         except HTTPException:
-            logger.error("Syncing the commands failed.")
+            logger.exception("Syncing the commands failed.")
 
         logger.info(f"The bot tree has synced with {len(loaded_app_commands)} commands")
 
@@ -519,7 +519,7 @@ class HuskerClient(Bot):
                         )
 
                         if destination == remind_who:
-                            logger.error(
+                            logger.exception(
                                 "destination and remind_who are both None. Skipping!"
                             )
                             continue
@@ -563,15 +563,60 @@ class HuskerClient(Bot):
 
         logger.info("Gathering and running scheduled daily posts")
 
-        def scheudler() -> None:
-            while not schedstop.is_set():
-                # schedule.run_pending()
-                sched.setup_and_run_schedule()
-                time.sleep(3)
+        schedule_daily_embeds: list[discord.Embed] = [
+            buildEmbed(
+                title=f"Monday Motivation",
+                description=f"Monday's suck. How can get through the day?",
+            ),
+            buildEmbed(
+                title=f"Good News Tuesday",
+                description=f"Share your good news of the day/week!",
+            ),
+            buildEmbed(
+                title=f"What's Your Wish Wednesday",
+                description=f"What do you want to see happen this week?",
+            ),
+            buildEmbed(
+                title=f"Throwback Thursday",
+                description=f"What is something from the past you want to share?",
+            ),
+            buildEmbed(
+                title=f"Finally Friday",
+                description=f"What's the plan for the weekend?",
+            ),
+            buildEmbed(title=f"Saturday", description=f"Weekend vibes"),
+            buildEmbed(title=f"Sunday", description=f"Weekend vibes"),
+        ]
 
-        sched: ScheudlePosts = ScheudlePosts()
-        schedthread: threading.Thread = threading.Thread(target=scheudler)
-        schedthread.start()
+        async def scheduler() -> None:
+            logger.debug("Scheduler starting...")
+
+            sched: ScheudlePosts = ScheudlePosts()
+
+            while True:
+                logger.debug("Scheduler...")
+                schedule.run_pending()
+                await asyncio.sleep(1)
+
+                if sched.send_message:
+                    guild: discord.Guild = await self.fetch_guild(GUILD_PROD)
+                    if DEBUGGING_CODE:
+                        chan_daily_message: discord.Text = await guild.fetch_channel(
+                            CHAN_BOT_SPAM_PRIVATE
+                        )
+                    else:
+                        chan_daily_message = await guild.fetch_channel(CHAN_GENERAL)
+
+                    await chan_daily_message.send(
+                        embed=schedule_daily_embeds[sched.which_day]
+                    )
+
+        # schedthread: threading.Thread = threading.Thread(target=scheudler)
+        # schedthread.start()
+        future_schedule: Future = asyncio.run_coroutine_threadsafe(
+            scheduler(), self.loop
+        )
+        future_schedule.result()
 
         logger.info("Scheduled daily posts started")
 
@@ -581,8 +626,7 @@ class HuskerClient(Bot):
             #     *on_ready_tasks, return_exceptions=True
             # )  # Has to be the last line of code because I don't know how to make code run after it
 
-            _executor = ThreadPoolExecutor()
-            await self.loop.run_in_executor(_executor, *on_ready_tasks)
+            await self.loop.run_in_executor(None, *on_ready_tasks)
 
         logger.info("Finished on_ready_tasks stuff")
 

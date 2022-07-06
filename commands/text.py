@@ -190,7 +190,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                         source_content += check_message(message)
                     logger.info("Discord text channel source compiled")
                 else:
-                    logger.error("Unexpected source type!", exc_info=True)
+                    logger.exception("Unexpected source type!", exc_info=True)
                     continue
 
         if not source_content == "":

@@ -671,7 +671,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
             year=year, team=BigTenTeams.Nebraska.lower()
         )  # We only care about Nebraska's schedule
     except ApiException:
-        logger.error("CFBD API unable to get games", exc_info=True)
+        logger.exception("CFBD API unable to get games", exc_info=True)
         raise BettingException("CFBD API unable to get games")
 
     for index, game in enumerate(games):
@@ -683,7 +683,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
             if not (game.away_points and game.home_points):
                 return game.week
             else:
-                logger.error(
+                logger.exception(
                     "Unknown error occurred when getting week for Nebraska game",
                     exc_info=True,
                 )
@@ -696,7 +696,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
         ):
             return game.week
 
-    logger.error(f"Unable to find week for {team}")
+    logger.exception(f"Unable to find week for {team}")
     raise BettingException(f"Unable to find week for {team}")
 
 

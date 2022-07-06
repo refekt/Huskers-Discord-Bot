@@ -193,7 +193,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
         )
         logger.debug(f"Connected to the MySQL Database!")
     except OperationalError:  # Unsure if this is the correct exception
-        logger.error(f"Unable to connect to the `{SQL_DB}` database.")
+        logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
 
     result: Union[dict, list[dict], None] = None
 
@@ -213,7 +213,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     #                     result: dict = cursor.fetchone()
     #                 elif kwargs["fetch"] == "many":
     #                     if "size" not in kwargs.keys():
-    #                         logger.error("Fetching many requires a `size` kwargs.")
+    #                         logger.exception("Fetching many requires a `size` kwargs.")
     #                     cursor.execute(query=query)
     #                     result: list[dict] = cursor.fetchmany(many=kwargs["size"])
     #                 elif kwargs["fetch"] == "all":
@@ -225,7 +225,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
     #                     result: dict = cursor.fetchone()
     #                 elif kwargs["fetch"] == "many":
     #                     if "size" not in kwargs.keys():
-    #                         logger.error("Fetching many requires a `size` kwargs.")
+    #                         logger.exception("Fetching many requires a `size` kwargs.")
     #                     cursor.execute(query=query, args=kwargs["values"])
     #                     result: list[dict] = cursor.fetchmany(many=kwargs["size"])
     #                 elif kwargs["fetch"] == "all":
@@ -246,7 +246,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
                         result: dict = cursor.fetchone()
                     elif sql.fetch == SqlFetch.many:
                         if "size" not in kwargs.keys():
-                            logger.error("Fetching many requires a `size` kwargs.")
+                            logger.exception("Fetching many requires a `size` kwargs.")
                         cursor.execute(query=sql.query)
                         result: list[dict] = cursor.fetchmany(many=kwargs["size"])
                     elif sql.fetch == SqlFetch.all:
@@ -258,7 +258,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
                         result: dict = cursor.fetchone()
                     elif sql.fetch == SqlFetch.many:
                         if "size" not in kwargs.keys():
-                            logger.error("Fetching many requires a `size` kwargs.")
+                            logger.exception("Fetching many requires a `size` kwargs.")
                         cursor.execute(query=sql.query, args=sql.values)
                         result: list[dict] = cursor.fetchmany(many=kwargs["size"])
                     elif sql.fetch == SqlFetch.all:
@@ -266,7 +266,7 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
                         result: list[dict] = cursor.fetchall()
         sqlConnection.commit()
     except TypeError as err:
-        logger.error("Error occurred opening the MySQL database.")
+        logger.exception("Error occurred opening the MySQL database.")
         raise err
     finally:
         logger.debug(f"Closing connection to the MySQL Database")

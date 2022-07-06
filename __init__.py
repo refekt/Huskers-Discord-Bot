@@ -15,7 +15,7 @@ from discord.ext.commands import Context, Greedy
 
 from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
 from helpers.embed import buildEmbed  # noqa
-from objects.Client import HuskerClient, schedstop
+from objects.Client import HuskerClient  # , schedstop
 from objects.Exceptions import DiscordError  # noqa
 from objects.Logger import discordLogger
 
@@ -62,7 +62,7 @@ async def on_app_command_error(
     logger.info("app_command error detected!")
 
     err: DiscordError = DiscordError(error, interaction.data.get("options", None))
-    logger.error(error, exc_info=True)
+    logger.exception(error, exc_info=True)
 
     embed: discord.Embed = buildEmbed(
         title="",
@@ -132,13 +132,13 @@ async def sync(
             logger.info(f"Attempting to sync application commands to {guild}")
             await client.tree.sync(guild=guild)
         except Forbidden:
-            logger.error(
+            logger.exception(
                 f"The guild {guild} does not have the ``applications.commands`` scope in the guild."
             )
         except MissingApplicationID:
-            logger.error(f"The guild {guild} does not have an application ID.")
+            logger.exception(f"The guild {guild} does not have an application ID.")
         except HTTPException:
-            logger.error("Syncing the commands failed.")
+            logger.exception("Syncing the commands failed.")
         else:
             ret += 1
 
@@ -166,8 +166,8 @@ async def main() -> None:
 
 try:
     asyncio.run(main())
-except (KeyboardInterrupt, RuntimeError):
-    schedstop.set()
+except (KeyboardInterrupt, RuntimeError, SystemExit):
+    # schedstop.set()
     pass
 
 logger.info("Closing the bot")

@@ -89,6 +89,7 @@ class TweetUserData(object):
     __slots__ = [
         "created_at",
         "description",
+        "entities",
         "followers",
         "following",
         "id",
@@ -320,7 +321,7 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code) -> None:
-        logger.error(f"Request Error: {status_code}")
+        logger.exception(f"Request Error: {status_code}")
 
         logger.debug(
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
@@ -330,7 +331,7 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.debug("Sleep is over")
 
     def on_connection_error(self) -> None:
-        logger.error(f"Connection Error")
+        logger.exception(f"Connection Error")
         task: Future = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(
                 self.client, "The Twitter Stream had an error connecting!"
@@ -348,13 +349,13 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_errors(self, errors) -> None:
-        logger.error(f"Error received: {errors}")
+        logger.exception(f"Error received: {errors}")
 
     def on_closed(self, response) -> None:
         logger.warning(f"Closed: {response}")
 
     def on_exception(self, exception) -> None:
-        logger.error(f"Exception: {exception}")
+        logger.exception(f"Exception: {exception}")
 
     def on_data(self, raw_data) -> None:
         logger.debug(pprint(json.loads(raw_data)))

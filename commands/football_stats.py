@@ -419,7 +419,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         if (year_start and year_end is None) or (
             year_start is None and year_end
         ):  # Both variables weren't selected
-            logger.error("Both year_start and year_end were not provided")
+            logger.exception("Both year_start and year_end were not provided")
 
             raise StatsException(
                 "If you must pick both year start and year end if choosing a date range."
