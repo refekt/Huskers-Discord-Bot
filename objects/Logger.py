@@ -3,7 +3,7 @@ import os
 import pathlib
 import sys
 
-__all__ = ["discordLogger"]
+__all__: list[str] = ["discordLogger"]
 
 
 def discordLogger(name: str, level: int = logging.INFO) -> logging.Logger:
