@@ -11,7 +11,7 @@ from numpy import random
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["fry_image"]
+__all__: list[str] = ["fry_image"]
 
 face_cascade = cv2.CascadeClassifier(
     os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")

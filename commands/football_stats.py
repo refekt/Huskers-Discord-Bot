@@ -211,7 +211,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ),
                 dict(
                     name=f"{team_for.title()}'s Longest Win Streak",
-                    value=f"{comparison.compare.longest_win_streak} ({comparison.compare.largest_win_streak_date})",
+                    value=f"{comparison.compare.longest_win_streak} ({comparison.compare.longest_win_streak_date})",
                 ),
                 dict(
                     name=f"{team_against.title()}'s Largest MOV",
@@ -219,7 +219,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ),
                 dict(
                     name=f"{team_against.title()}'s Longest Win Streak",
-                    value=f"{comparison.against.longest_win_streak} ({comparison.against.largest_win_streak_date})",
+                    value=f"{comparison.against.longest_win_streak} ({comparison.against.longest_win_streak_date})",
                 ),
             ],
         )

@@ -16,7 +16,7 @@ if DEBUGGING_CODE:
 else:
     logger = discordLogger(name=__name__, level=logging.INFO)
 
-__all__ = [
+__all__: list[str] = [
     "processMySQL",
     "sqlCreateImageCommand",
     "sqlDeleteImageCommand",

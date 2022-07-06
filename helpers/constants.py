@@ -346,7 +346,7 @@ RECRUIT_POSITIONS = {
 
 logger.info("Discord Union group variables loaded")
 
-__all__ = [
+__all__: list[str] = [
     "BOT_DISPLAY_NAME",
     "BOT_FOOTER_BOT",
     "BOT_FOOTER_SECRET",

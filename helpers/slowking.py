@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 logger.info(f"{str(__name__).title()} module loaded!")
 
-__all__ = ["makeSlowking"]
+__all__: list[str] = ["makeSlowking"]
 
 
 def makeSlowking(person: discord.Member) -> discord.File:

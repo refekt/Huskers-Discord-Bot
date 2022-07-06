@@ -1,7 +1,6 @@
 import hashlib
 import random
 import string
-from hashlib import _Hash
 from typing import Optional, AnyStr, Union, List, Any
 
 import discord
@@ -186,7 +185,7 @@ class Survey:
         self.embed = embed
 
     def update_embed(self, user_id: str, opt: str) -> None:
-        hashed_user: _Hash = hashlib.sha1(str(user_id).encode("UTF-8")).hexdigest()[:10]
+        hashed_user = hashlib.sha1(str(user_id).encode("UTF-8")).hexdigest()[:10]
         if hashed_user in self.embed.footer.text:
             return
 

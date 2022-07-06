@@ -12,7 +12,7 @@ from objects.Exceptions import CommandException, StatsException
 
 logger = logging.getLogger(__name__)
 
-__all__ = [
+__all__: list[str] = [
     "alias_param",
     "checkYearValid",
     "convertSeconds",
@@ -74,7 +74,7 @@ def getModuleMethod(stack) -> tuple[str, str]:
 
 
 # https://stackoverflow.com/questions/41784308/keyword-arguments-aliases-in-python
-def alias_param(param_name: str, param_alias: str) -> Callable:
+def alias_param(param_name: str, param_alias: str) -> None:
     """
     Decorator for aliasing a param in a function
 
@@ -84,9 +84,9 @@ def alias_param(param_name: str, param_alias: str) -> Callable:
     Returns:
     """
 
-    def decorator(func: Callable):
+    def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Callable:
             alias_param_value = kwargs.get(param_alias)
             if alias_param_value:
                 kwargs[param_name] = alias_param_value

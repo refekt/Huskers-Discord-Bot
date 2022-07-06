@@ -33,7 +33,7 @@ from objects.Exceptions import BettingException
 
 logger = logging.getLogger(__name__)
 
-__all__ = [
+__all__: list[str] = [
     "buildEmbed",
     "buildRecruitEmbed",
     "buildTweetEmbed",
@@ -404,19 +404,19 @@ def buildRecruitEmbed(recruit) -> discord.Embed:
             )
             return prediction_str
 
-    def prettify_predictions():
+    def prettify_predictions() -> str:
         pretty = ""
         for item in recruit.cb_predictions:
             pretty += f"{item}\n"
         return pretty
 
-    def prettify_experts():
+    def prettify_experts() -> str:
         pretty = ""
         for item in recruit.cb_experts:
             pretty += f"{item}\n"
         return pretty
 
-    def prettify_offers():
+    def prettify_offers() -> str:
         pretty = ""
         for index, item in enumerate(recruit.recruit_interests):
             if index > 9:

@@ -1,6 +1,7 @@
 import json
 import logging
 import pathlib
+from typing import AnyStr
 
 from cryptography.fernet import Fernet
 
@@ -10,10 +11,10 @@ key_path = pathlib.PurePath(
     f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"
 )
 
-__all__ = ["decrypt", "decrypt_return_data", "encrypt", "load_key"]
+__all__: list[str] = ["decrypt", "decrypt_return_data", "encrypt", "load_key"]
 
 
-def write_key():
+def write_key() -> None:
     """
     Generates an image_name and save it into a file
     """
@@ -22,7 +23,7 @@ def write_key():
         key_file.write(key)
 
 
-def load_key():
+def load_key() -> AnyStr:
     """
     Loads the image_name from the current directory named `image_name.image_name`
     """
