@@ -16,7 +16,9 @@ def discordLogger(name: str, level: int = logging.INFO) -> logging.Logger:
     filename: pathlib.Path = pathlib.Path("log.log")
     full_path: str = os.path.join(filename.parent.resolve(), "logs", filename)
 
-    file_handler: logging.FileHandler = logging.FileHandler(filename=full_path)
+    file_handler: logging.FileHandler = logging.FileHandler(
+        filename=full_path, mode="w"
+    )
     file_handler.setFormatter(formatter)
     file_handler.setLevel(level=level)
 
