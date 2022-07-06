@@ -6,6 +6,7 @@ from typing import Union, Any, Optional
 import discord.ext.commands
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import ResultSet
 from discord import app_commands
 from discord.ext import commands
 from requests import Response, JSONDecodeError
@@ -23,9 +24,9 @@ from helpers.misc import checkYearValid
 from helpers.mysql import (
     processMySQL,
     sqlGetIndividualPrediction,
+    sqlGetPrediction,
     sqlInsertPrediction,
     sqlTeamIDs,
-    sqlGetPrediction,
 )
 from objects.Exceptions import RecruitException
 from objects.Logger import discordLogger
@@ -33,14 +34,14 @@ from objects.Recruits import RecruitInterest, Recruit
 
 logger = discordLogger(__name__)
 
-croot_search = []
-prediction_search = []
-search_reactions = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4}
+croot_search: list[Recruit] = []
+prediction_search: list[Recruit] = []
+search_reactions: dict[str, int] = {"1️⃣": 0, "2️⃣": 1, "3️⃣": 2, "4️⃣": 3, "5️⃣": 4}
 
-CURRENT_CLASS = datetime.now().year
-NO_MORE_PREDS = datetime.now().year
+CURRENT_CLASS: int = datetime.now().year
+NO_MORE_PREDS: int = datetime.now().year
 
-__all__ = ["RecruitingCog"]
+__all__: list[str] = ["RecruitingCog"]
 
 
 class RecruitListView(discord.ui.View):
@@ -170,7 +171,7 @@ class PredictionView(discord.ui.View):
 
     def __init__(self, recruit: Recruit) -> None:
         super().__init__()
-        self.recruit = recruit
+        self.recruit: Recruit = recruit
 
     @discord.ui.button(label="🔮", disabled=True)
     async def crystal_ball(
@@ -270,17 +271,17 @@ user_prediction: UserPrediction = UserPrediction(None, None)
 
 
 def is_walk_on(soup: BeautifulSoup) -> bool:
-    icon = soup.find_all(attrs={"class": "icon-walkon"})
+    icon: ResultSet = soup.find_all(attrs={"class": "icon-walkon"})
     return True if icon else False
 
 
 def is_early_enrolee(soup: BeautifulSoup) -> bool:
-    icon = soup.find_all(attrs={"class": "icon-time"})
+    icon: ResultSet = soup.find_all(attrs={"class": "icon-time"})
     return True if icon else False
 
 
 def is_early_signee(soup: BeautifulSoup) -> bool:
-    icon = soup.find_all(attrs={"class": "signee-icon"})
+    icon: ResultSet = soup.find_all(attrs={"class": "signee-icon"})
     return True if icon else False
 
 
@@ -316,8 +317,8 @@ def reformat_height(height: str) -> str:
     if height is None:
         return "N/A"
 
-    double_apo = '" '
-    height = f"{height.replace('-', double_apo)}{double_apo}"
+    double_apo: str = '" '
+    height: str = f"{height.replace('-', double_apo)}{double_apo}"
     return height
 
 
@@ -347,10 +348,12 @@ def get_committed_school(all_team_ids: list[dict], team_id: int) -> Union[str, N
 
 def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
     logger.info("Collecting expert crystal ball predictions")
-    experts = []
+    experts: list[str] = []
 
     try:
-        cbs_long_expert = soup.find_all(attrs={"class": "prediction-list long expert"})
+        cbs_long_expert: ResultSet = soup.find_all(
+            attrs={"class": "prediction-list long expert"}
+        )
     except:  # noqa
         return experts
 
@@ -363,11 +366,11 @@ def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
             f"Searching expert #{index + 1} out of {len(cbs_long_expert[0].contents)}"
         )
         try:
-            expert_name = expert.contents[1].string
-            predicted_team = None
+            expert_name: str = expert.contents[1].string
+            predicted_team: str = ""
 
             if expert.find_all("img", src=True):
-                predicted_team_id = int(
+                predicted_team_id: int = int(
                     expert.find_all("img", src=True)[0]["src"]
                     .split("/")[-1]
                     .split(".")[0]
@@ -386,8 +389,8 @@ def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
 
             # If the pick is undecided, it doesn't have a confidence
             if predicted_team != "Undecided":
-                expert_confidence = f"{expert.contents[5].contents[1].text.strip()}, {expert.contents[5].contents[3].text.strip()}"
-                expert_string = (
+                expert_confidence: str = f"{expert.contents[5].contents[1].text.strip()}, {expert.contents[5].contents[3].text.strip()}"
+                expert_string: str = (
                     f"{expert_name} picks {predicted_team} ({expert_confidence})"
                 )
             else:
@@ -405,15 +408,16 @@ def get_cb_experts(soup: BeautifulSoup, team_ids) -> list:
 
 def get_cb_predictions(soup: BeautifulSoup) -> list:
     logger.info("Getting crystal ball predictions")
-    crystal_balls = []
+    crystal_balls: list[str] = []
 
-    predictions_header = soup.find_all(attrs={"class": "list-header-item"})
+    predictions_header: ResultSet = soup.find_all(attrs={"class": "list-header-item"})
 
     if len(predictions_header) == 0:
         logger.info("No crystal ball predictions found")
         return crystal_balls
 
-    cbs_long = cbs_one = None
+    cbs_long: Optional[ResultSet] = None
+    cbs_one: Optional[ResultSet] = None
 
     # When there are more than one predicted schools
     try:
@@ -432,12 +436,12 @@ def get_cb_predictions(soup: BeautifulSoup) -> list:
                 f"Searching long list of predictions #{index} out of {len(cbs_long[0].contents)}"
             )
             try:
-                school_name = cb.contents[3].text.strip()
-                school_weight = cb.contents[5].text.strip()
-                school_string = f"{school_name}: {school_weight}"
+                school_name: str = cb.contents[3].text.strip()
+                school_weight: str = cb.contents[5].text.strip()
+                school_string: str = f"{school_name}: {school_weight}"
                 # If there is an "Undecided" in the list, it won't have a confidence with it
                 if school_name != "Undecided":
-                    school_confidence = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
+                    school_confidence: str = f"{cb.contents[7].contents[1].text.strip()}, {cb.contents[7].contents[3].text.strip()}"
                     school_string += f"({school_confidence})"
                 crystal_balls.append(school_string)
             except:  # noqa
@@ -446,14 +450,14 @@ def get_cb_predictions(soup: BeautifulSoup) -> list:
         return crystal_balls
     elif len(cbs_one) > 0:
         logger.info(f"Searching short list of crystal ball predictions")
-        single_school = cbs_one[0].contents[1]
-        single_school_name = single_school.contents[3].text.strip()
-        single_school_weight = single_school.contents[5].text.strip()
+        single_school: str = cbs_one[0].contents[1]
+        single_school_name: str = single_school.contents[3].text.strip()  # noqa
+        single_school_weight: str = single_school.contents[5].text.strip()  # noqa
         try:
-            single_school_confidence = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"
+            single_school_confidence: str = f"{single_school.contents[7].contents[1].text.strip()}, {single_school.contents[7].contents[3].text.strip()}"  # noqa
         except:  # noqa
             single_school_confidence = ""
-        single_school_string = (
+        single_school_string: str = (
             f"{single_school_name}: {single_school_weight} ({single_school_confidence})"
         )
 
@@ -466,12 +470,12 @@ def get_cb_predictions(soup: BeautifulSoup) -> list:
 
 
 def get_all_time_ranking(soup: BeautifulSoup) -> int:
-    recruit_rank = soup.find_all(
+    recruit_rank: ResultSet = soup.find_all(
         attrs={"href": "https://247sports.com/Sport/Football/AllTimeRecruitRankings/"}
     )
 
     try:
-        ranking = recruit_rank[1].contents[3].text
+        ranking: int = recruit_rank[1].contents[3].text
 
         if len(recruit_rank) > 1:
             return ranking
@@ -505,16 +509,19 @@ def get_state_ranking(cur_player: dict) -> str:
 def get_recruit_interests(search_player: dict) -> list[RecruitInterest]:
     logger.info("Getting recruit interests")
 
-    reqs = requests.get(url=search_player["RecruitInterestsUrl"], headers=HEADERS)
-    interests_soup = BeautifulSoup(reqs.content, "html.parser")
-    interests = interests_soup.find(
+    all_interests: list[Optional[RecruitInterest]] = []
+
+    reqs: requests.Response = requests.get(
+        url=search_player["RecruitInterestsUrl"], headers=HEADERS
+    )
+    interests_soup: BeautifulSoup = BeautifulSoup(reqs.content, "html.parser")
+    interests: ResultSet = interests_soup.find(
         "ul", attrs={"class": "recruit-interest-index_lst"}
     ).find_all("li", recursive=False)
-    all_interests = []
 
     # Goes through the list of interests and only adds in the ones that are offers
     for index, interest in enumerate(interests):
-        offered = (
+        offered: str = (
             interest.find("div", attrs={"class": "secondary_blk"})
             .find("span", attrs={"class": "offer"})
             .text.split(":")[1]
@@ -541,7 +548,9 @@ def get_recruit_interests(search_player: dict) -> list[RecruitInterest]:
 
 
 def get_school_type(soup: BeautifulSoup) -> str:
-    institution_type = soup.find_all(attrs={"data-js": "institution-selector"})
+    institution_type: Union[ResultSet, str] = soup.find_all(
+        attrs={"data-js": "institution-selector"}
+    )
 
     if len(institution_type) == 0:
         return "High School"
@@ -565,7 +574,7 @@ def get_thumbnail(cur_player: dict) -> Union[None, str]:
 
 
 def get_twitter_handle(soup: BeautifulSoup) -> str:
-    twitter = soup.find_all(attrs={"class": "tweets-comp"})
+    twitter: Union[ResultSet, str] = soup.find_all(attrs={"class": "tweets-comp"})
     try:
         twitter = twitter[0].attrs["data-username"]
         twitter = re.sub(r"[^\w*]+", "", twitter)
@@ -581,7 +590,7 @@ def get_teams() -> list[str]:
 
 
 def get_individual_predictions(user_id: int, recruit) -> Union[dict, list[dict]]:
-    sql_response = processMySQL(
+    sql_response: list[dict] = processMySQL(
         query=sqlGetPrediction,
         values=(user_id, recruit.twofourseven_profile),
         fetch="one",
@@ -591,7 +600,7 @@ def get_individual_predictions(user_id: int, recruit) -> Union[dict, list[dict]]
 
 def search_result_info(new_search: list[Recruit]) -> str:
     logger.info("Building search result string")
-    result_info = ""
+    result_info: str = ""
     for index, recruit in enumerate(new_search):
         if index < CROOT_SEARCH_LIMIT:
             result_info += (
@@ -605,7 +614,7 @@ def search_result_info(new_search: list[Recruit]) -> str:
 
 
 def createPredictionView(target_recruit: Recruit) -> PredictionView:
-    view = PredictionView(target_recruit)
+    view: PredictionView = PredictionView(target_recruit)
     if not target_recruit.committed == "Enrolled":
         view.crystal_ball.disabled = False
     view.scroll.disabled = False
@@ -687,7 +696,7 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
         cur_player = search_player["Player"]
 
         reqs = requests.get(url=search_player["Player"]["Url"], headers=HEADERS)
-        soup = BeautifulSoup(reqs.content, "html.parser")
+        soup: BeautifulSoup = BeautifulSoup(reqs.content, "html.parser")
 
         # Put into separate variables for debugging purposes
         # red_shirt
