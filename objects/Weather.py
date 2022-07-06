@@ -8,6 +8,26 @@ __all__ = ["WeatherResponse", "WeatherHour"]
 
 
 class WeatherHour:
+    __slots__ = [
+        "_data_len",
+        "clouds",
+        "dew_point",
+        "dt",
+        "feels_like",
+        "humidity",
+        "pop",
+        "pressure",
+        "rain",
+        "snow",
+        "temp",
+        "uvi",
+        "visibility",
+        "weather",
+        "wind_deg",
+        "wind_gust",
+        "wind_speed",
+    ]
+
     def __init__(self, dictionary) -> None:
         self.wind_speed = None
         self.temp = None
@@ -17,6 +37,16 @@ class WeatherHour:
 
 
 class WeatherMain:
+    __slots__ = [
+        "_data_len",
+        "feels_like",
+        "humidity",
+        "pressure",
+        "temp",
+        "temp_max",
+        "temp_min",
+    ]
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -27,6 +57,8 @@ class WeatherMain:
 
 
 class WeatherCoord:
+    __slots__ = ["lon", "lat", "_data_len"]
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -37,6 +69,8 @@ class WeatherCoord:
 
 
 class WeatherSys:
+    __slots__ = ["type", "id", "country", "sunrise", "sunset", "_data_len"]
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             if key == "sunrise":
@@ -56,6 +90,8 @@ class WeatherSys:
 
 
 class WeatherWeather:
+    __slots__ = ["id", "main", "description", "icon", "_data_len"]
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -66,6 +102,8 @@ class WeatherWeather:
 
 
 class WeatherWind:
+    __slots__ = ["speed", "deg", "gust", "_data_len"]
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -76,6 +114,8 @@ class WeatherWind:
 
 
 class WeatherClouds:
+    __slots__ = ["all", "_data_len"]
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -86,6 +126,8 @@ class WeatherClouds:
 
 
 class WeatherRain:
+    # TODO Slots
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -96,6 +138,8 @@ class WeatherRain:
 
 
 class WeatherSnow:
+    # TODO Slots
+
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -106,6 +150,24 @@ class WeatherSnow:
 
 
 class WeatherResponse:
+    __slots__ = [
+        "base",
+        "clouds",
+        "cod",
+        "coord",
+        "dt",
+        "id",
+        "main",
+        "name",
+        "rain",
+        "snow",
+        "sys",
+        "timezone",
+        "visibility",
+        "weather",
+        "wind",
+    ]
+
     def __init__(self, dictionary) -> None:
         self.timezone = None
         self.cod = None
