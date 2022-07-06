@@ -40,7 +40,7 @@ class MyTweet(object):
         "data",
         "includes",
         "matching_rules",
-    ]  # TODO Verify there are not any more variables
+    ]
 
     def __init__(self, tweet_data) -> None:
         for key in tweet_data:
@@ -48,7 +48,15 @@ class MyTweet(object):
 
 
 class TweetMediaData(object):
-    __slots__ = ["url"]  # TODO Verify there are not any more variables
+    __slots__ = [
+        "height",
+        "media_key",
+        "public_metrics",
+        "type",
+        "url",
+        "url",
+        "width",
+    ]
 
     def __init__(self, tweet_data) -> None:
         for key in tweet_data:
@@ -57,10 +65,20 @@ class TweetMediaData(object):
 
 class TweetQuoteData(object):
     __slots__ = [
+        "attachments",
         "author_id",
+        "conversation_id",
+        "created_at",
+        "entities",
+        "geo",
         "id",
+        "lang",
+        "possibly_sensitive",
+        "public_metrics",
+        "reply_settings",
+        "source",
         "text",
-    ]  # TODO Verify there are not any more variables
+    ]
 
     def __init__(self, tweet_data) -> None:
         for key in tweet_data:

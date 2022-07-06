@@ -224,7 +224,7 @@ def buildTweetEmbed(
     )
     embed.set_thumbnail(url=profile_image_url)
 
-    logger.info(f"Creating a tweet embed from [{module}-{method}]")
+    logger.info(f"Finished tweet embed from [{module}-{method}]")
     return embed
 
 

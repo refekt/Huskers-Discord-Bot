@@ -462,13 +462,13 @@ class HuskerClient(Bot):
         # on_ready_tasks: list[Optional[Coroutine]] = []
         on_ready_tasks = []
 
-        if DEBUGGING_CODE:
+        if not DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
         else:
             await start_twitter_stream(self)
             logger.info("Twitter stream started")
 
-        if not DEBUGGING_CODE:
+        if DEBUGGING_CODE:
             logger.info("Skipping restarting reminders")
         else:
             logger.info("Collecting open reminders")
