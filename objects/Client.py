@@ -462,7 +462,7 @@ class HuskerClient(Bot):
         # on_ready_tasks: list[Optional[Coroutine]] = []
         on_ready_tasks = []
 
-        if not DEBUGGING_CODE:
+        if DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
         else:
             await start_twitter_stream(self)

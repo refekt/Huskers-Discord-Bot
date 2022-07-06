@@ -42,6 +42,7 @@ class ScheudlePosts:
     __slots__ = [
         "_delivery_time",
         "_embeds",
+        "_setup",
     ]
 
     def __init__(
@@ -72,6 +73,7 @@ class ScheudlePosts:
             buildEmbed(title=f"Saturday", description=f"Weekend vibes"),
             buildEmbed(title=f"Sunday", description=f"Weekend vibes"),
         ]
+        self._setup: bool = False
 
     # noinspection PyMethodMayBeStatic
     def _setup_debug_scheudle(self) -> None:
@@ -113,11 +115,17 @@ class ScheudlePosts:
     def setup_and_run_schedule(self) -> None:
         if DEBUGGING_CODE:
             logger.debug("Attempting to create debug schedule")
-            self._setup_debug_scheudle()
+            if not self._setup:
+                self._setup_debug_scheudle()
+                self._setup = True
+                logger.debug("Debug schedule created")
             schedule.run_pending()
         else:
             logger.debug("Attempting to create schedule")
-            self._setup_schedule()
+            if not self._setup:
+                self._setup_schedule()
+                self._setup = True
+                logger.debug("Sschedule created")
             schedule.run_pending()
 
 
