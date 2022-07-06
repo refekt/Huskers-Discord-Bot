@@ -44,7 +44,6 @@ class TextCog(commands.Cog, name="Text Commands"):
             "Ask again later.",
             "Better not tell you now.",
             "Cannot predict now.",
-            "Coach V's cigar would like this!",
             "Concentrate and ask again.",
             "Definitely yes!",
             "Don’t count on it...",
@@ -64,8 +63,8 @@ class TextCog(commands.Cog, name="Text Commands"):
             "You may rely on it.",
         ]
 
-        reply = random.choice(responses)
-        embed = buildEmbed(
+        reply: str = random.choice(responses)
+        embed: discord.Embed = buildEmbed(
             title="Eight Ball Response",
             description="These are all 100% accurate. No exceptions! Unless an answer says anyone other than Nebraska is good.",
             fields=[
@@ -131,7 +130,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         def cleanup_source_content(check_source_content: str) -> str:
             logger.info("Cleaning source content")
-            output = check_source_content
+            output: str = check_source_content
 
             regex_discord_http = [
                 r"(<@\d{18}>|<@!\d{18}>|<:\w{1,}:\d{18}>|<#\d{18}>)",  # All Discord mentions
@@ -153,7 +152,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         if not combined_sources:  # Nothing was provided
             logger.info("No sources provided")
             try:
-                message_history = [
+                message_history: list[discord.Message] = [
                     message
                     async for message in interaction.channel.history(
                         limit=channel_history_limit
@@ -208,29 +207,31 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         logger.info("Creating a markov chain")
-        markov_response = markovify.NewlineText(source_content, well_formed=True)
+        markov_response: markovify.NewlineText = markovify.NewlineText(
+            source_content, well_formed=True
+        )
         logger.info("Creating a markov original_message")
-        markov_output = markov_response.make_sentence(
+        markov_output: Optional[str] = markov_response.make_sentence(
             max_overlap_ratio=0.9, max_overlap_total=27, min_words=7, tries=100
         )
-
-        if not combined_sources:
-            source_name: Union[discord.Member, discord.Text] = (
-                interaction.channel.name.replace("-", " ").title().replace(" ", "-")
-            )
-        else:
-            source_name = (
-                source_member.name.replace("-", " ").title().replace(" ", "-")
-                if source_member
-                else source_channel.name.replace("-", " ").title().replace(" ", "-")
-            )
 
         if markov_output is None:
             raise TextException(
                 "Markovify failed to create an output! Mor than likely, there is not enough source material available to create a markov chain."
             )
         else:
-            embed = buildEmbed(
+            if not combined_sources:
+                source_name: Union[discord.Member, discord.Text] = (
+                    interaction.channel.name.replace("-", " ").title().replace(" ", "-")
+                )
+            else:
+                source_name = (
+                    source_member.name.replace("-", " ").title().replace(" ", "-")
+                    if source_member
+                    else source_channel.name.replace("-", " ").title().replace(" ", "-")
+                )
+
+            embed: discord.Embed = buildEmbed(
                 title="",
                 author=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})",
                 icon_url=interaction.user.avatar.url,
@@ -260,7 +261,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     async def police(
         self, interaction: discord.Interaction, arrestee: discord.Member
     ) -> None:
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Wee woo, wee woo!",
             fields=[
                 dict(
@@ -293,14 +294,11 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def possum(self, interaction: discord.Interaction, message: str) -> None:
-        # assert interaction.channel.id == CHAN_POSSUMS, CommandException(
-        #     "You can only use this in the possum droppings channel!"
-        # )
         assert message, CommandException("You cannot have an empty message!")
 
         await interaction.response.defer(ephemeral=True)
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Possum Droppings",
             thumbnail="https://cdn.discordapp.com/attachments/593984711706279937/875162041818693632/unknown.jpeg",
             footer="Created by a sneaky possum",
@@ -311,7 +309,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 )
             ],
         )
-        chan = await interaction.client.fetch_channel(CHAN_POSSUMS)
+        chan: discord.TextChannel = await interaction.client.fetch_channel(CHAN_POSSUMS)
         await chan.send(embed=embed)
 
     @app_commands.command(
@@ -334,11 +332,13 @@ class TextCog(commands.Cog, name="Text Commands"):
                 self.example = example
                 self.contributor = contributor
 
-        r = requests.get(f"https://www.urbandictionary.com/define.php?term={word}")
-        soup = BeautifulSoup(r.content, features="html.parser")
+        r: requests.Response = requests.get(
+            f"https://www.urbandictionary.com/define.php?term={word}"
+        )
+        soup: BeautifulSoup = BeautifulSoup(r.content, features="html.parser")
 
         try:
-            definitions = soup.find_all(
+            definitions: ResultSet = soup.find_all(
                 name="div", attrs={"class": re.compile("definition.*")}
             )
         except AttributeError:
@@ -350,7 +350,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         del r, soup
 
-        results = []
+        results: list[UrbanDictDefinition] = []
         for definition in definitions:
             results.append(
                 UrbanDictDefinition(
@@ -361,7 +361,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 )
             )
 
-        pages = []
+        pages: list[discord.Embed] = []
         for index, result in enumerate(results):
             pages.append(
                 buildEmbed(
@@ -384,7 +384,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 )
             )
 
-        view = EmbedPaginatorView(
+        view: EmbedPaginatorView = EmbedPaginatorView(
             embeds=pages, original_message=await interaction.original_message()
         )
         await interaction.edit_original_message(embed=view.initial, view=view)
@@ -406,7 +406,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         options: str,
         timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
-        survey = Survey(
+        survey: Survey = Survey(
             client=interaction.client,
             interaction=interaction,
             question=question,
@@ -435,7 +435,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         await interaction.response.defer()
 
         try:
-            formatted_state = next(
+            formatted_state: dict[str] = next(
                 (
                     search_state
                     for search_state in US_STATES
@@ -450,20 +450,20 @@ class TextCog(commands.Cog, name="Text Commands"):
         except StopIteration:
             raise WeatherException("Unable to find state. Please try again!")
 
-        def shift_utc_tz(dt, shift: int) -> datetime:
+        def shift_utc_tz(dt: datetime, shift: int) -> datetime:
             return dt + timedelta(seconds=shift)
 
-        weather_url = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
-        response = requests.get(weather_url, headers=HEADERS)
-        j = json.loads(response.content)
+        weather_url: str = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
+        response: requests.Response = requests.get(weather_url, headers=HEADERS)
+        j: dict = json.loads(response.content)
 
-        weather = WeatherResponse(j)
+        weather: WeatherResponse = WeatherResponse(j)
         if weather.cod == "404":
             raise WeatherException(
                 f"Unable to find {city.title()}, {state}. Try again!"
             )
 
-        temp_str = (
+        temp_str: str = (
             f"Temperature: {weather.main.temp}℉\n"
             f"Feels Like: {weather.main.feels_like}℉\n"
             f"Humidity: {weather.main.humidity}%\n"
@@ -472,7 +472,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         if len(weather.wind) == 2:
-            wind_str = (
+            wind_str: str = (
                 f"Speed: {weather.wind.speed} MPH\n" f"Direction: {weather.wind.deg} °"
             )
         elif len(weather.wind) == 3:
@@ -484,17 +484,17 @@ class TextCog(commands.Cog, name="Text Commands"):
         else:
             wind_str = f"Speed: {weather.wind.speed} MPH"
 
-        hourly_url = f"https://api.openweathermap.org/data/2.5/onecall?lat={weather.coord.lat}&lon={weather.coord.lon}&appid={WEATHER_API_KEY}&units=imperial"
-        response = requests.get(hourly_url, headers=HEADERS)
-        j = json.loads(response.content)
+        hourly_url: str = f"https://api.openweathermap.org/data/2.5/onecall?lat={weather.coord.lat}&lon={weather.coord.lon}&appid={WEATHER_API_KEY}&units=imperial"
+        response: requests.Response = requests.get(hourly_url, headers=HEADERS)
+        j: dict = json.loads(response.content)
         hours: List[WeatherHour] = []
         for index, item in enumerate(j["hourly"]):
             hours.append(WeatherHour(item))
             if index == 3:
                 break
 
-        hour_temp_str = ""
-        hour_wind_str = ""
+        hour_temp_str: str = ""
+        hour_wind_str: str = ""
         for index, hour in enumerate(hours):
             if index < len(hours) - 1:
                 hour_temp_str += f"{hour.temp}℉ » "
@@ -503,15 +503,15 @@ class TextCog(commands.Cog, name="Text Commands"):
                 hour_temp_str += f"{hour.temp}℉"
                 hour_wind_str += f"{hour.wind_speed} MPH"
 
-        sunrise = shift_utc_tz(weather.sys.sunrise, weather.timezone)
-        sunset = shift_utc_tz(weather.sys.sunset, weather.timezone)
+        sunrise: datetime = shift_utc_tz(weather.sys.sunrise, weather.timezone)
+        sunset: datetime = shift_utc_tz(weather.sys.sunset, weather.timezone)
 
-        sun_str = (
+        sun_str: str = (
             f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n"
             f"Sunset: {sunset.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}"
         )
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title=f"Weather conditions for {city.title()}, {state.upper()}",
             description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state} is located at {weather.coord.lat}, {weather.coord.lon}.",
             fields=[
@@ -562,7 +562,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
             def compile(self) -> str:
                 new_line: str = "\n"
-                lines = [
+                lines: list[str] = [
                     f"  | {str(self.message[i: i + self.max_line_len]).ljust(self.max_line_len, ' ')} |"
                     for i in range(0, len(self.message), self.max_line_len)
                 ]
@@ -573,17 +573,17 @@ class TextCog(commands.Cog, name="Text Commands"):
         await interaction.response.defer()
 
         with open("resources/husk_messages.txt", encoding="UTF-8") as f:
-            source_data = f.read()
+            source_data: str = f.read()
 
-        text_model = markovify.NewlineText(source_data)
+        text_model: markovify.NewlineText = markovify.NewlineText(source_data)
 
-        output = (
+        output: str = (
             str(text_model.make_short_sentence(min_chars=20, max_chars=50))
             .lower()
             .capitalize()
         )
 
-        processed_output = Scroll(output).compile()
+        processed_output: str = Scroll(output).compile()
 
         if not output == "None":
             await interaction.followup.send(f"```\n{processed_output}```")
