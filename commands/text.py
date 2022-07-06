@@ -8,6 +8,7 @@ import discord.ext.commands
 import markovify
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import ResultSet
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
