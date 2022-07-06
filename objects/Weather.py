@@ -4,7 +4,7 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-__all__ = ["WeatherResponse", "WeatherHour"]
+__all__: list[str] = ["WeatherResponse", "WeatherHour"]
 
 
 class WeatherHour:
@@ -169,8 +169,6 @@ class WeatherResponse:
     ]
 
     def __init__(self, dictionary) -> None:
-        self.timezone = None
-        self.cod = None
         for key, value in dictionary.items():
             if key == "main":
                 self.main = WeatherMain(value)
