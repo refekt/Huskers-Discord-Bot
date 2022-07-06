@@ -16,8 +16,8 @@ from discord.ext import commands
 
 from helpers.constants import (
     GUILD_PROD,
-    ROLE_ADMIN_PROD,
     HEADERS,
+    ROLE_ADMIN_PROD,
 )
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
@@ -36,20 +36,20 @@ logger = discordLogger(__name__)
 
 image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
-__all__ = ["ImageCog"]
+__all__: list[str] = ["ImageCog"]
 
 
-def retrieve_all_img():
+def retrieve_all_img() -> Union[dict, list[dict], None]:
     try:
         return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
     except:  # noqa
         raise ImageException(f"Unable to retrieve image commands.")
 
 
-all_imgs = retrieve_all_img()
+all_imgs: Union[dict, list[dict], None] = retrieve_all_img()
 
 
-def retrieve_img(image_name: str) -> Union[None, Any]:
+def retrieve_img(image_name: str) -> Union[dict, list[dict], None]:
     try:
         return processMySQL(query=sqlSelectImageCommand, values=image_name, fetch="one")
     except:  # noqa
@@ -81,6 +81,7 @@ def retrieve_all_img() -> None:
         raise ImageException(f"Unable to retrieve image commands.")
 
 
+# Depreciated
 # def gatherAiImageResults(_prompt: str) -> Response:
 #     request_url: str = "https://backend.craiyon.com/generate"
 #     headers: dict[str] = {
@@ -171,11 +172,11 @@ def getBuffer(_buffer: Image) -> io.BytesIO:
 
 
 class ImageCog(commands.Cog, name="Image Commands"):
-    def __init__(self, loop):
+    def __init__(self, loop) -> None:
         super(ImageCog, self).__init__()
         self.tasks: list[Task] = []
 
-    group_img = app_commands.Group(
+    group_img: app_commands.Group = app_commands.Group(
         name="img",
         description="Get creative with images",
         guild_ids=[GUILD_PROD],
@@ -208,15 +209,17 @@ class ImageCog(commands.Cog, name="Image Commands"):
             ), ImageException("You must provide a valid URL!")
 
         def load_image_from_url(url: str) -> Image:
-            image_response = requests.get(url=url, stream=True, headers=HEADERS)
+            image_response: requests.Response = requests.get(
+                url=url, stream=True, headers=HEADERS
+            )
             return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
 
-        emote_amount = random.randrange(1, 6)
-        noise = random.uniform(0.4, 0.65)
-        contrast = random.randrange(1, 99)
-        layers = random.randrange(1, 3)
+        emote_amount: int = random.randrange(1, 6)
+        noise: float = random.uniform(0.4, 0.65)
+        contrast: int = random.randrange(1, 99)
+        layers: int = random.randrange(1, 3)
 
-        image = None
+        image: Optional[Image] = None
 
         if source_url:
             logger.info("Loading image from URL")
@@ -231,7 +234,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
         try:
             logger.info("Frying loaded image")
-            fried = fry_image(image, emote_amount, noise, contrast)
+            fried: Image = fry_image(image, emote_amount, noise, contrast)
 
             logger.info("Adding emotes, noise, and contrast")
             for layer in range(layers):
@@ -245,7 +248,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
             with io.BytesIO() as image_binary:
                 fried.save(image_binary, "PNG")
                 if image_binary.tell() > 8000000:
-                    image_binary = io.BytesIO()
+                    image_binary: io.BytesIO = io.BytesIO()
                     fried.convert("RGB").save(
                         image_binary, "JPEG", quality=90, optimize=True
                     )
@@ -268,7 +271,9 @@ class ImageCog(commands.Cog, name="Image Commands"):
     async def inspireme(
         self, interaction: discord.Interaction, person: Optional[discord.Member] = None
     ) -> None:
-        image = requests.get("https://inspirobot.me/api?generate=true")
+        image: requests.Response = requests.get(
+            "https://inspirobot.me/api?generate=true"
+        )
 
         if person:
             await interaction.response.send_message(
@@ -364,14 +369,14 @@ class ImageCog(commands.Cog, name="Image Commands"):
         await interaction.response.defer(ephemeral=True)
 
         try:
-            img_author = int(retrieve_img(image_name)["author"])
+            img_author: int = int(retrieve_img(image_name)["author"])
         except TypeError:
             raise ImageException(f"Unable to locate image [{image_name}]")
 
         assert img_author, ImageException(f"Unable to locate image [{image_name}]")
 
-        admin = interaction.guild.get_role(ROLE_ADMIN_PROD)
-        admin_delete = False
+        admin: discord.Role = interaction.guild.get_role(ROLE_ADMIN_PROD)
+        admin_delete: bool = False
 
         if admin in interaction.user.roles:
             admin_delete = True
@@ -393,7 +398,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         except:  # noqa
             raise ImageException("Unable to delete this image command!")
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="Delete Image Command",
             fields=[
                 dict(
@@ -409,10 +414,10 @@ class ImageCog(commands.Cog, name="Image Commands"):
         await interaction.response.defer()
 
         global all_imgs
-        all_imgs = retrieve_all_img()
-        image = random.choice(all_imgs)
+        all_imgs: Union[dict, list[dict], None] = retrieve_all_img()
+        image: dict = random.choice(all_imgs)
 
-        author = interaction.guild.get_member(int(image["author"]))
+        author: Optional[str] = interaction.guild.get_member(int(image["author"]))
         if author is None:
             author = "Unknown"
 
@@ -427,18 +432,18 @@ class ImageCog(commands.Cog, name="Image Commands"):
         await interaction.response.defer()
 
         if "Windows" in platform.platform():
-            twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
+            twos_path: str = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
         else:
             twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/TWOS/"
 
-        twos_files = [
+        twos_files: list[str] = [
             file for file in listdir(twos_path) if isfile(join(twos_path, file))
         ]
 
         random.shuffle(twos_files)
 
         with open(f"{twos_path}{random.choice(twos_files)}", "rb") as f:
-            file = discord.File(f)
+            file = discord.File(f)  # noqa
 
         await interaction.followup.send(file=file)
 
