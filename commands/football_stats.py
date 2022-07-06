@@ -1,14 +1,14 @@
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta
+from typing import Optional, Union
 
 import cfbd
 import discord
 from cfbd import (
     ApiClient,
     Game,
+    GamesApi,
     PlayersApi,
     TeamRecord,
-    GamesApi,
 )
 from discord import app_commands
 from discord.app_commands import Choice
@@ -18,9 +18,9 @@ from helpers.constants import (
     CFBD_CONFIG,
     DT_CFBD_GAMES,
     DT_CFBD_GAMES_DISPLAY,
+    FIELDS_LIMIT,
     GUILD_PROD,
     TZ,
-    FIELDS_LIMIT,
 )
 from helpers.embed import buildEmbed, collectScheduleEmbeds
 from helpers.misc import checkYearValid
@@ -32,6 +32,7 @@ from objects.Bets_Stats_Schedule import (
     getConsensusLineByOpponent,
     getHuskerOpponent,
     getNebraskaGameByOpponent,
+    BetLines,
 )
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
@@ -41,7 +42,7 @@ from objects.Winsipedia import CompareWinsipedia
 
 logger = discordLogger(__name__)
 
-__all__ = ["FootballStatsCog"]
+__all__: list[str] = ["FootballStatsCog"]
 
 season_stats_year_choices: list[Choice] = []
 for _ in range(0, FIELDS_LIMIT - 1, 1):
@@ -65,13 +66,13 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info(f"Starting countdown")
         await interaction.response.defer()
 
-        year = datetime.now().year
+        year: int = datetime.now().year
 
         assert checkYearValid(year), StatsException(
             f"The provided year is not valid: {year}"
         )
 
-        game = getNebraskaGameByOpponent(opponent_name=opponent_name)
+        game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name)
 
         start_date: datetime = datetime.strptime(
             game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
@@ -80,15 +81,16 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             DT_CFBD_GAMES,
         ).astimezone(tz=TZ)
 
-        consensus = getConsensusLineByOpponent(
+        consensus: Union[BetLines, str] = getConsensusLineByOpponent(
             away_team=game.away_team,
             home_team=game.home_team,
         )
+        consensus = consensus or "TBD"
 
-        opponent_info = buildTeam(getHuskerOpponent(game)["id"])
-        dt_difference = start_date - datetime.now(tz=TZ)
+        opponent_info: FootballTeam = buildTeam(getHuskerOpponent(game)["id"])
+        dt_difference: timedelta = start_date - datetime.now(tz=TZ)
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title="",
             color=opponent_info.color,
             thumbnail=opponent_info.logo,
@@ -134,7 +136,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         await interaction.response.defer()
 
-        year = datetime.now().year
+        year: int = datetime.now().year
 
         assert checkYearValid(year), StatsException(
             f"The provided year is not valid: {year}"
@@ -143,12 +145,13 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name.lower())
         opponent_info: FootballTeam = buildTeam(getHuskerOpponent(game)["id"])
 
-        lines = getConsensusLineByOpponent(
-            away_team=game.away_team, home_team=game.home_team
+        consensus: Union[BetLines, str] = getConsensusLineByOpponent(
+            away_team=game.away_team,
+            home_team=game.home_team,
         )
-        lines = lines or "TBD"
+        consensus = consensus or "TBD"
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title=f"Opponent Betting Lines",
             fields=[
                 dict(name="Opponent Name", value=opponent_name.title()),
@@ -158,7 +161,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 ),
                 dict(name="Year", value=f"{year}"),
                 dict(name="Week", value=f"{game.week}"),
-                dict(name="Lines", value=str(lines)),
+                dict(name="Lines", value=str(consensus)),
             ],
             thumbnail=opponent_info.logo,
         )
@@ -180,13 +183,15 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info(f"Comparing {team_for} against {team_against} stats")
         await interaction.response.defer()
 
-        team_for = team_for.replace(" ", "-")
-        team_against = team_against.replace(" ", "-")
+        team_for: str = team_for.replace(" ", "-")
+        team_against: str = team_against.replace(" ", "-")
 
         logger.info("Creating a comparison object")
-        comparison = CompareWinsipedia(compare=team_for, against=team_against)
+        comparison: CompareWinsipedia = CompareWinsipedia(
+            compare=team_for, against=team_against
+        )
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title=f"Historical records for [{team_for.title()}] vs. [{team_against.title()}]",
             inline=False,
             fields=[
@@ -230,8 +235,8 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             content="Loading schedule...this may take several seconds...",
         )
 
-        pages = collectScheduleEmbeds(year=year)
-        view = EmbedPaginatorView(
+        pages: list[discord.Embed] = collectScheduleEmbeds(year=year)
+        view: EmbedPaginatorView = EmbedPaginatorView(
             embeds=pages, original_message=await interaction.original_message()
         )
 
@@ -266,7 +271,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
 
         logger.debug(f"Searching for {player_name}")
-        api = PlayersApi(ApiClient(CFBD_CONFIG))
+        api: PlayersApi = PlayersApi(ApiClient(CFBD_CONFIG))
         api_player_search_result: list[cfbd.PlayerSearchResult] = api.player_search(
             search_term=player_name,
             year=year,
@@ -299,7 +304,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         else:
             raise StatsException(f"Unable to locate stats for {player_name}")
 
-        stat_type_descriptions = {
+        stat_type_descriptions: dict[str, str] = {
             "ATT": "Attempts",
             "AVG": "Average",
             "CAR": "Carries",
@@ -332,7 +337,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             "YPR": "Yards Per Reception",
         }
 
-        desc = (
+        desc: str = (
             f"Position: {api_player_search_result.position}\n"
             f"Height: {int(api_player_search_result.height / 12)}'{api_player_search_result.height % 12}\"\n"
             f"Weight: {api_player_search_result.weight} lbs.\n"
@@ -387,7 +392,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             )
 
         logger.info("Creating Paginator")
-        view = EmbedPaginatorView(
+        view: EmbedPaginatorView = EmbedPaginatorView(
             embeds=[embed for embed in stat_categories.values() if embed.fields],
             original_message=await interaction.original_message(),
         )
@@ -422,14 +427,14 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
         records: list[Optional[TeamRecord]] = []
-        total_wins = 0
-        total_losses = 0
-        home_wins = 0
-        home_losses = 0
-        away_wins = 0
-        away_losses = 0
-        conference_wins = 0
-        conference_losses = 0
+        total_wins: int = 0
+        total_losses: int = 0
+        home_wins: int = 0
+        home_losses: int = 0
+        away_wins: int = 0
+        away_losses: int = 0
+        conference_wins: int = 0
+        conference_losses: int = 0
 
         if all(
             _ is None for _ in (year_start, year_end)
@@ -477,29 +482,29 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 conference_wins += records[0].conference_games["wins"]  # noqa
                 conference_losses += records[0].conference_games["losses"]  # noqa
 
-        total_games = total_wins + total_losses
-        total_away_games = away_wins + away_losses
-        total_home_games = home_wins + home_losses
-        total_conference_games = conference_wins + conference_losses
+        total_games: int = total_wins + total_losses
+        total_away_games: int = away_wins + away_losses
+        total_home_games: int = home_wins + home_losses
+        total_conference_games: int = conference_wins + conference_losses
 
-        embed = buildEmbed(
+        embed: discord.Embed = buildEmbed(
             title=f"Nebraska's {str(year_start.value) + ' to ' + str(year_end.value) if (year_start is not None and year_end is not None) else year} Season Stats",
             fields=[
                 dict(
                     name="Wins-Losses",
-                    value=f"{total_wins}-{total_losses} ({total_wins/total_games:0.4f})",
+                    value=f"{total_wins}-{total_losses} ({total_wins / total_games:0.4f})",
                 ),
                 dict(
                     name="Home Wins-Losses",
-                    value=f"{home_wins}-{home_losses} ({home_wins/total_home_games:0.4f})",
+                    value=f"{home_wins}-{home_losses} ({home_wins / total_home_games:0.4f})",
                 ),
                 dict(
                     name="Away Wins-Losses",
-                    value=f"{away_wins}-{away_losses} ({away_wins/total_away_games:0.4f})",
+                    value=f"{away_wins}-{away_losses} ({away_wins / total_away_games:0.4f})",
                 ),
                 dict(
                     name="Conference Wins-Losses",
-                    value=f"{conference_wins}-{conference_losses} ({conference_wins/total_conference_games:0.4f})",
+                    value=f"{conference_wins}-{conference_losses} ({conference_wins / total_conference_games:0.4f})",
                 ),
             ],
         )
