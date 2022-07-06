@@ -10,7 +10,7 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
 
-__all__ = ["ScheudlePosts"]
+__all__: list[str] = ["ScheudlePosts"]
 
 
 class Weekday(enum.IntEnum):
@@ -76,11 +76,11 @@ class ScheudlePosts:
     # noinspection PyMethodMayBeStatic
     def _setup_debug_scheudle(self) -> None:
         logger.debug("Creating schedule for debug messages")
-        debug_job = schedule.every(3).seconds.do(print, "Debug message for schedule")
+        schedule.every(5).minutes.do(print, "Debug message for schedule")
         logger.debug("Scheduled debug messages for every 3 seconds")
 
     def _setup_schedule(self) -> None:
-        logger.info("Creating schedule for daily posts")
+        logger.debug("Creating schedule for daily posts")
 
         time_str: str = (
             f"{self._delivery_time.hour:02d}:{self._delivery_time.minute:02d}"
