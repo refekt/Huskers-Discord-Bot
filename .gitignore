@@ -8,5 +8,5 @@
 /changelog.md
 /husk_messages.txt
 __pycache__
-commands/testing.py
 resources/*
+commands/testing.py
