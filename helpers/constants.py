@@ -1,19 +1,8 @@
 import logging
 import platform
-from typing import Union
 
-import discord
 import pytz
 from cfbd import Configuration
-from discord import (
-    CategoryChannel,
-    ForumChannel,
-    PartialMessageable,
-    StageChannel,
-    TextChannel,
-    Thread,
-    VoiceChannel,
-)
 from dotenv import load_dotenv
 
 from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
@@ -22,10 +11,6 @@ from helpers.misc import loadVarPath
 logger = logging.getLogger(__name__)
 
 logger.info(f"Platform == {platform.platform()}")
-
-# Consistent timezone
-TZ = pytz.timezone("CST6CDT")
-logger.info(f"Timezone set as {TZ}")
 
 # Setting variables location
 variables_path = loadVarPath()
@@ -46,21 +31,8 @@ if run:
 env_vars = decrypt_return_data(env_file, key)
 logger.info("Environment variables loaded")
 
-# SSH
-SSH_HOST = env_vars["ssh_host"]
-SSH_USERNAME = env_vars["ssh_username"]
-SSH_PASSWORD = env_vars["ssh_password"]
-logger.info("SSH variables loaded")
-
-# Imgur
-IMGUR_CLIENT = env_vars["imgur_client"]
-IMGUR_SECRET = env_vars["imgur_secret"]
-logger.info("Imgur variables loaded")
-
 # Discord Bot Tokens
-TEST_TOKEN = env_vars["TEST_TOKEN"]
 PROD_TOKEN = env_vars["DISCORD_TOKEN"]
-BACKUP_TOKEN = env_vars["BACKUP_TOKEN"]
 logger.info("Discord tokens loaded")
 
 # SQL information
@@ -70,32 +42,23 @@ SQL_PASSWD = env_vars["sqlPass"]
 SQL_DB = env_vars["sqlDb"]
 logger.info("MySQL variables loaded")
 
-# Reddit Bot Info
+# TODO Reddit Bot Info
 REDDIT_CLIENT_ID = env_vars["reddit_client_id"]
 REDDIT_SECRET = env_vars["reddit_secret"]
 REDDIT_PW = env_vars["reddit_pw"]
-
-# CFBD API Key
-CFBD_KEY = env_vars["cfbd_api"]
-logger.info("CFBD key loaded")
 
 # DEBUG
 DEBUGGING_CODE = "Windows" in platform.platform()
 
 # Twitter variables
 TWITTER_HUSKER_MEDIA_LIST_ID = 1307680291285278720
-TWITTER_BLOCK16_ID_STR = "457066083"
 TWITTER_BLOCK16_SCREENANME = "Block16Omaha"
 TWITTER_QUERY_MAX = 512
-
 TWITTER_BEARER = env_vars["twitter_bearer"]
-
 TWITTER_KEY = env_vars["twitter_api_key"]
 TWITTER_SECRET_KEY = env_vars["twitter_api_key_secret"]
-
 TWITTER_TOKEN = env_vars["twitter_access_token"]
 TWITTER_TOKEN_SECRET = env_vars["twitter_access_token_secret"]
-
 TWITTER_V2_CLIENT_ID = env_vars["twitter_v2_client_id"]
 TWITTER_V2_CLIENT_SECRET = env_vars["twitter_v2_client_secret"]
 
@@ -106,12 +69,18 @@ WEATHER_API_KEY = env_vars["openweather_key"]
 logger.info("Weather API key loaded")
 
 # cfbd
+CFBD_KEY = env_vars["cfbd_api"]
+
 CFBD_CONFIG = Configuration()
 CFBD_CONFIG.api_key["Authorization"] = CFBD_KEY
 CFBD_CONFIG.api_key_prefix["Authorization"] = "Bearer"
 
-del env_vars, env_file, key
+del env_vars, env_file, key, variables_path
 logger.info("Deleted environment variables, files, and key")
+
+# Consistent timezone
+TZ = pytz.timezone("CST6CDT")
+logger.info(f"Timezone set as {TZ}")
 
 # Headers for `requests`
 HEADERS = {
@@ -119,7 +88,7 @@ HEADERS = {
 }
 logger.info("User-Agent Header loaded")
 
-# Discord Roles
+# TODO Discord Roles
 ROLE_ADMIN_PROD = 440639061191950336
 ROLE_ADMIN_TEST = 606301197426753536
 ROLE_AIRPOD = 633702209703378978
@@ -151,7 +120,6 @@ CHAN_ANNOUNCEMENT = 651523695214329887
 CHAN_BOTLOGS = 458474143403212801
 CHAN_BOT_SPAM = 593984711706279937
 CHAN_BOT_SPAM_PRIVATE = 990262349703286864
-CHAN_BOT_SPAM_TEST = 595705205069185047
 CHAN_DISCUSSION_LIVE = 768828614773833768
 CHAN_DISCUSSION_STREAMING = 768828705102888980
 CHAN_FOOD = 453994941857923082
@@ -162,7 +130,6 @@ CHAN_HYPE_MAX = 682386060264865953
 CHAN_HYPE_NO = 682386220072042537
 CHAN_HYPE_SOME = 682386133950136333
 CHAN_IOWA = 749339421077274664
-CHAN_NOBOS = 620043869504929832
 CHAN_POLITICS = 504777800100741120
 CHAN_POSSUMS = 873645025878233099
 CHAN_RECRUITING = 507520543096832001
@@ -170,10 +137,8 @@ CHAN_TWITTERVERSE = 636220560010903584
 logger.info("Channel variables loaded")
 
 # Game Day Category
-CAT_ADMIN = 600530901407105055
 CAT_GAMEDAY = 768828439636606996
 CAT_GENERAL = 440632687087058944
-CAT_INTRO = 442062321695719434
 logger.info("Channel category variables loaded")
 
 CHAN_BANNED = (
@@ -186,32 +151,16 @@ CHAN_BANNED = (
 )
 logger.info("Banned channels loaded")
 
-CHAN_STATS_BANNED = (
-    CHAN_ADMIN,
-    CHAN_ADMIN_DOUBLE,
-    CHAN_ANNOUNCEMENT,
-    CHAN_BOTLOGS,
-    CHAN_HOF,
-    CHAN_HOS,
-)
-logger.info("Banned channel stats loaded")
-
 CHAN_HYPE_GROUP = (CHAN_HYPE_MAX, CHAN_HYPE_SOME, CHAN_HYPE_NO)
 logger.info("Hype channels loaded")
 
 # Servers/guilds
 GUILD_PROD = 440632686185414677
-GUILD_TEST = 595705205069185045
 logger.info("Guild variable loaded")
 
 # Member ID
-MEMBER_BOT = 593949013443608596
 MEMBER_GEE = 189554873778307073
 logger.info("Member variables loaded")
-
-# Currency
-CURRENCY_NAME = "Husker Coins"
-logger.info("Currency variable loaded")
 
 # Bot Info
 BOT_DISPLAY_NAME = "Bot Frost"
@@ -221,7 +170,7 @@ BOT_THUMBNAIL_URL = "https://ucomm.unl.edu/images/brand-book/Our-marks/nebraska-
 BOT_FOOTER_SECRET = (
     "These messages are anonymous and there is no way to verify messages are accurate."
 )
-BOT_FOOTER_BOT = "Created by Bot Frost"
+BOT_FOOTER_BOT = "Bot Frost praises the sun \\[T]/"  # noqa
 logger.info("Bot info variables loaded")
 
 # DateTime format
@@ -230,28 +179,26 @@ DT_CFBD_GAMES_DISPLAY = "%B %d, %Y at %H:%M %p %Z"
 DT_FAP_RECRUIT = "%Y-%m-%d %H:%M:%S"
 DT_MYSQL_FORMAT = "%Y-%m-%d %H:%M:%S"
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
-DT_OBJ_FORMAT_TBA = "%d %b %Y"
 DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
 DT_STR_FORMAT = "%b %d %Y %I:%M %p"
 DT_STR_RECRUIT = "%m/%d/%Y %I:%M:%S %p"
 DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
-DT_TBA_HR = 10
-DT_TBA_MIN = 58
 DT_TBA_TIME = "10:58 PM"
 DT_TWEET_FORMAT = "%H:%M:%S %d %b %Y"
-DT_TWEET_FORMAT_OLD = "%Y-%m-%d %H:%M:%S"
 logger.info("Datetime formatting variables loaded")
 
+# Discord UI Timeout
 GLOBAL_TIMEOUT = 3600
 
+# Croot bot
 CROOT_SEARCH_LIMIT = 5
 
 # Embed limitations
 # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
 DESC_LIMIT = 4096
 EMBED_MAX = 6000
-FIELD_VALUE_LIMIT = 1024
 FIELDS_LIMIT = 25
+FIELD_VALUE_LIMIT = 1024
 FOOTER_LIMIT = 2048
 TITLE_LIMIT = NAME_LIMIT = FIELD_NAME_LIMIT = 256
 
@@ -397,32 +344,17 @@ RECRUIT_POSITIONS = {
     "WR": "Wide Receiver",
 }
 
-DISCORD_CHANNEL_TYPES = Union[
-    VoiceChannel,
-    StageChannel,
-    TextChannel,
-    ForumChannel,
-    CategoryChannel,
-    Thread,
-    PartialMessageable,
-    None,
-]
-DISCORD_USER_TYPES = Union[discord.Member, discord.User]
-
 logger.info("Discord Union group variables loaded")
 
 __all__ = [
-    "BACKUP_TOKEN",
     "BOT_DISPLAY_NAME",
     "BOT_FOOTER_BOT",
     "BOT_FOOTER_SECRET",
     "BOT_GITHUB_URL",
     "BOT_ICON_URL",
     "BOT_THUMBNAIL_URL",
-    "CAT_ADMIN",
     "CAT_GAMEDAY",
     "CAT_GENERAL",
-    "CAT_INTRO",
     "CFBD_CONFIG",
     "CFBD_KEY",
     "CHAN_ADMIN",
@@ -432,7 +364,6 @@ __all__ = [
     "CHAN_BOTLOGS",
     "CHAN_BOT_SPAM",
     "CHAN_BOT_SPAM_PRIVATE",
-    "CHAN_BOT_SPAM_TEST",
     "CHAN_DISCUSSION_LIVE",
     "CHAN_DISCUSSION_STREAMING",
     "CHAN_FOOD",
@@ -444,33 +375,24 @@ __all__ = [
     "CHAN_HYPE_NO",
     "CHAN_HYPE_SOME",
     "CHAN_IOWA",
-    "CHAN_NOBOS",
     "CHAN_POLITICS",
     "CHAN_POSSUMS",
     "CHAN_RECRUITING",
-    "CHAN_STATS_BANNED",
     "CHAN_TWITTERVERSE",
     "CROOT_SEARCH_LIMIT",
-    "CURRENCY_NAME",
     "DEBUGGING_CODE",
     "DESC_LIMIT",
-    "DISCORD_CHANNEL_TYPES",
-    "DISCORD_USER_TYPES",
     "DT_CFBD_GAMES",
     "DT_CFBD_GAMES_DISPLAY",
     "DT_FAP_RECRUIT",
     "DT_MYSQL_FORMAT",
     "DT_OBJ_FORMAT",
-    "DT_OBJ_FORMAT_TBA",
     "DT_OPENWEATHER_UTC",
     "DT_STR_FORMAT",
     "DT_STR_RECRUIT",
     "DT_TASK_FORMAT",
-    "DT_TBA_HR",
-    "DT_TBA_MIN",
     "DT_TBA_TIME",
     "DT_TWEET_FORMAT",
-    "DT_TWEET_FORMAT_OLD",
     "EMBED_MAX",
     "FIELDS_LIMIT",
     "FIELD_NAME_LIMIT",
@@ -478,11 +400,7 @@ __all__ = [
     "FOOTER_LIMIT",
     "GLOBAL_TIMEOUT",
     "GUILD_PROD",
-    "GUILD_TEST",
     "HEADERS",
-    "IMGUR_CLIENT",
-    "IMGUR_SECRET",
-    "MEMBER_BOT",
     "MEMBER_GEE",
     "NAME_LIMIT",
     "PROD_TOKEN",
@@ -517,13 +435,8 @@ __all__ = [
     "SQL_HOST",
     "SQL_PASSWD",
     "SQL_USER",
-    "SSH_HOST",
-    "SSH_PASSWORD",
-    "SSH_USERNAME",
-    "TEST_TOKEN",
     "TITLE_LIMIT",
     "TWITTER_BEARER",
-    "TWITTER_BLOCK16_ID_STR",
     "TWITTER_BLOCK16_SCREENANME",
     "TWITTER_HUSKER_MEDIA_LIST_ID",
     "TWITTER_KEY",
@@ -537,10 +450,5 @@ __all__ = [
     "US_STATES",
     "WEATHER_API_KEY",
 ]
-logger.debug(f"Constants.py __all__: {__all__}")
-# try:
-#     __all__.remove("logging")
-# except ValueError:
-#     pass
 
 logger.info(f"{str(__name__).title()} module loaded!")
