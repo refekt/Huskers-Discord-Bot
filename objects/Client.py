@@ -25,7 +25,6 @@ from helpers.constants import (
     CHAN_HOF,
     CHAN_HOS,
     DEBUGGING_CODE,
-    DISCORD_CHANNEL_TYPES,
     GUILD_PROD,
     TWITTER_BEARER,
     TWITTER_BLOCK16_SCREENANME,
@@ -43,7 +42,7 @@ from objects.TweepyStreamListener import StreamClientV2
 
 logger = discordLogger(__name__)
 
-__all__ = ["HuskerClient", "start_twitter_stream", "schedstop"]
+__all__: list[str] = ["HuskerClient", "start_twitter_stream", "schedstop"]
 
 schedstop: threading.Event = threading.Event()
 
@@ -331,7 +330,7 @@ class HuskerClient(Bot):
     async def send_welcome_message(
         self, guild_member: Union[discord.Member, discord.User]
     ) -> None:
-        channel_general: DISCORD_CHANNEL_TYPES = await self.fetch_channel(CHAN_GENERAL)
+        channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
             title="New Husker fan!",
             description="Welcome the new member to the server!",
@@ -463,7 +462,7 @@ class HuskerClient(Bot):
         # on_ready_tasks: list[Optional[Coroutine]] = []
         on_ready_tasks = []
 
-        if DEBUGGING_CODE:
+        if not DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
         else:
             await start_twitter_stream(self)
@@ -565,7 +564,7 @@ class HuskerClient(Bot):
 
         logger.info("Gathering and running scheduled daily posts")
 
-        def scheudler():
+        def scheudler() -> None:
             while not schedstop.is_set():
                 # schedule.run_pending()
                 sched.setup_and_run_schedule()
