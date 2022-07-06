@@ -54,44 +54,45 @@ client: HuskerClient = HuskerClient(
 
 tree: CommandTree = client.tree
 
+if not DEBUGGING_CODE:
 
-@tree.error
-async def on_app_command_error(
-    interaction: discord.Interaction, error: CommandInvokeError
-) -> None:
-    logger.info("app_command error detected!")
+    @tree.error
+    async def on_app_command_error(
+        interaction: discord.Interaction, error: CommandInvokeError
+    ) -> None:
+        logger.info("app_command error detected!")
 
-    err: DiscordError = DiscordError(error, interaction.data.get("options", None))
-    logger.exception(error, exc_info=True)
+        err: DiscordError = DiscordError(error, interaction.data.get("options", None))
+        logger.exception(error, exc_info=True)
 
-    embed: discord.Embed = buildEmbed(
-        title="",
-        fields=[
-            dict(
-                name=f"Error Type: {err.error_type}",
-                value=f"{err.message}",
-            ),
-            dict(
-                name="Command",
-                value=f"{'/' + err.command if not err.parent else '/' + err.parent.name + ' ' + err.command}",
-            ),
-            dict(
-                name="Command Input",
-                value=f"{', '.join(err.options) if err.options else 'None'}",
-            ),
-            dict(name="Originating Module", value=f"{err.module}"),
-        ],
-    )
+        embed: discord.Embed = buildEmbed(
+            title="",
+            fields=[
+                dict(
+                    name=f"Error Type: {err.error_type}",
+                    value=f"{err.message}",
+                ),
+                dict(
+                    name="Command",
+                    value=f"{'/' + err.command if not err.parent else '/' + err.parent.name + ' ' + err.command}",
+                ),
+                dict(
+                    name="Command Input",
+                    value=f"{', '.join(err.options) if err.options else 'None'}",
+                ),
+                dict(name="Originating Module", value=f"{err.module}"),
+            ],
+        )
 
-    if interaction.response.is_done():
-        # Make error message hidden
-        try:
-            await interaction.delete_original_message()
-        except (HTTPException, NotFound, Forbidden):
-            pass
-        await interaction.followup.send(content="", embed=embed, ephemeral=True)
-    else:
-        await interaction.followup.send(content="", embed=embed, ephemeral=True)
+        if interaction.response.is_done():
+            # Make error message hidden
+            try:
+                await interaction.delete_original_message()
+            except (HTTPException, NotFound, Forbidden):
+                pass
+            await interaction.followup.send(content="", embed=embed, ephemeral=True)
+        else:
+            await interaction.followup.send(content="", embed=embed, ephemeral=True)
 
 
 @client.command()
@@ -146,7 +147,7 @@ async def sync(
 
 
 discord_loggers: list[str] = [
-    "asyncio",
+    # "asyncio",
     "discord",
     "discord.client",
     "discord.gateway",
@@ -167,7 +168,6 @@ async def main() -> None:
 try:
     asyncio.run(main())
 except (KeyboardInterrupt, RuntimeError, SystemExit):
-    # schedstop.set()
     pass
 
 logger.info("Closing the bot")

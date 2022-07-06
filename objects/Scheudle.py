@@ -1,12 +1,18 @@
 import enum
-from datetime import time, datetime
+import logging
+import time
+from datetime import datetime, time as _time
 
+import discord
 import schedule
 
 from helpers.constants import TZ, DEBUGGING_CODE
+from helpers.embed import buildEmbed
 from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
+asyncio_logger = logging.getLogger("asyncio")
+
 
 __all__: list[str] = ["ScheudlePosts"]
 
@@ -30,15 +36,49 @@ class Weekday(enum.IntEnum):
 
 
 class ScheudlePosts:
-    __slots__ = ["_delivery_time", "_setup", "send_message", "which_day"]
+    __slots__ = [
+        "_delivery_time",
+        "_setup",
+        "channel",
+        "schedule_daily_embeds",
+        "send_message",
+        "which_day",
+    ]
 
-    def __init__(
-        self,
-    ) -> None:
-        self._delivery_time: time = time(hour=7, minute=30, second=0, tzinfo=TZ)
+    def __init__(self, channel: discord.TextChannel) -> None:
+        logger.debug("Creating ScheudlePosts instance")
+
+        self._delivery_time: time = _time(hour=7, minute=30, second=0, tzinfo=TZ)
         self._setup: bool = False
+        self.channel: discord.TextChannel = channel
         self.send_message: bool = False
         self.which_day: int = 0
+        self.schedule_daily_embeds: list[discord.Embed] = [
+            buildEmbed(
+                title=f"Monday Motivation",
+                description=f"Monday's suck. How can get through the day?",
+            ),
+            buildEmbed(
+                title=f"Good News Tuesday",
+                description=f"Share your good news of the day/week!",
+            ),
+            buildEmbed(
+                title=f"What's Your Wish Wednesday",
+                description=f"What do you want to see happen this week?",
+            ),
+            buildEmbed(
+                title=f"Throwback Thursday",
+                description=f"What is something from the past you want to share?",
+            ),
+            buildEmbed(
+                title=f"Finally Friday",
+                description=f"What's the plan for the weekend?",
+            ),
+            buildEmbed(title=f"Saturday", description=f"Weekend vibes"),
+            buildEmbed(title=f"Sunday", description=f"Weekend vibes"),
+        ]
+
+        logger.debug("ScheudlePosts initialized")
 
     def send_daily_message(self) -> None:
         logger.info("Attempting to send a daily message")
@@ -86,6 +126,25 @@ class ScheudlePosts:
             schedule.run_pending()
             all_jobs: list[schedule.Job] = schedule.jobs()
             logger.debug(f"Jobs are:\n{[job for job in all_jobs]}")
+
+    async def run(self):
+        if DEBUGGING_CODE:
+            asyncio_logger.setLevel(logging.DEBUG)
+        else:
+            asyncio_logger.setLevel(logging.INFO)
+
+        asyncio_logger.debug("Running ScheudlePosts loop")
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+            if self.send_message:
+                asyncio_logger.debug("self.send_message == True")
+                await self.channel.send(
+                    embed=self.schedule_daily_embeds[self.which_day]
+                )
+            else:
+                asyncio_logger.debug("self.send_message == False")
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

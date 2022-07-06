@@ -1,12 +1,12 @@
 import asyncio
+import logging
 import os
 import pathlib
 import sys
 import tracemalloc
-from asyncio import Future
 from datetime import timedelta
 from os import listdir
-from typing import Union
+from typing import Union, Any
 
 import discord
 import schedule
@@ -43,8 +43,6 @@ from objects.TweepyStreamListener import StreamClientV2
 logger = discordLogger(__name__)
 
 __all__: list[str] = ["HuskerClient", "start_twitter_stream"]
-
-# schedstop: threading.Event = threading.Event()
 
 tracemalloc.start()
 
@@ -561,72 +559,36 @@ class HuskerClient(Bot):
             else:
                 logger.info("No open reminders found")
 
-        logger.info("Gathering and running scheduled daily posts")
+        logger.info("Creating daily posts schedule")
 
-        schedule_daily_embeds: list[discord.Embed] = [
-            buildEmbed(
-                title=f"Monday Motivation",
-                description=f"Monday's suck. How can get through the day?",
-            ),
-            buildEmbed(
-                title=f"Good News Tuesday",
-                description=f"Share your good news of the day/week!",
-            ),
-            buildEmbed(
-                title=f"What's Your Wish Wednesday",
-                description=f"What do you want to see happen this week?",
-            ),
-            buildEmbed(
-                title=f"Throwback Thursday",
-                description=f"What is something from the past you want to share?",
-            ),
-            buildEmbed(
-                title=f"Finally Friday",
-                description=f"What's the plan for the weekend?",
-            ),
-            buildEmbed(title=f"Saturday", description=f"Weekend vibes"),
-            buildEmbed(title=f"Sunday", description=f"Weekend vibes"),
-        ]
+        scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
+        scheduled_posts.setup_and_run_schedule()
 
-        async def scheduler() -> None:
-            logger.debug("Scheduler starting...")
+        all_jobs: list[schedule.Job] = schedule.jobs()
+        logger.debug(f"Jobs are:\n{[job for job in all_jobs]}")
 
-            sched: ScheudlePosts = ScheudlePosts()
+        on_ready_tasks.append(scheduled_posts.run())
 
-            while True:
-                logger.debug("Scheduler...")
-                schedule.run_pending()
-                await asyncio.sleep(1)
-
-                if sched.send_message:
-                    guild: discord.Guild = await self.fetch_guild(GUILD_PROD)
-                    if DEBUGGING_CODE:
-                        chan_daily_message: discord.Text = await guild.fetch_channel(
-                            CHAN_BOT_SPAM_PRIVATE
-                        )
-                    else:
-                        chan_daily_message = await guild.fetch_channel(CHAN_GENERAL)
-
-                    await chan_daily_message.send(
-                        embed=schedule_daily_embeds[sched.which_day]
-                    )
-
-        # schedthread: threading.Thread = threading.Thread(target=scheudler)
-        # schedthread.start()
-        future_schedule: Future = asyncio.run_coroutine_threadsafe(
-            scheduler(), self.loop
-        )
-        future_schedule.result()
-
-        logger.info("Scheduled daily posts started")
+        logger.info("Daily post schedule created")
 
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
-            # await asyncio.gather(
-            #     *on_ready_tasks, return_exceptions=True
-            # )  # Has to be the last line of code because I don't know how to make code run after it
 
-            await self.loop.run_in_executor(None, *on_ready_tasks)
+            asyncio_logger = logging.getLogger("asyncio")
+
+            if DEBUGGING_CODE:
+                asyncio_logger.setLevel(logging.DEBUG)
+            else:
+                asyncio_logger.setLevel(logging.INFO)
+
+            results: tuple[Union[BaseException, Any], ...] = await asyncio.gather(
+                *on_ready_tasks, return_exceptions=True
+            )
+
+            for exc in [r for r in results if isinstance(r, BaseException)]:
+                asyncio_logger.exception(
+                    "Exception caught from on_ready_tasks_", exc_info=exc
+                )
 
         logger.info("Finished on_ready_tasks stuff")
 
