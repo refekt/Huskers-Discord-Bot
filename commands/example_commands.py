@@ -8,9 +8,9 @@ from discord.ext import commands
 from helpers.constants import GUILD_PROD
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(__name__)  # Logger for each module/file
 
-__all__ = [
+__all__: list[str] = [
     ""
 ]  # Leaving blank but insert varaibles and functions that you want accessible to other files
 
@@ -18,10 +18,12 @@ __all__ = [
 class MyCog(commands.Cog):
     # for simplicity, these commands are all global. You can add `guild=` or `guilds=` to `Bot.add_cog` in `setup` to add them to a guild.
     def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
+        self.bot: commands.Bot = bot
         super().__init__()  # this is now required in this context.
 
-    group_example = app_commands.Group(name="example-command", description="TBD")
+    group_example: app_commands.Group = app_commands.Group(
+        name="example-command", description="TBD"
+    )
 
     @group_example.command(name="sub-command")
     async def sub_command(self, interaction: discord.Interaction) -> None:
@@ -70,4 +72,9 @@ class MyCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(MyCog(bot), guilds=[discord.Object(id=GUILD_PROD)])
+    await bot.add_cog(
+        MyCog(bot),
+        guilds=[
+            discord.Object(id=GUILD_PROD)
+        ],  # Be sure to update this when adding guild-specific commands
+    )
