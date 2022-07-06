@@ -4,7 +4,13 @@ from typing import Literal, Optional
 
 import discord  # noqa # Beta version thing
 from discord import HTTPException, NotFound, Forbidden
-from discord.app_commands import CommandInvokeError, commands, MissingApplicationID
+from discord.app_commands import (
+    CommandInvokeError,
+    commands,
+    MissingApplicationID,
+    CommandTree,
+    AppCommand,
+)
 from discord.ext.commands import Context, Greedy
 
 from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
@@ -33,20 +39,20 @@ from objects.TweepyStreamListener import *  # noqa
 from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa
 
-__all__ = ["client"]
+__all__: list[str] = ["client"]
 
 intents = discord.Intents.all()
 intents.typing = False
 intents.presences = False
 
-client = HuskerClient(
+client: HuskerClient = HuskerClient(
     command_prefix="$",
     fetch_offline_members=True,
     intents=intents,
     owner_id=MEMBER_GEE,
 )
 
-tree = client.tree
+tree: CommandTree = client.tree
 
 
 @tree.error
@@ -55,10 +61,10 @@ async def on_app_command_error(
 ) -> None:
     logger.info("app_command error detected!")
 
-    err = DiscordError(error, interaction.data.get("options", None))
+    err: DiscordError = DiscordError(error, interaction.data.get("options", None))
     logger.error(error, exc_info=True)
 
-    embed = buildEmbed(
+    embed: discord.Embed = buildEmbed(
         title="",
         fields=[
             dict(
@@ -99,7 +105,7 @@ async def sync(
     if not guilds:
         if spec == "~":  # Current guild
             logger.info("Syncing commands to current guild")
-            synced = await client.tree.sync(guild=ctx.guild)
+            synced: list[AppCommand] = await client.tree.sync(guild=ctx.guild)
         elif spec == "*":  # Copies all global app commands to current guild and syncs
             logger.info("Copying all global application commands to current guild")
             client.tree.copy_global_to(guild=ctx.guild)
@@ -120,7 +126,7 @@ async def sync(
         )
         return
 
-    ret = 0
+    ret: int = 0
     for guild in guilds:
         try:
             logger.info(f"Attempting to sync application commands to {guild}")
@@ -139,7 +145,7 @@ async def sync(
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 
-discord_loggers = [
+discord_loggers: list[str] = [
     "asyncio",
     "discord",
     "discord.client",
