@@ -836,7 +836,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.user.send(content=f"```\n{last_lines[-BODY_LIMIT:]}\n```")
         await interaction.followup.send(
-            f"Log sent in a DM! {interaction.client.user.mention}"
+            f"Log sent in a DM! {interaction.client.user.mention}\nLog path: {path_log}"
         )
 
 
