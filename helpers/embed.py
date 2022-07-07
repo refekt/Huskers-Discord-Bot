@@ -198,7 +198,7 @@ def buildTweetEmbed(
 
     if medias:
         for index, item in enumerate(medias):
-            if index == 0:
+            if index == 0 and item.get("url", False):
                 embed.set_image(url=item.url)
             embed.add_field(
                 name="Embedded Image",
