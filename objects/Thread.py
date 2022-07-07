@@ -4,6 +4,8 @@ import re
 from datetime import datetime, timedelta
 from typing import Coroutine, Optional, Callable, Union
 
+from dateutil.relativedelta import relativedelta
+
 from helpers.constants import DT_TASK_FORMAT
 from objects.Logger import discordLogger
 
@@ -15,6 +17,7 @@ __all__: list[str] = [
     "convertDateTimeString",
     "convertIowaDuration",
     "convert_duration",
+    "prettifyLongTimeDateValue",
     "prettifyTimeDateValue",
 ]
 
@@ -27,6 +30,26 @@ class DateTimeChars(enum.Enum):
     HOUR = "h"
     MINUTE = "m"
     SECOND = "s"
+
+
+def prettifyLongTimeDateValue(start, end) -> str:
+    _diff = relativedelta(start, end)
+    _output: str = ""
+    if _diff.years:
+        _output = f"{_diff.years} years, "
+
+    if _diff.months:
+        _output += f"{_diff.months} months, "
+    elif _diff.years and not _diff.months:
+        _output += "0 months, "
+
+    if _diff.days:
+        _output += f"{_diff.days} days"
+
+    if _output[:-2] == ", ":
+        _output = _output[len(str(_diff)) - 2]
+
+    return _output
 
 
 def prettifyTimeDateValue(total_seconds: float) -> str:

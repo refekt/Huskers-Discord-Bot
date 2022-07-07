@@ -255,6 +255,8 @@ logger.info("Bot info variables loaded")
 DT_CFBD_GAMES = "%Y-%m-%dT%H:%M:%S.%f%z"
 DT_CFBD_GAMES_DISPLAY = "%B %d, %Y at %H:%M %p %Z"
 DT_FAP_RECRUIT = "%Y-%m-%d %H:%M:%S"
+DT_GITHUB_API = "%Y-%m-%dT%H:%M:%SZ"
+DT_GITHUB_API_DISPLAY = "%A, %B %d, %Y"
 DT_MYSQL_FORMAT = "%Y-%m-%d %H:%M:%S"
 DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
 DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
@@ -463,6 +465,8 @@ __all__: list[str] = [
     "DT_CFBD_GAMES",
     "DT_CFBD_GAMES_DISPLAY",
     "DT_FAP_RECRUIT",
+    "DT_GITHUB_API",
+    "DT_GITHUB_API_DISPLAY",
     "DT_MYSQL_FORMAT",
     "DT_OBJ_FORMAT",
     "DT_OPENWEATHER_UTC",

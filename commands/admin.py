@@ -1,3 +1,4 @@
+import json
 import pathlib
 import platform
 import subprocess
@@ -6,6 +7,7 @@ from enum import Enum
 from typing import Any, Union, Optional
 
 import discord.ext.commands
+import requests
 from discord import app_commands, Forbidden, HTTPException
 from discord.app_commands import Group, Command
 from discord.ext import commands
@@ -25,6 +27,9 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
+    TZ,
+    DT_GITHUB_API,
+    DT_GITHUB_API_DISPLAY,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -37,6 +42,7 @@ from objects.Thread import (
     background_run_function,
     prettifyTimeDateValue,
     convertIowaDuration,
+    prettifyLongTimeDateValue,
 )
 from objects.Timers import IowaDuration
 
@@ -273,6 +279,20 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def about(self, interaction: discord.Interaction) -> None:
         """All about Bot Frost"""
 
+        github_api_url: str = "https://api.github.com/repos/refekt/Bot-Frost"
+        github_response: requests.Response = requests.get(url=github_api_url)
+        github_json: dict = json.loads(github_response.text)
+
+        created_on: datetime = datetime.strptime(
+            github_json.get("created_at", "UNK"), DT_GITHUB_API
+        ).astimezone(tz=TZ)
+        updated_on: datetime = datetime.strptime(
+            github_json.get("updated_at", "UNK"), DT_GITHUB_API
+        ).astimezone(tz=TZ)
+        pushed_on: datetime = datetime.strptime(
+            github_json.get("pushed_at", "UNK"), DT_GITHUB_API
+        ).astimezone(tz=TZ)
+
         await interaction.response.send_message(
             embed=buildEmbed(
                 title="About Me",
@@ -280,6 +300,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     dict(
                         name="History",
                         value="Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
+                    ),
+                    dict(
+                        name="GitHub Information",
+                        value=f"Created On: {created_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
+                        f"Updated On: {updated_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
+                        f"Pushed On: {pushed_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
+                        f"Age: {prettifyLongTimeDateValue(datetime.now().astimezone(tz=TZ), created_on)}\n",
                     ),
                     dict(
                         name="Source Code",
