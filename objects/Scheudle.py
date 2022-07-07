@@ -133,9 +133,7 @@ class ScheudlePosts:
         all_jobs_str: str = ""
         for job in all_jobs:
             all_jobs_str += f"* {repr(job)}\n"
-        asyncio_logger.debug(
-            f"Scheduled messages complete. Jobs are:\n\n{all_jobs_str}"
-        )
+        asyncio_logger.info(f"Scheduled messages complete. Jobs are:\n\n{all_jobs_str}")
 
         asyncio_logger.debug("Scheduled debug messages for every 3 seconds")
 
