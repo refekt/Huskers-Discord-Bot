@@ -6,7 +6,7 @@ import sys
 import tracemalloc
 from datetime import timedelta
 from os import listdir
-from typing import Union, Any
+from typing import Union, Any, Awaitable
 
 import discord
 import tweepy
@@ -395,7 +395,7 @@ class HuskerClient(Bot):
         logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
 
-        on_ready_tasks = []
+        on_ready_tasks: list[Awaitable] = []
 
         if DEBUGGING_CODE:
             logger.info("Skipping Twitter stream")
@@ -491,7 +491,7 @@ class HuskerClient(Bot):
                                 message=reminder["message"],
                                 remind_who=remind_who,
                                 missed_reminder=True,
-                            ).run
+                            ).run()
                         )
                 logger.info("Compiled all open tasks")
             else:
