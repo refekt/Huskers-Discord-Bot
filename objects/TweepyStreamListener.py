@@ -52,11 +52,12 @@ class MyTweet(object):
 
 class TweetMediaData(object):
     __slots__ = [
+        "duration_ms",
         "height",
         "media_key",
+        "preview_image_url",
         "public_metrics",
         "type",
-        "url",
         "url",
         "width",
     ]
@@ -73,6 +74,7 @@ class TweetQuoteData(object):
     __slots__ = [
         "attachments",
         "author_id",
+        "context_annotations",
         "conversation_id",
         "created_at",
         "entities",
