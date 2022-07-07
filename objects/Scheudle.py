@@ -48,7 +48,7 @@ class ScheudlePosts:
     def __init__(self, channel: discord.TextChannel) -> None:
         logger.debug("Creating ScheudlePosts instance")
 
-        self._delivery_time: time = _time(hour=7, minute=30, second=0, tzinfo=TZ)
+        self._delivery_time: time = _time(hour=0, minute=50, second=0, tzinfo=TZ)
         self._setup: bool = False
         self.channel: discord.TextChannel = channel
         self.send_message: bool = False

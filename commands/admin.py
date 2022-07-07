@@ -1,4 +1,3 @@
-import os
 import pathlib
 import platform
 import subprocess
@@ -818,23 +817,38 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/log.log"
         )
 
-        with open(path_log, "rb") as file:
-            last_lines: str = ""
-            for index in range(15):
-                try:
-                    file.seek(-2, os.SEEK_END)
-                    while file.read(1) != b"\n":
-                        file.seek(-2, os.SEEK_CUR)
-                except OSError:
-                    file.seek(0)
+        with open(path_log, "rb") as f:
+            total_lines: int = 15
+            block_size: int = 1024
+            lines_remaining: int = total_lines
+            block_number: int = -1
+            blocks: list[str] = []
 
-                last_lines += f"{file.readline().decode()}"
+            f.seek(0, 2)
+            block_end_byte: int = f.tell()
 
-        file.close()
+            while lines_remaining > 0 and block_end_byte > 0:
+                read: str = f.read(block_size).decode("utf-8")
+                if block_end_byte - block_size > 0:
+                    f.seek(block_number * block_size, 2)
+                    blocks.append(read)
+                else:
+                    f.seek(0, 0)
+                    blocks.append(read)
 
-        BODY_LIMIT: int = 2000 - 15
+                lines_found: int = blocks[-1].count("\n")
+                lines_remaining -= lines_found
+                block_end_byte -= block_size
+                block_number -= 1
 
-        await interaction.user.send(content=f"```\n{last_lines[-BODY_LIMIT:]}\n```")
+        log_output: str = ""
+        for block in blocks:
+            if block:
+                log_output += f"{block}\n"
+
+        str_limit: int = 1990
+
+        await interaction.user.send(content=f"```\n{log_output[-str_limit:]}\n```")
         await interaction.followup.send(
             f"Log sent in a DM! {interaction.client.user.mention}\nLog path: {path_log}"
         )
