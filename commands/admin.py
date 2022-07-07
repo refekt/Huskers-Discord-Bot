@@ -24,12 +24,12 @@ from helpers.constants import (
     CHAN_HYPE_GROUP,
     CHAN_IOWA,
     CHAN_RECRUITING,
+    DT_GITHUB_API,
+    DT_GITHUB_API_DISPLAY,
     GUILD_PROD,
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
     TZ,
-    DT_GITHUB_API,
-    DT_GITHUB_API_DISPLAY,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
