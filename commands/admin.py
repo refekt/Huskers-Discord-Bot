@@ -34,11 +34,11 @@ from objects.Exceptions import CommandException, UserInputException, SSHExceptio
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 from objects.Thread import (
-    DateTimeChars,
     background_run_function,
-    convertDateTimeString,
     prettifyTimeDateValue,
+    convertIowaDuration,
 )
+from objects.Timers import IowaDuration
 
 logger = discordLogger(__name__)
 
@@ -590,10 +590,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info(f"Removed [{role_timeout}] role")
 
         previous_roles_raw: Union[dict, list[dict], None] = processMySQL(
-            query=sqlRetrieveIowa, values=who.id, fetch="all"
+            query=sqlRetrieveIowa, values=str(who.id), fetch="all"
         )
 
-        processMySQL(query=sqlRemoveIowa, values=who.id)
+        processMySQL(query=sqlRemoveIowa, values=str(who.id))
 
         if previous_roles_raw is not None:
             previous_roles: str = previous_roles_raw[0]["previous_roles"].split(",")
@@ -637,7 +637,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.describe(
         who="User to send to Iowa",
         reason="The reason why",
-        duration="Duration in ##d##h##m##s format. E.g.; 30m, 1d6h, 6h30s.",
+        duration="How long you want the Iowa command to apply.",
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     @app_commands.default_permissions(manage_messages=True)
@@ -646,7 +646,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         interaction: discord.Interaction,
         who: Union[discord.Member, discord.User],
         reason: str,
-        duration: str = None,
+        duration: IowaDuration = None,
     ) -> None:
         await interaction.response.defer(thinking=True)
 
@@ -658,13 +658,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         assert reason, UserInputException("You must include a reason why!")
 
         if duration:
-            assert True in [
-                dt.__str__() in duration for dt in DateTimeChars
-            ], UserInputException(
-                "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
-            )
+            # assert True in [
+            #     dt.__str__() in duration for dt in DateTimeChars
+            # ], UserInputException(
+            #     "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
+            # )
 
-            dt_duration: Optional[timedelta] = convertDateTimeString(duration)
+            dt_duration: Optional[timedelta] = convertIowaDuration(duration)
         else:
             dt_duration = None
 
@@ -705,7 +705,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         message_str: str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
 
         if duration:
-            statement_str += f" This will be reverted in {duration}."
+            statement_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
             message_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
 
         embed: discord.Embed = buildEmbed(
@@ -717,7 +717,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         await interaction.followup.send(embed=embed)
-        await who.send(message_str)
+        try:
+            await who.send(message_str)
+        except (HTTPException, Forbidden, ValueError, TypeError):
+            pass
 
         if duration is not None:
             await background_run_function(

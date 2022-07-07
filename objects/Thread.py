@@ -13,6 +13,7 @@ __all__: list[str] = [
     "DateTimeChars",
     "background_run_function",
     "convertDateTimeString",
+    "convertIowaDuration",
     "convert_duration",
     "prettifyTimeDateValue",
 ]
@@ -63,6 +64,10 @@ def convertDateTimeString(dt_string: str) -> timedelta:
     return timedelta(
         days=dt_days, hours=dt_hours, minutes=dt_minutes, seconds=dt_seconds
     )
+
+
+def convertIowaDuration(cmd_duration: int) -> timedelta:
+    return timedelta(minutes=cmd_duration)
 
 
 def convert_duration(value: str) -> timedelta:

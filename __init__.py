@@ -35,6 +35,7 @@ from objects.Paginator import *  # noqa
 from objects.Recruits import *  # noqa
 from objects.Survey import *  # noqa
 from objects.Thread import *  # noqa
+from objects.Timers import *  # noqa
 from objects.TweepyStreamListener import *  # noqa
 from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa
