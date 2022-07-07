@@ -9,7 +9,6 @@ from os import listdir
 from typing import Union, Any
 
 import discord
-import schedule
 import tweepy
 from discord import NotFound, Forbidden, HTTPException
 from discord.app_commands import MissingApplicationID
@@ -564,9 +563,6 @@ class HuskerClient(Bot):
         scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
         scheduled_posts.setup_and_run_schedule()
 
-        all_jobs: list[schedule.Job] = schedule.jobs()
-        logger.debug(f"Jobs are:\n{[job for job in all_jobs]}")
-
         on_ready_tasks.append(scheduled_posts.run())
 
         logger.info("Daily post schedule created")
@@ -574,7 +570,7 @@ class HuskerClient(Bot):
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
 
-            asyncio_logger = logging.getLogger("asyncio")
+            asyncio_logger = discordLogger("asyncio")
 
             if DEBUGGING_CODE:
                 asyncio_logger.setLevel(logging.DEBUG)

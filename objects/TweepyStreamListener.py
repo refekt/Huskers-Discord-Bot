@@ -43,8 +43,11 @@ class MyTweet(object):
     ]
 
     def __init__(self, tweet_data) -> None:
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
+        try:
+            for key in tweet_data:
+                setattr(self, key, tweet_data[key])
+        except AttributeError:
+            logger.exception(f"Key not in __slots__ for {self}")
 
 
 class TweetMediaData(object):
@@ -59,8 +62,11 @@ class TweetMediaData(object):
     ]
 
     def __init__(self, tweet_data) -> None:
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
+        try:
+            for key in tweet_data:
+                setattr(self, key, tweet_data[key])
+        except AttributeError:
+            logger.exception(f"Key not in __slots__ for {self}")
 
 
 class TweetQuoteData(object):
@@ -81,8 +87,11 @@ class TweetQuoteData(object):
     ]
 
     def __init__(self, tweet_data) -> None:
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
+        try:
+            for key in tweet_data:
+                setattr(self, key, tweet_data[key])
+        except AttributeError:
+            logger.exception(f"Key not in __slots__ for {self}")
 
 
 class TweetUserData(object):
@@ -94,6 +103,7 @@ class TweetUserData(object):
         "following",
         "id",
         "listed_count",
+        "location",
         "name",
         "profile_image_url",
         "protected",
@@ -104,9 +114,12 @@ class TweetUserData(object):
         "verified",
     ]
 
-    def __init__(self, data) -> None:
-        for key in data:
-            setattr(self, key, data[key])
+    def __init__(self, tweet_data) -> None:
+        try:
+            for key in tweet_data:
+                setattr(self, key, tweet_data[key])
+        except AttributeError:
+            logger.exception(f"Key not in __slots__ for {self}")
 
 
 async def send_tweet_alert(client: discord.Client, message) -> None:
