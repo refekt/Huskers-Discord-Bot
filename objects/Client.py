@@ -3,7 +3,9 @@ import logging
 import os
 import pathlib
 import sys
+import threading
 import tracemalloc
+from asyncio import ProactorEventLoop
 from datetime import timedelta
 from os import listdir
 from typing import Union, Any, Awaitable
@@ -392,9 +394,6 @@ class HuskerClient(Bot):
 
         logger.info(f"sys.arv == {sys.argv}")
 
-        logger.info("Creating online message")
-        await chan_botspam.send(embed=await self.create_online_message())
-
         on_ready_tasks: list[Awaitable] = []
 
         if DEBUGGING_CODE:
@@ -502,9 +501,25 @@ class HuskerClient(Bot):
         scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
         scheduled_posts.setup_and_run_schedule()
 
-        on_ready_tasks.append(scheduled_posts.run())
+        # on_ready_tasks.append(scheduled_posts.run())
+        logger.debug("Creating thread")
+
+        def scheudle_between_callback(loop: ProactorEventLoop):
+            loop.create_task(scheduled_posts.run())
+
+        thread: threading.Thread = threading.Thread(
+            target=scheudle_between_callback, args=(self.loop,)
+        )
+        logger.debug("Starting thread")
+        thread.start()
+        logger.debug("Joining thread")
+        thread.join()
+        logger.debug("Thread work completed")
 
         logger.info("Daily post schedule created")
+
+        logger.info("Creating online message")
+        await chan_botspam.send(embed=await self.create_online_message())
 
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
