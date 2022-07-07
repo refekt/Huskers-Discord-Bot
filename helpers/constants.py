@@ -61,6 +61,84 @@ TWITTER_TOKEN = env_vars["twitter_access_token"]
 TWITTER_TOKEN_SECRET = env_vars["twitter_access_token_secret"]
 TWITTER_V2_CLIENT_ID = env_vars["twitter_v2_client_id"]
 TWITTER_V2_CLIENT_SECRET = env_vars["twitter_v2_client_secret"]
+TWITTER_TWEET_OBJECT: list[str] = [
+    "data",
+    "includes",
+    "matching_rules",
+]
+TWITTER_EXPANSIONS: list[str] = [
+    "attachments.media_keys",
+    "attachments.poll_ids",
+    "author_id",
+    "entities.mentions.username",
+    "geo.place_id",
+    "in_reply_to_user_id",
+    "referenced_tweets.id",
+    "referenced_tweets.id.author_id",
+]
+TWITTER_MEDIA_FIELDS: list[str] = [
+    "alt_text",
+    "duration_ms",
+    "height",
+    "media_key",
+    "preview_image_url",
+    "public_metrics",
+    "type",
+    "url",
+    "width",
+]
+TWITTER_PLACE_FIELDS: list[str] = [
+    "contained_within",
+    "country",
+    "country_code",
+    "full_name",
+    "geo",
+    "id",
+    "name",
+    "place_type",
+]
+TWITTER_POLL_FIELDS: list[str] = [
+    "duration_minutes",
+    "end_datetime",
+    "id",
+    "options",
+    "voting_status",
+]
+TWITTER_TWEET_FIELDS: list[str] = [
+    "attachments",
+    "author_id",
+    "context_annotations",
+    "conversation_id",
+    "created_at",
+    "entities",
+    "geo",
+    "id",
+    "in_reply_to_user_id",
+    "lang",
+    "possibly_sensitive",
+    "public_metrics",
+    "referenced_tweets",
+    "reply_settings",
+    "source",
+    "text",
+    "withheld",
+]
+TWITTER_USER_FIELDS: list[str] = [
+    "created_at",
+    "description",
+    "entities",
+    "id",
+    "location",
+    "name",
+    "pinned_tweet_id",
+    "profile_image_url",
+    "protected",
+    "public_metrics",
+    "url",
+    "username",
+    "verified",
+    "withheld",
+]
 
 logger.info("Twitter variables loaded")
 
@@ -438,12 +516,19 @@ __all__: list[str] = [
     "TITLE_LIMIT",
     "TWITTER_BEARER",
     "TWITTER_BLOCK16_SCREENANME",
+    "TWITTER_EXPANSIONS",
     "TWITTER_HUSKER_MEDIA_LIST_ID",
     "TWITTER_KEY",
+    "TWITTER_MEDIA_FIELDS",
+    "TWITTER_PLACE_FIELDS",
+    "TWITTER_POLL_FIELDS",
     "TWITTER_QUERY_MAX",
     "TWITTER_SECRET_KEY",
     "TWITTER_TOKEN",
     "TWITTER_TOKEN_SECRET",
+    "TWITTER_TWEET_FIELDS",
+    "TWITTER_TWEET_OBJECT",
+    "TWITTER_USER_FIELDS",
     "TWITTER_V2_CLIENT_ID",
     "TWITTER_V2_CLIENT_SECRET",
     "TZ",

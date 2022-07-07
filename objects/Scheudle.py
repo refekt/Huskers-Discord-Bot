@@ -9,11 +9,7 @@ import schedule
 from helpers.constants import TZ, DEBUGGING_CODE
 from helpers.embed import buildEmbed
 
-# from objects.Logger import discordLogger
-
-# asyncio_logger = discordLogger(__name__)
 asyncio_logger = logging.getLogger("asyncio")
-
 
 __all__: list[str] = ["ScheudlePosts"]
 

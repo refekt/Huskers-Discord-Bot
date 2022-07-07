@@ -12,13 +12,13 @@ import tweepy
 from tweepy import Response
 
 from helpers.constants import (
+    CHAN_BOT_SPAM_PRIVATE,
     CHAN_FOOD,
     CHAN_GENERAL,
     CHAN_RECRUITING,
     CHAN_TWITTERVERSE,
     DEBUGGING_CODE,
     TWITTER_BLOCK16_SCREENANME,
-    CHAN_BOT_SPAM_PRIVATE,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from objects.Logger import discordLogger
@@ -52,6 +52,7 @@ class MyTweet(object):
 
 class TweetMediaData(object):
     __slots__ = [
+        "alt_text",
         "duration_ms",
         "height",
         "media_key",
@@ -73,6 +74,7 @@ class TweetMediaData(object):
 class TweetQuoteData(object):
     __slots__ = [
         "attachments",
+        "attachments",
         "author_id",
         "context_annotations",
         "conversation_id",
@@ -80,12 +82,15 @@ class TweetQuoteData(object):
         "entities",
         "geo",
         "id",
+        "in_reply_to_user_id",
         "lang",
         "possibly_sensitive",
         "public_metrics",
+        "referenced_tweets",
         "reply_settings",
         "source",
         "text",
+        "withheld",
     ]
 
     def __init__(self, tweet_data) -> None:
@@ -101,12 +106,12 @@ class TweetUserData(object):
         "created_at",
         "description",
         "entities",
-        "followers",
         "following",
         "id",
         "listed_count",
         "location",
         "name",
+        "pinned_tweet_id",
         "profile_image_url",
         "protected",
         "public_metrics",
@@ -114,6 +119,7 @@ class TweetUserData(object):
         "url",
         "username",
         "verified",
+        "withheld",
     ]
 
     def __init__(self, tweet_data) -> None:
