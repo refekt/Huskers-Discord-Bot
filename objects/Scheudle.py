@@ -1,3 +1,4 @@
+import asyncio
 import enum
 import logging
 import time
@@ -180,7 +181,7 @@ class ScheudlePosts:
 
         while True:
             schedule.run_pending()
-            time.sleep(1)
+            await asyncio.sleep(1)
 
             if self.send_message:
                 asyncio_logger.debug("self.send_message == True")

@@ -3,9 +3,7 @@ import logging
 import os
 import pathlib
 import sys
-import threading
 import tracemalloc
-from asyncio import ProactorEventLoop
 from datetime import timedelta
 from os import listdir
 from typing import Union, Any, Awaitable
@@ -62,7 +60,6 @@ async def start_twitter_stream(client: discord.Client) -> None:
         bearer_token=TWITTER_BEARER,
         client=client,
         wait_on_rate_limit=True,
-        # max_retries=5,
     )
 
     logger.debug("Looking for any lingering stream rules")
@@ -497,26 +494,11 @@ class HuskerClient(Bot):
                 logger.info("No open reminders found")
 
         logger.info("Creating daily posts schedule")
-
         scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
         scheduled_posts.setup_and_run_schedule()
 
-        # on_ready_tasks.append(scheduled_posts.run())
-        logger.debug("Creating thread")
-
-        def scheudle_between_callback(loop: ProactorEventLoop):
-            loop.create_task(scheduled_posts.run())
-
-        thread: threading.Thread = threading.Thread(
-            target=scheudle_between_callback, args=(self.loop,)
-        )
-        logger.debug("Starting thread")
-        thread.start()
-        logger.debug("Joining thread")
-        thread.join()
-        logger.debug("Thread work completed")
-
-        logger.info("Daily post schedule created")
+        logger.info("Running scheudled_posts")
+        self.loop.create_task(scheduled_posts.run())
 
         logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
