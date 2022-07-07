@@ -1,3 +1,4 @@
+import os
 import pathlib
 import platform
 import subprocess
@@ -805,6 +806,37 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         await interaction.followup.send(
             f"Back channel communication successfully sent to {chan.mention}!"
+        )
+
+    @app_commands.command(name="get-log", description="Send last few lines of bot.log")
+    @app_commands.default_permissions(administrator=True)
+    async def get_log(self, interaction: discord.Interaction):
+
+        await interaction.response.defer(ephemeral=True)
+
+        path_log: pathlib.PurePosixPath = pathlib.PurePosixPath(
+            f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/log.log"
+        )
+
+        with open(path_log, "rb") as file:
+            last_lines: str = ""
+            for index in range(15):
+                try:
+                    file.seek(-2, os.SEEK_END)
+                    while file.read(1) != b"\n":
+                        file.seek(-2, os.SEEK_CUR)
+                except OSError:
+                    file.seek(0)
+
+                last_lines += f"{file.readline().decode()}"
+
+        file.close()
+
+        BODY_LIMIT: int = 2000 - 15
+
+        await interaction.user.send(content=f"```\n{last_lines[-BODY_LIMIT:]}\n```")
+        await interaction.followup.send(
+            f"Log sent in a DM! {interaction.client.user.mention}"
         )
 
 
