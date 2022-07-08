@@ -1,13 +1,14 @@
 import asyncio
 import enum
 import logging
+import random
 import time
 from datetime import datetime, time as _time
 
 import discord
 import schedule
 
-from helpers.constants import TZ, DEBUGGING_CODE
+from helpers.constants import TZ, DEBUGGING_CODE, SCHED_DAY_IMG, SCHED_NIGHT_IMG
 from helpers.embed import buildEmbed
 
 asyncio_logger = logging.getLogger("asyncio")
@@ -35,10 +36,16 @@ class Weekday(enum.IntEnum):
 
 class ScheudlePosts:
     __slots__ = [
-        "_delivery_time",
+        "_day_delivery_time",
+        "_night_delivery_time",
         "_setup",
         "channel",
+        "is_day",
+        "is_night",
         "schedule_daily_embeds",
+        "schedule_embeds",
+        "schedule_nightly_embeds",
+        "schedule_random_embed",
         "send_message",
         "which_day",
     ]
@@ -46,11 +53,12 @@ class ScheudlePosts:
     def __init__(self, channel: discord.TextChannel) -> None:
         asyncio_logger.debug("Creating ScheudlePosts instance")
 
-        self._delivery_time: time = _time(hour=7, minute=0, second=0, tzinfo=TZ)
+        self._day_delivery_time: time = _time(hour=7, minute=0, second=0, tzinfo=TZ)
+        self._night_delivery_time: time = _time(hour=22, minute=0, second=0, tzinfo=TZ)
         self._setup: bool = False
         self.channel: discord.TextChannel = channel
-        self.send_message: bool = False
-        self.which_day: int = 0
+        self.is_day: bool = False
+        self.is_night: bool = False
         self.schedule_daily_embeds: list[discord.Embed] = [
             buildEmbed(
                 title="Daily Theme Post",
@@ -60,6 +68,7 @@ class ScheudlePosts:
                         value=f"Monday's suck. How can get through the day?",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
             buildEmbed(
                 title="Daily Theme Post",
@@ -69,6 +78,7 @@ class ScheudlePosts:
                         value=f"Share your good news of the day/week!",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
             buildEmbed(
                 title="Daily Theme Post",
@@ -78,6 +88,7 @@ class ScheudlePosts:
                         value=f"What do you want to see happen this week?",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
             buildEmbed(
                 title="Daily Theme Post",
@@ -87,6 +98,7 @@ class ScheudlePosts:
                         value=f"What is something from the past you want to share?",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
             buildEmbed(
                 title="Daily Theme Post",
@@ -96,6 +108,7 @@ class ScheudlePosts:
                         value=f"What's the plan for the weekend?",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
             buildEmbed(
                 title="Daily Theme Post",
@@ -105,6 +118,7 @@ class ScheudlePosts:
                         value=f"Weekend vibes. Possibly CFB game day?",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
             buildEmbed(
                 title="Daily Theme Post",
@@ -114,21 +128,117 @@ class ScheudlePosts:
                         value=f"Weekend vibes. Possibly NFL game day?",
                     )
                 ],
+                image=SCHED_DAY_IMG,
             ),
         ]
+        self.schedule_nightly_embeds: list[discord.Embed] = [
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name="fMonday Motivation",
+                        value=f"Monday's suck. How can get through the day?",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name=f"Good News Tuesday",
+                        value=f"Share your good news of the day/week!",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name=f"What's Your Wish Wednesday",
+                        value=f"What do you want to see happen this week?",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name=f"Throwback Thursday",
+                        value=f"What is something from the past you want to share?",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name=f"Finally Friday",
+                        value=f"What's the plan for the weekend?",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name=f"Saturday",
+                        value=f"Weekend vibes. Possibly CFB post-game day?",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+            buildEmbed(
+                title="Daily Theme Post",
+                fields=[
+                    dict(
+                        name=f"Sunday",
+                        value=f"Weekend vibes. Possibly NFL post-game day?",
+                    )
+                ],
+                image=SCHED_NIGHT_IMG,
+            ),
+        ]  # TODO Update the content
+        self.schedule_embeds: list[list[discord.Embed], list[discord.Embed]] = [
+            self.schedule_daily_embeds,
+            self.schedule_nightly_embeds,
+        ]
+        self.schedule_random_embed: list[discord.Embed] = [
+            buildEmbed(
+                title="All Praise the Meme Overlord Gumby",
+                description="May his ways never be forgotten!",
+                image="https://i.imgur.com/BGFD6Fk.jpg",
+            ),
+            buildEmbed(
+                title="OVERTHROW THE REDNAMES",
+                description="Rednames suck",
+                image="https://i.imgur.com/2ciD4Va.jpg",
+            ),
+        ]
+        self.send_message: bool = False
+        self.which_day: int = 0
 
         asyncio_logger.debug("ScheudlePosts initialized")
 
-    def send_daily_message(self) -> None:
+    def send_daily_message(self, is_day: bool = False, is_night: bool = False) -> None:
         asyncio_logger.info("Attempting to send a daily message")
         self.send_message = True
+        self.is_day = is_day
+        self.is_night = is_night
+
         dt_now = datetime.now(tz=TZ)
         self.which_day = dt_now.weekday()
 
     def _setup_debug_scheudle(self) -> None:
         asyncio_logger.debug("Creating schedule for debug messages")
 
-        schedule.every(5).seconds.do(self.send_daily_message)
+        schedule.every(5).seconds.do(
+            self.send_daily_message, is_day=True, is_night=False
+        )
 
         all_jobs: list[schedule.Job] = schedule.jobs
         all_jobs_str: str = ""
@@ -141,12 +251,25 @@ class ScheudlePosts:
     def _setup_schedule(self) -> None:
         asyncio_logger.debug("Creating schedule for daily posts")
 
-        time_str: str = (
-            f"{self._delivery_time.hour:02d}:{self._delivery_time.minute:02d}"
+        day_time_str: str = (
+            f"{self._day_delivery_time.hour:02d}:{self._day_delivery_time.minute:02d}"
         )
-        asyncio_logger.debug(f"Time string is {time_str}")
+        night_time_str: str = f"{self._night_delivery_time.hour:02d}:{self._night_delivery_time.minute:02d}"
+        asyncio_logger.debug(
+            f"Day time string is {day_time_str}. Night time string is {night_time_str}."
+        )
 
-        schedule.every().day.at(time_str).do(self.send_daily_message)
+        schedule.every().day.at(day_time_str).do(
+            self.send_daily_message,
+            is_day=True,
+            is_night=False,
+        )
+
+        schedule.every().day.at(night_time_str).do(
+            self.send_daily_message,
+            is_day=False,
+            is_night=True,
+        )
 
         all_jobs: list[schedule.Job] = schedule.jobs
         all_jobs_str: str = ""
@@ -185,9 +308,21 @@ class ScheudlePosts:
 
             if self.send_message:
                 asyncio_logger.debug("self.send_message == True")
-                await self.channel.send(
-                    embed=self.schedule_daily_embeds[self.which_day]
-                )
+                if random.randint(1, 100) <= 5:
+                    await self.channel.send(
+                        embed=random.choice(self.schedule_random_embed)
+                    )
+                elif self.is_day:
+                    await self.channel.send(
+                        embed=self.schedule_daily_embeds[self.which_day]
+                    )
+                elif self.is_night:
+                    await self.channel.send(
+                        embed=self.schedule_nightly_embeds[self.which_day]
+                    )
+
+                self.is_day = False
+                self.is_night = False
                 self.send_message = False
             else:
                 asyncio_logger.debug("self.send_message == False")

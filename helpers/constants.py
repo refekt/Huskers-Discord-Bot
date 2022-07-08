@@ -424,6 +424,10 @@ RECRUIT_POSITIONS = {
     "WR": "Wide Receiver",
 }
 
+# Schedule Posts
+SCHED_DAY_IMG: str = "https://i.imgur.com/8KPOgoq.png"
+SCHED_NIGHT_IMG: str = "https://i.imgur.com/4c3lZQj.jpg"
+
 logger.info("Discord Union group variables loaded")
 
 __all__: list[str] = [
@@ -513,6 +517,8 @@ __all__: list[str] = [
     "ROLE_RUNZA",
     "ROLE_TARMAC",
     "ROLE_TIME_OUT",
+    "SCHED_DAY_IMG",
+    "SCHED_NIGHT_IMG",
     "SQL_DB",
     "SQL_HOST",
     "SQL_PASSWD",
@@ -520,12 +526,9 @@ __all__: list[str] = [
     "TITLE_LIMIT",
     "TWITTER_BEARER",
     "TWITTER_BLOCK16_SCREENANME",
-    # "TWITTER_EXPANSIONS",
     "TWITTER_HUSKER_MEDIA_LIST_ID",
     "TWITTER_KEY",
     "TWITTER_MEDIA_FIELDS",
-    # "TWITTER_PLACE_FIELDS",
-    # "TWITTER_POLL_FIELDS",
     "TWITTER_QUERY_MAX",
     "TWITTER_SECRET_KEY",
     "TWITTER_TOKEN",
@@ -538,6 +541,10 @@ __all__: list[str] = [
     "TZ",
     "US_STATES",
     "WEATHER_API_KEY",
+    # "TWITTER_EXPANSIONS",
+    # "TWITTER_PLACE_FIELDS",
+    # "TWITTER_POLL_FIELDS",
 ]
+
 
 logger.info(f"{str(__name__).title()} module loaded!")
