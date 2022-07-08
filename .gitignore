@@ -9,5 +9,4 @@
 /husk_messages.txt
 __pycache__
 resources/*
-tests/*
 tests/testing.py
