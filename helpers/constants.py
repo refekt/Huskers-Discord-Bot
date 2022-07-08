@@ -66,16 +66,16 @@ TWITTER_TWEET_OBJECT: list[str] = [
     "includes",
     "matching_rules",
 ]
-# TWITTER_EXPANSIONS: list[str] = [
-#     "attachments.media_keys",
-#     "attachments.poll_ids",
-#     "author_id",
-#     "entities.mentions.username",
-#     "geo.place_id",
-#     "in_reply_to_user_id",
-#     "referenced_tweets.id",
-#     "referenced_tweets.id.author_id",
-# ]
+TWITTER_EXPANSIONS: list[str] = [
+    "attachments.media_keys",
+    "attachments.poll_ids",
+    "author_id",
+    "entities.mentions.username",
+    "geo.place_id",
+    "in_reply_to_user_id",
+    "referenced_tweets.id",
+    "referenced_tweets.id.author_id",
+]
 TWITTER_MEDIA_FIELDS: list[str] = [
     # "alt_text",
     # "duration_ms",
@@ -541,7 +541,7 @@ __all__: list[str] = [
     "TZ",
     "US_STATES",
     "WEATHER_API_KEY",
-    # "TWITTER_EXPANSIONS",
+    "TWITTER_EXPANSIONS",
     # "TWITTER_PLACE_FIELDS",
     # "TWITTER_POLL_FIELDS",
 ]
