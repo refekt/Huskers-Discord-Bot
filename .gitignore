@@ -9,4 +9,4 @@
 /husk_messages.txt
 __pycache__
 resources/*
-commands/testing.py
+tests/*
