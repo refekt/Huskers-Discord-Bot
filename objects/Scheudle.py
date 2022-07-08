@@ -54,7 +54,7 @@ class ScheudlePosts:
         asyncio_logger.debug("Creating ScheudlePosts instance")
 
         self._day_delivery_time: time = _time(hour=7, minute=0, second=0, tzinfo=TZ)
-        self._night_delivery_time: time = _time(hour=22, minute=0, second=0, tzinfo=TZ)
+        self._night_delivery_time: time = _time(hour=20, minute=0, second=0, tzinfo=TZ)
         self._setup: bool = False
         self.channel: discord.TextChannel = channel
         self.is_day: bool = False

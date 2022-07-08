@@ -1,5 +1,5 @@
 from collections import deque
-from typing import List, Optional
+from typing import List, Union
 
 import discord
 
@@ -43,7 +43,7 @@ class EmbedPaginatorView(discord.ui.View):
         self._len: int = len(embeds)
         self.current_index: int = 1
         self.response: discord.InteractionMessage = original_message
-        self.children: Optional[list[discord.Button]] = None
+        self.timeout: int = timeout
 
         try:  # TODO Make this show up in the middle.
             self.add_item(
@@ -58,6 +58,9 @@ class EmbedPaginatorView(discord.ui.View):
             logger.exception(
                 f"Error creating ud_current_page button: {e}", exc_info=True
             )
+        self.children: Union[
+            list[discord.Button], list[discord.ui.Item]
+        ] = self._children
 
     async def update_current_page(self) -> None:
         logger.debug(f"Current index is: {self.current_index}")
