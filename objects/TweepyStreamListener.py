@@ -43,11 +43,8 @@ class MyTweet(object):
     ]
 
     def __init__(self, tweet_data) -> None:
-        try:
-            for key in tweet_data:
-                setattr(self, key, tweet_data[key])
-        except AttributeError:
-            logger.exception(f"Key not in __slots__ for {self}")
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
 
 
 class TweetMediaData(object):
@@ -65,41 +62,34 @@ class TweetMediaData(object):
     ]
 
     def __init__(self, tweet_data) -> None:
-        try:
-            for key in tweet_data:
-                setattr(self, key, tweet_data[key])
-        except AttributeError:
-            logger.exception(f"Key not in __slots__ for {self}")
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
 
 
 class TweetQuoteData(object):
-    __slots__ = [
-        "attachments",
-        "attachments",
-        "author_id",
-        "context_annotations",
-        "conversation_id",
-        "created_at",
-        "entities",
-        "geo",
-        "id",
-        "in_reply_to_user_id",
-        "lang",
-        "possibly_sensitive",
-        "public_metrics",
-        "referenced_tweets",
-        "reply_settings",
-        "source",
-        "text",
-        "withheld",
-    ]
+    # __slots__ = [
+    #     "attachments",
+    #     "author_id",
+    #     "context_annotations",
+    #     "conversation_id",
+    #     "created_at",
+    #     "entities",
+    #     "geo",
+    #     "id",
+    #     "in_reply_to_user_id",
+    #     "lang",
+    #     "possibly_sensitive",
+    #     "public_metrics",
+    #     "referenced_tweets",
+    #     "reply_settings",
+    #     "source",
+    #     "text",
+    #     "withheld",
+    # ]
 
     def __init__(self, tweet_data) -> None:
-        try:
-            for key in tweet_data:
-                setattr(self, key, tweet_data[key])
-        except AttributeError:
-            logger.exception(f"Key not in __slots__ for {self}")
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
 
 
 class TweetUserData(object):
@@ -124,11 +114,8 @@ class TweetUserData(object):
     ]
 
     def __init__(self, tweet_data) -> None:
-        try:
-            for key in tweet_data:
-                setattr(self, key, tweet_data[key])
-        except AttributeError:
-            logger.exception(f"Key not in __slots__ for {self}")
+        for key in tweet_data:
+            setattr(self, key, tweet_data[key])
 
 
 async def send_tweet_alert(client: discord.Client, message) -> None:

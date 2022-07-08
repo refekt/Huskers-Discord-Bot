@@ -27,11 +27,11 @@ from helpers.constants import (
     GUILD_PROD,
     TWITTER_BEARER,
     TWITTER_BLOCK16_SCREENANME,
-    TWITTER_EXPANSIONS,
+    # TWITTER_EXPANSIONS,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_MEDIA_FIELDS,
-    TWITTER_PLACE_FIELDS,
-    TWITTER_POLL_FIELDS,
+    # TWITTER_PLACE_FIELDS,
+    # TWITTER_POLL_FIELDS,
     TWITTER_QUERY_MAX,
     TWITTER_TWEET_FIELDS,
     TWITTER_USER_FIELDS,
@@ -120,10 +120,10 @@ async def start_twitter_stream(client: discord.Client) -> None:
         logger.debug("No rules found")
 
     tweeter_stream.filter(
-        expansions=TWITTER_EXPANSIONS,
+        # expansions=TWITTER_EXPANSIONS,
         media_fields=TWITTER_MEDIA_FIELDS,
-        place_fields=TWITTER_PLACE_FIELDS,
-        poll_fields=TWITTER_POLL_FIELDS,
+        # place_fields=TWITTER_PLACE_FIELDS,
+        # poll_fields=TWITTER_POLL_FIELDS,
         tweet_fields=TWITTER_TWEET_FIELDS,
         user_fields=TWITTER_USER_FIELDS,
         threaded=True,
