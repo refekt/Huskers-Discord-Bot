@@ -64,7 +64,7 @@ class ScheudlePosts:
                 title="Daily Theme Post",
                 fields=[
                     dict(
-                        name="fMonday Motivation",
+                        name=f"Monday Motivation",
                         value=f"Monday's suck. How can get through the day?",
                     )
                 ],
@@ -133,57 +133,57 @@ class ScheudlePosts:
         ]
         self.schedule_nightly_embeds: list[discord.Embed] = [
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
-                        name="fMonday Motivation",
-                        value=f"Monday's suck. How can get through the day?",
+                        name=f"Mellow Monday",
+                        value=f"Monday night relaxation",
                     )
                 ],
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
-                        name=f"Good News Tuesday",
+                        name=f"Thriving Tuesday",
                         value=f"Share your good news of the day/week!",
                     )
                 ],
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
-                        name=f"What's Your Wish Wednesday",
-                        value=f"What do you want to see happen this week?",
+                        name=f"Worry-free Wednesday",
+                        value=f"What has made this week good?",
                     )
                 ],
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
-                        name=f"Throwback Thursday",
-                        value=f"What is something from the past you want to share?",
+                        name=f"Thirsty Thursday",
+                        value=f"DRINKS?",
                     )
                 ],
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
-                        name=f"Finally Friday",
-                        value=f"What's the plan for the weekend?",
+                        name=f"Freedom Friday",
+                        value=f"Free as a bird, flying over mountains",
                     )
                 ],
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
                         name=f"Saturday",
@@ -193,7 +193,7 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title="Nightly Theme Post",
                 fields=[
                     dict(
                         name=f"Sunday",
@@ -202,7 +202,7 @@ class ScheudlePosts:
                 ],
                 image=SCHED_NIGHT_IMG,
             ),
-        ]  # TODO Update the content
+        ]
         self.schedule_embeds: list[list[discord.Embed], list[discord.Embed]] = [
             self.schedule_daily_embeds,
             self.schedule_nightly_embeds,
