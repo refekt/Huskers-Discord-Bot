@@ -42,7 +42,7 @@ SQL_PASSWD = env_vars["sqlPass"]
 SQL_DB = env_vars["sqlDb"]
 logger.info("MySQL variables loaded")
 
-# TODO Reddit Bot Info
+# TODO Reddit Bot Info...needed?
 REDDIT_CLIENT_ID = env_vars["reddit_client_id"]
 REDDIT_SECRET = env_vars["reddit_secret"]
 REDDIT_PW = env_vars["reddit_pw"]
@@ -166,7 +166,7 @@ HEADERS = {
 }
 logger.info("User-Agent Header loaded")
 
-# TODO Discord Roles
+# TODO Discord Roles...needed?
 ROLE_ADMIN_PROD = 440639061191950336
 ROLE_ADMIN_TEST = 606301197426753536
 ROLE_AIRPOD = 633702209703378978
