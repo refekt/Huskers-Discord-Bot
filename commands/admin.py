@@ -837,48 +837,26 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.command(name="get-log", description="Send last few lines of bot.log")
     @app_commands.default_permissions(administrator=True)
     async def get_log(self, interaction: discord.Interaction):
+        logger.debug("Grabbing and sending bot.log")
 
         await interaction.response.defer(ephemeral=True)
 
         path_log: pathlib.PurePosixPath = pathlib.PurePosixPath(
-            f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/log.log"
+            f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/bot.log"
         )
 
-        with open(path_log, "rb") as f:
-            total_lines: int = 15
-            block_size: int = 1024
-            lines_remaining: int = total_lines
-            block_number: int = -1
-            blocks: list[str] = []
+        file: discord.File = discord.File(
+            path_log,
+            filename="bot.txt",
+            description=f"Bot's log as of {datetime.now(tz=TZ)}",
+        )
 
-            f.seek(0, 2)
-            block_end_byte: int = f.tell()
-
-            while lines_remaining > 0 and block_end_byte > 0:
-                read: str = f.read(block_size).decode("utf-8")
-                if block_end_byte - block_size > 0:
-                    f.seek(block_number * block_size, 2)
-                    blocks.append(read)
-                else:
-                    f.seek(0, 0)
-                    blocks.append(read)
-
-                lines_found: int = blocks[-1].count("\n")
-                lines_remaining -= lines_found
-                block_end_byte -= block_size
-                block_number -= 1
-
-        log_output: str = ""
-        for block in blocks:
-            if block:
-                log_output += f"{block}\n"
-
-        str_limit: int = 1990
-
-        await interaction.user.send(content=f"```\n{log_output[-str_limit:]}\n```")
+        await interaction.user.send(content="!", file=file)
         await interaction.followup.send(
             f"Log sent in a DM! {interaction.client.user.mention}\nLog path: {path_log}"
         )
+
+        logger.debug("Sent bot.log")
 
 
 async def setup(bot: commands.Bot) -> None:
