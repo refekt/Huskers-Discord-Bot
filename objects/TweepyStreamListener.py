@@ -54,6 +54,7 @@ class TweetMediaData(object):
     __slots__ = [
         "alt_text",
         "duration_ms",
+        "get",
         "height",
         "media_key",
         "preview_image_url",
