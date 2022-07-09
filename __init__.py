@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import traceback
 from typing import Literal, Optional
 
 import discord  # noqa # Beta version thing
@@ -63,7 +64,9 @@ if not DEBUGGING_CODE:
     ) -> None:
         logger.info("app_command error detected!")
 
-        err: DiscordError = DiscordError(error, interaction.data.get("options", None))
+        err: DiscordError = DiscordError(
+            error, interaction.data.get("options", None), traceback.format_exc()
+        )
         logger.exception(error, exc_info=True)
 
         embed: discord.Embed = buildEmbed(
@@ -94,6 +97,9 @@ if not DEBUGGING_CODE:
             await interaction.followup.send(content="", embed=embed, ephemeral=True)
         else:
             await interaction.followup.send(content="", embed=embed, ephemeral=True)
+
+        member_me: discord.Member = await interaction.guild.fetch_member(MEMBER_GEE)
+        await member_me.send(content=str(err))
 
 
 @client.command()
@@ -148,7 +154,6 @@ async def sync(
 
 
 discord_loggers: list[str] = [
-    # "asyncio",
     "discord",
     "discord.client",
     "discord.gateway",

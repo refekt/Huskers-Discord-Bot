@@ -1,6 +1,5 @@
 # Global Errors
 import logging
-import traceback
 from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 from typing import Optional
 
@@ -30,13 +29,15 @@ __all__: list[str] = [
 
 
 class DiscordError:
-    def __init__(self, original: CommandInvokeError, options: dict) -> None:
+    def __init__(
+        self, original: CommandInvokeError, options: dict, tb_msg: str
+    ) -> None:
         self.command: Optional[str] = original.command.qualified_name
         self.error_type: str = type(original).__name__
-        if hasattr(original, "message"):
+        if hasattr(original, "original"):
+            self.message = original.original.args[0].message
+        elif hasattr(original, "message"):
             self.message: str = original.original.message
-        elif hasattr(original, "args"):
-            self.message = original.args[0]
         self.module: Optional[str] = original.command.module
         self.original: ALL_EXCEPTIONS = original.original
         self.options: list[str] = (
@@ -45,10 +46,23 @@ class DiscordError:
             else None
         )
         self.parent: Optional[str] = original.command.parent
-        self.traceback: traceback = original.__traceback__
+        self.traceback: str = tb_msg
 
     def __str__(self) -> str:
-        return f"{self.error_type}: {self.message}"
+        return (
+            f"{self.error_type}: /{self.command} {' '.join(self.options)}: {self.message}\n"
+            f"```\n"
+            f"{self.traceback}\n"
+            f"```"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.error_type}: /{self.command} {' '.join(self.options)}: {self.message}\n"
+            f"```\n"
+            f"{self.traceback}\n"
+            f"```"
+        )
 
 
 @dataclass()
