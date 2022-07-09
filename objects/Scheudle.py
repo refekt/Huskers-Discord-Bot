@@ -4,6 +4,7 @@ import logging
 import random
 import time
 from datetime import datetime, time as _time
+from typing import ClassVar
 
 import discord
 import schedule
@@ -53,6 +54,11 @@ class ScheudlePosts:
     def __init__(self, channel: discord.TextChannel) -> None:
         asyncio_logger.debug("Creating ScheudlePosts instance")
 
+        description_daily: ClassVar[str] = "MORNING GANG RISE UP!"
+        description_nightly: ClassVar[str] = "Night Owls Assemble!"
+        title_daily: ClassVar[str] = "Daily Themed Topics of Discussion"
+        title_nightly: ClassVar[str] = "Nightly Themed Topics of Discussion"
+
         self._day_delivery_time: time = _time(hour=7, minute=0, second=0, tzinfo=TZ)
         self._night_delivery_time: time = _time(hour=20, minute=0, second=0, tzinfo=TZ)
         self._setup: bool = False
@@ -61,7 +67,8 @@ class ScheudlePosts:
         self.is_night: bool = False
         self.schedule_daily_embeds: list[discord.Embed] = [
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"Monday Motivation",
@@ -71,7 +78,8 @@ class ScheudlePosts:
                 image=SCHED_DAY_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"Good News Tuesday",
@@ -81,7 +89,8 @@ class ScheudlePosts:
                 image=SCHED_DAY_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"What's Your Wish Wednesday",
@@ -91,7 +100,8 @@ class ScheudlePosts:
                 image=SCHED_DAY_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"Throwback Thursday",
@@ -101,7 +111,8 @@ class ScheudlePosts:
                 image=SCHED_DAY_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"Finally Friday",
@@ -111,7 +122,8 @@ class ScheudlePosts:
                 image=SCHED_DAY_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"Saturday",
@@ -121,7 +133,8 @@ class ScheudlePosts:
                 image=SCHED_DAY_IMG,
             ),
             buildEmbed(
-                title="Daily Theme Post",
+                title=title_daily,
+                description=description_daily,
                 fields=[
                     dict(
                         name=f"Sunday",
@@ -133,7 +146,8 @@ class ScheudlePosts:
         ]
         self.schedule_nightly_embeds: list[discord.Embed] = [
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Mellow Monday",
@@ -143,7 +157,8 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Thriving Tuesday",
@@ -153,7 +168,8 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Worry-free Wednesday",
@@ -163,7 +179,8 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Thirsty Thursday",
@@ -173,7 +190,8 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Freedom Friday",
@@ -183,7 +201,8 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Saturday",
@@ -193,7 +212,8 @@ class ScheudlePosts:
                 image=SCHED_NIGHT_IMG,
             ),
             buildEmbed(
-                title="Nightly Theme Post",
+                title=title_nightly,
+                description=description_nightly,
                 fields=[
                     dict(
                         name=f"Sunday",
