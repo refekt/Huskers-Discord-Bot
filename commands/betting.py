@@ -32,17 +32,17 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     @bet_group.command(name="game", description="Place a bet against a Nebraska game.")
     @app_commands.describe(
         opponent_name="Name of the opponent_name for the Husker game.",
-        who_wins="Whether you predict Nebraska or their opponent to win the game.",
-        over_under_points="Whether you predict the points to go over or under.",
-        over_under_spread="Whether you predict Nebraska or their opponent to win against the spread.",
+        predict_game="Whether you predict Nebraska or their opponent to win the game.",
+        predict_points="Whether you predict the total points to go over or under.",
+        predict_spread="Whether you predict Nebraska or their opponent to win against the spread.",
     )
     async def bet_game(
         self,
         interaction: discord.Interaction,
         opponent_name: HuskerSched2022,
-        who_wins: Optional[WhichTeamChoice],
-        over_under_points: Optional[WhichOverUnderChoice],
-        over_under_spread: Optional[WhichTeamChoice],
+        predict_game: Optional[WhichTeamChoice],
+        predict_points: Optional[WhichOverUnderChoice],
+        predict_spread: Optional[WhichTeamChoice],
     ) -> None:
         game_started: bool = False
         games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
@@ -71,19 +71,19 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         else:
             await interaction.response.defer()
 
-        if [_ for _ in (who_wins, over_under_points, over_under_spread) if _ is None]:
+        if [_ for _ in (predict_game, predict_points, predict_spread) if _ is None]:
             raise BettingException("You cannot submit a blank bet!")
 
-        assert who_wins is not None, BettingException(
-            "`who_wins` is the minimum bet and must be included."
+        assert predict_game is not None, BettingException(
+            "`predict_game` is the minimum bet and must be included."
         )
 
         bet: Bet = Bet(
             author=interaction.user,
             opponent_name=opponent_name,
-            who_wins=who_wins,
-            over_under_points=over_under_points,
-            over_under_spread=over_under_spread,
+            predict_game=predict_game,
+            predict_points=predict_points,
+            predict_spread=predict_spread,
         )
         try:
             bet.submitRecord()
@@ -99,9 +99,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             fields=[
                 dict(
                     name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
-                    value=f"Wins: {bet.who_wins}\n"
-                    f"Against the Spread: {bet.over_under_spread}\n"
-                    f"Total Points: {bet.over_under_points}",
+                    value=f"Wins: {bet.predict_game}\n"
+                    f"Total Points: {bet.predict_points}\n"
+                    f"Against the Spread: {bet.predict_spread}\n",
                 )
             ],
             author=bet.author_str,
@@ -130,22 +130,22 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             )
         else:
             total_wins: dict[str, int] = {"Nebraska": 0, "Opponent": 0}
-            total_spread: dict[str, int] = {"Nebraska": 0, "Opponent": 0}
             total_overunder: dict[str, int] = {"Over": 0, "Under": 0}
+            total_spread: dict[str, int] = {"Nebraska": 0, "Opponent": 0}
             fields: list[dict[str, str]] = []
 
             for bet in opponent_bets:
-                total_wins[bet.get("which_team_wins")] += 1
-                total_spread[bet.get("which_team_spread")] += 1
-                total_overunder[bet.get("which_team_overunder")] += 1
+                total_wins[bet.get("predict_game")] += 1
+                total_overunder[bet.get("predict_points")] += 1
+                total_spread[bet.get("predict_spread")] += 1
 
                 fields.append(
                     dict(
                         name=f"{bet.get('author_str', 'N/A')}'s Bet",
                         value=(
-                            f"Wins: {bet.get('which_team_wins', 'N/A')}\n"
-                            f"Total Points: {bet.get('which_team_spread', 'N/A')}\n"
-                            f"Against the Spread: {bet.get('which_team_overunder', 'N/A')}\n"
+                            f"Wins: {bet.get('predict_game', 'N/A')}\n"
+                            f"Total Points: {bet.get('predict_points', 'N/A')}\n"
+                            f"Against the Spread: {bet.get('predict_spread', 'N/A')}\n"
                         ),
                     )
                 )
@@ -191,7 +191,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 fields=[
                     dict(
                         name=f"#{index + 1}",
-                        value=f"{bet['author_str']} - {bet['average_points_per_game']} pts\n({bet['correct_wins']} Wins, {bet['correct_overunder']} Points, {bet['correct_spread']} Spread)",
+                        value=f"{bet['author_str']} - {bet['average_points_per_game']} pts\n({bet['correct_wins']} Wins, {bet['correct_overunder']} Total Points, {bet['correct_spread']} Against the Spread)",
                     )
                     for (index, bet) in enumerate(all_bets)
                 ],
@@ -218,19 +218,19 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         self,
         interaction: discord.Interaction,
         opponent_name: HuskerSched2022,
-        who_wins: Optional[WhichTeamChoice],
-        over_under_points: Optional[WhichOverUnderChoice],
-        over_under_spread: Optional[WhichTeamChoice],
+        result_game: Optional[WhichTeamChoice],
+        result_points: Optional[WhichOverUnderChoice],
+        result_spread: Optional[WhichTeamChoice],
     ):
         await interaction.response.defer(ephemeral=True)
 
         processMySQL(
             query=sqlResolveGame,
-            values=(who_wins, over_under_points, over_under_spread, opponent_name),
+            values=(result_game, result_points, result_spread, opponent_name),
         )
 
         await interaction.followup.send(
-            f"Updated the {opponent_name} game with {who_wins} winning, {over_under_points} on the points, and {over_under_spread} on the spread."
+            f"Updated the {opponent_name} game with {result_game} winning, {result_points} on the points, and {result_spread} on the spread."
         )
 
 

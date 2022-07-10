@@ -243,20 +243,20 @@ class Bet:
         "game_datetime_passed",
         "home_game",
         "opponent_name",
-        "over_under_points",
-        "over_under_spread",
+        "predict_game",
+        "predict_points",
+        "predict_spread",
         "resolved",
         "week",
-        "who_wins",
     ]
 
     def __init__(
         self,
         author: Union[discord.Member, discord.User],
         opponent_name: Union[BigTenTeams, HuskerSched2022],
-        who_wins: Optional[WhichTeamChoice],
-        over_under_points: Optional[WhichTeamChoice],
-        over_under_spread: Optional[WhichTeamChoice],
+        predict_game: Optional[WhichTeamChoice],
+        predict_points: Optional[WhichTeamChoice],
+        predict_spread: Optional[WhichTeamChoice],
     ) -> None:
         logger.debug("Creating a Bet object")
 
@@ -277,9 +277,9 @@ class Bet:
         self.opponent_name = buildTeam(id_str=getTeamIdByName(opponent_name))
         self.resolved: bool = False
         self.week = self._raw.week
-        self.who_wins = who_wins
-        self.over_under_points = over_under_points
-        self.over_under_spread = over_under_spread
+        self.predict_game = predict_game
+        self.predict_points = predict_points
+        self.predict_spread = predict_spread
 
         if self.home_game:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
@@ -293,7 +293,7 @@ class Bet:
             )
 
     def __str__(self) -> str:
-        return f"{self.author_str}: Wins-{self.who_wins}, OverUnder-{self.over_under_points}, Spread-{self.over_under_spread}"
+        return f"{self.author_str}: Wins-{self.predict_game}, OverUnder-{self.predict_points}, Spread-{self.predict_spread}"
 
     def submitRecord(self) -> None:
         logger.debug("Submitting MySQL entry for bet")
@@ -303,9 +303,9 @@ class Bet:
 
         if previous_bet:
             if (
-                previous_bet["which_team_wins"] == self.who_wins
-                and previous_bet["which_team_overunder"] == self.over_under_points
-                and previous_bet["which_team_spread"] == self.over_under_spread
+                previous_bet["predict_game"] == self.predict_game
+                and previous_bet["predict_points"] == self.predict_points
+                and previous_bet["predict_spread"] == self.predict_spread
             ):
                 logger.debug("Previous bet matches current bet")
                 return
@@ -313,11 +313,11 @@ class Bet:
                 logger.debug("Updating previously entered bet")
                 try:
                     processMySQL(
-                        query=sqlUpdateGameBet,
+                        query=sqlUpdateGameBet,  # TODO Validate the order of values
                         values=(
-                            self.who_wins,
-                            self.over_under_points,
-                            self.over_under_spread,
+                            self.predict_game,
+                            self.predict_points,
+                            self.predict_spread,
                             self.created,
                             self.created_str,
                             previous_bet["id"],
@@ -329,7 +329,7 @@ class Bet:
             logger.debug("Embedded placed")
             try:
                 processMySQL(
-                    query=sqlInsertGameBet,
+                    query=sqlInsertGameBet,  # TODO Validate the order of values
                     values=(
                         self.author,
                         self.author_str,
@@ -340,9 +340,9 @@ class Bet:
                         self.week,
                         self.game_datetime.strftime(DT_MYSQL_FORMAT),
                         self.game_datetime_passed,
-                        self.who_wins,
-                        self.over_under_points,
-                        self.over_under_spread,
+                        self.predict_game,
+                        self.predict_points,
+                        self.predict_spread,
                         self.resolved,
                     ),
                 )

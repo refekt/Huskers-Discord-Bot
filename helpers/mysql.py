@@ -64,17 +64,17 @@ sqlGetTeamInfoByID = "SELECT id, espn_id, school, alt_name, alt_name2, conferenc
 
 sqlGetTeamInfoByESPNID = "SELECT id, espn_id, school, alt_name, alt_name2, conference, division, color, alt_color, logos1, logos2, location_name, location_city, location_state, location_capacity, location_grass FROM team_ids WHERE espn_id = % s"
 
-sqlInsertGameBet = "INSERT INTO bets ( id, author, author_str, created, created_str, opponent, home_game, week, game_datetime, game_datetime_passed, which_team_wins, which_team_overunder, which_team_spread, resolved ) VALUES ( 0, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s )"
+sqlInsertGameBet = "INSERT INTO bets ( id, author, author_str, created, created_str, opponent, home_game, week, game_datetime, game_datetime_passed, predict_game, predict_points, predict_spread, resolved ) VALUES ( 0, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s )"
 
-sqlUpdateGameBet = "UPDATE bets SET which_team_wins = % s, which_team_overunder = % s, which_team_spread = % s, created = % s, created_str = % s WHERE id = %s"
+sqlUpdateGameBet = "UPDATE bets SET predict_game = % s, predict_points = % s, predict_spread = % s, created = % s, created_str = % s WHERE id = %s"
 
-sqlSelectGameBetbyAuthor = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, which_team_wins, which_team_overunder, which_team_spread, resolved FROM bets WHERE author_str = % s AND opponent = % s"
+sqlSelectGameBetbyAuthor = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, predict_game, predict_points, predict_spread, resolved FROM bets WHERE author_str = % s AND opponent = % s"
 
-sqlSelectGameBetbyOpponent = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, which_team_wins, which_team_overunder, which_team_spread, resolved FROM bets WHERE opponent = % s"
+sqlSelectGameBetbyOpponent = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, predict_game, predict_points, predict_spread, resolved FROM bets WHERE opponent = % s"
 
 sqlGetBetsLeaderboard = "SELECT * FROM `bets_leaderboard.v`"
 
-sqlResolveGame = "UPDATE botfrost.schedule_22 SET game_datetime_passed = 1, which_team_wins_final = % s, which_team_overunder_final = % s, which_team_spread_final = % s, resolved = 1 WHERE opponent = % s;"
+sqlResolveGame = "UPDATE botfrost.schedule_22 SET game_datetime_passed = 1, result_game = % s, result_points = % s, result_spread = % s, resolved = 1 WHERE opponent = % s;"
 
 # Croot Bot
 sqlTeamIDs = "SELECT id, school FROM team_ids"
