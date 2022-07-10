@@ -393,13 +393,15 @@ class HuskerClient(Bot):
 
         on_ready_tasks: list[Awaitable] = []
 
-        if DEBUGGING_CODE:
+        is_silent: bool = True if sys.argv[1] == "silent" else False
+
+        if is_silent:
             logger.info("Skipping Twitter stream")
         else:
             await start_twitter_stream(self)
             logger.info("Twitter stream started")
 
-        if DEBUGGING_CODE:
+        if is_silent:
             logger.info("Skipping restarting reminders")
         else:
             logger.info("Collecting open reminders")
@@ -493,12 +495,15 @@ class HuskerClient(Bot):
             else:
                 logger.info("No open reminders found")
 
-        logger.info("Creating daily posts schedule")
-        scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
-        scheduled_posts.setup_and_run_schedule()
+        if is_silent:
+            logger.info("Skipping daily posts schedule")
+        else:
+            logger.info("Creating daily posts schedule")
+            scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
+            scheduled_posts.setup_and_run_schedule()
 
-        logger.info("Running scheudled_posts")
-        self.loop.create_task(scheduled_posts.run())
+            logger.info("Running scheudled_posts")
+            self.loop.create_task(scheduled_posts.run())
 
         logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
