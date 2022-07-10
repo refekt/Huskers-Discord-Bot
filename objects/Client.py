@@ -393,7 +393,12 @@ class HuskerClient(Bot):
 
         on_ready_tasks: list[Awaitable] = []
 
-        is_silent: bool = True if sys.argv[1] == "silent" else False
+        logger.info(f"Sys.argv[1] == {sys.argv[1]}")
+        try:
+            is_silent: bool = True if sys.argv[1] == "silent" else False
+        except IndexError:
+            is_silent = False
+        logger.info(f"is_silent == {is_silent}")
 
         if is_silent:
             logger.info("Skipping Twitter stream")
