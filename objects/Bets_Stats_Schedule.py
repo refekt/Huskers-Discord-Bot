@@ -7,6 +7,7 @@ from typing import Optional, Union
 import discord
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import ResultSet
 from cfbd import ApiClient, BettingApi, GamesApi, Game
 from cfbd.rest import ApiException
 
@@ -182,7 +183,7 @@ class BetLines:
         )
 
     def __repr__(self) -> str:
-        return [var for var in vars()]
+        return str([var for var in vars()])
 
 
 class FootballTeam(JSONEncoder):
@@ -257,7 +258,7 @@ class Bet:
         over_under_points: Optional[WhichTeamChoice],
         over_under_spread: Optional[WhichTeamChoice],
     ) -> None:
-        logger.info("Creating a Bet object")
+        logger.debug("Creating a Bet object")
 
         self._raw = getNebraskaGameByOpponent(opponent_name)
         self.author: discord.Member = author
@@ -295,7 +296,7 @@ class Bet:
         return f"{self.author_str}: Wins-{self.who_wins}, OverUnder-{self.over_under_points}, Spread-{self.over_under_spread}"
 
     def submitRecord(self) -> None:
-        logger.info("Submitting MySQL entry for bet")
+        logger.debug("Submitting MySQL entry for bet")
         previous_bet = retrieveGameBets(
             author_str=self.author_str, school_name=self.opponent_name.school_name
         )
@@ -306,10 +307,10 @@ class Bet:
                 and previous_bet["which_team_overunder"] == self.over_under_points
                 and previous_bet["which_team_spread"] == self.over_under_spread
             ):
-                logger.info("Previous bet matches current bet")
+                logger.debug("Previous bet matches current bet")
                 return
             else:
-                logger.info("Updating previously entered bet")
+                logger.debug("Updating previously entered bet")
                 try:
                     processMySQL(
                         query=sqlUpdateGameBet,
@@ -325,7 +326,7 @@ class Bet:
                 except BettingException:
                     BettingException("Was not able to create bet in MySQL database.")
         else:
-            logger.info("Embedded placed")
+            logger.debug("Embedded placed")
             try:
                 processMySQL(
                     query=sqlInsertGameBet,
@@ -392,7 +393,7 @@ def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> G
             and game.away_team.lower() == nebraska.lower()
         )
     ]
-    logger.info(
+    logger.debug(
         f"Found game {game[0].id} with {game[0].away_team} and {game[0].home_team}"
     )
     return game[0]

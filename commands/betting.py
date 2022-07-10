@@ -1,12 +1,15 @@
+from datetime import datetime
 from typing import Optional, Union
 
 import discord.ext.commands
+from cfbd import ApiClient, GamesApi, Game
 from discord import app_commands
 from discord.app_commands import Group
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD
+from helpers.constants import GUILD_PROD, FIELDS_LIMIT, CFBD_CONFIG, DT_CFBD_GAMES, TZ
 from helpers.embed import buildEmbed
+from helpers.mysql import processMySQL, sqlGetBetsLeaderboard, sqlResolveGame
 from objects.Bets_Stats_Schedule import (
     Bet,
     BigTenTeams,
@@ -41,7 +44,32 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         over_under_points: Optional[WhichOverUnderChoice],
         over_under_spread: Optional[WhichTeamChoice],
     ) -> None:
-        await interaction.response.defer()
+        game_started: bool = False
+        games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
+        check_games: list[Game] = games_api.get_games(
+            year=datetime.now().year,
+            team=BigTenTeams.Nebraska.lower(),
+            season_type="both",
+        )
+
+        opponent_game: Optional[Game] = None
+        for game in check_games:
+            if opponent_name not in (game.home_team, game.away_team):
+                continue
+            opponent_game = game
+            break
+
+        dt_start_date: datetime = datetime.strptime(
+            opponent_game.start_date, DT_CFBD_GAMES
+        ).astimezone(tz=TZ)
+
+        if dt_start_date.astimezone(tz=TZ) < datetime.now(tz=TZ):
+            await interaction.response.send(
+                f"You cannot place a bet on {opponent_name} after the game has started!",
+                ephemeral=True,
+            )
+        else:
+            await interaction.response.defer()
 
         if [_ for _ in (who_wins, over_under_points, over_under_spread) if _ is None]:
             raise BettingException("You cannot submit a blank bet!")
@@ -138,6 +166,72 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             )
 
         await interaction.followup.send(embed=embed)
+
+    @bet_group.command(
+        name="leaderboard", description="Show the leaderboard for betting"
+    )
+    async def bet_leaderboard(
+        self,
+        interaction: discord.Interaction,
+    ):
+        await interaction.response.defer()
+
+        all_bets: Optional[list[dict]] = processMySQL(
+            query=sqlGetBetsLeaderboard, fetch="all"
+        )
+        if all_bets is not None and len(all_bets) > FIELDS_LIMIT:
+            all_bets = all_bets[0 : FIELDS_LIMIT - 1]
+
+        bet_title: str = "2022 Husker Betting Leaderboard"
+
+        if all_bets:
+            embed = buildEmbed(
+                title=bet_title,
+                description="Point weights: 1x win, 2x points, 2x spread",
+                fields=[
+                    dict(
+                        name=f"#{index + 1}",
+                        value=f"{bet['author_str']} - {bet['average_points_per_game']} pts\n({bet['correct_wins']} Wins, {bet['correct_overunder']} Points, {bet['correct_spread']} Spread)",
+                    )
+                    for (index, bet) in enumerate(all_bets)
+                ],
+            )
+        else:
+            embed = buildEmbed(
+                title=bet_title,
+                description="Point weights: 1x win, 2x points, 2x spread",
+                fields=[
+                    dict(
+                        name="No Bets Found!",
+                        value="Check back after a game has been resolved",
+                    )
+                ],
+            )
+
+        await interaction.followup.send(embed=embed)
+
+    @bet_group.command(
+        name="resolve", description="Resolve a game to update the leaderboard"
+    )
+    @app_commands.default_permissions(administrator=True)
+    async def bet_resolve(
+        self,
+        interaction: discord.Interaction,
+        opponent_name: HuskerSched2022,
+        who_wins: Optional[WhichTeamChoice],
+        over_under_points: Optional[WhichOverUnderChoice],
+        over_under_spread: Optional[WhichTeamChoice],
+    ):
+        await interaction.response.defer(ephemeral=True)
+
+        processMySQL(
+            query=sqlResolveGame,
+            values=(who_wins, over_under_points, over_under_spread, opponent_name),
+        )
+
+        await interaction.followup.send(
+            f"Updated the {opponent_name} game with {who_wins} winning, {over_under_points} on the points, and {over_under_spread} on the spread."
+        )
 
 
 async def setup(bot: commands.Bot) -> None:

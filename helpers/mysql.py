@@ -20,6 +20,7 @@ __all__: list[str] = [
     "processMySQL",
     "sqlCreateImageCommand",
     "sqlDeleteImageCommand",
+    "sqlGetBetsLeaderboard",
     "sqlGetCrootPredictions",
     "sqlGetIndividualPrediction",
     "sqlGetPrediction",
@@ -30,6 +31,7 @@ __all__: list[str] = [
     "sqlInsertPrediction",
     "sqlRecordReminder",
     "sqlRemoveIowa",
+    "sqlResolveGame",
     "sqlRetrieveIowa",
     "sqlRetrieveReminders",
     "sqlSelectAllImageCommand",
@@ -69,6 +71,10 @@ sqlUpdateGameBet = "UPDATE bets SET which_team_wins = % s, which_team_overunder 
 sqlSelectGameBetbyAuthor = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, which_team_wins, which_team_overunder, which_team_spread, resolved FROM bets WHERE author_str = % s AND opponent = % s"
 
 sqlSelectGameBetbyOpponent = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, which_team_wins, which_team_overunder, which_team_spread, resolved FROM bets WHERE opponent = % s"
+
+sqlGetBetsLeaderboard = "SELECT * FROM `bets_leaderboard.v`"
+
+sqlResolveGame = "UPDATE botfrost.schedule_22 SET game_datetime_passed = 1, which_team_wins_final = % s, which_team_overunder_final = % s, which_team_spread_final = % s, resolved = 1 WHERE opponent = % s;"
 
 # Croot Bot
 sqlTeamIDs = "SELECT id, school FROM team_ids"
@@ -196,41 +202,6 @@ def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
         logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
 
     result: Union[dict, list[dict], None] = None
-
-    # try:
-    #     with sqlConnection.cursor() as cursor:
-    #         if (
-    #             "fetch" not in kwargs.keys()
-    #         ):  # Try using this instead: tries = kwargs.get('tries', DEFAULT_TRIES)
-    #             if "values" not in kwargs.keys():
-    #                 cursor.execute(query=query)
-    #             else:
-    #                 cursor.execute(query=query, args=kwargs["values"])
-    #         else:
-    #             if "values" not in kwargs.keys():
-    #                 if kwargs["fetch"] == "one":
-    #                     cursor.execute(query=query)
-    #                     result: dict = cursor.fetchone()
-    #                 elif kwargs["fetch"] == "many":
-    #                     if "size" not in kwargs.keys():
-    #                         logger.exception("Fetching many requires a `size` kwargs.")
-    #                     cursor.execute(query=query)
-    #                     result: list[dict] = cursor.fetchmany(many=kwargs["size"])
-    #                 elif kwargs["fetch"] == "all":
-    #                     cursor.execute(query=query)
-    #                     result: list[dict] = cursor.fetchall()
-    #             else:
-    #                 if kwargs["fetch"] == "one":
-    #                     cursor.execute(query=query, args=kwargs["values"])
-    #                     result: dict = cursor.fetchone()
-    #                 elif kwargs["fetch"] == "many":
-    #                     if "size" not in kwargs.keys():
-    #                         logger.exception("Fetching many requires a `size` kwargs.")
-    #                     cursor.execute(query=query, args=kwargs["values"])
-    #                     result: list[dict] = cursor.fetchmany(many=kwargs["size"])
-    #                 elif kwargs["fetch"] == "all":
-    #                     cursor.execute(query=query, args=kwargs["values"])
-    #                     result: list[dict] = cursor.fetchall()
 
     try:
         with sqlConnection.cursor() as cursor:
