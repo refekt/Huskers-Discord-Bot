@@ -395,7 +395,7 @@ class HuskerClient(Bot):
 
         logger.info(f"Sys.argv[1] == {sys.argv[1]}")
         try:
-            is_silent: bool = True if sys.argv[1] == "silent" else False
+            is_silent: bool = True if "silent" in sys.argv else False
         except IndexError:
             is_silent = False
         logger.info(f"is_silent == {is_silent}")
