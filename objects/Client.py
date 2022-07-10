@@ -393,7 +393,7 @@ class HuskerClient(Bot):
 
         on_ready_tasks: list[Awaitable] = []
 
-        logger.info(f"Sys.argv == {sys.argv}")
+        logger.info(f"Sys.argv is {sys.argv}")
         if "silent" in sys.argv:
             is_silent: bool = True
         else:
