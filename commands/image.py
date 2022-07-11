@@ -14,7 +14,7 @@ import discord.ext.commands
 import requests
 import validators
 from PIL import Image
-from discord import app_commands, HTTPException, Forbidden, NotFound
+from discord import app_commands, HTTPException, Forbidden
 from discord.ext import commands
 
 from helpers.constants import (
@@ -97,7 +97,7 @@ async def gatherAiImageResults(_prompt: str) -> dict[str]:
     }
     json_input: dict[str] = {"prompt": _prompt}
 
-    logger.info("Loading results...")
+    asyncio_logger.debug("Loading results...")
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url=request_url, headers=headers, json=json_input) as r:
@@ -110,7 +110,6 @@ async def gatherAiImageResults(_prompt: str) -> dict[str]:
 def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
     asyncio_logger.debug("Decoding Image to Bytes")
 
-    logger.info("Decoding images")
     decoded = []
     for image in _images["images"]:
         decoded.append(
@@ -179,10 +178,21 @@ async def sendAiImage(_prompt: str, _author: discord.Member, _channel: Any) -> N
     collage_image: Image = createCollageImage(converted_files)
     buffer: io.BytesIO = getBuffer(collage_image)
 
-    await _channel.send(
-        content=f"An AI generated image was created by {_author.mention} with the following prompt: {_prompt}",
-        file=discord.File(fp=buffer, filename="ai-image.jpg"),
-    )
+    try:
+        await _channel.send(
+            content=f"An AI generated image was created by {_author.mention} with the following prompt: {_prompt}",
+            file=discord.File(fp=buffer, filename="ai-image.jpg"),
+        )
+    except Forbidden:
+        logger.exception(f"Not enough permissions to send a message.")
+    except HTTPException:
+        logger.exception(f"The message failed send.")
+    except ValueError:
+        logger.exception(f"The files or embeds list is not of the appropriate size.")
+    except TypeError:
+        logger.exception(
+            f"You specified both file and files, or you specified both embed and embeds, or the reference object is not a Message, MessageReference or PartialMessage."
+        )
 
 
 class ImageCog(commands.Cog, name="Image Commands"):
@@ -465,12 +475,15 @@ class ImageCog(commands.Cog, name="Image Commands"):
         name="ai-image",
         description="Use craiyon services to generate an AI generated image.",
     )
+    @app_commands.describe(prompt="The prompt you want to generate.")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def ai_image(self, interaction: discord.Interaction, prompt: str) -> None:
         await interaction.response.send_message(
-            "This may take up to 3 minutes to process. Your message will be sent when ready.",
+            f"Your request to create an AI Image with the prompt [{prompt}] as been submitted. This may take up to 3 minutes to process. Your message will be sent when ready.",
             ephemeral=True,
         )
+
+        asyncio_logger.debug("Creating sendAiImage task")
 
         interaction.client.loop.create_task(
             sendAiImage(
@@ -478,10 +491,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
             )
         )
 
-        try:
-            await interaction.delete_original_message()
-        except (HTTPException, NotFound, Forbidden):
-            pass
+        asyncio_logger.debug("sendAiImage task completed")
 
 
 async def setup(bot: commands.Bot) -> None:
