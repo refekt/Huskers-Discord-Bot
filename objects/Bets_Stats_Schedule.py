@@ -313,7 +313,7 @@ class Bet:
                 logger.debug("Updating previously entered bet")
                 try:
                     processMySQL(
-                        query=sqlUpdateGameBet,  # TODO Validate the order of values
+                        query=sqlUpdateGameBet,
                         values=(
                             self.predict_game,
                             self.predict_points,
@@ -329,7 +329,7 @@ class Bet:
             logger.debug("Embedded placed")
             try:
                 processMySQL(
-                    query=sqlInsertGameBet,  # TODO Validate the order of values
+                    query=sqlInsertGameBet,
                     values=(
                         self.author,
                         self.author_str,
