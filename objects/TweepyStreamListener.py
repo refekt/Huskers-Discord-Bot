@@ -2,7 +2,6 @@ import asyncio
 import json
 import time
 from asyncio import Future
-from pprint import pprint
 from typing import Union, Optional
 
 import dateutil.parser
@@ -367,8 +366,6 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.exception(f"Exception: {exception}")
 
     def on_data(self, raw_data) -> None:
-        logger.debug(pprint(json.loads(raw_data)))
-
         processed_data: dict = json.loads(raw_data)
         task = asyncio.run_coroutine_threadsafe(
             send_tweet(self.client, MyTweet(processed_data)), self.client.loop

@@ -103,6 +103,8 @@ async def gatherAiImageResults(_prompt: str) -> dict[str]:
         async with session.post(url=request_url, headers=headers, json=json_input) as r:
             if r.status == 200:
                 return await r.json()
+            elif r.status == 524:
+                raise ImageException(f"The API called timed out.")
             else:
                 raise ImageException(f"API Returned {r.status}: {r.reason}")
 
@@ -171,7 +173,15 @@ def getBuffer(_buffer: Image) -> io.BytesIO:
 async def sendAiImage(_prompt: str, _author: discord.Member, _channel: Any) -> None:
     asyncio_logger.debug("Sending AI Image")
 
-    api_results: dict[str] = await gatherAiImageResults(_prompt)
+    api_results: Optional[dict[str]] = None
+    try:
+        api_results = await gatherAiImageResults(_prompt)
+    except ImageException as err:
+        logger.exception(f"Gathering AI Images failed: {err}")
+        await _channel.send(
+            content=f"The API call for [{_prompt}] from [{_author}] timed out.",
+        )
+
     api_results_images: dict[str, str] = api_results
     decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
     converted_files: list[Image] = convertBytesToImages(decoded_images)
