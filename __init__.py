@@ -87,19 +87,21 @@ if not DEBUGGING_CODE:
                 dict(name="Originating Module", value=f"{err.module}"),
             ],
         )
+        try:
+            member_me: discord.Member = await interaction.guild.fetch_member(MEMBER_GEE)
+            await member_me.send(content=err.traceback)
+        except (Forbidden, HTTPException, NotFound):
+            pass
 
         if interaction.response.is_done():
             # Make error message hidden
             try:
                 await interaction.delete_original_message()
+                await interaction.followup.send(content="", embed=embed, ephemeral=True)
             except (HTTPException, NotFound, Forbidden):
-                pass
-            await interaction.followup.send(content="", embed=embed, ephemeral=True)
+                await interaction.channel.send(embed=embed)
         else:
             await interaction.followup.send(content="", embed=embed, ephemeral=True)
-
-        member_me: discord.Member = await interaction.guild.fetch_member(MEMBER_GEE)
-        await member_me.send(content=str(err))
 
 
 @client.command()
