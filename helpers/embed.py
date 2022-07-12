@@ -198,11 +198,12 @@ def buildTweetEmbed(
 
     if medias:
         for index, item in enumerate(medias):
+            if item.get("url", None) is None:
+                continue
+
             if index == 0:
-                try:
-                    embed.set_image(url=item.url)
-                except:
-                    pass
+                embed.set_image(url=item.url)
+
             embed.add_field(
                 name="Embedded Image",
                 value=discordURLFormatter(f"Image #{index + 1}", item.url),
