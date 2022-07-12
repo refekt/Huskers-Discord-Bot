@@ -113,11 +113,14 @@ def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
     asyncio_logger.debug("Decoding Image to Bytes")
 
     decoded = []
-    for image in _images["images"]:
-        decoded.append(
-            base64.decodebytes(bytes(image, encoding="utf-8")) + b"=="
-        )  # Added b"==" for padding, but I had `images` instead of `images["images"]` so may not need
-    return decoded
+    try:
+        for image in _images["images"]:
+            decoded.append(
+                base64.decodebytes(bytes(image, encoding="utf-8")) + b"=="
+            )  # Added b"==" for padding, but I had `images` instead of `images["images"]` so may not need
+        return decoded
+    except TypeError:
+        raise ImageException("Error occured while processing images.")
 
 
 def convertBytesToImages(_decoded_images: list[bytes]) -> list[Image]:
