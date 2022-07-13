@@ -21,6 +21,7 @@ from helpers.constants import (
     GUILD_PROD,
     HEADERS,
     ROLE_ADMIN_PROD,
+    CHAN_BOT_SPAM,
 )
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
@@ -173,39 +174,16 @@ def getBuffer(_buffer: Image) -> io.BytesIO:
     return buffer
 
 
-async def sendAiImage(_prompt: str, _author: discord.Member, _channel: Any) -> None:
+def sendAiImage(_api_results, _author: discord.Member) -> io.BytesIO:
     asyncio_logger.debug("Sending AI Image")
 
-    api_results: Optional[dict[str]] = None
-    try:
-        api_results = await gatherAiImageResults(_prompt)
-    except ImageException as err:
-        logger.exception(f"Gathering AI Images failed: {err}")
-        await _channel.send(
-            content=f"The API call for [{_prompt}] from [{_author}] timed out.",
-        )
-
-    api_results_images: dict[str, str] = api_results
+    api_results_images: dict[str, str] = _api_results
     decoded_images: list[bytes] = decodeImagesToBytes(api_results_images)
     converted_files: list[Image] = convertBytesToImages(decoded_images)
     collage_image: Image = createCollageImage(converted_files)
     buffer: io.BytesIO = getBuffer(collage_image)
 
-    try:
-        await _channel.send(
-            content=f"An AI generated image was created by {_author.mention} with the following prompt: {_prompt}",
-            file=discord.File(fp=buffer, filename="ai-image.jpg"),
-        )
-    except Forbidden:
-        logger.exception(f"Not enough permissions to send a message.")
-    except HTTPException:
-        logger.exception(f"The message failed send.")
-    except ValueError:
-        logger.exception(f"The files or embeds list is not of the appropriate size.")
-    except TypeError:
-        logger.exception(
-            f"You specified both file and files, or you specified both embed and embeds, or the reference object is not a Message, MessageReference or PartialMessage."
-        )
+    return buffer
 
 
 class ImageCog(commands.Cog, name="Image Commands"):
@@ -498,11 +476,42 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
         asyncio_logger.debug("Creating sendAiImage task")
 
-        interaction.client.loop.create_task(
-            sendAiImage(
-                _prompt=prompt, _author=interaction.user, _channel=interaction.channel
+        api_results: Optional[dict[str]] = None
+        try:
+            api_results = await gatherAiImageResults(prompt)
+        except ImageException as err:
+            logger.exception(f"Gathering AI Images failed: {err}")
+            await interaction.followup.send(
+                content=f"The API call for [{prompt}] from [{interaction.user}] timed out.",
             )
+
+        buffer: io.BytesIO = sendAiImage(
+            _api_results=api_results, _author=interaction.user
         )
+
+        try:
+            bot_spam: discord.TextChannel = await interaction.guild.fetch_channel(
+                CHAN_BOT_SPAM
+            )
+            await bot_spam.send(
+                content=f"An AI generated image was created by {interaction.user.mention} with the following prompt: {prompt}",
+                file=discord.File(fp=buffer, filename="ai-image.jpg"),
+            )
+            await interaction.followup.send(
+                f"AI created image has been made and sent to {bot_spam.mention}"
+            )
+        except Forbidden:
+            logger.exception(f"Not enough permissions to send a message.")
+        except HTTPException:
+            logger.exception(f"The message failed send.")
+        except ValueError:
+            logger.exception(
+                f"The files or embeds list is not of the appropriate size."
+            )
+        except TypeError:
+            logger.exception(
+                f"You specified both file and files, or you specified both embed and embeds, or the reference object is not a Message, MessageReference or PartialMessage."
+            )
 
         asyncio_logger.debug("sendAiImage task completed")
 
