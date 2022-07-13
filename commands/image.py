@@ -464,14 +464,14 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
     @app_commands.command(
         name="ai-image",
-        description="Use craiyon services to generate an AI generated image.",
+        description="Use craiyon services to generate an AI generated image. This may take up to 3 minutes to process. Your message will be sent when ready.",
     )
     @app_commands.describe(prompt="The prompt you want to generate.")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def ai_image(self, interaction: discord.Interaction, prompt: str) -> None:
-        await interaction.response.send_message(
-            f"Your request to create an AI Image with the prompt [{prompt}] as been submitted. This may take up to 3 minutes to process. Your message will be sent when ready.",
+        await interaction.response.defer(
             ephemeral=True,
+            thinking=True,
         )
 
         asyncio_logger.debug("Creating sendAiImage task")
@@ -494,11 +494,11 @@ class ImageCog(commands.Cog, name="Image Commands"):
                 CHAN_BOT_SPAM
             )
             await bot_spam.send(
-                content=f"An AI generated image was created by {interaction.user.mention} with the following prompt: {prompt}",
+                content=f"An AI generated image was created by [{interaction.user.mention}] with the following prompt: {prompt}",
                 file=discord.File(fp=buffer, filename="ai-image.jpg"),
             )
             await interaction.followup.send(
-                f"AI created image has been made and sent to {bot_spam.mention}"
+                f"AI created image has been made and sent to {bot_spam.mention}",
             )
         except Forbidden:
             logger.exception(f"Not enough permissions to send a message.")
