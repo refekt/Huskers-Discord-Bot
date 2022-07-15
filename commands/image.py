@@ -1,4 +1,5 @@
 import base64
+import enum
 import io
 import logging
 import pathlib
@@ -19,9 +20,9 @@ from discord.ext import commands
 
 from helpers.constants import (
     GUILD_PROD,
-    HEADERS,
     ROLE_ADMIN_PROD,
     CHAN_BOT_SPAM,
+    HEADERS,
 )
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
@@ -42,6 +43,12 @@ asyncio_logger = logging.getLogger("asyncio")
 image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")
 
 __all__: list[str] = ["ImageCog"]
+
+
+class DeepFryOptions(str, enum.Enum):
+    url = "URL"
+    discord_member = "Discord Member"
+    upload = "Upload"
 
 
 def retrieve_all_img() -> Union[dict, list[dict], None]:
@@ -202,50 +209,66 @@ class ImageCog(commands.Cog, name="Image Commands"):
         description="Deep fry a picture into a unique creation",
     )
     @app_commands.describe(
-        source_url="URL of an image you want to deepfry",
-        source_avatar="Avatar of member you want to deepfry",
+        # source="A URL, Discord Member, or attachment you want to deep fry.",
+        url="(Optional) The URL of a file you want to deep fry.",
+        discord_member="(Optional) The Discord Member's avatar you want to deep fry.",
+        upload="(Optional) The picture upload you want to deep fry.",
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
-    async def deepfry(
+    async def deep_fry(
         self,
         interaction: discord.Interaction,
-        source_url: str = None,
-        source_avatar: discord.Member = None,
+        # source: DeepFryOptions,
+        url: str = None,
+        discord_member: discord.Member = None,
+        upload: discord.Attachment = None,
     ) -> None:
         logger.info("Attempting to create a deep fried image!")
-        await interaction.response.defer()
 
-        if source_url is not None and source_avatar is not None:
-            raise ImageException("You can only provide one source!")
+        await interaction.response.defer(thinking=True)
 
-        if source_url is not None:
-            assert validators.url(source_url) and any(
-                sub_str in source_url for sub_str in image_formats
+        assert (
+            sum(var is not None for var in (url, discord_member, upload)) == 1
+        ), ImageException(
+            "You can only pick one source type (URL, Discord Member, or Upload)!"
+        )
+
+        async def image_from_url(_url: str) -> Image:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=_url, headers=HEADERS) as resp:
+                    if resp.status == 200:
+                        image_response: bytes = await resp.read()
+                    else:
+                        raise ImageException(
+                            f"Unable to retrieve image from the provided URL: {url}"
+                        )
+
+            return Image.open(io.BytesIO(image_response)).convert("RGBA")
+
+        image: Optional[Image] = None
+
+        if url:
+            assert validators.url(url) and any(
+                sub_str in url for sub_str in image_formats
             ), ImageException("You must provide a valid URL!")
 
-        def load_image_from_url(url: str) -> Image:
-            image_response: requests.Response = requests.get(
-                url=url, stream=True, headers=HEADERS
-            )
-            return Image.open(io.BytesIO(image_response.content)).convert("RGBA")
+            logger.debug("Loading image from URL")
+            image = await image_from_url(url)
+        elif discord_member:
+            logger.debug("Loading image from discord_member")
+            image = await image_from_url(discord_member.avatar.url)
+        elif upload:
+            logger.debug("Loading image from upload")
+            image = await image_from_url(upload.url)
+        else:
+            raise ImageException("You must input the correct source and source input!")
+
+        assert image, ImageException("Unable to load image")
 
         emote_amount: int = random.randrange(1, 6)
         noise: float = random.uniform(0.4, 0.65)
         contrast: int = random.randrange(1, 99)
         layers: int = random.randrange(1, 3)
-
-        image: Optional[Image] = None
-
-        if source_url:
-            logger.info("Loading image from URL")
-            image = load_image_from_url(source_url)
-        elif source_avatar:
-            logger.info("Loading image from member avatar")
-            image = load_image_from_url(source_avatar.avatar.url)
-        else:
-            ImageException("Unknown source used!")
-
-        assert image, ImageException("Unable to load image")
 
         try:
             logger.info("Frying loaded image")

@@ -106,6 +106,7 @@ if not DEBUGGING_CODE:
 
 @client.command()
 @commands.guild_only()
+@commands.default_permissions(administrator=True)
 async def sync(
     ctx: Context,
     guilds: Greedy[discord.Object],
