@@ -20,6 +20,7 @@ from helpers.constants import (
     TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
+from objects.Exceptions import TwitterStreamException
 from objects.Logger import discordLogger
 
 logger = discordLogger(__name__)
@@ -362,8 +363,9 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_closed(self, response) -> None:
         logger.warning(f"Closed: {response}")
 
-    def on_exception(self, exception) -> None:
-        logger.exception(f"Exception: {exception}")
+    def on_exception(self, exception: tweepy.HTTPException) -> None:
+        # logger.exception(f"Exception: {exception}")
+        raise TwitterStreamException(", ".join(exception.api_messages))
 
     def on_data(self, raw_data) -> None:
         processed_data: dict = json.loads(raw_data)
