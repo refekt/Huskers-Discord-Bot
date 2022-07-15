@@ -464,7 +464,9 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
     @app_commands.command(
         name="ai-image",
-        description="Use craiyon services to generate an AI generated image. This may take up to 3 minutes to process. Your message will be sent when ready.",
+        description="Use craiyon services to generate an AI generated image. This may take up to 3 minutes to process."[
+            :100
+        ],
     )
     @app_commands.describe(prompt="The prompt you want to generate.")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
