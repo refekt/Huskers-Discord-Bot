@@ -473,7 +473,7 @@ class TriviaBot:
                 )
 
                 self.trivia_message = await self.channel.send(
-                    delete_after=self.question_duration * 3,
+                    # delete_after=self.question_duration * 3,
                     embed=self.embeds[self.current_embed],
                     view=self.question_view,
                 )

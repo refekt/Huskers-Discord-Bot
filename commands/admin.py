@@ -284,6 +284,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         """All about Bot Frost"""
 
         github_api_url: str = "https://api.github.com/repos/refekt/Bot-Frost"
+        github_commits_api_url: str = (
+            "https://api.github.com/repos/refekt/Bot-Frost/stats/contributors"
+        )
         github_response: requests.Response = requests.get(url=github_api_url)
         github_json: dict = json.loads(github_response.text)
 
