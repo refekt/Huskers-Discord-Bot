@@ -131,7 +131,7 @@ def decodeImagesToBytes(_images: dict[str]) -> list[bytes]:
             )  # Added b"==" for padding, but I had `images` instead of `images["images"]` so may not need
         return decoded
     except TypeError:
-        raise ImageException("Error occured while processing images.")
+        raise ImageException("Error occurred while processing images.")
 
 
 def convertBytesToImages(_decoded_images: list[bytes]) -> list[Image]:

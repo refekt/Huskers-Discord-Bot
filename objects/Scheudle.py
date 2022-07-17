@@ -17,7 +17,7 @@ asyncio_logger = discordLogger(
     name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
 
-__all__: list[str] = ["ScheudlePosts"]
+__all__: list[str] = ["SchedulePosts"]
 
 
 class Weekday(enum.IntEnum):
@@ -38,7 +38,7 @@ class Weekday(enum.IntEnum):
         return str(self.value)
 
 
-class ScheudlePosts:
+class SchedulePosts:
     __slots__ = [
         "_day_delivery_time",
         "_night_delivery_time",
@@ -55,7 +55,7 @@ class ScheudlePosts:
     ]
 
     def __init__(self, channel: discord.TextChannel) -> None:
-        asyncio_logger.debug("Creating ScheudlePosts instance")
+        asyncio_logger.debug("Creating SchedulePosts instance")
 
         description_daily: ClassVar[str] = "MORNING GANG RISE UP!"
         description_nightly: ClassVar[str] = "Night Owls Assemble!"
@@ -245,7 +245,7 @@ class ScheudlePosts:
         self.send_message: bool = False
         self.which_day: int = 0
 
-        asyncio_logger.debug("ScheudlePosts initialized")
+        asyncio_logger.debug("SchedulePosts initialized")
 
     def send_daily_message(self, is_day: bool = False, is_night: bool = False) -> None:
         asyncio_logger.info("Attempting to send a daily message")
@@ -256,7 +256,7 @@ class ScheudlePosts:
         dt_now = datetime.now(tz=TZ)
         self.which_day = dt_now.weekday()
 
-    def _setup_debug_scheudle(self) -> None:
+    def _setup_debug_schedule(self) -> None:
         asyncio_logger.debug("Creating schedule for debug messages")
 
         schedule.every(5).seconds.do(
@@ -306,7 +306,7 @@ class ScheudlePosts:
         if DEBUGGING_CODE:
             asyncio_logger.debug("Attempting to create debug schedule")
             if not self._setup:
-                self._setup_debug_scheudle()
+                self._setup_debug_schedule()
                 self._setup = True
                 asyncio_logger.debug("Debug schedule created")
             schedule.run_pending()
@@ -318,7 +318,7 @@ class ScheudlePosts:
                 asyncio_logger.debug("Sschedule created")
 
     async def run(self):
-        asyncio_logger.debug("Running ScheudlePosts loop")
+        asyncio_logger.debug("Running SchedulePosts loop")
 
         if DEBUGGING_CODE:
             asyncio_logger.setLevel(logging.DEBUG)

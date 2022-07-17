@@ -32,7 +32,7 @@ class TriviaCommands(commands.Cog, name="Trivia Commands"):
         self,
         interaction: discord.Interaction,
         category: TriviaCategories,
-        difficuly: TriviaDifficulty,
+        difficulty: TriviaDifficulty,
         question_type: TriviaQuestionType,
         question_amount: int = 3 if DEBUGGING_CODE else 10,
     ):
@@ -40,7 +40,7 @@ class TriviaCommands(commands.Cog, name="Trivia Commands"):
             game_master=interaction.user,
             channel=interaction.channel,
             category=category,
-            difficuly=difficuly,
+            difficulty=difficulty,
             question_type=question_type,
             question_amount=question_amount,
         )

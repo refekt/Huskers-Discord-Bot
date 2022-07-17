@@ -237,7 +237,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             quotes.append(TweetQuoteData(item))
 
     if author.username.lower() == TWITTER_BLOCK16_SCREENANME.lower():
-        logger.info("Sending a Block 16 twweet")
+        logger.info("Sending a Block 16 tweet")
         embed: discord.Embed = buildTweetEmbed(
             name=author.name,
             username=author.username,

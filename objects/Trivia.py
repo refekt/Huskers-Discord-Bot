@@ -59,7 +59,7 @@ class SessionToken(str):
     def reset_token(
         self,
     ) -> str:  # May not be needed since all questions are queried up front
-        logger.debug("Reseting session token")
+        logger.debug("Resetting session token")
 
         resp: Response = requests.get(url=self.token_reset_url, headers=HEADERS)
 
@@ -286,7 +286,7 @@ class TriviaBot:
         game_master: discord.Member,
         channel: Union[discord.TextChannel, Any],
         category: TriviaCategories,
-        difficuly: TriviaDifficulty,
+        difficulty: TriviaDifficulty,
         question_type: TriviaQuestionType,
         question_amount: int,
         question_duration: int = 3 if DEBUGGING_CODE else 15,
@@ -296,7 +296,7 @@ class TriviaBot:
         self.api_url: str = (
             f"https://opentdb.com/api.php?amount={min(question_amount, self.MAX_QUESTIONS)}&"
             f"category={'' if category == TriviaCategories.any else category}&"
-            f"difficulty={difficuly}&"
+            f"difficulty={difficulty}&"
             f"type={question_type}&"
             f"token={self.session_token}"
         )
@@ -326,7 +326,7 @@ class TriviaBot:
                     dict(
                         name="Game Info",
                         value=f"Category: {str(category.name).title()}\n"
-                        f"Difficulty: {str(difficuly).title()}\n"
+                        f"Difficulty: {str(difficulty).title()}\n"
                         f"Question Types: {str(question_type.name).title()}\n"
                         f"Number of Questions: {question_amount}\n"
                         f"Question Timer: {question_duration} seconds",
@@ -466,7 +466,7 @@ class TriviaBot:
                     self.players, self.question_view.players
                 )
 
-            logger.debug("Triva game is over. Sending leaderboard")
+            logger.debug("Trivia game is over. Sending leaderboard")
 
             embed = buildEmbed(
                 title="Trivia Bot Results",

@@ -41,7 +41,7 @@ from helpers.mysql import processMySQL, sqlRetrieveReminders, sqlUpdateReminder
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException
 from objects.Logger import discordLogger
-from objects.Scheudle import ScheudlePosts
+from objects.Scheudle import SchedulePosts
 from objects.Thread import convert_duration
 from objects.TweepyStreamListener import StreamClientV2
 
@@ -151,7 +151,7 @@ class HuskerClient(Bot):
             CHAN_HOS,
         ):  # Stay out of HOF and HOS
             logger.debug(
-                "Reaction was eitehr in HOF/HOS channel or not in the correct guild."
+                "Reaction was either in HOF/HOS channel or not in the correct guild."
             )
             return None
 
@@ -515,10 +515,10 @@ class HuskerClient(Bot):
             logger.info("Skipping daily posts schedule")
         else:
             logger.info("Creating daily posts schedule")
-            scheduled_posts: ScheudlePosts = ScheudlePosts(channel=chan_general)
+            scheduled_posts: SchedulePosts = SchedulePosts(channel=chan_general)
             scheduled_posts.setup_and_run_schedule()
 
-            logger.info("Running scheudled_posts")
+            logger.info("Running scheduled_posts")
             self.loop.create_task(scheduled_posts.run())
 
         logger.info("Creating online message")

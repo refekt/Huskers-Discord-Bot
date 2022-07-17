@@ -15,7 +15,7 @@ logger = discordLogger(
 
 __all__: list[str] = [
     ""
-]  # Leaving blank but insert varaibles and functions that you want accessible to other files
+]  # Leaving blank but insert variables and functions that you want accessible to other files
 
 
 class MyCog(commands.Cog):
