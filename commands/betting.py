@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Optional, Union
 
@@ -7,7 +8,14 @@ from discord import app_commands
 from discord.app_commands import Group
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, FIELDS_LIMIT, CFBD_CONFIG, DT_CFBD_GAMES, TZ
+from helpers.constants import (
+    CFBD_CONFIG,
+    DEBUGGING_CODE,
+    DT_CFBD_GAMES,
+    FIELDS_LIMIT,
+    GUILD_PROD,
+    TZ,
+)
 from helpers.embed import buildEmbed
 from helpers.mysql import processMySQL, sqlGetBetsLeaderboard, sqlResolveGame
 from objects.Bets_Stats_Schedule import (
@@ -21,7 +29,9 @@ from objects.Bets_Stats_Schedule import (
 from objects.Exceptions import BettingException
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 
 class BettingCog(commands.Cog, name="Betting Commands"):

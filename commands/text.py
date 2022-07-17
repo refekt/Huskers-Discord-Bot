@@ -1,4 +1,5 @@
 import json
+import logging
 import random
 import re
 from datetime import timedelta, datetime
@@ -15,6 +16,7 @@ from discord.ext import commands
 from helpers.constants import (
     CHAN_BANNED,
     CHAN_POSSUMS,
+    DEBUGGING_CODE,
     DT_OPENWEATHER_UTC,
     GLOBAL_TIMEOUT,
     GUILD_PROD,
@@ -30,7 +32,9 @@ from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
 from objects.Weather import WeatherResponse, WeatherHour
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 
 class TextCog(commands.Cog, name="Text Commands"):

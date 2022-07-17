@@ -1,6 +1,5 @@
 import functools
 import inspect
-import logging
 import pathlib
 import platform
 import random
@@ -9,8 +8,9 @@ from datetime import datetime
 from typing import Callable, Union, Any
 
 from objects.Exceptions import CommandException, StatsException
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(name=__name__)
 
 __all__: list[str] = [
     "alias_param",

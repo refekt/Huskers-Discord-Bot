@@ -11,10 +11,10 @@ from helpers.misc import getModuleMethod
 from objects.Exceptions import MySQLException
 from objects.Logger import discordLogger
 
-if DEBUGGING_CODE:
-    logger = discordLogger(name=__name__, level=logging.DEBUG)
-else:
-    logger = discordLogger(name=__name__, level=logging.INFO)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
+
 
 __all__: list[str] = [
     "processMySQL",

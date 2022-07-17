@@ -19,10 +19,11 @@ from discord import app_commands, HTTPException, Forbidden
 from discord.ext import commands
 
 from helpers.constants import (
-    GUILD_PROD,
-    ROLE_ADMIN_PROD,
     CHAN_BOT_SPAM,
+    DEBUGGING_CODE,
+    GUILD_PROD,
     HEADERS,
+    ROLE_ADMIN_PROD,
 )
 from helpers.embed import buildEmbed
 from helpers.fryer import fry_image
@@ -37,7 +38,9 @@ from helpers.slowking import makeSlowking
 from objects.Exceptions import ImageException
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 asyncio_logger = logging.getLogger("asyncio")
 
 image_formats = (".jpg", ".jpeg", ".png", ".gif", ".gifv", ".mp4")

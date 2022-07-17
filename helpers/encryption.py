@@ -1,11 +1,12 @@
 import json
-import logging
 import pathlib
 from typing import AnyStr
 
 from cryptography.fernet import Fernet
 
-logger = logging.getLogger(__name__)
+from objects.Logger import discordLogger
+
+logger = discordLogger(name=__name__)
 
 key_path = pathlib.PurePath(
     f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"

@@ -1,4 +1,5 @@
 import enum
+import logging
 import urllib.parse
 from datetime import datetime, timedelta
 from json import JSONEncoder
@@ -13,6 +14,7 @@ from cfbd.rest import ApiException
 
 from helpers.constants import (
     CFBD_CONFIG,
+    DEBUGGING_CODE,
     DT_CFBD_GAMES,
     DT_MYSQL_FORMAT,
     DT_STR_FORMAT,
@@ -33,7 +35,9 @@ from helpers.mysql import (
 from objects.Exceptions import BettingException, ScheduleException
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = [
     "Bet",

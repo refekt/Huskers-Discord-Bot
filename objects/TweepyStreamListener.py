@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import time
 from asyncio import Future
 from typing import Union, Optional
@@ -23,7 +24,9 @@ from helpers.embed import buildEmbed, buildTweetEmbed
 from objects.Exceptions import TwitterStreamException
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = ["StreamClientV2"]
 

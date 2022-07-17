@@ -45,7 +45,9 @@ from objects.Scheudle import ScheudlePosts
 from objects.Thread import convert_duration
 from objects.TweepyStreamListener import StreamClientV2
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = ["HuskerClient", "start_twitter_stream"]
 
@@ -399,8 +401,6 @@ class HuskerClient(Bot):
             logger.exception("Syncing the commands failed.")
 
         logger.info(f"The bot tree has synced with {len(loaded_app_commands)} commands")
-
-        logger.info(f"sys.arv == {sys.argv}")
 
         on_ready_tasks: list[Awaitable] = []
 

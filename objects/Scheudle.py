@@ -11,8 +11,11 @@ import schedule
 
 from helpers.constants import TZ, DEBUGGING_CODE, SCHED_DAY_IMG, SCHED_NIGHT_IMG
 from helpers.embed import buildEmbed
+from objects.Logger import discordLogger
 
-asyncio_logger = logging.getLogger("asyncio")
+asyncio_logger = discordLogger(
+    name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = ["ScheudlePosts"]
 

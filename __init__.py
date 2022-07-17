@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import platform
 import traceback
 from typing import Literal, Optional
 
@@ -20,7 +21,10 @@ from objects.Client import HuskerClient  # , schedstop
 from objects.Exceptions import DiscordError  # noqa
 from objects.Logger import discordLogger
 
-logger = discordLogger("__init__")
+logger = discordLogger(
+    name=__name__,
+    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+)
 
 from helpers.constants import *  # noqa
 from helpers.embed import *  # noqa
@@ -37,6 +41,7 @@ from objects.Recruits import *  # noqa
 from objects.Survey import *  # noqa
 from objects.Thread import *  # noqa
 from objects.Timers import *  # noqa
+from objects.Trivia import *  # noqa
 from objects.TweepyStreamListener import *  # noqa
 from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa

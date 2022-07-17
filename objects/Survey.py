@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import random
 import string
 from typing import Optional, AnyStr, Union, List, Any
@@ -15,12 +16,14 @@ from discord import (
 from discord.ext.commands import Bot
 from discord.ui import View, Button
 
-from helpers.constants import GLOBAL_TIMEOUT
+from helpers.constants import GLOBAL_TIMEOUT, DEBUGGING_CODE
 from objects.Exceptions import SurveyException
 from objects.Logger import discordLogger
 from objects.Thread import prettifyTimeDateValue
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = ["Survey"]
 

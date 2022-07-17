@@ -7,8 +7,12 @@ from dotenv import load_dotenv
 
 from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
 from helpers.misc import loadVarPath
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(
+    name=__name__,
+    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+)
 
 logger.info(f"Platform == {platform.platform()}")
 
@@ -545,6 +549,5 @@ __all__: list[str] = [
     # "TWITTER_PLACE_FIELDS",
     # "TWITTER_POLL_FIELDS",
 ]
-
 
 logger.info(f"{str(__name__).title()} module loaded!")

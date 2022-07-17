@@ -1,14 +1,17 @@
 # https://gist.github.com/AbstractUmbra/a9c188797ae194e592efe05fa129c57f
 # https://discordpy.readthedocs.io/en/latest/interactions/api.html#discord.Interaction
+import logging
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD
+from helpers.constants import GUILD_PROD, DEBUGGING_CODE
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)  # Logger for each module/file
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)  # Logger for each module/file
 
 __all__: list[str] = [
     ""

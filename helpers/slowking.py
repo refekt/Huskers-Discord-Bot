@@ -6,9 +6,13 @@ import discord
 import requests
 from PIL import Image, ImageOps
 
+from helpers.constants import DEBUGGING_CODE
 from objects.Exceptions import ImageException
+from objects.Logger import discordLogger
 
-logger = logging.getLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 logger.info(f"{str(__name__).title()} module loaded!")
 

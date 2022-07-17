@@ -1,14 +1,17 @@
+import logging
 from typing import Union
 
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import ResultSet
 
-from helpers.constants import HEADERS
+from helpers.constants import HEADERS, DEBUGGING_CODE
 from objects.Exceptions import StatsException
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = [
     "TeamStatsWinsipediaTeam",

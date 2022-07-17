@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
@@ -16,6 +17,7 @@ from discord.ext import commands
 
 from helpers.constants import (
     CFBD_CONFIG,
+    DEBUGGING_CODE,
     DT_CFBD_GAMES,
     DT_CFBD_GAMES_DISPLAY,
     FIELDS_LIMIT,
@@ -40,7 +42,9 @@ from objects.Paginator import EmbedPaginatorView
 from objects.Thread import prettifyTimeDateValue
 from objects.Winsipedia import CompareWinsipedia
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = ["FootballStatsCog"]
 

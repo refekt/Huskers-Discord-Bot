@@ -1,8 +1,12 @@
 import enum
+import logging
 
+from helpers.constants import DEBUGGING_CODE
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__ = ["IowaDuration"]
 

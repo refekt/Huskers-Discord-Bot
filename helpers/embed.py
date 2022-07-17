@@ -25,13 +25,19 @@ from helpers.constants import (
     TZ,
     DT_CFBD_GAMES,
     DT_CFBD_GAMES_DISPLAY,
+    DEBUGGING_CODE,
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions
 from objects.Bets_Stats_Schedule import BigTenTeams, getHuskerOpponent, buildTeam
 from objects.Exceptions import BettingException
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+from objects.Logger import discordLogger
+
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = [
     "buildEmbed",

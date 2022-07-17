@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from datetime import datetime
 from typing import Union, Any, Optional
@@ -13,6 +14,7 @@ from requests import Response, JSONDecodeError
 
 from helpers.constants import (
     CROOT_SEARCH_LIMIT,
+    DEBUGGING_CODE,
     DT_FAP_RECRUIT,
     GUILD_PROD,
     HEADERS,
@@ -32,7 +34,9 @@ from objects.Exceptions import RecruitException
 from objects.Logger import discordLogger
 from objects.Recruits import RecruitInterest, Recruit
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 croot_search: list[Recruit] = []
 prediction_search: list[Recruit] = []

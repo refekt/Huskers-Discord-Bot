@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
@@ -6,7 +7,7 @@ import discord.ext.commands
 from discord import app_commands
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, TZ, DT_OBJ_FORMAT
+from helpers.constants import GUILD_PROD, TZ, DT_OBJ_FORMAT, DEBUGGING_CODE
 from helpers.embed import buildEmbed
 from helpers.mysql import processMySQL, sqlRecordReminder, sqlUpdateReminder
 from objects.Exceptions import ReminderException
@@ -18,7 +19,9 @@ from objects.Thread import (
     prettifyTimeDateValue,
 )
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = [
     "MissedReminder",

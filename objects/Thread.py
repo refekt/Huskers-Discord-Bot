@@ -1,15 +1,18 @@
 import asyncio
 import enum
+import logging
 import re
 from datetime import datetime, timedelta
 from typing import Coroutine, Optional, Callable, Union
 
 from dateutil.relativedelta import relativedelta
 
-from helpers.constants import DT_TASK_FORMAT
+from helpers.constants import DT_TASK_FORMAT, DEBUGGING_CODE
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 __all__: list[str] = [
     "DateTimeChars",

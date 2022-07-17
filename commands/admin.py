@@ -1,4 +1,5 @@
 import json
+import logging
 import pathlib
 import platform
 import subprocess
@@ -24,6 +25,7 @@ from helpers.constants import (
     CHAN_HYPE_GROUP,
     CHAN_IOWA,
     CHAN_RECRUITING,
+    DEBUGGING_CODE,
     DT_GITHUB_API,
     DT_GITHUB_API_DISPLAY,
     GUILD_PROD,
@@ -46,7 +48,9 @@ from objects.Thread import (
 )
 from objects.Timers import IowaDuration
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
 
 
 class ConfirmButtons(discord.ui.View):

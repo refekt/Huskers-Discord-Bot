@@ -1,11 +1,12 @@
 # Global Errors
-import logging
 from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 from typing import Optional
 
 from discord.app_commands import CommandInvokeError
 
-logger = logging.getLogger(__name__)
+from objects.Logger import discordLogger
+
+logger = discordLogger(name=__name__)
 
 __all__: list[str] = [
     "BettingException",
@@ -22,6 +23,7 @@ __all__: list[str] = [
     "StatsException",
     "SurveyException",
     "TextException",
+    "TriviaException",
     "TwitterStreamException",
     "UserInputException",
     "WeatherException",
@@ -142,6 +144,11 @@ class BettingException(Exception):
 
 @dataclass()
 class TextException(Exception):
+    message: str
+
+
+@dataclass()
+class TriviaException(Exception):
     message: str
 
 
