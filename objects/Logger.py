@@ -6,7 +6,7 @@ import sys
 __all__: list[str] = ["discordLogger"]
 
 
-def discordLogger(name: str, level: int = logging.DEBUG) -> logging.Logger:
+def discordLogger(name: str, level: int) -> logging.Logger:
     logger: logging.Logger = logging.getLogger(name=name)
     logger.setLevel(level=level)
 

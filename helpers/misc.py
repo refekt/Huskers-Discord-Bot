@@ -1,5 +1,6 @@
 import functools
 import inspect
+import logging
 import pathlib
 import platform
 import random
@@ -10,7 +11,10 @@ from typing import Callable, Union, Any
 from objects.Exceptions import CommandException, StatsException
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__,
+    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+)
 
 __all__: list[str] = [
     "alias_param",

@@ -1,4 +1,6 @@
 # Global Errors
+import logging
+import platform
 from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 from typing import Optional
 
@@ -6,7 +8,10 @@ from discord.app_commands import CommandInvokeError
 
 from objects.Logger import discordLogger
 
-logger = discordLogger(__name__)
+logger = discordLogger(
+    name=__name__,
+    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+)
 
 __all__: list[str] = [
     "BettingException",
