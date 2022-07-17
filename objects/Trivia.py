@@ -26,6 +26,8 @@ __all__ = [
     "TriviaQuestionType",
 ]
 
+trivia_players: dict[str, int] = {}
+
 
 # https://opentdb.com/api_config.php
 
@@ -225,6 +227,26 @@ class TriviaQuestionCancelButton(discord.ui.Button):
         )
 
 
+def tally_score(player: discord.Member, point: int) -> dict[str, int]:
+    player_name: str = f"{player.name}#{player.discriminator}"
+
+    logger.debug(f"Adding [{point} point] to [player_name]")
+
+    global trivia_players
+
+    if player_name not in trivia_players.keys():
+        trivia_players[player_name] = 0
+
+    if point == 1:
+        trivia_players[player_name] = trivia_players[player_name] + point
+    elif point == -1:
+        trivia_players[player_name] = trivia_players[player_name] - abs(point)
+
+    logger.debug(f"Current scores are: {trivia_players}")
+
+    return {f"{player_name}": trivia_players[player_name]}
+
+
 class TriviaQuestionView(discord.ui.View):
     LABEL_LIMIT: ClassVar[int] = 80
     CUSTOM_ID_LIMIT: ClassVar[int] = 100
@@ -249,16 +271,6 @@ class TriviaQuestionView(discord.ui.View):
         self.game_master: discord.Member = game_master
         self.check_already_pressed: list[str] = []
 
-    def tally_score(self, player: discord.Member, point: float) -> None:
-        logger.debug(
-            f"Adding [{point} point] to [{player.name}#{player.discriminator}]"
-        )
-
-        try:
-            self.players[f"{player.name}#{player.discriminator}"] += point
-        except (TypeError, KeyError):
-            self.players[f"{player.name}#{player.discriminator}"] = point
-
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         def get_hashed_user(user: discord.Member) -> str:
             return hashlib.sha1(str(user.id).encode("UTF-8")).hexdigest()[:10]
@@ -280,20 +292,20 @@ class TriviaQuestionView(discord.ui.View):
             item.label for item in buttons if item.custom_id == data.custom_id
         ]
 
-        logger.debug(f"Question button [{pressed_button}] pressed.")
+        logger.debug(f"Question button {pressed_button} pressed.")
 
         if str(data.custom_id).startswith("correct"):
             self.is_correct = True
-            self.tally_score(player=interaction.user, point=1)
+            self.players = tally_score(player=interaction.user, point=1)
         elif str(data.custom_id).startswith("incorrect"):
             self.is_correct = False
-            self.tally_score(player=interaction.user, point=-1)
+            self.players = tally_score(player=interaction.user, point=-1)
         elif str(data.custom_id) == "cancel" and interaction.user == self.game_master:
             self.cancel = True
             self.stop()
 
         await interaction.response.send_message(
-            f"You selected {pressed_button}. This message can be dismissed.",
+            f"You selected {pressed_button}. Your score is [{trivia_players[f'{interaction.user.name}#{interaction.user.discriminator}']}]. This message can be dismissed.",
             ephemeral=True,
         )
 
@@ -319,7 +331,7 @@ class TriviaBot:
         difficulty: TriviaDifficulty,
         question_type: TriviaQuestionType,
         question_amount: int,
-        question_duration: int = 3 if DEBUGGING_CODE else 15,
+        question_duration: int = 5 if DEBUGGING_CODE else 15,
     ) -> None:
         self.session_token: SessionToken = SessionToken()
         self.session_token.set_token()
@@ -336,7 +348,6 @@ class TriviaBot:
         self.current_question: Optional[int] = None
         self.difficulty: str = difficulty.name
         self.game_master: discord.Member = game_master
-        self.players: dict[str, Union[float, list[float]]] = {}
         self.question_duration: int = question_duration
         self.question_type: str = question_type.name
         self.question_view: Optional[TriviaQuestionView] = None
@@ -406,7 +417,6 @@ class TriviaBot:
                                     inline=False,
                                 ),
                             ],
-                            # footer=f"This message will self-destruct after {self.question_duration * 3} seconds.",
                         )
                     )
             else:
@@ -417,7 +427,7 @@ class TriviaBot:
             return "The game was cancelled."
 
         sorted_players = sorted(
-            self.players.items(), key=lambda kv: kv[1], reverse=True
+            trivia_players.items(), key=lambda kv: kv[1], reverse=True
         )
         lb = "\n".join(
             [
@@ -473,7 +483,6 @@ class TriviaBot:
                 )
 
                 self.trivia_message = await self.channel.send(
-                    # delete_after=self.question_duration * 3,
                     embed=self.embeds[self.current_embed],
                     view=self.question_view,
                 )
@@ -499,23 +508,7 @@ class TriviaBot:
                     ),
                 )
 
-                def update_players_scores(main: dict, new: dict):
-                    if not new:
-                        return main
-
-                    temp: dict = {**main, **new}
-
-                    for key, value in temp.items():
-                        if key in main and key in new:
-                            temp[key] += value
-
-                    return temp
-
                 logger.debug("Updating trivia scores")
-
-                self.players = update_players_scores(
-                    self.players, self.question_view.players
-                )
 
             logger.debug("Trivia game is over. Sending leaderboard")
 
