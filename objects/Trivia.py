@@ -296,10 +296,10 @@ class TriviaQuestionView(discord.ui.View):
 
         if str(data.custom_id).startswith("correct"):
             self.is_correct = True
-            self.players = tally_score(player=interaction.user, point=1)
+            self.players += tally_score(player=interaction.user, point=1)
         elif str(data.custom_id).startswith("incorrect"):
             self.is_correct = False
-            self.players = tally_score(player=interaction.user, point=-1)
+            self.players += tally_score(player=interaction.user, point=-1)
         elif str(data.custom_id) == "cancel" and interaction.user == self.game_master:
             self.cancel = True
             self.stop()
