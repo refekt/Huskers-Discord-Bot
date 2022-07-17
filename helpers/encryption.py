@@ -6,7 +6,7 @@ from cryptography.fernet import Fernet
 
 from objects.Logger import discordLogger
 
-logger = discordLogger(name=__name__)
+logger = discordLogger(__name__)
 
 key_path = pathlib.PurePath(
     f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/key.key"

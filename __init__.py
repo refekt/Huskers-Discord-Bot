@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import platform
 import traceback
 from typing import Literal, Optional
 
@@ -23,7 +22,7 @@ from objects.Logger import discordLogger
 
 logger = discordLogger(
     name=__name__,
-    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+    level=logging.DEBUG,  # if "Windows" in platform.platform() else logging.INFO,
 )
 
 from helpers.constants import *  # noqa

@@ -6,7 +6,7 @@ import sys
 __all__: list[str] = ["discordLogger"]
 
 
-def discordLogger(name: str, level: int = logging.INFO) -> logging.Logger:
+def discordLogger(name: str, level: int = logging.DEBUG) -> logging.Logger:
     logger: logging.Logger = logging.getLogger(name=name)
     logger.setLevel(level=level)
 
@@ -33,4 +33,7 @@ def discordLogger(name: str, level: int = logging.INFO) -> logging.Logger:
         handlers=[file_handler, stream_handler],
     )
 
+    logging.debug(
+        f"Created [{str(logger.name).upper()}] logger with [{logger.level}] level"
+    )
     return logger

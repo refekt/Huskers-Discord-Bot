@@ -10,7 +10,7 @@ from typing import Callable, Union, Any
 from objects.Exceptions import CommandException, StatsException
 from objects.Logger import discordLogger
 
-logger = discordLogger(name=__name__)
+logger = discordLogger(__name__)
 
 __all__: list[str] = [
     "alias_param",

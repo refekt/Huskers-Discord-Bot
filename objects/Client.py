@@ -171,7 +171,7 @@ class HuskerClient(Bot):
 
         if not reactions_over_threshold:
             logger.debug(
-                f"No reactions found over threshold found in {reaction_channel}."
+                f"No reactions found over threshold found in {reaction_channel.name.encode('utf-8')}."
             )
             return None
 
@@ -544,6 +544,10 @@ class HuskerClient(Bot):
                 )
 
         logger.info("Finished on_ready_tasks stuff")
+
+        # all_loggers = [
+        #     logging.getLogger(name) for name in logging.root.manager.loggerDict
+        # ]
 
     async def on_member_join(self, guild_member: discord.Member) -> None:
         if guild_member.guild.id != GUILD_PROD:

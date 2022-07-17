@@ -6,7 +6,7 @@ from discord.app_commands import CommandInvokeError
 
 from objects.Logger import discordLogger
 
-logger = discordLogger(name=__name__)
+logger = discordLogger(__name__)
 
 __all__: list[str] = [
     "BettingException",
