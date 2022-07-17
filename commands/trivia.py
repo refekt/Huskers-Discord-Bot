@@ -1,0 +1,61 @@
+import logging
+
+import discord
+from discord import app_commands
+from discord.app_commands import Group
+from discord.ext import commands
+
+from helpers.constants import GUILD_PROD, DEBUGGING_CODE
+from objects.Logger import discordLogger
+from objects.Trivia import (
+    TriviaBot,
+    TriviaCategories,
+    TriviaDifficulty,
+    TriviaQuestionType,
+)
+
+logger = discordLogger(
+    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+)
+
+__all__ = []
+
+
+class TriviaCommands(commands.Cog, name="Trivia Commands"):
+    bet_trivia: Group = app_commands.Group(
+        name="trivia", description="Trivia commands", guild_ids=[GUILD_PROD]
+    )
+
+    # TODO describe
+    @bet_trivia.command(name="start", description="Start a trivia game!")
+    async def trivia_start(
+        self,
+        interaction: discord.Interaction,
+        category: TriviaCategories,
+        difficuly: TriviaDifficulty,
+        question_type: TriviaQuestionType,
+        question_amount: int = 3 if DEBUGGING_CODE else 10,
+    ):
+        trivia_bot: TriviaBot = TriviaBot(
+            game_master=interaction.user,
+            channel=interaction.channel,
+            category=category,
+            difficuly=difficuly,
+            question_type=question_type,
+            question_amount=question_amount,
+        )
+
+        await interaction.response.defer(ephemeral=True)
+        await interaction.followup.send("Game started! You can dismiss this message.")
+
+        await trivia_bot.start_game()
+
+    async def trivia_leaderboard(self, interaction: discord.Interaction):
+        pass
+
+
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(TriviaCommands(bot), guilds=[discord.Object(id=GUILD_PROD)])
+
+
+logger.info(f"{str(__name__).title()} module loaded!")
