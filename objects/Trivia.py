@@ -1,5 +1,6 @@
 import asyncio
 import enum
+import hashlib
 import logging
 import random
 from html import unescape
@@ -213,7 +214,14 @@ class InteractionData(str):
 class TriviaQuestionButton(discord.ui.Button):
     def __init__(self, label: str, custom_id: str) -> None:
         super().__init__(
-            label=label, custom_id=custom_id, style=discord.ButtonStyle.grey
+            label=label, custom_id=custom_id, style=discord.ButtonStyle.green
+        )
+
+
+class TriviaQuestionCancelButton(discord.ui.Button):
+    def __init__(self) -> None:
+        super().__init__(
+            label="Cancel", custom_id="cancel", style=discord.ButtonStyle.grey
         )
 
 
@@ -221,24 +229,30 @@ class TriviaQuestionView(discord.ui.View):
     LABEL_LIMIT: ClassVar[int] = 80
     CUSTOM_ID_LIMIT: ClassVar[int] = 100
 
-    def __init__(self, question: TriviaQuestions) -> None:
+    def __init__(self, question: TriviaQuestions, game_master: discord.Member) -> None:
         super().__init__(timeout=GLOBAL_TIMEOUT)
-        logger.debug(f"Adding question: {question}")
+        logger.debug(f"Adding question: {str(question).encode('utf-8', 'replace')}")
 
         for index, answer in enumerate(question.answers):
             self.add_item(
                 TriviaQuestionButton(
-                    label=answer[: self.LABEL_LIMIT],
+                    label=unescape(answer[: self.LABEL_LIMIT]),
                     custom_id=f"correct_{index}"[: self.CUSTOM_ID_LIMIT]
                     if answer == question.correct_answer
                     else f"incorrect_{index}",
                 )
             )
+        self.add_item(TriviaQuestionCancelButton())
+        self.cancel: bool = False
         self.is_correct: bool = False
         self.players: dict[str, float] = {}
+        self.game_master: discord.Member = game_master
+        self.check_already_pressed: list[str] = []
 
     def tally_score(self, player: discord.Member, point: float) -> None:
-        logger.debug(f"Adding {point} point to {player.name}#{player.discriminator}")
+        logger.debug(
+            f"Adding [{point} point] to [{player.name}#{player.discriminator}]"
+        )
 
         try:
             self.players[f"{player.name}#{player.discriminator}"] += point
@@ -246,20 +260,37 @@ class TriviaQuestionView(discord.ui.View):
             self.players[f"{player.name}#{player.discriminator}"] = point
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        def get_hashed_user(user: discord.Member) -> str:
+            return hashlib.sha1(str(user.id).encode("UTF-8")).hexdigest()[:10]
+
+        if get_hashed_user(user=interaction.user) in self.check_already_pressed:
+            logger.debug("User already pressed a button.")
+            await interaction.response.send_message(
+                f"You have already answered! This message can be dismissed.",
+                ephemeral=True,
+            )
+
+            return True
+        else:
+            self.check_already_pressed.append(get_hashed_user(user=interaction.user))
+
         data: InteractionData = InteractionData(interaction.data)
         buttons: list[discord.Button] = interaction.message.components[0].children
         pressed_button = [
             item.label for item in buttons if item.custom_id == data.custom_id
         ]
 
-        logger.debug(f"Question button {pressed_button} pressed.")
+        logger.debug(f"Question button [{pressed_button}] pressed.")
 
         if str(data.custom_id).startswith("correct"):
             self.is_correct = True
-            self.tally_score(player=interaction.user, point=len(buttons) / 4)
+            self.tally_score(player=interaction.user, point=1)
         elif str(data.custom_id).startswith("incorrect"):
             self.is_correct = False
-            self.tally_score(player=interaction.user, point=-len(buttons) / 4)
+            self.tally_score(player=interaction.user, point=-1)
+        elif str(data.custom_id) == "cancel" and interaction.user == self.game_master:
+            self.cancel = True
+            self.stop()
 
         await interaction.response.send_message(
             f"You selected {pressed_button}. This message can be dismissed.",
@@ -277,7 +308,6 @@ class TriviaQuestionView(discord.ui.View):
         logger.exception(error, exc_info=True)
 
 
-# noinspection PyProtectedMember
 class TriviaBot:
     MAX_QUESTIONS: ClassVar[int] = 20
 
@@ -300,12 +330,15 @@ class TriviaBot:
             f"type={question_type}&"
             f"token={self.session_token}"
         )
+        self.category: str = category.name
         self.channel: discord.TextChannel = channel
         self.current_embed: Optional[int] = None
         self.current_question: Optional[int] = None
+        self.difficulty: str = difficulty.name
         self.game_master: discord.Member = game_master
         self.players: dict[str, Union[float, list[float]]] = {}
         self.question_duration: int = question_duration
+        self.question_type: str = question_type.name
         self.question_view: Optional[TriviaQuestionView] = None
         self.questions: list[TriviaQuestions] = []
         self.running: bool = False
@@ -325,9 +358,9 @@ class TriviaBot:
                     ),
                     dict(
                         name="Game Info",
-                        value=f"Category: {str(category.name).title()}\n"
-                        f"Difficulty: {str(difficulty).title()}\n"
-                        f"Question Types: {str(question_type.name).title()}\n"
+                        value=f"Category: {self.category.title()}\n"
+                        f"Difficulty: {self.difficulty.title()}\n"
+                        f"Question Types: {self.question_type.title()}\n"
                         f"Number of Questions: {question_amount}\n"
                         f"Question Timer: {question_duration} seconds",
                     ),
@@ -348,7 +381,7 @@ class TriviaBot:
             j = resp.json()
 
             if j["response_code"] == 0:
-                for result in j["results"]:
+                for index, result in enumerate(j["results"]):
                     self.questions.append(
                         TriviaQuestions(
                             category=unescape(result["category"]),
@@ -363,7 +396,7 @@ class TriviaBot:
                     self.embeds.append(
                         buildEmbed(
                             title=f"Trivia Bot Game Master: 👑 {self.game_master.name}#{self.game_master.discriminator}",
-                            description=f"{unescape(result['category'])} | "
+                            description=f"Q {index + 1}/{len(j['results'])} | {unescape(result['category'])} | "
                             f"{unescape(str(result['type']).title())} | "
                             f"{unescape(str(result['difficulty']).title())}",
                             fields=[
@@ -373,16 +406,23 @@ class TriviaBot:
                                     inline=False,
                                 ),
                             ],
+                            footer=f"This message will self-destruct after {self.question_duration * 3} seconds.",
                         )
                     )
             else:
                 raise TriviaException("Unable to load questions")
 
     def leaderboard(self) -> str:
+        if self.question_view.cancel:
+            return "The game was cancelled."
+
+        sorted_players = sorted(
+            self.players.items(), key=lambda kv: kv[1], reverse=True
+        )
         lb = "\n".join(
             [
-                f"{key}: {value} points"
-                for (key, value) in sorted(self.players.items(), key=lambda x: x[0])
+                f"#{index + 1}: {value} -- {key}"
+                for index, (key, value) in enumerate(sorted_players)
             ]
         )
 
@@ -397,7 +437,8 @@ class TriviaBot:
         start_view = TriviaStartButtons(game_master=self.game_master)
 
         self.trivia_message = await self.channel.send(
-            embed=self.initial_embed, view=start_view
+            embed=self.initial_embed,
+            view=start_view,
         )
         await start_view.wait()
 
@@ -405,26 +446,36 @@ class TriviaBot:
             logger.exception("Trivia bot timed out")
             return
         elif start_view.running:
-            await self.trivia_message.edit(view=None)
+            await self.trivia_message.delete()
 
             self.running = True
             self.current_question = -1
             self.current_embed = self.current_question + 1
 
             while self.running:
+                if self.question_view:
+                    if self.question_view.cancel:
+                        logger.debug("Cancelling the game")
+                        self.running = False
+                        break
+
                 self.current_question += 1
                 self.current_embed += 1
 
                 if self.current_question >= len(self.questions):
+                    logger.debug("Stopping game because there are no more questions")
                     self.running = False
                     break
 
                 self.question_view = TriviaQuestionView(
-                    question=self.questions[self.current_question]
+                    question=self.questions[self.current_question],
+                    game_master=self.game_master,
                 )
 
                 self.trivia_message = await self.channel.send(
-                    embed=self.embeds[self.current_embed], view=self.question_view
+                    delete_after=self.question_duration * 3,
+                    embed=self.embeds[self.current_embed],
+                    view=self.question_view,
                 )
 
                 await asyncio.sleep(self.question_duration)
@@ -470,7 +521,16 @@ class TriviaBot:
 
             embed = buildEmbed(
                 title="Trivia Bot Results",
-                fields=[dict(name="Leaderboard", value=self.leaderboard())],
+                description="Game over!",
+                fields=[
+                    dict(
+                        name="Game Info",
+                        value=f"Category: {self.category.title()}\n"
+                        f"Difficulty: {self.difficulty.title()}\n"
+                        f"Question Types: {self.question_type.title()}\n",
+                    ),
+                    dict(name="Leaderboard", value=self.leaderboard()),
+                ],
             )
             await self.channel.send(embed=embed)
 
