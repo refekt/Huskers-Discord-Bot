@@ -272,6 +272,13 @@ class TriviaQuestionView(discord.ui.View):
         self.check_already_pressed: list[str] = []
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        data: InteractionData = InteractionData(interaction.data)
+
+        if str(data.custom_id) == "cancel" and interaction.user == self.game_master:
+            self.cancel = True
+            self.stop()
+            return True
+
         def get_hashed_user(user: discord.Member) -> str:
             return hashlib.sha1(str(user.id).encode("UTF-8")).hexdigest()[:10]
 
@@ -286,7 +293,6 @@ class TriviaQuestionView(discord.ui.View):
         else:
             self.check_already_pressed.append(get_hashed_user(user=interaction.user))
 
-        data: InteractionData = InteractionData(interaction.data)
         buttons: list[discord.Button] = interaction.message.components[0].children
         pressed_button = [
             item.label for item in buttons if item.custom_id == data.custom_id
@@ -296,13 +302,10 @@ class TriviaQuestionView(discord.ui.View):
 
         if str(data.custom_id).startswith("correct"):
             self.is_correct = True
-            self.players += tally_score(player=interaction.user, point=1)
+            self.players.update(tally_score(player=interaction.user, point=1))
         elif str(data.custom_id).startswith("incorrect"):
             self.is_correct = False
-            self.players += tally_score(player=interaction.user, point=-1)
-        elif str(data.custom_id) == "cancel" and interaction.user == self.game_master:
-            self.cancel = True
-            self.stop()
+            self.players.update(tally_score(player=interaction.user, point=-1))
 
         await interaction.response.send_message(
             f"You selected {pressed_button}. Your score is [{trivia_players[f'{interaction.user.name}#{interaction.user.discriminator}']}]. This message can be dismissed.",
@@ -444,6 +447,8 @@ class TriviaBot:
     async def start_game(self) -> None:
         logger.info("Starting a trivia game")
 
+        global trivia_players
+
         start_view = TriviaStartButtons(game_master=self.game_master)
 
         self.trivia_message = await self.channel.send(
@@ -527,9 +532,13 @@ class TriviaBot:
             )
             await self.channel.send(embed=embed)
 
+            trivia_players = {}
+
         else:
             logger.info("Cancelling trivia game")
             await self.trivia_message.delete()
+
+            trivia_players = {}
 
             await self.channel.send(content="The trivia game was cancelled.")
 
