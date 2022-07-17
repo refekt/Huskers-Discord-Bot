@@ -406,7 +406,7 @@ class TriviaBot:
                                     inline=False,
                                 ),
                             ],
-                            footer=f"This message will self-destruct after {self.question_duration * 3} seconds.",
+                            # footer=f"This message will self-destruct after {self.question_duration * 3} seconds.",
                         )
                     )
             else:
