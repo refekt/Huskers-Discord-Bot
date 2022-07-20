@@ -83,7 +83,7 @@ sqlGetPrediction = (
     "SELECT * FROM fap_predictions WHERE user_id = % s AND recruit_profile = % s"
 )
 
-sqlInsertPrediction = "INSERT INTO fap_predictions ( id, `user`, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date, correct, decision_date, committed_team ) VALUES ( % s, % s, % s, % s, % s, % s, % s, % s, % s, NULL, NULL, NULL ) ON DUPLICATE KEY UPDATE ( team = % s, confidence = % s, prediction_date = % s )"
+sqlInsertPrediction = "INSERT INTO fap_predictions ( id, `user`, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date, correct, decision_date, committed_team ) VALUES ( % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s ) ON DUPLICATE KEY UPDATE ( team = % s, confidence = % s, prediction_date = % s )"
 
 # Back up
 # sqlInsertPrediction = "INSERT INTO fap_predictions ( USER, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date ) VALUES (% s, % s, % s, % s, % s, % s, % s, Now())"
@@ -112,6 +112,10 @@ sqlRetrieveReminders = (
 sqlRecordReminder = "INSERT INTO tasks_repo ( send_to, message, send_when, is_open, author ) VALUES (% s, % s, % s, % s, % s)"
 
 sqlUpdateReminder = "UPDATE tasks_repo SET is_open = % s WHERE send_to = % s AND message = % s AND author = % s"
+
+# Wordle
+
+sqlInsertWordle = "INSERT INTO wordle (id, author, which_day, score, green_squares, yellow_squares, black_squares) VALUES (% s, % s, % s, % s, % s, % s, % s)"  # ON DUPLICATE KEY UPDATE ( score = % s, green_squares = % s, yellow_squares = % s, black_squares = % s)"
 
 
 class SqlFetch(str, enum.Enum):
@@ -144,7 +148,9 @@ class SqlQuery:
         if values is None:
             self.processed_query = self.query
         elif isinstance(values, str):
-            self.processed_query = self.query.replace("% s", str(values), 1)
+            self.processed_query = self.query.replace(
+                "% s", f"'{values}'" if type(values) == str else str(values), 1
+            )
         else:
             l_count = len(values)
             s_count = query.count("% s")
@@ -160,7 +166,7 @@ class SqlQuery:
             self.processed_query = self.query
             for value in self.values:
                 self.processed_query = self.processed_query.replace(
-                    "% s", str(value), 1
+                    "% s", f"'{value}'" if type(value) == str else str(value), 1
                 )
         self.exploded: list[str] = (
             self.processed_query.replace(",", "")
