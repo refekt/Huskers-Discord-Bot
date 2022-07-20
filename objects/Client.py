@@ -30,20 +30,25 @@ from helpers.constants import (
     TWITTER_EXPANSIONS,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_MEDIA_FIELDS,
-    # TWITTER_PLACE_FIELDS,
-    # TWITTER_POLL_FIELDS,
     TWITTER_QUERY_MAX,
     TWITTER_TWEET_FIELDS,
     TWITTER_USER_FIELDS,
+    CHAN_NORTH_BOTTOMS,
 )
 from helpers.embed import buildEmbed
-from helpers.mysql import processMySQL, sqlRetrieveReminders, sqlUpdateReminder
+from helpers.mysql import (
+    processMySQL,
+    sqlRetrieveReminders,
+    sqlUpdateReminder,
+    sqlInsertWordle,
+)
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException
 from objects.Logger import discordLogger
 from objects.Scheudle import SchedulePosts
 from objects.Thread import convert_duration
 from objects.TweepyStreamListener import StreamClientV2
+from objects.Wordle import WordleFinder, Wordle
 
 logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
@@ -124,8 +129,6 @@ async def start_twitter_stream(client: discord.Client) -> None:
     tweeter_stream.filter(
         expansions=TWITTER_EXPANSIONS,
         media_fields=TWITTER_MEDIA_FIELDS,
-        # place_fields=TWITTER_PLACE_FIELDS,
-        # poll_fields=TWITTER_POLL_FIELDS,
         tweet_fields=TWITTER_TWEET_FIELDS,
         user_fields=TWITTER_USER_FIELDS,
         threaded=True,
@@ -134,16 +137,19 @@ async def start_twitter_stream(client: discord.Client) -> None:
 
 
 class HuskerClient(Bot):
-    add_extensions = [
-        "commands.admin",
-        "commands.football_stats",
-        "commands.image",
-        "commands.recruiting",
-        "commands.reminder",
-        "commands.text",
-    ]
-    guild_user_len: int = 0
-    reaction_threshold: int = 0
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_extensions = [
+            "commands.admin",
+            "commands.football_stats",
+            "commands.image",
+            "commands.recruiting",
+            "commands.reminder",
+            "commands.text",
+        ]
+        self.guild_user_len: int = 0
+        self.reaction_threshold: int = 0
+        self.wordle_finder: Optional[WordleFinder] = None
 
     async def check_reaction(self, payload: discord.RawReactionActionEvent) -> None:
         if not payload.guild_id == GUILD_PROD or payload.channel_id in (
@@ -353,9 +359,16 @@ class HuskerClient(Bot):
             chan_botspam: discord.TextChannel = await self.fetch_channel(
                 CHAN_BOT_SPAM_PRIVATE
             )
+            chan_north_bottoms: discord.TextChannel = await self.fetch_channel(
+                CHAN_BOT_SPAM_PRIVATE
+            )
         else:
             chan_general = await self.fetch_channel(CHAN_GENERAL)
             chan_botspam = await self.fetch_channel(CHAN_BOT_SPAM)
+            chan_north_bottoms = await self.fetch_channel(CHAN_NORTH_BOTTOMS)
+
+        logger.info("Establishing Wordle Finder")
+        self.wordle_finder = WordleFinder(chan_north_bottoms)
 
         logger.info(
             f"Reaction threshold for HOF and HOS messages set to [{self.reaction_threshold}]"
@@ -527,12 +540,9 @@ class HuskerClient(Bot):
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
 
-            asyncio_logger = discordLogger("asyncio")
-
-            if DEBUGGING_CODE:
-                asyncio_logger.setLevel(logging.DEBUG)
-            else:
-                asyncio_logger.setLevel(logging.INFO)
+            asyncio_logger = discordLogger(
+                name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+            )
 
             results: tuple[Union[BaseException, Any], ...] = await asyncio.gather(
                 *on_ready_tasks, return_exceptions=True
@@ -545,10 +555,6 @@ class HuskerClient(Bot):
 
         logger.info("Finished on_ready_tasks stuff")
 
-        # all_loggers = [
-        #     logging.getLogger(name) for name in logging.root.manager.loggerDict
-        # ]
-
     async def on_member_join(self, guild_member: discord.Member) -> None:
         if guild_member.guild.id != GUILD_PROD:
             logger.info("Skipping on_member_join because not Husker server")
@@ -560,6 +566,34 @@ class HuskerClient(Bot):
     ) -> None:
         logger.debug(f"Checking to see if reaction broke threshold")
         await self.check_reaction(payload)
+
+    async def on_message(self, message: discord.Message) -> None:
+        if message.author.bot:
+            return
+
+        wordle: Optional[Wordle] = self.wordle_finder.get_wordle_message(
+            message=message
+        )
+
+        if wordle:
+            logger.debug("Wordle found!")
+
+            author: str = f"{message.author.name}#{message.author.discriminator}"
+            processMySQL(
+                query=sqlInsertWordle,
+                values=(
+                    f"{wordle.day}_{author}",
+                    author,
+                    wordle.day,
+                    wordle.score,
+                    wordle.green_squares,
+                    wordle.yellow_squares,
+                    wordle.black_squares,
+                ),
+            )
+            logger.debug("MySQL updated")
+        else:
+            logger.debug("No wordle found.")
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
