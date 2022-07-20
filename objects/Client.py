@@ -367,7 +367,9 @@ class HuskerClient(Bot):
             chan_botspam = await self.fetch_channel(CHAN_BOT_SPAM)
             chan_north_bottoms = await self.fetch_channel(CHAN_NORTH_BOTTOMS)
 
-        logger.info("Establishing Wordle Finder")
+        logger.info(
+            f"Establishing Wordle Finder in {chan_north_bottoms.name.encode('utf-8')}"
+        )
         self.wordle_finder = WordleFinder(chan_north_bottoms)
 
         logger.info(
@@ -591,9 +593,6 @@ class HuskerClient(Bot):
                     wordle.black_squares,
                 ),
             )
-            logger.debug("MySQL updated")
-        else:
-            logger.debug("No wordle found.")
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
