@@ -211,7 +211,7 @@ class Survey:
             timeout=self.timeout,
         )
         for index, child in enumerate(view.children):
-            if index >= self.max_options:
+            if index >= self.max_options or index >= len(self.options):
                 view.remove_item(view.option_three)
                 break
             child.label = self.options[index].label
