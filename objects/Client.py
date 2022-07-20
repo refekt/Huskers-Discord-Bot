@@ -23,6 +23,7 @@ from helpers.constants import (
     CHAN_GENERAL,
     CHAN_HOF,
     CHAN_HOS,
+    CHAN_NORTH_BOTTOMS,
     DEBUGGING_CODE,
     GUILD_PROD,
     TWITTER_BEARER,
@@ -33,7 +34,6 @@ from helpers.constants import (
     TWITTER_QUERY_MAX,
     TWITTER_TWEET_FIELDS,
     TWITTER_USER_FIELDS,
-    CHAN_NORTH_BOTTOMS,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (

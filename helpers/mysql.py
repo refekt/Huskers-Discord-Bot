@@ -29,6 +29,7 @@ __all__: list[str] = [
     "sqlInsertGameBet",
     "sqlInsertIowa",
     "sqlInsertPrediction",
+    "sqlInsertWordle",
     "sqlRecordReminder",
     "sqlRemoveIowa",
     "sqlResolveGame",

@@ -11,7 +11,7 @@ logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
 
-__all__ = [""]
+__all__ = ["Wordle", "WordleFinder"]
 
 
 class Wordle:

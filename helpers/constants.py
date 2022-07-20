@@ -464,6 +464,7 @@ __all__: list[str] = [
     "CHAN_HYPE_NO",
     "CHAN_HYPE_SOME",
     "CHAN_IOWA",
+    "CHAN_NORTH_BOTTOMS",
     "CHAN_POLITICS",
     "CHAN_POSSUMS",
     "CHAN_RECRUITING",
@@ -531,6 +532,7 @@ __all__: list[str] = [
     "TITLE_LIMIT",
     "TWITTER_BEARER",
     "TWITTER_BLOCK16_SCREENANME",
+    "TWITTER_EXPANSIONS",
     "TWITTER_HUSKER_MEDIA_LIST_ID",
     "TWITTER_KEY",
     "TWITTER_MEDIA_FIELDS",
@@ -546,9 +548,6 @@ __all__: list[str] = [
     "TZ",
     "US_STATES",
     "WEATHER_API_KEY",
-    "TWITTER_EXPANSIONS",
-    # "TWITTER_PLACE_FIELDS",
-    # "TWITTER_POLL_FIELDS",
 ]
 
 logger.info(f"{str(__name__).title()} module loaded!")
