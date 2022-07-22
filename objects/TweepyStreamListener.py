@@ -39,84 +39,33 @@ __all__: list[str] = ["StreamClientV2"]
 
 
 class MyTweet(object):
-    __slots__ = [
-        "data",
-        "includes",
-        "matching_rules",
-    ]
-
     def __init__(self, tweet_data) -> None:
+        self.data = None
+        self.includes = None
         for key in tweet_data:
             setattr(self, key, tweet_data[key])
 
 
 class TweetMediaData(object):
-    __slots__ = [
-        "alt_text",
-        "duration_ms",
-        "get",
-        "height",
-        "media_key",
-        "preview_image_url",
-        "public_metrics",
-        "type",
-        "url",
-        "width",
-    ]
-
     def __init__(self, tweet_data) -> None:
         for key in tweet_data:
             setattr(self, key, tweet_data[key])
 
 
 class TweetQuoteData(object):
-    # __slots__ = [
-    #     "attachments",
-    #     "author_id",
-    #     "context_annotations",
-    #     "conversation_id",
-    #     "created_at",
-    #     "entities",
-    #     "geo",
-    #     "id",
-    #     "in_reply_to_user_id",
-    #     "lang",
-    #     "possibly_sensitive",
-    #     "public_metrics",
-    #     "referenced_tweets",
-    #     "reply_settings",
-    #     "source",
-    #     "text",
-    #     "withheld",
-    # ]
-
     def __init__(self, tweet_data) -> None:
         for key in tweet_data:
             setattr(self, key, tweet_data[key])
 
 
 class TweetUserData(object):
-    __slots__ = [
-        "created_at",
-        "description",
-        "entities",
-        "following",
-        "id",
-        "listed_count",
-        "location",
-        "name",
-        "pinned_tweet_id",
-        "profile_image_url",
-        "protected",
-        "public_metrics",
-        "tweet_count",
-        "url",
-        "username",
-        "verified",
-        "withheld",
-    ]
-
     def __init__(self, tweet_data) -> None:
+        self.name = None
+        self.username = None
+        self.public_metrics = None
+        self.verified = None
+        self.profile_image_url = None
+
         for key in tweet_data:
             setattr(self, key, tweet_data[key])
 
