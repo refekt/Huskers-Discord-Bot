@@ -26,6 +26,7 @@ __all__: list[str] = [
     "sqlGetPrediction",
     "sqlGetTeamInfoByESPNID",
     "sqlGetTeamInfoByID",
+    "sqlGetWordleScoers",
     "sqlInsertGameBet",
     "sqlInsertIowa",
     "sqlInsertPrediction",
@@ -117,6 +118,7 @@ sqlUpdateReminder = "UPDATE tasks_repo SET is_open = % s WHERE send_to = % s AND
 # Wordle
 
 sqlInsertWordle = "INSERT INTO wordle (id, author, which_day, score, green_squares, yellow_squares, black_squares) VALUES (% s, % s, % s, % s, % s, % s, % s)"  # ON DUPLICATE KEY UPDATE ( score = % s, green_squares = % s, yellow_squares = % s, black_squares = % s)"
+sqlGetWordleScoers = "SELECT author, games_played, score_avg, green_avg, yellow_avg, black_avg FROM `wordle.v`"
 
 
 class SqlFetch(str, enum.Enum):
@@ -184,6 +186,9 @@ class SqlQuery:
 
 
 def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
+    # TODO Need to capture MySQL errors as exceptions or something.
+    #  A failed cursor.execute() can stop code without explanation
+
     module, method = getModuleMethod(inspect.stack())
 
     sql = SqlQuery(

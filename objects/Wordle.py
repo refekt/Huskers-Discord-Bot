@@ -99,8 +99,13 @@ class WordleFinder:
         self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s\d{1}\/\d{1}"
 
     def get_wordle_message(self, message: discord.Message) -> Optional[Wordle]:
+        msg: str = message.content
+
         if re.search(self.wordle_finder, str(message.clean_content)):
-            return Wordle(message=str(message.clean_content))
+            try:
+                return Wordle(message=msg)
+            except UnicodeError:
+                return None
         else:
             return None
 

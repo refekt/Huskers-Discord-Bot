@@ -3,6 +3,7 @@ import logging
 import random
 import re
 from datetime import timedelta, datetime
+from decimal import Decimal
 from typing import List, Optional, Union
 
 import discord.ext.commands
@@ -26,6 +27,7 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
+from helpers.mysql import processMySQL, sqlGetWordleScoers
 from objects.Exceptions import CommandException, WeatherException, TextException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
@@ -597,6 +599,37 @@ class TextCog(commands.Cog, name="Text Commands"):
             await interaction.followup.send(
                 "Unable to make a Husk Chain!", ephemeral=True
             )
+
+    @app_commands.command(
+        name="wordle-board", description="Leaderboard for Wordle scores"
+    )
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
+    async def wordle_board(self, interaction: discord.Interaction):
+        wordle_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(
+            query=sqlGetWordleScoers, fetch="all"
+        )
+
+        if wordle_leaderboard:
+            leaderboard_str: str = ""
+
+            for item in wordle_leaderboard:
+                leaderboard_str += (
+                    f"{item['author']} ({item['games_played']} played): "
+                    f"{item['score_avg']:0.1f}/6 ("
+                    f"🟩: {item['green_avg']:0.1f} "
+                    f"🟨: {item['yellow_avg']:0.1f} "
+                    f"⬛: {item['black_avg']:0.1f}"
+                    f")\n"
+                )
+
+            embed: discord.Embed = buildEmbed(
+                title="Wordle Leaderboard",
+                fields=[
+                    dict(name="Wordle Leaderboard", value=f"```\n{leaderboard_str}```")
+                ],
+            )
+
+            await interaction.response.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
