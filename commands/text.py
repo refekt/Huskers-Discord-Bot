@@ -612,14 +612,16 @@ class TextCog(commands.Cog, name="Text Commands"):
         if wordle_leaderboard:
             leaderboard_str: str = ""
 
-            for item in wordle_leaderboard:
+            for index, item in enumerate(wordle_leaderboard):
                 leaderboard_str += (
-                    f"{item['author']} ({item['games_played']} played): "
-                    f"{item['score_avg']:0.1f}/6 ("
-                    f"🟩: {item['green_avg']:0.1f} "
-                    f"🟨: {item['yellow_avg']:0.1f} "
-                    f"⬛: {item['black_avg']:0.1f}"
-                    f")\n"
+                    f"#{index + 1}: "
+                    f"{item['author']} ({item['games_played']} games) - "
+                    f"{item['score_avg']:0.1f}/6\n"
+                    f"\t"
+                    f"🟩 {item['green_avg']:0.1f} "
+                    f"🟨 {item['yellow_avg']:0.1f} "
+                    f"⬛ {item['black_avg']:0.1f}"
+                    f"\n"
                 )
 
             embed: discord.Embed = buildEmbed(
@@ -629,7 +631,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 ],
             )
 
-            await interaction.response.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
