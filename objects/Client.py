@@ -595,9 +595,6 @@ class HuskerClient(Bot):
                         wordle.black_squares,
                     ),
                 )
-            except MySQLException:
-                return
-            finally:
                 embed = buildEmbed(
                     title="",
                     fields=[
@@ -608,6 +605,8 @@ class HuskerClient(Bot):
                     ],
                 )
                 await message.channel.send(embed=embed)
+            except MySQLException:
+                return
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
