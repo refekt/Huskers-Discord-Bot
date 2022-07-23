@@ -613,22 +613,26 @@ class TextCog(commands.Cog, name="Text Commands"):
             leaderboard_str: str = ""
 
             for index, item in enumerate(wordle_leaderboard):
+                author: discord.Member = interaction.client.guilds[0].get_member_named(
+                    item["author"]
+                )
+
                 leaderboard_str += (
                     f"#{index + 1}: "
-                    f"{item['author']} ({item['games_played']} games) - "
-                    f"{item['score_avg']:0.1f}/6\n"
-                    f"\t"
+                    f"{author.mention if author else item['author']}\n"
+                    f"`"
+                    f"{item['score_avg']:0.1f}/6 "
+                    # f"({item['games_played']} games)"
                     f"🟩 {item['green_avg']:0.1f} "
                     f"🟨 {item['yellow_avg']:0.1f} "
                     f"⬛ {item['black_avg']:0.1f}"
-                    f"\n"
+                    f"`\n"
                 )
 
             embed: discord.Embed = buildEmbed(
-                title="Wordle Leaderboard",
-                fields=[
-                    dict(name="Wordle Leaderboard", value=f"```\n{leaderboard_str}```")
-                ],
+                title="",
+                description="Minimum of 10 games",
+                fields=[dict(name="Wordle Leaderboard", value=leaderboard_str)],
             )
 
             await interaction.response.send_message(embed=embed)

@@ -43,7 +43,7 @@ from helpers.mysql import (
     sqlInsertWordle,
 )
 from helpers.slowking import makeSlowking
-from objects.Exceptions import ChangelogException
+from objects.Exceptions import ChangelogException, MySQLException
 from objects.Logger import discordLogger
 from objects.Scheudle import SchedulePosts
 from objects.Thread import convert_duration
@@ -581,18 +581,33 @@ class HuskerClient(Bot):
             logger.debug("Wordle found!")
 
             author: str = f"{message.author.name}#{message.author.discriminator}"
-            processMySQL(
-                query=sqlInsertWordle,
-                values=(
-                    f"{wordle.day}_{author}",
-                    author,
-                    wordle.day,
-                    wordle.score,
-                    wordle.green_squares,
-                    wordle.yellow_squares,
-                    wordle.black_squares,
-                ),
-            )
+
+            try:
+                processMySQL(
+                    query=sqlInsertWordle,
+                    values=(
+                        f"{wordle.day}_{author}",
+                        author,
+                        wordle.day,
+                        wordle.score,
+                        wordle.green_squares,
+                        wordle.yellow_squares,
+                        wordle.black_squares,
+                    ),
+                )
+            except MySQLException:
+                return
+            finally:
+                embed = buildEmbed(
+                    title="",
+                    fields=[
+                        dict(
+                            name="Wordle Scored!",
+                            value=f"{message.author.mention} submitted a Wordle score of {wordle.score}/6.",
+                        ),
+                    ],
+                )
+                await message.channel.send(embed=embed)
 
 
 logger.info(f"{str(__name__).title()} module loaded!")
