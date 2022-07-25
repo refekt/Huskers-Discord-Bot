@@ -5,6 +5,7 @@ import pathlib
 import sys
 import tracemalloc
 from datetime import timedelta
+from decimal import Decimal
 from os import listdir
 from typing import Union, Any, Awaitable, Optional
 
@@ -38,9 +39,10 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.mysql import (
     processMySQL,
+    sqlGetWordleIndividualUserScore,
+    sqlInsertWordle,
     sqlRetrieveReminders,
     sqlUpdateReminder,
-    sqlInsertWordle,
 )
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException, MySQLException
@@ -595,15 +597,25 @@ class HuskerClient(Bot):
                         wordle.black_squares,
                     ),
                 )
+
+                author_score: dict[str, Union[int, Decimal]] = processMySQL(
+                    query=sqlGetWordleIndividualUserScore, fetch="one"
+                )
+
+                author_score_str: Optional[str] = None
+                if author_score:
+                    author_score_str = f"{message.author.mention}'s ranks as #{author_score['lb_rank']} with an average score of {author_score['score_avg']}/6."
+
                 embed = buildEmbed(
                     title="",
                     fields=[
                         dict(
                             name="Wordle Scored!",
-                            value=f"{message.author.mention} submitted a Wordle score of {wordle.score}/6.",
+                            value=f"{message.author.mention} submitted a Wordle score of {wordle.score}/6.{author_score_str if author_score_str else ''}",
                         ),
                     ],
                 )
+
                 await message.channel.send(embed=embed)
             except MySQLException:
                 return

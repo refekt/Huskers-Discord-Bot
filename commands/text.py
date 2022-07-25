@@ -27,7 +27,7 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
-from helpers.mysql import processMySQL, sqlGetWordleScoers
+from helpers.mysql import processMySQL, sqlGetWordleScores
 from objects.Exceptions import CommandException, WeatherException, TextException
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
@@ -606,7 +606,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def wordle_board(self, interaction: discord.Interaction):
         wordle_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(
-            query=sqlGetWordleScoers, fetch="all"
+            query=sqlGetWordleScores, fetch="all"
         )
 
         if wordle_leaderboard:
@@ -622,7 +622,6 @@ class TextCog(commands.Cog, name="Text Commands"):
                     f"{author.mention if author else item['author']}\n"
                     f"`"
                     f"{item['score_avg']:0.1f}/6 "
-                    # f"({item['games_played']} games)"
                     f"🟩 {item['green_avg']:0.1f} "
                     f"🟨 {item['yellow_avg']:0.1f} "
                     f"⬛ {item['black_avg']:0.1f}"

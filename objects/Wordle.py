@@ -5,6 +5,7 @@ from typing import ClassVar, Union, Optional
 import discord
 
 from helpers.constants import DEBUGGING_CODE
+from objects.Exceptions import WordleException
 from objects.Logger import discordLogger
 
 logger = discordLogger(
@@ -14,9 +15,31 @@ logger = discordLogger(
 __all__ = ["Wordle", "WordleFinder"]
 
 
+class WordleConfirm(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init__()
+        self.value: Optional[bool] = None
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
+    async def confirm(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
+        self.value = True
+        self.stop()
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
+    async def cancel(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
+        self.value = False
+        self.stop()
+
+
 class Wordle:
     __slots__ = [
         "__b",
+        "__boxes",
+        "__err_mg",
         "__g",
         "__y",
         "message",
@@ -30,9 +53,39 @@ class Wordle:
         message: str,
     ) -> None:
         self.message: str = message.replace("\n\n", "\n")
-        self.__y: ClassVar[tuple[str, str]] = (":yellow_square:", "🟨")
-        self.__g: ClassVar[tuple[str, str]] = (":green_square:", "🟩")
-        self.__b: ClassVar[tuple[str, str]] = (":black_large_square:", "⬛")
+        self.__boxes: list[str] = self.message.strip().split("\n")
+        self.__b: ClassVar[str] = "⬛"  # ":black_large_square:"
+        self.__g: ClassVar[str] = "🟩"  # ":green_square:"
+        self.__y: ClassVar[str] = "🟨"  # ":yellow_square:"
+        self.__err_mg: str = "Denied! User submitted an invalid Wordle score."
+
+        # Check each line is accurate
+        for line in self.__boxes:
+
+            # Skip first line
+            if "wordle" in line.lower() or line == "":
+                continue
+
+            # Check if each line is 5 characters long
+            assert len(line) == 5, WordleException(self.__err_mg)
+
+            _line_count: int = 0
+            _box_count: int = 0
+
+            # Check to make sure no illegal characters are present
+            for box in (self.__b, self.__g, self.__y):
+
+                _box_count = line.count(box)
+
+                if _box_count:
+                    _line_count += _box_count
+
+            assert _line_count == 5, WordleException(self.__err_mg)
+
+            # Check last line is all green if a score is present
+            if line == self.__boxes[-1]:
+                if self.score != "X":
+                    assert line == self.__g * 5, WordleException(self.__err_mg)
 
     @property
     def day(self) -> int:
@@ -44,27 +97,9 @@ class Wordle:
 
         day: int = int(self.message[pos[0] : pos[1]])
 
-        assert day > 0 and type(day) == int, ValueError("Invalid day.")
+        assert day > 0 and type(day) == int, WordleException(self.__err_mg)
 
         return day
-
-    @property
-    def score(self) -> Union[int, str]:
-        search = re.search(self.__REGEX_SCORE, self.message)
-        try:
-            pos: tuple[Union[int, str], int] = search.regs[0]
-        except IndexError:
-            return "N/A"
-
-        score: Union[int, str] = self.message[pos[0] : pos[0] + 1]
-
-        if score.isnumeric():
-            assert 1 <= int(score) <= 6, ValueError("Score is not between 1 and 6")
-            return score
-        elif score.upper() == "X":
-            return score.upper()
-        else:
-            raise ValueError("Invalid score.")
 
     @property
     def green_squares(self) -> int:
@@ -90,6 +125,34 @@ class Wordle:
     @property
     def total_squares(self) -> int:
         return self.green_squares + self.yellow_squares + self.black_squares
+
+    @property
+    def score(self) -> Union[int, str]:
+        search = re.search(self.__REGEX_SCORE, self.message)
+        try:
+            pos: tuple[Union[int, str], int] = search.regs[0]
+        except IndexError:
+            return "N/A"
+
+        score: Union[int, str] = self.message[pos[0] : pos[0] + 1]
+
+        if score.isnumeric():
+            assert 1 <= int(score) <= 6, WordleException(self.__err_mg)
+
+            if score == 1:
+                assert (
+                    self.green_squares == 5
+                    and self.yellow_squares == 0
+                    and self.black_squares == 0
+                ), WordleException(self.__err_mg)
+
+                return score
+
+            return score
+        elif score.upper() == "X":
+            return score.upper()
+        else:
+            raise WordleException(self.__err_mg)
 
 
 class WordleFinder:
