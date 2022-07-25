@@ -605,6 +605,8 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def wordle_board(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
         wordle_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(
             query=sqlGetWordleScores, fetch="all"
         )
@@ -634,7 +636,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 fields=[dict(name="Wordle Leaderboard", value=leaderboard_str)],
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:

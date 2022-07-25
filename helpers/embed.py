@@ -28,7 +28,7 @@ from helpers.constants import (
     DEBUGGING_CODE,
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
-from helpers.mysql import processMySQL, sqlGetCrootPredictions
+from helpers.mysql import processMySQL, sqlGetCrootPredictions, SqlFetch
 from objects.Bets_Stats_Schedule import BigTenTeams, getHuskerOpponent, buildTeam
 from objects.Exceptions import BettingException
 
@@ -403,7 +403,8 @@ def buildRecruitEmbed(recruit) -> discord.Embed:
         get_croot_preds_response = processMySQL(
             query=sqlGetCrootPredictions,
             values=recruit.twofourseven_profile,
-            fetch="all",
+            fetch=SqlFetch.all,
+            # fetch="all",
         )
 
         if get_croot_preds_response is None:

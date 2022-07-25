@@ -212,7 +212,6 @@ class InteractionData(str):
             setattr(self, key, value)
 
 
-# TODO Transcribe to Twitter
 class TriviaQuestionButton(discord.ui.Button):
     def __init__(self, label: str, custom_id: str) -> None:
         super().__init__(

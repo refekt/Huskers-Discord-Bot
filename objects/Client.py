@@ -43,6 +43,7 @@ from helpers.mysql import (
     sqlInsertWordle,
     sqlRetrieveReminders,
     sqlUpdateReminder,
+    SqlFetch,
 )
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException, MySQLException
@@ -438,7 +439,11 @@ class HuskerClient(Bot):
             logger.info("Skipping restarting reminders")
         else:
             logger.info("Collecting open reminders")
-            open_reminders = processMySQL(query=sqlRetrieveReminders, fetch="all")
+            open_reminders = processMySQL(
+                query=sqlRetrieveReminders,
+                fetch=SqlFetch.all,
+                # fetch="all",
+            )
 
             async def convertDestination(raw_send_to: str) -> discord.TextChannel:
                 logger.debug("Attempting to fetch destination")
@@ -599,7 +604,9 @@ class HuskerClient(Bot):
                 )
 
                 author_score: dict[str, Union[int, Decimal]] = processMySQL(
-                    query=sqlGetWordleIndividualUserScore, fetch="one"
+                    query=sqlGetWordleIndividualUserScore,
+                    fetch=SqlFetch.one,
+                    # fetch="one",
                 )
 
                 author_score_str: Optional[str] = None

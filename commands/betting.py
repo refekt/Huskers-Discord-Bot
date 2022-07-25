@@ -186,7 +186,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     ):
         await interaction.response.defer()
 
-        all_bets: Optional[list[dict]] = processMySQL(
+        all_bets: Optional[list[dict, ...]] = processMySQL(
             query=sqlGetBetsLeaderboard, fetch="all"
         )
         if all_bets is not None and len(all_bets) > FIELDS_LIMIT:

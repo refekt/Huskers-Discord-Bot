@@ -54,7 +54,7 @@ class DeepFryOptions(str, enum.Enum):
     upload = "Upload"
 
 
-def retrieve_all_img() -> Union[dict, list[dict], None]:
+def retrieve_all_img() -> Union[dict, list[dict, ...], None]:
     try:
         return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
     except:  # noqa
@@ -64,7 +64,7 @@ def retrieve_all_img() -> Union[dict, list[dict], None]:
 all_imgs: Union[dict, list[dict], None] = retrieve_all_img()
 
 
-def retrieve_img(image_name: str) -> Union[dict, list[dict], None]:
+def retrieve_img(image_name: str) -> Union[dict, list[dict, ...], None]:
     try:
         return processMySQL(query=sqlSelectImageCommand, values=image_name, fetch="one")
     except:  # noqa
@@ -87,13 +87,6 @@ def create_img(author: int, image_name: str, image_url: str) -> Union[bool, Any]
         return True
     except:  # noqa
         raise ImageException("Unable to create image command in MySQL database!")
-
-
-def retrieve_all_img() -> None:
-    try:
-        return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
-    except:  # noqa
-        raise ImageException(f"Unable to retrieve image commands.")
 
 
 # Depreciated

@@ -623,7 +623,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Removed [{role_timeout}] role")
 
-        previous_roles_raw: Union[dict, list[dict], None] = processMySQL(
+        previous_roles_raw: Union[dict, list[dict, ...], None] = processMySQL(
             query=sqlRetrieveIowa, values=str(who.id), fetch="all"
         )
 

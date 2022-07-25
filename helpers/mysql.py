@@ -1,10 +1,10 @@
 import enum
 import inspect
 import logging
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 import pymysql
-from pymysql import OperationalError
+from pymysql import OperationalError, Connection
 
 from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB, DEBUGGING_CODE
 from helpers.misc import getModuleMethod
@@ -14,7 +14,6 @@ from objects.Logger import discordLogger
 logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
-
 
 __all__: list[str] = [
     "processMySQL",
@@ -132,9 +131,7 @@ class SqlFetch(str, enum.Enum):
 
 class SqlQuery:
     __slots__ = [
-        "exploded",
         "fetch",
-        "processed_query",
         "query",
         "values",
     ]
@@ -145,36 +142,45 @@ class SqlQuery:
         values: Union[None, str, tuple[str, ...]] = None,
         fetch: Optional[str] = None,
     ) -> None:
+        self.fetch: Optional[str] = fetch
         self.query: str = (
             query  # SQL must be "SQL Minify" from https://codebeautify.org/sqlformatter
         )
         self.values: Optional[tuple[str]] = values
-        self.fetch: Optional[str] = fetch
 
-        if values is None:
-            self.processed_query = self.query
-        elif isinstance(values, str):
-            self.processed_query = self.query.replace(
-                "% s", f"'{values}'" if type(values) == str else str(values), 1
+    @property
+    def processed_query(self) -> str:
+        if self.values is None:
+            return self.query
+        elif isinstance(self.values, str):
+            return self.query.replace(
+                "% s",
+                f"'{self.values}'" if type(self.values) == str else str(self.values),
+                1,
             )
         else:
-            l_count = len(values)
-            s_count = query.count("% s")
-            if s_count == 0:
-                self.processed_query = self.query
-                return
+            values_count = len(self.values)
+            sql_s_count = self.query.count("% s")
 
-            if l_count != s_count:
+            if sql_s_count == 0:
+                return self.query
+
+            if values_count != sql_s_count:
                 raise MySQLException(
-                    f"Not enough values provided. {l_count} provided bu {s_count} expected."
+                    f"Not enough self.values provided. {values_count} provided bu {sql_s_count} expected."
                 )
 
-            self.processed_query = self.query
+            _temp_query: str = self.query
             for value in self.values:
-                self.processed_query = self.processed_query.replace(
+                _temp_query = self.processed_query.replace(
                     "% s", f"'{value}'" if type(value) == str else str(value), 1
                 )
-        self.exploded: list[str] = (
+
+            return _temp_query
+
+    @property
+    def exploded(self) -> list[str]:
+        return (
             self.processed_query.replace(",", "")
             .replace("(", "")
             .replace(")", "")
@@ -188,68 +194,51 @@ class SqlQuery:
         return self.processed_query
 
 
-def processMySQL(query: str, **kwargs) -> Union[dict, list[dict], None]:
-    # TODO Need to capture MySQL errors as exceptions or something.
-    #  A failed cursor.execute() can stop code without explanation
-
+def processMySQL(
+    query: str, **kwargs
+) -> Union[dict, list[dict, ...], tuple[tuple[Any, ...], ...], None]:
     module, method = getModuleMethod(inspect.stack())
 
-    sql = SqlQuery(
-        query=query, values=kwargs.get("values", None), fetch=kwargs.get("fetch", None)
+    sql_qeury: SqlQuery = SqlQuery(
+        fetch=kwargs.get("fetch", None),
+        query=query,
+        values=kwargs.get("values", None),
     )
 
     logger.debug(
-        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql.processed_query}\n"
+        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
     )
 
-    sqlConnection = None
+    sqlConnection: Optional[Connection] = None
     try:
         sqlConnection = pymysql.connect(
-            host=SQL_HOST,
-            user=SQL_USER,
-            password=SQL_PASSWD,
-            db=SQL_DB,
             charset="utf8mb4",
             cursorclass=pymysql.cursors.DictCursor,  # noqa
+            db=SQL_DB,
+            host=SQL_HOST,
+            password=SQL_PASSWD,
+            user=SQL_USER,
         )
         logger.debug(f"Connected to the MySQL Database!")
     except OperationalError:  # Unsure if this is the correct exception
         logger.exception(f"Unable to connect to the `{SQL_DB}` database.")
 
-    result: Union[dict, list[dict], None] = None
+    result: Union[dict, list[dict, ...], tuple[tuple[Any, ...], ...], None] = None
 
     try:
         with sqlConnection.cursor() as cursor:
-            if not sql.fetch:
-                if not sql.values:
-                    cursor.execute(query=sql.query)
-                else:
-                    cursor.execute(query=sql.query, args=sql.values)
-            else:
-                if not sql.values:
-                    if sql.fetch == SqlFetch.one:
-                        cursor.execute(query=sql.query)
-                        result: dict = cursor.fetchone()
-                    elif sql.fetch == SqlFetch.many:
-                        if "size" not in kwargs.keys():
-                            logger.exception("Fetching many requires a `size` kwargs.")
-                        cursor.execute(query=sql.query)
-                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
-                    elif sql.fetch == SqlFetch.all:
-                        cursor.execute(query=sql.query)
-                        result: list[dict] = cursor.fetchall()
-                else:
-                    if sql.fetch == SqlFetch.one:
-                        cursor.execute(query=sql.query, args=sql.values)
-                        result: dict = cursor.fetchone()
-                    elif sql.fetch == SqlFetch.many:
-                        if "size" not in kwargs.keys():
-                            logger.exception("Fetching many requires a `size` kwargs.")
-                        cursor.execute(query=sql.query, args=sql.values)
-                        result: list[dict] = cursor.fetchmany(many=kwargs["size"])
-                    elif sql.fetch == SqlFetch.all:
-                        cursor.execute(query=sql.query, args=sql.values)
-                        result: list[dict] = cursor.fetchall()
+            cursor.execute(query=sql_qeury.query, args=sql_qeury.values)
+
+            if sql_qeury.fetch:
+                if sql_qeury.fetch == SqlFetch.one:
+                    result = cursor.fetchone()
+                elif sql_qeury.fetch == SqlFetch.many:
+                    if "size" not in kwargs.keys():
+                        logger.exception("Fetching many requires a `size` kwargs.")
+                    result = cursor.fetchmany(size=kwargs["size"])
+                elif sql_qeury.fetch == SqlFetch.all:
+                    result = cursor.fetchall()
+
         sqlConnection.commit()
     except TypeError as err:
         logger.exception("Error occurred opening the MySQL database.")

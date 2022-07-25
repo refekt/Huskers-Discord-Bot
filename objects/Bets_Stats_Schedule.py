@@ -31,6 +31,7 @@ from helpers.mysql import (
     sqlSelectGameBetbyOpponent,
     sqlTeamIDs,
     sqlUpdateGameBet,
+    SqlFetch,
 )
 from objects.Exceptions import BettingException, ScheduleException
 from objects.Logger import discordLogger
@@ -364,11 +365,14 @@ def retrieveGameBets(
         results = processMySQL(
             query=sqlSelectGameBetbyAuthor,
             values=(author_str, school_name),
-            fetch="one",
+            fetch=SqlFetch.one,
+            # fetch="one",
         )
     else:
         results = processMySQL(
-            query=sqlSelectGameBetbyOpponent, values=school_name, fetch="all"
+            query=sqlSelectGameBetbyOpponent,
+            values=school_name,
+            fetch=SqlFetch.all,
         )
     if results:
         if _all:
@@ -406,7 +410,11 @@ def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> G
 def getTeamIdByName(team_name: str) -> str:
     logger.info(f"Getting Team ID by Name: {team_name}")
 
-    sql_teams = processMySQL(query=sqlTeamIDs, fetch="all")
+    sql_teams = processMySQL(
+        query=sqlTeamIDs,
+        fetch=SqlFetch.all,
+        # fetch="all",
+    )
     _id = ""
 
     if team_name.lower() in [team["school"].lower() for team in sql_teams]:
@@ -430,10 +438,18 @@ def getTeamIdByName(team_name: str) -> str:
 def buildTeam(id_str: str) -> FootballTeam:
     logger.debug("Building a FootballTeam")
 
-    query: dict = processMySQL(query=sqlGetTeamInfoByID, fetch="one", values=id_str)
+    query: dict = processMySQL(
+        query=sqlGetTeamInfoByID,
+        fetch=SqlFetch.one,
+        # fetch="one",
+        values=id_str,
+    )
     if query is None:
         query: dict = processMySQL(
-            query=sqlGetTeamInfoByESPNID, fetch="one", values=id_str
+            query=sqlGetTeamInfoByESPNID,
+            fetch=SqlFetch.one,
+            # fetch="one",
+            values=id_str,
         )
 
     if query:

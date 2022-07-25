@@ -212,7 +212,7 @@ class PredictionView(discord.ui.View):
         logger.info(f"Retrieving predictions for {self.recruit.name}...")
         await interaction.response.defer()
 
-        individual_preds: Optional[list[dict]] = processMySQL(
+        individual_preds: Optional[list[dict, ...]] = processMySQL(
             query=sqlGetIndividualPrediction,
             fetch="all",
             values=(self.recruit.twofourseven_profile,),
@@ -594,7 +594,7 @@ def get_teams() -> list[str]:
 
 
 def get_individual_predictions(user_id: int, recruit) -> Union[dict, list[dict]]:
-    sql_response: list[dict] = processMySQL(
+    sql_response: list[dict, ...] = processMySQL(
         query=sqlGetPrediction,
         values=(user_id, recruit.twofourseven_profile),
         fetch="one",
@@ -637,7 +637,9 @@ def buildFootballRecruit(year: int, name: str) -> list[Recruit]:
     )
 
     logger.info("Collecting team IDs")
-    all_team_ids: Optional[list[dict]] = processMySQL(fetch="all", query=sqlTeamIDs)
+    all_team_ids: Optional[list[dict, ...]] = processMySQL(
+        fetch="all", query=sqlTeamIDs
+    )
     name: list[str] = name.split(" ")
 
     if len(name) == 1:
