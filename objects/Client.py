@@ -14,6 +14,7 @@ import tweepy
 from discord import NotFound, Forbidden, HTTPException
 from discord.app_commands import MissingApplicationID
 from discord.ext.commands import Bot, ExtensionAlreadyLoaded
+from pymysql import IntegrityError, ProgrammingError
 from tweepy import Response
 
 from __version__ import _version
@@ -603,29 +604,34 @@ class HuskerClient(Bot):
                     ),
                 )
 
+                logger.debug("Wordle MySQL processed")
+
+            except (MySQLException, IntegrityError, ProgrammingError):
+                return
+
+            author_score_str: Optional[str] = None
+
+            try:
                 author_score: dict[str, Union[int, Decimal]] = processMySQL(
                     query=sqlGetWordleIndividualUserScore,
                     fetch=SqlFetch.one,
-                    # fetch="one",
                 )
+                author_score_str = f"{message.author.mention}'s ranks as #{author_score['lb_rank']} with an average score of {author_score['score_avg']}/6."
 
-                author_score_str: Optional[str] = None
-                if author_score:
-                    author_score_str = f"{message.author.mention}'s ranks as #{author_score['lb_rank']} with an average score of {author_score['score_avg']}/6."
+                logger.debug("Author scores retreived")
+            except (MySQLException, IntegrityError, ProgrammingError):
+                pass
 
-                embed = buildEmbed(
-                    title="",
-                    fields=[
-                        dict(
-                            name="Wordle Scored!",
-                            value=f"{message.author.mention} submitted a Wordle score of {wordle.score}/6.{author_score_str if author_score_str else ''}",
-                        ),
-                    ],
-                )
-
-                await message.channel.send(embed=embed)
-            except MySQLException:
-                return
+            embed = buildEmbed(
+                title="",
+                fields=[
+                    dict(
+                        name="Wordle Scored!",
+                        value=f"{message.author.mention} submitted a Wordle score of {wordle.score}/6.{author_score_str if author_score_str else ''}",
+                    ),
+                ],
+            )
+            await message.channel.send(embed=embed)
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

@@ -4,7 +4,7 @@ import logging
 from typing import Union, Optional, Any
 
 import pymysql
-from pymysql import OperationalError, Connection
+from pymysql import OperationalError, Connection, IntegrityError, ProgrammingError
 
 from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB, DEBUGGING_CODE
 from helpers.misc import getModuleMethod
@@ -205,9 +205,11 @@ def processMySQL(
         values=kwargs.get("values", None),
     )
 
-    logger.debug(
-        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
-    )
+    # TODO Fix processed_Query
+    # logger.debug(
+    #     f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
+    # )
+    logger.debug(f"Starting a MySQL query called from [{module}-{method}] with query\n")
 
     sqlConnection: Optional[Connection] = None
     try:
@@ -240,9 +242,12 @@ def processMySQL(
                     result = cursor.fetchall()
 
         sqlConnection.commit()
-    except TypeError as err:
+    except IntegrityError as err:
         logger.exception("Error occurred opening the MySQL database.")
-        raise err
+        raise MySQLException(f"Integrity Error: {err.args[1]}")
+    except ProgrammingError as err:
+        logger.exception("Error occurred opening the MySQL database.")
+        raise MySQLException(f"MySQL Syntax error: {err.args[1]}")
     finally:
         logger.debug(f"Closing connection to the MySQL Database")
         sqlConnection.close()

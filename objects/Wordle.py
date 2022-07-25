@@ -66,6 +66,8 @@ class Wordle:
             if "wordle" in line.lower() or line == "":
                 continue
 
+            logger.debug("Checking if line is 5 chars long")
+
             # Check if each line is 5 characters long
             assert len(line) == 5, WordleException(self.__err_mg)
 
@@ -76,16 +78,25 @@ class Wordle:
             for box in (self.__b, self.__g, self.__y):
 
                 _box_count = line.count(box)
+                logger.debug(f"Box count is {_box_count}")
 
                 if _box_count:
                     _line_count += _box_count
+                    logger.debug(f"Line count is {_line_count}")
 
+            logger.debug("Checking if line count totals 5")
             assert _line_count == 5, WordleException(self.__err_mg)
 
             # Check last line is all green if a score is present
+            logger.debug("Checking if last line in box and if score is not X")
             if line == self.__boxes[-1]:
                 if self.score != "X":
                     assert line == self.__g * 5, WordleException(self.__err_mg)
+                    logger.debug(
+                        f"Line ({line.encode('utf-8', 'replace')}) is 5 green squares"
+                    )
+                else:
+                    logger.debug("Error with last line")
 
     @property
     def day(self) -> int:
