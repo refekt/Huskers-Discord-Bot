@@ -1,3 +1,4 @@
+import enum
 import json
 import logging
 import pathlib
@@ -32,6 +33,9 @@ from helpers.constants import (
     ROLE_EVERYONE_PROD,
     ROLE_TIME_OUT,
     TZ,
+    ROLE_HYPE_MAX,
+    ROLE_HYPE_SOME,
+    ROLE_HYPE_NO,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -51,6 +55,15 @@ from objects.Timers import IowaDuration
 logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
+
+
+class HypeRoles(str, enum.Enum):
+    MaxHype = "Max Hype"
+    SomeHype = "Some Hype"
+    NoHype = "No Hype"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class ConfirmButtons(discord.ui.View):
@@ -805,6 +818,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     # TODO Make SMMS hidden
     @app_commands.command(name="smms", description="Tee hee")
     @app_commands.default_permissions(manage_messages=True)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def smms(
         self,
         interaction: discord.Interaction,
@@ -843,6 +857,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     @app_commands.command(name="get-log", description="Send last few lines of bot.log")
     @app_commands.default_permissions(administrator=True)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def get_log(self, interaction: discord.Interaction):
         logger.debug("Grabbing and sending bot.log")
 
@@ -864,6 +879,42 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         logger.debug("Sent bot.log")
+
+    @app_commands.command(name="hype", description="Add a hype role")
+    @app_commands.describe(apply_role="The hype role you want to apply")
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
+    async def hype(
+        self, interaction: discord.Interaction, apply_role: HypeRoles
+    ) -> None:
+
+        await interaction.response.defer(ephemeral=True)
+
+        hype_roles = (
+            interaction.guild.get_role(ROLE_HYPE_MAX),
+            interaction.guild.get_role(ROLE_HYPE_SOME),
+            interaction.guild.get_role(ROLE_HYPE_NO),
+        )
+
+        role: Optional[discord.Role] = None
+
+        try:
+            await interaction.user.remove_roles(
+                *hype_roles, reason="Clearing old hype roles"
+            )
+
+            if apply_role == HypeRoles.MaxHype:
+                role = interaction.guild.get_role(ROLE_HYPE_MAX)
+            elif apply_role == HypeRoles.SomeHype:
+                role = interaction.guild.get_role(ROLE_HYPE_SOME)
+            elif apply_role == HypeRoles.NoHype:
+                role = interaction.guild.get_role(ROLE_HYPE_NO)
+
+            await interaction.user.add_roles(*[role])
+
+        except (Forbidden, HTTPException):
+            logger.exception("Unable to clear user's roles")
+        finally:
+            await interaction.followup.send(f"You have added the {role.mention} role")
 
 
 async def setup(bot: commands.Bot) -> None:
