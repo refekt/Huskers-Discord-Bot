@@ -16,6 +16,7 @@ logger = discordLogger(
 )
 
 __all__: list[str] = [
+    "SqlFetch",
     "processMySQL",
     "sqlCreateImageCommand",
     "sqlDeleteImageCommand",

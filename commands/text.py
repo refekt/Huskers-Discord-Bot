@@ -2,7 +2,7 @@ import json
 import logging
 import random
 import re
-from datetime import timedelta, datetime
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Union
 
@@ -27,6 +27,7 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
+from helpers.misc import shift_utc_tz
 from helpers.mysql import processMySQL, sqlGetWordleScores
 from objects.Exceptions import CommandException, WeatherException, TextException
 from objects.Logger import discordLogger
@@ -456,9 +457,6 @@ class TextCog(commands.Cog, name="Text Commands"):
             )
         except StopIteration:
             raise WeatherException("Unable to find state. Please try again!")
-
-        def shift_utc_tz(dt: datetime, shift: int) -> datetime:
-            return dt + timedelta(seconds=shift)
 
         weather_url: str = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
         response: requests.Response = requests.get(weather_url, headers=HEADERS)

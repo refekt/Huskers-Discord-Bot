@@ -5,7 +5,7 @@ import pathlib
 import platform
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Callable, Union, Any
 
 from objects.Exceptions import CommandException, StatsException
@@ -24,6 +24,7 @@ __all__: list[str] = [
     "discordURLFormatter",
     "getModuleMethod",
     "loadVarPath",
+    "shift_utc_tz",
 ]
 
 
@@ -108,6 +109,10 @@ def convertSeconds(n) -> Union[int, Any]:
     secs %= 3600
     mins = secs // 60
     return hour, mins
+
+
+def shift_utc_tz(dt: datetime, shift: int) -> datetime:
+    return dt + timedelta(seconds=shift)
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

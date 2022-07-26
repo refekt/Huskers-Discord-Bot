@@ -7,11 +7,21 @@ from datetime import datetime, time as _time
 from typing import ClassVar
 
 import discord
+import requests
 import schedule
 
-from helpers.constants import TZ, DEBUGGING_CODE, SCHED_DAY_IMG, SCHED_NIGHT_IMG
+from helpers.constants import (
+    DEBUGGING_CODE,
+    HEADERS,
+    SCHED_DAY_IMG,
+    SCHED_NIGHT_IMG,
+    TZ,
+    WEATHER_API_KEY,
+)
 from helpers.embed import buildEmbed
+from helpers.misc import shift_utc_tz
 from objects.Logger import discordLogger
+from objects.Weather import WeatherResponse
 
 asyncio_logger = discordLogger(
     name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
@@ -282,17 +292,46 @@ class SchedulePosts:
             f"Day time string is {day_time_str}. Night time string is {night_time_str}."
         )
 
-        schedule.every().day.at(day_time_str).do(
-            self.send_daily_message,
-            is_day=True,
-            is_night=False,
-        )
+        # Get sunrise and sunset
+        weather_url: str = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q=Omaha,NE,US"
+        response: requests.Response = requests.get(weather_url, headers=HEADERS)
+        response.json()
+        j: dict[str, ...] = response.json()
 
-        schedule.every().day.at(night_time_str).do(
-            self.send_daily_message,
-            is_day=False,
-            is_night=True,
-        )
+        if j:
+            weather: WeatherResponse = WeatherResponse(j)
+
+            sunrise: datetime = shift_utc_tz(weather.sys.sunrise, weather.timezone)
+            sunrise_str: str = f"{sunrise.astimezone(tz=TZ).hour:02d}:{sunrise.astimezone(tz=TZ).minute:02d}"
+            asyncio_logger.debug(f"Sunrise: {sunrise_str}")
+
+            sunset: datetime = shift_utc_tz(weather.sys.sunset, weather.timezone)
+            sunset_str: str = f"{sunset.astimezone(tz=TZ).hour:02d}:{sunset.astimezone(tz=TZ).minute:02d}"
+            asyncio_logger.debug(f"Sunset: {sunset_str}")
+
+            schedule.every().day.at(sunrise_str).do(
+                self.send_daily_message,
+                is_day=True,
+                is_night=False,
+            )
+
+            schedule.every().day.at(sunset_str).do(
+                self.send_daily_message,
+                is_day=False,
+                is_night=True,
+            )
+        else:
+            schedule.every().day.at(day_time_str).do(
+                self.send_daily_message,
+                is_day=True,
+                is_night=False,
+            )
+
+            schedule.every().day.at(night_time_str).do(
+                self.send_daily_message,
+                is_day=False,
+                is_night=True,
+            )
 
         all_jobs: list[schedule.Job] = schedule.jobs
         all_jobs_str: str = ""

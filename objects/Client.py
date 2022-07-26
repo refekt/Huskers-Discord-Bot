@@ -39,12 +39,12 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
+    SqlFetch,
     processMySQL,
     sqlGetWordleIndividualUserScore,
     sqlInsertWordle,
     sqlRetrieveReminders,
     sqlUpdateReminder,
-    SqlFetch,
 )
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException, MySQLException
