@@ -63,7 +63,7 @@ class Wordle:
         for line in self.__boxes:
 
             # Skip first line
-            if "wordle" in line.lower() or line == "":
+            if "Wordle" in line:
                 continue
 
             logger.debug("Checking if line is 5 chars long")
@@ -96,7 +96,8 @@ class Wordle:
                         f"Line ({line.encode('utf-8', 'replace')}) is 5 green squares"
                     )
                 else:
-                    logger.debug("Error with last line")
+                    assert line != self.__g * 5, WordleException(self.__err_mg)
+                    logger.debug("Score is X and last line is not 5 green squares")
 
     @property
     def day(self) -> int:
@@ -170,7 +171,7 @@ class WordleFinder:
     __slots__ = ["wordle_finder"]
 
     def __init__(self, search_channel: discord.TextChannel) -> None:
-        self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s\d{1}\/\d{1}"
+        self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
 
     def get_wordle_message(self, message: discord.Message) -> Optional[Wordle]:
         msg: str = message.content

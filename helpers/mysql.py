@@ -247,7 +247,7 @@ def processMySQL(
         logger.exception("Error occurred opening the MySQL database.")
         raise MySQLException(f"Integrity Error: {err.args[1]}")
     except ProgrammingError as err:
-        logger.exception("Error occurred opening the MySQL database.")
+        logger.warning("Error occurred opening the MySQL database.")
         raise MySQLException(f"MySQL Syntax error: {err.args[1]}")
     finally:
         logger.debug(f"Closing connection to the MySQL Database")

@@ -612,11 +612,17 @@ class HuskerClient(Bot):
             author_score_str: Optional[str] = None
 
             try:
-                author_score: dict[str, Union[int, Decimal]] = processMySQL(
+                author_score: dict[str, Union[int, Decimal, str]] = processMySQL(
                     query=sqlGetWordleIndividualUserScore,
                     fetch=SqlFetch.one,
+                    values=author,
                 )
-                author_score_str = f"{message.author.mention}'s ranks as #{author_score['lb_rank']} with an average score of {author_score['score_avg']}/6."
+                if author_score["score_avg"] == "X":
+                    wordle_score_str: str = author_score["score_avg"]
+                else:
+                    wordle_score_str = f"{author_score['score_avg']:0.1f}/6"
+
+                author_score_str = f"{message.author.mention}'s ranks as #{author_score['lb_rank']} with an average score of {wordle_score_str}."
 
                 logger.debug("Author scores retreived")
             except (MySQLException, IntegrityError, ProgrammingError):
@@ -627,7 +633,7 @@ class HuskerClient(Bot):
                 fields=[
                     dict(
                         name="Wordle Scored!",
-                        value=f"{message.author.mention} submitted a Wordle score of {wordle.score}/6.{author_score_str if author_score_str else ''}",
+                        value=f"{message.author.mention} submitted a Wordle score of {wordle.score}.{author_score_str if author_score_str else ''}",
                     ),
                 ],
             )
