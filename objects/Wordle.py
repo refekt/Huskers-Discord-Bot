@@ -1,5 +1,6 @@
 import logging
 import re
+import statistics
 from typing import ClassVar, Union, Optional
 
 import discord
@@ -42,6 +43,7 @@ class Wordle:
         "__err_mg",
         "__g",
         "__y",
+        "_failed_score",
         "message",
     ]
 
@@ -57,6 +59,7 @@ class Wordle:
         self.__b: ClassVar[str] = "⬛"  # ":black_large_square:"
         self.__g: ClassVar[str] = "🟩"  # ":green_square:"
         self.__y: ClassVar[str] = "🟨"  # ":yellow_square:"
+        self._failed_score: ClassVar[float] = 6 + statistics.stdev([1, 2, 3, 4, 5, 6])
         self.__err_mg: str = "Denied! User submitted an invalid Wordle score."
 
         # Check each line is accurate
@@ -90,7 +93,7 @@ class Wordle:
             # Check last line is all green if a score is present
             logger.debug("Checking if last line in box and if score is not X")
             if line == self.__boxes[-1]:
-                if self.score != "X":
+                if self.score != self._failed_score:
                     assert line == self.__g * 5, WordleException(self.__err_mg)
                     logger.debug(
                         f"Line ({line.encode('utf-8', 'replace')}) is 5 green squares"
@@ -161,8 +164,8 @@ class Wordle:
                 return score
 
             return score
-        elif score.upper() == "X":
-            return score.upper()
+        elif score == "X":
+            return self._failed_score
         else:
             raise WordleException(self.__err_mg)
 

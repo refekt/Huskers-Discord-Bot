@@ -5,7 +5,6 @@ import pathlib
 import sys
 import tracemalloc
 from datetime import timedelta
-from decimal import Decimal
 from os import listdir
 from typing import Union, Any, Awaitable, Optional
 
@@ -611,32 +610,48 @@ class HuskerClient(Bot):
 
             author_score_str: Optional[str] = None
 
-            try:
-                author_score: dict[str, Union[int, Decimal, str]] = processMySQL(
+            try:  # The entire leaderboard required for MySQL's RANK() to work right
+                leaderboard_scores: list[dict[str, Any]] = processMySQL(
                     query=sqlGetWordleIndividualUserScore,
-                    fetch=SqlFetch.one,
-                    values=author,
+                    fetch=SqlFetch.all,
                 )
-                if author_score["score_avg"] == "X":
-                    wordle_score_str: str = author_score["score_avg"]
-                else:
-                    wordle_score_str = f"{author_score['score_avg']:0.1f}/6"
 
-                author_score_str = f"{message.author.mention}'s ranks as #{author_score['lb_rank']} with an average score of {wordle_score_str}."
+                author_score = [
+                    score for score in leaderboard_scores if author in score.values()
+                ]
+                author_score = author_score[0]
+                author_score_str = f"They are the #{author_score['lb_rank']} Wordler with an average score of {author_score['score_avg']:0.1f}/6 over {author_score['games_played']} games"
 
                 logger.debug("Author scores retreived")
             except (MySQLException, IntegrityError, ProgrammingError):
                 pass
 
-            embed = buildEmbed(
-                title="",
-                fields=[
-                    dict(
-                        name="Wordle Scored!",
-                        value=f"{message.author.mention} submitted a Wordle score of {wordle.score}.{author_score_str if author_score_str else ''}",
-                    ),
-                ],
-            )
+            if wordle.score == wordle._failed_score:
+                wordle_score_str: str = "X"
+            else:
+                wordle_score_str = f"{wordle.score:0.2fs}"
+
+            if author_score_str is None:
+                embed = buildEmbed(
+                    title="",
+                    fields=[
+                        dict(
+                            name="Wordle Scored!",
+                            value=f"{message.author.mention} submitted a Wordle score of {wordle_score_str}.",
+                        ),
+                    ],
+                )
+            else:
+                embed = buildEmbed(
+                    title="",
+                    fields=[
+                        dict(
+                            name="Wordle Scored!",
+                            value=f"{message.author.mention} submitted a Wordle score of {wordle_score_str}. {author_score_str}.",
+                        ),
+                    ],
+                )
+
             await message.channel.send(embed=embed)
 
 
