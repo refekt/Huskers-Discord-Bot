@@ -631,7 +631,7 @@ class HuskerClient(Bot):
             if wordle.score == wordle._failed_score:
                 wordle_score_str: str = "X"
             else:
-                wordle_score_str = f"{wordle.score:0.2fs}"
+                wordle_score_str = wordle.score
 
             if author_score_str is None:
                 embed = buildEmbed(
