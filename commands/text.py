@@ -225,7 +225,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         if markov_output is None:
             raise TextException(
-                "Markovify failed to create an output! Mor than likely, there is not enough source material available to create a markov chain."
+                "Markovify failed to create an output! More than likely, there is not enough source material available to create a markov chain."
             )
         else:
             if not combined_sources:

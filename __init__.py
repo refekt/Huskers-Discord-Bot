@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import traceback
 from typing import Literal, Optional
@@ -13,12 +14,15 @@ from discord.app_commands import (
     AppCommand,
 )
 from discord.ext.commands import Context, Greedy
+from pymysql import IntegrityError, ProgrammingError
 
 from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
 from helpers.embed import buildEmbed  # noqa
+from objects import Wordle
 from objects.Client import HuskerClient  # , schedstop
 from objects.Exceptions import DiscordError  # noqa
 from objects.Logger import discordLogger
+from objects.Wordle import WordleFinder
 
 logger = discordLogger(
     name=__name__,
@@ -106,6 +110,56 @@ if not DEBUGGING_CODE:
                 await interaction.channel.send(embed=embed)
         else:
             await interaction.followup.send(content="", embed=embed, ephemeral=True)
+
+
+@client.command()
+@commands.default_permissions(administrator=True)
+async def backlog(ctx: Context):
+    north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
+    wordle_finder: WordleFinder = WordleFinder(search_channel=north_bottoms)
+
+    index: int = 0
+
+    async for message in north_bottoms.history(
+        oldest_first=True,
+        after=datetime.datetime(year=2021, month=1, day=21),
+        limit=None,
+    ):
+        index += 1
+
+        if message.author.bot:
+            continue
+
+        logger.debug(f"{index}: Searching for Wordle entry")
+
+        try:
+            wordle: Optional[Wordle] = wordle_finder.get_wordle_message(message=message)
+        except (AssertionError, WordleException):
+            continue
+
+        if wordle:
+            logger.debug("Wordle found!")
+
+            author: str = f"{message.author.name}#{message.author.discriminator}"
+
+            try:
+                processMySQL(
+                    query=sqlInsertWordle,
+                    values=(
+                        f"{wordle.day}_{author}",
+                        author,
+                        wordle.day,
+                        wordle.score,
+                        wordle.green_squares,
+                        wordle.yellow_squares,
+                        wordle.black_squares,
+                    ),
+                )
+
+                logger.debug("Wordle MySQL processed")
+
+            except (MySQLException, IntegrityError, ProgrammingError):
+                continue
 
 
 @client.command()
