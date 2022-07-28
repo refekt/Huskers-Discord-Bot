@@ -3,7 +3,7 @@ import enum
 import logging
 import random
 import time
-from datetime import datetime, time as _time
+from datetime import datetime, time as _time, timedelta
 from typing import ClassVar
 
 import discord
@@ -19,7 +19,6 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
-from helpers.misc import shift_utc_tz
 from objects.Logger import discordLogger
 from objects.Weather import WeatherResponse
 
@@ -301,12 +300,15 @@ class SchedulePosts:
         if j:
             weather: WeatherResponse = WeatherResponse(j)
 
-            sunrise: datetime = shift_utc_tz(weather.sys.sunrise, weather.timezone)
-            sunrise_str: str = f"{sunrise.astimezone(tz=TZ).hour:02d}:{sunrise.astimezone(tz=TZ).minute:02d}"
+            # TODO figure out why timezones are weird
+            sunrise: datetime = weather.sys.sunrise.astimezone(tz=TZ) - timedelta(
+                hours=4
+            )
+            sunrise_str: str = f"{sunrise.hour :02d}:{sunrise.minute:02d}"
             asyncio_logger.debug(f"Sunrise: {sunrise_str}")
 
-            sunset: datetime = shift_utc_tz(weather.sys.sunset, weather.timezone)
-            sunset_str: str = f"{sunset.astimezone(tz=TZ).hour:02d}:{sunset.astimezone(tz=TZ).minute:02d}"
+            sunset: datetime = weather.sys.sunset.astimezone(tz=TZ) - timedelta(hours=4)
+            sunset_str: str = f"{sunset.hour :02d}:{sunset.minute:02d}"
             asyncio_logger.debug(f"Sunset: {sunset_str}")
 
             schedule.every().day.at(sunrise_str).do(
@@ -345,7 +347,7 @@ class SchedulePosts:
         if DEBUGGING_CODE:
             asyncio_logger.debug("Attempting to create debug schedule")
             if not self._setup:
-                self._setup_debug_schedule()
+                self._setup_schedule()
                 self._setup = True
                 asyncio_logger.debug("Debug schedule created")
             schedule.run_pending()
@@ -359,17 +361,13 @@ class SchedulePosts:
     async def run(self):
         asyncio_logger.debug("Running SchedulePosts loop")
 
-        if DEBUGGING_CODE:
-            asyncio_logger.setLevel(logging.DEBUG)
-        else:
-            asyncio_logger.setLevel(logging.INFO)
-
         while True:
             schedule.run_pending()
             await asyncio.sleep(1)
 
             if self.send_message:
                 asyncio_logger.debug("self.send_message == True")
+
                 if random.randint(1, 100) <= 5:
                     await self.channel.send(
                         embed=random.choice(self.schedule_random_embed)
