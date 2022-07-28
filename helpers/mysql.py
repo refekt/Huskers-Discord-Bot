@@ -121,7 +121,7 @@ sqlUpdateReminder = "UPDATE tasks_repo SET is_open = % s WHERE send_to = % s AND
 sqlInsertWordle = "INSERT INTO wordle (id, author, which_day, score, green_squares, yellow_squares, black_squares) VALUES (% s, % s, % s, % s, % s, % s, % s)"  # ON DUPLICATE KEY UPDATE ( score = % s, green_squares = % s, yellow_squares = % s, black_squares = % s)"
 sqlGetWordleScores = "SELECT author, games_played, score_avg, green_avg, yellow_avg, black_avg FROM `wordle.v`"
 sqlGetWordleScoresv2 = "SELECT *, Dense_rank() OVER ( ORDER BY games_played DESC ) AS 'lb_rank' FROM `wordle.v` wv"
-sqlGetWordleIndividualUserScore = "SELECT *, Dense_rank() OVER ( ORDER BY games_played DESC ) AS 'lb_rank' FROM `wordle.v` wv"
+sqlGetWordleIndividualUserScore = "SELECT *, Dense_rank() OVER ( ORDER BY score_avg asc ) AS 'lb_rank' FROM `wordle.v` wv"
 
 
 class SqlFetch(str, enum.Enum):

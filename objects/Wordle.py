@@ -169,6 +169,10 @@ class Wordle:
         else:
             raise WordleException(self.__err_mg)
 
+    @property
+    def failed_score(self):
+        return self._failed_score
+
 
 class WordleFinder:
     __slots__ = ["wordle_finder"]

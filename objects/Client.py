@@ -579,7 +579,7 @@ class HuskerClient(Bot):
     async def on_message(self, message: discord.Message) -> None:
         await self.process_commands(message)
 
-        if message.author.bot:
+        if message.author.bot or message.channel.id != CHAN_NORTH_BOTTOMS:
             return
 
         wordle: Optional[Wordle] = self.wordle_finder.get_wordle_message(
@@ -626,9 +626,10 @@ class HuskerClient(Bot):
 
                 logger.debug("Author scores retreived")
             except (MySQLException, IntegrityError, ProgrammingError):
+                logger.debug("Error getting leaderboard or author_scores")
                 pass
 
-            if wordle.score == wordle._failed_score:
+            if wordle.score == wordle.failed_score:
                 wordle_score_str: str = "X"
             else:
                 wordle_score_str = wordle.score
