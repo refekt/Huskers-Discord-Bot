@@ -173,7 +173,7 @@ class SqlQuery:
 
             _temp_query: str = self.query
             for value in self.values:
-                _temp_query = self.processed_query.replace(
+                _temp_query = _temp_query.replace(
                     "% s", f"'{value}'" if type(value) == str else str(value), 1
                 )
 
@@ -207,10 +207,9 @@ def processMySQL(
     )
 
     # TODO Fix processed_Query
-    # logger.debug(
-    #     f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
-    # )
-    logger.debug(f"Starting a MySQL query called from [{module}-{method}] with query\n")
+    logger.debug(
+        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
+    )
 
     sqlConnection: Optional[Connection] = None
     try:
