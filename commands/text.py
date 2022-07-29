@@ -660,7 +660,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         await interaction.response.defer()
 
         user_score: Optional[dict[str, ...]] = None
-        author: str = f"{interaction.user.name}#{interaction.user.discriminator}"
+        author: str = f"{player.name}#{player.discriminator}"
 
         try:
             user_score = processMySQL(
