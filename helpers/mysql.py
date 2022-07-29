@@ -26,6 +26,7 @@ __all__: list[str] = [
     "sqlGetPrediction",
     "sqlGetTeamInfoByESPNID",
     "sqlGetTeamInfoByID",
+    "sqlGetUserWordleScores",
     "sqlGetWordleIndividualUserScore",
     "sqlGetWordleScores",
     "sqlInsertGameBet",
@@ -120,7 +121,7 @@ sqlUpdateReminder = "UPDATE tasks_repo SET is_open = % s WHERE send_to = % s AND
 
 sqlInsertWordle = "INSERT INTO wordle (id, author, which_day, score, green_squares, yellow_squares, black_squares) VALUES (% s, % s, % s, % s, % s, % s, % s)"  # ON DUPLICATE KEY UPDATE ( score = % s, green_squares = % s, yellow_squares = % s, black_squares = % s)"
 sqlGetWordleScores = "SELECT author, games_played, score_avg, green_avg, yellow_avg, black_avg FROM `wordle.v`"
-sqlGetWordleScoresv2 = "SELECT *, Dense_rank() OVER ( ORDER BY games_played DESC ) AS 'lb_rank' FROM `wordle.v` wv"
+sqlGetUserWordleScores = "SELECT * FROM wordle WHERE author = % s"
 sqlGetWordleIndividualUserScore = "SELECT *, Dense_rank() OVER ( ORDER BY score_avg asc ) AS 'lb_rank' FROM `wordle.v` wv"
 
 
@@ -242,10 +243,10 @@ def processMySQL(
 
         sqlConnection.commit()
     except IntegrityError as err:
-        logger.exception("Error occurred opening the MySQL database.")
+        # logger.exception("Error occurred opening the MySQL database.")
         raise MySQLException(f"Integrity Error: {err.args[1]}")
     except ProgrammingError as err:
-        logger.warning("Error occurred opening the MySQL database.")
+        # logger.warning("Error occurred opening the MySQL database.")
         raise MySQLException(f"MySQL Syntax error: {err.args[1]}")
     finally:
         logger.debug(f"Closing connection to the MySQL Database")

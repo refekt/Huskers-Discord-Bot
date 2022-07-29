@@ -28,8 +28,19 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from helpers.misc import shift_utc_tz
-from helpers.mysql import processMySQL, sqlGetWordleScores
-from objects.Exceptions import CommandException, WeatherException, TextException
+from helpers.mysql import (
+    processMySQL,
+    sqlGetWordleScores,
+    sqlGetUserWordleScores,
+    SqlFetch,
+    sqlGetWordleIndividualUserScore,
+)
+from objects.Exceptions import (
+    CommandException,
+    WeatherException,
+    TextException,
+    MySQLException,
+)
 from objects.Logger import discordLogger
 from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
@@ -41,6 +52,12 @@ logger = discordLogger(
 
 
 class TextCog(commands.Cog, name="Text Commands"):
+    group_wordle: app_commands.Group = app_commands.Group(
+        name="wordle",
+        description="Wordle commands",
+        guild_ids=[GUILD_PROD],
+    )
+
     @app_commands.command(
         name="eightball", description="Ask the Magic 8-Ball a question"
     )
@@ -598,11 +615,10 @@ class TextCog(commands.Cog, name="Text Commands"):
                 "Unable to make a Husk Chain!", ephemeral=True
             )
 
-    @app_commands.command(
-        name="wordle-board", description="Leaderboard for Wordle scores"
+    @group_wordle.command(
+        name="leaderboard", description="Leaderboard for Wordle scores"
     )
-    @app_commands.guilds(discord.Object(id=GUILD_PROD))
-    async def wordle_board(self, interaction: discord.Interaction):
+    async def wordle_leaderboard(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
         wordle_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(
@@ -635,6 +651,94 @@ class TextCog(commands.Cog, name="Text Commands"):
             )
 
             await interaction.followup.send(embed=embed)
+
+    @group_wordle.command(name="player-stats", description="Wordle stats for a player")
+    @app_commands.describe(player="Player in which to get stats")
+    async def wordle_player_stats(
+        self, interaction: discord.Interaction, player: discord.Member
+    ):
+        await interaction.response.defer()
+
+        user_score: Optional[dict[str, ...]] = None
+        author: str = f"{interaction.user.name}#{interaction.user.discriminator}"
+
+        try:
+            user_score = processMySQL(
+                query=sqlGetUserWordleScores,
+                fetch=SqlFetch.all,
+                values=author,
+            )
+        except MySQLException as err:
+            logger.exception(err)
+
+        if not user_score:
+            raise TextException("Unable to retrieve user score information")
+
+        total_games: int = len(user_score)
+
+        average_score: float = (
+            sum([float(user["score"]) for user in user_score]) / total_games  # noqa
+        )
+        average_green: float = (
+            sum([user["green_squares"] for user in user_score]) / total_games  # noqa
+        )
+        average_yellow: float = (
+            sum([user["yellow_squares"] for user in user_score]) / total_games  # noqa
+        )
+        average_black: float = (
+            sum([user["black_squares"] for user in user_score]) / total_games  # noqa
+        )
+
+        author_rank: Optional[int] = None
+
+        try:
+            leaderboard_scores: list[dict[str, ...]] = processMySQL(
+                query=sqlGetWordleIndividualUserScore,
+                fetch=SqlFetch.all,
+            )
+
+            author_score = [
+                score for score in leaderboard_scores if author in score.values()
+            ]
+
+            if author_score:
+                author_rank: int = author_score[0]["lb_rank"]
+            else:
+                author_rank = 0
+        except MySQLException:
+            logger.debug("Unable to get or find leaderboard info")
+            pass
+
+        embed: discord.Embed = buildEmbed(
+            title=f"Wordle Stats",
+            description=f"{interaction.user.mention}",
+            fields=[
+                dict(name="Total Games", value=f"{total_games}", inline=True),
+                dict(
+                    name="Leaderboard Rank",
+                    value=f"{author_rank if author_rank > 0 else 'N/A'}",
+                    inline=True,
+                ),
+                dict(name="Average Score", value=f"{average_score:0.3f}", inline=True),
+                dict(
+                    name="Average Green Squares",
+                    value=f"{average_green:0.3f}",
+                    inline=True,
+                ),
+                dict(
+                    name="Average Yellow Squares",
+                    value=f"{average_yellow:0.3f}",
+                    inline=True,
+                ),
+                dict(
+                    name="Average Black Squares",
+                    value=f"{average_black:0.3f}",
+                    inline=True,
+                ),
+            ],
+        )
+
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
