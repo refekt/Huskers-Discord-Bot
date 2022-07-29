@@ -711,7 +711,7 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         embed: discord.Embed = buildEmbed(
             title=f"Wordle Stats",
-            description=f"{interaction.user.mention}",
+            description=f"{player.mention}",
             fields=[
                 dict(name="Total Games", value=f"{total_games}", inline=True),
                 dict(
