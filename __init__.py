@@ -116,7 +116,7 @@ if not DEBUGGING_CODE:
 @commands.default_permissions(administrator=True)
 async def backlog(ctx: Context):
     north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
-    wordle_finder: WordleFinder = WordleFinder(search_channel=north_bottoms)
+    wordle_finder: WordleFinder = WordleFinder()
 
     index: int = 0
 

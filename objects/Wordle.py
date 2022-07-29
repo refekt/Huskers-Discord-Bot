@@ -42,6 +42,7 @@ class Wordle:
         "__boxes",
         "__err_mg",
         "__g",
+        "__w",
         "__y",
         "_failed_score",
         "message",
@@ -57,6 +58,7 @@ class Wordle:
         self.message: str = message.replace("\n\n", "\n")
         self.__boxes: list[str] = self.message.strip().split("\n")
         self.__b: ClassVar[str] = "⬛"  # ":black_large_square:"
+        self.__w: ClassVar[str] = "⬜"  # :white_large_square:
         self.__g: ClassVar[str] = "🟩"  # ":green_square:"
         self.__y: ClassVar[str] = "🟨"  # ":yellow_square:"
         self._failed_score: ClassVar[float] = 6 + statistics.stdev([1, 2, 3, 4, 5, 6])
@@ -78,7 +80,7 @@ class Wordle:
             _box_count: int = 0
 
             # Check to make sure no illegal characters are present
-            for box in (self.__b, self.__g, self.__y):
+            for box in (self.__b, self.__w, self.__g, self.__y):
 
                 _box_count = line.count(box)
                 logger.debug(f"Box count is {_box_count}")
@@ -133,7 +135,10 @@ class Wordle:
     @property
     def black_squares(self) -> int:
         total_color_count: int = 0
-        for color in self.__b:
+        for color in (
+            self.__b,
+            self.__w,
+        ):  # Not creating a separate property for white squares
             total_color_count += self.message.count(color)
         return total_color_count
 
@@ -177,13 +182,18 @@ class Wordle:
 class WordleFinder:
     __slots__ = ["wordle_finder"]
 
-    def __init__(self, search_channel: discord.TextChannel) -> None:
+    def __init__(self) -> None:
         self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
 
-    def get_wordle_message(self, message: discord.Message) -> Optional[Wordle]:
-        msg: str = message.content
+    def get_wordle_message(
+        self, message: Union[discord.Message, str]
+    ) -> Optional[Wordle]:
+        if isinstance(message, str):
+            msg: str = message
+        else:
+            msg = message.content
 
-        if re.search(self.wordle_finder, str(message.clean_content)):
+        if re.search(self.wordle_finder, msg):
             try:
                 return Wordle(message=msg)
             except UnicodeError:

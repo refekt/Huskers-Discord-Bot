@@ -373,7 +373,7 @@ class HuskerClient(Bot):
         logger.info(
             f"Establishing Wordle Finder in {chan_north_bottoms.name.encode('utf-8')}"
         )
-        self.wordle_finder = WordleFinder(chan_north_bottoms)
+        self.wordle_finder = WordleFinder()
 
         logger.info(
             f"Reaction threshold for HOF and HOS messages set to [{self.reaction_threshold}]"
