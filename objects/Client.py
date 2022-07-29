@@ -579,7 +579,10 @@ class HuskerClient(Bot):
     async def on_message(self, message: discord.Message) -> None:
         await self.process_commands(message)
 
-        if message.author.bot or message.channel.id != CHAN_NORTH_BOTTOMS:
+        if message.author.bot or message.channel.id not in (
+            CHAN_NORTH_BOTTOMS,
+            CHAN_BOT_SPAM_PRIVATE,
+        ):
             return
 
         wordle: Optional[Wordle] = self.wordle_finder.get_wordle_message(
@@ -621,10 +624,13 @@ class HuskerClient(Bot):
                 author_score = [
                     score for score in leaderboard_scores if author in score.values()
                 ]
-                author_score = author_score[0]
-                author_score_str = f"They are the #{author_score['lb_rank']} Wordler with an average score of {author_score['score_avg']:0.1f}/6 over {author_score['games_played']} games"
+                if len(author_score):
+                    author_score = author_score[0]
+                    author_score_str = f"They are the #{author_score['lb_rank']} Wordler with an average score of {author_score['score_avg']:0.1f}/6 over {author_score['games_played']} games"
 
-                logger.debug("Author scores retreived")
+                    logger.debug("Author scores retreived")
+                else:
+                    logger.debug("No author scores retrieved")
             except (MySQLException, IntegrityError, ProgrammingError):
                 logger.debug("Error getting leaderboard or author_scores")
                 pass
