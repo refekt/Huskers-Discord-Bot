@@ -206,7 +206,6 @@ def processMySQL(
         values=kwargs.get("values", None),
     )
 
-    # TODO Fix processed_Query
     logger.debug(
         f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
     )

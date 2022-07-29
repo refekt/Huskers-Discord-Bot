@@ -2,8 +2,7 @@ import asyncio
 import enum
 import logging
 import random
-import time
-from datetime import datetime, time as _time, timedelta
+from datetime import datetime, time as _time
 from typing import ClassVar
 
 import discord
@@ -49,8 +48,6 @@ class Weekday(enum.IntEnum):
 
 class SchedulePosts:
     __slots__ = [
-        "_day_delivery_time",
-        "_night_delivery_time",
         "_setup",
         "channel",
         "is_day",
@@ -71,8 +68,6 @@ class SchedulePosts:
         title_daily: ClassVar[str] = "Daily Themed Topics of Discussion"
         title_nightly: ClassVar[str] = "Nightly Themed Topics of Discussion"
 
-        self._day_delivery_time: time = _time(hour=7, minute=0, second=0, tzinfo=TZ)
-        self._night_delivery_time: time = _time(hour=20, minute=0, second=0, tzinfo=TZ)
         self._setup: bool = False
         self.channel: discord.TextChannel = channel
         self.is_day: bool = False
@@ -256,14 +251,49 @@ class SchedulePosts:
 
         asyncio_logger.debug("SchedulePosts initialized")
 
+    @property
+    def __weather_info(self) -> WeatherResponse:
+        weather_url: str = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q=Omaha,NE,US"
+        response: requests.Response = requests.get(weather_url, headers=HEADERS)
+        response.json()
+        j: dict[str, ...] = response.json()
+
+        return WeatherResponse(j)
+
+    @property
+    def sunrise_str(self) -> str:
+        try:
+            sunrise = self.__weather_info.sys.sunrise
+        except requests.exceptions.RequestException:
+            sunrise = _time(hour=7, minute=0, second=0, tzinfo=TZ)
+
+        return f"{sunrise.hour :02d}:{sunrise.minute:02d}"
+
+    @property
+    def sunset_str(self) -> str:
+        try:
+            sunset = self.__weather_info.sys.sunset
+        except requests.exceptions.RequestException:
+            sunset = _time(hour=10, minute=0, second=0, tzinfo=TZ)
+
+        return f"{sunset.hour :02d}:{sunset.minute:02d}"
+
     def send_daily_message(self, is_day: bool = False, is_night: bool = False) -> None:
         asyncio_logger.info("Attempting to send a daily message")
+
         self.send_message = True
         self.is_day = is_day
         self.is_night = is_night
+        self.which_day = datetime.now(tz=TZ).weekday()
 
-        dt_now = datetime.now(tz=TZ)
-        self.which_day = dt_now.weekday()
+    @property
+    def all_jobs(self) -> str:
+        all_jobs: list[schedule.Job] = schedule.jobs
+        all_jobs_str: str = ""
+        for job in all_jobs:
+            all_jobs_str += f"* {repr(job)}\n"
+
+        return all_jobs_str
 
     def _setup_debug_schedule(self) -> None:
         asyncio_logger.debug("Creating schedule for debug messages")
@@ -272,78 +302,41 @@ class SchedulePosts:
             self.send_daily_message, is_day=True, is_night=False
         )
 
-        all_jobs: list[schedule.Job] = schedule.jobs
-        all_jobs_str: str = ""
-        for job in all_jobs:
-            all_jobs_str += f"* {repr(job)}\n"
-        asyncio_logger.info(f"Scheduled messages complete. Jobs are:\n\n{all_jobs_str}")
-
-        asyncio_logger.debug("Scheduled debug messages for every 3 seconds")
+        asyncio_logger.info(
+            f"Scheduled messages complete. Jobs are:\n\n{self.all_jobs}"
+        )
 
     def _setup_schedule(self) -> None:
-        asyncio_logger.debug("Creating schedule for daily posts")
-
-        day_time_str: str = (
-            f"{self._day_delivery_time.hour:02d}:{self._day_delivery_time.minute:02d}"
-        )
-        night_time_str: str = f"{self._night_delivery_time.hour:02d}:{self._night_delivery_time.minute:02d}"
         asyncio_logger.debug(
-            f"Day time string is {day_time_str}. Night time string is {night_time_str}."
+            "Creating schedule for daily posts from sunrise and sunset"
         )
 
-        # Get sunrise and sunset
-        weather_url: str = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q=Omaha,NE,US"
-        response: requests.Response = requests.get(weather_url, headers=HEADERS)
-        response.json()
-        j: dict[str, ...] = response.json()
+        asyncio_logger.debug(f"Sunrise: {self.sunrise_str}")
+        schedule.every().day.at(self.sunrise_str).do(
+            self.send_daily_message,
+            is_day=True,
+            is_night=False,
+        )
 
-        if j:
-            weather: WeatherResponse = WeatherResponse(j)
+        asyncio_logger.debug(f"Sunset: {self.sunset_str}")
+        schedule.every().day.at(self.sunset_str).do(
+            self.send_daily_message,
+            is_day=False,
+            is_night=True,
+        )
 
-            # TODO figure out why timezones are weird
-            sunrise: datetime = weather.sys.sunrise.astimezone(tz=TZ) - timedelta(
-                hours=4
-            )
-            sunrise_str: str = f"{sunrise.hour :02d}:{sunrise.minute:02d}"
-            asyncio_logger.debug(f"Sunrise: {sunrise_str}")
-
-            sunset: datetime = weather.sys.sunset.astimezone(tz=TZ) - timedelta(hours=4)
-            sunset_str: str = f"{sunset.hour :02d}:{sunset.minute:02d}"
-            asyncio_logger.debug(f"Sunset: {sunset_str}")
-
-            schedule.every().day.at(sunrise_str).do(
-                self.send_daily_message,
-                is_day=True,
-                is_night=False,
-            )
-
-            schedule.every().day.at(sunset_str).do(
-                self.send_daily_message,
-                is_day=False,
-                is_night=True,
-            )
-        else:
-            schedule.every().day.at(day_time_str).do(
-                self.send_daily_message,
-                is_day=True,
-                is_night=False,
-            )
-
-            schedule.every().day.at(night_time_str).do(
-                self.send_daily_message,
-                is_day=False,
-                is_night=True,
-            )
-
-        all_jobs: list[schedule.Job] = schedule.jobs
-        all_jobs_str: str = ""
-        for job in all_jobs:
-            all_jobs_str += f"* {repr(job)}\n"
         asyncio_logger.debug(
-            f"Scheduled messages complete. Jobs are:\n\n{all_jobs_str}"
+            f"Scheduled messages complete. Jobs are:\n\n{self.all_jobs}"
         )
 
     def setup_and_run_schedule(self) -> None:
+        asyncio_logger.debug("Clearing any previous jobs")
+
+        for scheduled_job in schedule.jobs:
+            schedule.cancel_job(scheduled_job)
+
+        asyncio_logger.debug("Previous jobs cleared")
+
         if DEBUGGING_CODE:
             asyncio_logger.debug("Attempting to create debug schedule")
             if not self._setup:

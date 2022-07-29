@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 
-from helpers.constants import DEBUGGING_CODE
+from helpers.constants import DEBUGGING_CODE, TZ
 from objects.Logger import discordLogger
 
 logger = discordLogger(
@@ -78,12 +78,12 @@ class WeatherSys:
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             if key == "sunrise":
-                self.sunrise = datetime.utcfromtimestamp(value).astimezone(
-                    tz=timezone.utc
+                self.sunrise = datetime.fromtimestamp(value, timezone.utc).astimezone(
+                    tz=TZ
                 )
             elif key == "sunset":
-                self.sunset = datetime.utcfromtimestamp(value).astimezone(
-                    tz=timezone.utc
+                self.sunset = datetime.fromtimestamp(value, timezone.utc).astimezone(
+                    tz=TZ
                 )
             else:
                 setattr(self, key, value)
@@ -130,8 +130,6 @@ class WeatherClouds:
 
 
 class WeatherRain:
-    # TODO Slots
-
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
@@ -142,8 +140,6 @@ class WeatherRain:
 
 
 class WeatherSnow:
-    # TODO Slots
-
     def __init__(self, dictionary) -> None:
         for key, value in dictionary.items():
             setattr(self, key, value)
