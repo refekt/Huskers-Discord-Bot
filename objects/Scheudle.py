@@ -2,8 +2,7 @@ import asyncio
 import enum
 import logging
 import random
-from datetime import datetime, time as _time
-from typing import ClassVar
+from datetime import datetime, time as _time, timedelta
 
 import discord
 import requests
@@ -63,10 +62,10 @@ class SchedulePosts:
     def __init__(self, channel: discord.TextChannel) -> None:
         asyncio_logger.debug("Creating SchedulePosts instance")
 
-        description_daily: ClassVar[str] = "MORNING GANG RISE UP!"
-        description_nightly: ClassVar[str] = "Night Owls Assemble!"
-        title_daily: ClassVar[str] = "Daily Themed Topics of Discussion"
-        title_nightly: ClassVar[str] = "Nightly Themed Topics of Discussion"
+        description_daily: str = "MORNING GANG RISE UP!"
+        description_nightly: str = "Night Owls Assemble!"
+        title_daily: str = "Daily Themed Topics of Discussion"
+        title_nightly: str = "Nightly Themed Topics of Discussion"
 
         self._setup: bool = False
         self.channel: discord.TextChannel = channel
@@ -271,8 +270,10 @@ class SchedulePosts:
 
     @property
     def sunset_str(self) -> str:
+        TWILIGHT_OFFSET: timedelta = timedelta(minutes=90)
+
         try:
-            sunset = self.__weather_info.sys.sunset
+            sunset = self.__weather_info.sys.sunset + TWILIGHT_OFFSET
         except requests.exceptions.RequestException:
             sunset = _time(hour=10, minute=0, second=0, tzinfo=TZ)
 
