@@ -20,6 +20,7 @@ from helpers.constants import (
     CHAN_TWITTERVERSE,
     DEBUGGING_CODE,
     TWITTER_BLOCK16_SCREENANME,
+    TZ,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from objects.Exceptions import TwitterStreamException
@@ -215,7 +216,9 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             text=tweet.data["text"],
             tweet_metrics=tweet.data["public_metrics"],
             tweet_id=tweet.data["id"],
-            tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]),
+            tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]).astimezone(
+                tz=TZ
+            ),
             profile_image_url=author.profile_image_url,
             urls=tweet.data["entities"],
             medias=medias,
@@ -236,7 +239,9 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         text=tweet.data["text"],
         tweet_metrics=tweet.data["public_metrics"],
         tweet_id=tweet.data["id"],
-        tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]),
+        tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]).astimezone(
+            tz=TZ
+        ),
         profile_image_url=author.profile_image_url,
         urls=tweet.data["entities"],
         medias=medias,
@@ -335,7 +340,7 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.warning(f"Closed: {response}")
 
     def on_exception(self, exception: tweepy.HTTPException) -> None:
-        raise TwitterStreamException(", ".join(exception.api_messages))
+        raise TwitterStreamException(", ".join(exception.args))
 
     def on_data(self, raw_data) -> None:
         processed_data: dict = json.loads(raw_data)
