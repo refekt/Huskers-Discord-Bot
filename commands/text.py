@@ -27,7 +27,6 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
-from helpers.misc import shift_utc_tz
 from helpers.mysql import (
     processMySQL,
     sqlGetWordleScores,
@@ -525,8 +524,8 @@ class TextCog(commands.Cog, name="Text Commands"):
                 hour_temp_str += f"{hour.temp}℉"
                 hour_wind_str += f"{hour.wind_speed} MPH"
 
-        sunrise: datetime = shift_utc_tz(weather.sys.sunrise, weather.timezone)
-        sunset: datetime = shift_utc_tz(weather.sys.sunset, weather.timezone)
+        sunrise: datetime = weather.sys.sunrise
+        sunset: datetime = weather.sys.sunset
 
         sun_str: str = (
             f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n"
