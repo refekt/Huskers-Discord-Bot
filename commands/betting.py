@@ -151,7 +151,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
                 fields.append(
                     dict(
-                        name=f"{bet.get('author_str', 'N/A')}'s Bet",
+                        name=f"{bet.get('author_str', 'N/A').upper()}",
                         value=(
                             f"Wins: {bet.get('predict_game', 'N/A')}\n"
                             f"Total Points: {bet.get('predict_points', 'N/A')}\n"

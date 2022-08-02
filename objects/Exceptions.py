@@ -68,7 +68,10 @@ class DiscordError:
 
     @property
     def message(self) -> str:
-        return self.original.original.message
+        try:
+            return self.original.original.message
+        except AttributeError:
+            return self.original.original.args[0]
 
     @property
     def command(self) -> Optional[str]:
