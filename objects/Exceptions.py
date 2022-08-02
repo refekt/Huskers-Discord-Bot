@@ -2,7 +2,7 @@
 import logging
 import platform
 from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
-from typing import Optional
+from typing import Optional, Any
 
 from discord.app_commands import CommandInvokeError
 
@@ -38,35 +38,46 @@ __all__: list[str] = [
 
 class DiscordError:
     def __init__(
-        self, original: CommandInvokeError, options: dict, tb_msg: str
+        self,
+        original: CommandInvokeError,
+        options: list[dict[str:int, str : list[dict[Any, ...]], str:str]],
+        tb_msg: str,
     ) -> None:
-        self.command: Optional[str] = original.command.qualified_name
-        self.error_type: str = type(original).__name__
-        if hasattr(original, "original"):
-            self.message = original.original.args[0].message
-        elif hasattr(original, "message"):
-            self.message: str = original.original.message
-        self.module: Optional[str] = original.command.module
-        self.original: ALL_EXCEPTIONS = original.original
-        self.options: list[str] = (
-            [f"{opt['name']} : {opt.get('value', 'N/A')}" for opt in options]
+        self.original: CommandInvokeError = original
+        self.options: list[dict[str:int, str : list[dict[Any, ...]], str:str]] = (
+            [
+                f"{opt['name']} : {opt.get('value', 'N/A')}"
+                for opt in options[0]["options"]
+            ]
             if options is not None
             else None
         )
-        self.parent: Optional[str] = original.command.parent
         self.traceback: str = tb_msg
+
+    @property
+    def type(self) -> str:
+        return self.original.__class__.__name__
+
+    @property
+    def parent(self) -> Optional[str]:
+        return self.original.command.parent
+
+    @property
+    def module(self) -> Optional[str]:
+        return self.original.command.module
+
+    @property
+    def message(self) -> str:
+        return self.original.original.message
+
+    @property
+    def command(self) -> Optional[str]:
+        # TODO Monitor for Python Exceptions
+        return self.original.command.qualified_name
 
     def __str__(self) -> str:
         return (
-            f"{self.error_type}: /{self.command} {' '.join(self.options)}: {self.message}\n"
-            f"```\n"
-            f"{self.traceback}\n"
-            f"```"
-        )
-
-    def __repr__(self) -> str:
-        return (
-            f"{self.error_type}: /{self.command} {' '.join(self.options)}: {self.message}\n"
+            f"{self.type}: /{self.command} {' '.join(self.options)}: {self.message}\n"
             f"```\n"
             f"{self.traceback}\n"
             f"```"

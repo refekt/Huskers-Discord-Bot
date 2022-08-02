@@ -64,7 +64,7 @@ client: HuskerClient = HuskerClient(
 
 tree: CommandTree = client.tree
 
-if not DEBUGGING_CODE:
+if DEBUGGING_CODE:
 
     @tree.error
     async def on_app_command_error(
@@ -73,21 +73,21 @@ if not DEBUGGING_CODE:
         logger.info("app_command error detected!")
 
         err: DiscordError = DiscordError(
-            error, interaction.data.get("options", None), traceback.format_exc()
+            original=error,
+            options=interaction.data.get("options", None),
+            tb_msg=traceback.format_exc(),
         )
+
         logger.exception(error, exc_info=True)
 
         embed: discord.Embed = buildEmbed(
             title="",
             fields=[
                 dict(
-                    name=f"Error Type: {err.error_type}",
+                    name=f"Error Type: {err.type}",
                     value=f"{err.message}",
                 ),
-                dict(
-                    name="Command",
-                    value=f"{'/' + err.command if not err.parent else '/' + err.parent.name + ' ' + err.command}",
-                ),
+                dict(name="Command", value=f"/{err.command}"),
                 dict(
                     name="Command Input",
                     value=f"{', '.join(err.options) if err.options else 'None'}",
@@ -110,6 +110,9 @@ if not DEBUGGING_CODE:
                 await interaction.channel.send(embed=embed)
         else:
             await interaction.followup.send(content="", embed=embed, ephemeral=True)
+
+else:
+    logger.debug("Skipping error output message in Discord")
 
 
 @client.command()
