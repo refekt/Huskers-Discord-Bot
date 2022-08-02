@@ -115,6 +115,45 @@ else:
     logger.debug("Skipping error output message in Discord")
 
 
+@client.hybrid_command(name="manual-wordle")
+@commands.default_permissions(administrator=True)
+async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str):
+    wordle_finder: WordleFinder = WordleFinder()
+
+    try:
+        wordle: Optional[Wordle] = wordle_finder.get_wordle_message(
+            message=wordle_input
+        )
+    except (AssertionError, WordleException):
+        return
+
+    if wordle:
+        logger.debug("Wordle found!")
+
+        author: str = f"{who.name}#{who.discriminator}"
+
+        try:
+            processMySQL(
+                query=sqlInsertWordle,
+                values=(
+                    f"{wordle.day}_{author}",
+                    author,
+                    wordle.day,
+                    wordle.score,
+                    wordle.green_squares,
+                    wordle.yellow_squares,
+                    wordle.black_squares,
+                ),
+            )
+
+            logger.debug("Wordle MySQL processed")
+
+        except (MySQLException, IntegrityError, ProgrammingError):
+            return
+
+        logger.debug(f"Manual Wordle input for {author} completed")
+
+
 @client.command()
 @commands.default_permissions(administrator=True)
 async def backlog(ctx: Context):
