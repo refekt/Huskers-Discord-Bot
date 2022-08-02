@@ -26,8 +26,13 @@ class TriviaCommands(commands.Cog, name="Trivia Commands"):
         name="trivia", description="Trivia commands", guild_ids=[GUILD_PROD]
     )
 
-    # TODO describe
     @bet_trivia.command(name="start", description="Start a trivia game!")
+    @app_commands.describe(
+        category="The category for the trivia game",
+        difficulty="Difficulty of the trivia game",
+        question_type="Multiple choice or True/False questions",
+        question_amount="Number of questions to ask",
+    )
     async def trivia_start(
         self,
         interaction: discord.Interaction,

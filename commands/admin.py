@@ -63,7 +63,7 @@ class HypeRoles(str, enum.Enum):
     NoHype = "No Hype"
 
     def __str__(self) -> str:
-        return self.value
+        return str(self.value)
 
 
 class ConfirmButtons(discord.ui.View):
@@ -815,7 +815,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await self.process_gameday(False, interaction.guild)
         await self.alert_gameday_channels(client=interaction.client, on=False)
 
-    # TODO Make SMMS hidden
     @app_commands.command(name="smms", description="Tee hee")
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
