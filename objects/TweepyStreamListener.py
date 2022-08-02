@@ -12,6 +12,7 @@ import tweepy
 from tweepy import Response
 
 from helpers.constants import (
+    BOT_ICON_URL,
     CHAN_BOT_SPAM_PRIVATE,
     CHAN_FOOD,
     CHAN_GENERAL,
@@ -42,6 +43,7 @@ class MyTweet(object):
     def __init__(self, tweet_data) -> None:
         self.data = None
         self.includes = None
+
         for key in tweet_data:
             setattr(self, key, tweet_data[key])
 
@@ -75,11 +77,11 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
         twitter_channel: discord.TextChannel = await client.fetch_channel(
             CHAN_BOT_SPAM_PRIVATE
         )
-
     else:
         twitter_channel = await client.fetch_channel(CHAN_TWITTERVERSE)
 
     logger.debug(f"Tweet alert received: {message}")
+
     embed: discord.Embed = buildEmbed(
         title="Husker Twitter",
         fields=[
@@ -127,10 +129,13 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
             logger.debug("Sending tweet to general channel")
+
             chan: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
+
             await chan.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
             )
+
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         @discord.ui.button(
@@ -142,19 +147,21 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
             logger.debug("Sending tweet to recruiting channel")
+
             chan: discord.TextChannel = await client.fetch_channel(CHAN_RECRUITING)
+
             await chan.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
             )
+
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         async def on_timeout(self) -> None:
             logger.debug("Twitter buttons have timed out. Removing options")
-            self.clear_items()
-            await self.message.edit(view=self)
 
-        async def callback(self, interaction: discord.Interaction) -> None:
-            pass
+            self.clear_items()
+
+            await self.message.edit(view=self)
 
     logger.debug(f"Sending a tweet")
 
@@ -170,18 +177,30 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         food_channel = await client.fetch_channel(CHAN_FOOD)
 
     author: Optional[TweetUserData] = None
-    for user in tweet.includes["users"]:
-        if tweet.data["author_id"] == user["id"]:
-            author = TweetUserData(user)
-            break
+
+    if tweet.includes.get("users", None):
+        for user in tweet.includes["users"]:
+            if tweet.data["author_id"] == user["id"]:
+                author = TweetUserData(user)
+                break
+    else:
+        author = TweetUserData(
+            dict(
+                name="Unknown",
+                username="unknown",
+                public_metrics="Unkown",
+                verified="Unkown",
+                profile_image_url=BOT_ICON_URL,
+            )
+        )
 
     medias: list[TweetMediaData] = []
-    if "media" in tweet.includes:
+    if tweet.includes.get("media", None):
         for item in tweet.includes["media"]:
             medias.append(TweetMediaData(item))
 
     quotes: list[TweetQuoteData] = []
-    if "tweets" in tweet.includes:
+    if tweet.includes.get("tweets", None):
         for item in tweet.includes["tweets"]:
             quotes.append(TweetQuoteData(item))
 
@@ -204,8 +223,8 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             b16=True,
         )
 
-        if food_channel:
-            await food_channel.send(embed=embed)
+        await food_channel.send(embed=embed)
+
         return
 
     embed = buildTweetEmbed(
@@ -282,7 +301,7 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code) -> None:
-        logger.exception(f"Request Error: {status_code}")
+        logger.exception(f"Request Error: {status_code} status code")
 
         logger.debug(
             f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
@@ -316,7 +335,6 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.warning(f"Closed: {response}")
 
     def on_exception(self, exception: tweepy.HTTPException) -> None:
-        # logger.exception(f"Exception: {exception}")
         raise TwitterStreamException(", ".join(exception.api_messages))
 
     def on_data(self, raw_data) -> None:

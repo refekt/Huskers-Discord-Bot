@@ -179,7 +179,7 @@ def buildTweetEmbed(
             ),
         ],
     )
-    if urls.get("urls", None):  # TODO KeyError is raising
+    if urls.get("urls", None):
         for url in urls["urls"]:
             if (
                 medias
