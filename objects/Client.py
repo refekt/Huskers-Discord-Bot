@@ -289,16 +289,32 @@ class HuskerClient(Bot):
     ) -> None:
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
-            title="New Husker fan!",
+            title="Hark! A new Husker fan emerges",
             description="Welcome the new member to the server!",
             fields=[
                 dict(
                     name="New Member",
-                    value=f"{guild_member.display_name}#{guild_member.discriminator}",
+                    value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
                 ),
                 dict(
                     name="Info",
                     value=f"Be sure to check out `/commands` for how to use the bot!",
+                ),
+            ],
+        )
+        await channel_general.send(embed=embed)
+
+    async def send_goodbye_message(
+        self, guild_member: Union[discord.Member, discord.User]
+    ):
+        channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
+        embed = buildEmbed(
+            title="Woe is us, a Husker fan departs",
+            description="Say goodbye to the our friend",
+            fields=[
+                dict(
+                    name="Old Member",
+                    value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
                 ),
             ],
         )
@@ -569,6 +585,12 @@ class HuskerClient(Bot):
             logger.info("Skipping on_member_join because not Husker server")
             return
         await self.send_welcome_message(guild_member)
+
+    async def on_member_remove(self, guild_member: discord.Member) -> None:
+        if guild_member.guild.id != GUILD_PROD:
+            logger.info("Skipping on_member_join because not Husker server")
+            return
+        await self.send_goodbye_message(guild_member)
 
     async def on_raw_reaction_add(
         self, payload: discord.RawReactionActionEvent
