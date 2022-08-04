@@ -468,7 +468,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         embeds: list[discord.Embed] = list()
         limit: int = 10  # Arbitary limit
         if len(embed_fields_commands) > limit:
-            logger.info("Number of commands surprasses Discord embed field limitations")
+            logger.info("Number of commands surpasses Discord embed field limitations")
             temp: list = []
             for i in range(0, len(embed_fields_commands), limit):
                 temp.append(embed_fields_commands[i : i + limit])

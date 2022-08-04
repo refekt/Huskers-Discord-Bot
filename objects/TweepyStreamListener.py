@@ -189,8 +189,8 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
             dict(
                 name="Unknown",
                 username="unknown",
-                public_metrics="Unkown",
-                verified="Unkown",
+                public_metrics="Unknown",
+                verified="Unknown",
                 profile_image_url=BOT_ICON_URL,
             )
         )

@@ -310,7 +310,7 @@ class HuskerClient(Bot):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
             title="Woe is us, a Husker fan departs",
-            description="Say goodbye to the our friend",
+            description="Say goodbye to our friend",
             fields=[
                 dict(
                     name="Old Member",
@@ -650,7 +650,7 @@ class HuskerClient(Bot):
                     author_score = author_score[0]
                     author_score_str = f"They are the #{author_score['lb_rank']} Wordler with an average score of {author_score['score_avg']:0.1f}/6 over {author_score['games_played']} games"
 
-                    logger.debug("Author scores retreived")
+                    logger.debug("Author scores retrieved")
                 else:
                     logger.debug("No author scores retrieved")
             except (MySQLException, IntegrityError, ProgrammingError):

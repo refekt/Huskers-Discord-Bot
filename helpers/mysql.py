@@ -201,14 +201,14 @@ def processMySQL(
 ) -> Union[dict, list[dict, ...], tuple[tuple[Any, ...], ...], None]:
     module, method = getModuleMethod(inspect.stack())
 
-    sql_qeury: SqlQuery = SqlQuery(
+    sql_query: SqlQuery = SqlQuery(
         fetch=kwargs.get("fetch", None),
         query=query,
         values=kwargs.get("values", None),
     )
 
     logger.debug(
-        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_qeury.processed_query}\n"
+        f"Starting a MySQL query called from [{module}-{method}] with query\n\n{sql_query.processed_query}\n"
     )
 
     sqlConnection: Optional[Connection] = None
@@ -229,16 +229,16 @@ def processMySQL(
 
     try:
         with sqlConnection.cursor() as cursor:
-            cursor.execute(query=sql_qeury.query, args=sql_qeury.values)
+            cursor.execute(query=sql_query.query, args=sql_query.values)
 
-            if sql_qeury.fetch:
-                if sql_qeury.fetch == SqlFetch.one:
+            if sql_query.fetch:
+                if sql_query.fetch == SqlFetch.one:
                     result = cursor.fetchone()
-                elif sql_qeury.fetch == SqlFetch.many:
+                elif sql_query.fetch == SqlFetch.many:
                     if "size" not in kwargs.keys():
                         logger.exception("Fetching many requires a `size` kwargs.")
                     result = cursor.fetchmany(size=kwargs["size"])
-                elif sql_qeury.fetch == SqlFetch.all:
+                elif sql_query.fetch == SqlFetch.all:
                     result = cursor.fetchall()
 
         sqlConnection.commit()

@@ -419,7 +419,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.describe(
         question="The question you want to ask",
-        options="A maximum of three space deliminated set of options; e.g., 'one two three'",
+        options="A maximum of three space delimited set of options; e.g., 'one two three'",
         timeout="Number of seconds to run the survey.",
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))

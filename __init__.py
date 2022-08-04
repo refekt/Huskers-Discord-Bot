@@ -19,7 +19,7 @@ from pymysql import IntegrityError, ProgrammingError
 from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
 from helpers.embed import buildEmbed  # noqa
 from objects import Wordle
-from objects.Client import HuskerClient  # , schedstop
+from objects.Client import HuskerClient
 from objects.Exceptions import DiscordError  # noqa
 from objects.Logger import discordLogger
 from objects.Wordle import WordleFinder
@@ -224,7 +224,7 @@ async def sync(
         elif (
             spec == "^"
         ):  # Clears all commands from the current guild target and syncs (removes guild commands)
-            logger.info("Cleaering all application commands")
+            logger.info("Clearing all application commands")
             client.tree.clear_commands(guild=ctx.guild)
             await client.tree.sync(guild=ctx.guild)
             synced = []

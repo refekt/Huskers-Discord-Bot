@@ -129,11 +129,11 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
             )
 
         logger.info("Checking if a prediction exists already")
-        previous_prediciton: dict = get_individual_predictions(
+        previous_prediction: dict = get_individual_predictions(
             user_id=interaction.user.id, recruit=self.recruit
         )
-        if previous_prediciton:
-            table_id = previous_prediciton["id"]
+        if previous_prediction:
+            table_id = previous_prediction["id"]
         else:
             table_id = 0
 

@@ -205,7 +205,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         description="Deep fry a picture into a unique creation",
     )
     @app_commands.describe(
-        # source="A URL, Discord Member, or attachment you want to deep fry.",
+        # source="A URL, Discord Member, or attachment you want to deep-fry.",
         url="(Optional) The URL of a file you want to deep fry.",
         discord_member="(Optional) The Discord Member's avatar you want to deep fry.",
         upload="(Optional) The picture upload you want to deep fry.",
