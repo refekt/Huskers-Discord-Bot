@@ -6,13 +6,17 @@ from typing import Union, Optional
 import discord
 import validators
 from cfbd import ApiClient, GamesApi, Game, TeamRecord
+from tweepy import Response, Client, Tweet, Media, StreamResponse, User
 
 from helpers.constants import (
     BOT_FOOTER_BOT,
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
     CFBD_CONFIG,
+    DEBUGGING_CODE,
     DESC_LIMIT,
+    DT_CFBD_GAMES,
+    DT_CFBD_GAMES_DISPLAY,
     DT_STR_RECRUIT,
     DT_TWEET_FORMAT,
     EMBED_MAX,
@@ -22,17 +26,13 @@ from helpers.constants import (
     FOOTER_LIMIT,
     NAME_LIMIT,
     TITLE_LIMIT,
+    TWITTER_BEARER,
     TZ,
-    DT_CFBD_GAMES,
-    DT_CFBD_GAMES_DISPLAY,
-    DEBUGGING_CODE,
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions, SqlFetch
 from objects.Bets_Stats_Schedule import BigTenTeams, getHuskerOpponent, buildTeam
 from objects.Exceptions import BettingException
-
-# logger = logging.getLogger(__name__)
 from objects.Logger import discordLogger
 
 logger = discordLogger(
@@ -118,124 +118,84 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
         return e
 
 
-def buildTweetEmbed(
-    author_metrics: dict,
-    name: str,
-    profile_image_url: str,
-    source: str,
-    text: str,
-    tweet_created_at: datetime,
-    tweet_id: str,
-    tweet_metrics: dict,
-    username: str,
-    verified: bool,
-    medias: list = None,
-    quotes: list = None,
-    urls: dict = None,
-    b16: bool = False,
-) -> discord.Embed:
+def buildTweetEmbed(response: StreamResponse) -> discord.Embed:
     module, method = getModuleMethod(inspect.stack())
     logger.info(f"Creating a tweet embed from [{module}-{method}]")
 
-    if b16 and medias:
-        logger.info(f"Creating a Block 16 embed from [{module}-{method}]")
-        return buildEmbed(
-            author=f"{name} (@{username})",
-            title="Block 16 Tweet",
-            description=text if text else "",
-            image=medias[0].url,
-            fields=[
-                dict(
-                    name="Link to Tweet",
-                    value=f"https://twitter.com/{username}/status/{tweet_id}",
-                )
-            ],
-        )
-    elif b16:
-        logger.info(f"Creating a Block 16 embed from [{module}-{method}]")
-        return buildEmbed(
-            author=f"{name} (@{username})",
-            title="Block 16 Tweet",
-            description=text if text else "",
-            fields=[
-                dict(
-                    name="Link to Tweet",
-                    value=f"https://twitter.com/{username}/status/{tweet_id}",
-                )
-            ],
-        )
+    author: User = response.includes["users"][0]
+    public_metrics: dict[str, int] = author.public_metrics
 
     embed = buildEmbed(
         title="",
-        description=f"Followers: {author_metrics['followers_count']} • Tweets: {author_metrics['tweet_count']}",
+        description=f"Followers: {public_metrics['followers_count']} • Tweets: {public_metrics['tweet_count']}",
         fields=[
             dict(
                 name="Message",
-                value=text,
-            ),
-            dict(
-                name="Link to Tweet",
-                value=f"https://twitter.com/{username}/status/{tweet_id}",
+                value=response.data.text,
             ),
         ],
     )
-    if urls.get("urls", None):
-        for url in urls["urls"]:
-            if (
-                medias
-            ):  # Avoid duplicating media embeds. Also, there's no "title" field when the URL is from a media embed
-                if not url.get("media_key"):
-                    logger.info("Skipping url because media_key does not exist")
-                    break
-                if url["media_key"] in [media.media_key for media in medias]:
-                    logger.info("Skipping duplicate media_key from URLs")
-                    break
 
-            # Quote tweets don't have title in the url item
-            if not url.get("title"):
-                break
+    # Add URLs to embed
+    if "urls" in response.data.entities.keys():
+        urls: list[dict] = response.data.entities["urls"]
+
+        for index, url in enumerate(urls):
+            if url.get("status") == 200:
+                embed.add_field(
+                    name="Embedded URL",
+                    value=discordURLFormatter(
+                        display_text=url["title"], url=url["expanded_url"]
+                    ),
+                )
+
+    # Add images to embed
+    if "media" in response.includes.keys():
+        media: list[Media] = response.includes["media"]
+
+        for index, item in enumerate(media):
+            if index == 0:
+                embed.set_image(url=item.url)
 
             embed.add_field(
-                name="Embedded URL",
+                name="Embedded Image",
                 value=discordURLFormatter(
-                    display_text=url["title"], url=url["expanded_url"]
+                    display_text=f"Image #{index + 1}", url=item.url
                 ),
             )
 
-    if medias:
-        for index, item in enumerate(medias):
-            try:
-                if item.get("url", None) is None:
-                    continue
+    # Add quoted tweets
+    if "tweets" in response.includes.keys():
+        tweets: list[Tweet] = response.includes["tweets"]
+        tweeter_client = Client(TWITTER_BEARER)
 
-                if index == 0:
-                    embed.set_image(url=item.url)
+        for index, item in enumerate(tweets):
+            quote_author: Response = tweeter_client.get_user(id=item.author_id)
 
-                embed.add_field(
-                    name="Embedded Image",
-                    value=discordURLFormatter(f"Image #{index + 1}", item.url),
-                )
-            except AttributeError:
-                continue
-
-    if quotes:
-        for item in quotes:
             embed.add_field(
-                name="Quoted Tweet",
-                value=item.text,
+                name="Quoted Text",
+                value=f"{quote_author.data.name} (@{quote_author.data.username}): {item.text}",
             )
 
-    embed.set_author(
-        name=f"{name}{' ☑️' if verified else ' '}(@{username})",
-        url=f"https://twitter.com/{username}",
-        icon_url=profile_image_url,
+    # Add hyperlink to tweet
+    embed.add_field(
+        name="Link to Tweet",
+        value=f"https://twitter.com/{author.username}/status/{response.data.id}",
     )
+
+    embed.set_author(
+        name=f"{author.name}{' ☑️' if author.verified else ' '}(@{author.username})",
+        url=f"https://twitter.com/{author.username}",
+        icon_url=author.profile_image_url,
+    )
+
     embed.set_footer(
-        text=f"Sent via {source} at {tweet_created_at.strftime(DT_TWEET_FORMAT)}"[  # • Retweets: {tweet_metrics['retweet_count']} • Replies: {tweet_metrics['reply_count']} • Likes: {tweet_metrics['like_count']} • Quotes: {tweet_metrics['quote_count']}"[
+        text=f"Sent via {response.data.source} at {response.data.created_at.strftime(DT_TWEET_FORMAT)}"[
             :FOOTER_LIMIT
         ],
     )
-    embed.set_thumbnail(url=profile_image_url)
+
+    embed.set_thumbnail(url=author.profile_image_url)
 
     logger.info(f"Finished tweet embed from [{module}-{method}]")
     return embed

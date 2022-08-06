@@ -65,25 +65,26 @@ tracemalloc.start()
 async def start_twitter_stream(client: discord.Client) -> None:
     logger.info("Bot is starting the Twitter stream")
 
-    logger.debug("Creating a stream client")
     tweeter_stream = StreamClientV2(
         bearer_token=TWITTER_BEARER,
-        client=client,
+        discord_client=client,
         wait_on_rate_limit=True,
     )
 
-    logger.debug("Looking for any lingering stream rules")
+    logger.debug("Twitter stream client created")
+
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
     if raw_rules.data is not None:
         ids = [rule.id for rule in raw_rules.data]
-        logger.debug(f"Deleting rule ids: {' '.join(ids)}")
         tweeter_stream.delete_rules(ids)
 
-    logger.debug("Collecting Husker Media Twitter list")
+    logger.debug("Previous Twitter Stream rules deleted")
+
     tweeter_client = tweepy.Client(TWITTER_BEARER)
     list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
 
-    logger.debug("Creating stream rule")
+    logger.debug("Collected usernames from the Husker Media Twitter List")
+
     rule_query = ""
     rules: list[str] = []
     append_str: str = ""
@@ -109,7 +110,6 @@ async def start_twitter_stream(client: discord.Client) -> None:
     del list_members, member, tweeter_client, append_str
 
     for stream_rule in rules:
-        logger.debug(f"Adding stream rule: {stream_rule}")
         tweeter_stream.add_rules(tweepy.StreamRule(stream_rule))
 
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
@@ -125,7 +125,7 @@ async def start_twitter_stream(client: discord.Client) -> None:
     auths = ", ".join(auths)
 
     if raw_rules.data is not None:
-        logger.debug(f"Number of rules: {len(raw_rules.data)}")
+        logger.debug(f"Twitter Stream rules: {auths}")
     else:
         logger.debug("No rules found")
 
@@ -136,7 +136,6 @@ async def start_twitter_stream(client: discord.Client) -> None:
         user_fields=TWITTER_USER_FIELDS,
         threaded=True,
     )
-    logger.info(f"Twitter stream is running: {tweeter_stream.running}")
 
 
 class HuskerClient(Bot):
@@ -427,10 +426,10 @@ class HuskerClient(Bot):
             )
         except Forbidden:
             logger.exception(
-                "The client does not have the ``applications.commands`` scope in the guild."
+                "The discord_client does not have the ``applications.commands`` scope in the guild."
             )
         except MissingApplicationID:
-            logger.exception("The client does not have an application ID.")
+            logger.exception("The discord_client does not have an application ID.")
         except HTTPException:
             logger.exception("Syncing the commands failed.")
 
@@ -445,7 +444,7 @@ class HuskerClient(Bot):
             is_silent = False
         logger.info(f"is_silent == {is_silent}")
 
-        if is_silent:
+        if not is_silent:
             logger.info("Skipping Twitter stream")
         else:
             await start_twitter_stream(self)

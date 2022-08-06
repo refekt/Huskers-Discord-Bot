@@ -1,18 +1,13 @@
 import asyncio
-import json
 import logging
-import time
 from asyncio import Future
 from typing import Union, Optional
 
-import dateutil.parser
 import discord
-import requests
 import tweepy
-from tweepy import Response
+from tweepy import Response, StreamResponse, User
 
 from helpers.constants import (
-    BOT_ICON_URL,
     CHAN_BOT_SPAM_PRIVATE,
     CHAN_FOOD,
     CHAN_GENERAL,
@@ -20,10 +15,8 @@ from helpers.constants import (
     CHAN_TWITTERVERSE,
     DEBUGGING_CODE,
     TWITTER_BLOCK16_SCREENANME,
-    TZ,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
-from objects.Exceptions import TwitterStreamException
 from objects.Logger import discordLogger
 
 logger = discordLogger(
@@ -35,42 +28,9 @@ __all__: list[str] = ["StreamClientV2"]
 
 # Example
 # task = asyncio.run_coroutine_threadsafe(
-#     send_tweet_alert(self.client, "Connected!"), self.client.loop
+#     send_tweet_alert(self.discord_client, "Connected!"), self.discord_client.loop
 # )
 # task.result()
-
-
-class MyTweet(object):
-    def __init__(self, tweet_data) -> None:
-        self.data = None
-        self.includes = None
-
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
-
-
-class TweetMediaData(object):
-    def __init__(self, tweet_data) -> None:
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
-
-
-class TweetQuoteData(object):
-    def __init__(self, tweet_data) -> None:
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
-
-
-class TweetUserData(object):
-    def __init__(self, tweet_data) -> None:
-        self.name = None
-        self.username = None
-        self.public_metrics = None
-        self.verified = None
-        self.profile_image_url = None
-
-        for key in tweet_data:
-            setattr(self, key, tweet_data[key])
 
 
 async def send_tweet_alert(client: discord.Client, message) -> None:
@@ -98,7 +58,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     logger.info(f"Twitter alert sent!")
 
 
-async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
+async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
     class TwitterButtons(discord.ui.View):
         __slots__ = [
             "children",
@@ -164,7 +124,7 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
 
             await self.message.edit(view=self)
 
-    logger.debug(f"Sending a tweet")
+    logger.debug(f"Sending a tweet...")
 
     if DEBUGGING_CODE:
         twitter_channel: discord.TextChannel = await client.fetch_channel(
@@ -177,104 +137,42 @@ async def send_tweet(client: discord.Client, tweet: MyTweet) -> None:
         twitter_channel = await client.fetch_channel(CHAN_TWITTERVERSE)
         food_channel = await client.fetch_channel(CHAN_FOOD)
 
-    author: Optional[TweetUserData] = None
+    embed = buildTweetEmbed(response=response)
 
-    if tweet.includes.get("users", None):
-        for user in tweet.includes["users"]:
-            if tweet.data["author_id"] == user["id"]:
-                author = TweetUserData(user)
-                break
+    if response.includes["users"][0].name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
+        await twitter_channel.send(embed=embed)
     else:
-        author = TweetUserData(
-            dict(
-                name="Unknown",
-                username="unknown",
-                public_metrics="Unknown",
-                verified="Unknown",
-                profile_image_url=BOT_ICON_URL,
+        author: User = response.includes["users"][0]
+
+        view: TwitterButtons = TwitterButtons()
+        view.add_item(
+            item=discord.ui.Button(
+                style=discord.ButtonStyle.url,
+                label="Open Tweet...",
+                url=f"https://twitter.com/{author.username}/status/{response.data.id}",
             )
         )
-
-    medias: list[TweetMediaData] = []
-    if tweet.includes.get("media", None):
-        for item in tweet.includes["media"]:
-            medias.append(TweetMediaData(item))
-
-    quotes: list[TweetQuoteData] = []
-    if tweet.includes.get("tweets", None):
-        for item in tweet.includes["tweets"]:
-            quotes.append(TweetQuoteData(item))
-
-    if author.username.lower() == TWITTER_BLOCK16_SCREENANME.lower():
-        logger.info("Sending a Block 16 tweet")
-        embed: discord.Embed = buildTweetEmbed(
-            name=author.name,
-            username=author.username,
-            author_metrics=author.public_metrics,
-            verified=author.verified,
-            source=tweet.data["source"],
-            text=tweet.data["text"],
-            tweet_metrics=tweet.data["public_metrics"],
-            tweet_id=tweet.data["id"],
-            tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]).astimezone(
-                tz=TZ
-            ),
-            profile_image_url=author.profile_image_url,
-            urls=tweet.data["entities"],
-            medias=medias,
-            quotes=quotes,
-            b16=True,
-        )
-
-        await food_channel.send(embed=embed)
-
-        return
-
-    embed = buildTweetEmbed(
-        name=author.name,
-        username=author.username,
-        author_metrics=author.public_metrics,
-        verified=author.verified,
-        source=tweet.data["source"],
-        text=tweet.data["text"],
-        tweet_metrics=tweet.data["public_metrics"],
-        tweet_id=tweet.data["id"],
-        tweet_created_at=dateutil.parser.parse(tweet.data["created_at"]).astimezone(
-            tz=TZ
-        ),
-        profile_image_url=author.profile_image_url,
-        urls=tweet.data["entities"],
-        medias=medias,
-        quotes=quotes,
-    )
-
-    view: TwitterButtons = TwitterButtons()
-    view.add_item(
-        item=discord.ui.Button(
-            style=discord.ButtonStyle.url,
-            label="Open Tweet...",
-            url=f"https://twitter.com/{author.username}/status/{tweet.data['id']}",
-        )
-    )
-
-    view.message = await twitter_channel.send(embed=embed, view=view)
-    await view.wait()
+        view.message = await twitter_channel.send(embed=embed, view=view)
+        logger.debug("Waiting for twitter buttons to be pushed")
+        await view.wait()
 
     logger.info(f"Tweet sent!")
 
 
 class StreamClientV2(tweepy.StreamingClient):
-    __slots__ = ["client", "cooldown", "bearer_token"]
+    __slots__ = [
+        "bearer_token",
+        "client",
+    ]
 
     def __init__(
         self,
-        bearer_token,
-        client: discord.Client,
+        bearer_token: str,
+        discord_client: Optional[discord.Client],
         **kwargs,
     ) -> None:
         super().__init__(bearer_token, **kwargs)
-        self.client = client
-        self.cooldown = 5
+        self.client = discord_client
 
     def remove_all_rules(self) -> None:
         raw_rules: Union[dict, Response, Response] = self.get_rules()
@@ -283,11 +181,7 @@ class StreamClientV2(tweepy.StreamingClient):
             self.delete_rules(ids)
 
     def on_connect(self) -> None:
-        logger.debug("Connected!")
-
-        self.cooldown = 5
-
-        raw_rules: Union[dict, Response, requests.Response] = self.get_rules()
+        raw_rules: Response = self.get_rules()
         auths: Union[str, list[str]] = ""
 
         if raw_rules.data is not None:
@@ -299,58 +193,23 @@ class StreamClientV2(tweepy.StreamingClient):
             auths = auths.split(" OR ")
             auths = ", ".join(auths)
 
+        logger.info(f"Connected with the following rules: {auths}")
+
         task: Future = asyncio.run_coroutine_threadsafe(
             send_tweet_alert(self.client, f"Connected! Following: {auths}"),
             self.client.loop,
         )
         task.result()
 
-    def on_request_error(self, status_code) -> None:
-        logger.exception(f"Request Error: {status_code} status code")
+    def on_response(self, response: StreamResponse):
+        if "husker-media" not in [rule.tag for rule in response.matching_rules]:
+            return
 
-        logger.debug(
-            f"Sleeping for {self.cooldown} seconds before attempting to reconnected"
-        )
-        time.sleep(self.cooldown)
-        self.cooldown = min(self.cooldown * 2, 900)  # Max of 900 seconds or 15 minutes
-        logger.debug("Sleep is over")
-
-    def on_connection_error(self) -> None:
-        logger.exception(f"Connection Error")
-        task: Future = asyncio.run_coroutine_threadsafe(
-            send_tweet_alert(
-                self.client, "The Twitter Stream had an error connecting!"
-            ),
-            self.client.loop,
-        )
-        task.result()
-
-    def on_disconnect(self) -> None:
-        logger.warning("Disconnected")
-        task: Future = asyncio.run_coroutine_threadsafe(
-            send_tweet_alert(self.client, "The Twitter Stream has been disconnected!"),
-            self.client.loop,
-        )
-        task.result()
-
-    def on_errors(self, errors) -> None:
-        logger.exception(f"Error received: {errors}")
-
-    def on_closed(self, response) -> None:
-        logger.warning(f"Closed: {response}")
-
-    def on_exception(self, exception: tweepy.HTTPException) -> None:
-        raise TwitterStreamException(", ".join(exception.args))
-
-    def on_data(self, raw_data) -> None:
-        processed_data: dict = json.loads(raw_data)
         task = asyncio.run_coroutine_threadsafe(
-            send_tweet(self.client, MyTweet(processed_data)), self.client.loop
+            coro=send_tweet(client=self.client, response=response),
+            loop=self.client.loop,
         )
         task.result()
-
-    def on_keep_alive(self) -> None:
-        logger.debug("Keep Alive signal received")
 
 
 logger.debug(f"{str(__name__).title()} module loaded!")

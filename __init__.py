@@ -259,6 +259,7 @@ async def sync(
 discord_loggers: list[str] = [
     "discord",
     "discord.client",
+    "discord.discord_client",
     "discord.gateway",
     "discord.http",
     "discord.state",
