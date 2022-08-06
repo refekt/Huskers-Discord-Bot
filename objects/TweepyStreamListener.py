@@ -60,23 +60,26 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
 
 async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
     class TwitterButtons(discord.ui.View):
-        __slots__ = [
-            "children",
-            "id",
-            "message",
-            "timeout",
-        ]
-
-        def __init__(self, timeout=1200) -> None:
+        def __init__(
+            self,
+            timeout=1200,
+        ) -> None:
             super(TwitterButtons, self).__init__()
-            self.message: Optional[discord.Message, None] = None
+            self.message: Optional[discord.Message] = None
             self.timeout = timeout
+            self.client = client
+
+        async def on_timeout(self) -> None:
+            logger.debug("Twitter buttons have timed out. Removing all buttons")
+
+            self.clear_items()
+            await self.message.edit(view=self)
 
         # noinspection PyMethodMayBeStatic
-        def grabTwitterLink(self, tweet_embed: discord.Embed) -> str:
+        def grabTwitterLink(self, message_embed: discord.Embed) -> str:
             link: list[str] = [
                 field.value
-                for field in tweet_embed.fields
+                for field in message_embed.fields
                 if field.name == "Link to Tweet"
             ]
             return "".join(link)
@@ -91,12 +94,11 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         ):
             logger.debug("Sending tweet to general channel")
 
-            chan: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
+            general_channel = await client.fetch_channel(CHAN_GENERAL)
 
-            await chan.send(
+            await general_channel.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
             )
-
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
         @discord.ui.button(
@@ -109,20 +111,12 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         ):
             logger.debug("Sending tweet to recruiting channel")
 
-            chan: discord.TextChannel = await client.fetch_channel(CHAN_RECRUITING)
+            recruiting_channel = await client.fetch_channel(CHAN_RECRUITING)
 
-            await chan.send(
+            await recruiting_channel.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
             )
-
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
-
-        async def on_timeout(self) -> None:
-            logger.debug("Twitter buttons have timed out. Removing options")
-
-            self.clear_items()
-
-            await self.message.edit(view=self)
 
     logger.debug(f"Sending a tweet...")
 
@@ -140,7 +134,7 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
     embed = buildTweetEmbed(response=response)
 
     if response.includes["users"][0].name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
-        await twitter_channel.send(embed=embed)
+        await food_channel.send(embed=embed)
     else:
         author: User = response.includes["users"][0]
 
@@ -154,7 +148,8 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         )
         view.message = await twitter_channel.send(embed=embed, view=view)
         logger.debug("Waiting for twitter buttons to be pushed")
-        await view.wait()
+
+        asyncio.run_coroutine_threadsafe(coro=view.wait(), loop=client.loop)
 
     logger.info(f"Tweet sent!")
 
@@ -204,6 +199,10 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_response(self, response: StreamResponse):
+        logger.debug(
+            f"Received a response with text ({response.data.text}) from Twitter Stream"
+        )
+
         if "husker-media" not in [rule.tag for rule in response.matching_rules]:
             return
 
@@ -212,6 +211,24 @@ class StreamClientV2(tweepy.StreamingClient):
             loop=self.client.loop,
         )
         task.result()
+
+    def on_disconnect(self):
+        logger.debug("Twitter stream disconnected")
+
+    def on_closed(self, response):
+        logger.debug(
+            f"Twitter stream closed with {response.status_code} {response.text}"
+        )
+
+    def on_exception(self, exception):
+        logger.debug(f"Twitter stream received an exception: {repr(exception)}")
+
+    def on_request_error(self, status_code):
+        logger.debug(f"Twitter stream received request erorr with {status_code}")
+
+    def on_errors(self, errors):
+        for error in errors:
+            logger.debug(f"Twitter stream received the error {error}")
 
 
 logger.debug(f"{str(__name__).title()} module loaded!")

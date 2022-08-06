@@ -110,7 +110,7 @@ async def start_twitter_stream(client: discord.Client) -> None:
     del list_members, member, tweeter_client, append_str
 
     for stream_rule in rules:
-        tweeter_stream.add_rules(tweepy.StreamRule(stream_rule))
+        tweeter_stream.add_rules(tweepy.StreamRule(stream_rule, tag="husker-media"))
 
     raw_rules: Union[dict, Response, Response] = tweeter_stream.get_rules()
 
