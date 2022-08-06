@@ -444,7 +444,7 @@ class HuskerClient(Bot):
             is_silent = False
         logger.info(f"is_silent == {is_silent}")
 
-        if not is_silent:
+        if is_silent:
             logger.info("Skipping Twitter stream")
         else:
             await start_twitter_stream(self)

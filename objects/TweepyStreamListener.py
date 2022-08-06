@@ -196,8 +196,10 @@ class StreamClientV2(tweepy.StreamingClient):
         logger.info(f"Connected with the following rules: {auths}")
 
         task: Future = asyncio.run_coroutine_threadsafe(
-            send_tweet_alert(self.client, f"Connected! Following: {auths}"),
-            self.client.loop,
+            coro=send_tweet_alert(
+                client=self.client, message=f"Connected! Following: {auths}"
+            ),
+            loop=self.client.loop,
         )
         task.result()
 
@@ -205,7 +207,7 @@ class StreamClientV2(tweepy.StreamingClient):
         if "husker-media" not in [rule.tag for rule in response.matching_rules]:
             return
 
-        task = asyncio.run_coroutine_threadsafe(
+        task: Future = asyncio.run_coroutine_threadsafe(
             coro=send_tweet(client=self.client, response=response),
             loop=self.client.loop,
         )
