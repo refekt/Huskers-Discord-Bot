@@ -64,7 +64,7 @@ client: HuskerClient = HuskerClient(
 
 tree: CommandTree = client.tree
 
-if DEBUGGING_CODE:
+if not DEBUGGING_CODE:
 
     @tree.error
     async def on_app_command_error(
@@ -154,25 +154,30 @@ async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str):
         logger.debug(f"Manual Wordle input for {author} completed")
 
 
-@client.command()
+@client.hybrid_command(name="backlog-wordle")
 @commands.default_permissions(administrator=True)
 async def backlog(ctx: Context):
     north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
+    general: discord.TextChannel = ctx.guild.get_channel(CHAN_GENERAL)
     wordle_finder: WordleFinder = WordleFinder()
 
     index: int = 0
 
+    # async for message in north_bottoms.history(
     async for message in north_bottoms.history(
+        # async for message in general.history(
         oldest_first=True,
-        after=datetime.datetime(year=2021, month=1, day=21),
+        after=datetime.datetime(year=2022, month=1, day=14),
         limit=None,
     ):
+        logger.debug(
+            f"{message.created_at.astimezone(tz=TZ).strftime(DT_TASK_FORMAT)} {message.author.name}: {message.clean_content[:100]}"
+        )
+
         index += 1
 
         if message.author.bot:
             continue
-
-        logger.debug(f"{index}: Searching for Wordle entry")
 
         try:
             wordle: Optional[Wordle] = wordle_finder.get_wordle_message(message=message)
