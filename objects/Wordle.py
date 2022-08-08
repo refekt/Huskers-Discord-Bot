@@ -147,7 +147,7 @@ class Wordle:
         return self.green_squares + self.yellow_squares + self.black_squares
 
     @property
-    def score(self) -> Union[int, str]:
+    def score(self) -> Union[float, str]:
         search = re.search(self.__REGEX_SCORE, self.message)
         try:
             pos: tuple[Union[int, str], int] = search.regs[0]
@@ -175,7 +175,7 @@ class Wordle:
             raise WordleException(self.__err_mg)
 
     @property
-    def failed_score(self):
+    def failed_score(self) -> float:
         return self._failed_score
 
 
@@ -183,15 +183,19 @@ class WordleFinder:
     __slots__ = ["wordle_finder"]
 
     def __init__(self) -> None:
-        self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
+        # self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
+        self.wordle_finder: ClassVar[str] = r"Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
 
     def get_wordle_message(
         self, message: Union[discord.Message, str]
     ) -> Optional[Wordle]:
         if isinstance(message, str):
-            msg: str = message
+            msg: str = message.strip()
         else:
-            msg = message.content
+            msg = message.content.strip()
+
+        if "wordle" in msg.lower():
+            logger.debug("WORDLE WORDLE WORDLE WORDLE WORDLE WORDLE WORDLE ")
 
         if re.search(self.wordle_finder, msg):
             try:
