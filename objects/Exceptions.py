@@ -44,14 +44,17 @@ class DiscordError:
         tb_msg: str,
     ) -> None:
         self.original: CommandInvokeError = original
-        self.options: list[dict[str:int, str : list[dict[Any, ...]], str:str]] = (
-            [
-                f"{opt['name']} : {opt.get('value', 'N/A')}"
-                for opt in options[0]["options"]
-            ]
-            if options is not None
-            else None
-        )
+        try:
+            self.options: list[dict[str:int, str : list[dict[Any, ...]], str:str]] = (
+                [
+                    f"{opt['name']} : {opt.get('value', 'N/A')}"
+                    for opt in options[0]["options"]
+                ]
+                if options is not None
+                else None
+            )
+        except KeyError:
+            self.options = None
         self.traceback: str = tb_msg
 
     @property
