@@ -87,6 +87,7 @@ sqlGetPrediction = (
     "SELECT * FROM fap_predictions WHERE user_id = % s AND recruit_profile = % s"
 )
 
+# Updated
 sqlInsertPrediction = "INSERT INTO fap_predictions ( id, `user`, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date, correct, decision_date, committed_team ) VALUES ( % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s ) ON DUPLICATE KEY UPDATE ( team = % s, confidence = % s, prediction_date = % s )"
 
 # Back up
