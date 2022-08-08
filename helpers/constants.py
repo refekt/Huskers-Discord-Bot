@@ -271,7 +271,7 @@ logger.info("Datetime formatting variables loaded")
 GLOBAL_TIMEOUT = 3600
 
 # Croot bot
-CROOT_SEARCH_LIMIT = 5
+CROOT_SEARCH_LIMIT = 3
 
 # Embed limitations
 # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits

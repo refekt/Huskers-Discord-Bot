@@ -88,7 +88,7 @@ sqlGetPrediction = (
 )
 
 # Updated
-sqlInsertPrediction = "INSERT INTO fap_predictions ( id, `user`, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date, correct, decision_date, committed_team ) VALUES ( % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s ) ON DUPLICATE KEY UPDATE ( team = % s, confidence = % s, prediction_date = % s )"
+sqlInsertPrediction = "INSERT INTO fap_predictions ( id, `USER`, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date ) VALUES ( % s, % s, % s, % s, % s, % s, % s, % s, % s ) ON DUPLICATE KEY UPDATE team = % s, confidence = % s, prediction_date = % s;"
 
 # Back up
 # sqlInsertPrediction = "INSERT INTO fap_predictions ( USER, user_id, recruit_name, recruit_profile, recruit_class, team, confidence, prediction_date ) VALUES (% s, % s, % s, % s, % s, % s, % s, Now())"
@@ -232,7 +232,7 @@ def processMySQL(
         with sqlConnection.cursor() as cursor:
             cursor.execute(query=sql_query.query, args=sql_query.values)
 
-            if sql_query.fetch:
+            if sql_query.fetch is not None:
                 if sql_query.fetch == SqlFetch.one:
                     result = cursor.fetchone()
                 elif sql_query.fetch == SqlFetch.many:

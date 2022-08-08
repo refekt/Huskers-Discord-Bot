@@ -138,6 +138,8 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
             table_id = 0
 
         logger.info("Inserting or updating prediction")
+        dt_now: datetime = datetime.now(tz=TZ)
+
         processMySQL(
             query=sqlInsertPrediction,
             values=(
@@ -149,10 +151,10 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
                 self.recruit.year,  # recruit_class
                 user_prediction.school.value,  # team
                 int(user_prediction.confidence.value),  # confidence
-                datetime.now(tz=TZ),  # prediction_date
+                dt_now,  # prediction_date
                 user_prediction.school.value,  # team
                 int(user_prediction.confidence.value),  # confidence
-                datetime.now(tz=TZ),  # prediction_date
+                dt_now,  # prediction_date
             ),
         )
 
