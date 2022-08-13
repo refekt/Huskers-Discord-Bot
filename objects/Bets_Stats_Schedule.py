@@ -136,10 +136,10 @@ class HuskerSched2022(str, enum.Enum):
     Iowa = "Iowa"
 
     def __str__(self) -> str:
-        return self.value
+        return str(self.value)
 
     def __repr__(self) -> str:
-        return self.value
+        return str(self.value)
 
 
 class WhichTeamChoice(str, enum.Enum):
@@ -147,7 +147,7 @@ class WhichTeamChoice(str, enum.Enum):
     Opponent = "Opponent"
 
     def __str__(self) -> str:
-        return self.value
+        return str(self.value)
 
 
 class WhichOverUnderChoice(str, enum.Enum):
@@ -155,7 +155,7 @@ class WhichOverUnderChoice(str, enum.Enum):
     Under = "Under"
 
     def __str__(self) -> str:
-        return self.value
+        return str(self.value)
 
 
 class BetLines:
@@ -260,7 +260,7 @@ class Bet:
         author: Union[discord.Member, discord.User],
         opponent_name: Union[BigTenTeams, HuskerSched2022],
         predict_game: Optional[WhichTeamChoice],
-        predict_points: Optional[WhichTeamChoice],
+        predict_points: Optional[WhichOverUnderChoice],
         predict_spread: Optional[WhichTeamChoice],
     ) -> None:
         logger.debug("Creating a Bet object")

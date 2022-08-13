@@ -39,20 +39,22 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         name="bet", description="Betting commands", guild_ids=[GUILD_PROD]
     )
 
-    @bet_group.command(name="game", description="Place a bet against a Nebraska game.")
+    @bet_group.command(
+        name="create", description="Place a bet against a Nebraska game."
+    )
     @app_commands.describe(
-        opponent_name="Name of the opponent_name for the Husker game.",
-        predict_game="Whether you predict Nebraska or their opponent to win the game.",
+        opponent="Name of the opponent_name for the Husker game.",
+        game_winner="Whether you predict Nebraska or their opponent to win the game.",
         predict_points="Whether you predict the total points to go over or under.",
         predict_spread="Whether you predict Nebraska or their opponent to win against the spread.",
     )
-    async def bet_game(
+    async def bet_create(
         self,
         interaction: discord.Interaction,
-        opponent_name: HuskerSched2022,
-        predict_game: Optional[WhichTeamChoice],
-        predict_points: Optional[WhichOverUnderChoice],
-        predict_spread: Optional[WhichTeamChoice],
+        opponent: HuskerSched2022,
+        game_winner: WhichTeamChoice,
+        predict_points: WhichOverUnderChoice,
+        predict_spread: WhichTeamChoice,
     ) -> None:
         game_started: bool = False
         games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
@@ -64,7 +66,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         opponent_game: Optional[Game] = None
         for game in check_games:
-            if opponent_name not in (game.home_team, game.away_team):
+            if opponent not in (game.home_team, game.away_team):
                 continue
             opponent_game = game
             break
@@ -75,23 +77,23 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         if dt_start_date.astimezone(tz=TZ) < datetime.now(tz=TZ):
             await interaction.response.send(
-                f"You cannot place a bet on {opponent_name} after the game has started!",
+                f"You cannot place a bet on {opponent} after the game has started!",
                 ephemeral=True,
             )
         else:
             await interaction.response.defer()
 
-        if [_ for _ in (predict_game, predict_points, predict_spread) if _ is None]:
+        if [_ for _ in (game_winner, predict_points, predict_spread) if _ is None]:
             raise BettingException("You cannot submit a blank bet!")
 
-        assert predict_game is not None, BettingException(
+        assert game_winner is not None, BettingException(
             "`predict_game` is the minimum bet and must be included."
         )
 
         bet: Bet = Bet(
             author=interaction.user,
-            opponent_name=opponent_name,
-            predict_game=predict_game,
+            opponent_name=opponent,
+            predict_game=game_winner,
             predict_points=predict_points,
             predict_spread=predict_spread,
         )
@@ -102,7 +104,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             return
 
         embed: discord.Embed = buildEmbed(
-            title=f"Nebraska vs. {opponent_name} Bet",
+            title=f"Nebraska vs. {opponent} Bet",
             description=str(bet.bet_lines)
             if bet.bet_lines
             else "Betting lines not available.",
@@ -178,7 +180,8 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         await interaction.followup.send(embed=embed)
 
     @bet_group.command(
-        name="leaderboard", description="Show the leaderboard for betting"
+        name="leaderboard",
+        description="Show the leaderboard for betting",
     )
     async def bet_leaderboard(
         self,
@@ -195,7 +198,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         bet_title: str = "2022 Husker Betting Leaderboard"
 
         if all_bets:
-            embed = buildEmbed(
+            embed: discord.Embed = buildEmbed(
                 title=bet_title,
                 description="Point weights: 1x win, 2x points, 2x spread",
                 fields=[
@@ -223,24 +226,35 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     @bet_group.command(
         name="resolve", description="Resolve a game to update the leaderboard"
     )
+    @app_commands.describe(
+        opponent_name="Name of the opponent",
+        game_winner="Who won the game",
+        result_points="Were the total points over or under",
+        result_spread="Who won the spread",
+    )
     @app_commands.default_permissions(administrator=True)
     async def bet_resolve(
         self,
         interaction: discord.Interaction,
         opponent_name: HuskerSched2022,
-        result_game: Optional[WhichTeamChoice],
-        result_points: Optional[WhichOverUnderChoice],
-        result_spread: Optional[WhichTeamChoice],
+        game_winner: WhichTeamChoice,
+        result_points: WhichOverUnderChoice,
+        result_spread: WhichTeamChoice,
     ):
         await interaction.response.defer(ephemeral=True)
 
         processMySQL(
             query=sqlResolveGame,
-            values=(result_game, result_points, result_spread, opponent_name),
+            values=(
+                game_winner,
+                result_points,
+                result_spread,
+                opponent_name,
+            ),
         )
 
         await interaction.followup.send(
-            f"Updated the {opponent_name} game with {result_game} winning, {result_points} on the points, and {result_spread} on the spread."
+            f"Updated the {opponent_name} game with {game_winner} winning, {result_points} on the points, and {result_spread} on the spread."
         )
 
 
