@@ -115,6 +115,12 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         default_permissions=discord.Permissions(manage_messages=True),
         guild_ids=[GUILD_PROD],
     )
+    group_log: app_commands.Group = app_commands.Group(
+        name="get-log",
+        description="Get bot logs",
+        default_permissions=discord.Permissions(administrator=True),
+        guild_ids=[GUILD_PROD],
+    )
 
     # noinspection PyMethodMayBeStatic
     async def alert_gameday_channels(
@@ -854,9 +860,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             f"Back channel communication successfully sent to {chan.mention}!"
         )
 
-    @app_commands.command(name="get-log", description="Send last few lines of bot.log")
-    @app_commands.default_permissions(administrator=True)
-    @app_commands.guilds(discord.Object(id=GUILD_PROD))
+    @group_log.command(name="bot", description="Send last few lines of bot.log")
     async def get_log(self, interaction: discord.Interaction):
         logger.debug("Grabbing and sending bot.log")
 
@@ -869,6 +873,31 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         file: discord.File = discord.File(
             path_log,
             filename="bot.txt",
+            description=f"Bot's log as of {datetime.now(tz=TZ)}",
+        )
+
+        await interaction.user.send(content="!", file=file)
+        await interaction.followup.send(
+            f"Log sent in a DM! {interaction.client.user.mention}\nLog path: {path_log}"
+        )
+
+        logger.debug("Sent bot.log")
+
+    @group_log.command(
+        name="twitter", description="Send last few lines of tweepy.client.log"
+    )
+    async def get_log(self, interaction: discord.Interaction):
+        logger.debug("Grabbing and sending bot.log")
+
+        await interaction.response.defer(ephemeral=True)
+
+        path_log: pathlib.PurePosixPath = pathlib.PurePosixPath(
+            f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/tweepy.client.log"
+        )
+
+        file: discord.File = discord.File(
+            path_log,
+            filename="tweepy.txt",
             description=f"Bot's log as of {datetime.now(tz=TZ)}",
         )
 
