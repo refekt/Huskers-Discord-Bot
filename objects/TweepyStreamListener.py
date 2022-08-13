@@ -1,5 +1,8 @@
 import asyncio
 import logging
+import os
+import pathlib
+import sys
 from asyncio import Future
 from typing import Union, Optional
 
@@ -17,10 +20,45 @@ from helpers.constants import (
     TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
-from objects.Logger import discordLogger
 
-logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+# logger = discordLogger(
+#     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+# )
+
+tweepy_client: str = "tweepy.client"
+level = logging.DEBUG
+tweepy_client_logger: logging.Logger = logging.getLogger(tweepy_client)
+tweepy_client_logger.setLevel(level=level)
+
+tweepy_stream: str = "tweepy.streaming"
+tweepy_stream_logger: logging.Logger = logging.getLogger(tweepy_stream)
+tweepy_stream_logger.setLevel(level=level)
+
+format_string: str = "[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s"
+formatter: logging.Formatter = logging.Formatter(format_string)
+
+filename: pathlib.Path = pathlib.Path(f"{tweepy_client}.log")
+full_path: str = os.path.join(filename.parent.resolve(), "logs", filename)
+
+file_handler: logging.FileHandler = logging.FileHandler(filename=full_path, mode="a")
+file_handler.setFormatter(formatter)
+file_handler.setLevel(level=level)
+
+stream_handler: logging.StreamHandler = logging.StreamHandler(stream=sys.stdout)
+stream_handler.setFormatter(formatter)
+stream_handler.setLevel(level=level)
+
+tweepy_client_logger.addHandler(file_handler)
+tweepy_client_logger.addHandler(stream_handler)
+
+tweepy_stream_logger.addHandler(file_handler)
+tweepy_stream_logger.addHandler(stream_handler)
+
+logging.basicConfig(
+    datefmt="%X %x",
+    level=level,
+    encoding="utf-8",
+    handlers=[file_handler, stream_handler],
 )
 
 __all__: list[str] = ["StreamClientV2"]
@@ -41,7 +79,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     else:
         twitter_channel = await client.fetch_channel(CHAN_TWITTERVERSE)
 
-    logger.debug(f"Tweet alert received: {message}")
+    tweepy_client_logger.debug(f"Tweet alert received: {message}")
 
     embed: discord.Embed = buildEmbed(
         title="Husker Twitter",
@@ -55,7 +93,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
 
     await twitter_channel.send(embed=embed)
 
-    logger.info(f"Twitter alert sent!")
+    tweepy_client_logger.info(f"Twitter alert sent!")
 
 
 async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
@@ -70,7 +108,9 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
             self.client = client
 
         async def on_timeout(self) -> None:
-            logger.debug("Twitter buttons have timed out. Removing all buttons")
+            tweepy_client_logger.debug(
+                "Twitter buttons have timed out. Removing all buttons"
+            )
 
             self.clear_items()
             await self.message.edit(view=self)
@@ -92,7 +132,7 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         async def send_to_general(
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
-            logger.debug("Sending tweet to general channel")
+            tweepy_client_logger.debug("Sending tweet to general channel")
 
             general_channel = await client.fetch_channel(CHAN_GENERAL)
 
@@ -109,7 +149,7 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         async def send_to_recruiting(
             self, interaction: discord.Interaction, button: discord.ui.Button
         ):
-            logger.debug("Sending tweet to recruiting channel")
+            tweepy_client_logger.debug("Sending tweet to recruiting channel")
 
             recruiting_channel = await client.fetch_channel(CHAN_RECRUITING)
 
@@ -118,7 +158,7 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
             )
             await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
 
-    logger.debug(f"Sending a tweet...")
+    tweepy_client_logger.debug(f"Sending a tweet...")
 
     if DEBUGGING_CODE:
         twitter_channel: discord.TextChannel = await client.fetch_channel(
@@ -147,11 +187,11 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
             )
         )
         view.message = await twitter_channel.send(embed=embed, view=view)
-        logger.debug("Waiting for twitter buttons to be pushed")
+        tweepy_client_logger.debug("Waiting for twitter buttons to be pushed")
 
         asyncio.run_coroutine_threadsafe(coro=view.wait(), loop=client.loop)
 
-    logger.info(f"Tweet sent!")
+    tweepy_client_logger.info(f"Tweet sent!")
 
 
 class StreamClientV2(tweepy.StreamingClient):
@@ -188,7 +228,7 @@ class StreamClientV2(tweepy.StreamingClient):
             auths = auths.split(" OR ")
             auths = ", ".join(auths)
 
-        logger.info(f"Connected with the following rules: {auths}")
+        tweepy_client_logger.info(f"Connected with the following rules: {auths}")
 
         task: Future = asyncio.run_coroutine_threadsafe(
             coro=send_tweet_alert(
@@ -199,7 +239,7 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_response(self, response: StreamResponse):
-        logger.debug(
+        tweepy_client_logger.debug(
             f"Received a response with text ({response.data.text}) from Twitter Stream"
         )
 
@@ -213,22 +253,26 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_disconnect(self):
-        logger.debug("Twitter stream disconnected")
+        tweepy_client_logger.debug("Twitter stream disconnected")
 
     def on_closed(self, response):
-        logger.debug(
+        tweepy_client_logger.debug(
             f"Twitter stream closed with {response.status_code} {response.text}"
         )
 
     def on_exception(self, exception):
-        logger.debug(f"Twitter stream received an exception: {repr(exception)}")
+        tweepy_client_logger.debug(
+            f"Twitter stream received an exception: {repr(exception)}"
+        )
 
     def on_request_error(self, status_code):
-        logger.debug(f"Twitter stream received request erorr with {status_code}")
+        tweepy_client_logger.debug(
+            f"Twitter stream received request erorr with {status_code}"
+        )
 
     def on_errors(self, errors):
         for error in errors:
-            logger.debug(f"Twitter stream received the error {error}")
+            tweepy_client_logger.debug(f"Twitter stream received the error {error}")
 
 
-logger.debug(f"{str(__name__).title()} module loaded!")
+tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
