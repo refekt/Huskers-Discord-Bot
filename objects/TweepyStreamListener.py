@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 import pathlib
@@ -7,7 +8,9 @@ from asyncio import Future
 from typing import Union, Optional
 
 import discord
+import requests
 import tweepy
+from discord import HTTPException, NotFound, Forbidden
 from tweepy import Response, StreamResponse, User
 
 from helpers.constants import (
@@ -18,6 +21,7 @@ from helpers.constants import (
     CHAN_TWITTERVERSE,
     DEBUGGING_CODE,
     TWITTER_BLOCK16_SCREENANME,
+    MEMBER_GEE,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 
@@ -69,6 +73,56 @@ __all__: list[str] = ["StreamClientV2"]
 #     send_tweet_alert(self.discord_client, "Connected!"), self.discord_client.loop
 # )
 # task.result()
+
+
+async def send_errors(client: discord.Client, error):
+    try:
+        gee_member: discord.User = await client.fetch_user(MEMBER_GEE)
+    except (NotFound, HTTPException):
+        return
+
+    error_message: str = ""
+
+    if isinstance(error, requests.Response):
+        _: requests.Response = error
+        error_message = (
+            "A Response was received from on_closed:\n"
+            f"Content: {_.content}\n"
+            f"Status Code: {_.status_code}\n"
+            f"Reason: {_.reason}"
+        )
+    elif isinstance(error, Exception):
+        _: Exception = error
+        error_message = (
+            f"An Exception was raised from on_exception:\n"
+            f"Cause: {_.__cause__}\n"
+            f"Context: {_.__context__}\n"
+            f"Traceback:\n"
+            f"```css\n"
+            f"{_.__traceback__}"
+            f"\n```"
+        )
+    elif isinstance(error, int):
+        error_message = (
+            "A status code was received from on_request_error:\n"
+            f"Status Code: {error_message}"
+        )
+    elif isinstance(error, dict):
+        _: dict = error
+        error_message = (
+            "An error was received from on_errors:\n"
+            f"JSON Dumps:\n"
+            f"```css\n"
+            f"{json.dumps(_, indent=4, sort_keys=True)}"
+            f"\n```"
+        )
+    else:
+        error_message = "NONE"
+
+    try:
+        await gee_member.send(content=error_message)
+    except (HTTPException, Forbidden, ValueError, TypeError):
+        return
 
 
 async def send_tweet_alert(client: discord.Client, message) -> None:
@@ -255,24 +309,28 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_disconnect(self):
         tweepy_client_logger.debug("Twitter stream disconnected")
 
-    def on_closed(self, response):
+    def on_closed(self, response: requests.Response):
         tweepy_client_logger.debug(
             f"Twitter stream closed with {response.status_code} {response.text}"
         )
+        await send_errors(client=self.client, error=response)
 
-    def on_exception(self, exception):
+    def on_exception(self, exception: Exception):
         tweepy_client_logger.debug(
             f"Twitter stream received an exception: {repr(exception)}"
         )
+        await send_errors(client=self.client, error=exception)
 
-    def on_request_error(self, status_code):
+    def on_request_error(self, status_code: int):
         tweepy_client_logger.debug(
             f"Twitter stream received request erorr with {status_code}"
         )
+        await send_errors(client=self.client, error=status_code)
 
-    def on_errors(self, errors):
+    def on_errors(self, errors: dict):
         for error in errors:
             tweepy_client_logger.debug(f"Twitter stream received the error {error}")
+            await send_errors(client=self.client, error=error)
 
 
 tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
