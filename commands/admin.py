@@ -751,6 +751,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
 
+        # TODO Exception raising here for MySQL
         processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
         logger.debug("Saved old roles roles to MySQL database")
 
