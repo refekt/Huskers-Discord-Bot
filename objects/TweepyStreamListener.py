@@ -105,7 +105,7 @@ async def send_errors(client: discord.Client, error):
     elif isinstance(error, int):
         error_message = (
             "A status code was received from on_request_error:\n"
-            f"Status Code: {error_message}"
+            f"Status Code: {error}"
         )
     elif isinstance(error, dict):
         _: dict = error
