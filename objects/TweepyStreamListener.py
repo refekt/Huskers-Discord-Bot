@@ -313,24 +313,44 @@ class StreamClientV2(tweepy.StreamingClient):
         tweepy_client_logger.debug(
             f"Twitter stream closed with {response.status_code} {response.text}"
         )
-        await send_errors(client=self.client, error=response)
+
+        task: Future = asyncio.run_coroutine_threadsafe(
+            coro=send_errors(client=self.client, error=response),
+            loop=self.client.loop,
+        )
+        task.result()
 
     def on_exception(self, exception: Exception):
         tweepy_client_logger.debug(
             f"Twitter stream received an exception: {repr(exception)}"
         )
-        await send_errors(client=self.client, error=exception)
+
+        task: Future = asyncio.run_coroutine_threadsafe(
+            coro=send_errors(client=self.client, error=exception),
+            loop=self.client.loop,
+        )
+        task.result()
 
     def on_request_error(self, status_code: int):
         tweepy_client_logger.debug(
             f"Twitter stream received request erorr with {status_code}"
         )
-        await send_errors(client=self.client, error=status_code)
+
+        task: Future = asyncio.run_coroutine_threadsafe(
+            coro=send_errors(client=self.client, error=status_code),
+            loop=self.client.loop,
+        )
+        task.result()
 
     def on_errors(self, errors: dict):
         for error in errors:
             tweepy_client_logger.debug(f"Twitter stream received the error {error}")
-            await send_errors(client=self.client, error=error)
+
+            task: Future = asyncio.run_coroutine_threadsafe(
+                coro=send_errors(client=self.client, error=error),
+                loop=self.client.loop,
+            )
+            task.result()
 
 
 tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
