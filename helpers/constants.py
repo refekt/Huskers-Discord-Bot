@@ -35,36 +35,39 @@ if run:
 env_vars = decrypt_return_data(env_file, key)
 logger.info("Environment variables loaded")
 
+# Admin
+WINDOWS_PATH: str = env_vars["windows_path"]
+
 # Discord Bot Tokens
-PROD_TOKEN = env_vars["DISCORD_TOKEN"]
+PROD_TOKEN: str = env_vars["DISCORD_TOKEN"]
 logger.info("Discord tokens loaded")
 
 # SQL information
-SQL_HOST = env_vars["sqlHost"]
-SQL_USER = env_vars["sqlUser"]
-SQL_PASSWD = env_vars["sqlPass"]
-SQL_DB = env_vars["sqlDb"]
+SQL_HOST: str = env_vars["sqlHost"]
+SQL_USER: str = env_vars["sqlUser"]
+SQL_PASSWD: str = env_vars["sqlPass"]
+SQL_DB: str = env_vars["sqlDb"]
 logger.info("MySQL variables loaded")
 
 # TODO Reddit Bot Info...needed?
-REDDIT_CLIENT_ID = env_vars["reddit_client_id"]
-REDDIT_SECRET = env_vars["reddit_secret"]
-REDDIT_PW = env_vars["reddit_pw"]
+REDDIT_CLIENT_ID: str = env_vars["reddit_client_id"]
+REDDIT_SECRET: str = env_vars["reddit_secret"]
+REDDIT_PW: str = env_vars["reddit_pw"]
 
 # DEBUG
 DEBUGGING_CODE = "Windows" in platform.platform()
 
 # Twitter variables
-TWITTER_HUSKER_MEDIA_LIST_ID = 1307680291285278720
-TWITTER_BLOCK16_SCREENANME = "Block16Omaha"
-TWITTER_QUERY_MAX = 512
-TWITTER_BEARER = env_vars["twitter_bearer"]
-TWITTER_KEY = env_vars["twitter_api_key"]
-TWITTER_SECRET_KEY = env_vars["twitter_api_key_secret"]
-TWITTER_TOKEN = env_vars["twitter_access_token"]
-TWITTER_TOKEN_SECRET = env_vars["twitter_access_token_secret"]
-TWITTER_V2_CLIENT_ID = env_vars["twitter_v2_client_id"]
-TWITTER_V2_CLIENT_SECRET = env_vars["twitter_v2_client_secret"]
+TWITTER_HUSKER_MEDIA_LIST_ID: int = 1307680291285278720
+TWITTER_BLOCK16_SCREENANME: str = "Block16Omaha"
+TWITTER_QUERY_MAX: int = 512
+TWITTER_BEARER: str = env_vars["twitter_bearer"]
+TWITTER_KEY: str = env_vars["twitter_api_key"]
+TWITTER_SECRET_KEY: str = env_vars["twitter_api_key_secret"]
+TWITTER_TOKEN: str = env_vars["twitter_access_token"]
+TWITTER_TOKEN_SECRET: str = env_vars["twitter_access_token_secret"]
+TWITTER_V2_CLIENT_ID: str = env_vars["twitter_v2_client_id"]
+TWITTER_V2_CLIENT_SECRET: str = env_vars["twitter_v2_client_secret"]
 TWITTER_TWEET_OBJECT: list[str] = [
     "data",
     "includes",
@@ -142,11 +145,11 @@ TWITTER_USER_FIELDS: list[str] = [
 logger.info("Twitter variables loaded")
 
 # Weather API
-WEATHER_API_KEY = env_vars["openweather_key"]
+WEATHER_API_KEY: str = env_vars["openweather_key"]
 logger.info("Weather API key loaded")
 
 # cfbd
-CFBD_KEY = env_vars["cfbd_api"]
+CFBD_KEY: str = env_vars["cfbd_api"]
 
 CFBD_CONFIG = Configuration()
 CFBD_CONFIG.api_key["Authorization"] = CFBD_KEY
@@ -166,28 +169,28 @@ HEADERS = {
 logger.info("User-Agent Header loaded")
 
 # TODO Discord Roles...needed?
-ROLE_ADMIN_PROD = 440639061191950336
-ROLE_ADMIN_TEST = 606301197426753536
-ROLE_AIRPOD = 633702209703378978
-ROLE_ALDIS = 802639913824550952
-ROLE_ASPARAGUS = 583842403341828115
-ROLE_EVERYONE_PROD = 440632686185414677
-ROLE_GUMBY = 459569717430976513
-ROLE_HYPE_MAX = 682380058261979176
-ROLE_HYPE_NO = 682380119666720789
-ROLE_HYPE_SOME = 682380101077434480
-ROLE_ISMS = 592425861534449674
-ROLE_LILRED = 464903715854483487
-ROLE_MEME = 448690298760200195
-ROLE_MINECRAFT = 661409899481268238
-ROLE_MOD_PROD = 443805741111836693
-ROLE_PACKER = 609409451836964878
-ROLE_PIXEL = 633698252809699369
-ROLE_POTATO = 583842320575889423
-ROLE_QDOBA = 797587264112820264
-ROLE_RUNZA = 485086088017215500
-ROLE_TARMAC = 881546056687583242
-ROLE_TIME_OUT = 663881203983843338
+ROLE_ADMIN_PROD: int = 440639061191950336
+ROLE_ADMIN_TEST: int = 606301197426753536
+ROLE_AIRPOD: int = 633702209703378978
+ROLE_ALDIS: int = 802639913824550952
+ROLE_ASPARAGUS: int = 583842403341828115
+ROLE_EVERYONE_PROD: int = 440632686185414677
+ROLE_GUMBY: int = 459569717430976513
+ROLE_HYPE_MAX: int = 682380058261979176
+ROLE_HYPE_NO: int = 682380119666720789
+ROLE_HYPE_SOME: int = 682380101077434480
+ROLE_ISMS: int = 592425861534449674
+ROLE_LILRED: int = 464903715854483487
+ROLE_MEME: int = 448690298760200195
+ROLE_MINECRAFT: int = 661409899481268238
+ROLE_MOD_PROD: int = 443805741111836693
+ROLE_PACKER: int = 609409451836964878
+ROLE_PIXEL: int = 633698252809699369
+ROLE_POTATO: int = 583842320575889423
+ROLE_QDOBA: int = 797587264112820264
+ROLE_RUNZA: int = 485086088017215500
+ROLE_TARMAC: int = 881546056687583242
+ROLE_TIME_OUT: int = 663881203983843338
 logger.info("Role variables loaded")
 
 # Discord Channels
@@ -215,8 +218,8 @@ CHAN_TWITTERVERSE: int = 636220560010903584
 logger.info("Channel variables loaded")
 
 # Game Day Category
-CAT_GAMEDAY = 768828439636606996
-CAT_GENERAL = 440632687087058944
+CAT_GAMEDAY: int = 768828439636606996
+CAT_GENERAL: int = 440632687087058944
 logger.info("Channel category variables loaded")
 
 CHAN_BANNED = (
@@ -241,49 +244,51 @@ MEMBER_GEE = 189554873778307073
 logger.info("Member variables loaded")
 
 # Bot Info
-BOT_DISPLAY_NAME = "Bot Frost"
-BOT_GITHUB_URL = "https://github.com/refekt/Husker-Bot"
-BOT_ICON_URL = "https://i.imgur.com/Ah3x5NA.png"
-BOT_THUMBNAIL_URL = "https://ucomm.unl.edu/images/brand-book/Our-marks/nebraska-n.jpg"
-BOT_FOOTER_SECRET = (
+BOT_DISPLAY_NAME: str = "Bot Frost"
+BOT_GITHUB_URL: str = "https://github.com/refekt/Husker-Bot"
+BOT_ICON_URL: str = "https://i.imgur.com/Ah3x5NA.png"
+BOT_THUMBNAIL_URL: str = (
+    "https://ucomm.unl.edu/images/brand-book/Our-marks/nebraska-n.jpg"
+)
+BOT_FOOTER_SECRET: str = (
     "These messages are anonymous and there is no way to verify messages are accurate."
 )
-BOT_FOOTER_BOT = "Bot Frost praises the sun \\[T]/"  # noqa
+BOT_FOOTER_BOT: str = "Bot Frost praises the sun \\[T]/"  # noqa
 logger.info("Bot info variables loaded")
 
 # DateTime format
-DT_CFBD_GAMES = "%Y-%m-%dT%H:%M:%S.%f%z"
-DT_CFBD_GAMES_DISPLAY = "%B %d, %Y at %H:%M %p %Z"
-DT_FAP_RECRUIT = "%Y-%m-%d %H:%M:%S"
-DT_GITHUB_API = "%Y-%m-%dT%H:%M:%SZ"
-DT_GITHUB_API_DISPLAY = "%A, %B %d, %Y"
-DT_MYSQL_FORMAT = "%Y-%m-%d %H:%M:%S"
-DT_OBJ_FORMAT = "%d %b %Y %I:%M %p %Z"
-DT_OPENWEATHER_UTC = "%H:%M:%S %Z"
-DT_STR_FORMAT = "%b %d %Y %I:%M %p"
-DT_STR_RECRUIT = "%m/%d/%Y %I:%M:%S %p"
-DT_TASK_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
-DT_TBA_TIME = "10:58 PM"
-DT_TWEET_FORMAT = "%H:%M:%S %d %b %Y"
+DT_CFBD_GAMES: str = "%Y-%m-%dT%H:%M:%S.%f%z"
+DT_CFBD_GAMES_DISPLAY: str = "%B %d, %Y at %H:%M %p %Z"
+DT_FAP_RECRUIT: str = "%Y-%m-%d %H:%M:%S"
+DT_GITHUB_API: str = "%Y-%m-%dT%H:%M:%SZ"
+DT_GITHUB_API_DISPLAY: str = "%A, %B %d, %Y"
+DT_MYSQL_FORMAT: str = "%Y-%m-%d %H:%M:%S"
+DT_OBJ_FORMAT: str = "%d %b %Y %I:%M %p %Z"
+DT_OPENWEATHER_UTC: str = "%H:%M:%S %Z"
+DT_STR_FORMAT: str = "%b %d %Y %I:%M %p"
+DT_STR_RECRUIT: str = "%m/%d/%Y %I:%M:%S %p"
+DT_TASK_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
+DT_TBA_TIME: str = "10:58 PM"
+DT_TWEET_FORMAT: str = "%H:%M:%S %d %b %Y"
 logger.info("Datetime formatting variables loaded")
 
 # Discord UI Timeout
-GLOBAL_TIMEOUT = 3600
+GLOBAL_TIMEOUT: int = 3600
 
 # Croot bot
-CROOT_SEARCH_LIMIT = 3
+CROOT_SEARCH_LIMIT: int = 3
 
 # Embed limitations
 # https://discord.com/developers/docs/resources/channel#embed-object-embed-limits
-DESC_LIMIT = 4096
-EMBED_MAX = 6000
-FIELDS_LIMIT = 25
-FIELD_VALUE_LIMIT = 1024
-FOOTER_LIMIT = 2048
+DESC_LIMIT: int = 4096
+EMBED_MAX: int = 6000
+FIELDS_LIMIT: int = 25
+FIELD_VALUE_LIMIT: int = 1024
+FOOTER_LIMIT: int = 2048
 TITLE_LIMIT = NAME_LIMIT = FIELD_NAME_LIMIT = 256
 
 # States
-US_STATES = [
+US_STATES: list[dict[str, str]] = [
     {"State": "Alabama", "Abbrev": "Ala.", "Code": "AL"},
     {"State": "Alaska", "Abbrev": "Alaska", "Code": "AK"},
     {"State": "Arizona", "Abbrev": "Ariz.", "Code": "AZ"},
@@ -338,7 +343,7 @@ US_STATES = [
     {"State": "Puerto Rico", "Abbrev": "PR", "Code": "PR"},
 ]
 
-RECRUIT_STATES = {
+RECRUIT_STATES: dict[str, str] = {
     "Alabama": "AL",
     "Alaska": "AK",
     "American Samoa": "AS",
@@ -394,7 +399,7 @@ RECRUIT_STATES = {
     "Wyoming": "WY",
 }
 
-RECRUIT_POSITIONS = {
+RECRUIT_POSITIONS: dict[str, str] = {
     "APB": "All-Purpose Back",
     "ATH": "Athlete",
     "CB": "Cornerback",
