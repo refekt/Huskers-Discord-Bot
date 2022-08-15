@@ -4,6 +4,7 @@ import logging
 import os
 import pathlib
 import sys
+import traceback
 from asyncio import Future
 from typing import Union, Optional
 
@@ -93,13 +94,14 @@ async def send_errors(client: discord.Client, error):
         )
     elif isinstance(error, Exception):
         _: Exception = error
+        traceback_str: str = traceback.format_exc()
         error_message = (
             f"An Exception was raised from on_exception:\n"
             f"Cause: {_.__cause__}\n"
             f"Context: {_.__context__}\n"
             f"Traceback:\n"
             f"```css\n"
-            f"{_.__traceback__}"
+            f"{traceback_str}"
             f"\n```"
         )
     elif isinstance(error, int):
