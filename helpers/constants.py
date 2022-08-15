@@ -548,6 +548,7 @@ __all__: list[str] = [
     "TZ",
     "US_STATES",
     "WEATHER_API_KEY",
+    "WINDOWS_PATH",
 ]
 
 logger.info(f"{str(__name__).title()} module loaded!")

@@ -6,7 +6,7 @@ import platform
 import subprocess
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Union, Optional
+from typing import Any, Union, Optional, Generator
 
 import discord.ext.commands
 import requests
@@ -36,6 +36,7 @@ from helpers.constants import (
     ROLE_HYPE_MAX,
     ROLE_HYPE_SOME,
     ROLE_HYPE_NO,
+    WINDOWS_PATH,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
@@ -908,6 +909,32 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         logger.debug("Sent bot.log")
+
+    @group_log.command(name="download", description="Download the logs")
+    async def get_download(self, interaction: discord.Interaction):
+        remote_path: pathlib.PurePosixPath = pathlib.PurePosixPath(
+            f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/log.log"
+        )
+        remote_folder: Generator = pathlib.Path(remote_path.parent).glob("**/*")
+        remote_files: list[Union[pathlib.WindowsPath, pathlib.PosixPath]] = [
+            item for item in remote_folder if item.is_file()
+        ]
+
+        local_path: pathlib.Path = pathlib.Path(WINDOWS_PATH)
+        local_folder: Generator = local_path.glob("**/*")
+        local_files: list[Union[pathlib.WindowsPath]] = [
+            item for item in local_folder if item.is_file()
+        ]
+
+        for index, local_file in enumerate(local_files):
+            try:
+                with open(local_file, "w") as log_file:
+                    contents: str = remote_files[index].read_text()
+                    local_file.write_text(contents)
+                    logger.info(f"Downlaoded and copied {local_file}")
+            except IOError:
+                logger.info(f"Cannot download {local_file}")
+                continue
 
     @app_commands.command(name="hype", description="Add a hype role")
     @app_commands.describe(apply_role="The hype role you want to apply")
