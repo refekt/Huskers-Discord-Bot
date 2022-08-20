@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 import os
 import pathlib
@@ -23,6 +22,7 @@ from helpers.constants import (
     DEBUGGING_CODE,
     TWITTER_BLOCK16_SCREENANME,
     MEMBER_GEE,
+    CHAN_ADMIN,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 
@@ -76,9 +76,17 @@ __all__: list[str] = ["StreamClientV2"]
 # task.result()
 
 
-async def send_errors(client: discord.Client, error):
+async def send_errors(client: discord.Client, error, alert_admins: bool = False):
     try:
         gee_member: discord.User = await client.fetch_user(MEMBER_GEE)
+
+        if alert_admins:
+            admin_channel: Optional[discord.TextChannel] = await client.fetch_channel(
+                CHAN_ADMIN
+            )
+        else:
+            admin_channel = None
+
     except (NotFound, HTTPException):
         return
 
@@ -111,11 +119,12 @@ async def send_errors(client: discord.Client, error):
         )
     elif isinstance(error, dict):
         _: dict = error
+        traceback_str: str = traceback.format_exc()
         error_message = (
             "An error was received from on_errors:\n"
             f"JSON Dumps:\n"
             f"```css\n"
-            f"{json.dumps(_, indent=4, sort_keys=True)}"
+            f"{traceback_str}"
             f"\n```"
         )
     else:
@@ -123,6 +132,12 @@ async def send_errors(client: discord.Client, error):
 
     try:
         await gee_member.send(content=error_message)
+
+        if admin_channel:
+            await gee_member.send(
+                content=f"Potential Twitter stream disconnect. This is typically from Twitter server maintennace. An Admin or Mod needs to `/restart twitter` to continue receiving tweets.\n\n"
+                f"{error_message}"
+            )
     except (HTTPException, Forbidden, ValueError, TypeError):
         return
 
@@ -309,11 +324,20 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_disconnect(self):
-        tweepy_client_logger.debug("Twitter stream disconnected")
+        tweepy_client_logger.exception("Twitter stream disconnected", exc_info=True)
+
+        task: Future = asyncio.run_coroutine_threadsafe(
+            coro=send_tweet_alert(
+                client=self.client, message="The Twitter stream has been disconnected!"
+            ),
+            loop=self.client.loop,
+        )
+        task.result()
 
     def on_closed(self, response: requests.Response):
-        tweepy_client_logger.debug(
-            f"Twitter stream closed with {response.status_code} {response.text}"
+        tweepy_client_logger.exception(
+            f"Twitter stream closed with {response.status_code} {response.text}",
+            exc_info=True,
         )
 
         task: Future = asyncio.run_coroutine_threadsafe(
@@ -323,8 +347,8 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_exception(self, exception: Exception):
-        tweepy_client_logger.debug(
-            f"Twitter stream received an exception: {repr(exception)}"
+        tweepy_client_logger.exception(
+            f"Twitter stream received an exception: {repr(exception)}", exc_info=True
         )
 
         task: Future = asyncio.run_coroutine_threadsafe(
@@ -334,8 +358,8 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code: int):
-        tweepy_client_logger.debug(
-            f"Twitter stream received request erorr with {status_code}"
+        tweepy_client_logger.exception(
+            f"Twitter stream received request erorr with {status_code}", exc_info=True
         )
 
         task: Future = asyncio.run_coroutine_threadsafe(
@@ -346,13 +370,19 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_errors(self, errors: dict):
         for error in errors:
-            tweepy_client_logger.debug(f"Twitter stream received the error {error}")
+            error_type: str = error.get("title", None)
+            if error_type == "operational-disconnect":
+                pass
+            else:
+                tweepy_client_logger.exception(
+                    f"Twitter stream received the error {error}", exc_info=True
+                )
 
-            task: Future = asyncio.run_coroutine_threadsafe(
-                coro=send_errors(client=self.client, error=error),
-                loop=self.client.loop,
-            )
-            task.result()
+                task: Future = asyncio.run_coroutine_threadsafe(
+                    coro=send_errors(client=self.client, error=error),
+                    loop=self.client.loop,
+                )
+                task.result()
 
 
 tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
