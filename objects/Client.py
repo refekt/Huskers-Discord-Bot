@@ -139,7 +139,7 @@ async def start_twitter_stream(client: discord.Client) -> None:
 
 
 class HuskerClient(Bot):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.add_extensions = [
             "commands.admin",

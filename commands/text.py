@@ -617,7 +617,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     @group_wordle.command(
         name="leaderboard", description="Leaderboard for Wordle scores"
     )
-    async def wordle_leaderboard(self, interaction: discord.Interaction):
+    async def wordle_leaderboard(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
 
         wordle_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(

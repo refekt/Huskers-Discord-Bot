@@ -117,7 +117,7 @@ else:
 
 @client.hybrid_command(name="manual-wordle")
 @commands.default_permissions(administrator=True)
-async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str):
+async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str) -> None:
     wordle_finder: WordleFinder = WordleFinder()
 
     try:
@@ -156,7 +156,7 @@ async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str):
 
 @client.hybrid_command(name="backlog-wordle")
 @commands.default_permissions(administrator=True)
-async def backlog(ctx: Context):
+async def backlog(ctx: Context) -> None:
     north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
     general: discord.TextChannel = ctx.guild.get_channel(CHAN_GENERAL)
     wordle_finder: WordleFinder = WordleFinder()

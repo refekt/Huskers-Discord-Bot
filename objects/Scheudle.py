@@ -352,7 +352,7 @@ class SchedulePosts:
                 self._setup = True
                 asyncio_logger.debug("Schedule created")
 
-    async def run(self):
+    async def run(self) -> None:
         asyncio_logger.debug("Running SchedulePosts loop")
 
         while True:

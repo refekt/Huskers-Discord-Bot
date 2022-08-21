@@ -865,7 +865,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
     @group_log.command(name="bot", description="Send last few lines of bot.log")
-    async def get_log(self, interaction: discord.Interaction):
+    async def get_log(self, interaction: discord.Interaction) -> None:
         logger.debug("Grabbing and sending bot.log")
 
         await interaction.response.defer(ephemeral=True)
@@ -890,7 +890,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @group_log.command(
         name="twitter", description="Send last few lines of tweepy.client.log"
     )
-    async def get_log(self, interaction: discord.Interaction):
+    async def get_log(self, interaction: discord.Interaction) -> None:
         logger.debug("Grabbing and sending bot.log")
 
         await interaction.response.defer(ephemeral=True)
@@ -913,7 +913,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.debug("Sent bot.log")
 
     @group_log.command(name="download", description="Download the logs")
-    async def get_download(self, interaction: discord.Interaction):
+    async def get_download(self, interaction: discord.Interaction) -> None:
         remote_path: pathlib.PurePosixPath = pathlib.PurePosixPath(
             f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/log.log"
         )

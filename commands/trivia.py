@@ -55,7 +55,7 @@ class TriviaCommands(commands.Cog, name="Trivia Commands"):
 
         await trivia_bot.start_game()
 
-    async def trivia_leaderboard(self, interaction: discord.Interaction):
+    async def trivia_leaderboard(self, interaction: discord.Interaction) -> None:
         pass
 
 

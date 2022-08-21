@@ -52,7 +52,7 @@ class TeamStatsWinsipediaTeam:
             except:  # noqa
                 return "UNK", "UNK"
 
-        def bowl_games():
+        def bowl_games() -> (str, str):
             bowl: ResultSet = soup.find_all(attrs={"class": "ranking span2 item5h"})
             try:
                 return (

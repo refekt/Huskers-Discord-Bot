@@ -76,7 +76,9 @@ __all__: list[str] = ["StreamClientV2"]
 # task.result()
 
 
-async def send_errors(client: discord.Client, error, alert_admins: bool = False):
+async def send_errors(
+    client: discord.Client, error, alert_admins: bool = False
+) -> None:
     try:
         gee_member: discord.User = await client.fetch_user(MEMBER_GEE)
 
@@ -309,7 +311,7 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_response(self, response: StreamResponse):
+    def on_response(self, response: StreamResponse) -> None:
         tweepy_client_logger.debug(
             f"Received a response with text ({response.data.text}) from Twitter Stream"
         )
@@ -323,7 +325,7 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_disconnect(self):
+    def on_disconnect(self) -> None:
         tweepy_client_logger.exception("Twitter stream disconnected", exc_info=True)
 
         task: Future = asyncio.run_coroutine_threadsafe(
@@ -334,7 +336,7 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_closed(self, response: requests.Response):
+    def on_closed(self, response: requests.Response) -> None:
         tweepy_client_logger.exception(
             f"Twitter stream closed with {response.status_code} {response.text}",
             exc_info=True,
@@ -346,7 +348,7 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_exception(self, exception: Exception):
+    def on_exception(self, exception: Exception) -> None:
         tweepy_client_logger.exception(
             f"Twitter stream received an exception: {repr(exception)}", exc_info=True
         )
@@ -357,7 +359,7 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_request_error(self, status_code: int):
+    def on_request_error(self, status_code: int) -> None:
         tweepy_client_logger.exception(
             f"Twitter stream received request erorr with {status_code}", exc_info=True
         )
@@ -368,7 +370,7 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
-    def on_errors(self, errors: dict):
+    def on_errors(self, errors: dict) -> None:
         for error in errors:
             error_type: str = error.get("title", None)
             if error_type == "operational-disconnect":
