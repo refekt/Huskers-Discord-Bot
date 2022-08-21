@@ -10,7 +10,7 @@ from typing import Any, Union, Optional, Generator
 
 import discord.ext.commands
 import requests
-from discord import app_commands, Forbidden, HTTPException
+from discord import app_commands, Forbidden, HTTPException, InvalidData, NotFound
 from discord.app_commands import Group, Command
 from discord.ext import commands
 
@@ -20,6 +20,7 @@ from helpers.constants import (
     CAT_GAMEDAY,
     CAT_GENERAL,
     CHAN_ADMIN,
+    CHAN_ANNOUNCEMENT,
     CHAN_DISCUSSION_LIVE,
     CHAN_DISCUSSION_STREAMING,
     CHAN_GENERAL,
@@ -30,12 +31,13 @@ from helpers.constants import (
     DT_GITHUB_API,
     DT_GITHUB_API_DISPLAY,
     GUILD_PROD,
+    ROLE_ANNOUNCEMENT,
     ROLE_EVERYONE_PROD,
+    ROLE_HYPE_MAX,
+    ROLE_HYPE_NO,
+    ROLE_HYPE_SOME,
     ROLE_TIME_OUT,
     TZ,
-    ROLE_HYPE_MAX,
-    ROLE_HYPE_SOME,
-    ROLE_HYPE_NO,
     WINDOWS_PATH,
 )
 from helpers.embed import buildEmbed
@@ -971,6 +973,37 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             logger.exception("Unable to clear user's roles")
         finally:
             await interaction.followup.send(f"You have added the {role.mention} role")
+
+    @app_commands.command(
+        name="server-announcement",
+        description="Send an announcement out ot the server.",
+    )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guilds(discord.Object(id=GUILD_PROD))
+    async def server_announcement(
+        self, interaction: discord.Interaction, title: str, message: str
+    ) -> None:
+        try:
+            channel_announcement: discord.TextChannel = (
+                await interaction.client.fetch_channel(CHAN_ANNOUNCEMENT)
+            )
+        except (InvalidData, HTTPException, NotFound, Forbidden):
+            return
+
+        embed = buildEmbed(
+            title="Server Announcement", fields=[dict(name=title, value=message)]
+        )
+
+        role_announcement: Optional[discord.Role] = interaction.guild.get_role(
+            ROLE_ANNOUNCEMENT
+        )
+
+        if role_announcement:
+            await channel_announcement.send(
+                content=f"{role_announcement.mention}", embed=embed
+            )
+        else:
+            await channel_announcement.send(content=f"@Announcements", embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
