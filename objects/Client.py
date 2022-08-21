@@ -81,7 +81,7 @@ async def start_twitter_stream(client: discord.Client) -> None:
     logger.debug("Previous Twitter Stream rules deleted")
 
     tweeter_client = tweepy.Client(TWITTER_BEARER)
-    list_members = tweeter_client.get_list_members(TWITTER_HUSKER_MEDIA_LIST_ID)
+    list_members = tweeter_client.get_list_members(str(TWITTER_HUSKER_MEDIA_LIST_ID))
 
     logger.debug("Collected usernames from the Husker Media Twitter List")
 
@@ -237,7 +237,7 @@ class HuskerClient(Bot):
                 file = makeSlowking(payload.member)
             else:
                 logger.debug("Creating Hall of Fame Embed")
-                embed_title = f"{'🏆' * 3} Hall of Shame Message {'🏆' * 3}"
+                embed_title = f"{'🏆' * 3} Hall of Fame Message {'🏆' * 3}"
                 embed_description = (
                     "Messages so amazing they had to be memorialized forever!"
                 )
