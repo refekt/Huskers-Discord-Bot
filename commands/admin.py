@@ -907,6 +907,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def server_announcement(
         self, interaction: discord.Interaction, title: str, message: str
     ) -> None:
+        await interaction.response.defer(ephemeral=True)
+
         try:
             channel_announcement: discord.TextChannel = (
                 await interaction.client.fetch_channel(CHAN_ANNOUNCEMENT)
@@ -928,6 +930,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
         else:
             await channel_announcement.send(content=f"@Announcements", embed=embed)
+
+        await interaction.followup.send(
+            f"Announcement has been sent to {channel_announcement.mention}"
+        )
 
 
 async def setup(bot: commands.Bot) -> None:
