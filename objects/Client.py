@@ -57,9 +57,15 @@ logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
 
-__all__: list[str] = ["HuskerClient", "start_twitter_stream"]
+__all__: list[str] = [
+    "GUILD_ROLES",
+    "HuskerClient",
+    "start_twitter_stream",
+]
 
 tracemalloc.start()
+
+GUILD_ROLES: Optional[list[discord.Role]] = None
 
 
 async def start_twitter_stream(client: discord.Client) -> None:
@@ -369,6 +375,9 @@ class HuskerClient(Bot):
     async def on_ready(self) -> None:
         self.guild_user_len = len(self.users)
         self.reaction_threshold = int(0.0047 * self.guild_user_len)
+
+        global GUILD_ROLES
+        GUILD_ROLES = self.guilds[0].roles
 
         if DEBUGGING_CODE:
             chan_general: discord.TextChannel = await self.fetch_channel(

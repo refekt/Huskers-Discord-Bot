@@ -1,4 +1,3 @@
-import enum
 import json
 import logging
 import pathlib
@@ -33,9 +32,6 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_ANNOUNCEMENT,
     ROLE_EVERYONE_PROD,
-    ROLE_HYPE_MAX,
-    ROLE_HYPE_NO,
-    ROLE_HYPE_SOME,
     ROLE_TIME_OUT,
     TZ,
     WINDOWS_PATH,
@@ -58,15 +54,6 @@ from objects.Timers import IowaDuration
 logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
-
-
-class HypeRoles(str, enum.Enum):
-    MaxHype = "Max Hype"
-    SomeHype = "Some Hype"
-    NoHype = "No Hype"
-
-    def __str__(self) -> str:
-        return str(self.value)
 
 
 class ConfirmButtons(discord.ui.View):
@@ -99,11 +86,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         name="purge",
         description="Purge messages from channel",
         default_permissions=discord.Permissions(administrator=True),
-        guild_ids=[GUILD_PROD],
-    )
-    group_submit: app_commands.Group = app_commands.Group(
-        name="submit",
-        description="Submit a bug or feature request for the bot",
         guild_ids=[GUILD_PROD],
     )
     group_gameday: app_commands.Group = app_commands.Group(
@@ -605,28 +587,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.followup.send("Twitter stream has been restarted!")
         logger.info("Twitter stream restarted!")
 
-    @group_submit.command(name="bug", description="Submit a bug")
-    async def submit_bug(self, interaction: discord.Interaction) -> None:
-        embed: discord.Embed = buildEmbed(
-            title="Bug Reporter",
-            description=discordURLFormatter(
-                "Submit a bug report here",
-                "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=bug&template=bug_report.md&title=%5BBUG%5D+",
-            ),
-        )
-        await interaction.response.send_message(embed=embed)
-
-    @group_submit.command(name="feature", description="Submit a feature")
-    async def submit_feature(self, interaction: discord.Interaction) -> None:
-        embed: discord.Embed = buildEmbed(
-            title="Feature Request",
-            description=discordURLFormatter(
-                "Submit a feature request here",
-                "https://github.com/refekt/Bot-Frost/issues/new?assignees=refekt&labels=request&template=feature_request.md&title=%5BREQUEST%5D+",
-            ),
-        )
-        await interaction.response.send_message(embed=embed)
-
     async def proess_nebraska(  # noqa
         self, interaction: discord.Interaction, who: discord.Member
     ) -> None:
@@ -937,42 +897,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             except IOError:
                 logger.info(f"Cannot download {local_file}")
                 continue
-
-    @app_commands.command(name="hype", description="Add a hype role")
-    @app_commands.describe(apply_role="The hype role you want to apply")
-    @app_commands.guilds(discord.Object(id=GUILD_PROD))
-    async def hype(
-        self, interaction: discord.Interaction, apply_role: HypeRoles
-    ) -> None:
-
-        await interaction.response.defer(ephemeral=True)
-
-        hype_roles = (
-            interaction.guild.get_role(ROLE_HYPE_MAX),
-            interaction.guild.get_role(ROLE_HYPE_SOME),
-            interaction.guild.get_role(ROLE_HYPE_NO),
-        )
-
-        role: Optional[discord.Role] = None
-
-        try:
-            await interaction.user.remove_roles(
-                *hype_roles, reason="Clearing old hype roles"
-            )
-
-            if apply_role == HypeRoles.MaxHype:
-                role = interaction.guild.get_role(ROLE_HYPE_MAX)
-            elif apply_role == HypeRoles.SomeHype:
-                role = interaction.guild.get_role(ROLE_HYPE_SOME)
-            elif apply_role == HypeRoles.NoHype:
-                role = interaction.guild.get_role(ROLE_HYPE_NO)
-
-            await interaction.user.add_roles(*[role])
-
-        except (Forbidden, HTTPException):
-            logger.exception("Unable to clear user's roles")
-        finally:
-            await interaction.followup.send(f"You have added the {role.mention} role")
 
     @app_commands.command(
         name="server-announcement",
