@@ -326,6 +326,8 @@ class ImageCog(commands.Cog, name="Image Commands"):
     async def slowking(
         self, interaction: discord.Interaction, person: discord.Member
     ) -> None:
+        assert person.avatar, ImageException("The person must have an avatar!")
+
         assert person, ImageException(
             "You must provide a discord member to make a Slow King image!"
         )
