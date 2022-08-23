@@ -142,10 +142,11 @@ def buildTweetEmbed(response: StreamResponse) -> discord.Embed:
 
         for index, url in enumerate(urls):
             if url.get("status") == 200:
+                title: str = url.get("title", "Expanded URL")
                 embed.add_field(
                     name="Embedded URL",
                     value=discordURLFormatter(
-                        display_text=url["title"], url=url["expanded_url"]
+                        display_text=title, url=url["expanded_url"]
                     ),
                 )
 
