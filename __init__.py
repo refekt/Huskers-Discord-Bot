@@ -95,11 +95,17 @@ if not DEBUGGING_CODE:
                 dict(name="Originating Module", value=f"{err.module}"),
             ],
         )
-        try:
-            member_me: discord.Member = await interaction.guild.fetch_member(MEMBER_GEE)
-            await member_me.send(content=err.traceback)
-        except (Forbidden, HTTPException, NotFound):
-            pass
+
+        if not isinstance(err.original.original, AssertionError):
+            try:
+                member_me: discord.Member = await interaction.guild.fetch_member(
+                    MEMBER_GEE
+                )
+                await member_me.send(content=err.traceback)
+            except (Forbidden, HTTPException, NotFound):
+                pass
+        else:
+            logger.debug("Skipping DM for an error derived from Assert")
 
         if interaction.response.is_done():
             # Make error message hidden
