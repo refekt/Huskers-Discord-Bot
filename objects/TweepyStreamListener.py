@@ -312,9 +312,14 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_response(self, response: StreamResponse) -> None:
-        tweepy_client_logger.debug(
-            f"Received a response with text ({response.data.text}) from Twitter Stream"
-        )
+        try:
+            tweepy_client_logger.debug(
+                f"Received a response with text ({response.data.text}) from Twitter Stream"
+            )
+        except AttributeError:
+            tweepy_client_logger.debug(
+                f"Received a response with text ({dict(response._asdict())}) from Twitter Stream"
+            )
 
         if "husker-media" not in [rule.tag for rule in response.matching_rules]:
             return
