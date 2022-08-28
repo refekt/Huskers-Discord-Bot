@@ -215,6 +215,78 @@ async def backlog(ctx: Context) -> None:
                 continue
 
 
+@client.hybrid_command(name="hype-audit")
+@commands.default_permissions(administrator=True)
+async def hype_audit(ctx: Context):
+    logger.info("Begining hype role audit")
+
+    logger.debug("Generating list of hype roles")
+    hype_roles: tuple[Optional[discord.Role], ...] = (
+        ctx.guild.get_role(ROLE_HYPE_MAX),
+        ctx.guild.get_role(ROLE_HYPE_SOME),
+        ctx.guild.get_role(ROLE_HYPE_NO),
+    )
+
+    logger.debug("Generating list of hype members")
+    hype_members: list[Optional[discord.Member]] = []
+
+    for role in hype_roles:
+        hype_members.extend(role.members)
+
+    if not hype_members:
+        logger.info("No hype members found")
+        return
+
+    logger.debug("Generating a list of hypers with more than hype role")
+    seen: set = set()
+    duplicate_hypers: list[Optional[discord.Member]] = [
+        hyper for hyper in hype_members if hyper in seen or seen.add(hyper)
+    ]
+
+    hypers_str: str = ""
+    hypers_list: list[Optional[str]] = []
+
+    if duplicate_hypers:
+        logger.debug("Removing hype roles from those with duplicate hypers")
+
+        for hyper in duplicate_hypers:
+            new_add: str = f"{hyper.mention}, "
+            if len(hypers_str + new_add) > FIELD_VALUE_LIMIT:
+                hypers_list.append(hypers_str)
+
+            hypers_str += new_add
+
+            try:
+                await hyper.remove_roles(
+                    *hype_roles, reason="/hype-audit - Clearing duplicate hype roles"
+                )
+            except (Forbidden, HTTPException):
+                logger.debug(
+                    f"Unable to clear {hyper.name}#{hyper.discriminator}'s roles"
+                )
+                continue
+
+        if len(hypers_list) == 0:
+            hypers_list.append(hypers_str)
+    else:
+        logger.info("No hypers with more than one roole")
+
+    if hypers_str:
+        embed: discord.Embed = buildEmbed(
+            title="Hyper Role Audit",
+            fields=[
+                dict(name="Audited Members", value=f"{item}") for item in hypers_list
+            ],
+        )
+    else:
+        embed = buildEmbed(
+            title="Hyper Role Audit",
+            description="No members found with duplicate roles.",
+        )
+
+    await ctx.send(embed=embed)
+
+
 @client.command()
 @commands.guild_only()
 @commands.default_permissions(administrator=True)

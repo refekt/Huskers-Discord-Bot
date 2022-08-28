@@ -162,7 +162,7 @@ class UserCog(commands.Cog, name="User Commands"):
 
         logger.debug(f"Generated [{new_role.name}] role object")
 
-        hype_roles = (
+        hype_roles: tuple[Optional[discord.Role], ...] = (
             interaction.guild.get_role(ROLE_HYPE_MAX),
             interaction.guild.get_role(ROLE_HYPE_SOME),
             interaction.guild.get_role(ROLE_HYPE_NO),
