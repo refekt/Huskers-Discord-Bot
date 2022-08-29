@@ -279,7 +279,7 @@ class StreamClientV2(tweepy.StreamingClient):
         discord_client: Optional[discord.Client],
         **kwargs,
     ) -> None:
-        super().__init__(bearer_token, **kwargs)
+        super().__init__(bearer_token, wait_on_rate_limit=True, **kwargs)
         self.client = discord_client
 
     def remove_all_rules(self) -> None:
@@ -386,7 +386,8 @@ class StreamClientV2(tweepy.StreamingClient):
         for error in errors:
             error_type: str = error.get("title", None)
             if error_type == "operational-disconnect":
-                pass
+                self.disconnect()
+                return
             else:
                 tweepy_client_logger.exception(
                     f"Twitter stream received the error {error}", exc_info=True
