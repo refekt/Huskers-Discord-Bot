@@ -279,7 +279,7 @@ class StreamClientV2(tweepy.StreamingClient):
         discord_client: Optional[discord.Client],
         **kwargs,
     ) -> None:
-        super().__init__(bearer_token, wait_on_rate_limit=True, **kwargs)
+        super().__init__(bearer_token, **kwargs)
         self.client = discord_client
 
     def remove_all_rules(self) -> None:
@@ -343,7 +343,7 @@ class StreamClientV2(tweepy.StreamingClient):
 
     def on_closed(self, response: requests.Response) -> None:
         tweepy_client_logger.exception(
-            f"Twitter stream closed with {response.status_code} {response.text}",
+            f"Twitter stream closed by Twitter with {response.status_code} {response.text}",
             exc_info=True,
         )
 
@@ -352,6 +352,16 @@ class StreamClientV2(tweepy.StreamingClient):
             loop=self.client.loop,
         )
         task.result()
+
+        task = asyncio.run_coroutine_threadsafe(
+            coro=send_tweet_alert(
+                client=self.client, message="The Twitter stream has been disconnected!"
+            ),
+            loop=self.client.loop,
+        )
+        task.result()
+
+        self.disconnect()
 
     def on_exception(self, exception: Exception) -> None:
         tweepy_client_logger.exception(
@@ -363,6 +373,16 @@ class StreamClientV2(tweepy.StreamingClient):
             loop=self.client.loop,
         )
         task.result()
+
+        task = asyncio.run_coroutine_threadsafe(
+            coro=send_tweet_alert(
+                client=self.client, message="The Twitter stream has been disconnected!"
+            ),
+            loop=self.client.loop,
+        )
+        task.result()
+
+        self.disconnect()
 
     def on_request_error(self, status_code: int) -> None:
         if status_code == 429:
@@ -382,6 +402,16 @@ class StreamClientV2(tweepy.StreamingClient):
         )
         task.result()
 
+        task = asyncio.run_coroutine_threadsafe(
+            coro=send_tweet_alert(
+                client=self.client, message="The Twitter stream has been disconnected!"
+            ),
+            loop=self.client.loop,
+        )
+        task.result()
+
+        self.disconnect()
+
     def on_errors(self, errors: dict) -> None:
         for error in errors:
             error_type: str = error.get("title", None)
@@ -398,6 +428,16 @@ class StreamClientV2(tweepy.StreamingClient):
                     loop=self.client.loop,
                 )
                 task.result()
+
+        task = asyncio.run_coroutine_threadsafe(
+            coro=send_tweet_alert(
+                client=self.client, message="The Twitter stream has been disconnected!"
+            ),
+            loop=self.client.loop,
+        )
+        task.result()
+
+        self.disconnect()
 
 
 tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
