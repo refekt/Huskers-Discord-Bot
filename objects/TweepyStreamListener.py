@@ -365,8 +365,15 @@ class StreamClientV2(tweepy.StreamingClient):
         task.result()
 
     def on_request_error(self, status_code: int) -> None:
+        if status_code == 429:
+            tweepy_client_logger.debug(
+                f"Twitter stream received request error with a {status_code} status code."
+            )
+            return
+
         tweepy_client_logger.exception(
-            f"Twitter stream received request erorr with {status_code}", exc_info=True
+            f"Twitter stream received request erorr with a {status_code} status code.",
+            exc_info=True,
         )
 
         task: Future = asyncio.run_coroutine_threadsafe(
