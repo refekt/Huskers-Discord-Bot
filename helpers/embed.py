@@ -315,15 +315,40 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
             and game.away_postgame_elo is None
         ):
             elo_str: str = "TBD"
-        elif (
-            game.home_pregame_elo
-            and game.home_postgame_elo is None
-            and game.away_pregame_elo
-            and game.away_postgame_elo is None
-        ):
-            elo_str = f"```\n{game.home_team} {game.home_pregame_elo:,}\n{game.away_team} {game.away_pregame_elo:,}\n```"
+        # elif (
+        #     game.home_pregame_elo
+        #     and game.home_postgame_elo is None
+        #     and game.away_pregame_elo
+        #     and game.away_postgame_elo is None
+        # ):
+        #     elo_str = (
+        #         f"```\n{game.home_team} {game.home_pregame_elo:,}\n"
+        #         f"{game.away_team} {game.away_pregame_elo:,}\n```"
+        #     )
+        # else:
+        #     elo_str = (
+        #         f"```\n{game.home_team} {game.home_pregame_elo:,} -> {game.home_postgame_elo:,}\n"
+        #         f"{game.away_team} {game.away_pregame_elo:,} -> {game.away_postgame_elo:,}\n```"
+        #     )
         else:
-            elo_str = f"```\n{game.home_team} {game.home_pregame_elo:,} -> {game.home_postgame_elo:,}\n{game.away_team} {game.away_pregame_elo:,} -> {game.away_postgame_elo:,}\n```"
+            home_pregame_elo: str = (
+                f"{game.home_pregame_elo:,}" if game.home_pregame_elo else "N/A"
+            )
+            home_postgame_elo: str = (
+                f"{game.home_postgame_elo:,}" if game.home_postgame_elo else "N/A"
+            )
+
+            away_pregame_elo: str = (
+                f"{game.away_pregame_elo:,}" if game.away_pregame_elo else "N/A"
+            )
+            away_postgame_elo: str = (
+                f"{game.away_postgame_elo:,}" if game.away_postgame_elo else "N/A"
+            )
+
+            elo_str = (
+                f"```\n{game.home_team} {home_pregame_elo} -> {home_postgame_elo}\n"
+                f"{game.away_team} {away_pregame_elo} -> {away_postgame_elo}\n```"
+            )
 
         embeds.append(
             buildEmbed(
