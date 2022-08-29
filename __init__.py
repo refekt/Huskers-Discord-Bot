@@ -110,7 +110,7 @@ if not DEBUGGING_CODE:
         if interaction.response.is_done():
             # Make error message hidden
             try:
-                await interaction.delete_original_message()
+                await interaction.delete_original_response()
                 await interaction.followup.send(content="", embed=embed, ephemeral=True)
             except (HTTPException, NotFound, Forbidden):
                 await interaction.channel.send(embed=embed)

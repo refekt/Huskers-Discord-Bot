@@ -79,7 +79,7 @@ class RecruitListView(discord.ui.View):
         view: discord.ui.View = createPredictionView(croot_search[reaction_pressed])
 
         logger.info("Sending a new recruit embed")
-        await interaction.edit_original_message(embed=embed, view=view)
+        await interaction.edit_original_response(embed=embed, view=view)
 
         return True
 

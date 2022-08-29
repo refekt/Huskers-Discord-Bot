@@ -118,7 +118,7 @@ class Survey:
 
             embed: discord.Embed = interaction.message.embeds[0]
             if interaction.user.display_name in embed.footer.text:
-                await interaction.edit_original_message(
+                await interaction.edit_original_response(
                     content="You cannot vote more than once!"
                 )
                 return

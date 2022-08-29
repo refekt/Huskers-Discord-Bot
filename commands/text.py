@@ -269,7 +269,7 @@ class TextCog(commands.Cog, name="Text Commands"):
             )
 
             if interaction.response.is_done():
-                await interaction.edit_original_message(embed=embed)
+                await interaction.edit_original_response(embed=embed)
             else:
                 await interaction.channel.send(embed=embed)
             logger.info("Markov out sent")
@@ -409,9 +409,9 @@ class TextCog(commands.Cog, name="Text Commands"):
             )
 
         view: EmbedPaginatorView = EmbedPaginatorView(
-            embeds=pages, original_message=await interaction.original_message()
+            embeds=pages, original_message=await interaction.original_response()
         )
-        await interaction.edit_original_message(embed=view.initial, view=view)
+        await interaction.edit_original_response(embed=view.initial, view=view)
 
     @app_commands.command(
         name="survey",

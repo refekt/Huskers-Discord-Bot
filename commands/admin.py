@@ -481,7 +481,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             )
 
         view: EmbedPaginatorView = EmbedPaginatorView(
-            embeds=embeds, original_message=await interaction.original_message()
+            embeds=embeds, original_message=await interaction.original_response()
         )
 
         await interaction.followup.send(embed=view.initial, view=view)
@@ -498,17 +498,19 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             await interaction.response.defer(ephemeral=True)
 
         if not await self.confirm_purge(interaction):
-            await interaction.edit_original_message(content="Purge declined", view=None)
+            await interaction.edit_original_response(
+                content="Purge declined", view=None
+            )
             return
 
-        await interaction.edit_original_message(content="Working...")
+        await interaction.edit_original_response(content="Working...")
 
         msgs: list[discord.Message] = await self.college_purge_messages(
             channel=interaction.channel, all_messages=False
         )
 
         await interaction.channel.delete_messages(msgs)
-        await interaction.edit_original_message(
+        await interaction.edit_original_response(
             content=f"Bulk delete of {len(msgs)} messages successful.", view=None
         )
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
@@ -520,17 +522,19 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         if not await self.confirm_purge(interaction):
-            await interaction.edit_original_message(content="Purge declined", view=None)
+            await interaction.edit_original_response(
+                content="Purge declined", view=None
+            )
             return
 
-        await interaction.edit_original_message(content="Working...")
+        await interaction.edit_original_response(content="Working...")
 
         msgs: list[discord.Message] = await self.college_purge_messages(
             channel=interaction.channel, all_messages=True
         )
 
         await interaction.channel.delete_messages(msgs)
-        await interaction.edit_original_message(
+        await interaction.edit_original_response(
             content=f"Bulk delete of {len(msgs)} messages successful.", view=None
         )
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")

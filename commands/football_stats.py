@@ -241,10 +241,10 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         pages: list[discord.Embed] = collectScheduleEmbeds(year=year)
         view: EmbedPaginatorView = EmbedPaginatorView(
-            embeds=pages, original_message=await interaction.original_message()
+            embeds=pages, original_message=await interaction.original_response()
         )
 
-        await interaction.edit_original_message(
+        await interaction.edit_original_response(
             content="", embed=view.initial, view=view
         )
 
@@ -398,7 +398,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info("Creating Paginator")
         view: EmbedPaginatorView = EmbedPaginatorView(
             embeds=[embed for embed in stat_categories.values() if embed.fields],
-            original_message=await interaction.original_message(),
+            original_message=await interaction.original_response(),
         )
 
         await interaction.followup.send(embed=view.initial, view=view)
