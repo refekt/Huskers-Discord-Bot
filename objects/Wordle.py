@@ -1,3 +1,4 @@
+import datetime
 import logging
 import re
 import statistics
@@ -5,7 +6,7 @@ from typing import ClassVar, Union, Optional
 
 import discord
 
-from helpers.constants import DEBUGGING_CODE
+from helpers.constants import DEBUGGING_CODE, TZ
 from objects.Exceptions import WordleException
 from objects.Logger import discordLogger
 
@@ -64,6 +65,9 @@ class Wordle:
         self._failed_score: ClassVar[float] = 6 + statistics.stdev([1, 2, 3, 4, 5, 6])
         self.__err_mg: str = "Denied! User submitted an invalid Wordle score."
 
+        if len(self.__boxes) - 1 != self.score:
+            assert WordleException("Score and number of boxes do not match.")
+
         # Check each line is accurate
         for line in self.__boxes:
 
@@ -113,6 +117,14 @@ class Wordle:
             return 0
 
         day: int = int(self.message[pos[0] : pos[1]])
+
+        wordle_founded: datetime.date = datetime.datetime(
+            year=2021, month=6, day=19, tzinfo=TZ
+        )
+
+        assert (
+            day == datetime.datetime.now(tz=TZ).date() - wordle_founded
+        ), WordleException("Date provided is not the correct date.")
 
         assert day > 0 and type(day) == int, WordleException(self.__err_mg)
 

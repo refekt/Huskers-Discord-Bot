@@ -615,6 +615,9 @@ class HuskerClient(Bot):
         ):
             return
 
+        if "marty" in message.author.name.lower():
+            return
+
         wordle: Optional[Wordle] = self.wordle_finder.get_wordle_message(
             message=message
         )
