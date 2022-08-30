@@ -336,6 +336,8 @@ class TextCog(commands.Cog, name="Text Commands"):
         chan: discord.TextChannel = await interaction.client.fetch_channel(CHAN_POSSUMS)
         await chan.send(embed=embed)
 
+        await interaction.followup.send("Possum message sent!")
+
     @app_commands.command(
         name="urban-dictionary",
         description="Look up a word on Urban Dictionary",
