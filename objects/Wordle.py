@@ -193,7 +193,6 @@ class WordleFinder:
     __slots__ = ["wordle_finder"]
 
     def __init__(self) -> None:
-        # self.wordle_finder: ClassVar[str] = r"^Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
         self.wordle_finder: ClassVar[str] = r"Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
 
     def get_wordle_message(
