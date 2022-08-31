@@ -162,7 +162,7 @@ async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str) ->
 
 @client.hybrid_command(name="backlog-wordle")
 @commands.default_permissions(administrator=True)
-async def backlog(ctx: Context) -> None:
+async def backlog(ctx: Context, year: int, month: int, day: int) -> None:
     north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
     general: discord.TextChannel = ctx.guild.get_channel(CHAN_GENERAL)
     wordle_finder: WordleFinder = WordleFinder()
@@ -173,7 +173,7 @@ async def backlog(ctx: Context) -> None:
     async for message in north_bottoms.history(
         # async for message in general.history(
         oldest_first=True,
-        after=datetime.datetime(year=2022, month=1, day=14),
+        after=datetime.datetime(year=year, month=month, day=day),
         limit=None,
     ):
         logger.debug(
@@ -186,7 +186,9 @@ async def backlog(ctx: Context) -> None:
             continue
 
         try:
-            wordle: Optional[Wordle] = wordle_finder.get_wordle_message(message=message)
+            wordle: Optional[Wordle] = wordle_finder.get_wordle_message(
+                message=message, backup_finder=True
+            )
         except (AssertionError, WordleException):
             continue
 

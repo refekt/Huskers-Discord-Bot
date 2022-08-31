@@ -40,6 +40,7 @@ class WordleConfirm(discord.ui.View):
 class Wordle:
     __slots__ = [
         "__b",
+        "__backup_finder",
         "__boxes",
         "__err_mg",
         "__g",
@@ -52,10 +53,7 @@ class Wordle:
     __REGEX_DAY: ClassVar[str] = r"\s\d{3,4}\s"
     __REGEX_SCORE: ClassVar[str] = r"(\d{1}|X)\/\d{1}"
 
-    def __init__(
-        self,
-        message: str,
-    ) -> None:
+    def __init__(self, message: str, backup_finder: bool = False) -> None:
         self.message: str = message.replace("\n\n", "\n")
         self.__boxes: list[str] = self.message.strip().split("\n")
         self.__b: ClassVar[str] = "⬛"  # ":black_large_square:"
@@ -64,6 +62,7 @@ class Wordle:
         self.__y: ClassVar[str] = "🟨"  # ":yellow_square:"
         self._failed_score: ClassVar[float] = 6 + statistics.stdev([1, 2, 3, 4, 5, 6])
         self.__err_mg: str = "Denied! User submitted an invalid Wordle score."
+        self.__backup_finder: bool = backup_finder
 
         if len(self.__boxes) - 1 != self.score:
             assert WordleException("Score and number of boxes do not match.")
@@ -118,13 +117,12 @@ class Wordle:
 
         day: int = int(self.message[pos[0] : pos[1]])
 
-        wordle_founded: datetime.date = datetime.datetime(
-            year=2021, month=6, day=19, tzinfo=TZ
-        )
+        wordle_founded: datetime.date = datetime.date(year=2021, month=6, day=19)
 
-        assert (
-            day == datetime.datetime.now(tz=TZ).date() - wordle_founded
-        ), WordleException("Date provided is not the correct date.")
+        if not self.__backup_finder:
+            assert (
+                day == datetime.datetime.now(tz=TZ).date() - wordle_founded
+            ), WordleException("Date provided is not the correct date.")
 
         assert day > 0 and type(day) == int, WordleException(self.__err_mg)
 
@@ -199,7 +197,7 @@ class WordleFinder:
         self.wordle_finder: ClassVar[str] = r"Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
 
     def get_wordle_message(
-        self, message: Union[discord.Message, str]
+        self, message: Union[discord.Message, str], backup_finder: bool = False
     ) -> Optional[Wordle]:
         if isinstance(message, str):
             msg: str = message.strip()
@@ -211,7 +209,7 @@ class WordleFinder:
 
         if re.search(self.wordle_finder, msg):
             try:
-                return Wordle(message=msg)
+                return Wordle(message=msg, backup_finder=backup_finder)
             except UnicodeError:
                 return None
         else:
