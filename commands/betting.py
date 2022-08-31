@@ -56,6 +56,10 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         predict_points: WhichOverUnderChoice,
         predict_spread: WhichTeamChoice,
     ) -> None:
+        assert game_winner != WhichTeamChoice.NA, BettingException(
+            "Cannot choose 'Not Available' for the game winner!"
+        )
+
         game_started: bool = False
         games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
         check_games: list[Game] = games_api.get_games(

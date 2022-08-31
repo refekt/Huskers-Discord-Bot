@@ -64,7 +64,7 @@ sqlDeleteImageCommand = "DELETE FROM img_cmd_db WHERE img_name = % s AND author 
 sqlGetTeamInfoByID = "SELECT id, espn_id, school, alt_name, alt_name2, conference, division, color, alt_color, logos1, logos2, location_name, location_city, location_state, location_capacity, location_grass FROM team_ids WHERE id = % s"
 sqlGetTeamInfoByESPNID = "SELECT id, espn_id, school, alt_name, alt_name2, conference, division, color, alt_color, logos1, logos2, location_name, location_city, location_state, location_capacity, location_grass FROM team_ids WHERE espn_id = % s"
 sqlInsertGameBet = "INSERT INTO bets ( id, author, author_str, created, created_str, opponent, home_game, week, game_datetime, game_datetime_passed, predict_game, predict_points, predict_spread, resolved ) VALUES ( 0, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s )"
-sqlUpdateGameBet = "UPDATE bets SET predict_game = % s, predict_points = % s, predict_spread = % s, created = % s, created_str = % s WHERE id = %s"
+sqlUpdateGameBet = "UPDATE bets SET predict_game = % s, predict_points = % s, predict_spread = % s, created = % s, created_str = % s WHERE id = % s"
 sqlSelectGameBetbyAuthor = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, predict_game, predict_points, predict_spread, resolved FROM bets WHERE author_str = % s AND opponent = % s"
 sqlSelectGameBetbyOpponent = "SELECT id, author, author_str, created, created_str, opponent, week, game_datetime, game_datetime_passed, predict_game, predict_points, predict_spread, resolved FROM bets WHERE opponent = % s"
 sqlGetBetsLeaderboard = "SELECT * FROM `bets_leaderboard.v`"
@@ -145,15 +145,16 @@ class SqlQuery:
                 1,
             )
         else:
-            values_count = len(self.values)
             sql_s_count = self.query.count("% s")
 
             if sql_s_count == 0:
                 return self.query
 
+            values_count = len(self.values)
+
             if values_count != sql_s_count:
                 raise MySQLException(
-                    f"Not enough self.values provided. {values_count} provided bu {sql_s_count} expected."
+                    f"Not enough self.values provided. {values_count} provided but {sql_s_count} are expected."
                 )
 
             _temp_query: str = self.query

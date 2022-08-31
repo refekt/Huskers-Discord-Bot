@@ -145,6 +145,7 @@ class HuskerSched2022(str, enum.Enum):
 class WhichTeamChoice(str, enum.Enum):
     Nebraska = "Nebraska"
     Opponent = "Opponent"
+    NA = "Not Available"
 
     def __str__(self) -> str:
         return str(self.value)
@@ -153,6 +154,7 @@ class WhichTeamChoice(str, enum.Enum):
 class WhichOverUnderChoice(str, enum.Enum):
     Over = "Over"
     Under = "Under"
+    NA = "Not Available"
 
     def __str__(self) -> str:
         return str(self.value)
