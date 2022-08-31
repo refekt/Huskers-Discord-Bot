@@ -64,8 +64,9 @@ class Wordle:
         self.__err_mg: str = "Denied! User submitted an invalid Wordle score."
         self.__backup_finder: bool = backup_finder
 
-        if len(self.__boxes) - 1 != self.score:
-            assert WordleException("Score and number of boxes do not match.")
+        assert len(self.__boxes) - 1 != self.score, WordleException(
+            "Score and number of boxes do not match."
+        )
 
         # Check each line is accurate
         for line in self.__boxes:
@@ -118,11 +119,14 @@ class Wordle:
         day: int = int(self.message[pos[0] : pos[1]])
 
         wordle_founded: datetime.date = datetime.date(year=2021, month=6, day=19)
+        check_days: datetime.timedelta = (
+            datetime.datetime.now(tz=TZ).date() - wordle_founded
+        )
 
         if not self.__backup_finder:
-            assert (
-                day == datetime.datetime.now(tz=TZ).date() - wordle_founded
-            ), WordleException("Date provided is not the correct date.")
+            assert day == check_days.days, WordleException(
+                "Date provided is not the correct date."
+            )
 
         assert day > 0 and type(day) == int, WordleException(self.__err_mg)
 

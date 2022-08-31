@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import logging
+import sys
 import traceback
 from typing import Literal, Optional
 
@@ -64,7 +65,7 @@ client: HuskerClient = HuskerClient(
 
 tree: CommandTree = client.tree
 
-if not DEBUGGING_CODE:
+if not "silent" in sys.argv:
 
     @tree.error
     async def on_app_command_error(
