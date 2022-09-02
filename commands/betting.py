@@ -151,9 +151,12 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             fields: list[dict[str, str]] = []
 
             for bet in opponent_bets:
-                total_wins[bet.get("predict_game")] += 1
-                total_overunder[bet.get("predict_points")] += 1
-                total_spread[bet.get("predict_spread")] += 1
+                try:
+                    total_wins[bet.get("predict_game")] += 1
+                    total_overunder[bet.get("predict_points")] += 1
+                    total_spread[bet.get("predict_spread")] += 1
+                except KeyError:
+                    continue
 
                 fields.append(
                     dict(
