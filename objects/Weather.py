@@ -46,6 +46,7 @@ class WeatherMain:
         "feels_like",
         "humidity",
         "pressure",
+        "sea_level",
         "temp",
         "temp_max",
         "temp_min",
