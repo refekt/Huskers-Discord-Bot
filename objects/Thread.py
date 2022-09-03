@@ -2,6 +2,7 @@ import asyncio
 import enum
 import logging
 import re
+import sys
 from datetime import datetime, timedelta
 from typing import Coroutine, Optional, Callable, Union
 
@@ -109,7 +110,7 @@ def convert_duration(value: str) -> timedelta:
 async def background_run_function(
     func: Union[Coroutine, Callable],
     duration: Optional[timedelta] = None,
-    loop: asyncio.ProactorEventLoop = None,
+    loop=None,
 ) -> None:
     if duration:
         logger.info(
@@ -119,6 +120,11 @@ async def background_run_function(
         logger.info(f"{func.__name__} waiting complete. Calling function!")
 
     if loop:
+        if "Windows" in sys.platform:
+            loop: asyncio.ProactorEventLoop = loop
+        else:
+            loop: asyncio.SelectorEventLoop = loop
+
         asyncio.run_coroutine_threadsafe(coro=func, loop=loop)
     else:
         result = await func
