@@ -135,29 +135,29 @@ class HuskerSched2022(str, enum.Enum):
     Wisconsin = "Wisconsin"
     Iowa = "Iowa"
 
-    _game_dates: tuple[date, ...] = (
-        date(year=2022, month=8, day=27),
-        date(year=2022, month=9, day=3),
-        date(year=2022, month=9, day=10),
-        date(year=2022, month=9, day=17),
-        date(year=2022, month=10, day=1),
-        date(year=2022, month=10, day=7),
-        date(year=2022, month=10, day=15),
-        date(year=2022, month=10, day=29),
-        date(year=2022, month=11, day=5),
-        date(year=2022, month=11, day=12),
-        date(year=2022, month=11, day=19),
-        date(year=2022, month=11, day=25),
-    )
-
     def __str__(self) -> str:
+        _game_dates: tuple[date, ...] = (
+            date(year=2022, month=8, day=27),
+            date(year=2022, month=9, day=3),
+            date(year=2022, month=9, day=10),
+            date(year=2022, month=9, day=17),
+            date(year=2022, month=10, day=1),
+            date(year=2022, month=10, day=7),
+            date(year=2022, month=10, day=15),
+            date(year=2022, month=10, day=29),
+            date(year=2022, month=11, day=5),
+            date(year=2022, month=11, day=12),
+            date(year=2022, month=11, day=19),
+            date(year=2022, month=11, day=25),
+        )
+
         teams: list[str] = [
             entry.value  # noqa
             for entry in HuskerSched2022
             if isinstance(entry.value, str)  # noqa
         ]
         game_index: int = teams.index(str(self.value))
-        game_date: str = f"{self._game_dates.value[game_index]}"  # noqa
+        game_date: str = f"{_game_dates.value[game_index]}"  # noqa
 
         return f"{str(self.value)}__{game_date}"
 
