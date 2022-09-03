@@ -243,6 +243,7 @@ logger.info("Guild variable loaded")
 
 # Member ID
 MEMBER_GEE = 189554873778307073
+MEMBER_GEE_BACKUP = 541240112521019413
 logger.info("Member variables loaded")
 
 # Bot Info
@@ -496,6 +497,7 @@ __all__: list[str] = [
     "GUILD_PROD",
     "HEADERS",
     "MEMBER_GEE",
+    "MEMBER_GEE_BACKUP",
     "NAME_LIMIT",
     "PROD_TOKEN",
     "RECRUIT_POSITIONS",

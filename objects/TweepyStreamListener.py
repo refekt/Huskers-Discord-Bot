@@ -4,7 +4,6 @@ import os
 import pathlib
 import sys
 import traceback
-from asyncio import Future
 from typing import Union, Optional
 
 import discord
@@ -23,6 +22,9 @@ from helpers.constants import (
     DEBUGGING_CODE,
     MEMBER_GEE,
     TWITTER_BLOCK16_SCREENANME,
+    ROLE_EVERYONE_PROD,
+    CHAN_DISCUSSION_LIVE,
+    CHAN_DISCUSSION_STREAMING,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 
@@ -170,6 +172,11 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
 
 
 async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
+    def general_locked(
+        gen_c: discord.TextChannel, gen_check: Union[discord.Role, discord.Member]
+    ) -> bool:
+        return not gen_c.permissions_for(gen_check).send_messages
+
     class TwitterButtons(discord.ui.View):
         def __init__(
             self,
@@ -207,7 +214,17 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         ):
             tweepy_client_logger.debug("Sending tweet to general channel")
 
-            general_channel = await client.fetch_channel(CHAN_GENERAL)
+            general_channel: discord.TextChannel = await self.client.fetch_channel(
+                CHAN_GENERAL
+            )
+
+            if general_locked(
+                general_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
+            ):
+                tweepy_client_logger.debug(
+                    "Game day mode is on. Will send tweets to live discussion."
+                )
+                general_channel = await self.client.fetch_channel(CHAN_DISCUSSION_LIVE)
 
             await general_channel.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
@@ -224,7 +241,17 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         ):
             tweepy_client_logger.debug("Sending tweet to recruiting channel")
 
-            recruiting_channel = await client.fetch_channel(CHAN_RECRUITING)
+            recruiting_channel = await self.client.fetch_channel(CHAN_RECRUITING)
+
+            if general_locked(
+                recruiting_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
+            ):
+                tweepy_client_logger.debug(
+                    "Game day mode is on. Will send tweets to streaming discussion."
+                )
+                recruiting_channel = await self.client.fetch_channel(
+                    CHAN_DISCUSSION_STREAMING
+                )
 
             await recruiting_channel.send(
                 f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
@@ -252,6 +279,13 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         author: User = response.includes["users"][0]
 
         view: TwitterButtons = TwitterButtons()
+
+        test_channel: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
+
+        if general_locked(test_channel, client.guilds[0].get_role(ROLE_EVERYONE_PROD)):
+            view.children[0].label = "Send to Live"
+            view.children[1].label = "Send to Streaming"
+
         view.add_item(
             item=discord.ui.Button(
                 style=discord.ButtonStyle.url,
@@ -303,13 +337,18 @@ class StreamClientV2(tweepy.StreamingClient):
 
         tweepy_client_logger.info(f"Connected with the following rules: {auths}")
 
-        task: Future = asyncio.run_coroutine_threadsafe(
+        # task: Future = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet_alert(
+        #         client=self.client, message=f"Connected! Following: {auths}"
+        #     ),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_tweet_alert(
                 client=self.client, message=f"Connected! Following: {auths}"
-            ),
-            loop=self.client.loop,
+            )
         )
-        task.result()
 
     def on_response(self, response: StreamResponse) -> None:
         try:
@@ -324,22 +363,30 @@ class StreamClientV2(tweepy.StreamingClient):
         if "husker-media" not in [rule.tag for rule in response.matching_rules]:
             return
 
-        task: Future = asyncio.run_coroutine_threadsafe(
-            coro=send_tweet(client=self.client, response=response),
-            loop=self.client.loop,
+        # task: Future = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet(client=self.client, response=response),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
+            coro=send_tweet(client=self.client, response=response)
         )
-        task.result()
 
     def on_disconnect(self) -> None:
         tweepy_client_logger.exception("Twitter stream disconnected", exc_info=True)
 
-        task: Future = asyncio.run_coroutine_threadsafe(
+        # task: Future = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet_alert(
+        #         client=self.client, message="The Twitter stream has been disconnected!"
+        #     ),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_tweet_alert(
                 client=self.client, message="The Twitter stream has been disconnected!"
             ),
-            loop=self.client.loop,
         )
-        task.result()
 
     def on_closed(self, response: requests.Response) -> None:
         tweepy_client_logger.exception(
@@ -347,19 +394,27 @@ class StreamClientV2(tweepy.StreamingClient):
             exc_info=True,
         )
 
-        task: Future = asyncio.run_coroutine_threadsafe(
+        # task: Future = asyncio.run_coroutine_threadsafe(
+        #     coro=send_errors(client=self.client, error=response),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_errors(client=self.client, error=response),
-            loop=self.client.loop,
         )
-        task.result()
 
-        task = asyncio.run_coroutine_threadsafe(
+        # task = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet_alert(
+        #         client=self.client, message="The Twitter stream was closed!"
+        #     ),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_tweet_alert(
-                client=self.client, message="The Twitter stream has been disconnected!"
+                client=self.client, message="The Twitter stream was closed!"
             ),
-            loop=self.client.loop,
         )
-        task.result()
 
         self.disconnect()
 
@@ -368,19 +423,27 @@ class StreamClientV2(tweepy.StreamingClient):
             f"Twitter stream received an exception: {repr(exception)}", exc_info=True
         )
 
-        task: Future = asyncio.run_coroutine_threadsafe(
+        # task: Future = asyncio.run_coroutine_threadsafe(
+        #     coro=send_errors(client=self.client, error=exception),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_errors(client=self.client, error=exception),
-            loop=self.client.loop,
         )
-        task.result()
 
-        task = asyncio.run_coroutine_threadsafe(
+        # task = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet_alert(
+        #         client=self.client, message="The Twitter stream received an exception!"
+        #     ),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_tweet_alert(
-                client=self.client, message="The Twitter stream has been disconnected!"
+                client=self.client, message="The Twitter stream received an exception!"
             ),
-            loop=self.client.loop,
         )
-        task.result()
 
         self.disconnect()
 
@@ -396,19 +459,29 @@ class StreamClientV2(tweepy.StreamingClient):
             exc_info=True,
         )
 
-        task: Future = asyncio.run_coroutine_threadsafe(
+        # task: Future = asyncio.run_coroutine_threadsafe(
+        #     coro=send_errors(client=self.client, error=status_code),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_errors(client=self.client, error=status_code),
-            loop=self.client.loop,
         )
-        task.result()
 
-        task = asyncio.run_coroutine_threadsafe(
+        # task = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet_alert(
+        #         client=self.client,
+        #         message=f"The Twitter stream received a request error with status code {status_code}!",
+        #     ),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_tweet_alert(
-                client=self.client, message="The Twitter stream has been disconnected!"
+                client=self.client,
+                message=f"The Twitter stream received a request error with status code {status_code}!",
             ),
-            loop=self.client.loop,
         )
-        task.result()
 
         self.disconnect()
 
@@ -423,19 +496,29 @@ class StreamClientV2(tweepy.StreamingClient):
                     f"Twitter stream received the error {error}", exc_info=True
                 )
 
-                task: Future = asyncio.run_coroutine_threadsafe(
+                # task: Future = asyncio.run_coroutine_threadsafe(
+                #     coro=send_errors(client=self.client, error=error),
+                #     loop=self.client.loop,
+                # )
+                # task.result()
+                self.client.loop.create_task(
                     coro=send_errors(client=self.client, error=error),
-                    loop=self.client.loop,
                 )
-                task.result()
 
-        task = asyncio.run_coroutine_threadsafe(
+        # task = asyncio.run_coroutine_threadsafe(
+        #     coro=send_tweet_alert(
+        #         client=self.client,
+        #         message=f"The Twitter stream recieved {len(errors) + 1} errors!",
+        #     ),
+        #     loop=self.client.loop,
+        # )
+        # task.result()
+        self.client.loop.create_task(
             coro=send_tweet_alert(
-                client=self.client, message="The Twitter stream has been disconnected!"
+                client=self.client,
+                message=f"The Twitter stream recieved {len(errors) + 1} errors!",
             ),
-            loop=self.client.loop,
         )
-        task.result()
 
         self.disconnect()
 
