@@ -107,7 +107,7 @@ def convert_duration(value: str) -> timedelta:
 
 
 async def background_run_function(
-    func: Union[Coroutine, Callable], duration: Optional[timedelta] = None
+    func: Union[Coroutine, Callable], duration: Optional[timedelta] = None, loop=None
 ) -> None:
     if duration:
         logger.info(
@@ -116,7 +116,10 @@ async def background_run_function(
         await asyncio.sleep(delay=duration.total_seconds())
         logger.info(f"{func.__name__} waiting complete. Calling function!")
 
-    result = await func
+    if loop:
+        asyncio.run_coroutine_threadsafe(coro=func, loop=loop)
+    else:
+        result = await func
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

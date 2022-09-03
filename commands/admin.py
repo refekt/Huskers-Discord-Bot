@@ -747,6 +747,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             await background_run_function(
                 func=self.proess_nebraska(interaction=interaction, who=who),
                 duration=dt_duration,
+                loop=interaction.client.loop,
             )
 
         logger.info("Iowa command complete")

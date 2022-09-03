@@ -163,6 +163,7 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
                 remind_who=remind_who,
             ),
             duration=dt_duration,
+            loop=interaction.client.loop,
         )
 
         logger.debug("Updating MySQL to set to reminder is_open to False")
