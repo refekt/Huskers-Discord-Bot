@@ -3,15 +3,12 @@ from datetime import datetime, timedelta
 from typing import Optional, Union
 
 import discord.ext.commands
-from cfbd import ApiClient, GamesApi, Game
 from discord import app_commands
 from discord.app_commands import Group
 from discord.ext import commands
 
 from helpers.constants import (
-    CFBD_CONFIG,
     DEBUGGING_CODE,
-    DT_CFBD_GAMES,
     FIELDS_LIMIT,
     GUILD_PROD,
     TZ,
@@ -56,43 +53,49 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         predict_points: WhichOverUnderChoice,
         predict_spread: WhichTeamChoice,
     ) -> None:
+        await interaction.response.defer()
+
         dt_str: str = f"{str(opponent).split('__')[1]}"
         dt: datetime = datetime.strptime(dt_str, "%Y-%m-%d").astimezone(tz=TZ)
         dt += timedelta(hours=11)
+        dt_now: datetime = datetime.now(tz=TZ)
+
+        logger.debug(f"Checking current time vs. game time: {dt_now} ~ {dt}")
+
         assert datetime.now(tz=TZ) <= dt, BettingException(
-            "You cannot place a bet for a game that has started or finished!"
+            "You cannot place a bet after 11:00 AM of game days!"
         )
 
         assert game_winner != WhichTeamChoice.NA, BettingException(
             "Cannot choose 'Not Available' for the game winner!"
         )
 
-        game_started: bool = False
-        games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
-        check_games: list[Game] = games_api.get_games(
-            year=datetime.now().year,
-            team=BigTenTeams.Nebraska.lower(),
-            season_type="both",
-        )
-
-        opponent_game: Optional[Game] = None
-        for game in check_games:
-            if opponent not in (game.home_team, game.away_team):
-                continue
-            opponent_game = game
-            break
-
-        dt_start_date: datetime = datetime.strptime(
-            opponent_game.start_date, DT_CFBD_GAMES
-        ).astimezone(tz=TZ)
-
-        if dt_start_date.astimezone(tz=TZ) < datetime.now(tz=TZ):
-            await interaction.response.send(
-                f"You cannot place a bet on {opponent} after the game has started!",
-                ephemeral=True,
-            )
-        else:
-            await interaction.response.defer()
+        # game_started: bool = False
+        # games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
+        # check_games: list[Game] = games_api.get_games(
+        #     year=datetime.now().year,
+        #     team=BigTenTeams.Nebraska.lower(),
+        #     season_type="both",
+        # )
+        #
+        # opponent_game: Optional[Game] = None
+        # for game in check_games:
+        #     if opponent not in (game.home_team, game.away_team):
+        #         continue
+        #     opponent_game = game
+        #     break
+        #
+        # dt_start_date: datetime = datetime.strptime(
+        #     opponent_game.start_date, DT_CFBD_GAMES
+        # ).astimezone(tz=TZ)
+        #
+        # if dt_start_date.astimezone(tz=TZ) < datetime.now(tz=TZ):
+        #     await interaction.response.send(
+        #         f"You cannot place a bet on {opponent} after the game has started!",
+        #         ephemeral=True,
+        #     )
+        # else:
+        #     await interaction.response.defer()
 
         if [_ for _ in (game_winner, predict_points, predict_spread) if _ is None]:
             raise BettingException("You cannot submit a blank bet!")
