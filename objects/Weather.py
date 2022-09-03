@@ -44,6 +44,7 @@ class WeatherMain:
     __slots__ = [
         "_data_len",
         "feels_like",
+        "grnd_level",
         "humidity",
         "pressure",
         "sea_level",
