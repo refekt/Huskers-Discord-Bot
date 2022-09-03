@@ -157,7 +157,7 @@ class HuskerSched2022(str, enum.Enum):
             if isinstance(entry.value, str)  # noqa
         ]
         game_index: int = teams.index(str(self.value))
-        game_date: str = f"{_game_dates.value[game_index]}"  # noqa
+        game_date: str = f"{_game_dates[game_index]}"
 
         return f"{str(self.value)}__{game_date}"
 
