@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Union
 
 import discord.ext.commands
@@ -56,6 +56,13 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         predict_points: WhichOverUnderChoice,
         predict_spread: WhichTeamChoice,
     ) -> None:
+        dt_str: str = f"{str(opponent).split('__')[1]}"
+        dt: datetime = datetime.strptime(dt_str, "%Y-%m-%d").astimezone(tz=TZ)
+        dt += timedelta(hours=11)
+        assert datetime.now(tz=TZ) <= dt, BettingException(
+            "You cannot place a bet for a game that has started or finished!"
+        )
+
         assert game_winner != WhichTeamChoice.NA, BettingException(
             "Cannot choose 'Not Available' for the game winner!"
         )
