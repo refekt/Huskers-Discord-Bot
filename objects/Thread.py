@@ -119,8 +119,7 @@ async def background_run_function(
         logger.info(f"{func.__name__} waiting complete. Calling function!")
 
     if loop:
-        # asyncio.run_coroutine_threadsafe(coro=func, loop=loop)
-        loop.create_task(func())
+        asyncio.run_coroutine_threadsafe(coro=func, loop=loop)
     else:
         result = await func
 
