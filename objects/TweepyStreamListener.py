@@ -78,7 +78,7 @@ __all__: list[str] = ["StreamClientV2"]
 # task.result()
 
 
-async def send_errors(
+async def send_errors_to_gee(
     client: discord.Client, error, alert_admins: bool = False
 ) -> None:
     try:
@@ -395,12 +395,14 @@ class StreamClientV2(tweepy.StreamingClient):
         )
 
         # task: Future = asyncio.run_coroutine_threadsafe(
-        #     coro=send_errors(client=self.client, error=response),
+        #     coro=send_errors_to_gee(client=self.client, error=response),
         #     loop=self.client.loop,
         # )
         # task.result()
         self.client.loop.create_task(
-            coro=send_errors(client=self.client, error=response),
+            coro=send_errors_to_gee(
+                client=self.client, error=response, alert_admins=True
+            ),
         )
 
         # task = asyncio.run_coroutine_threadsafe(
@@ -424,12 +426,12 @@ class StreamClientV2(tweepy.StreamingClient):
         )
 
         # task: Future = asyncio.run_coroutine_threadsafe(
-        #     coro=send_errors(client=self.client, error=exception),
+        #     coro=send_errors_to_gee(client=self.client, error=exception),
         #     loop=self.client.loop,
         # )
         # task.result()
         self.client.loop.create_task(
-            coro=send_errors(client=self.client, error=exception),
+            coro=send_errors_to_gee(client=self.client, error=exception),
         )
 
         # task = asyncio.run_coroutine_threadsafe(
@@ -460,12 +462,12 @@ class StreamClientV2(tweepy.StreamingClient):
         )
 
         # task: Future = asyncio.run_coroutine_threadsafe(
-        #     coro=send_errors(client=self.client, error=status_code),
+        #     coro=send_errors_to_gee(client=self.client, error=status_code),
         #     loop=self.client.loop,
         # )
         # task.result()
         self.client.loop.create_task(
-            coro=send_errors(client=self.client, error=status_code),
+            coro=send_errors_to_gee(client=self.client, error=status_code),
         )
 
         # task = asyncio.run_coroutine_threadsafe(
@@ -497,12 +499,12 @@ class StreamClientV2(tweepy.StreamingClient):
                 )
 
                 # task: Future = asyncio.run_coroutine_threadsafe(
-                #     coro=send_errors(client=self.client, error=error),
+                #     coro=send_errors_to_gee(client=self.client, error=error),
                 #     loop=self.client.loop,
                 # )
                 # task.result()
                 self.client.loop.create_task(
-                    coro=send_errors(client=self.client, error=error),
+                    coro=send_errors_to_gee(client=self.client, error=error),
                 )
 
         # task = asyncio.run_coroutine_threadsafe(
