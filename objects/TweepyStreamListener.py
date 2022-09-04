@@ -9,28 +9,24 @@ from typing import Union, Optional
 import discord
 import requests
 import tweepy
-from discord import HTTPException, NotFound, Forbidden
+from discord import HTTPException, NotFound
 from tweepy import Response, StreamResponse, User
 
 from helpers.constants import (
     CHAN_ADMIN,
     CHAN_BOT_SPAM_PRIVATE,
+    CHAN_DISCUSSION_LIVE,
+    CHAN_DISCUSSION_STREAMING,
     CHAN_FOOD,
     CHAN_GENERAL,
     CHAN_RECRUITING,
     CHAN_TWITTERVERSE,
     DEBUGGING_CODE,
     MEMBER_GEE,
-    TWITTER_BLOCK16_SCREENANME,
     ROLE_EVERYONE_PROD,
-    CHAN_DISCUSSION_LIVE,
-    CHAN_DISCUSSION_STREAMING,
+    TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
-
-# logger = discordLogger(
-#     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
-# )
 
 tweepy_client: str = "tweepy.client"
 level = logging.DEBUG
@@ -71,25 +67,9 @@ logging.basicConfig(
 __all__: list[str] = ["StreamClientV2"]
 
 
-# Example
-# task = asyncio.run_coroutine_threadsafe(
-#     send_tweet_alert(self.discord_client, "Connected!"), self.discord_client.loop
-# )
-# task.result()
-
-
-async def send_errors_to_gee(
-    client: discord.Client, error, alert_admins: bool = False
-) -> None:
+async def send_errors_to_gee(client: discord.Client, error) -> None:
     try:
         gee_member: discord.User = await client.fetch_user(MEMBER_GEE)
-
-        if alert_admins:
-            admin_channel: Optional[discord.TextChannel] = await client.fetch_channel(
-                CHAN_ADMIN
-            )
-        else:
-            admin_channel = None
 
     except (NotFound, HTTPException):
         return
@@ -123,30 +103,22 @@ async def send_errors_to_gee(
         )
     elif isinstance(error, dict):
         _: dict = error
-        traceback_str: str = traceback.format_exc()
         error_message = (
             "An error was received from on_errors:\n"
             f"JSON Dumps:\n"
             f"```css\n"
-            f"{traceback_str}"
+            f"{_}"
             f"\n```"
         )
     else:
         error_message = "NONE"
 
-    try:
-        await gee_member.send(content=error_message)
-
-        if admin_channel:
-            await gee_member.send(
-                content=f"Potential Twitter stream disconnect. This is typically from Twitter server maintennace. An Admin or Mod needs to `/restart twitter` to continue receiving tweets.\n\n"
-                f"{error_message}"
-            )
-    except (HTTPException, Forbidden, ValueError, TypeError):
-        return
+    await gee_member.send(content=error_message)
 
 
-async def send_tweet_alert(client: discord.Client, message) -> None:
+async def send_tweet_alert(
+    client: discord.Client, message: str, alert_admins: bool = False
+) -> None:
     if DEBUGGING_CODE:
         twitter_channel: discord.TextChannel = await client.fetch_channel(
             CHAN_BOT_SPAM_PRIVATE
@@ -157,7 +129,7 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     tweepy_client_logger.debug(f"Tweet alert received: {message}")
 
     embed: discord.Embed = buildEmbed(
-        title="Husker Twitter",
+        title="",
         fields=[
             dict(
                 name="Twitter Stream Alert",
@@ -167,6 +139,20 @@ async def send_tweet_alert(client: discord.Client, message) -> None:
     )
 
     await twitter_channel.send(embed=embed)
+
+    admin_channel: Optional[discord.TextChannel] = None
+
+    if alert_admins:
+        try:
+            admin_channel = await client.fetch_channel(CHAN_ADMIN)
+        except (NotFound, HTTPException):
+            pass
+
+    if admin_channel is not None:
+        await admin_channel.send(
+            content=f"The Twitter Stream has been disconnected. An Admin or Mod needs to `/restart twitter` to continue receiving tweets.\n\n"
+            f"{message}"
+        )
 
     tweepy_client_logger.info(f"Twitter alert sent!")
 
@@ -273,7 +259,10 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
 
     embed = buildTweetEmbed(response=response)
 
-    if response.includes["users"][0].name.lower() == TWITTER_BLOCK16_SCREENANME.lower():
+    if (
+        response.includes["users"][0].username.lower()
+        == TWITTER_BLOCK16_SCREENANME.lower()
+    ):
         await food_channel.send(embed=embed)
     else:
         author: User = response.includes["users"][0]
@@ -283,8 +272,8 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
         test_channel: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
 
         if general_locked(test_channel, client.guilds[0].get_role(ROLE_EVERYONE_PROD)):
-            view.children[0].label = "Send to Live"
-            view.children[1].label = "Send to Streaming"
+            view.children[0].label = "Send to Live"  # noqa
+            view.children[1].label = "Send to Streaming"  # noqa
 
         view.add_item(
             item=discord.ui.Button(
@@ -384,7 +373,9 @@ class StreamClientV2(tweepy.StreamingClient):
         # task.result()
         self.client.loop.create_task(
             coro=send_tweet_alert(
-                client=self.client, message="The Twitter stream has been disconnected!"
+                client=self.client,
+                message="The Twitter stream has been disconnected!",
+                alert_admins=True,
             ),
         )
 
@@ -400,9 +391,7 @@ class StreamClientV2(tweepy.StreamingClient):
         # )
         # task.result()
         self.client.loop.create_task(
-            coro=send_errors_to_gee(
-                client=self.client, error=response, alert_admins=True
-            ),
+            coro=send_errors_to_gee(client=self.client, error=response),
         )
 
         # task = asyncio.run_coroutine_threadsafe(
@@ -417,8 +406,6 @@ class StreamClientV2(tweepy.StreamingClient):
                 client=self.client, message="The Twitter stream was closed!"
             ),
         )
-
-        self.disconnect()
 
     def on_exception(self, exception: Exception) -> None:
         tweepy_client_logger.exception(
@@ -446,8 +433,6 @@ class StreamClientV2(tweepy.StreamingClient):
                 client=self.client, message="The Twitter stream received an exception!"
             ),
         )
-
-        self.disconnect()
 
     def on_request_error(self, status_code: int) -> None:
         if status_code == 429:
@@ -485,8 +470,6 @@ class StreamClientV2(tweepy.StreamingClient):
             ),
         )
 
-        self.disconnect()
-
     def on_errors(self, errors: dict) -> None:
         for error in errors:
             error_type: str = error.get("title", None)
@@ -521,8 +504,6 @@ class StreamClientV2(tweepy.StreamingClient):
                 message=f"The Twitter stream recieved {len(errors) + 1} errors!",
             ),
         )
-
-        self.disconnect()
 
 
 tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
