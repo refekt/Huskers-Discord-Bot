@@ -6,7 +6,7 @@ import discord
 import requests
 from PIL import Image, ImageOps
 
-from helpers.constants import DEBUGGING_CODE
+from helpers.constants import DEBUGGING_CODE, BOT_ICON_URL
 from objects.Exceptions import ImageException
 from objects.Logger import discordLogger
 
@@ -19,14 +19,20 @@ logger.info(f"{str(__name__).title()} module loaded!")
 __all__: list[str] = ["makeSlowking"]
 
 
-def makeSlowking(person: discord.Member) -> discord.File:
+def makeSlowking(person: discord.Member, use_huskerbot: bool = False) -> discord.File:
     try:
-        avatar_thumbnail = Image.open(
+        avatar_thumbnail: Image = Image.open(
             requests.get(person.avatar.url, stream=True).raw
         ).convert("RGBA")
     except IOError:
-        logger.exception("Unable to create a Slow King avatar for user!", exc_info=True)
-        raise ImageException("Unable to create a Slow King avatar for user!")
+        if use_huskerbot:
+            avatar_thumbnail = Image.open(BOT_ICON_URL).convert("RGBA")
+            pass
+        else:
+            logger.exception(
+                "Unable to create a Slow King avatar for user!", exc_info=True
+            )
+            raise ImageException("Unable to create a Slow King avatar for user!")
 
     base_mask = Image.open("resources/images/mask.png").convert("L")
     avatar_thumbnail = ImageOps.fit(

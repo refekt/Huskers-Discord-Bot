@@ -19,6 +19,7 @@ from tweepy import Response
 from __version__ import _version
 from commands.reminder import MissedReminder, send_reminder
 from helpers.constants import (
+    BOT_ICON_URL,
     CHAN_BOT_SPAM,
     CHAN_BOT_SPAM_PRIVATE,
     CHAN_GENERAL,
@@ -306,7 +307,7 @@ class HuskerClient(Bot):
                     value=f"Be sure to check out `/commands` for how to use the bot!",
                 ),
             ],
-            image=guild_member.avatar.url if guild_member.avatar.url else None,
+            image=guild_member.avatar.url if guild_member.avatar.url else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
 
@@ -314,6 +315,8 @@ class HuskerClient(Bot):
         self, guild_member: Union[discord.Member, discord.User]
     ):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
+        image: discord.File = makeSlowking(guild_member, use_huskerbot=True)
+
         embed = buildEmbed(
             title="Woe is us, a Husker fan departs",
             description="Say goodbye to our friend",
@@ -323,7 +326,7 @@ class HuskerClient(Bot):
                     value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
                 ),
             ],
-            image=guild_member.avatar.url if guild_member.avatar.url else None,
+            image=image,
         )
         await channel_general.send(embed=embed)
 
