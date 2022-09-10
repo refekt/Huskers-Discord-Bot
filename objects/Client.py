@@ -315,7 +315,6 @@ class HuskerClient(Bot):
         self, guild_member: Union[discord.Member, discord.User]
     ):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
-        image: discord.File = makeSlowking(guild_member, use_huskerbot=True)
 
         embed = buildEmbed(
             title="Woe is us, a Husker fan departs",
@@ -326,7 +325,7 @@ class HuskerClient(Bot):
                     value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
                 ),
             ],
-            image=image,
+            image=guild_member.avatar.url if guild_member.avatar.url else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
 
