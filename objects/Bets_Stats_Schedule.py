@@ -43,6 +43,7 @@ logger = discordLogger(
 __all__: list[str] = [
     "Bet",
     "BetLines",
+    "BettingHuskerSchedule",
     "BigTenTeams",
     "FootballTeam",
     "HuskerSched2022",
@@ -122,18 +123,41 @@ class BigTenTeams(str, enum.Enum):
 
 
 class HuskerSched2022(str, enum.Enum):
-    Northwestern = "Northwestern"
-    North_Dakota = "North Dakota"
-    Georgia_Southern = "Georgia Southern"
-    Oklahoma = "Oklahoma"
-    Indiana = "Indiana"
-    Rutgers = "Rutgers"
-    Purdue = "Purdue"
-    Illinois = "Illinois"
-    Minnesota = "Minnesota"
-    Michigan = "Michigan"
-    Wisconsin = "Wisconsin"
-    Iowa = "Iowa"
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=8, day=27):
+        Northwestern = "Northwestern"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=3):
+        North_Dakota = "North Dakota"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=10):
+        Georgia_Southern = "Georgia Southern"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=17):
+        Oklahoma = "Oklahoma"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=1):
+        Indiana = "Indiana"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=7):
+        Rutgers = "Rutgers"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=15):
+        Purdue = "Purdue"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=29):
+        Illinois = "Illinois"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=5):
+        Minnesota = "Minnesota"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=12):
+        Michigan = "Michigan"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=19):
+        Wisconsin = "Wisconsin"
+
+    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=25):
+        Iowa = "Iowa"
 
     def __str__(self) -> str:
         _game_dates: tuple[date, ...] = (
@@ -160,6 +184,21 @@ class HuskerSched2022(str, enum.Enum):
         game_date: str = f"{_game_dates[game_index]}"
 
         return f"{str(self.value)}__{game_date}"
+
+
+class BettingHuskerSchedule(str, enum.Enum):
+    Northwestern = "Northwestern"
+    North_Dakota = "North Dakota"
+    Georgia_Southern = "Georgia Southern"
+    Oklahoma = "Oklahoma"
+    Indiana = "Indiana"
+    Rutgers = "Rutgers"
+    Purdue = "Purdue"
+    Illinois = "Illinois"
+    Minnesota = "Minnesota"
+    Michigan = "Michigan"
+    Wisconsin = "Wisconsin"
+    Iowa = "Iowa"
 
 
 class WhichTeamChoice(str, enum.Enum):

@@ -22,6 +22,7 @@ from objects.Bets_Stats_Schedule import (
     WhichOverUnderChoice,
     WhichTeamChoice,
     retrieveGameBets,
+    BettingHuskerSchedule,
 )
 from objects.Exceptions import BettingException
 from objects.Logger import discordLogger
@@ -141,7 +142,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         opponent_name="Name of the opponent_name for the Husker game."
     )
     async def bet_show(
-        self, interaction: discord.Interaction, opponent_name: HuskerSched2022
+        self, interaction: discord.Interaction, opponent_name: BettingHuskerSchedule
     ):
         await interaction.response.defer()
 
