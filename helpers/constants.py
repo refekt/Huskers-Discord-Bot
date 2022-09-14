@@ -256,7 +256,7 @@ BOT_THUMBNAIL_URL: str = (
 BOT_FOOTER_SECRET: str = (
     "These messages are anonymous and there is no way to verify messages are accurate."
 )
-BOT_FOOTER_BOT: str = "Bot Frost praises the sun \\[T]/"  # noqa
+BOT_FOOTER_BOT: str = "Husker Bot praises the sun \\[T]/"  # noqa
 logger.info("Bot info variables loaded")
 
 # DateTime format
