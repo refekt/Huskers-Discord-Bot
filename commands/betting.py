@@ -63,7 +63,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         logger.debug(f"Checking current time vs. game time: {dt_now} ~ {dt}")
 
-        assert datetime.now(tz=TZ) <= dt, BettingException(
+        assert datetime.now(tz=TZ) <= dt_now, BettingException(
             "You cannot place a bet after 11:00 AM of game days!"
         )
 

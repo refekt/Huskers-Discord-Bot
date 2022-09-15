@@ -161,18 +161,18 @@ class HuskerSched2022(str, enum.Enum):
 
     def __str__(self) -> str:
         _game_dates: tuple[date, ...] = (
-            date(year=2022, month=8, day=27),
-            date(year=2022, month=9, day=3),
-            date(year=2022, month=9, day=10),
-            date(year=2022, month=9, day=17),
-            date(year=2022, month=10, day=1),
-            date(year=2022, month=10, day=7),
-            date(year=2022, month=10, day=15),
-            date(year=2022, month=10, day=29),
-            date(year=2022, month=11, day=5),
-            date(year=2022, month=11, day=12),
-            date(year=2022, month=11, day=19),
-            date(year=2022, month=11, day=25),
+            date(year=2022, month=8, day=27),  # Northwestern
+            date(year=2022, month=9, day=3),  # North Dakota
+            date(year=2022, month=9, day=10),  # Georgia Southern
+            date(year=2022, month=9, day=17),  # Oklahoma
+            date(year=2022, month=10, day=1),  # Indiana
+            date(year=2022, month=10, day=7),  # Rutgers
+            date(year=2022, month=10, day=15),  # Purdue
+            date(year=2022, month=10, day=29),  # Illinois
+            date(year=2022, month=11, day=5),  # Minnesota
+            date(year=2022, month=11, day=12),  # Michigan
+            date(year=2022, month=11, day=19),  # Wisconsin
+            date(year=2022, month=11, day=25),  # Iowa
         )
 
         teams: list[str] = [
@@ -180,6 +180,8 @@ class HuskerSched2022(str, enum.Enum):
             for entry in HuskerSched2022
             if isinstance(entry.value, str)  # noqa
         ]
+        teams_offset: int = len(_game_dates) - len(teams)
+        _game_dates = _game_dates[teams_offset:]
         game_index: int = teams.index(str(self.value))
         game_date: str = f"{_game_dates[game_index]}"
 
