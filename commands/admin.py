@@ -140,6 +140,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 ],
             )
 
+            await chan_live.send(embed=embed)
+            await chan_streaming.send(embed=embed)
+            await chan_general.send(embed=embed)
+
             while general_locked:
                 await asyncio.sleep(60 * 10)
                 await chan_general.send(embed=embed)
@@ -155,9 +159,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 ],
             )
             await chan_general.send(embed=embed)
-
-        await chan_live.send(embed=embed)
-        await chan_streaming.send(embed=embed)
 
     # noinspection PyMethodMayBeStatic
     async def process_gameday(self, mode: bool, guild: discord.Guild) -> None:
@@ -190,7 +191,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
             try:
                 logger.info(
-                    f"Attempting to changes permissions for [{channel}] to [{not mode}]"
+                    f"Attempting to changes permissions for [{channel.name.encode('utf-8', 'replace')}] to [{not mode}]"
                 )
                 if channel.type == discord.ChannelType.text:
                     await channel.set_permissions(
@@ -198,11 +199,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     )
             except:  # noqa
                 logger.info(
-                    f"Unable to change permissions for [{channel}] to [{not mode}]"
+                    f"Unable to change permissions for [{channel.name.encode('utf-8', 'replace')}] to [{not mode}]"
                 )
                 continue
 
-            logger.info(f"Changed permissions for [{channel}] to [{not mode}]")
+            logger.info(
+                f"Changed permissions for [{channel.name.encode('utf-8', 'replace')}] to [{not mode}]"
+            )
 
         for channel in gameday_category.channels:
             try:
