@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import pathlib
@@ -37,7 +38,7 @@ from helpers.constants import (
     WINDOWS_PATH,
 )
 from helpers.embed import buildEmbed
-from helpers.misc import discordURLFormatter
+from helpers.misc import discordURLFormatter, general_locked
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Client import start_twitter_stream
 from objects.Exceptions import CommandException, UserInputException, SSHException
@@ -138,6 +139,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     ),
                 ],
             )
+
+            while general_locked:
+                await asyncio.sleep(60 * 10)
+                await chan_general.send(embed=embed)
         else:
             embed = buildEmbed(
                 title="Game Day Mode",
@@ -149,8 +154,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     )
                 ],
             )
+            await chan_general.send(embed=embed)
 
-        await chan_general.send(embed=embed)
         await chan_live.send(embed=embed)
         await chan_streaming.send(embed=embed)
 

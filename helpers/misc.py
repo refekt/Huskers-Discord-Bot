@@ -8,6 +8,8 @@ import string
 from datetime import datetime, timedelta
 from typing import Callable, Union, Any
 
+import discord
+
 from objects.Exceptions import CommandException, StatsException
 from objects.Logger import discordLogger
 
@@ -22,6 +24,7 @@ __all__: list[str] = [
     "convertSeconds",
     "createComponentKey",
     "discordURLFormatter",
+    "general_locked",
     "getModuleMethod",
     "loadVarPath",
     "shift_utc_tz",
@@ -113,6 +116,12 @@ def convertSeconds(n) -> Union[int, Any]:
 
 def shift_utc_tz(dt: datetime, shift: int) -> datetime:
     return dt + timedelta(seconds=shift)
+
+
+def general_locked(
+    gen_c: discord.TextChannel, gen_check: Union[discord.Role, discord.Member]
+) -> bool:
+    return not gen_c.permissions_for(gen_check).send_messages
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

@@ -27,6 +27,7 @@ from helpers.constants import (
     TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
+from helpers.misc import general_locked
 
 tweepy_client: str = "tweepy.client"
 level = logging.DEBUG
@@ -158,11 +159,6 @@ async def send_tweet_alert(
 
 
 async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
-    def general_locked(
-        gen_c: discord.TextChannel, gen_check: Union[discord.Role, discord.Member]
-    ) -> bool:
-        return not gen_c.permissions_for(gen_check).send_messages
-
     class TwitterButtons(discord.ui.View):
         def __init__(
             self,
