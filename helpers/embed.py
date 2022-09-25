@@ -95,8 +95,13 @@ def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
             icon_url=kwargs.get("icon_url", ""),
         )
 
-    if "thumbnail" in kwargs.keys() and validators.url(kwargs.get("thumbnail")):
-        e.set_thumbnail(url=kwargs.get("thumbnail"))
+    if "thumbnail" in kwargs.keys():
+        if kwargs.get("thumbnail") is None:
+            e.set_thumbnail(url=None)
+        elif validators.url(kwargs.get("thumbnail")):
+            e.set_thumbnail(url=kwargs.get("thumbnail"))
+        else:
+            e.set_thumbnail(url=BOT_THUMBNAIL_URL)
     else:
         e.set_thumbnail(url=BOT_THUMBNAIL_URL)
 
