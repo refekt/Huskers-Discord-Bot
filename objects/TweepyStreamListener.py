@@ -25,6 +25,9 @@ from helpers.constants import (
     MEMBER_GEE,
     ROLE_EVERYONE_PROD,
     TWITTER_BLOCK16_SCREENANME,
+    ROLE_ADMIN_PROD,
+    ROLE_MOD_PROD,
+    GUILD_PROD,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from helpers.misc import general_locked
@@ -131,12 +134,7 @@ async def send_tweet_alert(
 
     embed: discord.Embed = buildEmbed(
         title="",
-        fields=[
-            dict(
-                name="Twitter Stream Alert",
-                value=str(message),
-            )
-        ],
+        description=str(message),
     )
 
     await twitter_channel.send(embed=embed)
@@ -150,9 +148,13 @@ async def send_tweet_alert(
             pass
 
     if admin_channel is not None:
+        guild: discord.Guild = await client.fetch_guild(GUILD_PROD)
+        admins: Optional[discord.Role] = guild.get_role(ROLE_ADMIN_PROD)
+        mods: Optional[discord.Role] = guild.get_role(ROLE_MOD_PROD)
+
         await admin_channel.send(
             content=f"The Twitter Stream has been disconnected. An Admin or Mod needs to `/restart twitter` to continue receiving tweets.\n\n"
-            f"{message}"
+            f"{admins.mention}, {mods.mention}"
         )
 
     tweepy_client_logger.info(f"Twitter alert sent!")
@@ -331,7 +333,7 @@ class StreamClientV2(tweepy.StreamingClient):
         # task.result()
         self.client.loop.create_task(
             coro=send_tweet_alert(
-                client=self.client, message=f"Connected! Following: {auths}"
+                client=self.client, message=f"The Twitter stream has connected!"
             )
         )
 
