@@ -133,8 +133,7 @@ async def send_tweet_alert(
     tweepy_client_logger.debug(f"Tweet alert received: {message}")
 
     embed: discord.Embed = buildEmbed(
-        title="",
-        description=str(message),
+        title="", description=str(message), thumbnail=None
     )
 
     await twitter_channel.send(embed=embed)
