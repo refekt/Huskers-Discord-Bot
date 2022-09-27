@@ -152,8 +152,8 @@ async def send_tweet_alert(
         mods: Optional[discord.Role] = guild.get_role(ROLE_MOD_PROD)
 
         await admin_channel.send(
-            content=f"The Twitter Stream has been disconnected. An Admin or Mod needs to `/restart twitter` to continue receiving tweets.\n\n"
-            f"{admins.mention}, {mods.mention}"
+            content=f"The Twitter Stream has been disconnected. An Admin or Mod needs to `/restart twitter` to continue receiving tweets."
+            # f"{admins.mention}, {mods.mention}"
         )
 
     tweepy_client_logger.info(f"Twitter alert sent!")
