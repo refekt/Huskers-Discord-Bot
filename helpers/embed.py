@@ -243,7 +243,7 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
         if game.away_points is None and game.home_points is None:
             outcome_str: str = "TBD"
         else:
-            outcome_max_len: int = 17  # arbitrary
+            outcome_max_len: int = 20  # arbitrary
             outcome_home_len: int = outcome_max_len - (
                 len(game.home_team) + len(str(game.home_points))
             )
