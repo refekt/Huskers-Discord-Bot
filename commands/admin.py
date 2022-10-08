@@ -144,6 +144,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             await chan_streaming.send(embed=embed)
             await chan_general.send(embed=embed)
 
+            # TODO Setup a background task that can be turned off
             while general_locked:
                 await asyncio.sleep(60 * 10)
                 await chan_general.send(embed=embed)

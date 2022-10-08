@@ -1,4 +1,5 @@
 import base64
+import difflib
 import enum
 import io
 import logging
@@ -345,8 +346,13 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
         image = retrieve_img(image_name)
 
+        global all_imgs
+        all_imgs = retrieve_all_img()
+        img_list = [img["img_name"] for img in all_imgs]
+        img_list.sort()
+
         assert image, ImageException(
-            f"Unable to locate an image command named [{image_name}]."
+            f"Unable to locate an image command named [{image_name}]. Did you mean {difflib.get_close_matches(image_name, img_list)}?"
         )
 
         author = interaction.guild.get_member(int(image["author"]))
