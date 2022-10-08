@@ -704,8 +704,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         previous_roles: Union[list[str], str] = [str(role.id) for role in who.roles[1:]]
-        if previous_roles:
+        if len(previous_roles):
             previous_roles = ",".join(previous_roles)
+        else:
+            previous_roles = ""
 
         logger.info(f"Gathered all the roles to store")
 
@@ -726,7 +728,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
 
-        # TODO Exception raising here for MySQL
         processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
         logger.debug("Saved old roles roles to MySQL database")
 
