@@ -249,13 +249,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     ) -> list:
         msgs: list[discord.Message] = []
         max_age: datetime = datetime.now() - timedelta(
-            days=13, hours=23, minutes=59
+            days=13, hours=22, minutes=0
         )  # Discord only lets you delete 14 day old messages
 
         try:
             async for message in channel.history(limit=100):
                 if (
-                    message.created_at >= max_age.astimezone() and message.author.bot
+                    message.created_at >= max_age.astimezone(tz=TZ)
+                    and message.author.bot
                     if not all_messages
                     else True
                 ):
