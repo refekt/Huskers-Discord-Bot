@@ -254,14 +254,19 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         try:
             async for message in channel.history(limit=100):
-                if (
-                    message.created_at >= max_age.astimezone(tz=TZ)
-                    and message.author.bot
-                    if not all_messages
-                    else True
-                ):
-                    msgs.append(message)
+                if all_messages:
+                    if message.created_at.astimezone(tz=TZ) >= max_age.astimezone(
+                        tz=TZ
+                    ):
+                        msgs.append(message)
+                else:
+                    if not message.author.bot:
+                        continue
 
+                    if message.created_at.astimezone(tz=TZ) >= max_age.astimezone(
+                        tz=TZ
+                    ):
+                        msgs.append(message)
         except discord.ClientException:
             logger.exception(
                 "Cannot delete more than 100 messages at a time.", exc_info=True
