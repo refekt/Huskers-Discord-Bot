@@ -1,4 +1,5 @@
 import logging
+import platform
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
@@ -58,7 +59,10 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         dt_str: str = f"{str(opponent).split('__')[1]}"
         dt: datetime = datetime.strptime(dt_str, "%Y-%m-%d").astimezone(tz=TZ)
-        dt += timedelta(hours=11)
+        if "Windows" in platform.platform():
+            dt += timedelta(hours=11)
+        else:
+            dt += timedelta(hours=12)
         dt_now: datetime = datetime.now(tz=TZ)
 
         logger.debug(f"Checking current time vs. game time: {dt_now} ~ {dt}")
