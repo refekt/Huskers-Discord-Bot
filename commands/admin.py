@@ -630,7 +630,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         processMySQL(query=sqlRemoveIowa, values=str(who.id))
 
-        if previous_roles_raw is not None:
+        if len(previous_roles_raw):
             previous_roles: str = previous_roles_raw[0]["previous_roles"].split(",")
             logger.info(f"Gathered all the roles to store")
 
