@@ -630,7 +630,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         processMySQL(query=sqlRemoveIowa, values=str(who.id))
 
-        if len(previous_roles_raw):
+        if previous_roles_raw is not None and len(previous_roles_raw):
             previous_roles: str = previous_roles_raw[0]["previous_roles"].split(",")
             logger.info(f"Gathered all the roles to store")
 
@@ -693,12 +693,6 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         assert reason, UserInputException("You must include a reason why!")
 
         if duration:
-            # assert True in [
-            #     dt.__str__() in duration for dt in DateTimeChars
-            # ], UserInputException(
-            #     "The duration must be in the proper format! E.g.; 1h30m30s or 1d30m."
-            # )
-
             dt_duration: Optional[timedelta] = convertIowaDuration(duration)
         else:
             dt_duration = None
@@ -711,7 +705,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         previous_roles: Union[list[str], str] = [str(role.id) for role in who.roles[1:]]
-        if len(previous_roles):
+        if previous_roles is not None and len(previous_roles):
             previous_roles = ",".join(previous_roles)
         else:
             previous_roles = ""
