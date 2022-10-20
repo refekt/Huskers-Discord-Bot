@@ -604,6 +604,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         await interaction.response.defer(ephemeral=True)
         await start_twitter_stream(client=interaction.client)
         await interaction.followup.send("Twitter stream has been restarted!")
+        admin_channel: discord.TextChannel = interaction.client.get_channel(CHAN_ADMIN)
+        if admin_channel is not None:
+            await admin_channel.send("The Twitter stream has been restarted!")
         logger.info("Twitter stream restarted!")
 
     async def proess_nebraska(  # noqa
