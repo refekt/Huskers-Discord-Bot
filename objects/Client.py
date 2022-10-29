@@ -307,7 +307,9 @@ class HuskerClient(Bot):
                     value=f"Be sure to check out `/commands` for how to use the bot!",
                 ),
             ],
-            image=guild_member.avatar.url if guild_member.avatar.url else BOT_ICON_URL,
+            image=guild_member.avatar.url
+            if guild_member.avatar.url is not None
+            else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
 
