@@ -175,6 +175,7 @@ class HuskerSched2022(str, enum.Enum):
             date(year=2022, month=11, day=12),  # Michigan
             date(year=2022, month=11, day=19),  # Wisconsin
             date(year=2022, month=11, day=25),  # Iowa
+            date(year=2099, month=12, day=31),  # Python Stuff
         )
 
         teams: list[str] = [
