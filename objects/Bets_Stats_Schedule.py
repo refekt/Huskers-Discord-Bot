@@ -157,7 +157,9 @@ class HuskerSched2022(str, enum.Enum):
         Wisconsin = "Wisconsin"
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=25):
-        Iowa = "Iowa"
+        Iowa = "Python Requirement"
+
+    Ignore = "Ignore"
 
     def __str__(self) -> str:
         _game_dates: tuple[date, ...] = (

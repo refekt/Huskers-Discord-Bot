@@ -57,6 +57,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     ) -> None:
         await interaction.response.defer()
 
+        if opponent == HuskerSched2022.Ignore:
+            return
+
         dt_str: str = f"{str(opponent).split('__')[1]}"
         dt: datetime = datetime.strptime(dt_str, "%Y-%m-%d").astimezone(tz=TZ)
         if "Windows" in platform.platform():
@@ -265,6 +268,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         result_spread: WhichTeamChoice,
     ):
         await interaction.response.defer(ephemeral=True)
+
+        if opponent_name == HuskerSched2022.Ignore:
+            return
 
         processMySQL(
             query=sqlResolveGame,

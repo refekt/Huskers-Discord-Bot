@@ -70,6 +70,9 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info(f"Starting countdown")
         await interaction.response.defer()
 
+        if opponent_name == HuskerSched2022.Ignore:
+            return
+
         year: int = datetime.now().year
 
         assert checkYearValid(year), StatsException(
@@ -139,6 +142,9 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info(f"Gathering info for lines")
 
         await interaction.response.defer()
+
+        if opponent_name == HuskerSched2022.Ignore:
+            return
 
         year: int = datetime.now().year
 
