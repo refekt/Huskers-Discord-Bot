@@ -123,43 +123,61 @@ class BigTenTeams(str, enum.Enum):
 
 
 class HuskerSched2022(str, enum.Enum):
+    enum_items: int = 0
+
     if datetime.now(tz=TZ).date() <= date(year=2022, month=8, day=27):
         Northwestern = "Northwestern"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=3):
         North_Dakota = "North Dakota"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=10):
         Georgia_Southern = "Georgia Southern"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=17):
         Oklahoma = "Oklahoma"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=1):
         Indiana = "Indiana"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=7):
         Rutgers = "Rutgers"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=15):
         Purdue = "Purdue"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=29):
         Illinois = "Illinois"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=5):
         Minnesota = "Minnesota"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=12):
         Michigan = "Michigan"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=19):
         Wisconsin = "Wisconsin"
+        enum_items += 1
 
     if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=25):
         Iowa = "Iowa"
+        enum_items += 1
 
-    Ignore = "Python Requirement"
+    if enum_items == 0:
+        Ignore_1 = "Python Requirement 1"
+        Ignore_2 = "Python Requirement 2"
+    elif enum_items == 1:
+        Ignore_1 = "Python Requirement 1"
 
     def __str__(self) -> str:
         _game_dates: tuple[date, ...] = (

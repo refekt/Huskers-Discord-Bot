@@ -70,7 +70,10 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info(f"Starting countdown")
         await interaction.response.defer()
 
-        if opponent_name == HuskerSched2022.Ignore:
+        if (
+            opponent_name == HuskerSched2022.Ignore_1
+            or opponent_name == HuskerSched2022.Ignore_2
+        ):
             return
 
         year: int = datetime.now().year
@@ -143,7 +146,10 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         await interaction.response.defer()
 
-        if opponent_name == HuskerSched2022.Ignore:
+        if (
+            opponent_name == HuskerSched2022.Ignore_1
+            or opponent_name == HuskerSched2022.Ignore_2
+        ):
             return
 
         year: int = datetime.now().year
@@ -246,6 +252,13 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
 
         pages: list[discord.Embed] = collectScheduleEmbeds(year=year)
+
+        if len(pages) == 0:
+            await interaction.edit_original_response(
+                content=f"Unable to load the {year} schedule. The API has more than likely not been udpated."
+            )
+            return
+
         view: EmbedPaginatorView = EmbedPaginatorView(
             embeds=pages, original_message=await interaction.original_response()
         )
