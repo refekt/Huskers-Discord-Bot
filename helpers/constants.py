@@ -256,7 +256,7 @@ BOT_THUMBNAIL_URL: str = (
 BOT_FOOTER_SECRET: str = (
     "These messages are anonymous and there is no way to verify messages are accurate."
 )
-BOT_FOOTER_BOT: str = "Husker Bot praises the sun \\[T]/"  # noqa
+BOT_FOOTER_BOT: str = "Rhule's rhules rhool the rhoost rhightly"
 logger.info("Bot info variables loaded")
 
 # DateTime format
@@ -436,7 +436,6 @@ RECRUIT_POSITIONS: dict[str, str] = {
 SCHED_DAY_IMG: str = "https://i.imgur.com/8KPOgoq.png"
 SCHED_NIGHT_IMG: str = "https://i.imgur.com/4c3lZQj.jpg"
 
-logger.info("Discord Union group variables loaded")
 
 __all__: list[str] = [
     "BOT_DISPLAY_NAME",

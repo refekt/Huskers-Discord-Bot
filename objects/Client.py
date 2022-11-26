@@ -308,7 +308,7 @@ class HuskerClient(Bot):
                 ),
             ],
             image=guild_member.avatar.url
-            if guild_member.avatar.url is not None
+            if guild_member.avatar.url is not ""
             else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
@@ -327,7 +327,9 @@ class HuskerClient(Bot):
                     value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
                 ),
             ],
-            image=guild_member.avatar.url if guild_member.avatar.url else BOT_ICON_URL,
+            image=guild_member.avatar.url
+            if guild_member.avatar.url is not ""
+            else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
 
