@@ -319,14 +319,8 @@ class HuskerClient(Bot):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
 
         embed = buildEmbed(
-            title="Woe is us, a Husker fan departs",
-            description="Say goodbye to our friend",
-            fields=[
-                dict(
-                    name="Old Member",
-                    value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
-                ),
-            ],
+            title="Woe is us, {guild_member.display_name}#{guild_member.discriminator} fan departs",
+            description="Say goodbye to another fair weather fan Mick ran off and Bart failed to ban",
             image=guild_member.avatar.url
             if guild_member.avatar.url is not ""
             else BOT_ICON_URL,
