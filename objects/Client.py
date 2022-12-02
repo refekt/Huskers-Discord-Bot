@@ -308,7 +308,7 @@ class HuskerClient(Bot):
                 ),
             ],
             image=guild_member.avatar.url
-            if guild_member.avatar.url is not ""
+            if guild_member.avatar.url != ""
             else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
@@ -322,7 +322,7 @@ class HuskerClient(Bot):
             title=f"Woe is us, {guild_member.display_name}#{guild_member.discriminator} fan departs",
             description="Say goodbye to another fair weather fan Mick ran off and Bart failed to ban",
             image=guild_member.avatar.url
-            if guild_member.avatar.url is not ""
+            if guild_member.avatar.url != ""
             else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
