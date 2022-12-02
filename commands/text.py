@@ -4,7 +4,7 @@ import random
 import re
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 
 import discord.ext.commands
 import markovify
@@ -759,7 +759,7 @@ class TextCog(commands.Cog, name="Text Commands"):
             model="text-davinci-003",
             prompt=text_input.strip(),
             max_tokens=400,
-            temperature=0.75,
+            temperature=0.9,
         )
 
         output_message: str = ""
@@ -774,12 +774,17 @@ class TextCog(commands.Cog, name="Text Commands"):
             ]
 
         if output_message_list:
+            add_fields: list[dict[Any]] = [dict(name="Input", value=text_input.strip())]
+
+            for item in [
+                dict(name="Output", value=output_message_long)
+                for output_message_long in output_message_list
+            ]:
+                add_fields.append(item)
+
             embed: discord.Embed = buildEmbed(
                 title="Open AI Text Completion",
-                fields=[
-                    dict(name="Output", value=output_message_long)
-                    for output_message_long in output_message_list
-                ],
+                fields=add_fields,
             )
         else:
             embed: discord.Embed = buildEmbed(
