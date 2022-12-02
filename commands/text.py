@@ -8,11 +8,13 @@ from typing import List, Optional, Union
 
 import discord.ext.commands
 import markovify
+import openai
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import ResultSet
 from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
+from openai.openai_object import OpenAIObject
 
 from helpers.constants import (
     CHAN_BANNED,
@@ -25,6 +27,8 @@ from helpers.constants import (
     TZ,
     US_STATES,
     WEATHER_API_KEY,
+    OPENAI_KEY,
+    FIELD_VALUE_LIMIT,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -738,6 +742,55 @@ class TextCog(commands.Cog, name="Text Commands"):
                 ),
             ],
         )
+
+        await interaction.followup.send(embed=embed)
+
+    @app_commands.command(
+        name="open-ai", description="Create a passage from text input"
+    )
+    async def open_ai(self, interaction: discord.Interaction, text_input: str):
+        await interaction.response.defer()
+
+        openai.api_key = OPENAI_KEY
+        oai_completion: openai.Completion = openai.Completion()
+        oai_response: OpenAIObject = OpenAIObject()
+
+        oai_response = oai_completion.create(
+            model="text-davinci-003",
+            prompt=text_input.strip(),
+            max_tokens=400,
+            temperature=0.75,
+        )
+
+        output_message: str = ""
+        for output in oai_response["choices"]:
+            output_message += output["text"]
+
+        output_message_list: Optional[list[str]] = None
+
+        if len(output_message) > FIELD_VALUE_LIMIT:
+            output_message_list = output_message.split()
+            [
+                " ".join(output_message_list[x : x + FIELD_VALUE_LIMIT])
+                for x in range(0, len(output_message_list))
+            ]
+
+        if output_message_list:
+            embed: discord.Embed = buildEmbed(
+                title="Open AI Text Completion",
+                fields=[
+                    dict(name="Output", value=output_message_long)
+                    for output_message_long in output_message_list
+                ],
+            )
+        else:
+            embed: discord.Embed = buildEmbed(
+                title="Open AI Text Completion",
+                fields=[
+                    dict(name="Input", value=text_input.strip()),
+                    dict(name="Output", value=output_message),
+                ],
+            )
 
         await interaction.followup.send(embed=embed)
 

@@ -27,7 +27,7 @@ key = load_key()
 logger.info("Encryption key loaded")
 
 # DEBUGGING Save decrypted file
-run = False
+run = True
 if run:
     decrypt(env_file, key)
     encrypt(env_file, key)
@@ -154,6 +154,10 @@ CFBD_KEY: str = env_vars["cfbd_api"]
 CFBD_CONFIG = Configuration()
 CFBD_CONFIG.api_key["Authorization"] = CFBD_KEY
 CFBD_CONFIG.api_key_prefix["Authorization"] = "Bearer"
+
+# Open-AI
+OPENAI_ORG: str = "org-TMwGy8QGJhj8nJCs4axiHuCO"
+OPENAI_KEY: str = env_vars["openai_key"]
 
 del env_vars, env_file, key, variables_path
 logger.info("Deleted environment variables, files, and key")
