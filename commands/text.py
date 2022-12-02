@@ -769,7 +769,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         output_message_list: Optional[list[str]] = None
         if len(output_message) > FIELD_VALUE_LIMIT:
             output_message_list = [
-                str[i : i + FIELD_VALUE_LIMIT]
+                output_message[i : i + FIELD_VALUE_LIMIT]
                 for i in range(0, len(output_message), FIELD_VALUE_LIMIT)
             ]
 
