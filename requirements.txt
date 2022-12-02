@@ -2,7 +2,7 @@ Pillow==9.1.1
 beautifulsoup4==4.11.1
 black==22.6.0
 cfbd>=4.3.2
-cryptography==37.0.2
+cryptography==38.0.3
 discord.py==2.0.1
 markovify==0.9.4
 numpy==1.22.4
