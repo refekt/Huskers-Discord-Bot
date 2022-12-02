@@ -767,12 +767,10 @@ class TextCog(commands.Cog, name="Text Commands"):
             output_message += output["text"]
 
         output_message_list: Optional[list[str]] = None
-
         if len(output_message) > FIELD_VALUE_LIMIT:
-            output_message_list = output_message.split()
-            [
-                " ".join(output_message_list[x : x + FIELD_VALUE_LIMIT])
-                for x in range(0, len(output_message_list))
+            output_message_list = [
+                str[i : i + FIELD_VALUE_LIMIT]
+                for i in range(0, len(output_message), FIELD_VALUE_LIMIT)
             ]
 
         if output_message_list:
