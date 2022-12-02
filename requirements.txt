@@ -6,6 +6,7 @@ cryptography==37.0.2
 discord.py==2.0.1
 markovify==0.9.4
 numpy==1.22.4
+openai==0.25.0
 opencv-python==4.5.5.64
 pymysql==1.0.2
 python-dateutil==2.8.2
