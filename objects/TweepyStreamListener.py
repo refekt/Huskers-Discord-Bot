@@ -1,3 +1,4 @@
+import schedule
 import asyncio
 import logging
 import os
@@ -31,6 +32,7 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from helpers.misc import general_locked
+from objects.Logger import discordLogger
 
 tweepy_client: str = "tweepy.client"
 level = logging.DEBUG
@@ -66,6 +68,10 @@ logging.basicConfig(
     level=level,
     encoding="utf-8",
     handlers=[file_handler, stream_handler],
+)
+
+asyncio_logger = discordLogger(
+    name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
 
 __all__: list[str] = ["StreamClientV2"]

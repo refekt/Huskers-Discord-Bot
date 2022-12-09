@@ -36,6 +36,7 @@ from helpers.constants import (
     TWITTER_QUERY_MAX,
     TWITTER_TWEET_FIELDS,
     TWITTER_USER_FIELDS,
+    TWITTER_HUSKER_COACH_LIST_ID,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -51,6 +52,7 @@ from objects.Exceptions import ChangelogException, MySQLException
 from objects.Logger import discordLogger
 from objects.Scheudle import SchedulePosts
 from objects.Thread import convert_duration
+from objects.TweepyFollowerMonitor import TwitterFollowerMonitor
 from objects.TweepyStreamListener import StreamClientV2
 from objects.Wordle import WordleFinder, Wordle
 
@@ -91,6 +93,17 @@ async def start_twitter_stream(client: discord.Client) -> None:
     list_members = tweeter_client.get_list_members(str(TWITTER_HUSKER_MEDIA_LIST_ID))
 
     logger.debug("Collected usernames from the Husker Media Twitter List")
+
+    logger.debug("Starting Twitter Follower Monitor")
+
+    list_members_coaches = tweeter_client.get_list_members(
+        str(TWITTER_HUSKER_COACH_LIST_ID)
+    )
+    twitter_follower_monitor: TwitterFollowerMonitor = TwitterFollowerMonitor(
+        client=tweeter_client, members=list_members_coaches["data"]
+    )
+
+    logger.debug("Started Twitter Follower Monitor")
 
     rule_query = ""
     rules: list[str] = []

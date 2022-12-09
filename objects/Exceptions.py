@@ -29,6 +29,7 @@ __all__: list[str] = [
     "SurveyException",
     "TextException",
     "TriviaException",
+    "TwitterFollowerException",
     "TwitterStreamException",
     "UserInputException",
     "WeatherException",
@@ -177,6 +178,11 @@ class TriviaException(Exception):
 
 @dataclass()
 class WordleException(Exception):
+    message: str
+
+
+@dataclass()
+class TwitterFollowerException(Exception):
     message: str
 
 

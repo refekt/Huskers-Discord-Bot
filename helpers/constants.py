@@ -59,6 +59,7 @@ DEBUGGING_CODE = "Windows" in platform.platform()
 
 # Twitter variables
 TWITTER_HUSKER_MEDIA_LIST_ID: int = 1307680291285278720
+TWITTER_HUSKER_COACH_LIST_ID: int = 1223689242896977922
 TWITTER_BLOCK16_SCREENANME: str = "Block16Omaha"
 TWITTER_QUERY_MAX: int = 512
 TWITTER_BEARER: str = env_vars["twitter_bearer"]
