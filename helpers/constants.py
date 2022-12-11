@@ -67,6 +67,7 @@ TWITTER_FOLLOWER_WAIT: Final[int] = 15
 TWITTER_HUSKER_COACH_LIST_ID: str = "1223689242896977922"
 TWITTER_HUSKER_MEDIA_LIST_ID: int = 1307680291285278720
 TWITTER_KEY: str = env_vars["twitter_api_key"]
+TWITTER_MONITOR_BEARER: str = env_vars["twitter_monitor_bearer"]
 TWITTER_QUERY_MAX: int = 512
 TWITTER_SECRET_KEY: str = env_vars["twitter_api_key_secret"]
 TWITTER_TOKEN: str = env_vars["twitter_access_token"]
@@ -553,6 +554,7 @@ __all__: list[str] = [
     "TWITTER_HUSKER_MEDIA_LIST_ID",
     "TWITTER_KEY",
     "TWITTER_MEDIA_FIELDS",
+    "TWITTER_MONITOR_BEARER",
     "TWITTER_QUERY_MAX",
     "TWITTER_SECRET_KEY",
     "TWITTER_TOKEN",

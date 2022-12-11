@@ -38,6 +38,7 @@ from helpers.constants import (
     TWITTER_TWEET_FIELDS,
     TWITTER_USER_FIELDS,
     TWITTER_HUSKER_COACH_LIST_ID,
+    TWITTER_MONITOR_BEARER,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -79,7 +80,7 @@ GUILD_ROLES: Optional[list[discord.Role]] = None
 
 async def start_twitter_monitors(discord_client: discord.Client) -> None:
     tweepy_client = tweepy.asynchronous.AsyncClient(
-        bearer_token=TWITTER_BEARER, wait_on_rate_limit=True
+        bearer_token=TWITTER_MONITOR_BEARER, wait_on_rate_limit=True
     )
 
     logger.debug("Collecting Twitter Users from Husker Coaches list")
@@ -629,12 +630,12 @@ class HuskerClient(Bot):
             logger.info("Running scheduled_posts")
             self.loop.create_task(scheduled_posts.run())
 
-        if is_silent:
-            logger.info("Skipping creating Twitter Follower Monitors")
-        else:
-            logger.info("Initializing Twitter Follower Monitors")
-            # await start_twitter_monitors(discord_client=self)
-            self.loop.create_task(start_twitter_monitors(discord_client=self))
+        # TODO Turning off until I can fix it.
+        # if is_silent:
+        #     logger.info("Skipping creating Twitter Follower Monitors")
+        # else:
+        #     logger.info("Initializing Twitter Follower Monitors")
+        #     self.loop.create_task(start_twitter_monitors(discord_client=self))
 
         logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
