@@ -633,7 +633,8 @@ class HuskerClient(Bot):
             logger.info("Skipping creating Twitter Follower Monitors")
         else:
             logger.info("Initializing Twitter Follower Monitors")
-        await start_twitter_monitors(discord_client=self)
+            # await start_twitter_monitors(discord_client=self)
+            self.loop.create_task(start_twitter_monitors(discord_client=self))
 
         logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
