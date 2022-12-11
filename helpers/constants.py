@@ -1,5 +1,6 @@
 import logging
 import platform
+from typing import Final
 
 import pytz
 from cfbd import Configuration
@@ -27,7 +28,7 @@ key = load_key()
 logger.info("Encryption key loaded")
 
 # DEBUGGING Save decrypted file
-run = True
+run = False
 if run:
     decrypt(env_file, key)
     encrypt(env_file, key)
@@ -58,12 +59,15 @@ REDDIT_PW: str = env_vars["reddit_pw"]
 DEBUGGING_CODE = "Windows" in platform.platform()
 
 # Twitter variables
-TWITTER_HUSKER_MEDIA_LIST_ID: int = 1307680291285278720
-TWITTER_HUSKER_COACH_LIST_ID: int = 1223689242896977922
-TWITTER_BLOCK16_SCREENANME: str = "Block16Omaha"
-TWITTER_QUERY_MAX: int = 512
 TWITTER_BEARER: str = env_vars["twitter_bearer"]
+TWITTER_BLOCK16_SCREENANME: str = "Block16Omaha"
+TWITTER_FOLLOWER_API_LIMIT: Final[int] = 15
+TWITTER_FOLLOWER_PAGE_REQ: Final[int] = 1000
+TWITTER_FOLLOWER_WAIT: Final[int] = 15
+TWITTER_HUSKER_COACH_LIST_ID: str = "1223689242896977922"
+TWITTER_HUSKER_MEDIA_LIST_ID: int = 1307680291285278720
 TWITTER_KEY: str = env_vars["twitter_api_key"]
+TWITTER_QUERY_MAX: int = 512
 TWITTER_SECRET_KEY: str = env_vars["twitter_api_key_secret"]
 TWITTER_TOKEN: str = env_vars["twitter_access_token"]
 TWITTER_TOKEN_SECRET: str = env_vars["twitter_access_token_secret"]
@@ -441,7 +445,6 @@ RECRUIT_POSITIONS: dict[str, str] = {
 SCHED_DAY_IMG: str = "https://i.imgur.com/8KPOgoq.png"
 SCHED_NIGHT_IMG: str = "https://i.imgur.com/4c3lZQj.jpg"
 
-
 __all__: list[str] = [
     "BOT_DISPLAY_NAME",
     "BOT_FOOTER_BOT",
@@ -543,6 +546,10 @@ __all__: list[str] = [
     "TWITTER_BEARER",
     "TWITTER_BLOCK16_SCREENANME",
     "TWITTER_EXPANSIONS",
+    "TWITTER_FOLLOWER_API_LIMIT",
+    "TWITTER_FOLLOWER_PAGE_REQ",
+    "TWITTER_FOLLOWER_WAIT",
+    "TWITTER_HUSKER_COACH_LIST_ID",
     "TWITTER_HUSKER_MEDIA_LIST_ID",
     "TWITTER_KEY",
     "TWITTER_MEDIA_FIELDS",

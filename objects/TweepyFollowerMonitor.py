@@ -1,217 +1,181 @@
+import asyncio
 import logging
-import platform
-from typing import Optional, Any, Union
+import threading
+import time
+from typing import Optional, Union, Callable
 
 import discord
-import schedule
 import tweepy
+import tweepy.asynchronous
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 
 from helpers.constants import (
     DEBUGGING_CODE,
     CHAN_BOT_SPAM_PRIVATE,
     CHAN_TWITTERVERSE,
-    CHAN_GENERAL,
-    ROLE_EVERYONE_PROD,
+    TWITTER_FOLLOWER_PAGE_REQ,
+    TWITTER_FOLLOWER_API_LIMIT,
 )
-from helpers.embed import buildTweetEmbed
-from helpers.misc import general_locked
-from objects.Exceptions import TwitterFollowerException
-from objects.Logger import discordLogger
+from helpers.embed import buildEmbed
 
-asyncio_logger = discordLogger(
-    name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
-)
+# logger: logging.Logger = discordLogger(
+#     name=__name__,
+#     level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+# )
 
-logger = discordLogger(
-    name=__name__,
-    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
-)
+asyncio_logger: logging.Logger = logging.getLogger("asyncio")
+asyncio_logger.setLevel(level=logging.DEBUG)
+
+following_api_calls: int = 0
 
 
 class TwitterListMember:
-    def __init__(self, client: tweepy.Client, member_data):
-        self.client: tweepy.Client = client
-        self.user_id: Optional[Union[int, str]] = member_data["id"]
-        self.name: Optional[str] = member_data["name"]
-        self.usernamename: Optional[str] = member_data["username"]
-        self.orig_followers: Optional[Union[dict, Any]] = None
-        self.new_followers: Optional[Union[dict, Any]] = None
+    def __init__(
+        self, client: tweepy.asynchronous.AsyncClient, twitter_user: tweepy.User
+    ) -> None:
+        self._client: tweepy.asynchronous.AsyncClient = client
+        self.user_id: Optional[Union[int, str]] = twitter_user.id
+        self.name: Optional[str] = twitter_user.name
+        self.username: Optional[str] = twitter_user.username
+        self.orig_followers: Optional[list[tweepy.User]] = None
+        self.new_followers: Optional[list[tweepy.User]] = None
 
-        self._collect_users(initial=True)
+    async def get_users_following(self) -> tweepy.Response:
+        global following_api_calls
 
-    def _collect_users(self, initial: bool) -> None:
-        if initial:
-            self.orig_followers = self.client.get_users_following(id=self.user_id)
-        else:
-            self.new_followers = self.client.get_users_following(id=self.user_id)
-
-    @property
-    def differences(self):  # TODO Type hinting
-        # TODO Not sure if this all works.
-        self._collect_users(initial=False)
-
-        if not self.new_followers:
-            return
-
-        return set(self.orig_followers) ^ set(self.new_followers)
-
-
-async def send_tweet(client: discord.Client, member: TwitterListMember) -> None:
-    # class TwitterButtons(discord.ui.View):
-    #     def __init__(
-    #         self,
-    #         timeout=1200,
-    #     ) -> None:
-    #         super(TwitterButtons, self).__init__()
-    #         self.message: Optional[discord.Message] = None
-    #         self.timeout = timeout
-    #         self.client = client
-    #
-    #     async def on_timeout(self) -> None:
-    #         tweepy_client_logger.debug(
-    #             "Twitter buttons have timed out. Removing all buttons"
-    #         )
-    #
-    #         self.clear_items()
-    #         await self.message.edit(view=self)
-    #
-    #     # noinspection PyMethodMayBeStatic
-    #     def grabTwitterLink(self, message_embed: discord.Embed) -> str:
-    #         link: list[str] = [
-    #             field.value
-    #             for field in message_embed.fields
-    #             if field.name == "Link to Tweet"
-    #         ]
-    #         return "".join(link)
-    #
-    #     @discord.ui.button(
-    #         label="Send to General",
-    #         custom_id="send_to_general",
-    #         style=discord.ButtonStyle.gray,
-    #     )
-    #     async def send_to_general(
-    #         self, interaction: discord.Interaction, button: discord.ui.Button
-    #     ):
-    #         tweepy_client_logger.debug("Sending tweet to general channel")
-    #
-    #         general_channel: discord.TextChannel = await self.client.fetch_channel(
-    #             CHAN_GENERAL
-    #         )
-    #
-    #         if general_locked(
-    #             general_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
-    #         ):
-    #             tweepy_client_logger.debug(
-    #                 "Game day mode is on. Will send tweets to live discussion."
-    #             )
-    #             general_channel = await self.client.fetch_channel(CHAN_DISCUSSION_LIVE)
-    #
-    #         await general_channel.send(
-    #             f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
-    #         )
-    #         await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
-    #
-    #     @discord.ui.button(
-    #         label="Send to Recruiting",
-    #         custom_id="send_to_recruiting",
-    #         style=discord.ButtonStyle.gray,
-    #     )
-    #     async def send_to_recruiting(
-    #         self, interaction: discord.Interaction, button: discord.ui.Button
-    #     ):
-    #         tweepy_client_logger.debug("Sending tweet to recruiting channel")
-    #
-    #         recruiting_channel = await self.client.fetch_channel(CHAN_RECRUITING)
-    #
-    #         if general_locked(
-    #             recruiting_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
-    #         ):
-    #             tweepy_client_logger.debug(
-    #                 "Game day mode is on. Will send tweets to streaming discussion."
-    #             )
-    #             recruiting_channel = await self.client.fetch_channel(
-    #                 CHAN_DISCUSSION_STREAMING
-    #             )
-    #
-    #         await recruiting_channel.send(
-    #             f"{interaction.user.name}#{interaction.user.discriminator} forwarded the following tweet: {self.grabTwitterLink(interaction.message.embeds[0])}"
-    #         )
-    #         await interaction.response.send_message("Tweet forwarded!", ephemeral=True)
-
-    logger.debug(f"Sending a tweet...")
-
-    if DEBUGGING_CODE:
-        twitter_channel: discord.TextChannel = await client.fetch_channel(
-            CHAN_BOT_SPAM_PRIVATE
+        following_api_calls += 1
+        asyncio_logger.debug(
+            f"Total number of GET /2/users/:id/following calls: {following_api_calls}"
         )
-    else:
-        twitter_channel = await client.fetch_channel(CHAN_TWITTERVERSE)
 
-    embed = buildTweetEmbed(response=response)
+        if following_api_calls > TWITTER_FOLLOWER_API_LIMIT:
+            asyncio_logger.debug("Rate limit reached. Sleeping for 60 seconds!")
+            time.sleep(60)
 
-    # author: User = response.includes["users"][0]
+        return await self._client.get_users_following(
+            id=self.user_id, max_results=TWITTER_FOLLOWER_PAGE_REQ
+        )  # Subject to rate limiting
 
-    # view: TwitterButtons = TwitterButtons()
+    async def compile(self, initial: bool = True) -> None:
+        asyncio_logger.debug(
+            f"Attempting to establish {'original' if initial else 'new'} user list User {self.name} (@{self.username})."
+        )
 
-    test_channel: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
+        response: tweepy.Response = await self.get_users_following()
+        user_list: list[tweepy.User] = response[0]
 
-    if general_locked(test_channel, client.guilds[0].get_role(ROLE_EVERYONE_PROD)):
-        view.children[0].label = "Send to Live"  # noqa
-        view.children[1].label = "Send to Streaming"  # noqa
+        if initial:
+            self.orig_followers = user_list
+        else:
+            self.new_followers = user_list
 
-    # view.add_item(
-    #     item=discord.ui.Button(
-    #         style=discord.ButtonStyle.url,
-    #         label="Open Tweet...",
-    #         url=f"https://twitter.com/{author.username}/status/{response.data.id}",
-    #     )
-    # )
-    # view.message = await twitter_channel.send(embed=embed, view=view)
-    # logger.debug("Waiting for twitter buttons to be pushed")
+        token_info: dict = response[3]
+        while token_info.get("next_token", False):
+            asyncio_logger.debug(
+                f"User {self.name} (@{self.username}) followers required pages."
+            )
 
-    # asyncio.run_coroutine_threadsafe(coro=view.wait(), loop=client.loop)
+            response = await self.get_users_following()
 
-    logger.info(f"Tweet sent!")
+            token_info = response[3]
+            user_list = response[0]
+
+            if initial:
+                self.orig_followers += user_list
+            else:
+                self.new_followers += user_list
+
+        asyncio_logger.debug(
+            f"Established User {self.name} (@{self.username}) {'original' if initial else 'new'} user list with {len(self.orig_followers) if initial else len(self.new_followers)} followers."
+        )
 
 
 class TwitterFollowerMonitor:
-    def __init__(self, client: tweepy.Client, members: Union[dict, Any]):
-        self.client: tweepy.Client = client
-        self.list_members: Optional[list[TwitterListMember]] = self._setup_list_members(
-            members=members
+    def __init__(
+        self,
+        discord_client: discord.Client,
+        tweepy_client: tweepy.asynchronous.AsyncClient,
+        twitter_user: tweepy.User,
+    ) -> None:
+        self.discord_client: discord.Client = discord_client
+        self.tweepy_client: tweepy.asynchronous.AsyncClient = tweepy_client
+        self.twitter_user: TwitterListMember = TwitterListMember(
+            client=self.tweepy_client, twitter_user=twitter_user
         )
-        asyncio_logger.debug("Creating Twitter Follower Monitor")
-
-        self._setup_schedule()
-
-    def _setup_list_members(self, members: Union[dict, Any]) -> list[TwitterListMember]:
-        return [
-            TwitterListMember(client=self.client, member_data=member)
-            for member in members
-        ]
-
-    def check_differences(self):
-        asyncio_logger.debug("Attempting to check for Twitter Follower differences")
-
-        assert self.list_members, TwitterFollowerException("Error")
-
-        for member in self.list_members:
-            continue
-
-    @property
-    def all_jobs(self) -> str:
-        all_jobs: list[schedule.Job] = schedule.jobs
-        all_jobs_str: str = ""
-        for job in all_jobs:
-            all_jobs_str += f"* {repr(job)}\n"
-
-        return all_jobs_str
-
-    def _setup_schedule(self) -> None:
-        asyncio_logger.debug("Setting up Twitter Monitor Follower schedule")
-
-        schedule.every().hour.do(self.check_differences)
+        self.thread: Optional[threading.Thread] = None
 
         asyncio_logger.debug(
-            f"Scheduled messages complete. Jobs are:\n\n{self.all_jobs}"
+            f"Created Twitter Follower Monitor for User {self.twitter_user.name} (@{self.twitter_user.username})"
         )
+
+    async def send_follower_alert(self, differences: set[tweepy.User]) -> None:
+        # TODO Add buttons to the alert
+
+        asyncio_logger.debug(f"Sending a tweet...")
+
+        new_follows_str: str = ""
+        for follow in differences:
+            new_follows_str += f"• {follow.name} (@{follow.username})\n"
+
+        if DEBUGGING_CODE:
+            twitter_channel: discord.TextChannel = (
+                await self.discord_client.fetch_channel(CHAN_BOT_SPAM_PRIVATE)
+            )
+        else:
+            twitter_channel = await self.discord_client.fetch_channel(CHAN_TWITTERVERSE)
+
+        embed: discord.Embed = buildEmbed(
+            title="Twitter Follower Monitor",
+            description=f"{str(self.twitter_user.name).title()}'s followers changed! Different Twitter followers below ",
+            fields=[dict(name="", value="")],
+        )
+
+        await twitter_channel.send(embed=embed)
+
+        asyncio_logger.info(f"Tweet sent!")
+
+    async def check_differences(self) -> None:
+        differences: Optional[set[tweepy.User]] = await self.get_differences()
+
+        if differences:
+            asyncio_logger.debug("Differences found")
+            await self.send_follower_alert(differences=differences)
+        else:
+            asyncio_logger.debug("No differences found")
+
+    async def get_differences(self) -> Optional[set[tweepy.User]]:
+        asyncio_logger.debug("Attempting to check for Twitter Follower differences")
+
+        # TODO Error handling could go here
+
+        await self.twitter_user.compile(initial=False)
+
+        if (
+            self.twitter_user.new_followers
+        ):  # TODO Does it matter if it's fewer followers?
+            return set(self.twitter_user.orig_followers) ^ set(
+                self.twitter_user.new_followers
+            )
+        else:
+            return None
+
+    def _threaded_func(self, func: Callable) -> None:
+        self.thread = threading.Thread(target=func)
+        self.thread.start()
+
+    async def start(self) -> None:
+        asyncio_logger.debug("Setting up Twitter Monitor Follower schedule")
+
+        scheduler = AsyncIOScheduler()
+        trigger = IntervalTrigger(hours=1)
+        scheduler.add_job(self.check_differences, trigger=trigger)
+
+        asyncio_logger.debug("Added a schedule job")
+
+        while True:
+            scheduler.start()
+            await asyncio.sleep(1)
+
+
+asyncio_logger.debug(f"{str(__name__).title()} module loaded!")

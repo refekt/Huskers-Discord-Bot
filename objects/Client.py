@@ -10,6 +10,7 @@ from typing import Union, Any, Awaitable, Optional
 
 import discord
 import tweepy
+import tweepy.asynchronous
 from discord import NotFound, Forbidden, HTTPException
 from discord.app_commands import MissingApplicationID
 from discord.ext.commands import Bot, ExtensionAlreadyLoaded
@@ -59,6 +60,11 @@ from objects.Wordle import WordleFinder, Wordle
 logger = discordLogger(
     name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
 )
+asyncio_logger: logging.Logger = logging.getLogger("asyncio")
+tweepy_logger: logging.Logger = logging.getLogger("tweepy.client")
+tweepy_async_logger: logging.Logger = logging.getLogger("tweepy.asynchronous.client")
+tweepy_logger.setLevel(level=logging.INFO)
+tweepy_async_logger.setLevel(level=logging.INFO)
 
 __all__: list[str] = [
     "GUILD_ROLES",
@@ -69,6 +75,58 @@ __all__: list[str] = [
 tracemalloc.start()
 
 GUILD_ROLES: Optional[list[discord.Role]] = None
+
+
+async def start_twitter_monitors(discord_client: discord.Client) -> None:
+    tweepy_client = tweepy.asynchronous.AsyncClient(
+        bearer_token=TWITTER_BEARER, wait_on_rate_limit=True
+    )
+
+    logger.debug("Collecting Twitter Users from Husker Coaches list")
+
+    # Get members from twitter list
+    twitter_list: tweepy.Response = await tweepy_client.get_list(
+        id=TWITTER_HUSKER_COACH_LIST_ID
+    )
+    _raw_list_members: tweepy.Response = await tweepy_client.get_list_members(
+        twitter_list.data.id
+    )
+
+    # Create monitors to run async and threaded
+    monitors: Optional[list[TwitterFollowerMonitor]] = []
+    for user in _raw_list_members.data:
+        monitors.append(
+            TwitterFollowerMonitor(
+                discord_client=discord_client,
+                tweepy_client=tweepy_client,
+                twitter_user=user,
+            )
+        )
+
+    logger.debug("Twitter Users from Husker Coaches list collected")
+
+    # Compile followers for each monitor (Twitter user)
+    logger.debug("Starting to compile Husker Coaches followers")
+
+    for monitor in monitors:
+        await monitor.twitter_user.compile()
+
+        logger.debug(f"Monitor compiled for @{monitor.twitter_user.username}")
+
+    logger.debug(f"There were {len(monitors)} monitors compiled.")
+
+    # Compiling and starting separate on purpose
+
+    # Start each monitor
+    logger.debug("Starting monitors")
+
+    for monitor in monitors:
+        # TODO Stagger the starts to offset API calls to prevent rate limiting
+
+        await monitor.start()
+        asyncio_logger.debug(f"Monitor for @{monitor.twitter_user.username} started")
+
+    logger.debug(f"All {len(monitors)} monitors started.")
 
 
 async def start_twitter_stream(client: discord.Client) -> None:
@@ -94,20 +152,9 @@ async def start_twitter_stream(client: discord.Client) -> None:
 
     logger.debug("Collected usernames from the Husker Media Twitter List")
 
-    logger.debug("Starting Twitter Follower Monitor")
-
-    list_members_coaches = tweeter_client.get_list_members(
-        str(TWITTER_HUSKER_COACH_LIST_ID)
-    )
-    twitter_follower_monitor: TwitterFollowerMonitor = TwitterFollowerMonitor(
-        client=tweeter_client, members=list_members_coaches["data"]
-    )
-
-    logger.debug("Started Twitter Follower Monitor")
-
     rule_query = ""
     rules: list[str] = []
-    append_str: str = ""
+    # append_str: str = ""
 
     if DEBUGGING_CODE:
         rule_query = "from:ayy_gbr OR "
@@ -287,7 +334,7 @@ class HuskerClient(Bot):
     # noinspection PyMethodMayBeStatic
     def get_change_log(self) -> [str, ChangelogException]:
         try:
-            changelog_path = None
+            # changelog_path = None
             changelog_file = "changelog.md"
             changelog_path = os.path.join(
                 pathlib.Path(__file__).parent.parent.resolve(), changelog_file
@@ -582,15 +629,17 @@ class HuskerClient(Bot):
             logger.info("Running scheduled_posts")
             self.loop.create_task(scheduled_posts.run())
 
+        if is_silent:
+            logger.info("Skipping creating Twitter Follower Monitors")
+        else:
+            logger.info("Initializing Twitter Follower Monitors")
+        await start_twitter_monitors(discord_client=self)
+
         logger.info("Creating online message")
         await chan_botspam.send(embed=await self.create_online_message())
 
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
-
-            asyncio_logger = discordLogger(
-                name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
-            )
 
             results: tuple[Union[BaseException, Any], ...] = await asyncio.gather(
                 *on_ready_tasks, return_exceptions=True
