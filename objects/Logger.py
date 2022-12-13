@@ -20,8 +20,6 @@ def is_debugging() -> bool:
 
 
 def discordLogger(name: str, level: int) -> logging.Logger:
-
-    level = logging.DEBUG
     root_logger: logging.Logger = logging.getLogger("root")
     root_logger.setLevel(level=level)
 
