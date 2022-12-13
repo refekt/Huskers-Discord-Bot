@@ -45,7 +45,7 @@ tweepy_stream_logger.setLevel(level=level)
 format_string: str = "[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s"
 formatter: logging.Formatter = logging.Formatter(format_string)
 
-filename: pathlib.Path = pathlib.Path(f"{tweepy_client}.log")
+filename: pathlib.Path = pathlib.Path(f"twitter.log")
 full_path: str = os.path.join(filename.parent.resolve(), "logs", filename)
 
 file_handler: logging.FileHandler = logging.FileHandler(filename=full_path, mode="a+")
@@ -124,7 +124,7 @@ async def send_errors_to_gee(client: discord.Client, error) -> None:
 
 
 async def send_tweet_alert(
-        client: discord.Client, message: str, alert_admins: bool = False
+    client: discord.Client, message: str, alert_admins: bool = False
 ) -> None:
     if is_debugging():
         twitter_channel: discord.TextChannel = await client.fetch_channel(
@@ -165,8 +165,8 @@ async def send_tweet_alert(
 async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
     class TwitterButtons(discord.ui.View):
         def __init__(
-                self,
-                timeout=1200,
+            self,
+            timeout=1200,
         ) -> None:
             super(TwitterButtons, self).__init__()
             self.message: Optional[discord.Message] = None
@@ -196,7 +196,7 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
             style=discord.ButtonStyle.gray,
         )
         async def send_to_general(
-                self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
         ):
             tweepy_client_logger.debug("Sending tweet to general channel")
 
@@ -205,7 +205,7 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
             )
 
             if general_locked(
-                    general_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
+                general_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
             ):
                 tweepy_client_logger.debug(
                     "Game day mode is on. Will send tweets to live discussion."
@@ -223,14 +223,14 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
             style=discord.ButtonStyle.gray,
         )
         async def send_to_recruiting(
-                self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
         ):
             tweepy_client_logger.debug("Sending tweet to recruiting channel")
 
             recruiting_channel = await self.client.fetch_channel(CHAN_RECRUITING)
 
             if general_locked(
-                    recruiting_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
+                recruiting_channel, self.client.guilds[0].get_role(ROLE_EVERYONE_PROD)
             ):
                 tweepy_client_logger.debug(
                     "Game day mode is on. Will send tweets to streaming discussion."
@@ -260,8 +260,8 @@ async def send_tweet(client: discord.Client, response: StreamResponse) -> None:
     embed = buildTweetEmbed(response=response)
 
     if (
-            response.includes["users"][0].username.lower()
-            == TWITTER_BLOCK16_SCREENANME.lower()
+        response.includes["users"][0].username.lower()
+        == TWITTER_BLOCK16_SCREENANME.lower()
     ):
         await food_channel.send(embed=embed)
     else:
@@ -297,10 +297,10 @@ class StreamClientV2(tweepy.StreamingClient):
     ]
 
     def __init__(
-            self,
-            bearer_token: str,
-            discord_client: Optional[discord.Client],
-            **kwargs,
+        self,
+        bearer_token: str,
+        discord_client: Optional[discord.Client],
+        **kwargs,
     ) -> None:
         super().__init__(bearer_token, **kwargs)
         self.client = discord_client

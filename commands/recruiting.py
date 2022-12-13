@@ -14,7 +14,6 @@ from requests import Response, JSONDecodeError
 
 from helpers.constants import (
     CROOT_SEARCH_LIMIT,
-    DEBUGGING_CODE,
     DT_FAP_RECRUIT,
     GUILD_PROD,
     HEADERS,
@@ -31,11 +30,12 @@ from helpers.mysql import (
     sqlTeamIDs,
 )
 from objects.Exceptions import RecruitException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Recruits import RecruitInterest, Recruit
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 croot_search: list[Recruit] = []

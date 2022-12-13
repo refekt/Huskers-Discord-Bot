@@ -22,7 +22,8 @@ from objects.Logger import discordLogger, is_debugging
 from objects.Thread import prettifyTimeDateValue
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 __all__: list[str] = ["Survey"]
@@ -58,12 +59,12 @@ class Survey:
     ]
 
     def __init__(
-            self,
-            client: Union[Client, Bot],
-            interaction: Interaction,
-            options: Union[AnyStr, List[Any], List[SurveyOption]],
-            question: AnyStr,
-            timeout: Optional[int] = GLOBAL_TIMEOUT,
+        self,
+        client: Union[Client, Bot],
+        interaction: Interaction,
+        options: Union[AnyStr, List[Any], List[SurveyOption]],
+        question: AnyStr,
+        timeout: Optional[int] = GLOBAL_TIMEOUT,
     ) -> None:
         self.max_options = 3  # Space delimited options
         options = options.strip()
@@ -106,7 +107,7 @@ class Survey:
             self.message: Optional[discord.Message, None] = None
 
         async def process_button(
-                self, interaction: Interaction, button: Button
+            self, interaction: Interaction, button: Button
         ) -> None:
             logger.info(
                 f"{interaction.user.name}#{interaction.user.discriminator} selected option '{button.label.upper()}'"
@@ -145,19 +146,19 @@ class Survey:
 
         @discord.ui.button(label="one", custom_id="opt_one", style=ButtonStyle.gray)
         async def option_one(
-                self, interaction: discord.Interaction, button: Button
+            self, interaction: discord.Interaction, button: Button
         ) -> None:
             await self.process_button(interaction=interaction, button=button)
 
         @discord.ui.button(label="two", custom_id="opt_two", style=ButtonStyle.gray)
         async def option_two(
-                self, interaction: discord.Interaction, button: Button
+            self, interaction: discord.Interaction, button: Button
         ) -> None:
             await self.process_button(interaction=interaction, button=button)
 
         @discord.ui.button(label="three", custom_id="opt_three", style=ButtonStyle.gray)
         async def option_three(
-                self, interaction: discord.Interaction, button: Button
+            self, interaction: discord.Interaction, button: Button
         ) -> None:
             await self.process_button(interaction=interaction, button=button)
 

@@ -17,7 +17,6 @@ from discord.ext import commands
 
 from helpers.constants import (
     CFBD_CONFIG,
-    DEBUGGING_CODE,
     DT_CFBD_GAMES,
     DT_CFBD_GAMES_DISPLAY,
     FIELDS_LIMIT,
@@ -37,13 +36,14 @@ from objects.Bets_Stats_Schedule import (
     BetLines,
 )
 from objects.Exceptions import StatsException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
 from objects.Thread import prettifyTimeDateValue
 from objects.Winsipedia import CompareWinsipedia
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 __all__: list[str] = ["FootballStatsCog"]

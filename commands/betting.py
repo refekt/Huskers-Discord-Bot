@@ -9,7 +9,6 @@ from discord.app_commands import Group
 from discord.ext import commands
 
 from helpers.constants import (
-    DEBUGGING_CODE,
     FIELDS_LIMIT,
     GUILD_PROD,
     TZ,
@@ -26,10 +25,11 @@ from objects.Bets_Stats_Schedule import (
     BettingHuskerSchedule,
 )
 from objects.Exceptions import BettingException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 

@@ -27,7 +27,6 @@ from helpers.constants import (
     CHAN_HYPE_GROUP,
     CHAN_IOWA,
     CHAN_RECRUITING,
-    DEBUGGING_CODE,
     DT_GITHUB_API,
     DT_GITHUB_API_DISPLAY,
     GUILD_PROD,
@@ -42,7 +41,7 @@ from helpers.misc import discordURLFormatter, general_locked
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Client import start_twitter_stream
 from objects.Exceptions import CommandException, UserInputException, SSHException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
 from objects.Thread import (
     background_run_function,
@@ -53,7 +52,8 @@ from objects.Thread import (
 from objects.Timers import IowaDuration
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 

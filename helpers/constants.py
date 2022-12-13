@@ -10,8 +10,6 @@ from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
 from helpers.misc import loadVarPath
 from objects.Logger import discordLogger, is_debugging
 
-# DEBUGGING_CODE = is_debugging()
-
 logger = discordLogger(
     name=__name__,
     level=logging.DEBUG if is_debugging() else logging.INFO,
@@ -480,7 +478,7 @@ __all__: list[str] = [
     "CHAN_RECRUITING",
     "CHAN_TWITTERVERSE",
     "CROOT_SEARCH_LIMIT",
-    "DEBUGGING_CODE",
+    "is_debugging()",
     "DESC_LIMIT",
     "DT_CFBD_GAMES",
     "DT_CFBD_GAMES_DISPLAY",

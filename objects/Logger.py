@@ -6,6 +6,7 @@ import sys
 
 __all__: list[str] = [
     "discordLogger",
+    "initializeAsyncLogging",
     "initializeLogging",
     "is_debugging",
 ]
@@ -19,6 +20,8 @@ def is_debugging() -> bool:
 
 
 def discordLogger(name: str, level: int) -> logging.Logger:
+
+    level = logging.DEBUG
     root_logger: logging.Logger = logging.getLogger("root")
     root_logger.setLevel(level=level)
 
@@ -55,4 +58,30 @@ def initializeLogging():
         level=_level,
         encoding="utf-8",
         handlers=[file_handler, stream_handler],
+    )
+
+
+def initializeAsyncLogging():
+    asyncio_logger: logging.Logger = logging.getLogger("asyncio")
+    asyncio_logger.setLevel(level=logging.DEBUG if is_debugging() else logging.INFO)
+
+    filename: pathlib.Path = pathlib.Path(f"asyncio.log")
+    full_path: str = os.path.join(filename.parent.resolve(), "logs", filename)
+
+    format_string: str = "[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s"
+    formatter: logging.Formatter = logging.Formatter(format_string)
+
+    file_handler: logging.FileHandler = logging.FileHandler(
+        filename=full_path, mode="a+"
+    )
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(level=logging.DEBUG if is_debugging() else logging.INFO)
+
+    asyncio_logger.addHandler(file_handler)
+
+    logging.basicConfig(
+        datefmt="%X %x",
+        level=logging.DEBUG if is_debugging() else logging.INFO,
+        encoding="utf-8",
+        handlers=[file_handler],
     )

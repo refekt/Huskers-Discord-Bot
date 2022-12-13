@@ -19,7 +19,6 @@ from openai.openai_object import OpenAIObject
 from helpers.constants import (
     CHAN_BANNED,
     CHAN_POSSUMS,
-    DEBUGGING_CODE,
     DT_OPENWEATHER_UTC,
     GLOBAL_TIMEOUT,
     GUILD_PROD,
@@ -44,13 +43,14 @@ from objects.Exceptions import (
     TextException,
     MySQLException,
 )
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
 from objects.Weather import WeatherResponse, WeatherHour
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 

@@ -21,7 +21,6 @@ from discord.ext import commands
 
 from helpers.constants import (
     CHAN_BOT_SPAM,
-    DEBUGGING_CODE,
     GUILD_PROD,
     HEADERS,
     ROLE_ADMIN_PROD,
@@ -37,10 +36,11 @@ from helpers.mysql import (
 )
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ImageException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 asyncio_logger = logging.getLogger("asyncio")
 

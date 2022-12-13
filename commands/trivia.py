@@ -5,8 +5,8 @@ from discord import app_commands
 from discord.app_commands import Group
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, DEBUGGING_CODE
-from objects.Logger import discordLogger
+from helpers.constants import GUILD_PROD
+from objects.Logger import discordLogger, is_debugging
 from objects.Trivia import (
     TriviaBot,
     TriviaCategories,
@@ -15,7 +15,8 @@ from objects.Trivia import (
 )
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 __all__ = []
@@ -39,7 +40,7 @@ class TriviaCommands(commands.Cog, name="Trivia Commands"):
         category: TriviaCategories,
         difficulty: TriviaDifficulty,
         question_type: TriviaQuestionType,
-        question_amount: int = 3 if DEBUGGING_CODE else 10,
+        question_amount: int = 3 if is_debugging() else 10,
     ):
         trivia_bot: TriviaBot = TriviaBot(
             game_master=interaction.user,

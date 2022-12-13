@@ -5,7 +5,6 @@ import pathlib
 import platform
 import random
 import string
-import sys
 from datetime import datetime, timedelta
 from typing import Callable, Union, Any
 
@@ -14,14 +13,12 @@ import discord
 from objects.Exceptions import CommandException, StatsException
 from objects.Logger import discordLogger, is_debugging
 
-
-# from helpers.constants import DEBUGGING_CODE
+# from helpers.constants import is_debugging()
 
 
 logger = discordLogger(
     name=__name__,
     level=logging.DEBUG if is_debugging() else logging.INFO,
-    # level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
 )
 
 __all__: list[str] = [

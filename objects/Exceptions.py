@@ -1,6 +1,5 @@
 # Global Errors
 import logging
-import platform
 from dataclasses import dataclass  # https://www.youtube.com/watch?v=vBH6GRJ1REM
 from typing import Optional, Any
 

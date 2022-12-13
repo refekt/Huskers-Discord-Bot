@@ -6,11 +6,12 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, DEBUGGING_CODE
-from objects.Logger import discordLogger
+from helpers.constants import GUILD_PROD
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )  # Logger for each module/file
 
 __all__: list[str] = [

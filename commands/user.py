@@ -7,7 +7,6 @@ from discord import app_commands, Forbidden, HTTPException
 from discord.ext import commands
 
 from helpers.constants import (
-    DEBUGGING_CODE,
     GUILD_PROD,
     ROLE_ADMIN_PROD,
     ROLE_EVERYONE_PROD,
@@ -21,10 +20,11 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
 from objects.Client import GUILD_ROLES
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 dict_roles: dict = {}

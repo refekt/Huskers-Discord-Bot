@@ -20,7 +20,8 @@ from objects.Thread import (
 )
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 __all__: list[str] = [

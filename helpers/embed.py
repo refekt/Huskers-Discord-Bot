@@ -35,7 +35,8 @@ from objects.Exceptions import BettingException
 from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 __all__: list[str] = [

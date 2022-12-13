@@ -17,10 +17,11 @@ from helpers.constants import (
     TWITTER_FOLLOWER_PAGE_REQ,
 )
 from helpers.embed import buildEmbed
-from objects.Logger import is_debugging
+from objects.Logger import is_debugging, discordLogger
 
-asyncio_logger: logging.Logger = logging.getLogger("asyncio")
-asyncio_logger.setLevel(level=logging.DEBUG if is_debugging() else logging.INFO)
+asyncio_logger = discordLogger(
+    name="asyncio", level=logging.DEBUG if is_debugging() else logging.INFO
+)
 
 following_api_calls: int = 0
 

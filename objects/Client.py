@@ -58,7 +58,8 @@ from objects.TweepyStreamListener import StreamClientV2
 from objects.Wordle import WordleFinder, Wordle
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 asyncio_logger: logging.Logger = logging.getLogger("asyncio")
 tweepy_logger: logging.Logger = logging.getLogger("tweepy.client")
@@ -169,9 +170,8 @@ async def start_twitter_stream(client: discord.Client) -> None:
 
     rule_query = ""
     rules: list[str] = []
-    # append_str: str = ""
 
-    if DEBUGGING_CODE:
+    if is_debugging():
         rule_query = "from:ayy_gbr OR "
 
     rule_query += f"from:{TWITTER_BLOCK16_SCREENANME} OR "
@@ -456,7 +456,7 @@ class HuskerClient(Bot):
         global GUILD_ROLES
         GUILD_ROLES = self.guilds[0].roles
 
-        if DEBUGGING_CODE:
+        if is_debugging():
             chan_general: discord.TextChannel = await self.fetch_channel(
                 CHAN_BOT_SPAM_PRIVATE
             )
