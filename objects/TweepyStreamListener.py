@@ -35,7 +35,7 @@ from helpers.misc import general_locked
 from objects.Logger import discordLogger
 
 tweepy_client: str = "tweepy.client"
-level = logging.DEBUG
+level = logging.DEBUG if DEBUGGING_CODE else logging.INFO
 tweepy_client_logger: logging.Logger = logging.getLogger(tweepy_client)
 tweepy_client_logger.setLevel(level=level)
 
@@ -509,4 +509,4 @@ class StreamClientV2(tweepy.StreamingClient):
         )
 
 
-tweepy_client_logger.debug(f"{str(__name__).title()} module loaded!")
+tweepy_client_logger.info(f"{str(__name__).title()} module loaded!")

@@ -25,7 +25,7 @@ from helpers.embed import buildEmbed
 # )
 
 asyncio_logger: logging.Logger = logging.getLogger("asyncio")
-asyncio_logger.setLevel(level=logging.DEBUG)
+asyncio_logger.setLevel(level=logging.DEBUG if DEBUGGING_CODE else logging.INFO)
 
 following_api_calls: int = 0
 
