@@ -6,12 +6,12 @@ from typing import ClassVar, Union, Optional
 
 import discord
 
-from helpers.constants import DEBUGGING_CODE, TZ
+from helpers.constants import TZ
 from objects.Exceptions import WordleException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__ = ["Wordle", "WordleFinder"]

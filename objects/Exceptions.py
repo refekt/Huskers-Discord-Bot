@@ -6,11 +6,12 @@ from typing import Optional, Any
 
 from discord.app_commands import CommandInvokeError
 
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
     name=__name__,
-    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
+    # level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
 )
 
 __all__: list[str] = [

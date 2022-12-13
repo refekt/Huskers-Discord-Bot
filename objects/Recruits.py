@@ -1,10 +1,9 @@
 import logging
 
-from helpers.constants import DEBUGGING_CODE
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = ["Recruit", "RecruitInterest"]
@@ -58,41 +57,41 @@ class Recruit:
     ]
 
     def __init__(
-        self,
-        bio: str,
-        cb_experts,
-        cb_predictions,
-        city: str,
-        commitment_date: str,
-        committed,
-        committed_school: str,
-        early_enrollee,
-        early_signee,
-        height: str,
-        key: int,
-        name: str,
-        position: str,
-        ranking_all_time: int,
-        ranking_national: int,
-        ranking_position: int,
-        ranking_state: str,
-        rating_numerical: str,
-        rating_stars: str,
-        recruit_interests: list[RecruitInterest],
-        recruit_interests_url: str,
-        school: str,
-        school_type: str,
-        scout_evaluation: str,
-        state: str,
-        state_abbr: str,
-        team_id: int,
-        thumbnail: str,
-        twitter: str,
-        twofourseven_highlights: str,
-        twofourseven_profile: str,
-        walk_on: bool,
-        weight: str,
-        year: int,
+            self,
+            bio: str,
+            cb_experts,
+            cb_predictions,
+            city: str,
+            commitment_date: str,
+            committed,
+            committed_school: str,
+            early_enrollee,
+            early_signee,
+            height: str,
+            key: int,
+            name: str,
+            position: str,
+            ranking_all_time: int,
+            ranking_national: int,
+            ranking_position: int,
+            ranking_state: str,
+            rating_numerical: str,
+            rating_stars: str,
+            recruit_interests: list[RecruitInterest],
+            recruit_interests_url: str,
+            school: str,
+            school_type: str,
+            scout_evaluation: str,
+            state: str,
+            state_abbr: str,
+            team_id: int,
+            thumbnail: str,
+            twitter: str,
+            twofourseven_highlights: str,
+            twofourseven_profile: str,
+            walk_on: bool,
+            weight: str,
+            year: int,
     ) -> None:
         self.bio = bio
         self.cb_experts = cb_experts

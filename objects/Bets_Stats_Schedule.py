@@ -14,7 +14,6 @@ from cfbd.rest import ApiException
 
 from helpers.constants import (
     CFBD_CONFIG,
-    DEBUGGING_CODE,
     DT_CFBD_GAMES,
     DT_MYSQL_FORMAT,
     DT_STR_FORMAT,
@@ -34,10 +33,10 @@ from helpers.mysql import (
     SqlFetch,
 )
 from objects.Exceptions import BettingException, ScheduleException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = [

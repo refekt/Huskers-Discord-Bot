@@ -1,16 +1,16 @@
 import json
 import logging
 import pathlib
-import platform
 from typing import AnyStr
 
 from cryptography.fernet import Fernet
 
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
     name=__name__,
-    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
+    # level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
 )
 
 key_path = pathlib.PurePath(

@@ -1,11 +1,9 @@
-import asyncio
 import datetime
 import logging
 import sys
 import traceback
-from typing import Literal, Optional
+from typing import Literal
 
-import discord  # noqa # Beta version thing
 from discord import HTTPException, NotFound, Forbidden
 from discord.app_commands import (
     CommandInvokeError,
@@ -17,29 +15,28 @@ from discord.app_commands import (
 from discord.ext.commands import Context, Greedy
 from pymysql import IntegrityError, ProgrammingError
 
-from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
-from helpers.embed import buildEmbed  # noqa
-from objects import Wordle
-from objects.Client import HuskerClient
-from objects.Exceptions import DiscordError  # noqa
-from objects.Logger import discordLogger
-from objects.Wordle import WordleFinder
+from objects.Logger import discordLogger, initializeLogging, is_debugging
+
+initializeLogging()
 
 logger = discordLogger(
     name=__name__,
-    level=logging.DEBUG,  # if "Windows" in platform.platform() else logging.INFO,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
-from helpers.constants import *  # noqa
+# from helpers.constants import *  # noqa
+from helpers.constants import MEMBER_GEE, PROD_TOKEN  # noqa
 from helpers.embed import *  # noqa
+from helpers.embed import buildEmbed  # noqa
 from helpers.encryption import *  # noqa
 from helpers.fryer import *  # noqa
-from helpers.misc import *  # noqa
 from helpers.mysql import *  # noqa
 from helpers.slowking import *  # noqa
-
+from objects import Wordle
 from objects.Bets_Stats_Schedule import *  # noqa
+from objects.Client import HuskerClient
 from objects.Exceptions import *  # noqa
+from objects.Exceptions import DiscordError  # noqa
 from objects.Paginator import *  # noqa
 from objects.Recruits import *  # noqa
 from objects.Survey import *  # noqa
@@ -50,6 +47,7 @@ from objects.TweepyFollowerMonitor import *  # noqa
 from objects.TweepyStreamListener import *  # noqa
 from objects.Weather import *  # noqa
 from objects.Winsipedia import *  # noqa
+from objects.Wordle import WordleFinder  # noqa
 
 __all__: list[str] = ["client"]
 

@@ -10,13 +10,13 @@ import discord
 import requests
 from requests import Response
 
-from helpers.constants import HEADERS, GLOBAL_TIMEOUT, DEBUGGING_CODE
+from helpers.constants import HEADERS, GLOBAL_TIMEOUT
 from helpers.embed import buildEmbed
 from objects.Exceptions import TriviaException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__ = [
@@ -60,7 +60,7 @@ class SessionToken(str):
         return self.token
 
     def reset_token(
-        self,
+            self,
     ) -> str:  # May not be needed since all questions are queried up front
         logger.debug("Resetting session token")
 
@@ -92,7 +92,7 @@ class TriviaStartButtons(discord.ui.View):
 
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
     async def confirm(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         if interaction.user == self.game_master:
             logger.debug(
@@ -108,7 +108,7 @@ class TriviaStartButtons(discord.ui.View):
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def cancel(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         if interaction.user == self.game_master:
             logger.debug(
@@ -180,13 +180,13 @@ class TriviaQuestionType(str, enum.Enum):
 
 class TriviaQuestions:
     def __init__(
-        self,
-        category: TriviaCategories,
-        question_type: TriviaQuestionType,
-        difficulty: TriviaDifficulty,
-        question: str,
-        correct_answer: str,
-        incorrect_answers: list[str],
+            self,
+            category: TriviaCategories,
+            question_type: TriviaQuestionType,
+            difficulty: TriviaDifficulty,
+            question: str,
+            correct_answer: str,
+            incorrect_answers: list[str],
     ) -> None:
         self.category: TriviaCategories = category
         self.type: TriviaQuestionType = question_type
@@ -314,10 +314,10 @@ class TriviaQuestionView(discord.ui.View):
         return True
 
     async def on_error(
-        self,
-        interaction: discord.Interaction,
-        error: Exception,
-        item: discord.ui.Item[Any],
+            self,
+            interaction: discord.Interaction,
+            error: Exception,
+            item: discord.ui.Item[Any],
     ) -> None:
         logger.exception(error, exc_info=True)
 
@@ -326,14 +326,14 @@ class TriviaBot:
     MAX_QUESTIONS: ClassVar[int] = 20
 
     def __init__(
-        self,
-        game_master: discord.Member,
-        channel: Union[discord.TextChannel, Any],
-        category: TriviaCategories,
-        difficulty: TriviaDifficulty,
-        question_type: TriviaQuestionType,
-        question_amount: int,
-        question_duration: int = 5 if DEBUGGING_CODE else 15,
+            self,
+            game_master: discord.Member,
+            channel: Union[discord.TextChannel, Any],
+            category: TriviaCategories,
+            difficulty: TriviaDifficulty,
+            question_type: TriviaQuestionType,
+            question_amount: int,
+            question_duration: int = 5 if is_debugging() else 15,
     ) -> None:
         self.session_token: SessionToken = SessionToken()
         self.session_token.set_token()
@@ -365,17 +365,17 @@ class TriviaBot:
                     dict(
                         name="Rules",
                         value="The game master will choose the category and number of questions. "
-                        "Everyone in the server can join. "
-                        f"There are maximum number of {self.MAX_QUESTIONS} questions. "
-                        "The winner is determined by the number of correct questions at the end of the game.",
+                              "Everyone in the server can join. "
+                              f"There are maximum number of {self.MAX_QUESTIONS} questions. "
+                              "The winner is determined by the number of correct questions at the end of the game.",
                     ),
                     dict(
                         name="Game Info",
                         value=f"Category: {self.category.title()}\n"
-                        f"Difficulty: {self.difficulty.title()}\n"
-                        f"Question Types: {self.question_type.title()}\n"
-                        f"Number of Questions: {question_amount}\n"
-                        f"Question Timer: {question_duration} seconds",
+                              f"Difficulty: {self.difficulty.title()}\n"
+                              f"Question Types: {self.question_type.title()}\n"
+                              f"Number of Questions: {question_amount}\n"
+                              f"Question Timer: {question_duration} seconds",
                     ),
                     dict(
                         name="Ready?",
@@ -410,8 +410,8 @@ class TriviaBot:
                         buildEmbed(
                             title=f"Trivia Bot Game Master: 👑 {self.game_master.name}#{self.game_master.discriminator}",
                             description=f"Q {index + 1}/{len(j['results'])} | {unescape(result['category'])} | "
-                            f"{unescape(str(result['type']).title())} | "
-                            f"{unescape(str(result['difficulty']).title())}",
+                                        f"{unescape(str(result['type']).title())} | "
+                                        f"{unescape(str(result['difficulty']).title())}",
                             fields=[
                                 dict(
                                     name="Question",
@@ -523,8 +523,8 @@ class TriviaBot:
                     dict(
                         name="Game Info",
                         value=f"Category: {self.category.title()}\n"
-                        f"Difficulty: {self.difficulty.title()}\n"
-                        f"Question Types: {self.question_type.title()}\n",
+                              f"Difficulty: {self.difficulty.title()}\n"
+                              f"Question Types: {self.question_type.title()}\n",
                     ),
                     dict(name="Leaderboard", value=self.leaderboard()),
                 ],
@@ -541,4 +541,5 @@ class TriviaBot:
 
             await self.channel.send(content="The trivia game was cancelled.")
 
-    logger.info(f"{str(__name__).title()} module loaded!")
+
+logger.info(f"{str(__name__).title()} module loaded!")

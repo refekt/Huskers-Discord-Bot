@@ -8,11 +8,13 @@ from dotenv import load_dotenv
 
 from helpers.encryption import decrypt, decrypt_return_data, encrypt, load_key
 from helpers.misc import loadVarPath
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
+
+# DEBUGGING_CODE = is_debugging()
 
 logger = discordLogger(
     name=__name__,
-    level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
 logger.info(f"Platform == {platform.platform()}")
@@ -54,9 +56,6 @@ logger.info("MySQL variables loaded")
 REDDIT_CLIENT_ID: str = env_vars["reddit_client_id"]
 REDDIT_SECRET: str = env_vars["reddit_secret"]
 REDDIT_PW: str = env_vars["reddit_pw"]
-
-# DEBUG
-DEBUGGING_CODE = "Windows" in platform.platform()
 
 # Twitter variables
 TWITTER_BEARER: str = env_vars["twitter_bearer"]

@@ -6,13 +6,13 @@ from typing import Union, Optional, Any
 import pymysql
 from pymysql import OperationalError, Connection, IntegrityError, ProgrammingError
 
-from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB, DEBUGGING_CODE
+from helpers.constants import SQL_HOST, SQL_USER, SQL_PASSWD, SQL_DB
 from helpers.misc import getModuleMethod
 from objects.Exceptions import MySQLException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = [

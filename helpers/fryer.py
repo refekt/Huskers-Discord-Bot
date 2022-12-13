@@ -9,11 +9,10 @@ from PIL import Image
 from PIL.Image import Image as ImgImg
 from numpy import random
 
-from helpers.constants import DEBUGGING_CODE
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = ["fry_image"]

@@ -1,11 +1,11 @@
 import logging
 from datetime import datetime, timezone
 
-from helpers.constants import DEBUGGING_CODE, TZ
-from objects.Logger import discordLogger
+from helpers.constants import TZ
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = ["WeatherResponse", "WeatherHour"]

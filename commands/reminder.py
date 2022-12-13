@@ -7,11 +7,11 @@ import discord.ext.commands
 from discord import app_commands
 from discord.ext import commands
 
-from helpers.constants import GUILD_PROD, TZ, DT_OBJ_FORMAT, DEBUGGING_CODE
+from helpers.constants import GUILD_PROD, TZ, DT_OBJ_FORMAT
 from helpers.embed import buildEmbed
 from helpers.mysql import processMySQL, sqlRecordReminder, sqlUpdateReminder
 from objects.Exceptions import ReminderException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Thread import (
     DateTimeChars,
     background_run_function,
@@ -20,7 +20,7 @@ from objects.Thread import (
 )
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = [

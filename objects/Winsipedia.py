@@ -5,18 +5,18 @@ import requests
 from bs4 import BeautifulSoup
 from bs4.element import ResultSet
 
-from helpers.constants import HEADERS, DEBUGGING_CODE
+from helpers.constants import HEADERS
 from objects.Exceptions import StatsException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = [
-    "TeamStatsWinsipediaTeam",
-    "CompareWinsipediaTeam",
     "CompareWinsipedia",
+    "CompareWinsipediaTeam",
+    "TeamStatsWinsipediaTeam",
 ]
 
 

@@ -11,21 +11,16 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from helpers.constants import (
-    DEBUGGING_CODE,
     CHAN_BOT_SPAM_PRIVATE,
     CHAN_TWITTERVERSE,
-    TWITTER_FOLLOWER_PAGE_REQ,
     TWITTER_FOLLOWER_API_LIMIT,
+    TWITTER_FOLLOWER_PAGE_REQ,
 )
 from helpers.embed import buildEmbed
-
-# logger: logging.Logger = discordLogger(
-#     name=__name__,
-#     level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
-# )
+from objects.Logger import is_debugging
 
 asyncio_logger: logging.Logger = logging.getLogger("asyncio")
-asyncio_logger.setLevel(level=logging.DEBUG if DEBUGGING_CODE else logging.INFO)
+asyncio_logger.setLevel(level=logging.DEBUG if is_debugging() else logging.INFO)
 
 following_api_calls: int = 0
 
@@ -118,7 +113,7 @@ class TwitterFollowerMonitor:
         for follow in differences:
             new_follows_str += f"• {follow.name} (@{follow.username})\n"
 
-        if DEBUGGING_CODE:
+        if is_debugging():
             twitter_channel: discord.TextChannel = (
                 await self.discord_client.fetch_channel(CHAN_BOT_SPAM_PRIVATE)
             )

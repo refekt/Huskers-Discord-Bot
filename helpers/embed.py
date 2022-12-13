@@ -13,7 +13,6 @@ from helpers.constants import (
     BOT_ICON_URL,
     BOT_THUMBNAIL_URL,
     CFBD_CONFIG,
-    DEBUGGING_CODE,
     DESC_LIMIT,
     DT_CFBD_GAMES,
     DT_CFBD_GAMES_DISPLAY,
@@ -33,10 +32,10 @@ from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions, SqlFetch
 from objects.Bets_Stats_Schedule import BigTenTeams, getHuskerOpponent, buildTeam
 from objects.Exceptions import BettingException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = [

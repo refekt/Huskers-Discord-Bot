@@ -9,7 +9,6 @@ import requests
 import schedule
 
 from helpers.constants import (
-    DEBUGGING_CODE,
     HEADERS,
     SCHED_DAY_IMG,
     SCHED_NIGHT_IMG,
@@ -17,11 +16,11 @@ from helpers.constants import (
     WEATHER_API_KEY,
 )
 from helpers.embed import buildEmbed
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Weather import WeatherResponse
 
 asyncio_logger = discordLogger(
-    name="asyncio", level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name="asyncio", level=logging.DEBUG if is_debugging() else logging.INFO
 )
 
 __all__: list[str] = ["SchedulePosts"]
@@ -338,7 +337,7 @@ class SchedulePosts:
 
         asyncio_logger.debug("Previous jobs cleared")
 
-        if DEBUGGING_CODE:
+        if is_debugging():
             asyncio_logger.debug("Attempting to create debug schedule")
             if not self._setup:
                 self._setup_schedule()

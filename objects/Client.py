@@ -27,18 +27,17 @@ from helpers.constants import (
     CHAN_HOF,
     CHAN_HOS,
     CHAN_NORTH_BOTTOMS,
-    DEBUGGING_CODE,
     GUILD_PROD,
     TWITTER_BEARER,
     TWITTER_BLOCK16_SCREENANME,
     TWITTER_EXPANSIONS,
+    TWITTER_HUSKER_COACH_LIST_ID,
     TWITTER_HUSKER_MEDIA_LIST_ID,
     TWITTER_MEDIA_FIELDS,
+    TWITTER_MONITOR_BEARER,
     TWITTER_QUERY_MAX,
     TWITTER_TWEET_FIELDS,
     TWITTER_USER_FIELDS,
-    TWITTER_HUSKER_COACH_LIST_ID,
-    TWITTER_MONITOR_BEARER,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -51,7 +50,7 @@ from helpers.mysql import (
 )
 from helpers.slowking import makeSlowking
 from objects.Exceptions import ChangelogException, MySQLException
-from objects.Logger import discordLogger
+from objects.Logger import discordLogger, is_debugging
 from objects.Scheudle import SchedulePosts
 from objects.Thread import convert_duration
 from objects.TweepyFollowerMonitor import TwitterFollowerMonitor
@@ -59,13 +58,13 @@ from objects.TweepyStreamListener import StreamClientV2
 from objects.Wordle import WordleFinder, Wordle
 
 logger = discordLogger(
-    name=__name__, level=logging.DEBUG if DEBUGGING_CODE else logging.INFO
+    name=__name__, level=logging.DEBUG if is_debugging() else logging.INFO
 )
 asyncio_logger: logging.Logger = logging.getLogger("asyncio")
 tweepy_logger: logging.Logger = logging.getLogger("tweepy.client")
 tweepy_async_logger: logging.Logger = logging.getLogger("tweepy.asynchronous.client")
-tweepy_logger.setLevel(level=logging.INFO)
-tweepy_async_logger.setLevel(level=logging.INFO)
+tweepy_logger.setLevel(level=logging.INFO)  # Spam prevention
+tweepy_async_logger.setLevel(level=logging.INFO)  # Spam prevention
 
 __all__: list[str] = [
     "GUILD_ROLES",
@@ -79,6 +78,21 @@ GUILD_ROLES: Optional[list[discord.Role]] = None
 
 
 async def start_twitter_monitors(discord_client: discord.Client) -> None:
+    debug_logger: logging.Logger = logging.getLogger("twitter_monitor_debug")
+    debug_logger.setLevel(level=logging.DEBUG)
+
+    format_string: str = "[%(asctime)s] %(levelname)s :: %(name)s :: %(module)s :: func/%(funcName)s :: Ln/%(lineno)d :: %(message)s"
+    formatter: logging.Formatter = logging.Formatter(format_string)
+
+    filename: pathlib.Path = pathlib.Path("twitter_monitor.log")
+    full_path: str = os.path.join(filename.parent.resolve(), "logs", filename)
+
+    file_handler: logging.FileHandler = logging.FileHandler(
+        filename=full_path, mode="a+"
+    )
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(level=logging.DEBUG)
+
     tweepy_client = tweepy.asynchronous.AsyncClient(
         bearer_token=TWITTER_MONITOR_BEARER, wait_on_rate_limit=True
     )
