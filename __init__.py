@@ -8,19 +8,19 @@ from typing import Literal, Optional
 import discord
 from discord import HTTPException, NotFound, Forbidden
 from discord.app_commands import (
-    CommandInvokeError,
-    commands,
-    MissingApplicationID,
-    CommandTree,
     AppCommand,
+    CommandInvokeError,
+    CommandTree,
+    MissingApplicationID,
+    commands,
 )
 from discord.ext.commands import Context, Greedy
 from pymysql import IntegrityError, ProgrammingError
 
 from objects.Logger import (
     discordLogger,
-    initializeLogging,
     initializeAsyncLogging,
+    initializeLogging,
     is_debugging,
 )
 
@@ -36,16 +36,16 @@ from helpers.mysql import processMySQL, sqlInsertWordle
 
 # from helpers.constants import *
 from helpers.constants import (
+    CHAN_GENERAL,
+    CHAN_NORTH_BOTTOMS,
+    DT_TASK_FORMAT,
+    FIELD_VALUE_LIMIT,
     MEMBER_GEE,
     PROD_TOKEN,
-    CHAN_NORTH_BOTTOMS,
-    CHAN_GENERAL,
-    TZ,
-    DT_TASK_FORMAT,
     ROLE_HYPE_MAX,
-    ROLE_HYPE_SOME,
     ROLE_HYPE_NO,
-    FIELD_VALUE_LIMIT,
+    ROLE_HYPE_SOME,
+    TZ,
 )
 from helpers.embed import buildEmbed
 
@@ -78,7 +78,7 @@ if not "silent" in sys.argv:
 
     @tree.error
     async def on_app_command_error(
-            interaction: discord.Interaction, error: CommandInvokeError
+        interaction: discord.Interaction, error: CommandInvokeError
     ) -> None:
         logger.info("app_command error detected!")
 
@@ -179,12 +179,10 @@ async def backlog(ctx: Context, year: int, month: int, day: int) -> None:
 
     index: int = 0
 
-    # async for message in north_bottoms.history(
     async for message in north_bottoms.history(
-            # async for message in general.history(
-            oldest_first=True,
-            after=datetime.datetime(year=year, month=month, day=day),
-            limit=None,
+        oldest_first=True,
+        after=datetime.datetime(year=year, month=month, day=day),
+        limit=None,
     ):
         logger.debug(
             f"{message.created_at.astimezone(tz=TZ).strftime(DT_TASK_FORMAT)} {message.author.name}: {message.clean_content[:100]}"
@@ -303,9 +301,9 @@ async def hype_audit(ctx: Context):
 @commands.guild_only()
 @commands.default_permissions(administrator=True)
 async def sync(
-        ctx: Context,
-        guilds: Greedy[discord.Object],
-        spec: Optional[Literal["~", "*", "^"]] = None,
+    ctx: Context,
+    guilds: Greedy[discord.Object],
+    spec: Optional[Literal["~", "*", "^"]] = None,
 ) -> None:
     logger.info("Attempting to sync application commands")
     if not guilds:
@@ -317,7 +315,7 @@ async def sync(
             client.tree.copy_global_to(guild=ctx.guild)
             synced = await client.tree.sync(guild=ctx.guild)
         elif (
-                spec == "^"
+            spec == "^"
         ):  # Clears all commands from the current guild target and syncs (removes guild commands)
             logger.info("Clearing all application commands")
             client.tree.clear_commands(guild=ctx.guild)
