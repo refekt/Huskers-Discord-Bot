@@ -49,12 +49,19 @@ async def start_twitter_stream(client: discord.Client) -> None:
 
     logger.debug("Previous Twitter Stream rules deleted")
 
-    tweeter_client = tweepy.Client(TWITTER_BEARER)
-    list_members = tweeter_client.get_list_members(str(TWITTER_HUSKER_MEDIA_LIST_ID))
+    tweeter_client: tweepy.Client = tweepy.Client(TWITTER_BEARER)
+    media_members: tweepy.Response = tweeter_client.get_list_members(
+        str(TWITTER_HUSKER_MEDIA_LIST_ID)
+    )
+    coach_members: tweepy.Response = tweeter_client.get_list_members(
+        str(TWITTER_HUSKER_COACH_LIST_ID)
+    )
+
+    all_members: list[tweepy.User] = media_members[0] + coach_members[0]
 
     logger.debug("Collected usernames from the Husker Media Twitter List")
 
-    rule_query = ""
+    rule_query: str = ""
     rules: list[str] = []
 
     if is_debugging():
@@ -62,7 +69,7 @@ async def start_twitter_stream(client: discord.Client) -> None:
 
     rule_query += f"from:{TWITTER_BLOCK16_SCREENANME} OR "
 
-    for member in list_members[0]:
+    for member in all_members:  # list_members[0]:
         append_str = f"from:{member['username']} OR "
 
         if len(rule_query) + len(append_str) > TWITTER_QUERY_MAX:
@@ -75,7 +82,7 @@ async def start_twitter_stream(client: discord.Client) -> None:
     rule_query = rule_query[:-4]  # Get rid of ' OR '
     rules.append(rule_query)
 
-    del list_members, member, tweeter_client, append_str
+    del media_members, coach_members, all_members, member, tweeter_client, append_str
 
     for stream_rule in rules:
         tweeter_stream.add_rules(tweepy.StreamRule(stream_rule, tag="husker-media"))
