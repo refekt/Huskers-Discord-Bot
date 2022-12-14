@@ -228,7 +228,7 @@ async def backlog(ctx: Context, year: int, month: int, day: int) -> None:
 @client.hybrid_command(name="hype-audit")
 @commands.default_permissions(administrator=True)
 async def hype_audit(ctx: Context):
-    logger.info("Begining hype role audit")
+    logger.info("Beginning hype role audit")
 
     logger.debug("Generating list of hype roles")
     hype_roles: tuple[Optional[discord.Role], ...] = (
@@ -279,7 +279,7 @@ async def hype_audit(ctx: Context):
         if len(hypers_list) == 0:
             hypers_list.append(hypers_str)
     else:
-        logger.info("No hypers with more than one roole")
+        logger.info("No hypers with more than one role")
 
     if hypers_str:
         embed: discord.Embed = buildEmbed(

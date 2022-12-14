@@ -1,12 +1,12 @@
 import logging
 import os
 import pathlib
-from typing import Union
+from typing import Union, Optional
 
 import discord
 import tweepy
 import tweepy.asynchronous
-from black import Optional
+
 from tweepy import Response
 
 from helpers.constants import (

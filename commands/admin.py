@@ -914,7 +914,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 with open(local_file, "w") as log_file:
                     contents: str = remote_files[index].read_text()
                     local_file.write_text(contents)
-                    logger.info(f"Downlaoded and copied {local_file}")
+                    logger.info(f"Downloaded and copied {local_file}")
             except IOError:
                 logger.info(f"Cannot download {local_file}")
                 continue
