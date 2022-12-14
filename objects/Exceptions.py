@@ -10,7 +10,6 @@ from objects.Logger import discordLogger, is_debugging
 logger = discordLogger(
     name=__name__,
     level=logging.DEBUG if is_debugging() else logging.INFO,
-    # level=logging.DEBUG if "Windows" in platform.platform() else logging.INFO,
 )
 
 __all__: list[str] = [

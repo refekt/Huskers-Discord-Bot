@@ -35,12 +35,12 @@ class TriviaCommands(commands.Cog, name="Trivia Commands"):
         question_amount="Number of questions to ask",
     )
     async def trivia_start(
-        self,
-        interaction: discord.Interaction,
-        category: TriviaCategories,
-        difficulty: TriviaDifficulty,
-        question_type: TriviaQuestionType,
-        question_amount: int = 3 if is_debugging() else 10,
+            self,
+            interaction: discord.Interaction,
+            category: TriviaCategories,
+            difficulty: TriviaDifficulty,
+            question_type: TriviaQuestionType,
+            question_amount: int = 3 if is_debugging() else 10,
     ):
         trivia_bot: TriviaBot = TriviaBot(
             game_master=interaction.user,

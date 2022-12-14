@@ -21,16 +21,12 @@ from helpers.constants import (
     CHAN_GENERAL,
     CHAN_RECRUITING,
     CHAN_TWITTERVERSE,
-    GUILD_PROD,
     MEMBER_GEE,
-    ROLE_ADMIN_PROD,
     ROLE_EVERYONE_PROD,
-    ROLE_MOD_PROD,
     TWITTER_BLOCK16_SCREENANME,
 )
 from helpers.embed import buildEmbed, buildTweetEmbed
 from helpers.misc import general_locked
-from objects.Client import start_twitter_stream
 from objects.Logger import discordLogger, is_debugging
 
 level = logging.DEBUG if is_debugging() else logging.INFO
@@ -348,15 +344,17 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_disconnect(self) -> None:
         tweepy_client_logger.exception("Twitter stream disconnected", exc_info=True)
 
-        asyncio.run(start_twitter_stream(self.client))
+        self.client.loop.create_task(
+            coro=send_tweet_alert(
+                client=self.client,
+                message="The Twitter stream has been disconnected! Attempting to restart...",
+                alert_admins=True,
+            ),
+        )
 
-        # self.client.loop.create_task(
-        #     coro=send_tweet_alert(
-        #         client=self.client,
-        #         message="The Twitter stream has been disconnected!",
-        #         alert_admins=True,
-        #     ),
-        # )
+        from helpers.twitter import start_twitter_stream
+
+        asyncio.run(start_twitter_stream(self.client))
 
     def on_closed(self, response: requests.Response) -> None:
         tweepy_client_logger.exception(

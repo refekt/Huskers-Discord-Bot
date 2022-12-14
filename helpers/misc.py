@@ -13,9 +13,6 @@ import discord
 from objects.Exceptions import CommandException, StatsException
 from objects.Logger import discordLogger, is_debugging
 
-# from helpers.constants import is_debugging()
-
-
 logger = discordLogger(
     name=__name__,
     level=logging.DEBUG if is_debugging() else logging.INFO,

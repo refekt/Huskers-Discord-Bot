@@ -165,7 +165,7 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
         logger.info("Prediction was recorded!")
 
     async def on_error(
-        self, interaction: discord.Interaction, error: Exception
+            self, interaction: discord.Interaction, error: Exception
     ) -> None:
         raise RecruitException(str(error))
 
@@ -181,14 +181,14 @@ class PredictionView(discord.ui.View):
 
     @discord.ui.button(label="🔮", disabled=True)
     async def crystal_ball(
-        self, interaction: discord.Interaction, button: discord.Button
+            self, interaction: discord.Interaction, button: discord.Button
     ) -> None:
         logger.info("Starting a crystal ball prediction")
 
         if (
-            self.recruit.committed.lower()
-            if self.recruit.committed is not None
-            else None
+                self.recruit.committed.lower()
+                if self.recruit.committed is not None
+                else None
         ) in [
             "signed",
             "enrolled",
@@ -209,7 +209,7 @@ class PredictionView(discord.ui.View):
 
     @discord.ui.button(label="📜", disabled=True)
     async def scroll(
-        self, interaction: discord.Interaction, button: discord.Button
+            self, interaction: discord.Interaction, button: discord.Button
     ) -> None:
         logger.info(f"Retrieving predictions for {self.recruit.name}...")
         await interaction.response.defer()
@@ -265,9 +265,9 @@ class PredictionView(discord.ui.View):
 
 class UserPrediction:
     def __init__(
-        self,
-        school: Any,
-        confidence: Any,
+            self,
+            school: Any,
+            confidence: Any,
     ) -> None:
         self.school: discord.ui.TextInput = school
         self.confidence: discord.ui.Select = confidence
@@ -304,8 +304,8 @@ def reformat_commitment_string(search_player: dict) -> Union[str, None]:
     if search_player["HighestRecruitInterestEventType"] == "HardCommit":
         return "Hard Commit"
     elif (
-        search_player["HighestRecruitInterestEventType"] == "OfficialVisit"
-        or search_player["HighestRecruitInterestEventType"] == "0"
+            search_player["HighestRecruitInterestEventType"] == "OfficialVisit"
+            or search_player["HighestRecruitInterestEventType"] == "0"
     ):
         return None
     else:
@@ -805,7 +805,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         search_name="Name of the recruit",
     )
     async def croot_bot(
-        self, interaction: discord.Interaction, year: int, search_name: str
+            self, interaction: discord.Interaction, year: int, search_name: str
     ) -> None:
         logger.info(f"Searching for {year} {search_name.capitalize()}")
         await interaction.response.defer()
@@ -854,7 +854,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         search_name="Name of the recruit",
     )
     async def predict_submit(  # predict, stats, leaderboard, user
-        self, interaction: discord.Interaction, year: int, search_name: str
+            self, interaction: discord.Interaction, year: int, search_name: str
     ) -> None:
         logger.info(f"Starting a prediction for [{year}] [{search_name}]")
 

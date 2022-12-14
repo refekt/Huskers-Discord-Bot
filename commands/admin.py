@@ -39,7 +39,6 @@ from helpers.constants import (
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter, general_locked
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
-from objects.Client import start_twitter_stream
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
@@ -64,14 +63,14 @@ class ConfirmButtons(discord.ui.View):
 
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
     async def confirm(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         self.value = True
         self.stop()
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def cancel(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         self.value = False
         self.stop()
@@ -110,7 +109,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     # noinspection PyMethodMayBeStatic
     async def alert_gameday_channels(
-        self, client: Union[discord.ext.commands.Bot, discord.Client], on: bool
+            self, client: Union[discord.ext.commands.Bot, discord.Client], on: bool
     ) -> None:
         chan_general: discord.TextChannel = await client.fetch_channel(CHAN_GENERAL)
         chan_live: discord.TextChannel = await client.fetch_channel(
@@ -245,7 +244,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     # noinspection PyMethodMayBeStatic
     async def college_purge_messages(
-        self, channel: Any, all_messages: bool = False
+            self, channel: Any, all_messages: bool = False
     ) -> list:
         msgs: list[discord.Message] = []
         max_age: datetime = datetime.now() - timedelta(
@@ -256,7 +255,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             async for message in channel.history(limit=100):
                 if all_messages:
                     if message.created_at.astimezone(tz=TZ) >= max_age.astimezone(
-                        tz=TZ
+                            tz=TZ
                     ):
                         msgs.append(message)
                 else:
@@ -264,7 +263,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         continue
 
                     if message.created_at.astimezone(tz=TZ) >= max_age.astimezone(
-                        tz=TZ
+                            tz=TZ
                     ):
                         msgs.append(message)
         except discord.ClientException:
@@ -330,9 +329,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     dict(
                         name="GitHub Information",
                         value=f"Created On: {created_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
-                        f"Updated On: {updated_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
-                        f"Pushed On: {pushed_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
-                        f"Age: {prettifyLongTimeDateValue(datetime.now().astimezone(tz=TZ), created_on)}\n",
+                              f"Updated On: {updated_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
+                              f"Pushed On: {pushed_on.strftime(DT_GITHUB_API_DISPLAY)}\n"
+                              f"Age: {prettifyLongTimeDateValue(datetime.now().astimezone(tz=TZ), created_on)}\n",
                     ),
                     dict(
                         name="Source Code",
@@ -384,11 +383,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     dict(
                         name="Terms",
                         value="(1) Final discretion of donation usage is up to the creator(s). "
-                        "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
-                        "(3) No refunds. "
-                        "(4) Monthly subscriptions can be terminated by either party at any time. "
-                        "(5) These terms can be changed at any time. Please read before each donation. "
-                        "(6) Clicking the donation link signifies your agreement to these terms.",
+                              "(2) Making a donation to the product(s) and/or service(s) does not garner any control or authority over product(s) or service(s). "
+                              "(3) No refunds. "
+                              "(4) Monthly subscriptions can be terminated by either party at any time. "
+                              "(5) These terms can be changed at any time. Please read before each donation. "
+                              "(6) Clicking the donation link signifies your agreement to these terms.",
                     ),
                     dict(
                         name="Donation Link",
@@ -425,14 +424,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         embed_fields_commands: list[dict[str, str]] = []
 
         def commandHasPerms(
-            command: Union[discord.app_commands.Command, discord.app_commands.Group]
+                command: Union[discord.app_commands.Command, discord.app_commands.Group]
         ) -> bool:
             if command.default_permissions is None:
                 return True
 
             if (
-                command.default_permissions.administrator
-                or command.default_permissions.manage_messages
+                    command.default_permissions.administrator
+                    or command.default_permissions.manage_messages
             ) and not interaction.user.resolved_permissions.manage_messages:
                 return False
             else:
@@ -445,7 +444,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 continue
 
             if type(cmd_command) == discord.app_commands.Command and commandHasPerms(
-                cmd_command
+                    cmd_command
             ):
                 embed_fields_commands.append(
                     dict(
@@ -456,7 +455,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     )
                 )
             elif type(cmd_command) == discord.app_commands.Group and commandHasPerms(
-                cmd_command
+                    cmd_command
             ):
                 for sub_cmd in cmd_command.commands:
                     if not commandHasPerms(sub_cmd):
@@ -477,7 +476,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             logger.info("Number of commands surpasses Discord embed field limitations")
             temp: list = []
             for i in range(0, len(embed_fields_commands), limit):
-                temp.append(embed_fields_commands[i : i + limit])
+                temp.append(embed_fields_commands[i: i + limit])
             embeds: list[discord.Embed] = [
                 buildEmbed(
                     title="Bot Frost Commands",
@@ -602,7 +601,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def twitter(self, interaction: discord.Interaction) -> None:
         logger.info("Restarting the twitter bot")
         await interaction.response.defer(ephemeral=True)
+
+        from helpers.twitter import start_twitter_stream
+
         await start_twitter_stream(client=interaction.client)
+
         await interaction.followup.send("Twitter stream has been restarted!")
         admin_channel: discord.TextChannel = interaction.client.get_channel(CHAN_ADMIN)
         if admin_channel is not None:
@@ -610,7 +613,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         logger.info("Twitter stream restarted!")
 
     async def proess_nebraska(  # noqa
-        self, interaction: discord.Interaction, who: discord.Member
+            self, interaction: discord.Interaction, who: discord.Member
     ) -> None:
         logger.info(f"Starting Nebraska for {who.name}#{who.discriminator}")
 
@@ -644,9 +647,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         logger.info(f"Attempting to add [{new_role}] role...")
                         await who.add_roles(new_role, reason="Returning from Iowa")
                     except (
-                        discord.Forbidden,
-                        discord.HTTPException,
-                        discord.ext.commands.MissingPermissions,
+                            discord.Forbidden,
+                            discord.HTTPException,
+                            discord.ext.commands.MissingPermissions,
                     ) as e:
                         logger.info(f"Unable to add role!\n{e}")
                         continue
@@ -680,11 +683,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     @app_commands.default_permissions(manage_messages=True)
     async def iowa(
-        self,
-        interaction: discord.Interaction,
-        who: Union[discord.Member, discord.User],
-        reason: str,
-        duration: IowaDuration = None,
+            self,
+            interaction: discord.Interaction,
+            who: Union[discord.Member, discord.User],
+            reason: str,
+            duration: IowaDuration = None,
     ) -> None:
         await interaction.response.defer(thinking=True)
 
@@ -703,8 +706,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
         channel_iowa: discord.TextChannel = interaction.guild.get_channel(CHAN_IOWA)
         full_reason: str = (
-            f"Time Out by {interaction.user.name}#{interaction.user.discriminator}: "
-            + reason
+                f"Time Out by {interaction.user.name}#{interaction.user.discriminator}: "
+                + reason
         )
 
         previous_roles: Union[list[str], str] = [str(role.id) for role in who.roles[1:]]
@@ -770,9 +773,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     @app_commands.default_permissions(manage_messages=True)
     async def nebraska(
-        self,
-        interaction: discord.Interaction,
-        who: Union[discord.Member, discord.User],
+            self,
+            interaction: discord.Interaction,
+            who: Union[discord.Member, discord.User],
     ) -> None:
 
         await self.proess_nebraska(interaction=interaction, who=who)
@@ -807,10 +810,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def smms(
-        self,
-        interaction: discord.Interaction,
-        destination: MammalChannels,
-        message: str,
+            self,
+            interaction: discord.Interaction,
+            destination: MammalChannels,
+            message: str,
     ) -> None:
         assert message, CommandException("You cannot have a blank message!")
 
@@ -923,7 +926,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     @app_commands.default_permissions(administrator=True)
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def server_announcement(
-        self, interaction: discord.Interaction, title: str, message: str
+            self, interaction: discord.Interaction, title: str, message: str
     ) -> None:
         await interaction.response.defer(ephemeral=True)
 
