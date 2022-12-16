@@ -756,7 +756,8 @@ class TextCog(commands.Cog, name="Text Commands"):
         oai_response: OpenAIObject = OpenAIObject()
 
         oai_response = oai_completion.create(
-            model="text-davinci-003",
+            # model="text-davinci-003",
+            model="text-embedding-ada-002",
             prompt=text_input.strip(),
             max_tokens=400,
             temperature=0.9,
