@@ -187,14 +187,14 @@ class CompareWinsipedia:
         )
 
         def mov(which: int) -> list[str]:
-            raw_mov: Union[ResultSet, str] = soup.find_all(
+            raw_mov: ResultSet | str = soup.find_all(
                 attrs={"class": f"ranking span2 item{which}"}
             )
             raw_mov = raw_mov[0].contents[3].text.replace("\n \n", ":").strip()
             return raw_mov.split(":")
 
         def win(which: int) -> list[str]:
-            raw_win: Union[ResultSet, str] = soup.find_all(
+            raw_win: ResultSet | str = soup.find_all(
                 attrs={"class": f"ranking span2 item{which}"}
             )
             raw_win = raw_win[0].contents[3].text.replace("\n \n", ":").strip()

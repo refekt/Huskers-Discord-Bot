@@ -341,8 +341,8 @@ class Bet:
 
     def __init__(
         self,
-        author: Union[discord.Member, discord.User],
-        opponent_name: Union[BigTenTeams, HuskerSched2022],
+        author: discord.Member | discord.User,
+        opponent_name: BigTenTeams | HuskerSched2022,
         predict_game: Optional[WhichTeamChoice],
         predict_points: Optional[WhichOverUnderChoice],
         predict_spread: Optional[WhichTeamChoice],
@@ -567,7 +567,7 @@ def getConsensusLineByOpponent(
     return BetLines(from_dict=lines)
 
 
-def collect_opponent(game, year, week) -> Union[HuskerOpponent, str]:
+def collect_opponent(game, year, week) -> HuskerOpponent | str:
     # This is the culmination of going line by line through Huskers.com HTML and CSS.
     # If the website changes, this will more than likely need to change.
     logger.info(f"Collecting opponent_name information for Week {week} {year}")

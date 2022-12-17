@@ -6,7 +6,7 @@ import platform
 import random
 import string
 from datetime import datetime, timedelta
-from typing import Callable, Union, Any
+from typing import Callable, Any
 
 import discord
 
@@ -105,7 +105,7 @@ def alias_param(param_name: str, param_alias: str) -> None:
         return wrapper
 
 
-def convertSeconds(n) -> Union[int, Any]:
+def convertSeconds(n) -> int | Any:
     logger.info(f"Converting {n:,} seconds to hours and minutes")
     secs = n % (24 * 3600)
     hour = secs // 3600
@@ -119,7 +119,7 @@ def shift_utc_tz(dt: datetime, shift: int) -> datetime:
 
 
 def general_locked(
-    gen_c: discord.TextChannel, gen_check: Union[discord.Role, discord.Member]
+    gen_c: discord.TextChannel, gen_check: discord.Role | discord.Member
 ) -> bool:
     return not gen_c.permissions_for(gen_check).send_messages
 

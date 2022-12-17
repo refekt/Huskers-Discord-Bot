@@ -60,7 +60,7 @@ class Survey:
 
     def __init__(
         self,
-        client: Union[Client, Bot],
+        client: Client | Bot,
         interaction: Interaction,
         options: Union[AnyStr, List[Any], List[SurveyOption]],
         question: AnyStr,
@@ -89,7 +89,7 @@ class Survey:
         )
         assert timeout is not None, SurveyException("You must provide a timeout value!")
 
-        self.client: Union[Client, client] = client
+        self.client: Client | client = client
         self.interaction: Interaction = interaction
         self.embed: Optional[Embed] = None
         self.options: List[SurveyOption] = options

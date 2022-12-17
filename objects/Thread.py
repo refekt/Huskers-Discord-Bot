@@ -4,7 +4,7 @@ import logging
 import re
 import sys
 from datetime import datetime, timedelta
-from typing import Coroutine, Optional, Callable, Union
+from typing import Coroutine, Optional, Callable
 
 from dateutil.relativedelta import relativedelta
 
@@ -109,7 +109,7 @@ def convert_duration(value: str) -> timedelta:
 
 
 async def background_run_function(
-    func: Union[Coroutine, Callable],
+    func: Coroutine | Callable,
     duration: Optional[timedelta] = None,
     loop=None,
 ) -> None:

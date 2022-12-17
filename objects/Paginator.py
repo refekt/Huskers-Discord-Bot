@@ -1,6 +1,6 @@
 import logging
 from collections import deque
-from typing import List, Union
+from typing import List
 
 import discord
 
@@ -62,9 +62,7 @@ class EmbedPaginatorView(discord.ui.View):
             logger.exception(
                 f"Error creating ud_current_page button: {e}", exc_info=True
             )
-        self.children: Union[
-            list[discord.Button], list[discord.ui.Item]
-        ] = self._children
+        self.children: discord.Button | discord.ui.Item = self._children
 
     async def update_current_page(self) -> None:
         logger.debug(f"Current index is: {self.current_index}")

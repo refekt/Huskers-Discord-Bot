@@ -6,7 +6,6 @@ from typing import Union, Optional
 import discord
 import tweepy
 import tweepy.asynchronous
-
 from tweepy import Response
 
 from helpers.constants import (

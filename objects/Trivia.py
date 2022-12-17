@@ -4,7 +4,7 @@ import hashlib
 import logging
 import random
 from html import unescape
-from typing import ClassVar, Optional, Any, Union
+from typing import ClassVar, Optional, Any
 
 import discord
 import requests
@@ -329,7 +329,7 @@ class TriviaBot:
     def __init__(
         self,
         game_master: discord.Member,
-        channel: Union[discord.TextChannel, Any],
+        channel: discord.TextChannel | Any,
         category: TriviaCategories,
         difficulty: TriviaDifficulty,
         question_type: TriviaQuestionType,

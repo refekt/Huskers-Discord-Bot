@@ -6,7 +6,7 @@ import sys
 import tracemalloc
 from datetime import timedelta
 from os import listdir
-from typing import Union, Any, Awaitable, Optional
+from typing import Any, Awaitable, Optional
 
 import discord
 from discord import NotFound, Forbidden, HTTPException
@@ -80,8 +80,8 @@ class HuskerClient(Bot):
 
     async def check_reaction(self, payload: discord.RawReactionActionEvent) -> None:
         if not payload.guild_id == GUILD_PROD or payload.channel_id in (
-                CHAN_HOF,
-                CHAN_HOS,
+            CHAN_HOF,
+            CHAN_HOS,
         ):  # Stay out of HOF and HOS
             logger.debug(
                 "Reaction was either in HOF/HOS channel or not in the correct guild."
@@ -138,8 +138,8 @@ class HuskerClient(Bot):
         duplicate: bool = False
         for raw_message in raw_message_history:
             if (
-                    len(raw_message.embeds) > 0
-                    and str(reaction_message.id) in raw_message.embeds[0].footer.text
+                len(raw_message.embeds) > 0
+                and str(reaction_message.id) in raw_message.embeds[0].footer.text
             ):
                 logger.debug("Duplicate message found. Exiting")
                 duplicate = True
@@ -209,7 +209,7 @@ class HuskerClient(Bot):
             logger.exception("Error loading the changelog!", exc_info=True)
 
     async def send_welcome_message(
-            self, guild_member: Union[discord.Member, discord.User]
+        self, guild_member: discord.Member | discord.User
     ) -> None:
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
         embed = buildEmbed(
@@ -231,9 +231,7 @@ class HuskerClient(Bot):
         )
         await channel_general.send(embed=embed)
 
-    async def send_goodbye_message(
-            self, guild_member: Union[discord.Member, discord.User]
-    ):
+    async def send_goodbye_message(self, guild_member: discord.Member | discord.User):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
 
         embed = buildEmbed(
@@ -330,8 +328,8 @@ class HuskerClient(Bot):
             f"commands.{file[:len(file) - 3]}"
             for file in listdir(path)
             if ".py" in str(file)
-               and "testing" not in str(file)
-               and "example" not in str(file)
+            and "testing" not in str(file)
+            and "example" not in str(file)
         ]  # Get list of files that are not testing or example files and have .py extensions
 
         logger.info(f"Loading {len(files)} extensions")
@@ -392,7 +390,7 @@ class HuskerClient(Bot):
             async def convertDestination(raw_send_to: str) -> discord.TextChannel:
                 logger.debug("Attempting to fetch destination")
                 try:
-                    dest: Union[discord.TextChannel, None] = await self.fetch_channel(
+                    dest: discord.TextChannel | None = await self.fetch_channel(
                         int(raw_send_to)
                     )
                 except NotFound:
@@ -402,10 +400,10 @@ class HuskerClient(Bot):
                 logger.debug(f"destination is {dest.name.encode('utf-8')}")
                 return dest
 
-            async def convertSentTo(raw_send_to: str) -> Union[discord.User, None]:
+            async def convertSentTo(raw_send_to: str) -> discord.User | None:
                 logger.debug("Attempting to fetch remind_who")
                 try:
-                    send_to: Union[discord.User, None] = await self.fetch_user(
+                    send_to: discord.User | None = await self.fetch_user(
                         int(raw_send_to)
                     )
                     logger.debug(
@@ -500,7 +498,7 @@ class HuskerClient(Bot):
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
 
-            results: tuple[Union[BaseException, Any], ...] = await asyncio.gather(
+            results: tuple[BaseException | Any, ...] = await asyncio.gather(
                 *on_ready_tasks, return_exceptions=True
             )
 
@@ -524,7 +522,7 @@ class HuskerClient(Bot):
         await self.send_goodbye_message(guild_member)
 
     async def on_raw_reaction_add(
-            self, payload: discord.RawReactionActionEvent
+        self, payload: discord.RawReactionActionEvent
     ) -> None:
         logger.debug(f"Checking to see if reaction broke threshold")
         await self.check_reaction(payload)
@@ -533,8 +531,8 @@ class HuskerClient(Bot):
         await self.process_commands(message)
 
         if message.author.bot or message.channel.id not in (
-                CHAN_NORTH_BOTTOMS,
-                CHAN_BOT_SPAM_PRIVATE,
+            CHAN_NORTH_BOTTOMS,
+            CHAN_BOT_SPAM_PRIVATE,
         ):
             return
 

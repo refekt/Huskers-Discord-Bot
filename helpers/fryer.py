@@ -1,7 +1,7 @@
 import logging
 import math
 import os
-from typing import Any, Union
+from typing import Any
 
 import cv2
 import numpy
@@ -83,7 +83,7 @@ def find_chars(gray) -> list[tuple[Any, Any, Any, Any]]:
     return coords
 
 
-def find_eyes(gray) -> list[tuple[Union[float, Any], Union[float, Any]]]:
+def find_eyes(gray) -> list[tuple[float | Any, float | Any]]:
     logger.debug("Looking for eyes")
 
     coords = []
@@ -101,9 +101,7 @@ def find_eyes(gray) -> list[tuple[Union[float, Any], Union[float, Any]]]:
     return coords
 
 
-def add_flares(
-    image: ImgImg, coords: list[tuple[Union[float, Any], Union[float, Any]]]
-) -> ImgImg:
+def add_flares(image: ImgImg, coords: list[tuple[float | Any, float | Any]]) -> ImgImg:
     logger.debug(f"Adding flares at: {coords}")
 
     flare = Image.open(random_file(f"{deepfry_path}flares/")).convert("RGBA")

@@ -32,16 +32,16 @@ __all__: list[str] = [
 
 class MissedReminder:
     def __init__(
-            self,
-            duration: timedelta,
-            author: Union[discord.Member, str],
-            destination: discord.TextChannel,
-            message: str,
-            remind_who: Union[discord.Member, int, None] = None,
-            missed_reminder: bool = False,
+        self,
+        duration: timedelta,
+        author: discord.Member | str,
+        destination: discord.TextChannel,
+        message: str,
+        remind_who: Union[discord.Member, int, None] = None,
+        missed_reminder: bool = False,
     ) -> None:
         self.duration: timedelta = duration
-        self.author: Union[discord.Member, str] = author
+        self.author: discord.Member | str = author
         self.destination: discord.TextChannel = destination
         self.message: str = message
         self.remind_who: Union[discord.Member, int, None] = remind_who
@@ -75,11 +75,11 @@ class MissedReminder:
 
 
 async def send_reminder(
-        author: Union[discord.Member, str],
-        destination: discord.TextChannel,
-        message: str,
-        remind_who: Union[discord.Member, int, None] = None,
-        missed_reminder: bool = False,
+    author: discord.Member | str,
+    destination: discord.TextChannel,
+    message: str,
+    remind_who: Union[discord.Member, int, None] = None,
+    missed_reminder: bool = False,
 ) -> None:
     if missed_reminder:
         processMySQL(
@@ -118,12 +118,12 @@ class ReminderCog(commands.Cog, name="Reminder Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def remind_me(
-            self,
-            interaction: discord.Interaction,
-            destination: discord.TextChannel,
-            message: str,
-            duration: str,
-            remind_who: Optional[discord.Member] = None,
+        self,
+        interaction: discord.Interaction,
+        destination: discord.TextChannel,
+        message: str,
+        duration: str,
+        remind_who: Optional[discord.Member] = None,
     ) -> None:
         logger.info("Creating a reminder!")
         await interaction.response.defer(ephemeral=True)

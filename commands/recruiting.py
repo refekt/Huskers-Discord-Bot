@@ -165,7 +165,7 @@ class PredictionTeamModal(discord.ui.Modal, title="What school and confidence?"[
         logger.info("Prediction was recorded!")
 
     async def on_error(
-            self, interaction: discord.Interaction, error: Exception
+        self, interaction: discord.Interaction, error: Exception
     ) -> None:
         raise RecruitException(str(error))
 
@@ -181,14 +181,14 @@ class PredictionView(discord.ui.View):
 
     @discord.ui.button(label="🔮", disabled=True)
     async def crystal_ball(
-            self, interaction: discord.Interaction, button: discord.Button
+        self, interaction: discord.Interaction, button: discord.Button
     ) -> None:
         logger.info("Starting a crystal ball prediction")
 
         if (
-                self.recruit.committed.lower()
-                if self.recruit.committed is not None
-                else None
+            self.recruit.committed.lower()
+            if self.recruit.committed is not None
+            else None
         ) in [
             "signed",
             "enrolled",
@@ -209,7 +209,7 @@ class PredictionView(discord.ui.View):
 
     @discord.ui.button(label="📜", disabled=True)
     async def scroll(
-            self, interaction: discord.Interaction, button: discord.Button
+        self, interaction: discord.Interaction, button: discord.Button
     ) -> None:
         logger.info(f"Retrieving predictions for {self.recruit.name}...")
         await interaction.response.defer()
@@ -236,7 +236,7 @@ class PredictionView(discord.ui.View):
             if prediction_user is None:
                 prediction_user = prediction["user"]
 
-            prediction_datetime: Union[datetime, str] = prediction["prediction_date"]
+            prediction_datetime: datetime | str = prediction["prediction_date"]
             if isinstance(prediction_datetime, str):
                 prediction_datetime = datetime.strptime(
                     prediction["prediction_date"], DT_FAP_RECRUIT
@@ -265,9 +265,9 @@ class PredictionView(discord.ui.View):
 
 class UserPrediction:
     def __init__(
-            self,
-            school: Any,
-            confidence: Any,
+        self,
+        school: Any,
+        confidence: Any,
     ) -> None:
         self.school: discord.ui.TextInput = school
         self.confidence: discord.ui.Select = confidence
@@ -300,12 +300,12 @@ def reformat_weight(weight: str) -> str:
     return f"{int(weight)} lbs."
 
 
-def reformat_commitment_string(search_player: dict) -> Union[str, None]:
+def reformat_commitment_string(search_player: dict) -> str | None:
     if search_player["HighestRecruitInterestEventType"] == "HardCommit":
         return "Hard Commit"
     elif (
-            search_player["HighestRecruitInterestEventType"] == "OfficialVisit"
-            or search_player["HighestRecruitInterestEventType"] == "0"
+        search_player["HighestRecruitInterestEventType"] == "OfficialVisit"
+        or search_player["HighestRecruitInterestEventType"] == "0"
     ):
         return None
     else:
@@ -340,7 +340,7 @@ def get_team_id(search_player: dict) -> int:
     )
 
 
-def get_committed_school(all_team_ids: list[dict], team_id: int) -> Union[str, None]:
+def get_committed_school(all_team_ids: list[dict], team_id: int) -> str | None:
     try:
         if team_id > 0:
             for entry in all_team_ids:
@@ -554,7 +554,7 @@ def get_recruit_interests(search_player: dict) -> list[RecruitInterest]:
 
 
 def get_school_type(soup: BeautifulSoup) -> str:
-    institution_type: Union[ResultSet, str] = soup.find_all(
+    institution_type: ResultSet | str = soup.find_all(
         attrs={"data-js": "institution-selector"}
     )
 
@@ -572,7 +572,7 @@ def get_state_abbr(cur_player: dict) -> str:
         return cur_player["Hometown"]["State"]
 
 
-def get_thumbnail(cur_player: dict) -> Union[None, str]:
+def get_thumbnail(cur_player: dict) -> None | str:
     if cur_player["DefaultAssetUrl"] == "/.":
         return None
     else:
@@ -580,7 +580,7 @@ def get_thumbnail(cur_player: dict) -> Union[None, str]:
 
 
 def get_twitter_handle(soup: BeautifulSoup) -> str:
-    twitter: Union[ResultSet, str] = soup.find_all(attrs={"class": "tweets-comp"})
+    twitter: ResultSet | str = soup.find_all(attrs={"class": "tweets-comp"})
     try:
         twitter = twitter[0].attrs["data-username"]
         twitter = re.sub(r"[^\w*]+", "", twitter)
@@ -805,7 +805,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         search_name="Name of the recruit",
     )
     async def croot_bot(
-            self, interaction: discord.Interaction, year: int, search_name: str
+        self, interaction: discord.Interaction, year: int, search_name: str
     ) -> None:
         logger.info(f"Searching for {year} {search_name.capitalize()}")
         await interaction.response.defer()
@@ -854,7 +854,7 @@ class RecruitingCog(commands.Cog, name="Recruiting Commands"):
         search_name="Name of the recruit",
     )
     async def predict_submit(  # predict, stats, leaderboard, user
-            self, interaction: discord.Interaction, year: int, search_name: str
+        self, interaction: discord.Interaction, year: int, search_name: str
     ) -> None:
         logger.info(f"Starting a prediction for [{year}] [{search_name}]")
 

@@ -72,7 +72,7 @@ def retrieve_img(image_name: str) -> Union[dict, list[dict, ...], None]:
         raise ImageException(f"Unable to locate an image command named [{image_name}].")
 
 
-def create_img(author: int, image_name: str, image_url: str) -> Union[bool, Any]:
+def create_img(author: int, image_name: str, image_url: str) -> bool | Any:
     assert validators.url(image_url), ImageException(
         "Invalid image URL format. The URL must begin with 'http' or 'https'."
     )
@@ -213,19 +213,19 @@ class ImageCog(commands.Cog, name="Image Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def deep_fry(
-            self,
-            interaction: discord.Interaction,
-            # source: DeepFryOptions,
-            url: str = None,
-            discord_member: discord.Member = None,
-            upload: discord.Attachment = None,
+        self,
+        interaction: discord.Interaction,
+        # source: DeepFryOptions,
+        url: str = None,
+        discord_member: discord.Member = None,
+        upload: discord.Attachment = None,
     ) -> None:
         logger.info("Attempting to create a deep fried image!")
 
         await interaction.response.defer(thinking=True)
 
         assert (
-                sum(var is not None for var in (url, discord_member, upload)) == 1
+            sum(var is not None for var in (url, discord_member, upload)) == 1
         ), ImageException(
             "You can only pick one source type (URL, Discord Member, or Upload)!"
         )
@@ -304,7 +304,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
     @app_commands.describe(person="Person you want to inspire")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def inspireme(
-            self, interaction: discord.Interaction, person: Optional[discord.Member] = None
+        self, interaction: discord.Interaction, person: Optional[discord.Member] = None
     ) -> None:
         image: requests.Response = requests.get(
             "https://inspirobot.me/api?generate=true"
@@ -325,7 +325,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
     @app_commands.describe(person="Person you want to inspire")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def slowking(
-            self, interaction: discord.Interaction, person: discord.Member
+        self, interaction: discord.Interaction, person: discord.Member
     ) -> None:
         await interaction.response.defer()
 
@@ -368,7 +368,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
         image_name="A keyword for the new image", image_url="A valid URL for the image"
     )
     async def img_create(
-            self, interaction: discord.Interaction, image_name: str, image_url: str
+        self, interaction: discord.Interaction, image_name: str, image_url: str
     ) -> None:
         logger.info(f"Attempting to create new server image '{image_name}'")
         await interaction.response.defer(ephemeral=True)
@@ -410,7 +410,7 @@ class ImageCog(commands.Cog, name="Image Commands"):
     @group_img.command(name="delete", description="Delete a server image")
     @app_commands.describe(image_name="A keyword for the new image")
     async def img_delete(
-            self, interaction: discord.Interaction, image_name: str
+        self, interaction: discord.Interaction, image_name: str
     ) -> None:
         logger.info(f"Attempting to delete '{image_name}'!")
         await interaction.response.defer(ephemeral=True)
@@ -497,8 +497,8 @@ class ImageCog(commands.Cog, name="Image Commands"):
     @app_commands.command(
         name="ai-image",
         description="Use craiyon services to generate an AI generated image. This may take up to 3 minutes to process."[
-                    :100
-                    ],
+            :100
+        ],
     )
     @app_commands.describe(prompt="The prompt you want to generate.")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))

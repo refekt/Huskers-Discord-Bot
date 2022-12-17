@@ -2,7 +2,7 @@ import asyncio
 import logging
 import threading
 import time
-from typing import Optional, Union, Callable
+from typing import Optional, Callable
 
 import discord
 import tweepy
@@ -31,7 +31,7 @@ class TwitterListMember:
         self, client: tweepy.asynchronous.AsyncClient, twitter_user: tweepy.User
     ) -> None:
         self._client: tweepy.asynchronous.AsyncClient = client
-        self.user_id: Optional[Union[int, str]] = twitter_user.id
+        self.user_id: Optional[int | str] = twitter_user.id
         self.name: Optional[str] = twitter_user.name
         self.username: Optional[str] = twitter_user.username
         self.orig_followers: Optional[list[tweepy.User]] = None

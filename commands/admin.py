@@ -438,8 +438,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 return True
 
         for cmd in app_cmds.items():
-            cmd_name: Union[Group, Command] = cmd[0]
-            cmd_command: Union[Group, Command] = cmd[1]
+            cmd_name: Group | Command = cmd[0]
+            cmd_command: Group | Command = cmd[1]
             if str(cmd_name).lower() == "smms":
                 continue
 
@@ -685,7 +685,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def iowa(
         self,
         interaction: discord.Interaction,
-        who: Union[discord.Member, discord.User],
+        who: discord.Member | discord.User,
         reason: str,
         duration: IowaDuration = None,
     ) -> None:
@@ -775,7 +775,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     async def nebraska(
         self,
         interaction: discord.Interaction,
-        who: Union[discord.Member, discord.User],
+        who: discord.Member | discord.User,
     ) -> None:
 
         await self.proess_nebraska(interaction=interaction, who=who)
@@ -899,7 +899,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             f"{pathlib.Path(__file__).parent.parent.resolve()}/logs/log.log"
         )
         remote_folder: Generator = pathlib.Path(remote_path.parent).glob("**/*")
-        remote_files: list[Union[pathlib.WindowsPath, pathlib.PosixPath]] = [
+        remote_files: list[pathlib.WindowsPath | pathlib.PosixPath] = [
             item for item in remote_folder if item.is_file()
         ]
 

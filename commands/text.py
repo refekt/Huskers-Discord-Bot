@@ -249,7 +249,7 @@ class TextCog(commands.Cog, name="Text Commands"):
             )
         else:
             if not combined_sources:
-                source_name: Union[discord.Member, discord.Text] = (
+                source_name: discord.Member | discord.Text = (
                     interaction.channel.name.replace("-", " ").title().replace(" ", "-")
                 )
             else:

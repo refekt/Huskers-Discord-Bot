@@ -2,7 +2,7 @@ import datetime
 import logging
 import re
 import statistics
-from typing import ClassVar, Union, Optional
+from typing import ClassVar, Optional
 
 import discord
 
@@ -162,14 +162,14 @@ class Wordle:
         return self.green_squares + self.yellow_squares + self.black_squares
 
     @property
-    def score(self) -> Union[float, str]:
+    def score(self) -> float | str:
         search = re.search(self.__REGEX_SCORE, self.message)
         try:
-            pos: tuple[Union[int, str], int] = search.regs[0]
+            pos: tuple[int | str, int] = search.regs[0]
         except IndexError:
             return "N/A"
 
-        score: Union[int, str] = self.message[pos[0] : pos[0] + 1]
+        score: int | str = self.message[pos[0] : pos[0] + 1]
 
         if score.isnumeric():
             assert 1 <= int(score) <= 6, WordleException(self.__err_mg)
@@ -201,7 +201,7 @@ class WordleFinder:
         self.wordle_finder: ClassVar[str] = r"Wordle\s\d{3,4}\s(\d{1}|X)\/\d{1}"
 
     def get_wordle_message(
-        self, message: Union[discord.Message, str], backup_finder: bool = False
+        self, message: discord.Message | str, backup_finder: bool = False
     ) -> Optional[Wordle]:
         if isinstance(message, str):
             msg: str = message.strip()

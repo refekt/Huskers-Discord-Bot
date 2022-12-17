@@ -47,7 +47,7 @@ __all__: list[str] = [
 ]
 
 
-def buildEmbed(title: Optional[str], **kwargs) -> Union[discord.Embed, None]:
+def buildEmbed(title: Optional[str], **kwargs) -> discord.Embed | None:
     module, method = getModuleMethod(inspect.stack())
     logger.debug(f"Creating a normal embed from [{module}-{method}]")
 
