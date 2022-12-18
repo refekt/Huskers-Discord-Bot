@@ -644,6 +644,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                     f"Games played: {item['games_played']}, "
                     # f"`"
                     f"Average score: {item['score_avg']:0.1f}"
+                    f"\n\n"
                     # f"🟩 {item['green_avg']:0.1f} "
                     # f"🟨 {item['yellow_avg']:0.1f} "
                     # f"⬛ {item['black_avg']:0.1f}"
