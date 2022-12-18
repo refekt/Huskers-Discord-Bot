@@ -640,13 +640,14 @@ class TextCog(commands.Cog, name="Text Commands"):
 
                 leaderboard_str += (
                     f"#{index + 1}: "
-                    f"{author.mention if author else item['author']}\n ({item['games_played']} games)"
-                    f"`"
-                    f"{item['score_avg']:0.1f}: "
-                    f"🟩 {item['green_avg']:0.1f} "
-                    f"🟨 {item['yellow_avg']:0.1f} "
-                    f"⬛ {item['black_avg']:0.1f}"
-                    f"`\n\n"
+                    f"{author.mention if author else item['author']}\n"
+                    f"Games played: {item['games_played']}, "
+                    # f"`"
+                    f"Average score: {item['score_avg']:0.1f}"
+                    # f"🟩 {item['green_avg']:0.1f} "
+                    # f"🟨 {item['yellow_avg']:0.1f} "
+                    # f"⬛ {item['black_avg']:0.1f}"
+                    # f"`\n\n"
                 )
 
             embed: discord.Embed = buildEmbed(
