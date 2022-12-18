@@ -31,11 +31,12 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
-    processMySQL,
-    sqlGetWordleScores,
-    sqlGetUserWordleScores,
     SqlFetch,
+    processMySQL,
+    sqlGetUserWordleScores,
+    sqlGetWordleGamesPlayed,
     sqlGetWordleIndividualUserScore,
+    sqlGetWordleScores,
 )
 from objects.Exceptions import (
     CommandException,
@@ -118,10 +119,10 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def markov(
-        self,
-        interaction: discord.Interaction,
-        source_channel: discord.TextChannel = None,
-        source_member: discord.Member = None,
+            self,
+            interaction: discord.Interaction,
+            source_channel: discord.TextChannel = None,
+            source_member: discord.Member = None,
     ) -> None:
         logger.info("Attempting to create a markov chain")
 
@@ -148,9 +149,9 @@ class TextCog(commands.Cog, name="Text Commands"):
 
         def check_message(message: discord.Message) -> str:
             if (
-                message.channel.id in CHAN_BANNED
-                or message.author.bot
-                or message.content == ""
+                    message.channel.id in CHAN_BANNED
+                    or message.author.bot
+                    or message.content == ""
             ):
                 return ""
 
@@ -287,7 +288,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def police(
-        self, interaction: discord.Interaction, arrestee: discord.Member
+            self, interaction: discord.Interaction, arrestee: discord.Member
     ) -> None:
         embed: discord.Embed = buildEmbed(
             title="Wee woo, wee woo!",
@@ -295,19 +296,19 @@ class TextCog(commands.Cog, name="Text Commands"):
                 dict(
                     name="Halt!",
                     value=f"**"
-                    f"🚨 NANI 🚨\n"
-                    f"..🚨 THE 🚨\n"
-                    f"...🚨 FUCK 🚨\n"
-                    f"....🚨 DID 🚨\n"
-                    f".....🚨 YOU 🚨\n"
-                    f"....🚨 JUST 🚨\n"
-                    f"...🚨 SAY 🚨\n"
-                    f"..🚨 {arrestee.mention} 🚨\n"
-                    f"🚨🚨🚨🚨🚨🚨🚨🚨\n"
-                    f"\n"
-                    f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
-                    f"🙅‍♀️Thanks for your cooperation. 😍🤩😘"
-                    f"**",
+                          f"🚨 NANI 🚨\n"
+                          f"..🚨 THE 🚨\n"
+                          f"...🚨 FUCK 🚨\n"
+                          f"....🚨 DID 🚨\n"
+                          f".....🚨 YOU 🚨\n"
+                          f"....🚨 JUST 🚨\n"
+                          f"...🚨 SAY 🚨\n"
+                          f"..🚨 {arrestee.mention} 🚨\n"
+                          f"🚨🚨🚨🚨🚨🚨🚨🚨\n"
+                          f"\n"
+                          f"👮‍📢 Information ℹ provided in the VIP 👑 Room 🏆 is intended for Husker247 🌽🎈 members only ‼🔫. Please do not copy ✏ and paste 🖨 or summarize this content elsewhere‼ Please try to keep all replies in this thread 🧵 for Husker247 members only! 🚫 ⛔ 👎 "
+                          f"🙅‍♀️Thanks for your cooperation. 😍🤩😘"
+                          f"**",
                 )
             ],
         )
@@ -351,7 +352,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def urban_dictionary(
-        self, interaction: discord.Interaction, word: str
+            self, interaction: discord.Interaction, word: str
     ) -> None:
         await interaction.response.defer()
 
@@ -430,11 +431,11 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def survey(
-        self,
-        interaction: discord.Interaction,
-        question: str,
-        options: str,
-        timeout: int = GLOBAL_TIMEOUT,
+            self,
+            interaction: discord.Interaction,
+            question: str,
+            options: str,
+            timeout: int = GLOBAL_TIMEOUT,
     ) -> None:
         survey: Survey = Survey(
             client=interaction.client,
@@ -456,11 +457,11 @@ class TextCog(commands.Cog, name="Text Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def weather(
-        self,
-        interaction: discord.Interaction,
-        city: str,
-        state: str,
-        country: str = "US",
+            self,
+            interaction: discord.Interaction,
+            city: str,
+            state: str,
+            country: str = "US",
     ) -> None:
         await interaction.response.defer()
 
@@ -473,7 +474,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                         search_state["State"].lower() == state.lower()
                         or search_state["Abbrev"][:-1].lower() == state.lower()
                         or search_state["Code"].lower() == state.lower()
-                    )
+                )
                 ),
                 None,
             )
@@ -641,10 +642,10 @@ class TextCog(commands.Cog, name="Text Commands"):
                 leaderboard_str += (
                     f"#{index + 1}: "
                     f"{author.mention if author else item['author']}\n"
-                    f"Games played: {item['games_played']}, "
+                    f"Games: {item['games_played']}, "
                     # f"`"
-                    f"Average score: {item['score_avg']:0.1f}"
-                    f"\n\n"
+                    f"Average: {item['score_avg']:0.3f}"
+                    f"\n"
                     # f"🟩 {item['green_avg']:0.1f} "
                     # f"🟨 {item['yellow_avg']:0.1f} "
                     # f"⬛ {item['black_avg']:0.1f}"
@@ -659,10 +660,40 @@ class TextCog(commands.Cog, name="Text Commands"):
 
             await interaction.followup.send(embed=embed)
 
+    @group_wordle.command(
+        name="games-played", description="Wordle games played"
+    )
+    async def wordle_games_played(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+
+        wordle_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(
+            query=sqlGetWordleGamesPlayed, fetch="all"
+        )
+
+        if wordle_leaderboard:
+            leaderboard_str: str = ""
+
+            for index, item in enumerate(wordle_leaderboard):
+                author: discord.Member = interaction.client.guilds[0].get_member_named(
+                    item["author"]
+                )
+
+                leaderboard_str += (
+                    f"#{index + 1} - {item['games_played']}: {author.mention if author else item['author']}\n"
+                )
+
+            embed: discord.Embed = buildEmbed(
+                title="",
+                description="Total number of Wordle games submitted",
+                fields=[dict(name="Wordle Leaderboard", value=leaderboard_str)],
+            )
+
+            await interaction.followup.send(embed=embed)
+
     @group_wordle.command(name="player-stats", description="Wordle stats for a player")
     @app_commands.describe(player="Player in which to get stats")
     async def wordle_player_stats(
-        self, interaction: discord.Interaction, player: discord.Member
+            self, interaction: discord.Interaction, player: discord.Member
     ):
         await interaction.response.defer()
 
@@ -684,16 +715,16 @@ class TextCog(commands.Cog, name="Text Commands"):
         total_games: int = len(user_score)
 
         average_score: float = (
-            sum([float(user["score"]) for user in user_score]) / total_games  # noqa
+                sum([float(user["score"]) for user in user_score]) / total_games  # noqa
         )
         average_green: float = (
-            sum([user["green_squares"] for user in user_score]) / total_games  # noqa
+                sum([user["green_squares"] for user in user_score]) / total_games  # noqa
         )
         average_yellow: float = (
-            sum([user["yellow_squares"] for user in user_score]) / total_games  # noqa
+                sum([user["yellow_squares"] for user in user_score]) / total_games  # noqa
         )
         average_black: float = (
-            sum([user["black_squares"] for user in user_score]) / total_games  # noqa
+                sum([user["black_squares"] for user in user_score]) / total_games  # noqa
         )
 
         author_rank: Optional[int] = None
@@ -772,7 +803,7 @@ class TextCog(commands.Cog, name="Text Commands"):
         output_message_list: Optional[list[str]] = None
         if len(output_message) > FIELD_VALUE_LIMIT:
             output_message_list = [
-                output_message[i : i + FIELD_VALUE_LIMIT]
+                output_message[i: i + FIELD_VALUE_LIMIT]
                 for i in range(0, len(output_message), FIELD_VALUE_LIMIT)
             ]
 
