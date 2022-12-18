@@ -640,18 +640,18 @@ class TextCog(commands.Cog, name="Text Commands"):
 
                 leaderboard_str += (
                     f"#{index + 1}: "
-                    f"{author.mention if author else item['author']}\n"
+                    f"{author.mention if author else item['author']}\n ({item['games_played']} games)"
                     f"`"
-                    f"{item['score_avg']:0.1f}/6 "
+                    f"{item['score_avg']:0.1f}: "
                     f"🟩 {item['green_avg']:0.1f} "
                     f"🟨 {item['yellow_avg']:0.1f} "
                     f"⬛ {item['black_avg']:0.1f}"
-                    f"`\n"
+                    f"`\n\n"
                 )
 
             embed: discord.Embed = buildEmbed(
                 title="",
-                description="Minimum of 10 games",
+                description="Minimum of 30 games",
                 fields=[dict(name="Wordle Leaderboard", value=leaderboard_str)],
             )
 
