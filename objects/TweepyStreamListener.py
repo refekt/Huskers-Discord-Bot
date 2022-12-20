@@ -148,7 +148,8 @@ async def send_tweet_alert(
 
     if admin_channel is not None:
         await admin_channel.send(
-            content=f"The Twitter Stream has been disconnected. An Admin or Mod needs to `/restart twitter` to continue receiving tweets."
+            # content=f"The Twitter Stream has been disconnected. An Admin or Mod needs to `/restart twitter` to continue receiving tweets."
+            content=message
         )
 
     tweepy_client_logger.info(f"Twitter alert sent!")
