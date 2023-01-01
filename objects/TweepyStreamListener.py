@@ -345,14 +345,6 @@ class StreamClientV2(tweepy.StreamingClient):
     def on_disconnect(self) -> None:
         tweepy_client_logger.exception("Twitter stream disconnected", exc_info=True)
 
-        self.client.loop.create_task(
-            coro=send_tweet_alert(
-                client=self.client,
-                message="The Twitter stream has been disconnected! Attempting to restart...",
-                alert_admins=True,
-            ),
-        )
-
         from helpers.twitter import start_twitter_stream
 
         asyncio.run(start_twitter_stream(self.client))
