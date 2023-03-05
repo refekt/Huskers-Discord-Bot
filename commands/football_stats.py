@@ -255,7 +255,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         if len(pages) == 0:
             await interaction.edit_original_response(
-                content=f"Unable to load the {year} schedule. The API has more than likely not been udpated."
+                content=f"Unable to load the {year} schedule. The API has more than likely not been updated."
             )
             return
 
