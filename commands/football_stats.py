@@ -28,7 +28,7 @@ from helpers.misc import checkYearValid
 from objects.Bets_Stats_Schedule import (
     BigTenTeams,
     FootballTeam,
-    HuskerSched2022,
+    HuskerSched2023,
     buildTeam,
     getConsensusLineByOpponent,
     getHuskerOpponent,
@@ -65,14 +65,14 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def countdown(
         self,
         interaction: discord.Interaction,
-        opponent_name: HuskerSched2022,
+        opponent_name: HuskerSched2023,
     ) -> None:
         logger.info(f"Starting countdown")
         await interaction.response.defer()
 
         if (
-            opponent_name == HuskerSched2022.Ignore_1
-            or opponent_name == HuskerSched2022.Ignore_2
+            opponent_name == HuskerSched2023.Ignore_1
+            or opponent_name == HuskerSched2023.Ignore_2
         ):
             return
 
@@ -140,15 +140,15 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def lines(
         self,
         interaction: discord.Interaction,
-        opponent_name: HuskerSched2022,
+        opponent_name: HuskerSched2023,
     ) -> None:
         logger.info(f"Gathering info for lines")
 
         await interaction.response.defer()
 
         if (
-            opponent_name == HuskerSched2022.Ignore_1
-            or opponent_name == HuskerSched2022.Ignore_2
+            opponent_name == HuskerSched2023.Ignore_1
+            or opponent_name == HuskerSched2023.Ignore_2
         ):
             return
 

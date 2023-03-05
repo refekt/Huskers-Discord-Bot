@@ -46,7 +46,7 @@ __all__: list[str] = [
     "BettingHuskerSchedule",
     "BigTenTeams",
     "FootballTeam",
-    "HuskerSched2022",
+    "HuskerSched2023",
     "HuskerSchedule",
     "WhichOverUnderChoice",
     "WhichTeamChoice",
@@ -58,6 +58,20 @@ __all__: list[str] = [
     "retrieveGameBets",
 ]
 
+current_schedule: list[dict[str, date]] = [
+    {"team": "Minnesota", "date": date(year=2023, month=8, day=31)},
+    {"team": "Colorado", "date": date(year=2023, month=9, day=9)},
+    {"team": "Northern Illinois", "date": date(year=2023, month=9, day=16)},
+    {"team": "Louisiana Tech", "date": date(year=2023, month=9, day=23)},
+    {"team": "Michigan", "date": date(year=2023, month=9, day=30)},
+    {"team": "Illinois", "date": date(year=2023, month=10, day=7)},
+    {"team": "Northwestern", "date": date(year=2023, month=10, day=21)},
+    {"team": "Purdue", "date": date(year=2023, month=10, day=28)},
+    {"team": "Michigan State", "date": date(year=2023, month=11, day=4)},
+    {"team": "Maryland", "date": date(year=2023, month=11, day=11)},
+    {"team": "Wisconsin", "date": date(year=2023, month=11, day=18)},
+    {"team": "Iowa", "date": date(year=2023, month=11, day=24)},
+]
 
 class SeasonStats:
     losses = None
@@ -70,7 +84,7 @@ class SeasonStats:
 
 class HuskerOpponent:
     def __init__(
-        self, name, ranking, icon, date_time, week, location, outcome=None
+            self, name, ranking, icon, date_time, week, location, outcome=None
     ) -> None:
         self.date_time = date_time
         self.icon: str = icon
@@ -83,16 +97,16 @@ class HuskerOpponent:
 
 class HuskerDotComSchedule:
     def __init__(
-        self,
-        conference,
-        game_date_time,
-        home,
-        icon,
-        location,
-        opponent_name,
-        outcome,
-        ranking,
-        week,
+            self,
+            conference,
+            game_date_time,
+            home,
+            icon,
+            location,
+            opponent_name,
+            outcome,
+            ranking,
+            week,
     ):
         self.conference = conference
         self.game_date_time = game_date_time
@@ -122,107 +136,26 @@ class BigTenTeams(str, enum.Enum):
     Wisconsin = "Wisconsin"
 
 
-class HuskerSched2022(str, enum.Enum):
-    enum_items: int = 0
+class HuskerSched2023:
+    def __init__(self):
+        enum_items: int = 0
 
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=8, day=27):
-        Northwestern = "Northwestern"
-        enum_items += 1
+        for team in current_schedule:
+            if datetime.now(tz=TZ).date() <= team.get("date", None):
+                setattr(self, team.get("team"), team.get("date"))
+                enum_items += 1
 
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=3):
-        North_Dakota = "North Dakota"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=10):
-        Georgia_Southern = "Georgia Southern"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=9, day=17):
-        Oklahoma = "Oklahoma"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=1):
-        Indiana = "Indiana"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=7):
-        Rutgers = "Rutgers"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=15):
-        Purdue = "Purdue"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=10, day=29):
-        Illinois = "Illinois"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=5):
-        Minnesota = "Minnesota"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=12):
-        Michigan = "Michigan"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=19):
-        Wisconsin = "Wisconsin"
-        enum_items += 1
-
-    if datetime.now(tz=TZ).date() <= date(year=2022, month=11, day=25):
-        Iowa = "Iowa"
-        enum_items += 1
-
-    if enum_items == 0:
-        Ignore_1 = "Python Requirement 1"
-        Ignore_2 = "Python Requirement 2"
-    elif enum_items == 1:
-        Ignore_1 = "Python Requirement 1"
-
-    def __str__(self) -> str:
-        _game_dates: tuple[date, ...] = (
-            date(year=2022, month=8, day=27),  # Northwestern
-            date(year=2022, month=9, day=3),  # North Dakota
-            date(year=2022, month=9, day=10),  # Georgia Southern
-            date(year=2022, month=9, day=17),  # Oklahoma
-            date(year=2022, month=10, day=1),  # Indiana
-            date(year=2022, month=10, day=7),  # Rutgers
-            date(year=2022, month=10, day=15),  # Purdue
-            date(year=2022, month=10, day=29),  # Illinois
-            date(year=2022, month=11, day=5),  # Minnesota
-            date(year=2022, month=11, day=12),  # Michigan
-            date(year=2022, month=11, day=19),  # Wisconsin
-            date(year=2022, month=11, day=25),  # Iowa
-            date(year=2099, month=12, day=31),  # Python Stuff
-        )
-
-        teams: list[str] = [
-            entry.value  # noqa
-            for entry in HuskerSched2022
-            if isinstance(entry.value, str)  # noqa
-        ]
-        teams_offset: int = len(_game_dates) - len(teams)
-        _game_dates = _game_dates[teams_offset:]
-        game_index: int = teams.index(str(self.value))
-        game_date: str = f"{_game_dates[game_index]}"
-
-        return f"{str(self.value)}__{game_date}"
+        if enum_items == 0:
+            Ignore_1 = "Python Requirement 1"
+            Ignore_2 = "Python Requirement 2"
+        elif enum_items == 1:
+            Ignore_1 = "Python Requirement 1"
 
 
 class BettingHuskerSchedule(str, enum.Enum):
-    Northwestern = "Northwestern"
-    North_Dakota = "North Dakota"
-    Georgia_Southern = "Georgia Southern"
-    Oklahoma = "Oklahoma"
-    Indiana = "Indiana"
-    Rutgers = "Rutgers"
-    Purdue = "Purdue"
-    Illinois = "Illinois"
-    Minnesota = "Minnesota"
-    Michigan = "Michigan"
-    Wisconsin = "Wisconsin"
-    Iowa = "Iowa"
-
+    def __init__(self):
+        for game in current_schedule:
+            setattr(self, game["team"], game["team"])
 
 class WhichTeamChoice(str, enum.Enum):
     Nebraska = "Nebraska"
@@ -340,12 +273,12 @@ class Bet:
     ]
 
     def __init__(
-        self,
-        author: discord.Member | discord.User,
-        opponent_name: BigTenTeams | HuskerSched2022,
-        predict_game: Optional[WhichTeamChoice],
-        predict_points: Optional[WhichOverUnderChoice],
-        predict_spread: Optional[WhichTeamChoice],
+            self,
+            author: discord.Member | discord.User,
+            opponent_name: BigTenTeams | HuskerSched2022,
+            predict_game: Optional[WhichTeamChoice],
+            predict_points: Optional[WhichOverUnderChoice],
+            predict_spread: Optional[WhichTeamChoice],
     ) -> None:
         logger.debug("Creating a Bet object")
 
@@ -358,7 +291,7 @@ class Bet:
             self._raw.start_date, DT_CFBD_GAMES
         ).astimezone(tz=TZ)
         self.game_datetime_passed: bool = (
-            datetime.now(tz=TZ) >= self.game_datetime or False
+                datetime.now(tz=TZ) >= self.game_datetime or False
         )
         self.home_game: bool = (
             True if self._raw.home_team == BigTenTeams.Nebraska else False
@@ -392,9 +325,9 @@ class Bet:
 
         if previous_bet:
             if (
-                previous_bet["predict_game"] == self.predict_game
-                and previous_bet["predict_points"] == self.predict_points
-                and previous_bet["predict_spread"] == self.predict_spread
+                    previous_bet["predict_game"] == self.predict_game
+                    and previous_bet["predict_points"] == self.predict_points
+                    and previous_bet["predict_spread"] == self.predict_spread
             ):
                 logger.debug("Previous bet matches current bet")
                 return
@@ -440,7 +373,7 @@ class Bet:
 
 
 def retrieveGameBets(
-    school_name: str, author_str: str = None, _all: bool = False
+        school_name: str, author_str: str = None, _all: bool = False
 ) -> Union[list[dict], dict, None]:
     logger.info(
         f"Looking to see if a bet already exists for {author_str} and {school_name}"
@@ -477,13 +410,13 @@ def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> G
         game
         for game in cfbd_api.get_games(year=year, team=nebraska)
         if (
-            game.home_team.lower() == nebraska.lower()
-            and game.away_team.lower() == opponent_name.lower()
-        )
-        or (
-            game.home_team.lower() == opponent_name.lower()
-            and game.away_team.lower() == nebraska.lower()
-        )
+                   game.home_team.lower() == nebraska.lower()
+                   and game.away_team.lower() == opponent_name.lower()
+           )
+           or (
+                   game.home_team.lower() == opponent_name.lower()
+                   and game.away_team.lower() == nebraska.lower()
+           )
     ]
     logger.debug(
         f"Found game {game[0].id} with {game[0].away_team} and {game[0].home_team}"
@@ -543,9 +476,9 @@ def buildTeam(id_str: str) -> FootballTeam:
 
 
 def getConsensusLineByOpponent(
-    away_team: str,
-    home_team: str,
-    year: int = datetime.now().year,
+        away_team: str,
+        home_team: str,
+        year: int = datetime.now().year,
 ) -> Optional[BetLines]:
     logger.info(
         f"Getting the consensus line for {year} {away_team} and {home_team} game"
@@ -609,8 +542,8 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
                 pass
         else:
             icon = (
-                "https://huskers.com"
-                + game.contents[1].contents[1].contents[1].attrs["data-src"]
+                    "https://huskers.com"
+                    + game.contents[1].contents[1].contents[1].attrs["data-src"]
             )
 
         _date = (
@@ -639,9 +572,9 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
 
                 if game.contents[5].contents[1].contents[1].text.strip():
                     outcome = (
-                        game.contents[5].contents[1].contents[1].text.strip()
-                        + " "
-                        + outcome
+                            game.contents[5].contents[1].contents[1].text.strip()
+                            + " "
+                            + outcome
                     )
             except IndexError:
                 outcome = ""
@@ -669,7 +602,7 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
 
 
 def HuskerSchedule(
-    year=datetime.now().year,
+        year=datetime.now().year,
 ) -> tuple[list[HuskerDotComSchedule], SeasonStats]:
     logger.info(f"Creating Husker schedule for '{year}'")
 
@@ -793,11 +726,11 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
                     exc_info=True,
                 )
         elif (
-            game.away_team.lower() == BigTenTeams.Nebraska.lower()
-            or game.home_team.lower() == BigTenTeams.Nebraska.lower()
+                game.away_team.lower() == BigTenTeams.Nebraska.lower()
+                or game.home_team.lower() == BigTenTeams.Nebraska.lower()
         ) and (
-            game.away_team.lower() == team.lower()
-            or game.home_team.lower() == team.lower()
+                game.away_team.lower() == team.lower()
+                or game.home_team.lower() == team.lower()
         ):
             return game.week
 
