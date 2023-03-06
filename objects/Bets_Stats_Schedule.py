@@ -275,7 +275,7 @@ class Bet:
     def __init__(
             self,
             author: discord.Member | discord.User,
-            opponent_name: BigTenTeams | HuskerSched2022,
+            opponent_name: BigTenTeams | huskersched2023,
             predict_game: Optional[WhichTeamChoice],
             predict_points: Optional[WhichOverUnderChoice],
             predict_spread: Optional[WhichTeamChoice],

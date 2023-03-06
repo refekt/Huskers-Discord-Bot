@@ -18,7 +18,7 @@ from helpers.mysql import processMySQL, sqlGetBetsLeaderboard, sqlResolveGame
 from objects.Bets_Stats_Schedule import (
     Bet,
     BigTenTeams,
-    HuskerSched2022,
+    huskersched2023,
     WhichOverUnderChoice,
     WhichTeamChoice,
     retrieveGameBets,
@@ -50,14 +50,14 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     async def bet_create(
             self,
             interaction: discord.Interaction,
-            opponent: HuskerSched2022,
+            opponent: huskersched2023,
             game_winner: WhichTeamChoice,
             predict_points: WhichOverUnderChoice,
             predict_spread: WhichTeamChoice,
     ) -> None:
         await interaction.response.defer()
 
-        if opponent == HuskerSched2022.Ignore:
+        if opponent == huskersched2023.Ignore:
             return
 
         dt_str: str = f"{str(opponent).split('__')[1]}"
@@ -262,14 +262,14 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     async def bet_resolve(
             self,
             interaction: discord.Interaction,
-            opponent_name: HuskerSched2022,
+            opponent_name: huskersched2023,
             game_winner: WhichTeamChoice,
             result_points: WhichOverUnderChoice,
             result_spread: WhichTeamChoice,
     ):
         await interaction.response.defer(ephemeral=True)
 
-        if opponent_name == HuskerSched2022.Ignore:
+        if opponent_name == huskersched2023.Ignore:
             return
 
         processMySQL(
