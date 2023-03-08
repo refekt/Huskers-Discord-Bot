@@ -58,20 +58,6 @@ __all__: list[str] = [
     "retrieveGameBets",
 ]
 
-current_schedule: list[dict[str, date]] = [
-    {"team": "Minnesota", "date": date(year=2023, month=8, day=31)},
-    {"team": "Colorado", "date": date(year=2023, month=9, day=9)},
-    {"team": "Northern Illinois", "date": date(year=2023, month=9, day=16)},
-    {"team": "Louisiana Tech", "date": date(year=2023, month=9, day=23)},
-    {"team": "Michigan", "date": date(year=2023, month=9, day=30)},
-    {"team": "Illinois", "date": date(year=2023, month=10, day=7)},
-    {"team": "Northwestern", "date": date(year=2023, month=10, day=21)},
-    {"team": "Purdue", "date": date(year=2023, month=10, day=28)},
-    {"team": "Michigan State", "date": date(year=2023, month=11, day=4)},
-    {"team": "Maryland", "date": date(year=2023, month=11, day=11)},
-    {"team": "Wisconsin", "date": date(year=2023, month=11, day=18)},
-    {"team": "Iowa", "date": date(year=2023, month=11, day=24)},
-]
 
 class SeasonStats:
     losses = None
@@ -136,26 +122,60 @@ class BigTenTeams(str, enum.Enum):
     Wisconsin = "Wisconsin"
 
 
-class HuskerSched2023:
-    def __init__(self):
-        enum_items: int = 0
+class HuskerSched2023(enum.StrEnum):
+    Minnesota = "Minnesota"
+    Colorado = "Colorado"
+    Northern_Illinois = "Northern Illinois"
+    Louisiana_Tech = "Louisiana Tech"
+    Michigan = "Michigan"
+    Illinois = "Illinois"
+    Northwestern = "Northwestern"
+    Purdue = "Purdue"
+    Michigan_State = "Michigan State"
+    Maryland = "Maryland"
+    Wisconsin = "Wisconsin"
+    Iowa = "Iowa"
 
-        for team in current_schedule:
-            if datetime.now(tz=TZ).date() <= team.get("date", None):
-                setattr(self, team.get("team"), team.get("date"))
-                enum_items += 1
+    def __str__(self) -> str:
+        current_year: int = 2022
 
-        if enum_items == 0:
-            Ignore_1 = "Python Requirement 1"
-            Ignore_2 = "Python Requirement 2"
-        elif enum_items == 1:
-            Ignore_1 = "Python Requirement 1"
+        schedule = [
+            {"team": "Minnesota", "date": date(year=current_year, month=8, day=31)},
+            {"team": "Colorado", "date": date(year=current_year, month=9, day=9)},
+            {"team": "Northern Illinois", "date": date(year=current_year, month=9, day=16)},
+            {"team": "Louisiana Tech", "date": date(year=current_year, month=9, day=23)},
+            {"team": "Michigan", "date": date(year=current_year, month=9, day=30)},
+            {"team": "Illinois", "date": date(year=current_year, month=10, day=7)},
+            {"team": "Northwestern", "date": date(year=current_year, month=10, day=21)},
+            {"team": "Purdue", "date": date(year=current_year, month=10, day=28)},
+            {"team": "Michigan State", "date": date(year=current_year, month=11, day=4)},
+            {"team": "Maryland", "date": date(year=current_year, month=11, day=11)},
+            {"team": "Wisconsin", "date": date(year=current_year, month=11, day=18)},
+            {"team": "Iowa", "date": date(year=current_year, month=11, day=24)},
+        ]
+        result: Optional = None
+        for game in schedule:
+            if game["team"].lower() == self.value.lower():
+                result = game
+                break
+
+        return f"{result['team']}__{str(result['date'])}"
 
 
-class BettingHuskerSchedule(str, enum.Enum):
-    def __init__(self):
-        for game in current_schedule:
-            setattr(self, game["team"], game["team"])
+class BettingHuskerSchedule(enum.StrEnum):
+    Minnesota = "Minnesota"
+    Colorado = "Colorado"
+    Northern_Illinois = "Northern Illinois"
+    Louisiana_Tech = "Louisiana Tech"
+    Michigan = "Michigan"
+    Illinois = "Illinois"
+    Northwestern = "Northwestern"
+    Purdue = "Purdue"
+    Michigan_State = "Michigan State"
+    Maryland = "Maryland"
+    Wisconsin = "Wisconsin"
+    Iowa = "Iowa"
+
 
 class WhichTeamChoice(str, enum.Enum):
     Nebraska = "Nebraska"
@@ -400,28 +420,34 @@ def retrieveGameBets(
         return None
 
 
-def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> Game:
+def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> Optional[Game]:
     logger.info(f"Getting Nebraska opponent_name by name: {opponent_name}")
 
     cfbd_api = GamesApi(ApiClient(CFBD_CONFIG))
     nebraska = BigTenTeams.Nebraska.lower()
+    games = cfbd_api.get_games(year=year, team=nebraska)
 
-    game = [
-        game
-        for game in cfbd_api.get_games(year=year, team=nebraska)
-        if (
-                   game.home_team.lower() == nebraska.lower()
-                   and game.away_team.lower() == opponent_name.lower()
-           )
-           or (
-                   game.home_team.lower() == opponent_name.lower()
-                   and game.away_team.lower() == nebraska.lower()
-           )
-    ]
-    logger.debug(
-        f"Found game {game[0].id} with {game[0].away_team} and {game[0].home_team}"
-    )
-    return game[0]
+    if len(games) == 0:
+        raise ScheduleException(f"No games found for the {year} schedule.")
+    else:
+        game = [
+            game
+            for game in games
+            if (
+                       game.home_team.lower() == nebraska.lower()
+                       and game.away_team.lower() == opponent_name.lower()
+               )
+               or (
+                       game.home_team.lower() == opponent_name.lower()
+                       and game.away_team.lower() == nebraska.lower()
+               )
+        ]
+
+        logger.debug(
+            f"Found game {game[0].id} with {game[0].away_team} and {game[0].home_team}"
+        )
+
+        return game[0]
 
 
 def getTeamIdByName(team_name: str) -> str:
