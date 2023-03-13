@@ -269,6 +269,7 @@ logger.info("Bot info variables loaded")
 # DateTime format
 DT_CFBD_GAMES: str = "%Y-%m-%dT%H:%M:%S.%f%z"
 DT_CFBD_GAMES_DISPLAY: str = "%B %d, %Y at %H:%M %p %Z"
+DT_CFBD_GAMES_DISPLAY_NO_TIME: str = "%B %d, %Y"
 DT_FAP_RECRUIT: str = "%Y-%m-%d %H:%M:%S"
 DT_GITHUB_API: str = "%Y-%m-%dT%H:%M:%SZ"
 DT_GITHUB_API_DISPLAY: str = "%A, %B %d, %Y"
@@ -478,10 +479,10 @@ __all__: list[str] = [
     "CHAN_RECRUITING",
     "CHAN_TWITTERVERSE",
     "CROOT_SEARCH_LIMIT",
-    "is_debugging()",
     "DESC_LIMIT",
     "DT_CFBD_GAMES",
     "DT_CFBD_GAMES_DISPLAY",
+    "DT_CFBD_GAMES_DISPLAY_NO_TIME",
     "DT_FAP_RECRUIT",
     "DT_GITHUB_API",
     "DT_GITHUB_API_DISPLAY",
