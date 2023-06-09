@@ -374,7 +374,8 @@ class HuskerClient(Bot):
         if is_silent:
             logger.info("Skipping Twitter stream")
         else:
-            await start_twitter_stream(self)
+            # Turned off Twitter stream because Twitter API costs
+            # await start_twitter_stream(self)
             logger.info("Twitter stream started")
 
         if is_silent:
