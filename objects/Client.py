@@ -250,7 +250,7 @@ class HuskerClient(Bot):
             thumbnail="https://cdn.discordapp.com/icons/440632686185414677/a_061e9e57e43a5803e1d399c55f1ad1a4.gif",
             fields=[
                 dict(
-                    name="Support Bot Frost",
+                    name="Support Husker Bot",
                     value="Check out `/donate` to see how you can support the project!",
                 ),
                 dict(

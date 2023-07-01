@@ -296,10 +296,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         else:
             return False
 
-    @app_commands.command(name="about", description="Learn all about Bot Frost")
+    @app_commands.command(name="about", description="Learn all about Husker Bot")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def about(self, interaction: discord.Interaction) -> None:
-        """All about Bot Frost"""
+        """All about Husker Bot"""
 
         github_api_url: str = "https://api.github.com/repos/refekt/Bot-Frost"
         github_commits_api_url: str = (
@@ -324,7 +324,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 fields=[
                     dict(
                         name="History",
-                        value="Bot Frost was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
+                        value="Husker Bot was created and developed by [/u/refekt](https://reddit.com/u/refekt) and [/u/psyspoop](https://reddit.com/u/psyspoop). Jeyrad and ModestBeaver assisted with the creation greatly!",
                     ),
                     dict(
                         name="GitHub Information",
@@ -365,11 +365,11 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
     @app_commands.command(
-        name="donate", description="Contribute to the development of Bot Frost"
+        name="donate", description="Contribute to the development of Husker Bot"
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def donate(self, interaction: discord.Interaction) -> None:
-        """Contribute to the development of Bot Frost"""
+        """Contribute to the development of Husker Bot"""
 
         await interaction.response.send_message(
             embed=buildEmbed(
@@ -479,7 +479,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 temp.append(embed_fields_commands[i : i + limit])
             embeds: list[discord.Embed] = [
                 buildEmbed(
-                    title="Bot Frost Commands",
+                    title="Husker Bot Commands",
                     description=f"There are {len(embed_fields_commands)} commands",
                     fields=array,
                 )
@@ -488,7 +488,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         else:
             embeds.append(
                 buildEmbed(
-                    title="Bot Frost Commands",
+                    title="Husker Bot Commands",
                     description=f"There are {len(embed_fields_commands)} commands",
                     fields=embed_fields_commands,
                 )
@@ -553,7 +553,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
         logger.info(f"Bulk delete of {len(msgs)} messages successful.")
 
-    @app_commands.command(name="quit", description="Turn off Bot Frost")
+    @app_commands.command(name="quit", description="Turn off Husker Bot")
     @app_commands.default_permissions(administrator=True)
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def quit(self, interaction: discord.Interaction) -> None:

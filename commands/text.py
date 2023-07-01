@@ -76,7 +76,6 @@ class TextCog(commands.Cog, name="Text Commands"):
             "Concentrate and ask again.",
             "Definitely yes!",
             "Don’t count on it...",
-            "Frosty!",
             "Fuck Iowa!",
             "It is certain.",
             "It is decidedly so.",
@@ -84,7 +83,6 @@ class TextCog(commands.Cog, name="Text Commands"):
             "My reply is no.",
             "My sources say no.",
             "Outlook not so good and reply hazy",
-            "Scott Frost approves!",
             "These are the affirmative answers.",
             "Try again...",
             "Without a doubt.",
@@ -264,7 +262,7 @@ class TextCog(commands.Cog, name="Text Commands"):
                 title="",
                 author=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})",
                 icon_url=interaction.user.avatar.url,
-                footer=f"Markov chain crated by Bot Frost",
+                footer=f"Markov chain crated by Husker Bot",
                 fields=[
                     dict(
                         name=f"{source_name} said...",

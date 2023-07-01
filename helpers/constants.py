@@ -254,7 +254,7 @@ MEMBER_GEE_BACKUP = 541240112521019413
 logger.info("Member variables loaded")
 
 # Bot Info
-BOT_DISPLAY_NAME: str = "Bot Frost"
+BOT_DISPLAY_NAME: str = "Husker Bot"
 BOT_GITHUB_URL: str = "https://github.com/refekt/Husker-Bot"
 BOT_ICON_URL: str = "https://i.imgur.com/Ah3x5NA.png"
 BOT_THUMBNAIL_URL: str = (
