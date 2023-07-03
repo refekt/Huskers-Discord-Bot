@@ -78,12 +78,13 @@ class ConfirmButtons(discord.ui.View):
         self.stop()
 
 
-class AdminCog(commands.Cog, name="Admin Commands"):
-    class MammalChannels(Enum):
-        general = 1
-        recruiting = 2
-        admin = 3
+class MammalChannels(Enum):
+    general = 1
+    recruiting = 2
+    admin = 3
 
+
+class AdminCog(commands.Cog, name="Admin Commands"):
     group_purge: app_commands.Group = app_commands.Group(
         name="purge",
         description="Purge messages from channel",
