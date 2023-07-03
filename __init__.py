@@ -17,24 +17,6 @@ from discord.app_commands import (
 from discord.ext.commands import Context, Greedy
 from pymysql import IntegrityError, ProgrammingError
 
-from objects.Logger import (
-    discordLogger,
-    initializeAsyncLogging,
-    initializeLogging,
-    is_debugging,
-)
-
-initializeLogging()
-initializeAsyncLogging()
-
-logger = discordLogger(
-    name=__name__,
-    level=logging.DEBUG if is_debugging() else logging.INFO,
-)
-
-from helpers.mysql import processMySQL, sqlInsertWordle
-
-# from helpers.constants import *
 from helpers.constants import (
     CHAN_GENERAL,
     CHAN_NORTH_BOTTOMS,
@@ -48,16 +30,25 @@ from helpers.constants import (
     TZ,
 )
 from helpers.embed import buildEmbed
-
-# from helpers.mysql import *
+from helpers.mysql import processMySQL, sqlInsertWordle
 from objects import Wordle
 from objects.Client import HuskerClient
-
-# from objects.Exceptions import *
 from objects.Exceptions import DiscordError, WordleException, MySQLException
-
-# from objects.TweepyFollowerMonitor import *
+from objects.Logger import (
+    discordLogger,
+    initializeAsyncLogging,
+    initializeLogging,
+    is_debugging,
+)
 from objects.Wordle import WordleFinder
+
+initializeLogging()
+initializeAsyncLogging()
+
+logger = discordLogger(
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
+)
 
 __all__: list[str] = ["client"]
 
@@ -74,11 +65,11 @@ client: HuskerClient = HuskerClient(
 
 tree: CommandTree = client.tree
 
-if not "silent" in sys.argv:
+if "silent" not in sys.argv:
 
     @tree.error
     async def on_app_command_error(
-        interaction: discord.Interaction, error: CommandInvokeError
+            interaction: discord.Interaction, error: CommandInvokeError
     ) -> None:
         logger.info("app_command error detected!")
 
@@ -180,9 +171,9 @@ async def backlog(ctx: Context, year: int, month: int, day: int) -> None:
     index: int = 0
 
     async for message in north_bottoms.history(
-        oldest_first=True,
-        after=datetime.datetime(year=year, month=month, day=day),
-        limit=None,
+            oldest_first=True,
+            after=datetime.datetime(year=year, month=month, day=day),
+            limit=None,
     ):
         logger.debug(
             f"{message.created_at.astimezone(tz=TZ).strftime(DT_TASK_FORMAT)} {message.author.name}: {message.clean_content[:100]}"
@@ -301,9 +292,9 @@ async def hype_audit(ctx: Context):
 @commands.guild_only()
 @commands.default_permissions(administrator=True)
 async def sync(
-    ctx: Context,
-    guilds: Greedy[discord.Object],
-    spec: Optional[Literal["~", "*", "^"]] = None,
+        ctx: Context,
+        guilds: Greedy[discord.Object],
+        spec: Optional[Literal["~", "*", "^"]] = None,
 ) -> None:
     logger.info("Attempting to sync application commands")
     if not guilds:
@@ -315,7 +306,7 @@ async def sync(
             client.tree.copy_global_to(guild=ctx.guild)
             synced = await client.tree.sync(guild=ctx.guild)
         elif (
-            spec == "^"
+                spec == "^"
         ):  # Clears all commands from the current guild target and syncs (removes guild commands)
             logger.info("Clearing all application commands")
             client.tree.clear_commands(guild=ctx.guild)

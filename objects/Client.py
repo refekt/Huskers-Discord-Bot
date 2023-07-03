@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
@@ -36,7 +38,7 @@ from helpers.mysql import (
     sqlUpdateReminder,
 )
 from helpers.slowking import makeSlowking
-from helpers.twitter import start_twitter_stream
+# from helpers.twitter import start_twitter_stream
 from objects.Exceptions import ChangelogException, MySQLException
 from objects.Logger import discordLogger, is_debugging
 from objects.Scheudle import SchedulePosts
@@ -48,9 +50,9 @@ logger = discordLogger(
     level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
-# asyncio_logger = discordLogger(
-#     name="asyncio", level=logging.DEBUG if is_debugging() else logging.INFO
-# )
+asyncio_logger = discordLogger(
+    name="asyncio", level=logging.DEBUG if is_debugging() else logging.INFO
+)
 
 __all__: list[str] = [
     "GUILD_ROLES",
@@ -371,12 +373,12 @@ class HuskerClient(Bot):
             is_silent = False
         logger.info(f"is_silent == {is_silent}")
 
-        if is_silent:
-            logger.info("Skipping Twitter stream")
-        else:
-            # Turned off Twitter stream because Twitter API costs
-            # await start_twitter_stream(self)
-            logger.info("Twitter stream started")
+        # if is_silent:
+        #     logger.info("Skipping Twitter stream")
+        # else:
+        #     # Turned off Twitter stream because Twitter API costs
+        #     await start_twitter_stream(self)
+        #     logger.info("Twitter stream started")
 
         if is_silent:
             logger.info("Skipping restarting reminders")
@@ -499,7 +501,7 @@ class HuskerClient(Bot):
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
 
-            results: tuple[BaseException | Any, ...] = await asyncio.gather(
+            results: list = await asyncio.gather(
                 *on_ready_tasks, return_exceptions=True
             )
 

@@ -505,6 +505,7 @@ __all__: list[str] = [
     "MEMBER_GEE",
     "MEMBER_GEE_BACKUP",
     "NAME_LIMIT",
+    "OPENAI_KEY",
     "PROD_TOKEN",
     "RECRUIT_POSITIONS",
     "RECRUIT_STATES",
