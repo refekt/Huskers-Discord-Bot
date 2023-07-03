@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, date
 from json import JSONEncoder
 from typing import Optional, Union
 
+import cfbd
 import discord
 import requests
 from bs4 import BeautifulSoup
@@ -64,7 +65,7 @@ __all__: list[str] = [
 class SeasonStats:
     losses = None
     wins = None
-
+    
     def __init__(self, wins: int = 0, losses: int = 0) -> None:
         self.losses: int = losses
         self.wins: int = wins
@@ -137,10 +138,10 @@ class HuskerSched2023(enum.StrEnum):
     Maryland = "Maryland"
     Wisconsin = "Wisconsin"
     Iowa = "Iowa"
-
+    
     def __str__(self) -> str:
         current_year: int = 2022
-
+        
         schedule = [
             {"team": "Minnesota", "date": date(year=current_year, month=8, day=31)},
             {"team": "Colorado", "date": date(year=current_year, month=9, day=9)},
@@ -169,7 +170,7 @@ class HuskerSched2023(enum.StrEnum):
             if game["team"].lower() == self.value.lower():
                 result = game
                 break
-
+        
         return f"{result['team']}__{str(result['date'])}"
 
 
@@ -192,7 +193,7 @@ class WhichTeamChoice(str, enum.Enum):
     Nebraska = "Nebraska"
     Opponent = "Opponent"
     NA = "Not Available"
-
+    
     def __str__(self) -> str:
         return str(self.value)
 
@@ -201,7 +202,7 @@ class WhichOverUnderChoice(str, enum.Enum):
     Over = "Over"
     Under = "Under"
     NA = "Not Available"
-
+    
     def __str__(self) -> str:
         return str(self.value)
 
@@ -213,28 +214,30 @@ class BetLines:
         "spreadOpen",
         "formattedSpread",
     ]
-
-    def __init__(self, from_dict: dict) -> None:
+    
+    # def __init__(self, from_dict: dict) -> None:
+    def __init__(self, from_dict: cfbd.models.GameLinesLines) -> None:
         self.formattedSpread = None
         self.points = None
         self.pointsOpen = None
         self.spreadOpen = None
-
-        from_dict["points"] = from_dict["overUnder"]
-        from_dict["pointsOpen"] = from_dict["overUnderOpen"]
-
-        for key, value in from_dict.items():
+        
+        # 3 Jul 23: cfbd updated their model structure
+        # from_dict["points"] = from_dict["overUnder"]
+        # from_dict["pointsOpen"] = from_dict["overUnderOpen"]
+        
+        for key, value in from_dict.to_dict().items():
             try:
                 setattr(self, key, value)
             except AttributeError as _err:
                 continue
-
+    
     def __str__(self) -> str:
         return (
             f"Against the Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
             f"Total Points: {self.points} (Opened: {self.pointsOpen})"
         )
-
+    
     def __repr__(self) -> str:
         return str([var for var in vars()])
 
@@ -252,7 +255,7 @@ class FootballTeam(JSONEncoder):
         "stadium",
         "state",
     ]
-
+    
     def __init__(self, from_dict: dict = Optional[dict], *args, **kwargs) -> None:
         super().__init__()
         if from_dict:
@@ -262,7 +265,7 @@ class FootballTeam(JSONEncoder):
             from_dict["school_name"] = from_dict["school"]
             from_dict["stadium"] = from_dict["location_name"]
             from_dict["state"] = from_dict["location_state"]
-
+            
             for key, value in from_dict.items():
                 try:
                     setattr(self, key, value)
@@ -279,7 +282,7 @@ class FootballTeam(JSONEncoder):
             self.school_name: Optional[str] = kwargs.get("school_name", None)
             self.stadium: Optional[str] = kwargs.get("stadium", None)
             self.state: Optional[str] = kwargs.get("state", None)
-
+    
     def __str__(self) -> str:
         return f"{self.school_name}".title()
 
@@ -302,7 +305,7 @@ class Bet:
         "resolved",
         "week",
     ]
-
+    
     def __init__(
         self,
         author: discord.Member | discord.User,
@@ -312,7 +315,7 @@ class Bet:
         predict_spread: Optional[WhichTeamChoice],
     ) -> None:
         logger.debug("Creating a Bet object")
-
+        
         self._raw = getNebraskaGameByOpponent(opponent_name)
         self.author: discord.Member = author
         self.author_str: str = f"{self.author.name}#{self.author.discriminator}"
@@ -333,7 +336,7 @@ class Bet:
         self.predict_game = predict_game
         self.predict_points = predict_points
         self.predict_spread = predict_spread
-
+        
         if self.home_game:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
                 away_team=self.opponent_name.school_name.lower(),
@@ -344,16 +347,16 @@ class Bet:
                 away_team=BigTenTeams.Nebraska.lower(),
                 home_team=self.opponent_name.school_name.lower(),
             )
-
+    
     def __str__(self) -> str:
         return f"{self.author_str}: Wins-{self.predict_game}, OverUnder-{self.predict_points}, Spread-{self.predict_spread}"
-
+    
     def submitRecord(self) -> None:
         logger.debug("Submitting MySQL entry for bet")
         previous_bet = retrieveGameBets(
             author_str=self.author_str, school_name=self.opponent_name.school_name
         )
-
+        
         if previous_bet:
             if (
                 previous_bet["predict_game"] == self.predict_game
@@ -435,11 +438,11 @@ def getNebraskaGameByOpponent(
     opponent_name: str, year=datetime.now().year
 ) -> Optional[Game]:
     logger.info(f"Getting Nebraska opponent_name by name: {opponent_name}")
-
+    
     cfbd_api = GamesApi(ApiClient(CFBD_CONFIG))
     nebraska = BigTenTeams.Nebraska.lower()
     games = cfbd_api.get_games(year=year, team=nebraska)
-
+    
     if len(games) == 0:
         raise ScheduleException(f"No games found for the {year} schedule.")
     else:
@@ -447,32 +450,32 @@ def getNebraskaGameByOpponent(
             game
             for game in games
             if (
-                game.home_team.lower() == nebraska.lower()
-                and game.away_team.lower() == opponent_name.lower()
-            )
-            or (
-                game.home_team.lower() == opponent_name.lower()
-                and game.away_team.lower() == nebraska.lower()
-            )
+                   game.home_team.lower() == nebraska.lower()
+                   and game.away_team.lower() == opponent_name.lower()
+               )
+               or (
+                   game.home_team.lower() == opponent_name.lower()
+                   and game.away_team.lower() == nebraska.lower()
+               )
         ]
-
+        
         logger.debug(
             f"Found game {game[0].id} with {game[0].away_team} and {game[0].home_team}"
         )
-
+        
         return game[0]
 
 
 def getTeamIdByName(team_name: str) -> str:
     logger.info(f"Getting Team ID by Name: {team_name}")
-
+    
     sql_teams = processMySQL(
         query=sqlTeamIDs,
         fetch=SqlFetch.all,
         # fetch="all",
     )
     _id = ""
-
+    
     if team_name.lower() in [team["school"].lower() for team in sql_teams]:
         for team in sql_teams:
             if team["school"] == team_name:
@@ -482,7 +485,7 @@ def getTeamIdByName(team_name: str) -> str:
         raise BettingException(
             f"Not able to locate {team_name} in team list. Try again!"
         )
-
+    
     if _id:
         return _id
     else:
@@ -493,7 +496,7 @@ def getTeamIdByName(team_name: str) -> str:
 
 def buildTeam(id_str: str) -> FootballTeam:
     logger.debug("Building a FootballTeam")
-
+    
     query: dict = processMySQL(
         query=sqlGetTeamInfoByID,
         fetch=SqlFetch.one,
@@ -507,7 +510,7 @@ def buildTeam(id_str: str) -> FootballTeam:
             # fetch="one",
             values=id_str,
         )
-
+    
     if query:
         return FootballTeam(from_dict=query)
     else:
@@ -522,20 +525,20 @@ def getConsensusLineByOpponent(
     logger.info(
         f"Getting the consensus line for {year} {away_team} and {home_team} game"
     )
-
+    
     betting_api = BettingApi(ApiClient(CFBD_CONFIG))
-
+    
     try:
         api_response = betting_api.get_lines(away=away_team, home=home_team, year=year)
     except (ApiException, TypeError):
         return None
-
+    
     logger.debug(f"Results: {api_response}")
     try:
         lines = api_response[0].lines[0]
     except IndexError:
         return None
-
+    
     return BetLines(from_dict=lines)
 
 
@@ -553,25 +556,25 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
             .text.strip()
             .replace("\n", " ")
         )
-
+        
         ranking = None
-
+        
         if "#" in name:
             try:
                 [ranking, name] = str(name).split(" ", maxsplit=1)
             except ValueError:
                 pass
-
+        
         location = game.contents[3].contents[1].text.strip().replace("\n", " ")
-
+        
         if "Buy Tickets" in location:
             location = location.split("Buy Tickets ")[1].replace(
                 " Memorial Stadium", ""
             )
-
+        
         temp = game.contents[1].contents[1].contents[1].attrs["data-src"]
         icon = None
-
+        
         if "://" in temp:  # game.contents[1].contents[1].contents[1].attrs["data-src"]:
             # icon = temp_icon
             try:
@@ -584,7 +587,7 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
                 "https://huskers.com"
                 + game.contents[1].contents[1].contents[1].attrs["data-src"]
             )
-
+        
         _date = (
             game.contents[1]
             .contents[3]
@@ -593,7 +596,7 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
             .contents[1]
             .text.strip()
         )
-
+        
         _time = (
             game.contents[1]
             .contents[3]
@@ -602,13 +605,13 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
             .contents[3]
             .text.strip()
         )
-
+        
         if "Canceled" in game.contents[5].contents[1].text:
             outcome = "Canceled"
         else:
             try:
                 outcome = f"{game.contents[5].contents[1].contents[3].text.strip()} {game.contents[5].contents[1].contents[5].text}"
-
+                
                 if game.contents[5].contents[1].contents[1].text.strip():
                     outcome = (
                         game.contents[5].contents[1].contents[1].text.strip()
@@ -617,16 +620,16 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
                     )
             except IndexError:
                 outcome = ""
-
+        
         if _time == "Noon":
             _time = _time.replace("Noon", "12:00 PM")
-
+        
         if ":" not in _time:
             _time = _time.replace(" ", ":00 ")
-
+        
         date_time = f"{_date[0:6]} {year} {_time}"
         del _date, _time
-
+        
         return HuskerOpponent(
             name=name,
             ranking=ranking,
@@ -644,36 +647,36 @@ def HuskerSchedule(
     year=datetime.now().year,
 ) -> tuple[list[HuskerDotComSchedule], SeasonStats]:
     logger.info(f"Creating Husker schedule for '{year}'")
-
+    
     reqs = requests.get(
         url=f"https://huskers.com/sports/football/schedule/{year}", headers=HEADERS
     )
-
+    
     assert reqs.status_code == 200, ScheduleException(
         "Unable to retrieve schedule from Huskers.com."
     )
-
+    
     soup: BeautifulSoup = BeautifulSoup(reqs.content, "html.parser")
     games_raw: ResultSet = soup.find_all(attrs={"class": "sidearm-schedule-game"})
-
+    
     # Some games have a box around them and this removes that
     for index, game in enumerate(games_raw):
         if len(game.attrs) == 0:
             games_raw[index] = game.contents[1].contents[3].contents[1]
-
+    
     del index, game
-
+    
     games = []
     season_stats = SeasonStats()
     week = 0
-
+    
     for game in games_raw:
         week += 1
-
+        
         _opponent_name = collect_opponent(game, year, week)
         if _opponent_name == "Unknown Opponent":  # What am I doing here?
             continue
-
+        
         if "TBA" in _opponent_name.date_time:
             # Specific time to reference later for TBA games
             gdt_string = f"{_opponent_name.date_time[0:6]} {year} {DT_TBA_TIME}"
@@ -687,7 +690,7 @@ def HuskerSchedule(
                     _opponent_name.date_time = f"{temp[0]} {temp[1][-3:]}"
                 else:
                     _opponent_name.date_time = f"{temp[0]}:00 {temp[1][-3:]}"
-
+            
             _opponent_name.date_time = datetime.strptime(
                 _opponent_name.date_time.replace("A.M.", "AM")
                 .replace("a.m.", "AM")
@@ -696,7 +699,7 @@ def HuskerSchedule(
                 DT_STR_FORMAT,
             ).astimezone(tz=TZ)
             _opponent_name.date_time += timedelta(hours=1)
-
+        
         conference_teams = (
             "Illinois",
             "Iowa",
@@ -713,7 +716,7 @@ def HuskerSchedule(
         )
         conference: bool = _opponent_name.name in conference_teams
         home: bool = "Lincoln, Neb." in _opponent_name.location
-
+        
         games.append(
             HuskerDotComSchedule(
                 location=_opponent_name.location,
@@ -727,7 +730,7 @@ def HuskerSchedule(
                 home=home,
             )
         )
-
+    
     for game in games:
         if "W" in game.outcome:
             season_stats.wins += 1
@@ -735,14 +738,14 @@ def HuskerSchedule(
             season_stats.losses += 1
         else:
             pass
-
+    
     return games, season_stats
 
 
 def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
     logger.info(f"Getting the current week for the {year} {team} game")
     games_api = GamesApi(ApiClient(CFBD_CONFIG))
-
+    
     try:
         games = games_api.get_games(
             year=year, team=BigTenTeams.Nebraska.lower()
@@ -750,13 +753,13 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
     except ApiException:
         logger.exception("CFBD API unable to get games", exc_info=True)
         raise BettingException("CFBD API unable to get games")
-
+    
     for index, game in enumerate(games):
         logger.info(f"Checking the Week {game.week} game.")
         if team.lower() == BigTenTeams.Nebraska:
             if game.week == games[1].week:  # Week 0 game
                 return 0
-
+            
             if not (game.away_points and game.home_points):
                 return game.week
             else:
@@ -772,7 +775,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
             or game.home_team.lower() == team.lower()
         ):
             return game.week
-
+    
     logger.exception(f"Unable to find week for {team}")
     raise BettingException(f"Unable to find week for {team}")
 
