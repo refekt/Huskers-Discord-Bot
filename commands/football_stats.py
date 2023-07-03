@@ -65,9 +65,9 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def countdown(
-            self,
-            interaction: discord.Interaction,
-            opponent_name: HuskerSched2023,
+        self,
+        interaction: discord.Interaction,
+        opponent_name: HuskerSched2023,
     ) -> None:
         logger.info(f"Starting countdown")
         await interaction.response.defer()
@@ -137,9 +137,9 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def lines(
-            self,
-            interaction: discord.Interaction,
-            opponent_name: HuskerSched2023,
+        self,
+        interaction: discord.Interaction,
+        opponent_name: HuskerSched2023,
     ) -> None:
         logger.info(f"Gathering info for lines")
 
@@ -187,7 +187,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def compare_team_stats(
-            self, interaction: discord.Interaction, team_for: str, team_against: str
+        self, interaction: discord.Interaction, team_for: str, team_against: str
     ) -> None:
         logger.info(f"Comparing {team_for} against {team_against} stats")
         await interaction.response.defer()
@@ -207,8 +207,8 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
                 dict(
                     name="Links",
                     value=f"[All Games ]({comparison.full_games_url}) | "
-                          f"[{team_for.title()}'s Games]({'http://www.winsipedia.com/' + team_for.lower()}) |     "
-                          f"[{team_against.title()}'s Games]({'http://www.winsipedia.com/' + team_against.lower()})",
+                    f"[{team_for.title()}'s Games]({'http://www.winsipedia.com/' + team_for.lower()}) |     "
+                    f"[{team_against.title()}'s Games]({'http://www.winsipedia.com/' + team_against.lower()})",
                 ),
                 dict(
                     name=f"{team_for.title()}'s Record vs. {team_against.title()}",
@@ -238,7 +238,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.describe(year="The year of the schedule")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def schedule(
-            self, interaction: discord.Interaction, year: int = datetime.now().year
+        self, interaction: discord.Interaction, year: int = datetime.now().year
     ) -> None:
         await interaction.response.send_message(
             content="Loading schedule...this may take several seconds...",
@@ -269,7 +269,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     )
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def player_stats(
-            self, interaction: discord.Interaction, year: int, player_name: str
+        self, interaction: discord.Interaction, year: int, player_name: str
     ) -> None:
         logger.info(f"Starting player stat search for {year} {player_name.upper()}")
         await interaction.response.defer()
@@ -397,7 +397,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         logger.info("Updating embeds")
         for stat in api_season_stat_result:
             if (
-                    not stat.player.lower() == player_name
+                not stat.player.lower() == player_name
             ):  # Filter out only the player we're looking for
                 continue
 
@@ -423,17 +423,17 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         year_start=season_stats_year_choices, year_end=season_stats_year_choices
     )
     async def season_stats(
-            self,
-            interaction: discord.Interaction,
-            year: int = datetime.now().year,
-            year_start: Choice[int] = None,
-            year_end: Choice[int] = None,
+        self,
+        interaction: discord.Interaction,
+        year: int = datetime.now().year,
+        year_start: Choice[int] = None,
+        year_end: Choice[int] = None,
     ):
         logger.info(f"Retrieving Nebraska's {year} stats")
         await interaction.response.defer(thinking=True)
 
         if (year_start and year_end is None) or (
-                year_start is None and year_end
+            year_start is None and year_end
         ):  # Both variables weren't selected
             logger.exception("Both year_start and year_end were not provided")
 
@@ -453,7 +453,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         conference_losses: int = 0
 
         if all(
-                _ is None for _ in (year_start, year_end)
+            _ is None for _ in (year_start, year_end)
         ):  # Year provided, but year_start and year_end are None
             logger.info("Generating a single year's stats")
 
@@ -474,13 +474,13 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
             conference_wins = records[0].conference_games["wins"]  # noqa
             conference_losses = records[0].conference_games["losses"]  # noqa
         elif all(
-                _ is not None for _ in (year_start, year_end)
+            _ is not None for _ in (year_start, year_end)
         ):  # Both year_start and year_end provided
             logger.info("Generating a range of year's stats")
 
             for _year in range(  # To prevent year_start and year_end swap
-                    min(year_start.value, year_end.value),
-                    max(year_start.value, year_end.value),
+                min(year_start.value, year_end.value),
+                max(year_start.value, year_end.value),
             ):
                 records = games_api.get_team_records(
                     team=BigTenTeams.Nebraska.value, year=_year

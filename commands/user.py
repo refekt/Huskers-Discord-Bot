@@ -34,18 +34,18 @@ for index, role in enumerate(GUILD_ROLES):
         break
 
     if (
-            "/r/huskers mod" in role.name
-            or "Booster" in role.name
-            or "Politics time out" in role.name
-            or "Server Historian" in role.name
-            or role.id == ROLE_ADMIN_PROD
-            or role.id == ROLE_BLUE_NAME
-            or role.id == ROLE_EVERYONE_PROD
-            or role.id == ROLE_MOD_PROD
-            or role.id == ROLE_TIME_OUT
-            or role.name == "Bot Creators"
-            or role.name == "Dyno"
-            or role.name == "Statbot"
+        "/r/huskers mod" in role.name
+        or "Booster" in role.name
+        or "Politics time out" in role.name
+        or "Server Historian" in role.name
+        or role.id == ROLE_ADMIN_PROD
+        or role.id == ROLE_BLUE_NAME
+        or role.id == ROLE_EVERYONE_PROD
+        or role.id == ROLE_MOD_PROD
+        or role.id == ROLE_TIME_OUT
+        or role.name == "Bot Creators"
+        or role.name == "Dyno"
+        or role.name == "Statbot"
     ):
         continue
 
@@ -98,7 +98,7 @@ class UserCog(commands.Cog, name="User Commands"):
     # @app_commands.describe(apply_role="The hype role you want to apply")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def hype(
-            self, interaction: discord.Interaction  # , apply_role: HypeRoles
+        self, interaction: discord.Interaction  # , apply_role: HypeRoles
     ) -> None:
         await interaction.response.send_message(
             "This command has been replaced by `/roles`.", ephemeral=True

@@ -73,7 +73,6 @@ class Wordle:
 
         # Check each line is accurate
         for line in self.__boxes:
-
             # Skip first line
             if "Wordle" in line:
                 continue
@@ -88,7 +87,6 @@ class Wordle:
 
             # Check to make sure no illegal characters are present
             for box in (self.__b, self.__w, self.__g, self.__y):
-
                 _box_count = line.count(box)
                 logger.debug(f"Box count is {_box_count}")
 

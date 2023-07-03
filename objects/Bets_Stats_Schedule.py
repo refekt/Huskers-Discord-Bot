@@ -72,7 +72,7 @@ class SeasonStats:
 
 class HuskerOpponent:
     def __init__(
-            self, name, ranking, icon, date_time, week, location, outcome=None
+        self, name, ranking, icon, date_time, week, location, outcome=None
     ) -> None:
         self.date_time = date_time
         self.icon: str = icon
@@ -85,16 +85,16 @@ class HuskerOpponent:
 
 class HuskerDotComSchedule:
     def __init__(
-            self,
-            conference,
-            game_date_time,
-            home,
-            icon,
-            location,
-            opponent_name,
-            outcome,
-            ranking,
-            week,
+        self,
+        conference,
+        game_date_time,
+        home,
+        icon,
+        location,
+        opponent_name,
+        outcome,
+        ranking,
+        week,
     ):
         self.conference = conference
         self.game_date_time = game_date_time
@@ -144,13 +144,22 @@ class HuskerSched2023(enum.StrEnum):
         schedule = [
             {"team": "Minnesota", "date": date(year=current_year, month=8, day=31)},
             {"team": "Colorado", "date": date(year=current_year, month=9, day=9)},
-            {"team": "Northern Illinois", "date": date(year=current_year, month=9, day=16)},
-            {"team": "Louisiana Tech", "date": date(year=current_year, month=9, day=23)},
+            {
+                "team": "Northern Illinois",
+                "date": date(year=current_year, month=9, day=16),
+            },
+            {
+                "team": "Louisiana Tech",
+                "date": date(year=current_year, month=9, day=23),
+            },
             {"team": "Michigan", "date": date(year=current_year, month=9, day=30)},
             {"team": "Illinois", "date": date(year=current_year, month=10, day=7)},
             {"team": "Northwestern", "date": date(year=current_year, month=10, day=21)},
             {"team": "Purdue", "date": date(year=current_year, month=10, day=28)},
-            {"team": "Michigan State", "date": date(year=current_year, month=11, day=4)},
+            {
+                "team": "Michigan State",
+                "date": date(year=current_year, month=11, day=4),
+            },
             {"team": "Maryland", "date": date(year=current_year, month=11, day=11)},
             {"team": "Wisconsin", "date": date(year=current_year, month=11, day=18)},
             {"team": "Iowa", "date": date(year=current_year, month=11, day=24)},
@@ -295,12 +304,12 @@ class Bet:
     ]
 
     def __init__(
-            self,
-            author: discord.Member | discord.User,
-            opponent_name: BigTenTeams | HuskerSched2023,
-            predict_game: Optional[WhichTeamChoice],
-            predict_points: Optional[WhichOverUnderChoice],
-            predict_spread: Optional[WhichTeamChoice],
+        self,
+        author: discord.Member | discord.User,
+        opponent_name: BigTenTeams | HuskerSched2023,
+        predict_game: Optional[WhichTeamChoice],
+        predict_points: Optional[WhichOverUnderChoice],
+        predict_spread: Optional[WhichTeamChoice],
     ) -> None:
         logger.debug("Creating a Bet object")
 
@@ -313,7 +322,7 @@ class Bet:
             self._raw.start_date, DT_CFBD_GAMES
         ).astimezone(tz=TZ)
         self.game_datetime_passed: bool = (
-                datetime.now(tz=TZ) >= self.game_datetime or False
+            datetime.now(tz=TZ) >= self.game_datetime or False
         )
         self.home_game: bool = (
             True if self._raw.home_team == BigTenTeams.Nebraska else False
@@ -347,9 +356,9 @@ class Bet:
 
         if previous_bet:
             if (
-                    previous_bet["predict_game"] == self.predict_game
-                    and previous_bet["predict_points"] == self.predict_points
-                    and previous_bet["predict_spread"] == self.predict_spread
+                previous_bet["predict_game"] == self.predict_game
+                and previous_bet["predict_points"] == self.predict_points
+                and previous_bet["predict_spread"] == self.predict_spread
             ):
                 logger.debug("Previous bet matches current bet")
                 return
@@ -395,7 +404,7 @@ class Bet:
 
 
 def retrieveGameBets(
-        school_name: str, author_str: str = None, _all: bool = False
+    school_name: str, author_str: str = None, _all: bool = False
 ) -> Union[list[dict], dict, None]:
     logger.info(
         f"Looking to see if a bet already exists for {author_str} and {school_name}"
@@ -422,7 +431,9 @@ def retrieveGameBets(
         return None
 
 
-def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> Optional[Game]:
+def getNebraskaGameByOpponent(
+    opponent_name: str, year=datetime.now().year
+) -> Optional[Game]:
     logger.info(f"Getting Nebraska opponent_name by name: {opponent_name}")
 
     cfbd_api = GamesApi(ApiClient(CFBD_CONFIG))
@@ -436,13 +447,13 @@ def getNebraskaGameByOpponent(opponent_name: str, year=datetime.now().year) -> O
             game
             for game in games
             if (
-                       game.home_team.lower() == nebraska.lower()
-                       and game.away_team.lower() == opponent_name.lower()
-               )
-               or (
-                       game.home_team.lower() == opponent_name.lower()
-                       and game.away_team.lower() == nebraska.lower()
-               )
+                game.home_team.lower() == nebraska.lower()
+                and game.away_team.lower() == opponent_name.lower()
+            )
+            or (
+                game.home_team.lower() == opponent_name.lower()
+                and game.away_team.lower() == nebraska.lower()
+            )
         ]
 
         logger.debug(
@@ -504,9 +515,9 @@ def buildTeam(id_str: str) -> FootballTeam:
 
 
 def getConsensusLineByOpponent(
-        away_team: str,
-        home_team: str,
-        year: int = datetime.now().year,
+    away_team: str,
+    home_team: str,
+    year: int = datetime.now().year,
 ) -> Optional[BetLines]:
     logger.info(
         f"Getting the consensus line for {year} {away_team} and {home_team} game"
@@ -570,8 +581,8 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
                 pass
         else:
             icon = (
-                    "https://huskers.com"
-                    + game.contents[1].contents[1].contents[1].attrs["data-src"]
+                "https://huskers.com"
+                + game.contents[1].contents[1].contents[1].attrs["data-src"]
             )
 
         _date = (
@@ -600,9 +611,9 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
 
                 if game.contents[5].contents[1].contents[1].text.strip():
                     outcome = (
-                            game.contents[5].contents[1].contents[1].text.strip()
-                            + " "
-                            + outcome
+                        game.contents[5].contents[1].contents[1].text.strip()
+                        + " "
+                        + outcome
                     )
             except IndexError:
                 outcome = ""
@@ -630,7 +641,7 @@ def collect_opponent(game, year, week) -> HuskerOpponent | str:
 
 
 def HuskerSchedule(
-        year=datetime.now().year,
+    year=datetime.now().year,
 ) -> tuple[list[HuskerDotComSchedule], SeasonStats]:
     logger.info(f"Creating Husker schedule for '{year}'")
 
@@ -754,11 +765,11 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
                     exc_info=True,
                 )
         elif (
-                game.away_team.lower() == BigTenTeams.Nebraska.lower()
-                or game.home_team.lower() == BigTenTeams.Nebraska.lower()
+            game.away_team.lower() == BigTenTeams.Nebraska.lower()
+            or game.home_team.lower() == BigTenTeams.Nebraska.lower()
         ) and (
-                game.away_team.lower() == team.lower()
-                or game.home_team.lower() == team.lower()
+            game.away_team.lower() == team.lower()
+            or game.home_team.lower() == team.lower()
         ):
             return game.week
 

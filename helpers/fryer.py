@@ -91,10 +91,10 @@ def find_eyes(gray) -> list[tuple[float | Any, float | Any]]:
     coords = []
 
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    for (x, y, w, h) in faces:
+    for x, y, w, h in faces:
         roi_gray = gray[y : y + h, x : x + w]
         eyes = eye_cascade.detectMultiScale(roi_gray)
-        for (ex, ey, ew, eh) in eyes:
+        for ex, ey, ew, eh in eyes:
             coords.append((x + ex + ew / 2, y + ey + eh / 2))
     if len(coords) == 0:
         pass

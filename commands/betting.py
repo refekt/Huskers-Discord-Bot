@@ -48,12 +48,12 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         predict_spread="Whether you predict Nebraska or their opponent to win against the spread.",
     )
     async def bet_create(
-            self,
-            interaction: discord.Interaction,
-            opponent: HuskerSched2023,
-            game_winner: WhichTeamChoice,
-            predict_points: WhichOverUnderChoice,
-            predict_spread: WhichTeamChoice,
+        self,
+        interaction: discord.Interaction,
+        opponent: HuskerSched2023,
+        game_winner: WhichTeamChoice,
+        predict_points: WhichOverUnderChoice,
+        predict_spread: WhichTeamChoice,
     ) -> None:
         await interaction.response.defer()
 
@@ -134,8 +134,8 @@ class BettingCog(commands.Cog, name="Betting Commands"):
                 dict(
                     name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
                     value=f"Wins: {bet.predict_game}\n"
-                          f"Total Points: {bet.predict_points}\n"
-                          f"Against the Spread: {bet.predict_spread}\n",
+                    f"Total Points: {bet.predict_points}\n"
+                    f"Against the Spread: {bet.predict_spread}\n",
                 )
             ],
             author=bet.author_str,
@@ -149,7 +149,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         opponent_name="Name of the opponent_name for the Husker game."
     )
     async def bet_show(
-            self, interaction: discord.Interaction, opponent_name: BettingHuskerSchedule
+        self, interaction: discord.Interaction, opponent_name: BettingHuskerSchedule
     ):
         await interaction.response.defer()
 
@@ -210,8 +210,8 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         description="Show the leaderboard for betting",
     )
     async def bet_leaderboard(
-            self,
-            interaction: discord.Interaction,
+        self,
+        interaction: discord.Interaction,
     ):
         await interaction.response.defer()
 
@@ -219,7 +219,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             query=sqlGetBetsLeaderboard, fetch="all"
         )
         if all_bets is not None and len(all_bets) > FIELDS_LIMIT:
-            all_bets = all_bets[0: FIELDS_LIMIT - 1]
+            all_bets = all_bets[0 : FIELDS_LIMIT - 1]
 
         bet_title: str = "2022 Husker Betting Leaderboard"
 
@@ -260,12 +260,12 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     )
     @app_commands.default_permissions(administrator=True)
     async def bet_resolve(
-            self,
-            interaction: discord.Interaction,
-            opponent_name: HuskerSched2023,
-            game_winner: WhichTeamChoice,
-            result_points: WhichOverUnderChoice,
-            result_spread: WhichTeamChoice,
+        self,
+        interaction: discord.Interaction,
+        opponent_name: HuskerSched2023,
+        game_winner: WhichTeamChoice,
+        result_points: WhichOverUnderChoice,
+        result_spread: WhichTeamChoice,
     ):
         await interaction.response.defer(ephemeral=True)
 
