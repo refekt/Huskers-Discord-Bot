@@ -31,10 +31,12 @@ __all__: list[str] = [
     "sqlGetWordleGamesPlayed",
     "sqlGetWordleIndividualUserScore",
     "sqlGetWordleScores",
+    "sqlGetXwordScores",
     "sqlInsertGameBet",
     "sqlInsertIowa",
     "sqlInsertPrediction",
     "sqlInsertWordle",
+    "sqlInsertXword",
     "sqlRecordReminder",
     "sqlRemoveIowa",
     "sqlResolveGame",
@@ -104,12 +106,17 @@ sqlRecordReminder = "INSERT INTO tasks_repo ( send_to, message, send_when, is_op
 sqlUpdateReminder = "UPDATE tasks_repo SET is_open = % s WHERE send_to = % s AND message = % s AND author = % s;"
 
 # Wordle
-
-sqlInsertWordle = "INSERT INTO wordle (id, author, which_day, score, green_squares, yellow_squares, black_squares) VALUES (% s, % s, % s, % s, % s, % s, % s)"  # ON DUPLICATE KEY UPDATE ( score = % s, green_squares = % s, yellow_squares = % s, black_squares = % s)"
+sqlInsertWordle = "INSERT INTO wordle (id, author, which_day, score, green_squares, yellow_squares, black_squares) VALUES (% s, % s, % s, % s, % s, % s, % s)"
 sqlGetWordleScores = "SELECT author, games_played, score_avg, green_avg, yellow_avg, black_avg FROM `wordle.v`"
 sqlGetWordleGamesPlayed = "SELECT author, games_played, score_avg, green_avg, yellow_avg, black_avg FROM `wordle.v.games`"
 sqlGetUserWordleScores = "SELECT * FROM wordle WHERE author = % s"
 sqlGetWordleIndividualUserScore = "SELECT *, Dense_rank() OVER ( ORDER BY score_avg asc ) AS 'lb_rank' FROM `wordle.v` wv"
+
+# New York Crossword
+sqlInsertXword = "INSERT INTO nyxword (id, userid, date, seconds, url) VALUES (% s, % s, % s, % s, % s)"
+sqlGetXwordScores = (
+    "SELECT userid, userid_count, seconds_total, seconds_average FROM `nyxword.v`"
+)
 
 
 class SqlFetch(str, enum.Enum):

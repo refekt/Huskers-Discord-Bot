@@ -36,14 +36,17 @@ from helpers.mysql import (
     sqlInsertWordle,
     sqlRetrieveReminders,
     sqlUpdateReminder,
+    sqlInsertXword,
 )
 from helpers.slowking import makeSlowking
+
 # from helpers.twitter import start_twitter_stream
 from objects.Exceptions import ChangelogException, MySQLException
 from objects.Logger import discordLogger, is_debugging
 from objects.Scheudle import SchedulePosts
 from objects.Thread import convert_duration
 from objects.Wordle import WordleFinder, Wordle
+from objects.Xword import Xword
 
 logger = discordLogger(
     name=__name__,
@@ -531,6 +534,7 @@ class HuskerClient(Bot):
         await self.check_reaction(payload)
 
     async def on_message(self, message: discord.Message) -> None:
+
         await self.process_commands(message)
 
         if message.author.bot or message.channel.id not in (
@@ -619,6 +623,31 @@ class HuskerClient(Bot):
                 )
 
             await message.channel.send(embed=embed)
+
+        nyxword: Optional[Xword] = Xword(message=message)
+
+        if nyxword.url:
+            logger.debug("New York crossword found!")
+
+            author_id: str = str(message.author.id)
+
+            try:
+                processMySQL(
+                    query=sqlInsertXword,
+                    values=(
+                        f"{author_id.rjust(5)}_{nyxword.xword_date}".strip(),
+                        author_id,
+                        nyxword.xword_date,
+                        nyxword.seconds,
+                        nyxword.url,
+                    ),
+                )
+
+            except (MySQLException, IntegrityError, ProgrammingError) as e:
+                logger.exception(f"MySQL encountered an error:\n{e}")
+                return
+
+            logger.debug("New York crossword MySQL processed")
 
 
 logger.info(f"{str(__name__).title()} module loaded!")

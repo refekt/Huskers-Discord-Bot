@@ -30,7 +30,7 @@ from helpers.constants import (
     TZ,
 )
 from helpers.embed import buildEmbed
-from helpers.mysql import processMySQL, sqlInsertWordle
+from helpers.mysql import processMySQL, sqlInsertWordle, sqlInsertXword
 from objects import Wordle
 from objects.Client import HuskerClient
 from objects.Exceptions import DiscordError, WordleException, MySQLException
@@ -41,6 +41,7 @@ from objects.Logger import (
     is_debugging,
 )
 from objects.Wordle import WordleFinder
+from objects.Xword import Xword
 
 initializeLogging()
 initializeAsyncLogging()
@@ -163,7 +164,7 @@ async def man_wordle(ctx: Context, who: discord.Member, *, wordle_input: str) ->
 
 @client.hybrid_command(name="backlog-wordle")
 @commands.default_permissions(administrator=True)
-async def backlog(ctx: Context, year: int, month: int, day: int) -> None:
+async def backlog_wordle(ctx: Context, year: int, month: int, day: int) -> None:
     north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
     general: discord.TextChannel = ctx.guild.get_channel(CHAN_GENERAL)
     wordle_finder: WordleFinder = WordleFinder()
@@ -213,6 +214,49 @@ async def backlog(ctx: Context, year: int, month: int, day: int) -> None:
                 logger.debug("Wordle MySQL processed")
 
             except (MySQLException, IntegrityError, ProgrammingError):
+                continue
+
+
+@client.hybrid_command(name="backlog-nyxword")
+@commands.default_permissions(administrator=True)
+async def backlog_nyxword(ctx: Context, year: int, month: int, day: int) -> None:
+    logger.debug("Starting backlog of New York cross word")
+    north_bottoms: discord.TextChannel = ctx.guild.get_channel(CHAN_NORTH_BOTTOMS)
+
+    index: int = 0
+
+    async for message in north_bottoms.history(
+        oldest_first=True,
+        after=datetime.datetime(year=year, month=month, day=day),
+        limit=None,
+    ):
+        index += 1
+
+        if message.author.bot:
+            continue
+
+        nyxword: Optional[Xword] = Xword(message=message)
+
+        if nyxword.url:
+            logger.debug(
+                f"New York crossword found! Message date: {message.created_at}"
+            )
+
+            author_id: str = str(message.author.id)
+
+            try:
+                processMySQL(
+                    query=sqlInsertXword,
+                    values=(
+                        f"{author_id.rjust(5)}_{nyxword.xword_date}".strip(),
+                        author_id,
+                        nyxword.xword_date,
+                        nyxword.seconds,
+                        nyxword.url,
+                    ),
+                )
+            except (MySQLException, IntegrityError, ProgrammingError) as e:
+                logger.exception(f"MySQL encountered an error:\n{e}")
                 continue
 
 

@@ -37,6 +37,7 @@ from helpers.mysql import (
     sqlGetWordleGamesPlayed,
     sqlGetWordleIndividualUserScore,
     sqlGetWordleScores,
+    sqlGetXwordScores,
 )
 from objects.Exceptions import (
     CommandException,
@@ -59,6 +60,12 @@ class TextCog(commands.Cog, name="Text Commands"):
     group_wordle: app_commands.Group = app_commands.Group(
         name="wordle",
         description="Wordle commands",
+        guild_ids=[GUILD_PROD],
+    )
+
+    group_nyxword: app_commands.Group = app_commands.Group(
+        name="nyxword",
+        description="NY Times Crossword commands",
         guild_ids=[GUILD_PROD],
     )
 
@@ -641,13 +648,8 @@ class TextCog(commands.Cog, name="Text Commands"):
                     f"#{index + 1}: "
                     f"{author.mention if author else item['author']}\n"
                     f"Games: {item['games_played']}, "
-                    # f"`"
                     f"Average: {item['score_avg']:0.3f}"
                     f"\n"
-                    # f"🟩 {item['green_avg']:0.1f} "
-                    # f"🟨 {item['yellow_avg']:0.1f} "
-                    # f"⬛ {item['black_avg']:0.1f}"
-                    # f"`\n\n"
                 )
 
             embed: discord.Embed = buildEmbed(
@@ -771,6 +773,42 @@ class TextCog(commands.Cog, name="Text Commands"):
         )
 
         await interaction.followup.send(embed=embed)
+
+    @group_nyxword.command(
+        name="leaderboard", description="Leaderboard for the NY Times Crossword"
+    )
+    async def nyxword_leaderboard(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+
+        nyxword_leaderboard: list[dict[str, Union[str, float, Decimal]]] = processMySQL(
+            query=sqlGetXwordScores, fetch="all"
+        )
+
+        if nyxword_leaderboard:
+            leaderboard_str: str = ""
+
+            for index, item in enumerate(nyxword_leaderboard):
+                author: discord.Member = interaction.client.guilds[0].get_member(
+                    int(item["userid"])
+                )
+
+                leaderboard_str += (
+                    f"#{index + 1}: "
+                    f"{author.mention if author else item['userid']}\n"
+                    f"Games: {item['userid_count']}, "
+                    f"Average Seconds: {item['seconds_average']}"
+                    f"\n"
+                )
+
+            embed: discord.Embed = buildEmbed(
+                title="",
+                description="Minimum of 15 games",
+                fields=[
+                    dict(name="NY Times Crossword Leaderboard", value=leaderboard_str)
+                ],
+            )
+
+            await interaction.followup.send(embed=embed)
 
     @app_commands.command(
         name="open-ai", description="Create a passage from text input"
