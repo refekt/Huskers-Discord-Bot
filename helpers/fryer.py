@@ -126,7 +126,10 @@ def add_chars(image: ImgImg, coords: list[tuple[Any, Any, Any, Any]]) -> ImgImg:
         if numpy.random.random(1)[0] > 0.1:
             continue
         resized = char.copy()
-        resized.thumbnail((coord[2], coord[3]), Image.ANTIALIAS)
+        try:
+            resized.thumbnail((coord[2], coord[3]), Image.ANTIALIAS)
+        except AttributeError:
+            resized.thumbnail((coord[2], coord[3]), Image.LANCZOS)
         image.paste(resized, (int(coord[0]), int(coord[1])), resized)
 
     logger.debug("Characters added")
@@ -140,7 +143,10 @@ def add_emotes(image, max_emotes) -> None:
         emote = Image.open(random_file(f"{deepfry_path}/emotes/")).convert("RGBA")
         coord = numpy.random.random(2) * numpy.array([image.width, image.height])
         size = int((image.width / 10) * (numpy.random.random(1)[0] + 1))
-        emote.thumbnail((size, size), Image.ANTIALIAS)
+        try:
+            emote.thumbnail((size, size), Image.ANTIALIAS)
+        except AttributeError:
+            emote.thumbnail((size, size), Image.LANCZOS)
         image.paste(emote, (int(coord[0]), int(coord[1])), emote)
 
     logger.debug("Emotes added")

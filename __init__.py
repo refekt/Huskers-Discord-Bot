@@ -332,6 +332,25 @@ async def hype_audit(ctx: Context):
     await ctx.send(embed=embed)
 
 
+@client.hybrid_command(name="test")
+@commands.default_permissions(administrator=True)
+async def testing(ctx: Context):
+    private_channel: discord.TextChannel = await client.fetch_channel(
+        990262349703286864
+    )
+
+    if private_channel:
+        async for message in private_channel.history(
+            limit=20,
+        ):
+            if message.reactions:
+                logger.debug([reaction.emoji.url for reaction in message.reactions])
+            else:
+                continue
+    else:
+        return
+
+
 @client.command()
 @commands.guild_only()
 @commands.default_permissions(administrator=True)
