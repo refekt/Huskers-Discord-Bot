@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import datetime
 import logging
 import os
 import pathlib
@@ -17,6 +18,7 @@ from discord.ext.commands import Bot, ExtensionAlreadyLoaded
 from pymysql import IntegrityError, ProgrammingError
 
 from __version__ import _version
+from commands.football_stats import gen_countdown
 from commands.reminder import MissedReminder, send_reminder
 from helpers.constants import (
     BOT_ICON_URL,
@@ -27,6 +29,7 @@ from helpers.constants import (
     CHAN_HOS,
     CHAN_NORTH_BOTTOMS,
     GUILD_PROD,
+    TZ,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -39,6 +42,7 @@ from helpers.mysql import (
     sqlInsertXword,
 )
 from helpers.slowking import makeSlowking
+from objects.Bets_Stats_Schedule import HuskerSched2023
 
 # from helpers.twitter import start_twitter_stream
 from objects.Exceptions import ChangelogException, MySQLException
@@ -382,6 +386,38 @@ class HuskerClient(Bot):
         #     # Turned off Twitter stream because Twitter API costs
         #     await start_twitter_stream(self)
         #     logger.info("Twitter stream started")
+
+        if is_silent:
+            logger.info("Skipping daily countdown timer message.")
+        else:
+            logger.info("Sending daily countdown timer message")
+
+            def get_next_opponent() -> str:
+                for oppo_index, oppo in enumerate(HuskerSched2023):
+                    if oppo_index == len(HuskerSched2023):
+                        return "N/A"
+
+                    oppo_split = str(oppo).split("__")
+                    oppo_date = datetime.date(
+                        day=int(oppo_split[1][-2:]),
+                        month=int(oppo_split[1][6:7]),
+                        year=int(oppo_split[1][0:4]),
+                    )
+                    now_date = datetime.datetime.now(tz=TZ).date()
+
+                    if now_date > oppo_date:
+                        return str(oppo).split("__")[0]
+                    else:
+                        continue
+
+            opponent: str = get_next_opponent()
+
+            if opponent != "N/A":
+                await gen_countdown(
+                    opponent_name=get_next_opponent(), output_destination=chan_general
+                )
+
+            logger.info("Daily countdown timer message sent")
 
         if is_silent:
             logger.info("Skipping restarting reminders")

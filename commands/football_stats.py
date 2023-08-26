@@ -48,12 +48,87 @@ logger = discordLogger(
     level=logging.DEBUG if is_debugging() else logging.INFO,
 )
 
-__all__: list[str] = ["FootballStatsCog"]
+__all__: list[str] = [
+    "FootballStatsCog",
+    "gen_countdown",
+]
 
 season_stats_year_choices: list[Choice] = []
 for _ in range(0, FIELDS_LIMIT - 1, 1):
     cur_year: int = datetime.now().year - _
     season_stats_year_choices.append(Choice(name=str(cur_year), value=cur_year))
+
+
+async def gen_countdown(
+    opponent_name: HuskerSched2023 | str,
+    output_destination: discord.Interaction | discord.channel.TextChannel = None,
+):
+    year: int = datetime.now().year
+
+    assert checkYearValid(year), StatsException(
+        f"The provided year is not valid: {year}"
+    )
+
+    try:
+        game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name)
+    except ScheduleException as e:
+        raise e
+
+    start_date: datetime = datetime.strptime(
+        game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
+        if game.start_time_tbd
+        else game.start_date,
+        DT_CFBD_GAMES,
+    ).astimezone(tz=TZ)
+
+    consensus: BetLines | str = getConsensusLineByOpponent(
+        away_team=game.away_team,
+        home_team=game.home_team,
+    )
+    consensus = consensus or "TBD"
+
+    opponent_info: FootballTeam = buildTeam(getHuskerOpponent(game)["id"])
+    dt_difference: timedelta = start_date - datetime.now(tz=TZ)
+
+    embed: discord.Embed = buildEmbed(
+        title="",
+        color=opponent_info.color,
+        thumbnail=opponent_info.logo,
+        fields=[
+            dict(
+                name="Opponent",
+                value=getHuskerOpponent(game)["opponent_name"].title(),
+            ),
+            dict(
+                name="Scheduled Date & Time",
+                value=start_date.strftime(DT_CFBD_GAMES_DISPLAY),
+            ),
+            dict(name="Location", value=game.venue),
+            dict(
+                name="Countdown",
+                value=prettifyTimeDateValue(dt_difference.total_seconds()),
+            ),
+            dict(
+                name="Betting Info",
+                value=str(consensus) if consensus else "Line TBD",
+            ),
+        ],
+    )
+    if game.start_time_tbd:
+        embed.set_footer(
+            text="Note: Times are set to 11:00 A.M. Central until the API is updated."
+        )
+
+    print(type(output_destination))
+
+    if type(output_destination) == discord.channel.TextChannel:
+        await output_destination.send(embed=embed)
+    elif type(output_destination) == discord.Interaction:
+        await output_destination.followup.send(embed=embed)
+    else:
+        raise StatsException("Invalid destination type.")
+
+    logger.info(f"Countdown done")
 
 
 class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
@@ -69,67 +144,69 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         interaction: discord.Interaction,
         opponent_name: HuskerSched2023,
     ) -> None:
-        logger.info(f"Starting countdown")
-        await interaction.response.defer()
+        # logger.info(f"Starting countdown")
+        # await interaction.response.defer()
+        #
+        # year: int = datetime.now().year
+        #
+        # assert checkYearValid(year), StatsException(
+        #     f"The provided year is not valid: {year}"
+        # )
+        #
+        # try:
+        #     game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name)
+        # except ScheduleException as e:
+        #     raise e
+        #
+        # start_date: datetime = datetime.strptime(
+        #     game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
+        #     if game.start_time_tbd
+        #     else game.start_date,
+        #     DT_CFBD_GAMES,
+        # ).astimezone(tz=TZ)
+        #
+        # consensus: BetLines | str = getConsensusLineByOpponent(
+        #     away_team=game.away_team,
+        #     home_team=game.home_team,
+        # )
+        # consensus = consensus or "TBD"
+        #
+        # opponent_info: FootballTeam = buildTeam(getHuskerOpponent(game)["id"])
+        # dt_difference: timedelta = start_date - datetime.now(tz=TZ)
+        #
+        # embed: discord.Embed = buildEmbed(
+        #     title="",
+        #     color=opponent_info.color,
+        #     thumbnail=opponent_info.logo,
+        #     fields=[
+        #         dict(
+        #             name="Opponent",
+        #             value=getHuskerOpponent(game)["opponent_name"].title(),
+        #         ),
+        #         dict(
+        #             name="Scheduled Date & Time",
+        #             value=start_date.strftime(DT_CFBD_GAMES_DISPLAY),
+        #         ),
+        #         dict(name="Location", value=game.venue),
+        #         dict(
+        #             name="Countdown",
+        #             value=prettifyTimeDateValue(dt_difference.total_seconds()),
+        #         ),
+        #         dict(
+        #             name="Betting Info",
+        #             value=str(consensus) if consensus else "Line TBD",
+        #         ),
+        #     ],
+        # )
+        # if game.start_time_tbd:
+        #     embed.set_footer(
+        #         text="Note: Times are set to 11:00 A.M. Central until the API is updated."
+        #     )
+        #
+        # await interaction.followup.send(embed=embed)
+        # logger.info(f"Countdown done")
 
-        year: int = datetime.now().year
-
-        assert checkYearValid(year), StatsException(
-            f"The provided year is not valid: {year}"
-        )
-
-        try:
-            game: Game = getNebraskaGameByOpponent(opponent_name=opponent_name)
-        except ScheduleException as e:
-            raise e
-
-        start_date: datetime = datetime.strptime(
-            game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
-            if game.start_time_tbd
-            else game.start_date,
-            DT_CFBD_GAMES,
-        ).astimezone(tz=TZ)
-
-        consensus: BetLines | str = getConsensusLineByOpponent(
-            away_team=game.away_team,
-            home_team=game.home_team,
-        )
-        consensus = consensus or "TBD"
-
-        opponent_info: FootballTeam = buildTeam(getHuskerOpponent(game)["id"])
-        dt_difference: timedelta = start_date - datetime.now(tz=TZ)
-
-        embed: discord.Embed = buildEmbed(
-            title="",
-            color=opponent_info.color,
-            thumbnail=opponent_info.logo,
-            fields=[
-                dict(
-                    name="Opponent",
-                    value=getHuskerOpponent(game)["opponent_name"].title(),
-                ),
-                dict(
-                    name="Scheduled Date & Time",
-                    value=start_date.strftime(DT_CFBD_GAMES_DISPLAY),
-                ),
-                dict(name="Location", value=game.venue),
-                dict(
-                    name="Countdown",
-                    value=prettifyTimeDateValue(dt_difference.total_seconds()),
-                ),
-                dict(
-                    name="Betting Info",
-                    value=str(consensus) if consensus else "Line TBD",
-                ),
-            ],
-        )
-        if game.start_time_tbd:
-            embed.set_footer(
-                text="Note: Times are set to 11:00 A.M. Central until the API is updated."
-            )
-
-        await interaction.followup.send(embed=embed)
-        logger.info(f"Countdown done")
+        await gen_countdown(opponent_name=opponent_name, output_destination=interaction)
 
     @app_commands.command(name="lines", description="Get the betting lines for a game")
     @app_commands.describe(

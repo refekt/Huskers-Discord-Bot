@@ -209,22 +209,19 @@ class WhichOverUnderChoice(str, enum.Enum):
 
 class BetLines:
     __slots__ = [
-        "pointsOpen",
-        "points",
-        "spreadOpen",
-        "formattedSpread",
+        "formatted_spread",
+        "over_under",
+        "over_under_open",
+        "spread",
+        "spread_open",
     ]
 
-    # def __init__(self, from_dict: dict) -> None:
     def __init__(self, from_dict: cfbd.models.GameLinesLines) -> None:
-        self.formattedSpread = None
-        self.points = None
-        self.pointsOpen = None
-        self.spreadOpen = None
-
-        # 3 Jul 23: cfbd updated their model structure
-        # from_dict["points"] = from_dict["overUnder"]
-        # from_dict["pointsOpen"] = from_dict["overUnderOpen"]
+        self.formatted_spread = None
+        self.over_under = None
+        self.over_under_open = None
+        self.spread = None
+        self.spread_open = None
 
         for key, value in from_dict.to_dict().items():
             try:
@@ -234,8 +231,8 @@ class BetLines:
 
     def __str__(self) -> str:
         return (
-            f"Against the Spread: {self.formattedSpread} (Opened: {self.spreadOpen})\n"
-            f"Total Points: {self.points} (Opened: {self.pointsOpen})"
+            f"Against the Spread: {self.formatted_spread} (Opened: {self.spread_open})\n"
+            f"Over/Under: {self.over_under} (Opened: {self.over_under_open})\n"
         )
 
     def __repr__(self) -> str:
