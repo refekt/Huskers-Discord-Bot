@@ -413,9 +413,11 @@ class HuskerClient(Bot):
             opponent: str = get_next_opponent()
 
             if opponent != "N/A":
-                await gen_countdown(
-                    opponent_name=get_next_opponent(), output_destination=chan_general
+                embed: discord.Embed = await gen_countdown(
+                    opponent_name=get_next_opponent()
                 )
+
+                await chan_general.send(embed=embed)
 
             logger.info("Daily countdown timer message sent")
 

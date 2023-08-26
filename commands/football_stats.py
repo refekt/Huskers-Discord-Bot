@@ -61,8 +61,7 @@ for _ in range(0, FIELDS_LIMIT - 1, 1):
 
 async def gen_countdown(
     opponent_name: HuskerSched2023 | str,
-    output_destination: discord.Interaction | discord.channel.TextChannel = None,
-):
+) -> discord.Embed:
     year: int = datetime.now().year
 
     assert checkYearValid(year), StatsException(
@@ -119,16 +118,9 @@ async def gen_countdown(
             text="Note: Times are set to 11:00 A.M. Central until the API is updated."
         )
 
-    print(type(output_destination))
+    logger.info(f"Countdown embed creation done")
 
-    if type(output_destination) == discord.channel.TextChannel:
-        await output_destination.send(embed=embed)
-    elif type(output_destination) == discord.Interaction:
-        await output_destination.followup.send(embed=embed)
-    else:
-        raise StatsException("Invalid destination type.")
-
-    logger.info(f"Countdown done")
+    return embed
 
 
 class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
@@ -141,7 +133,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def countdown(
         self,
-        interaction: discord.Interaction,
+        interaction,  #: discord.Interaction,
         opponent_name: HuskerSched2023,
     ) -> None:
         # logger.info(f"Starting countdown")
@@ -206,7 +198,11 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         # await interaction.followup.send(embed=embed)
         # logger.info(f"Countdown done")
 
-        await gen_countdown(opponent_name=opponent_name, output_destination=interaction)
+        await interaction.response.defer()
+
+        embed: discord.Embed = await gen_countdown(opponent_name)
+
+        await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="lines", description="Get the betting lines for a game")
     @app_commands.describe(
