@@ -587,7 +587,7 @@ class HuskerClient(Bot):
                 ]
                 if len(author_score):
                     author_score = author_score[0]
-                    author_score_str = f"They are the #{author_score['lb_rank']} Wordler with an average score of {author_score['score_avg']:0.1f}/6 over {author_score['games_played']} games"
+                    author_score_str = f"They are the #{author_score['lb_rank'] + 1} Wordler with an average score of {author_score['score_avg']:0.1f}/6 over {author_score['games_played']} games"
 
                     logger.debug("Author scores retrieved")
                 else:
