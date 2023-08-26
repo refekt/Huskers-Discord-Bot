@@ -328,7 +328,7 @@ class Bet:
             datetime.now(tz=TZ) >= self.game_datetime or False
         )
         self.home_game: bool = (
-            True if self._raw.home_team == BigTenTeams.Nebraska else False
+            True if self._raw.home_team == BigTenTeams.Nebraska.value else False
         )
         self.opponent_name = buildTeam(id_str=getTeamIdByName(opponent_name))
         self.resolved: bool = False
@@ -340,11 +340,11 @@ class Bet:
         if self.home_game:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
                 away_team=self.opponent_name.school_name.lower(),
-                home_team=BigTenTeams.Nebraska.lower(),
+                home_team=BigTenTeams.Nebraska.value.lower(),
             )
         else:
             self.bet_lines: BetLines = getConsensusLineByOpponent(
-                away_team=BigTenTeams.Nebraska.lower(),
+                away_team=BigTenTeams.Nebraska.value.lower(),
                 home_team=self.opponent_name.school_name.lower(),
             )
 
@@ -440,7 +440,7 @@ def getNebraskaGameByOpponent(
     logger.info(f"Getting Nebraska opponent_name by name: {opponent_name}")
 
     cfbd_api = GamesApi(ApiClient(CFBD_CONFIG))
-    nebraska = BigTenTeams.Nebraska.lower()
+    nebraska = BigTenTeams.Nebraska.value.lower()
     games = cfbd_api.get_games(year=year, team=nebraska)
 
     if len(games) == 0:
@@ -748,7 +748,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
 
     try:
         games = games_api.get_games(
-            year=year, team=BigTenTeams.Nebraska.lower()
+            year=year, team=BigTenTeams.Nebraska.value.lower()
         )  # We only care about Nebraska's schedule
     except ApiException:
         logger.exception("CFBD API unable to get games", exc_info=True)
@@ -756,7 +756,7 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
 
     for index, game in enumerate(games):
         logger.info(f"Checking the Week {game.week} game.")
-        if team.lower() == BigTenTeams.Nebraska:
+        if team.lower() == BigTenTeams.Nebraska.value:
             if game.week == games[1].week:  # Week 0 game
                 return 0
 
@@ -768,8 +768,8 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
                     exc_info=True,
                 )
         elif (
-            game.away_team.lower() == BigTenTeams.Nebraska.lower()
-            or game.home_team.lower() == BigTenTeams.Nebraska.lower()
+            game.away_team.lower() == BigTenTeams.Nebraska.value.lower()
+            or game.home_team.lower() == BigTenTeams.Nebraska.value.lower()
         ) and (
             game.away_team.lower() == team.lower()
             or game.home_team.lower() == team.lower()
@@ -781,9 +781,9 @@ def getCurrentWeekByOpponent(team: str, year: int = datetime.now().year) -> int:
 
 
 def getHuskerOpponent(_game: Game) -> dict[str, str]:
-    if _game.away_team.lower() == BigTenTeams.Nebraska.lower():
+    if _game.away_team.lower() == BigTenTeams.Nebraska.value.lower():
         return {"opponent_name": _game.home_team, "id": str(_game.home_id)}
-    elif _game.home_team.lower() == BigTenTeams.Nebraska.lower():
+    elif _game.home_team.lower() == BigTenTeams.Nebraska.value.lower():
         return {"opponent_name": _game.away_team, "id": str(_game.away_id)}
 
 

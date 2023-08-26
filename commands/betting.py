@@ -82,7 +82,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
         # games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
         # check_games: list[Game] = games_api.get_games(
         #     year=datetime.now().year,
-        #     team=BigTenTeams.Nebraska.lower(),
+        #     team=BigTenTeams.Nebraska.value.lower(),
         #     season_type="both",
         # )
         #
@@ -159,7 +159,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         if opponent_bets is None:
             embed: discord.Embed = buildEmbed(
-                title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
+                title=f"{BigTenTeams.Nebraska.value} vs. {opponent_name.value} Bets",
                 description=f"No bets found for {interaction.user.mention}",
             )
         else:
@@ -198,7 +198,7 @@ class BettingCog(commands.Cog, name="Betting Commands"):
             )
 
             embed = buildEmbed(
-                title=f"{BigTenTeams.Nebraska} vs. {opponent_name.value} Bets",
+                title=f"{BigTenTeams.Nebraska.value} vs. {opponent_name.value} Bets",
                 description=totals_str,
                 fields=fields,
             )

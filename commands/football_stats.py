@@ -291,10 +291,10 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         api_player_search_result: list[cfbd.PlayerSearchResult] = api.player_search(
             search_term=player_name,
             year=year,
-            team=BigTenTeams.Nebraska,
+            team=str(BigTenTeams.Nebraska.value),
         )
 
-        if not api_player_search_result:
+        if len(api_player_search_result) == 0:
             raise StatsException(
                 f"Unable to find {player_name} on the Huskers. Please try again!"
             )
@@ -312,7 +312,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         ] = api.get_player_season_stats(
             year=year,
             season_type="both",
-            team=BigTenTeams.Nebraska,
+            team=BigTenTeams.Nebraska.value,
         )
 
         if api_season_stat_result:

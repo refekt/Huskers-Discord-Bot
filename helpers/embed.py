@@ -218,7 +218,7 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
 
     games_api: GamesApi = GamesApi(ApiClient(CFBD_CONFIG))
     games: list[Game] = games_api.get_games(
-        year=year, team=BigTenTeams.Nebraska.lower(), season_type="both"
+        year=year, team=BigTenTeams.Nebraska.value.lower(), season_type="both"
     )
     records: Union[list[TeamRecord], TeamRecord] = games_api.get_team_records(
         team=BigTenTeams.Nebraska.value, year=year
