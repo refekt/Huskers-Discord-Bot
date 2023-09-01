@@ -221,6 +221,15 @@ class HuskerClient(Bot):
         self, guild_member: discord.Member | discord.User
     ) -> None:
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
+
+        try:
+            if guild_member.avatar.url != "":
+                avatar_url = guild_member.avatar.url
+            else:
+                avatar_url = BOT_ICON_URL
+        except AttributeError:
+            avatar_url = BOT_ICON_URL
+
         embed = buildEmbed(
             title="Hark! A new Husker fan emerges",
             description="Welcome the new member to the server!",
@@ -234,10 +243,9 @@ class HuskerClient(Bot):
                     value=f"Be sure to check out `/commands` for how to use the bot!",
                 ),
             ],
-            image=guild_member.avatar.url
-            if guild_member.avatar.url != ""
-            else BOT_ICON_URL,
+            image=avatar_url,
         )
+
         await channel_general.send(embed=embed)
 
     async def send_goodbye_message(self, guild_member: discord.Member | discord.User):
