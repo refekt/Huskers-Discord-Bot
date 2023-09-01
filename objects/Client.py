@@ -393,21 +393,29 @@ class HuskerClient(Bot):
             logger.info("Sending daily countdown timer message")
 
             def get_next_opponent() -> str:
-                for oppo_index, oppo in enumerate(HuskerSched2023):
+                now_date = datetime.datetime.now().date()
+                previous_team: str = ""
+
+                for oppo_index, oppo in enumerate(reversed(HuskerSched2023)):
                     if oppo_index == len(HuskerSched2023):
                         return "N/A"
 
                     oppo_split = str(oppo).split("__")
-                    oppo_date = datetime.date(
-                        day=int(oppo_split[1][-2:]),
-                        month=int(oppo_split[1][6:7]),
-                        year=int(oppo_split[1][0:4]),
-                    )
-                    now_date = datetime.datetime.now(tz=TZ).date()
 
-                    if now_date > oppo_date:
-                        return str(oppo).split("__")[0]
+                    oppo_day: int = int(oppo_split[1].split("-")[2])
+                    oppo_month: int = int(oppo_split[1].split("-")[1])
+                    oppo_year: int = int(oppo_split[1].split("-")[0])
+
+                    oppo_date = datetime.date(
+                        day=oppo_day,
+                        month=oppo_month,
+                        year=oppo_year,
+                    )
+
+                    if now_date >= oppo_date:
+                        return previous_team
                     else:
+                        previous_team = oppo_split[0]
                         continue
 
             opponent: str = get_next_opponent()

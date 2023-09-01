@@ -140,7 +140,7 @@ class HuskerSched2023(enum.StrEnum):
     Iowa = "Iowa"
 
     def __str__(self) -> str:
-        current_year: int = 2022
+        current_year: int = 2023
 
         schedule = [
             {"team": "Minnesota", "date": date(year=current_year, month=8, day=31)},
