@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import pathlib
@@ -8,13 +7,18 @@ import platform
 import subprocess
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Union, Optional, Generator
+from typing import (
+    Any,
+    Union,
+    Optional,
+    Generator,
+)
 
 import discord.ext.commands
 import requests
 from discord import app_commands, Forbidden, HTTPException, InvalidData, NotFound
 from discord.app_commands import Group, Command
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from __version__ import _version
 from helpers.constants import (
@@ -26,7 +30,6 @@ from helpers.constants import (
     CHAN_DISCUSSION_LIVE,
     CHAN_DISCUSSION_STREAMING,
     CHAN_GENERAL,
-    CHAN_HYPE_GROUP,
     CHAN_IOWA,
     CHAN_RECRUITING,
     DT_GITHUB_API,
@@ -39,7 +42,7 @@ from helpers.constants import (
     WINDOWS_PATH,
 )
 from helpers.embed import buildEmbed
-from helpers.misc import discordURLFormatter, general_locked
+from helpers.misc import discordURLFormatter
 from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger, is_debugging
@@ -110,6 +113,10 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         guild_ids=[GUILD_PROD],
     )
 
+    @tasks.loop(seconds=600)
+    async def send_gameday_msg(self, channel, gd_embed):
+        await channel.send(embed=gd_embed)
+
     # noinspection PyMethodMayBeStatic
     async def alert_gameday_channels(
         self, client: Union[discord.ext.commands.Bot, discord.Client], on: bool
@@ -118,7 +125,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         chan_live: discord.TextChannel = await client.fetch_channel(
             CHAN_DISCUSSION_LIVE
         )
-        chan_streaming: discord.TextChannel = await client.fetch_channel(
+        chan_streaming: discord.TextChannel = await client.fetch_chfannel(
             CHAN_DISCUSSION_STREAMING
         )
 
@@ -147,9 +154,8 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             await chan_general.send(embed=embed)
 
             # TODO Setup a background task that can be turned off
-            while general_locked:
-                await asyncio.sleep(60 * 10)
-                await chan_general.send(embed=embed)
+            # self.send_gameday_msg(chan_general, embed).start()
+
         else:
             embed = buildEmbed(
                 title="Game Day Mode",
@@ -161,35 +167,42 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     )
                 ],
             )
+            # self.send_gameday_msg(chan_general, embed).cancel()
+
             await chan_general.send(embed=embed)
 
     # noinspection PyMethodMayBeStatic
     async def process_gameday(self, mode: bool, guild: discord.Guild) -> None:
         gameday_category: discord.CategoryChannel = guild.get_channel(CAT_GAMEDAY)
         general_category: discord.CategoryChannel = guild.get_channel(CAT_GENERAL)
-        everyone: discord.Role = guild.get_role(ROLE_EVERYONE_PROD)
+        role_everyone: discord.Role = guild.get_role(ROLE_EVERYONE_PROD)
 
         logger.info(f"Creating permissions to be [{mode}]")
 
-        perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite()
+        # perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite()
+        perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite(
+            view_channel=mode,
+            send_messages=mode,
+            read_messages=mode,
+        )
 
-        perms_text.view_channel = mode  # noqa
-        perms_text.send_messages = mode  # noqa
-        perms_text.read_messages = mode  # noqa
+        # perms_text.view_channel = mode  # noqa
+        # perms_text.send_messages = mode  # noqa
+        # perms_text.read_messages = mode  # noqa
 
-        perms_text_opposite: discord.PermissionOverwrite = discord.PermissionOverwrite()
-        perms_text_opposite.send_messages = not mode  # noqa
-
+        perms_text_opposite: discord.PermissionOverwrite = discord.PermissionOverwrite(
+            view_channel=True,
+            send_messages=not mode,
+            read_messages=True,
+        )
         perms_voice: discord.PermissionOverwrite = discord.PermissionOverwrite()
-        perms_voice.view_channel = mode  # noqa
-        perms_voice.connect = mode  # noqa
-        perms_voice.speak = mode  # noqa
+        # perms_voice.view_channel = mode  # noqa
+        # perms_voice.connect = mode  # noqa
+        # perms_voice.speak = mode  # noqa
 
         logger.info(f"Permissions created")
 
         for channel in general_category.channels:
-            if channel.id in CHAN_HYPE_GROUP:
-                continue
 
             try:
                 logger.info(
@@ -197,9 +210,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 )
                 if channel.type == discord.ChannelType.text:
                     await channel.set_permissions(
-                        everyone, overwrite=perms_text_opposite
+                        role_everyone, overwrite=perms_text_opposite
                     )
-            except:  # noqa
+            except (Forbidden, HTTPException, TypeError, ValueError):
                 logger.info(
                     f"Unable to change permissions for [{channel.name.encode('utf-8', 'replace')}] to [{not mode}]"
                 )
@@ -216,11 +229,14 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 )
 
                 if channel.type == discord.ChannelType.text:
-                    await channel.set_permissions(everyone, overwrite=perms_text)
+                    await channel.set_permissions(role_everyone, overwrite=perms_text)
                 elif channel.type == discord.ChannelType.voice:
-                    await channel.set_permissions(everyone, overwrite=perms_voice)
+                    await channel.set_permissions(role_everyone, overwrite=perms_voice)
 
-                    # Disconnects embers from voice
+                    # Disconnects members from voice
+                    if not channel.members:
+                        continue
+
                     for member in channel.members:
                         try:
                             await member.move_to(channel=None)
@@ -234,12 +250,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         f"Unable to change permissions for [{channel}] to [{mode}]"
                     )
                     continue
+
                 logger.info(f"Changed permissions for [{channel}] to [{mode}]")
-            except discord.errors.Forbidden:
+            except Forbidden:
                 logger.exception(
                     "The bot does not have access to change permissions!", exc_info=True
                 )
-            except:  # noqa
+            except (HTTPException, TypeError, ValueError):
                 continue
 
         logger.info(f"All permissions changes applied")
