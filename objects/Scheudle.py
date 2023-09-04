@@ -77,7 +77,7 @@ class SchedulePosts:
                 fields=[
                     dict(
                         name=f"Monday Motivation",
-                        value=f"Monday's suck. How can get through the day?",
+                        value=f"Monday's suck. How can we get through the day?",
                     )
                 ],
                 image=SCHED_DAY_IMG,

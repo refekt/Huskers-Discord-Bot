@@ -17,6 +17,21 @@ from discord.app_commands import (
 from discord.ext.commands import Context, Greedy
 from pymysql import IntegrityError, ProgrammingError
 
+from objects.Logger import (
+    discordLogger,
+    initializeAsyncLogging,
+    initializeLogging,
+    is_debugging,
+)
+
+initializeLogging()
+initializeAsyncLogging()
+
+logger = discordLogger(
+    name=__name__,
+    level=logging.DEBUG if is_debugging() else logging.INFO,
+)
+
 from helpers.constants import (
     CHAN_GENERAL,
     CHAN_NORTH_BOTTOMS,
@@ -34,22 +49,8 @@ from helpers.mysql import processMySQL, sqlInsertWordle, sqlInsertXword
 from objects import Wordle
 from objects.Client import HuskerClient
 from objects.Exceptions import DiscordError, WordleException, MySQLException
-from objects.Logger import (
-    discordLogger,
-    initializeAsyncLogging,
-    initializeLogging,
-    is_debugging,
-)
 from objects.Wordle import WordleFinder
 from objects.Xword import Xword
-
-initializeLogging()
-initializeAsyncLogging()
-
-logger = discordLogger(
-    name=__name__,
-    level=logging.DEBUG if is_debugging() else logging.INFO,
-)
 
 __all__: list[str] = ["client"]
 

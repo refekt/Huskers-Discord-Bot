@@ -11,6 +11,11 @@ __all__: list[str] = [
     "is_debugging",
 ]
 
+if "Windows" in platform.platform():
+    log_path: str = "logs"
+else:
+    log_path = "/home/botfrost/bot/logs"
+
 
 def is_debugging() -> bool:
     if "bypass" in sys.argv:

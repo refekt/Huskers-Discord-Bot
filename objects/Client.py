@@ -84,7 +84,7 @@ class HuskerClient(Bot):
             "commands.text",
         ]
         self.guild_user_len: int = 0
-        self.reaction_threshold: int = 999
+        self.reaction_threshold: int = 8
         self.wordle_finder: Optional[WordleFinder] = None
 
     async def check_reaction(self, payload: discord.RawReactionActionEvent) -> None:
