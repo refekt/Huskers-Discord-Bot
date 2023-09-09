@@ -231,7 +231,10 @@ class BetLines:
 
         for key, value in from_dict.to_dict().items():
             try:
-                setattr(self, key, value)
+                if value:
+                    setattr(self, key, value)
+                else:
+                    setattr(self, key, "N/A")
             except AttributeError as _err:
                 setattr(self, key, "N/A")
                 continue
@@ -241,7 +244,7 @@ class BetLines:
             f"{self.provider}'s lines:\n"
             f"Spread: {self.formatted_spread} (Opened: {self.spread_open})\n"
             f"Over/Under: {self.over_under} (Opened: {self.over_under_open})\n"
-            f"Moneyline: {self.home_moneyline}, {self.away_moneyline}"
+            f"Moneyline: Home {self.home_moneyline}, Away {self.away_moneyline}"
         )
 
     def __repr__(self) -> str:
