@@ -209,17 +209,23 @@ class WhichOverUnderChoice(str, enum.Enum):
 
 class BetLines:
     __slots__ = [
+        "away_moneyline",
         "formatted_spread",
+        "home_moneyline",
         "over_under",
         "over_under_open",
+        "provider",
         "spread",
         "spread_open",
     ]
 
     def __init__(self, from_dict: cfbd.models.GameLinesLines) -> None:
+        self.away_moneyline = None
         self.formatted_spread = None
+        self.home_moneyline = None
         self.over_under = None
         self.over_under_open = None
+        self.provider = None
         self.spread = None
         self.spread_open = None
 
@@ -227,12 +233,15 @@ class BetLines:
             try:
                 setattr(self, key, value)
             except AttributeError as _err:
+                setattr(self, key, "N/A")
                 continue
 
     def __str__(self) -> str:
         return (
-            f"Against the Spread: {self.formatted_spread} (Opened: {self.spread_open})\n"
+            f"{self.provider}'s lines:\n"
+            f"Spread: {self.formatted_spread} (Opened: {self.spread_open})\n"
             f"Over/Under: {self.over_under} (Opened: {self.over_under_open})\n"
+            f"Moneyline: {self.home_moneyline}, {self.away_moneyline}"
         )
 
     def __repr__(self) -> str:
