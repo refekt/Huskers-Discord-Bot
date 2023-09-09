@@ -309,7 +309,7 @@ class HuskerClient(Bot):
     # noinspection PyMethodMayBeStatic
     async def on_ready(self) -> None:
         self.guild_user_len = len(self.users)
-        self.reaction_threshold = int(0.0047 * self.guild_user_len)
+        self.reaction_threshold = 8
 
         global GUILD_ROLES
         GUILD_ROLES = self.guilds[0].roles
