@@ -125,7 +125,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         chan_live: discord.TextChannel = await client.fetch_channel(
             CHAN_DISCUSSION_LIVE
         )
-        chan_streaming: discord.TextChannel = await client.fetch_chfannel(
+        chan_streaming: discord.TextChannel = await client.fetch_channel(
             CHAN_DISCUSSION_STREAMING
         )
 
