@@ -173,45 +173,46 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
     # noinspection PyMethodMayBeStatic
     async def process_gameday(self, mode: bool, guild: discord.Guild) -> None:
-        gameday_category: discord.CategoryChannel = guild.get_channel(CAT_GAMEDAY)
-        general_category: discord.CategoryChannel = guild.get_channel(CAT_GENERAL)
-        role_everyone: discord.Role = guild.get_role(ROLE_EVERYONE_PROD)
-
-        logger.info(f"Creating permissions to be [{mode}]")
-
-        # perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite()
-        perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite(
-            view_channel=mode,
-            send_messages=mode,
-            read_messages=mode,
+        gameday_category: discord.CategoryChannel = await guild.fetch_channel(
+            CAT_GAMEDAY
         )
+        general_category: discord.CategoryChannel = await guild.fetch_channel(
+            CAT_GENERAL
+        )
+        role_everyone: Optional[discord.Role] = None
+        all_roles: list[discord.Role] = await guild.fetch_roles()
 
-        # perms_text.view_channel = mode  # noqa
-        # perms_text.send_messages = mode  # noqa
-        # perms_text.read_messages = mode  # noqa
+        for role in all_roles:
+            if role.id == ROLE_EVERYONE_PROD:
+                role_everyone = role
+                break
 
-        perms_text_opposite: discord.PermissionOverwrite = discord.PermissionOverwrite(
+        if role_everyone is None:
+            role_everyone = guild.get_role(ROLE_EVERYONE_PROD)
+
+        perms_toggle_general: discord.PermissionOverwrite = discord.PermissionOverwrite(
             view_channel=True,
             send_messages=not mode,
             read_messages=True,
         )
-        perms_voice: discord.PermissionOverwrite = discord.PermissionOverwrite()
-        # perms_voice.view_channel = mode  # noqa
-        # perms_voice.connect = mode  # noqa
-        # perms_voice.speak = mode  # noqa
-
-        logger.info(f"Permissions created")
+        perms_text: discord.PermissionOverwrite = discord.PermissionOverwrite(
+            view_channel=mode
+        )
+        perms_voice: discord.PermissionOverwrite = discord.PermissionOverwrite(
+            view_channel=mode
+        )
 
         for channel in general_category.channels:
-
             try:
                 logger.info(
                     f"Attempting to changes permissions for [{channel.name.encode('utf-8', 'replace')}] to [{not mode}]"
                 )
                 if channel.type == discord.ChannelType.text:
                     await channel.set_permissions(
-                        role_everyone, overwrite=perms_text_opposite
+                        role_everyone, overwrite=perms_toggle_general
                     )
+                else:
+                    continue
             except (Forbidden, HTTPException, TypeError, ValueError):
                 logger.info(
                     f"Unable to change permissions for [{channel.name.encode('utf-8', 'replace')}] to [{not mode}]"
@@ -227,16 +228,15 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 logger.info(
                     f"Attempting to changes permissions for [{channel}] to [{mode}]"
                 )
-
                 if channel.type == discord.ChannelType.text:
                     await channel.set_permissions(role_everyone, overwrite=perms_text)
                 elif channel.type == discord.ChannelType.voice:
                     await channel.set_permissions(role_everyone, overwrite=perms_voice)
 
-                    # Disconnects members from voice
                     if not channel.members:
                         continue
 
+                    # Disconnects members from voice
                     for member in channel.members:
                         try:
                             await member.move_to(channel=None)
@@ -246,20 +246,16 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                             )
                             continue
                 else:
-                    logger.info(
-                        f"Unable to change permissions for [{channel}] to [{mode}]"
-                    )
                     continue
 
                 logger.info(f"Changed permissions for [{channel}] to [{mode}]")
-            except Forbidden:
+            except (Forbidden, HTTPException, TypeError, ValueError):
                 logger.exception(
                     "The bot does not have access to change permissions!", exc_info=True
                 )
-            except (HTTPException, TypeError, ValueError):
                 continue
 
-        logger.info(f"All permissions changes applied")
+        logger.info(f"Completed all channel permission updates")
 
     # noinspection PyMethodMayBeStatic
     async def college_purge_messages(
