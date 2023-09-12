@@ -29,7 +29,7 @@ from helpers.constants import (
     CHAN_HOS,
     CHAN_NORTH_BOTTOMS,
     GUILD_PROD,
-    TZ,
+    CHAN_ANNOUNCEMENT,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -251,12 +251,18 @@ class HuskerClient(Bot):
     async def send_goodbye_message(self, guild_member: discord.Member | discord.User):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
 
+        try:
+            if guild_member.avatar.url != "":
+                avatar_url = guild_member.avatar.url
+            else:
+                avatar_url = BOT_ICON_URL
+        except AttributeError:
+            avatar_url = BOT_ICON_URL
+
         embed = buildEmbed(
             title=f"Woe is us, {guild_member.display_name}#{guild_member.discriminator} fan departs",
             description="Say goodbye to another fair weather fan Mick ran off and Bart failed to ban",
-            image=guild_member.avatar.url
-            if guild_member.avatar.url != ""
-            else BOT_ICON_URL,
+            image=avatar_url,
         )
         await channel_general.send(embed=embed)
 
@@ -324,8 +330,13 @@ class HuskerClient(Bot):
             chan_north_bottoms: discord.TextChannel = await self.fetch_channel(
                 CHAN_BOT_SPAM_PRIVATE
             )
+            chan_announcement: discord.TextChannel = await self.fetch_channel(
+                CHAN_BOT_SPAM_PRIVATE
+            )
+
         else:
             chan_general = await self.fetch_channel(CHAN_GENERAL)
+            chan_announcement = await self.fetch_channel(CHAN_ANNOUNCEMENT)
             chan_botspam = await self.fetch_channel(CHAN_BOT_SPAM)
             chan_north_bottoms = await self.fetch_channel(CHAN_NORTH_BOTTOMS)
 
@@ -540,6 +551,7 @@ class HuskerClient(Bot):
         else:
             logger.info("Creating daily posts schedule")
             scheduled_posts: SchedulePosts = SchedulePosts(channel=chan_general)
+            # scheduled_posts: SchedulePosts = SchedulePosts(channel=chan_announcement)
             scheduled_posts.setup_and_run_schedule()
 
             logger.info("Running scheduled_posts")
@@ -558,7 +570,7 @@ class HuskerClient(Bot):
         if on_ready_tasks:
             logger.info(f"Processing {len(on_ready_tasks)} collected tasks")
 
-            results: list = await asyncio.gather(
+            results: tuple[BaseException | Any] = await asyncio.gather(
                 *on_ready_tasks, return_exceptions=True
             )
 

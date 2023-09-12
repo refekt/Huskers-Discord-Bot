@@ -1,10 +1,8 @@
-import json
 import logging
 import random
 import re
-from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional, Union, Any
+from typing import Optional, Union, Any
 
 import discord.ext.commands
 import markovify
@@ -19,17 +17,13 @@ from openai.openai_object import OpenAIObject
 from helpers.constants import (
     CHAN_BANNED,
     CHAN_POSSUMS,
-    DT_OPENWEATHER_UTC,
     GLOBAL_TIMEOUT,
     GUILD_PROD,
-    HEADERS,
-    TZ,
-    US_STATES,
-    WEATHER_API_KEY,
     OPENAI_KEY,
     FIELD_VALUE_LIMIT,
 )
 from helpers.embed import buildEmbed
+from helpers.misc import weather_embed
 from helpers.mysql import (
     SqlFetch,
     processMySQL,
@@ -41,14 +35,12 @@ from helpers.mysql import (
 )
 from objects.Exceptions import (
     CommandException,
-    WeatherException,
     TextException,
     MySQLException,
 )
 from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
 from objects.Survey import Survey
-from objects.Weather import WeatherResponse, WeatherHour
 
 logger = discordLogger(
     name=__name__,
@@ -470,111 +462,7 @@ class TextCog(commands.Cog, name="Text Commands"):
     ) -> None:
         await interaction.response.defer()
 
-        try:
-            formatted_state: dict[str] = next(
-                (
-                    search_state
-                    for search_state in US_STATES
-                    if (
-                        search_state["State"].lower() == state.lower()
-                        or search_state["Abbrev"][:-1].lower() == state.lower()
-                        or search_state["Code"].lower() == state.lower()
-                    )
-                ),
-                None,
-            )
-        except StopIteration:
-            raise WeatherException("Unable to find state. Please try again!")
-
-        weather_url: str = f"https://api.openweathermap.org/data/2.5/weather?appid={WEATHER_API_KEY}&units=imperial&lang=en&q={city},{formatted_state['Code']},{country}"
-        response: requests.Response = requests.get(weather_url, headers=HEADERS)
-        j: dict = json.loads(response.content)
-
-        weather: WeatherResponse = WeatherResponse(j)
-        if weather.cod == "404":
-            raise WeatherException(
-                f"Unable to find {city.title()}, {state}. Try again!"
-            )
-
-        temp_str: str = (
-            f"Temperature: {weather.main.temp}℉\n"
-            f"Feels Like: {weather.main.feels_like}℉\n"
-            f"Humidity: {weather.main.humidity}%\n"
-            f"Max: {weather.main.temp_max}℉\n"
-            f"Min: {weather.main.temp_min}℉"
-        )
-
-        if len(weather.wind) == 2:
-            wind_str: str = (
-                f"Speed: {weather.wind.speed} MPH\n" f"Direction: {weather.wind.deg} °"
-            )
-        elif len(weather.wind) == 3:
-            wind_str = (
-                f"Speed: {weather.wind.speed} MPH\n"
-                f"Gusts: {weather.wind.gust} MPH\n"
-                f"Direction: {weather.wind.deg} °"
-            )
-        else:
-            wind_str = f"Speed: {weather.wind.speed} MPH"
-
-        hourly_url: str = f"https://api.openweathermap.org/data/2.5/onecall?lat={weather.coord.lat}&lon={weather.coord.lon}&appid={WEATHER_API_KEY}&units=imperial"
-        response: requests.Response = requests.get(hourly_url, headers=HEADERS)
-        j: dict = json.loads(response.content)
-        hours: List[WeatherHour] = []
-        for index, item in enumerate(j["hourly"]):
-            hours.append(WeatherHour(item))
-            if index == 3:
-                break
-
-        hour_temp_str: str = ""
-        hour_wind_str: str = ""
-        for index, hour in enumerate(hours):
-            if index < len(hours) - 1:
-                hour_temp_str += f"{hour.temp}℉ » "
-                hour_wind_str += f"{hour.wind_speed} MPH » "
-            else:
-                hour_temp_str += f"{hour.temp}℉"
-                hour_wind_str += f"{hour.wind_speed} MPH"
-
-        sunrise: datetime = weather.sys.sunrise
-        sunset: datetime = weather.sys.sunset
-
-        sun_str: str = (
-            f"Sunrise: {sunrise.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}\n"
-            f"Sunset: {sunset.astimezone(tz=TZ).strftime(DT_OPENWEATHER_UTC)}"
-        )
-
-        embed: discord.Embed = buildEmbed(
-            title=f"Weather conditions for {city.title()}, {state.upper()}",
-            description=f"It is currently {weather.weather[0].main} with {weather.weather[0].description}. {city.title()}, {state} is located at {weather.coord.lat}, {weather.coord.lon}.",
-            fields=[
-                dict(
-                    name="Temperature",
-                    value=temp_str,
-                ),
-                dict(
-                    name="Clouds",
-                    value=f"Coverage: {weather.clouds.all}%",
-                ),
-                dict(
-                    name="Wind",
-                    value=wind_str,
-                ),
-                dict(
-                    name="Temp Next 4 Hours",
-                    value=hour_temp_str,
-                ),
-                dict(
-                    name="Wind Next 4 Hours",
-                    value=hour_wind_str,
-                ),
-                dict(
-                    name="Sun",
-                    value=sun_str,
-                ),
-            ],
-            thumbnail=f"https://openweathermap.org/img/wn/{weather.weather[0].icon}@4x.png",
-        )
+        embed: discord.Embed = weather_embed(city=city, state=state, country=country)
 
         await interaction.followup.send(embed=embed)
 

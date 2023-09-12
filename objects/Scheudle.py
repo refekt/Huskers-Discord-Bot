@@ -62,7 +62,7 @@ class SchedulePosts:
         asyncio_logger.debug("Creating SchedulePosts instance")
 
         description_daily: str = "MORNING GANG RISE UP!"
-        description_nightly: str = "Night Owls Assemble!"
+        description_nightly: str = "Night Gang Assemble!"
         title_daily: str = "Daily Themed Topics of Discussion"
         title_nightly: str = "Nightly Themed Topics of Discussion"
 
