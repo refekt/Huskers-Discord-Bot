@@ -639,7 +639,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
         try:
             await who.remove_roles(role_timeout)
-        except (Forbidden, HTTPException) as e:
+        except (Forbidden, HTTPException, AttributeError) as e:
             logger.exception(f"Unable to remove the timeout role!\n{e}", exc_info=True)
 
         logger.info(f"Removed [{role_timeout}] role")
@@ -658,7 +658,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 for role in previous_roles:
                     try:
                         new_role: discord.Role = interaction.guild.get_role(int(role))
-                        logger.info(f"Attempting to add [{new_role}] role...")
+                        logger.info(
+                            f"Attempting to add [{str(new_role).encode('utf-8', 'replace')}] role..."
+                        )
                         await who.add_roles(new_role, reason="Returning from Iowa")
                     except (
                         discord.Forbidden,
@@ -668,7 +670,9 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                         logger.info(f"Unable to add role!\n{e}")
                         continue
 
-                    logger.info(f"Added [{new_role}] role")
+                    logger.info(
+                        f"Added [{str(new_role).encode('utf-8', 'replace')}] role"
+                    )
 
         embed: discord.Embed = buildEmbed(
             title="Return to Nebraska",
@@ -724,7 +728,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
             + reason
         )
 
-        previous_roles: Union[list[str], str] = [str(role.id) for role in who.roles[1:]]
+        try:
+            previous_roles: Union[list[str], str, None] = [
+                str(role.id) for role in who.roles[1:]
+            ]
+        except AttributeError:
+            previous_roles = None
+
         if previous_roles is not None and len(previous_roles):
             previous_roles = ",".join(previous_roles)
         else:

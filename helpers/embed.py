@@ -226,7 +226,7 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
 
     try:
         records = records[0]
-        records_str: str = f"Nebraska's {year} Record: {records.total['wins']} - {records.total['losses']}"  # noqa
+        records_str: str = f"Nebraska's {year} Record: {records.total.wins} - {records.total.losses}"  # noqa
     except IndexError:
         records_str = ""
 
