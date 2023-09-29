@@ -22,6 +22,8 @@ from commands.football_stats import gen_countdown
 from commands.reminder import MissedReminder, send_reminder
 from helpers.constants import (
     BOT_ICON_URL,
+    CHAN_ADMIN,
+    CHAN_ADMIN_DOUBLE,
     CHAN_BOT_SPAM,
     CHAN_BOT_SPAM_PRIVATE,
     CHAN_GENERAL,
@@ -29,7 +31,6 @@ from helpers.constants import (
     CHAN_HOS,
     CHAN_NORTH_BOTTOMS,
     GUILD_PROD,
-    TZ,
 )
 from helpers.embed import buildEmbed
 from helpers.mysql import (
@@ -91,6 +92,8 @@ class HuskerClient(Bot):
         if not payload.guild_id == GUILD_PROD or payload.channel_id in (
             CHAN_HOF,
             CHAN_HOS,
+            CHAN_ADMIN,
+            CHAN_ADMIN_DOUBLE,
         ):  # Stay out of HOF and HOS
             logger.debug(
                 "Reaction was either in HOF/HOS channel or not in the correct guild."
