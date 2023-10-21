@@ -30,7 +30,6 @@ from helpers.constants import (
     CHAN_DISCUSSION_LIVE,
     CHAN_DISCUSSION_STREAMING,
     CHAN_GENERAL,
-    CHAN_IOWA,
     CHAN_RECRUITING,
     DT_GITHUB_API,
     DT_GITHUB_API_DISPLAY,
@@ -43,12 +42,11 @@ from helpers.constants import (
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
-from helpers.mysql import processMySQL, sqlInsertIowa, sqlRetrieveIowa, sqlRemoveIowa
+from helpers.mysql import processMySQL, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
 from objects.Thread import (
-    background_run_function,
     prettifyTimeDateValue,
     convertIowaDuration,
     prettifyLongTimeDateValue,
@@ -721,53 +719,62 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         else:
             dt_duration = None
 
-        role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
-        channel_iowa: discord.TextChannel = interaction.guild.get_channel(CHAN_IOWA)
+        # role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
+        # channel_iowa: discord.TextChannel = interaction.guild.get_channel(CHAN_IOWA)
         full_reason: str = (
             f"Time Out by {interaction.user.name}#{interaction.user.discriminator}: "
             + reason
         )
 
         try:
-            previous_roles: Union[list[str], str, None] = [
-                str(role.id) for role in who.roles[1:]
-            ]
-        except AttributeError:
-            previous_roles = None
-
-        if previous_roles is not None and len(previous_roles):
-            previous_roles = ",".join(previous_roles)
-        else:
-            previous_roles = ""
-
-        logger.info(f"Gathered all the roles to store")
-
-        roles: list[discord.Role] = who.roles
-        for role in roles:
-            try:
-                await who.remove_roles(role, reason=full_reason)
-                logger.info(f"Removed [{role}] role")
-            except (discord.Forbidden, discord.HTTPException):
-                continue
-
-        try:
-            await who.add_roles(role_timeout, reason=full_reason)
-        except (discord.Forbidden, discord.HTTPException):
+            await who.timeout(dt_duration, reason=reason)
+        except TypeError:
             logger.exception(
-                f"Unable to add role to {who.name}#{who.discriminator}!", exc_info=True
+                f"Unable to timeout {who.name}#{who.discriminator}!", exc_info=True
             )
 
-        logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
+        #
+        # try:
+        #     previous_roles: Union[list[str], str, None] = [
+        #         str(role.id) for role in who.roles[1:]
+        #     ]
+        # except AttributeError:
+        #     previous_roles = None
+        #
+        # if previous_roles is not None and len(previous_roles):
+        #     previous_roles = ",".join(previous_roles)
+        # else:
+        #     previous_roles = ""
+        #
+        # logger.info(f"Gathered all the roles to store")
+        #
+        # roles: list[discord.Role] = who.roles
+        # for role in roles:
+        #     try:
+        #         await who.remove_roles(role, reason=full_reason)
+        #         logger.info(f"Removed [{role}] role")
+        #     except (discord.Forbidden, discord.HTTPException):
+        #         continue
+        #
+        # try:
+        #     await who.add_roles(role_timeout, reason=full_reason)
+        # except (discord.Forbidden, discord.HTTPException):
+        #     logger.exception(
+        #         f"Unable to add role to {who.name}#{who.discriminator}!", exc_info=True
+        #     )
+        #
+        # logger.info(f"Added [{role_timeout}] role to {who.name}#{who.discriminator}")
+        #
+        # processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
+        # logger.debug("Saved old roles roles to MySQL database")
 
-        processMySQL(query=sqlInsertIowa, values=(who.id, full_reason, previous_roles))
-        logger.debug("Saved old roles roles to MySQL database")
-
-        statement_str: str = f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
-        message_str: str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
+        # statement_str: str = f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
+        statement_str: str = f"[{who.mention}] has been a Rhuligan and sent to Iowa."
+        # message_str: str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
 
         if duration:
             statement_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
-            message_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
+            # message_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
 
         embed: discord.Embed = buildEmbed(
             title="Banished to Iowa",
@@ -778,17 +785,18 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         )
 
         await interaction.followup.send(embed=embed)
-        try:
-            await who.send(message_str)
-        except (HTTPException, Forbidden, ValueError, TypeError):
-            pass
 
-        if duration is not None:
-            await background_run_function(
-                func=self.proess_nebraska(interaction=interaction, who=who),
-                duration=dt_duration,
-                loop=interaction.client.loop,
-            )
+        # try:
+        #     await who.send(message_str)
+        # except (HTTPException, Forbidden, ValueError, TypeError):
+        #     pass
+        #
+        # if duration is not None:
+        #     await background_run_function(
+        #         func=self.proess_nebraska(interaction=interaction, who=who),
+        #         duration=dt_duration,
+        #         loop=interaction.client.loop,
+        #     )
 
         logger.info("Iowa command complete")
 
