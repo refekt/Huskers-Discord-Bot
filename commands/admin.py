@@ -36,13 +36,11 @@ from helpers.constants import (
     GUILD_PROD,
     ROLE_ANNOUNCEMENT,
     ROLE_EVERYONE_PROD,
-    ROLE_TIME_OUT,
     TZ,
     WINDOWS_PATH,
 )
 from helpers.embed import buildEmbed
 from helpers.misc import discordURLFormatter
-from helpers.mysql import processMySQL, sqlRetrieveIowa, sqlRemoveIowa
 from objects.Exceptions import CommandException, UserInputException, SSHException
 from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
@@ -634,43 +632,50 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         if not interaction.response.is_done():
             await interaction.response.defer(thinking=True)
 
-        role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
+        # role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
+        # try:
+        #     await who.remove_roles(role_timeout)
+        # except (Forbidden, HTTPException, AttributeError) as e:
+        #     logger.exception(f"Unable to remove the timeout role!\n{e}", exc_info=True)
+        #
+        # logger.info(f"Removed [{role_timeout}] role")
+        #
+        # previous_roles_raw: Union[dict, list[dict, ...], None] = processMySQL(
+        #     query=sqlRetrieveIowa, values=str(who.id), fetch="all"
+        # )
+        #
+        # processMySQL(query=sqlRemoveIowa, values=str(who.id))
+        #
+        # if previous_roles_raw is not None and len(previous_roles_raw):
+        #     previous_roles: str = previous_roles_raw[0]["previous_roles"].split(",")
+        #     logger.info(f"Gathered all the roles to store")
+        #
+        #     if previous_roles:
+        #         for role in previous_roles:
+        #             try:
+        #                 new_role: discord.Role = interaction.guild.get_role(int(role))
+        #                 logger.info(
+        #                     f"Attempting to add [{str(new_role).encode('utf-8', 'replace')}] role..."
+        #                 )
+        #                 await who.add_roles(new_role, reason="Returning from Iowa")
+        #             except (
+        #                 discord.Forbidden,
+        #                 discord.HTTPException,
+        #                 discord.ext.commands.MissingPermissions,
+        #             ) as e:
+        #                 logger.info(f"Unable to add role!\n{e}")
+        #                 continue
+        #
+        #             logger.info(
+        #                 f"Added [{str(new_role).encode('utf-8', 'replace')}] role"
+        #             )
+
         try:
-            await who.remove_roles(role_timeout)
-        except (Forbidden, HTTPException, AttributeError) as e:
-            logger.exception(f"Unable to remove the timeout role!\n{e}", exc_info=True)
-
-        logger.info(f"Removed [{role_timeout}] role")
-
-        previous_roles_raw: Union[dict, list[dict, ...], None] = processMySQL(
-            query=sqlRetrieveIowa, values=str(who.id), fetch="all"
-        )
-
-        processMySQL(query=sqlRemoveIowa, values=str(who.id))
-
-        if previous_roles_raw is not None and len(previous_roles_raw):
-            previous_roles: str = previous_roles_raw[0]["previous_roles"].split(",")
-            logger.info(f"Gathered all the roles to store")
-
-            if previous_roles:
-                for role in previous_roles:
-                    try:
-                        new_role: discord.Role = interaction.guild.get_role(int(role))
-                        logger.info(
-                            f"Attempting to add [{str(new_role).encode('utf-8', 'replace')}] role..."
-                        )
-                        await who.add_roles(new_role, reason="Returning from Iowa")
-                    except (
-                        discord.Forbidden,
-                        discord.HTTPException,
-                        discord.ext.commands.MissingPermissions,
-                    ) as e:
-                        logger.info(f"Unable to add role!\n{e}")
-                        continue
-
-                    logger.info(
-                        f"Added [{str(new_role).encode('utf-8', 'replace')}] role"
-                    )
+            await who.timeout(None)
+        except TypeError:
+            logger.exception(
+                f"Unable to add role to {who.name}#{who.discriminator}!", exc_info=True
+            )
 
         embed: discord.Embed = buildEmbed(
             title="Return to Nebraska",
