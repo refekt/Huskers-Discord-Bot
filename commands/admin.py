@@ -726,10 +726,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
 
         # role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
         # channel_iowa: discord.TextChannel = interaction.guild.get_channel(CHAN_IOWA)
-        full_reason: str = (
-            f"Time Out by {interaction.user.name}#{interaction.user.discriminator}: "
-            + reason
-        )
+        full_reason: str = f"Time Out by {interaction.user.mention}: " + reason
 
         try:
             await who.timeout(dt_duration, reason=reason)
@@ -774,11 +771,13 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         # logger.debug("Saved old roles roles to MySQL database")
 
         # statement_str: str = f"[{who.mention}] has had all roles removed and been sent to Iowa. Their User ID has been recorded and {role_timeout.mention} will be reapplied on rejoining the server."
-        statement_str: str = f"[{who.mention}] has been a Rhuligan and sent to Iowa."
+        statement_str: str = (
+            f"[{who.mention}] has been a Rhuligan and was sent to Iowa."
+        )
         # message_str: str = f"You have been moved to [ {channel_iowa.mention} ] for the following reason: {reason}."
 
         if duration:
-            statement_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
+            statement_str += f" This will be reverted in {int(duration):,} seconds."
             # message_str += f" This will be reverted in {prettifyTimeDateValue(dt_duration.seconds)}."
 
         embed: discord.Embed = buildEmbed(

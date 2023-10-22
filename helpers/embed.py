@@ -81,7 +81,15 @@ def buildEmbed(title: Optional[str], **kwargs) -> discord.Embed | None:
             e = discord.Embed(title=title[:TITLE_LIMIT], color=0xD00000)
 
     if "footer" in kwargs.keys():
-        e.set_footer(text=kwargs.get("footer")[:FOOTER_LIMIT], icon_url=BOT_ICON_URL)
+        if "icon_url" in kwargs.keys():
+            e.set_footer(
+                text=kwargs.get("footer")[:FOOTER_LIMIT],
+                icon_url=kwargs.get("icon_url"),
+            )
+        else:
+            e.set_footer(
+                text=kwargs.get("footer")[:FOOTER_LIMIT], icon_url=BOT_ICON_URL
+            )
     else:
         e.set_footer(
             text=BOT_FOOTER_BOT[:FOOTER_LIMIT],

@@ -234,19 +234,21 @@ class HuskerClient(Bot):
             avatar_url = BOT_ICON_URL
 
         embed = buildEmbed(
-            title="Hark! A new Husker fan emerges",
-            description="Welcome the new member to the server!",
-            fields=[
-                dict(
-                    name="New Member",
-                    value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
-                ),
-                dict(
-                    name="Info",
-                    value=f"Be sure to check out `/commands` for how to use the bot!",
-                ),
-            ],
-            image=avatar_url,
+            footer=f"Welcome [{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})] to the server! ",
+            icon_url=avatar_url,
+            # title="Hark! A new Husker fan emerges",
+            # description="Welcome the new member to the server!",
+            # fields=[
+            # dict(
+            #     name="New Member",
+            #     value=f"{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})",
+            # ),
+            # dict(
+            #     name="Info",
+            #     value=f"Be sure to check out `/commands` for how to use the bot!",
+            # ),
+            # ],
+            # image=avatar_url,
         )
 
         await channel_general.send(embed=embed)
@@ -254,12 +256,22 @@ class HuskerClient(Bot):
     async def send_goodbye_message(self, guild_member: discord.Member | discord.User):
         channel_general: discord.TextChannel = await self.fetch_channel(CHAN_GENERAL)
 
+        try:
+            if guild_member.avatar.url != "":
+                avatar_url = guild_member.avatar.url
+            else:
+                avatar_url = BOT_ICON_URL
+        except AttributeError:
+            avatar_url = BOT_ICON_URL
+
         embed = buildEmbed(
-            title=f"Woe is us, {guild_member.display_name}#{guild_member.discriminator} fan departs",
-            description="Say goodbye to another fair weather fan Mick ran off and Bart failed to ban",
-            image=guild_member.avatar.url
-            if guild_member.avatar.url != ""
-            else BOT_ICON_URL,
+            footer=f"Say goodbye to another fair weather fan [{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})] that Mick ran off and Bart failed to ban! ",
+            icon_url=avatar_url,
+            # title=f"Woe is us, {guild_member.display_name}#{guild_member.discriminator} fan departs",
+            # description="Say goodbye to another fair weather fan Mick ran off and Bart failed to ban",
+            # image=guild_member.avatar.url
+            # if guild_member.avatar.url != ""
+            # else BOT_ICON_URL,
         )
         await channel_general.send(embed=embed)
 
