@@ -268,7 +268,7 @@ class HuskerClient(Bot):
 
         embed = buildEmbed(
             title="",
-            footer=f"Say goodbye to another fair weather fan [{guild_member.mention} ({guild_member.display_name}#{guild_member.discriminator})] that Mick ran off and Bart failed to ban! ",
+            footer=f"Say goodbye to another fair weather fan [{guild_member.display_name}] that Mick ran off and Bart failed to ban! ",
             icon_url=avatar_url,
             thumbnail=None,
             # title=f"Woe is us, {guild_member.display_name}#{guild_member.discriminator} fan departs",
