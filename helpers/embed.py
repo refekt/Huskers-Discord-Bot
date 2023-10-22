@@ -18,6 +18,7 @@ from helpers.constants import (
     DESC_LIMIT,
     DT_CFBD_GAMES,
     DT_CFBD_GAMES_DISPLAY,
+    DT_CFBD_GAMES_DISPLAY_NO_TIME,
     DT_STR_RECRUIT,
     DT_TWEET_FORMAT,
     EMBED_MAX,
@@ -29,7 +30,6 @@ from helpers.constants import (
     TITLE_LIMIT,
     TWITTER_BEARER,
     TZ,
-    DT_CFBD_GAMES_DISPLAY_NO_TIME,
 )
 from helpers.misc import discordURLFormatter, getModuleMethod
 from helpers.mysql import processMySQL, sqlGetCrootPredictions, SqlFetch
@@ -96,8 +96,13 @@ def buildEmbed(title: Optional[str], **kwargs) -> discord.Embed | None:
             icon_url=BOT_ICON_URL,
         )
 
-    if "image" in kwargs.keys() and validators.url(kwargs.get("image")):
-        e.set_image(url=kwargs.get("image"))
+    if "image" in kwargs.keys():
+        if kwargs.get("image") is None:
+            e.set_image(url=None)
+        elif validators.url(kwargs.get("image")):
+            e.set_image(url=kwargs.get("image"))
+        else:
+            e.set_image(url="")
 
     if "author" in kwargs.keys():
         e.set_author(
