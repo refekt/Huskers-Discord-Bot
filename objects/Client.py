@@ -421,7 +421,7 @@ class HuskerClient(Bot):
 
             def get_next_opponent() -> str:
                 now_date = datetime.datetime.now().date()
-                now_date += datetime.timedelta(
+                now_date -= datetime.timedelta(
                     days=1
                 )  # Avoid showing next's weeks game on gameday
 
