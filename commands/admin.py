@@ -722,7 +722,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         if duration:
             dt_duration: Optional[timedelta] = convertIowaDuration(duration)
         else:
-            dt_duration = None
+            dt_duration = timedelta(minutes=30)
 
         # role_timeout: discord.Role = interaction.guild.get_role(ROLE_TIME_OUT)
         # channel_iowa: discord.TextChannel = interaction.guild.get_channel(CHAN_IOWA)
