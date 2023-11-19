@@ -121,7 +121,7 @@ class HuskerClient(Bot):
             return None
 
         logger.info(
-            f"Reaction threshold broken with [{reactions_over_threshold[0].count}] [{reactions_over_threshold[0].emoji.name}] reactions"
+            f"Reaction threshold broken with [{reactions_over_threshold[0].count}] reactions"
         )
 
         hof_channel: Optional[discord.TextChannel] = None
