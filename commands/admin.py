@@ -45,7 +45,6 @@ from objects.Exceptions import CommandException, UserInputException, SSHExceptio
 from objects.Logger import discordLogger, is_debugging
 from objects.Paginator import EmbedPaginatorView
 from objects.Thread import (
-    prettifyTimeDateValue,
     convertIowaDuration,
     prettifyLongTimeDateValue,
 )
@@ -251,7 +250,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 )
                 continue
 
-        logger.info(f"Completed all channel permission updates")
+        logger.info("Completed all channel permission updates")
 
     # noinspection PyMethodMayBeStatic
     async def college_purge_messages(
@@ -368,7 +367,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                     ),
                     dict(
                         name="Feeling generous?",
-                        value=f"Check out `/donate` to help out the production and upkeep of the bot.",
+                        value="Check out `/donate` to help out the production and upkeep of the bot.",
                     ),
                 ],
             )
@@ -424,11 +423,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         ] = [
             bot_guild_command
             for bot_guild_command in interaction.client.tree._guild_commands.items()  # noqa
-        ][
-            0
-        ][
-            1
-        ]
+        ][0][1]
         # Don't judge me for the craziness above
 
         embed_fields_commands: list[dict[str, str]] = []
@@ -823,7 +818,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     )
     @app_commands.default_permissions(manage_messages=True)
     async def gameday_on(self, interaction: discord.Interaction) -> None:
-        logger.info(f"Game Day: On")
+        logger.info("Game Day: On")
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("Processing!")
         await self.process_gameday(True, interaction.guild)
@@ -835,7 +830,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
     )
     @app_commands.default_permissions(manage_messages=True)
     async def gameday_off(self, interaction: discord.Interaction) -> None:
-        logger.info(f"Game Day: Off")
+        logger.info("Game Day: Off")
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("Processing!")
         await self.process_gameday(False, interaction.guild)
@@ -985,7 +980,7 @@ class AdminCog(commands.Cog, name="Admin Commands"):
                 content=f"{role_announcement.mention}", embed=embed
             )
         else:
-            await channel_announcement.send(content=f"@Announcements", embed=embed)
+            await channel_announcement.send(content="@Announcements", embed=embed)
 
         await interaction.followup.send(
             f"Announcement has been sent to {channel_announcement.mention}"

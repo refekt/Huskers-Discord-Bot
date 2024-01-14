@@ -611,7 +611,6 @@ class HuskerClient(Bot):
         await self.check_reaction(payload)
 
     async def on_message(self, message: discord.Message) -> None:
-
         await self.process_commands(message)
 
         if message.author.bot or message.channel.id not in (

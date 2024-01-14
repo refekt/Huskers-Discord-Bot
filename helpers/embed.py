@@ -239,7 +239,9 @@ def collectScheduleEmbeds(year: int) -> list[discord.Embed]:
 
     try:
         records = records[0]
-        records_str: str = f"Nebraska's {year} Record: {records.total.wins} - {records.total.losses}"  # noqa
+        records_str: str = (
+            f"Nebraska's {year} Record: {records.total.wins} - {records.total.losses}"
+        )
     except IndexError:
         records_str = ""
 
@@ -422,7 +424,7 @@ def buildRecruitEmbed(recruit) -> discord.Embed:
         if get_croot_preds_response is None:
             return "There are no predictions for this recruit."
         else:
-            prediction_str = f"Team: Percent (Avg Confidence)"
+            prediction_str = "Team: Percent (Avg Confidence)"
             for predictions in get_croot_preds_response:
                 prediction_str += f"\n{predictions['team']}: {predictions['percent']:.0f}% ({predictions['confidence']:.1f})"
             prediction_str += (

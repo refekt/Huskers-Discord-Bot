@@ -98,7 +98,8 @@ class UserCog(commands.Cog, name="User Commands"):
     # @app_commands.describe(apply_role="The hype role you want to apply")
     @app_commands.guilds(discord.Object(id=GUILD_PROD))
     async def hype(
-        self, interaction: discord.Interaction  # , apply_role: HypeRoles
+        self,
+        interaction: discord.Interaction,  # , apply_role: HypeRoles
     ) -> None:
         await interaction.response.send_message(
             "This command has been replaced by `/roles`.", ephemeral=True
