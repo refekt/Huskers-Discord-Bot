@@ -134,7 +134,6 @@ class HuskerSched2024(enum.StrEnum):
     Illinois = "Illinois"
     Indiana = "Indiana"
     Iowa = "Iowa"
-    Nebraska = "Nebraska"
     Northern_Iowa = "Northern Iowa"
     Ohio_State = "Ohio State"
     Purdue = "Purdue"
