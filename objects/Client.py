@@ -43,7 +43,7 @@ from helpers.mysql import (
     sqlInsertXword,
 )
 from helpers.slowking import makeSlowking
-from objects.Bets_Stats_Schedule import HuskerSched2023
+from objects.Bets_Stats_Schedule import HuskerSched2024
 
 # from helpers.twitter import start_twitter_stream
 from objects.Exceptions import ChangelogException, MySQLException
@@ -188,9 +188,11 @@ class HuskerClient(Bot):
                     dict(name="Author", value=f"{reaction_message.author.mention}"),
                     dict(
                         name="Message",
-                        value=f"{reaction_message.content}"
-                        if reaction_message.content != ""
-                        else f"{reaction_message.attachments[0].url}",
+                        value=(
+                            f"{reaction_message.content}"
+                            if reaction_message.content != ""
+                            else f"{reaction_message.attachments[0].url}"
+                        ),
                     ),
                     dict(
                         name="Message Link",
@@ -291,7 +293,7 @@ class HuskerClient(Bot):
                 ),
                 dict(
                     name="Commands",
-                    value=f"View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
+                    value="View the list of commands with the `/commands` command. Note: Commands do not work in Direct Messages.",
                 ),
                 dict(
                     name="Version",
@@ -427,8 +429,8 @@ class HuskerClient(Bot):
 
                 previous_team: str = ""
 
-                for oppo_index, oppo in enumerate(reversed(HuskerSched2023)):
-                    if oppo_index == len(HuskerSched2023):
+                for oppo_index, oppo in enumerate(reversed(HuskerSched2024)):
+                    if oppo_index == len(HuskerSched2024):
                         return "N/A"
 
                     oppo_split = str(oppo).split("__")
@@ -512,7 +514,7 @@ class HuskerClient(Bot):
 
                     if duration == timedelta(seconds=0):
                         logger.info(
-                            f"Reminder exceeded original send datetime. Sending now!"
+                            "Reminder exceeded original send datetime. Sending now!"
                         )
 
                         if destination == remind_who:
@@ -607,7 +609,7 @@ class HuskerClient(Bot):
     async def on_raw_reaction_add(
         self, payload: discord.RawReactionActionEvent
     ) -> None:
-        logger.debug(f"Checking to see if reaction broke threshold")
+        logger.debug("Checking to see if reaction broke threshold")
         await self.check_reaction(payload)
 
     async def on_message(self, message: discord.Message) -> None:

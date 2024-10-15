@@ -49,7 +49,7 @@ __all__: list[str] = [
     "BettingHuskerSchedule",
     "BigTenTeams",
     "FootballTeam",
-    "HuskerSched2023",
+    "HuskerSched2024",
     "HuskerSchedule",
     "WhichOverUnderChoice",
     "WhichTeamChoice",
@@ -119,51 +119,47 @@ class BigTenTeams(str, enum.Enum):
     Nebraska = "Nebraska"
     Northwestern = "Northwestern"
     Ohio_State = "Ohio State"
+    Oregon = "Oregon"
     Penn_State = "Penn State"
     Purdue = "Purdue"
     Rutgers = "Rutgers"
+    UCLA = "UCLA"
+    USC = "USC"
+    Washington = "Washington"
     Wisconsin = "Wisconsin"
 
 
-class HuskerSched2023(enum.StrEnum):
-    Minnesota = "Minnesota"
+class HuskerSched2024(enum.StrEnum):
     Colorado = "Colorado"
-    Northern_Illinois = "Northern Illinois"
-    Louisiana_Tech = "Louisiana Tech"
-    Michigan = "Michigan"
     Illinois = "Illinois"
-    Northwestern = "Northwestern"
-    Purdue = "Purdue"
-    Michigan_State = "Michigan State"
-    Maryland = "Maryland"
-    Wisconsin = "Wisconsin"
+    Indiana = "Indiana"
     Iowa = "Iowa"
+    Nebraska = "Nebraska"
+    Northern_Iowa = "Northern Iowa"
+    Ohio_State = "Ohio State"
+    Purdue = "Purdue"
+    Rutgers = "Rutgers"
+    UCLA = "UCLA"
+    USC = "USC"
+    UTEP = "UTEP"
+    Wisconsin = "Wisconsin"
 
     def __str__(self) -> str:
-        current_year: int = 2023
+        current_year: int = 2024
 
         schedule = [
-            {"team": "Minnesota", "date": date(year=current_year, month=8, day=31)},
-            {"team": "Colorado", "date": date(year=current_year, month=9, day=9)},
-            {
-                "team": "Northern Illinois",
-                "date": date(year=current_year, month=9, day=16),
-            },
-            {
-                "team": "Louisiana Tech",
-                "date": date(year=current_year, month=9, day=23),
-            },
-            {"team": "Michigan", "date": date(year=current_year, month=9, day=30)},
-            {"team": "Illinois", "date": date(year=current_year, month=10, day=7)},
-            {"team": "Northwestern", "date": date(year=current_year, month=10, day=21)},
-            {"team": "Purdue", "date": date(year=current_year, month=10, day=28)},
-            {
-                "team": "Michigan State",
-                "date": date(year=current_year, month=11, day=4),
-            },
-            {"team": "Maryland", "date": date(year=current_year, month=11, day=11)},
-            {"team": "Wisconsin", "date": date(year=current_year, month=11, day=18)},
-            {"team": "Iowa", "date": date(year=current_year, month=11, day=24)},
+            {"team": "UTEP", "date": date(year=current_year, month=8, day=31)},
+            {"team": "Colorado", "date": date(year=current_year, month=9, day=7)},
+            {"team": "Northern Iowa", "date": date(year=current_year, month=9, day=14)},
+            {"team": "Illinois", "date": date(year=current_year, month=9, day=20)},
+            {"team": "Purdue", "date": date(year=current_year, month=9, day=28)},
+            {"team": "Rutgers", "date": date(year=current_year, month=10, day=5)},
+            {"team": "Indiana", "date": date(year=current_year, month=10, day=19)},
+            {"team": "Ohio State", "date": date(year=current_year, month=10, day=26)},
+            {"team": "UCLA", "date": date(year=current_year, month=11, day=2)},
+            {"team": "USC", "date": date(year=current_year, month=11, day=16)},
+            {"team": "Wisconsin", "date": date(year=current_year, month=11, day=23)},
+            {"team": "Iowa", "date": date(year=current_year, month=11, day=29)},
         ]
         result: Optional = None
         for game in schedule:
@@ -175,18 +171,19 @@ class HuskerSched2023(enum.StrEnum):
 
 
 class BettingHuskerSchedule(enum.StrEnum):
-    Minnesota = "Minnesota"
     Colorado = "Colorado"
-    Northern_Illinois = "Northern Illinois"
-    Louisiana_Tech = "Louisiana Tech"
-    Michigan = "Michigan"
     Illinois = "Illinois"
-    Northwestern = "Northwestern"
-    Purdue = "Purdue"
-    Michigan_State = "Michigan State"
-    Maryland = "Maryland"
-    Wisconsin = "Wisconsin"
+    Indiana = "Indiana"
     Iowa = "Iowa"
+    Nebraska = "Nebraska"
+    Northern_Iowa = "Northern Iowa"
+    Ohio_State = "Ohio State"
+    Purdue = "Purdue"
+    Rutgers = "Rutgers"
+    UCLA = "UCLA"
+    USC = "USC"
+    UTEP = "UTEP"
+    Wisconsin = "Wisconsin"
 
 
 class WhichTeamChoice(str, enum.Enum):
@@ -318,7 +315,7 @@ class Bet:
     def __init__(
         self,
         author: discord.Member | discord.User,
-        opponent_name: BigTenTeams | HuskerSched2023,
+        opponent_name: BigTenTeams | HuskerSched2024,
         predict_game: Optional[WhichTeamChoice],
         predict_points: Optional[WhichOverUnderChoice],
         predict_spread: Optional[WhichTeamChoice],

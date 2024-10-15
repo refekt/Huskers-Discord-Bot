@@ -18,7 +18,7 @@ from helpers.mysql import processMySQL, sqlGetBetsLeaderboard, sqlResolveGame
 from objects.Bets_Stats_Schedule import (
     Bet,
     BigTenTeams,
-    HuskerSched2023,
+    HuskerSched2024,
     WhichOverUnderChoice,
     WhichTeamChoice,
     retrieveGameBets,
@@ -50,14 +50,14 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     async def bet_create(
         self,
         interaction: discord.Interaction,
-        opponent: HuskerSched2023,
+        opponent: HuskerSched2024,
         game_winner: WhichTeamChoice,
         predict_points: WhichOverUnderChoice,
         predict_spread: WhichTeamChoice,
     ) -> None:
         await interaction.response.defer()
 
-        if opponent == HuskerSched2023.Ignore:
+        if opponent == HuskerSched2024.Ignore:
             return
 
         dt_str: str = f"{str(opponent).split('__')[1]}"
@@ -127,9 +127,9 @@ class BettingCog(commands.Cog, name="Betting Commands"):
 
         embed: discord.Embed = buildEmbed(
             title=f"Nebraska vs. {opponent} Bet",
-            description=str(bet.bet_lines)
-            if bet.bet_lines
-            else "Betting lines not available.",
+            description=(
+                str(bet.bet_lines) if bet.bet_lines else "Betting lines not available."
+            ),
             fields=[
                 dict(
                     name=f"{interaction.user.display_name} ({interaction.user.name}#{interaction.user.discriminator})'s Bet",
@@ -262,14 +262,14 @@ class BettingCog(commands.Cog, name="Betting Commands"):
     async def bet_resolve(
         self,
         interaction: discord.Interaction,
-        opponent_name: HuskerSched2023,
+        opponent_name: HuskerSched2024,
         game_winner: WhichTeamChoice,
         result_points: WhichOverUnderChoice,
         result_spread: WhichTeamChoice,
     ):
         await interaction.response.defer(ephemeral=True)
 
-        if opponent_name == HuskerSched2023.Ignore:
+        if opponent_name == HuskerSched2024.Ignore:
             return
 
         processMySQL(

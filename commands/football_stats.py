@@ -31,7 +31,7 @@ from objects.Bets_Stats_Schedule import (
     BetLines,
     BigTenTeams,
     FootballTeam,
-    HuskerSched2023,
+    HuskerSched2024,
     buildTeam,
     getConsensusLineByOpponent,
     getHuskerOpponent,
@@ -60,7 +60,7 @@ for _ in range(0, FIELDS_LIMIT - 1, 1):
 
 
 async def gen_countdown(
-    opponent_name: HuskerSched2023 | str,
+    opponent_name: HuskerSched2024 | str,
 ) -> discord.Embed:
     year: int = datetime.now().year
 
@@ -74,9 +74,11 @@ async def gen_countdown(
         raise e
 
     start_date: datetime = datetime.strptime(
-        game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
-        if game.start_time_tbd
-        else game.start_date,
+        (
+            game.start_date.split("T")[0] + "T17:00:00.000Z"  # 9:00a CST/CDT
+            if game.start_time_tbd
+            else game.start_date
+        ),
         DT_CFBD_GAMES,
     ).astimezone(tz=TZ)
 
@@ -118,7 +120,7 @@ async def gen_countdown(
             text="Note: Times are set to 11:00 A.M. Central until the API is updated."
         )
 
-    logger.info(f"Countdown embed creation done")
+    logger.info("Countdown embed creation done")
 
     return embed
 
@@ -134,7 +136,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def countdown(
         self,
         interaction,  #: discord.Interaction,
-        opponent_name: HuskerSched2023,
+        opponent_name: HuskerSched2024,
     ) -> None:
         # logger.info(f"Starting countdown")
         # await interaction.response.defer()
@@ -212,9 +214,9 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def lines(
         self,
         interaction: discord.Interaction,
-        opponent_name: HuskerSched2023,
+        opponent_name: HuskerSched2024,
     ) -> None:
-        logger.info(f"Gathering info for lines")
+        logger.info("Gathering info for lines")
 
         await interaction.response.defer()
 
@@ -234,7 +236,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         consensus = consensus or "TBD"
 
         embed: discord.Embed = buildEmbed(
-            title=f"Opponent Betting Lines",
+            title="Opponent Betting Lines",
             fields=[
                 dict(name="Opponent Name", value=opponent_name.title()),
                 dict(
@@ -249,7 +251,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
         )
 
         await interaction.followup.send(embed=embed)
-        logger.info(f"Lines completed")
+        logger.info("Lines completed")
 
     @app_commands.command(
         name="compare-teams-stats", description="Compare two team's season stats"

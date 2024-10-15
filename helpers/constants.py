@@ -28,7 +28,7 @@ key = load_key()
 logger.info("Encryption key loaded")
 
 # DEBUGGING Save decrypted file
-run = False
+run = True
 if run:
     decrypt(env_file, key)
     encrypt(env_file, key)
