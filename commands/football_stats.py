@@ -382,12 +382,12 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
 
         logger.info(f"Found player {player_name.upper()}")
 
-        api_season_stat_result: list[
-            cfbd.PlayerSeasonStat
-        ] = api.get_player_season_stats(
-            year=year,
-            season_type="both",
-            team=BigTenTeams.Nebraska.value,
+        api_season_stat_result: list[cfbd.PlayerSeasonStat] = (
+            api.get_player_season_stats(
+                year=year,
+                season_type="both",
+                team=BigTenTeams.Nebraska.value,
+            )
         )
 
         if api_season_stat_result:
