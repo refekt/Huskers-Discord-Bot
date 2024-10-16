@@ -130,18 +130,18 @@ class BigTenTeams(str, enum.Enum):
 
 
 class HuskerSched2024(enum.StrEnum):
+    UTEP = "UTEP"
     Colorado = "Colorado"
-    Illinois = "Illinois"
-    Indiana = "Indiana"
-    Iowa = "Iowa"
     Northern_Iowa = "Northern Iowa"
-    Ohio_State = "Ohio State"
+    Illinois = "Illinois"
     Purdue = "Purdue"
     Rutgers = "Rutgers"
+    Indiana = "Indiana"
+    Ohio_State = "Ohio State"
     UCLA = "UCLA"
     USC = "USC"
-    UTEP = "UTEP"
     Wisconsin = "Wisconsin"
+    Iowa = "Iowa"
 
     def __str__(self) -> str:
         current_year: int = 2024
