@@ -31,7 +31,7 @@ from objects.Bets_Stats_Schedule import (
     BetLines,
     BigTenTeams,
     FootballTeam,
-    HuskerSched2024,
+    HuskerSched2025,
     buildTeam,
     getConsensusLineByOpponent,
     getHuskerOpponent,
@@ -60,7 +60,7 @@ for _ in range(0, FIELDS_LIMIT - 1, 1):
 
 
 async def gen_countdown(
-    opponent_name: HuskerSched2024 | str,
+    opponent_name: HuskerSched2025 | str,
 ) -> discord.Embed:
     year: int = datetime.now().year
 
@@ -136,7 +136,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def countdown(
         self,
         interaction,  #: discord.Interaction,
-        opponent_name: HuskerSched2024,
+        opponent_name: HuskerSched2025,
     ) -> None:
         # logger.info(f"Starting countdown")
         # await interaction.response.defer()
@@ -214,7 +214,7 @@ class FootballStatsCog(commands.Cog, name="Football Stats Commands"):
     async def lines(
         self,
         interaction: discord.Interaction,
-        opponent_name: HuskerSched2024,
+        opponent_name: HuskerSched2025,
     ) -> None:
         logger.info("Gathering info for lines")
 

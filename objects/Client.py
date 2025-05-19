@@ -43,7 +43,7 @@ from helpers.mysql import (
     sqlInsertXword,
 )
 from helpers.slowking import makeSlowking
-from objects.Bets_Stats_Schedule import HuskerSched2024
+from objects.Bets_Stats_Schedule import HuskerSched2025
 
 # from helpers.twitter import start_twitter_stream
 from objects.Exceptions import ChangelogException, MySQLException
@@ -429,8 +429,8 @@ class HuskerClient(Bot):
 
                 previous_team: str = ""
 
-                for oppo_index, oppo in enumerate(reversed(HuskerSched2024)):
-                    if oppo_index == len(HuskerSched2024):
+                for oppo_index, oppo in enumerate(reversed(HuskerSched2025)):
+                    if oppo_index == len(HuskerSched2025):
                         return "N/A"
 
                     oppo_split = str(oppo).split("__")
