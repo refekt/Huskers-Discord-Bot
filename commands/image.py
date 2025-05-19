@@ -5,12 +5,8 @@ import difflib
 import enum
 import io
 import logging
-import pathlib
-import platform
 import random
 from asyncio import Task
-from os import listdir
-from os.path import isfile, join
 from typing import Optional, Any, Union
 
 import aiohttp
@@ -61,7 +57,7 @@ def retrieve_all_img() -> Union[dict, list[dict, ...], None]:
     try:
         return processMySQL(query=sqlSelectAllImageCommand, fetch="all")
     except:  # noqa
-        raise ImageException(f"Unable to retrieve image commands.")
+        raise ImageException("Unable to retrieve image commands.")
 
 
 all_imgs: Union[dict, list[dict], None] = retrieve_all_img()
@@ -111,7 +107,7 @@ async def gatherAiImageResults(_prompt: str) -> dict[str]:
             if r.status == 200:
                 return await r.json()
             elif r.status == 524:
-                raise ImageException(f"The API called timed out.")
+                raise ImageException("The API called timed out.")
             else:
                 raise ImageException(f"API Returned {r.status}: {r.reason}")
 
@@ -474,27 +470,27 @@ class ImageCog(commands.Cog, name="Image Commands"):
 
         del image
 
-    @app_commands.command(name="twos", description="Random Tunnel Walk of Shame image")
-    @app_commands.guilds(discord.Object(id=GUILD_PROD))
-    async def tunnel_walk(self, interaction: discord.Interaction) -> None:
-        logger.info("Grabbing a random TWOS image")
-        await interaction.response.defer()
-
-        if "Windows" in platform.platform():
-            twos_path: str = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
-        else:
-            twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/TWOS/"
-
-        twos_files: list[str] = [
-            file for file in listdir(twos_path) if isfile(join(twos_path, file))
-        ]
-
-        random.shuffle(twos_files)
-
-        with open(f"{twos_path}{random.choice(twos_files)}", "rb") as f:
-            file = discord.File(f)  # noqa
-
-        await interaction.followup.send(file=file)
+    # @app_commands.command(name="twos", description="Random Tunnel Walk of Shame image")
+    # @app_commands.guilds(discord.Object(id=GUILD_PROD))
+    # async def tunnel_walk(self, interaction: discord.Interaction) -> None:
+    #     logger.info("Grabbing a random TWOS image")
+    #     await interaction.response.defer()
+    #
+    #     if "Windows" in platform.platform():
+    #         twos_path: str = f"{pathlib.Path(__file__).parent.parent.resolve()}\\resources\\images\\TWOS\\"
+    #     else:
+    #         twos_path = f"{pathlib.Path(__file__).parent.parent.resolve()}/resources/images/TWOS/"
+    #
+    #     twos_files: list[str] = [
+    #         file for file in listdir(twos_path) if isfile(join(twos_path, file))
+    #     ]
+    #
+    #     random.shuffle(twos_files)
+    #
+    #     with open(f"{twos_path}{random.choice(twos_files)}", "rb") as f:
+    #         file = discord.File(f)  # noqa
+    #
+    #     await interaction.followup.send(file=file)
 
     @app_commands.command(
         name="ai-image",
@@ -537,16 +533,14 @@ class ImageCog(commands.Cog, name="Image Commands"):
                 f"AI created image has been made and sent to {bot_spam.mention}",
             )
         except Forbidden:
-            logger.exception(f"Not enough permissions to send a message.")
+            logger.exception("Not enough permissions to send a message.")
         except HTTPException:
-            logger.exception(f"The message failed send.")
+            logger.exception("The message failed send.")
         except ValueError:
-            logger.exception(
-                f"The files or embeds list is not of the appropriate size."
-            )
+            logger.exception("The files or embeds list is not of the appropriate size.")
         except TypeError:
             logger.exception(
-                f"You specified both file and files, or you specified both embed and embeds, or the reference object is not a Message, MessageReference or PartialMessage."
+                "You specified both file and files, or you specified both embed and embeds, or the reference object is not a Message, MessageReference or PartialMessage."
             )
 
         asyncio_logger.debug("sendAiImage task completed")
