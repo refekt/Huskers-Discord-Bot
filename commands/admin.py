@@ -602,20 +602,20 @@ class AdminCog(commands.Cog, name="Admin Commands"):
         except subprocess.CalledProcessError as e:
             raise SSHException(f"Status Code: {e.returncode}, Output: {e.output}")
 
-    @group_restart.command(name="twitter", description="Restart the twitter stream")
-    async def twitter(self, interaction: discord.Interaction) -> None:
-        logger.info("Restarting the twitter bot")
-        await interaction.response.defer(ephemeral=True)
-
-        from helpers.twitter import start_twitter_stream
-
-        await start_twitter_stream(client=interaction.client)
-
-        await interaction.followup.send("Twitter stream has been restarted!")
-        admin_channel: discord.TextChannel = interaction.client.get_channel(CHAN_ADMIN)
-        if admin_channel is not None:
-            await admin_channel.send("The Twitter stream has been restarted!")
-        logger.info("Twitter stream restarted!")
+    # @group_restart.command(name="twitter", description="Restart the twitter stream")
+    # async def twitter(self, interaction: discord.Interaction) -> None:
+    #     logger.info("Restarting the twitter bot")
+    #     await interaction.response.defer(ephemeral=True)
+    #
+    #     from helpers.twitter import start_twitter_stream
+    #
+    #     await start_twitter_stream(client=interaction.client)
+    #
+    #     await interaction.followup.send("Twitter stream has been restarted!")
+    #     admin_channel: discord.TextChannel = interaction.client.get_channel(CHAN_ADMIN)
+    #     if admin_channel is not None:
+    #         await admin_channel.send("The Twitter stream has been restarted!")
+    #     logger.info("Twitter stream restarted!")
 
     async def proess_nebraska(  # noqa
         self, interaction: discord.Interaction, who: discord.Member
